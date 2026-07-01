@@ -1,0 +1,317 @@
+package core
+
+import std.unittest.*
+import std.unittest.testmacro.*
+
+@Test
+class CjTuiBoundaryExtremeTest {
+    @TestCase
+    func zeroSizedBuffersIgnoreWritesAndHaveEmptyDiff(): Unit {
+        let empty = Buffer(Rect(0, 0, 0, 0))
+        empty.setString(0, 0, "ignored")
+        @Expect(empty.getCell(0, 0).symbol, " ")
+        @Expect(empty.diff(Buffer(Rect(0, 0, 0, 0))).size, 0)
+    }
+
+    @TestCase
+    func bufferWriteAtRightEdgeTruncatesSafely(): Unit {
+        let buffer = Buffer(Rect(0, 0, 3, 1))
+        buffer.setString(2, 0, "abc")
+        @Expect(buffer.getCell(2, 0).symbol, "a")
+        @Expect(buffer.getCell(0, 0).symbol, " ")
+    }
+
+    @TestCase
+    func bufferWideCharAtRightEdgeDoesNotWriteContinuationOutsideArea(): Unit {
+        let buffer = Buffer(Rect(0, 0, 3, 1))
+        buffer.setString(2, 0, "界")
+        @Expect(buffer.getCell(2, 0).symbol, " ")
+        @Expect(buffer.getCell(3, 0).symbol, " ")
+    }
+
+    @TestCase
+    func bufferWideCharOverwriteClearsOldContinuation(): Unit {
+        let buffer = Buffer(Rect(0, 0, 5, 1))
+        buffer.setString(0, 0, "界")
+        buffer.setString(1, 0, "x")
+        @Expect(buffer.getCell(0, 0).symbol, " ")
+        @Expect(buffer.getCell(1, 0).symbol, "x")
+    }
+
+    @TestCase
+    func bufferResizeToSmallerAreaKeepsIntersection(): Unit {
+        let buffer = Buffer(Rect(0, 0, 5, 2))
+        buffer.setString(1, 1, "xy")
+        let resized = buffer.resize(Rect(0, 0, 2, 2))
+        @Expect(resized.getCell(1, 1).symbol, "x")
+        @Expect(resized.getCell(2, 1).symbol, " ")
+    }
+
+    @TestCase
+    func bufferDiffAgainstDifferentAreaTreatsEveryCellAsChanged(): Unit {
+        let before = Buffer(Rect(0, 0, 1, 1))
+        let after = Buffer(Rect(0, 0, 3, 2))
+        @Expect(after.diff(before).size, 6)
+    }
+
+    @TestCase
+    func layoutEmptyConstraintsReturnNoRects(): Unit {
+        @Expect(Layout.horizontal([]).split(Rect(0, 0, 10, 1)).size, 0)
+        @Expect(Layout.vertical([]).split(Rect(0, 0, 10, 1)).size, 0)
+    }
+
+    @TestCase
+    func layoutZeroAreaProducesZeroSizedRects(): Unit {
+        let chunks = Layout.horizontal([Constraint.Length(3), Constraint.Min(1)]).split(Rect(0, 0, 0, 0))
+        @Expect(chunks.size, 2)
+        @Expect(chunks[0].width, 0)
+        @Expect(chunks[1].height, 0)
+    }
+
+    @TestCase
+    func layoutHugeGapCannotCreateNegativeWidths(): Unit {
+        let chunks = Layout.horizontal([Constraint.Length(3), Constraint.Length(3)]).withGap(100).split(Rect(0, 0, 4, 1))
+        @Expect(chunks.size, 2)
+        @Expect(chunks[0].width >= 0)
+        @Expect(chunks[1].width >= 0)
+    }
+
+    @TestCase
+    func layoutPercentAndRatioClampInvalidInputs(): Unit {
+        let chunks = Layout.horizontal([
+            Constraint.Percent(150),
+            Constraint.Percent(-10),
+            Constraint.Ratio(1, 0),
+            Constraint.Ratio(-1, 2)
+        ]).split(Rect(0, 0, 20, 1))
+        @Expect(chunks.size, 4)
+        @Expect(chunks[0].width <= 20)
+        @Expect(chunks[1].width, 0)
+        @Expect(chunks[2].width, 0)
+        @Expect(chunks[3].width, 0)
+    }
+
+    @TestCase
+    func spacingLargerThanAreaClampsInnerSizeToZero(): Unit {
+        let inner = Spacing.all(10).inner(Rect(1, 2, 3, 4))
+        @Expect(inner.x, 11)
+        @Expect(inner.y, 12)
+        @Expect(inner.width, 0)
+        @Expect(inner.height, 0)
+    }
+
+    @TestCase
+    func gridWithEmptyRowsOrColumnsReturnsEmptyShape(): Unit {
+        @Expect(Grid([], [Constraint.Length(1)]).split(Rect(0, 0, 3, 3)).size, 0)
+        let rows = Grid([Constraint.Length(1)], []).split(Rect(0, 0, 3, 3))
+        @Expect(rows.size, 1)
+        @Expect(rows[0].size, 0)
+    }
+
+    @TestCase
+    func flexLayoutWithNoItemsReturnsNoRects(): Unit {
+        @Expect(FlexLayout(Direction.Horizontal, []).split(Rect(0, 0, 10, 1)).size, 0)
+    }
+
+    @TestCase
+    func flexLayoutHugeGapKeepsNonNegativeRects(): Unit {
+        let chunks = FlexLayout(Direction.Horizontal, [FlexItem(basis: 2), FlexItem(basis: 2)], gap: 50).split(Rect(0, 0, 5, 1))
+        @Expect(chunks.size, 2)
+        @Expect(chunks[0].width >= 0)
+        @Expect(chunks[1].width >= 0)
+    }
+
+    @TestCase
+    func layoutCacheReusesUntilInvalidated(): Unit {
+        let cache = LayoutCache()
+        let first = cache.get(Rect(0, 0, 10, 1), { area => [area] })
+        let second = cache.get(Rect(0, 0, 10, 1), { area => [Rect(area.x + 1, area.y, area.width, area.height)] })
+        @Expect(first.size, 1)
+        @Expect(second.size, 1)
+        @Expect(second[0].x, 0)
+        cache.invalidate()
+        let third = cache.get(Rect(0, 0, 10, 1), { area => [Rect(area.x + 1, area.y, area.width, area.height)] })
+        @Expect(third[0].x, 1)
+    }
+
+    @TestCase
+    func eventParserKeepsPartialUtf8UntilComplete(): Unit {
+        let parser = EventParser()
+        @Expect(parser.push([0xE7]).size, 0)
+        @Expect(parser.push([0x95]).size, 0)
+        let events = parser.push([0x8C])
+        @Expect(events.size, 1)
+        match (events[0]) {
+            case Event.KeyDown(k) => match (k.code) {
+                case KeyCode.Char(r'界') => ()
+                case _ => @Expect(false)
+            }
+            case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func eventParserKeepsPartialCsiUntilTerminator(): Unit {
+        let parser = EventParser()
+        @Expect(parser.push([0x1B, b'[']).size, 0)
+        let events = parser.push([b'A'])
+        @Expect(events.size, 1)
+        match (events[0]) {
+            case Event.KeyDown(k) => match (k.code) {
+                case KeyCode.Up => ()
+                case _ => @Expect(false)
+            }
+            case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func eventParserUnknownMouseSequenceDoesNotCrash(): Unit {
+        let events = EventParser().push(unsafe { "\u{1B}[<badM".rawData() })
+        @Expect(events.size, 1)
+        match (events[0]) {
+            case Event.Unknown(bytes) => @Expect(bytes.size > 0)
+            case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func eventParserPartialBracketedPasteWaitsForEndMarker(): Unit {
+        let parser = EventParser()
+        @Expect(parser.push(unsafe { "\u{1B}[200~hello".rawData() }).size, 0)
+        let events = parser.push(unsafe { "\u{1B}[201~".rawData() })
+        @Expect(events.size, 1)
+        match (events[0]) {
+            case Event.Paste(text) => @Expect(text, "hello")
+            case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func textBufferEmptyNeedlesAreNoops(): Unit {
+        let buffer = TextBuffer(text: "abc")
+        match (buffer.find("")) {
+            case Some(_) => @Expect(false)
+            case None => ()
+        }
+        @Expect(buffer.findAll("").size, 0)
+        @Expect(buffer.replaceAll("", "x"), 0)
+        @Expect(buffer.text(), "abc")
+    }
+
+    @TestCase
+    func textBufferClampExtremePositions(): Unit {
+        let buffer = TextBuffer(text: "a\nbc")
+        @Expect(buffer.clampPosition(TextPosition(99, 99)), TextPosition(1, 2))
+        @Expect(buffer.clampPosition(TextPosition(0, 99)), TextPosition(0, 1))
+    }
+
+    @TestCase
+    func textBufferDeleteAcrossWholeDocumentLeavesSingleEmptyLine(): Unit {
+        let buffer = TextBuffer(text: "one\ntwo\nthree")
+        _ = buffer.deleteRange(TextRange(TextPosition(0, 0), TextPosition(2, 5)))
+        @Expect(buffer.lineCount(), 1)
+        @Expect(buffer.text(), "")
+    }
+
+    @TestCase
+    func textBufferLargeInsertFindAndUndo(): Unit {
+        let buffer = TextBuffer(text: "")
+        var text = ""
+        for (_ in 0..200) { text += "x" }
+        _ = buffer.insert(TextPosition(0, 0), text + "END")
+        match (buffer.find("END")) {
+            case Some(pos) => @Expect(pos.column, 200)
+            case None => @Expect(false)
+        }
+        @Expect(buffer.undo())
+        @Expect(buffer.text(), "")
+    }
+
+    @TestCase
+    func paragraphZeroAreaAndHugeTextDoNotMutateBuffer(): Unit {
+        let buffer = Buffer(Rect(0, 0, 4, 1))
+        buffer.setString(0, 0, "keep")
+        var text = ""
+        for (_ in 0..200) { text += "x" }
+        Paragraph(text).render(Rect(0, 0, 0, 0), buffer)
+        @Expect(buffer.getCell(0, 0).symbol, "k")
+    }
+
+    @TestCase
+    func paragraphTinyWidthWrapsCjkWithoutOverflow(): Unit {
+        let buffer = Buffer(Rect(0, 0, 2, 4))
+        Paragraph("界界界").render(buffer.area, buffer)
+        @Expect(buffer.getCell(0, 0).symbol, "界")
+        @Expect(buffer.getCell(0, 1).symbol, "界")
+    }
+
+    @TestCase
+    func inputExtremeCursorClampsToRuneBoundary(): Unit {
+        let input = Input(value: "a界b", cursor: 999)
+        @Expect(input.cursor, "a界b".size)
+        @Expect(input.handle(KeyEvent(KeyCode.Left)))
+        @Expect(input.cursor < "a界b".size)
+    }
+
+    @TestCase
+    func inputZeroWidthCursorPositionDoesNotOverflow(): Unit {
+        let input = Input(value: "abcdef", cursor: 6)
+        let pos = input.cursorPosition(Rect(10, 5, 0, 1))
+        @Expect(pos.x, 10)
+        @Expect(pos.y, 5)
+    }
+
+    @TestCase
+    func listStateEmptyTotalClearsSelectionAndOffset(): Unit {
+        let state = ListState(selected: Some(10), offset: 7)
+        state.move(1, 0, viewportHeight: 3)
+        match (state.selected) {
+            case Some(_) => @Expect(false)
+            case None => ()
+        }
+        @Expect(state.offset, 0)
+    }
+
+    @TestCase
+    func listRenderEmptyAndTinyAreaDoesNotCrash(): Unit {
+        let buffer = Buffer(Rect(0, 0, 1, 1))
+        List([]).render(Rect(0, 0, 1, 1), buffer)
+        @Expect(buffer.getCell(0, 0).symbol, " ")
+        List(["one"]).render(Rect(0, 0, 0, 0), buffer)
+        @Expect(buffer.getCell(0, 0).symbol, " ")
+    }
+
+    @TestCase
+    func testBackendSnapshotsTrackMultipleFramesAndOutOfRange(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 4, 1))
+        let terminal = Terminal(backend)
+        terminal.draw { frame => frame.renderWidget(Paragraph("one"), frame.area) }
+        terminal.draw { frame => frame.renderWidget(Paragraph("two"), frame.area) }
+        @Expect(backend.snapshots().size, 2)
+        @Expect(backend.snapshotAt(-1), "")
+        @Expect(backend.snapshotAt(99), "")
+        @Expect(backend.snapshotAt(0).contains("one"))
+        @Expect(backend.snapshotAt(1).contains("two"))
+    }
+
+    @TestCase
+    func virtualTableLargeRowCountNavigationStaysBounded(): Unit {
+        let table = VirtualTable([TableColumn("ID", width: 4)], 10000, { index => ["${index}"] })
+        @Expect(table.handle(KeyEvent(KeyCode.End), 5))
+        match (table.selectedRow) {
+            case Some(row) => @Expect(row, 9999)
+            case None => @Expect(false)
+        }
+        @Expect(table.offset <= 9999)
+    }
+
+    @TestCase
+    func documentViewEmptyAndTinyWidthAreSafe(): Unit {
+        let empty = DocumentView(Document([]))
+        @Expect(empty.renderedLineCount(0), 0)
+        let buffer = Buffer(Rect(0, 0, 1, 1))
+        DocumentView(Document([DocumentLine(DocumentLineKind.Paragraph, "abcdef")])).render(buffer.area, buffer)
+        @Expect(!buffer.getCell(0, 0).symbol.isEmpty())
+    }
+}

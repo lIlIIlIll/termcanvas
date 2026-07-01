@@ -1,0 +1,6 @@
+target/
+.cache/
+*.cjo
+
+!docs/api-index.txt
+!packages/core/tests/fixtures/file_picker/notes.txt

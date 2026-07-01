@@ -1,0 +1,957 @@
+packages/core/src/app.cj:1003:public class ScenarioResult {
+packages/core/src/app.cj:1017:public struct SnapshotDiffResult {
+packages/core/src/app.cj:1042:public class SnapshotDiff {
+packages/core/src/app.cj:1083:public class EventScenario {
+packages/core/src/app.cj:108:public class AppMetrics {
+packages/core/src/app.cj:1091:    public func add(step: ScenarioStep): EventScenario {
+packages/core/src/app.cj:1096:    public func event(event: Event): EventScenario {
+packages/core/src/app.cj:1100:    public func key(key: KeyEvent): EventScenario {
+packages/core/src/app.cj:1104:    public func paste(text: String): EventScenario {
+packages/core/src/app.cj:1108:    public func message(text: String): EventScenario {
+packages/core/src/app.cj:1112:    public func tick(): EventScenario {
+packages/core/src/app.cj:1116:    public func expectFlow(flow: ControlFlow): EventScenario {
+packages/core/src/app.cj:1120:    public func expectSnapshot(snapshot: String): EventScenario {
+packages/core/src/app.cj:1124:    public func expectCell(x: Int64, y: Int64, symbol: String): EventScenario {
+packages/core/src/app.cj:1128:    public func size(): Int64 {
+packages/core/src/app.cj:113:    public func record(frame: FrameMetrics): Unit {
+packages/core/src/app.cj:1174:    public func run(backend: TestBackend, render: (Frame) -> Unit, update: (Event) -> UpdateResult): ScenarioResult {
+packages/core/src/app.cj:117:    public func record(
+packages/core/src/app.cj:1212:public enum HeadlessStep {
+packages/core/src/app.cj:1221:public class HeadlessScript {
+packages/core/src/app.cj:1230:    public func add(step: HeadlessStep): HeadlessScript {
+packages/core/src/app.cj:1235:    public func event(event: Event): HeadlessScript { add(HeadlessStep.Input(event)) }
+packages/core/src/app.cj:1236:    public func key(key: KeyEvent): HeadlessScript { event(Event.KeyDown(key)) }
+packages/core/src/app.cj:1237:    public func mouse(event: MouseEvent): HeadlessScript { this.event(Event.Mouse(event)) }
+packages/core/src/app.cj:1238:    public func paste(text: String): HeadlessScript { event(Event.Paste(text)) }
+packages/core/src/app.cj:1239:    public func message(text: String): HeadlessScript { event(Event.Message(text)) }
+packages/core/src/app.cj:1240:    public func resize(area: Rect): HeadlessScript { add(HeadlessStep.Resize(area)) }
+packages/core/src/app.cj:1241:    public func tick(count!: Int64 = 1): HeadlessScript { add(HeadlessStep.Tick(count)) }
+packages/core/src/app.cj:1242:    public func render(): HeadlessScript { add(HeadlessStep.Render) }
+packages/core/src/app.cj:1243:    public func expectSnapshot(snapshot: String): HeadlessScript { add(HeadlessStep.ExpectSnapshot(snapshot)) }
+packages/core/src/app.cj:1244:    public func expectCell(x: Int64, y: Int64, symbol: String): HeadlessScript { add(HeadlessStep.ExpectCell(x, y, symbol)) }
+packages/core/src/app.cj:1246:    public func steps(): Array<HeadlessStep> {
+packages/core/src/app.cj:1251:public struct HeadlessRunOptions {
+packages/core/src/app.cj:1273:public class HeadlessRunResult {
+packages/core/src/app.cj:1288:    public func passed(): Bool {
+packages/core/src/app.cj:1293:public class AppTestRunner {
+packages/core/src/app.cj:140:    public func lastFrame(): ?FrameMetrics {
+packages/core/src/app.cj:145:    public func frames(): Array<FrameMetrics> {
+packages/core/src/app.cj:1487:public class App {
+packages/core/src/app.cj:149:    public func averageFps(): Int64 {
+packages/core/src/app.cj:1545:    public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit {
+packages/core/src/app.cj:1549:    public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit {
+packages/core/src/app.cj:162:    public func droppedTicks(): Int64 {
+packages/core/src/app.cj:169:    public func reset(): Unit {
+packages/core/src/app.cj:1854:public class LinuxEpollEventWaiter <: EventWaiter {
+packages/core/src/app.cj:1881:    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit {
+packages/core/src/app.cj:189:public class TimerRuntime {
+packages/core/src/app.cj:2022:    public func close(): Unit {
+packages/core/src/app.cj:2117:public class FocusManager {
+packages/core/src/app.cj:2124:    public func add(id: String, enabled!: Bool = true): Unit {
+packages/core/src/app.cj:2132:    public func remove(id: String): Unit {
+packages/core/src/app.cj:2146:    public func focus(id: String): Bool {
+packages/core/src/app.cj:2153:    public func current(): ?String {
+packages/core/src/app.cj:2158:    public func isFocused(id: String): Bool {
+packages/core/src/app.cj:2165:    public func next(): ?String {
+packages/core/src/app.cj:2169:    public func previous(): ?String {
+packages/core/src/app.cj:2173:    public func handle(key: KeyEvent): Bool {
+packages/core/src/app.cj:281:public class AsyncRuntime {
+packages/core/src/app.cj:286:    public func start(id: String, task: () -> Event): Event {
+packages/core/src/app.cj:28:public enum ControlFlow {
+packages/core/src/app.cj:299:    public func startExec(id: String, commandLine: String): Event {
+packages/core/src/app.cj:303:    public func cancel(id: String): Bool {
+packages/core/src/app.cj:314:    public func drain(): Array<Event> {
+packages/core/src/app.cj:336:    public func pendingCount(): Int64 {
+packages/core/src/app.cj:33:public struct TimerSpec {
+packages/core/src/app.cj:341:public class Subscription {
+packages/core/src/app.cj:351:    public func poll(step!: Int64 = 1): ?Event {
+packages/core/src/app.cj:362:public interface EventWaiter {
+packages/core/src/app.cj:367:public class NoopEventWaiter <: EventWaiter {
+packages/core/src/app.cj:370:    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit {
+packages/core/src/app.cj:374:    public func close(): Unit {}
+packages/core/src/app.cj:377:public struct UpdateResult {
+packages/core/src/app.cj:399:public struct HandleResult {
+packages/core/src/app.cj:426:    public func toUpdateResult(): UpdateResult {
+packages/core/src/app.cj:431:public interface Component {
+packages/core/src/app.cj:437:public enum EventPhase {
+packages/core/src/app.cj:443:public enum EventPropagation {
+packages/core/src/app.cj:449:public class EventContext {
+packages/core/src/app.cj:463:    public func stopPropagation(): Unit {
+packages/core/src/app.cj:467:    public func isStopped(): Bool {
+packages/core/src/app.cj:472:public class StringState {
+packages/core/src/app.cj:47:public enum Command {
+packages/core/src/app.cj:480:    public func get(): String { value }
+packages/core/src/app.cj:482:    public func set(value: String): Unit {
+packages/core/src/app.cj:489:    public func isDirty(): Bool { dirty }
+packages/core/src/app.cj:490:    public func clearDirty(): Unit { dirty = false }
+packages/core/src/app.cj:493:public class IntState {
+packages/core/src/app.cj:501:    public func get(): Int64 { value }
+packages/core/src/app.cj:503:    public func set(value: Int64): Unit {
+packages/core/src/app.cj:510:    public func isDirty(): Bool { dirty }
+packages/core/src/app.cj:511:    public func clearDirty(): Unit { dirty = false }
+packages/core/src/app.cj:514:public class ViewNode {
+packages/core/src/app.cj:552:    public func add(child: ViewNode): ViewNode {
+packages/core/src/app.cj:558:    public func setText(text: String): ViewNode {
+packages/core/src/app.cj:564:    public func setMedia(source: MediaSource): ViewNode {
+packages/core/src/app.cj:570:    public func clearMedia(): ViewNode {
+packages/core/src/app.cj:576:    public func textContent(): String {
+packages/core/src/app.cj:580:    public func addClass(name: String): ViewNode {
+packages/core/src/app.cj:588:    public func removeClass(name: String): ViewNode {
+packages/core/src/app.cj:599:    public func hasClass(name: String): Bool {
+packages/core/src/app.cj:606:    public func setState(name: String, enabled!: Bool = true): ViewNode {
+packages/core/src/app.cj:624:    public func hasState(name: String): Bool {
+packages/core/src/app.cj:631:    public func setInlineStyle(style: StyleDeclaration): ViewNode {
+packages/core/src/app.cj:637:    public func inlineStyle(): StyleDeclaration {
+packages/core/src/app.cj:641:    public func setComputedStyle(style: ComputedStyle): Unit {
+packages/core/src/app.cj:645:    public func computedStyle(): ComputedStyle {
+packages/core/src/app.cj:649:    public func setPart(name: String): ViewNode {
+packages/core/src/app.cj:655:    public func partName(): String {
+packages/core/src/app.cj:659:    public func parentNode(): ?ViewNode {
+packages/core/src/app.cj:663:    public func setArea(area: Rect): Unit {
+packages/core/src/app.cj:671:    public func setLayoutBox(area: Rect): Unit {
+packages/core/src/app.cj:675:    public func layoutBox(): Rect {
+packages/core/src/app.cj:679:    public func invalidate(): Unit {
+packages/core/src/app.cj:683:    public func clearDirty(): Unit {
+packages/core/src/app.cj:68:public struct FrameMetrics {
+packages/core/src/app.cj:690:    public func isDirty(): Bool {
+packages/core/src/app.cj:698:    public func childNodes(): Array<ViewNode> {
+packages/core/src/app.cj:702:    public func render(frame: Frame): Unit {
+packages/core/src/app.cj:725:    public func render(frame: Frame, sheet: StyleSheet): Unit {
+packages/core/src/app.cj:730:    public func dispatch(event: Event, focusId!: ?String = None): ControlFlow {
+packages/core/src/app.cj:734:    public func dispatchResult(event: Event, focusId!: ?String = None): HandleResult {
+packages/core/src/app.cj:760:    public func find(id: String): ?ViewNode {
+packages/core/src/app.cj:771:    public func queryByClass(name: String): Array<ViewNode> {
+packages/core/src/app.cj:826:public class EventRouter {
+packages/core/src/app.cj:836:    public func add(component: Component, focused!: Bool = true): Unit {
+packages/core/src/app.cj:844:    public func focusManager(): FocusManager {
+packages/core/src/app.cj:848:    public func componentCount(): Int64 {
+packages/core/src/app.cj:852:    public func render(frame: Frame, areas: Array<Rect>): Unit {
+packages/core/src/app.cj:859:    public func handle(event: Event): ControlFlow {
+packages/core/src/app.cj:863:    public func handle(event: Event, actionHandler: (String) -> ControlFlow): ControlFlow {
+packages/core/src/app.cj:867:    public func handleResult(event: Event): HandleResult {
+packages/core/src/app.cj:871:    public func handleResult(event: Event, actionHandler: (String) -> HandleResult): HandleResult {
+packages/core/src/app.cj:900:public class EventScript {
+packages/core/src/app.cj:909:    public func add(event: Event): EventScript {
+packages/core/src/app.cj:914:    public func key(key: KeyEvent): EventScript {
+packages/core/src/app.cj:918:    public func paste(text: String): EventScript {
+packages/core/src/app.cj:922:    public func message(text: String): EventScript {
+packages/core/src/app.cj:926:    public func tick(): EventScript {
+packages/core/src/app.cj:930:    public func resize(area: Rect): EventScript {
+packages/core/src/app.cj:934:    public func size(): Int64 {
+packages/core/src/app.cj:966:    public func run(update: (Event) -> ControlFlow): ControlFlow {
+packages/core/src/app.cj:976:    public func runWithCommands(update: (Event) -> UpdateResult): ControlFlow {
+packages/core/src/app.cj:996:public enum ScenarioStep {
+packages/core/src/buffer.cj:110:    public func copy(): Buffer {
+packages/core/src/buffer.cj:123:    public func diff(previous: Buffer): Array<DrawOp> {
+packages/core/src/buffer.cj:136:    public func addMedia(placement: MediaPlacement): Unit {
+packages/core/src/buffer.cj:140:    public func mediaPlacements(): Array<MediaPlacement> {
+packages/core/src/buffer.cj:145:public struct DrawOp {
+packages/core/src/buffer.cj:21:public class Buffer {
+packages/core/src/buffer.cj:31:    public func clear(style!: Style = Style.default()): Unit {
+packages/core/src/buffer.cj:44:    public func indexOf(x: Int64, y: Int64): ?Int64 {
+packages/core/src/buffer.cj:51:    public func setCell(x: Int64, y: Int64, cell: Cell): Unit {
+packages/core/src/buffer.cj:5:public struct Cell <: Equatable<Cell> {
+packages/core/src/buffer.cj:69:    public func getCell(x: Int64, y: Int64): Cell {
+packages/core/src/buffer.cj:76:    public func setString(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit {
+packages/core/src/buffer.cj:98:    public func resize(area: Rect): Buffer {
+packages/core/src/canvas.cj:103:    public func strokeRect(area: Rect, style: Style, horizontal!: String = "-", vertical!: String = "|", corner!: String = "+"): Unit {
+packages/core/src/canvas.cj:115:    public func drawLine(x1: Int64, y1: Int64, x2: Int64, y2: Int64, symbol: String, style: Style): Unit {
+packages/core/src/canvas.cj:12:public struct ViewportFit {
+packages/core/src/canvas.cj:138:    public func drawText(x: Int64, y: Int64, text: String, style: Style): Unit {
+packages/core/src/canvas.cj:160:    public func drawSprite(x: Int64, y: Int64, lines: Array<String>, style: Style): Unit {
+packages/core/src/canvas.cj:166:    public func composite(surface: Surface): Unit {
+packages/core/src/canvas.cj:177:public func centeredViewport(area: Rect, width: Int64, height: Int64): Rect {
+packages/core/src/canvas.cj:28:public class SizeGuard {
+packages/core/src/canvas.cj:37:    public func fit(area: Rect, policy!: ResizePolicy = ResizePolicy.Center): ViewportFit {
+packages/core/src/canvas.cj:50:public class Surface {
+packages/core/src/canvas.cj:5:public enum ResizePolicy {
+packages/core/src/canvas.cj:61:    public func canvas(): Canvas {
+packages/core/src/canvas.cj:65:    public func bufferView(): Buffer {
+packages/core/src/canvas.cj:70:public class Canvas {
+packages/core/src/canvas.cj:83:    public func withClip(area: Rect): Canvas {
+packages/core/src/canvas.cj:87:    public func translated(x: Int64, y: Int64): Canvas {
+packages/core/src/canvas.cj:91:    public func viewport(camera: Position): Canvas {
+packages/core/src/canvas.cj:95:    public func fillRect(area: Rect, style: Style): Unit {
+packages/core/src/command_widgets.cj:107:    public func handle(key: KeyEvent): Bool {
+packages/core/src/command_widgets.cj:126:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/command_widgets.cj:139:public class CommandPalette <: Widget {
+packages/core/src/command_widgets.cj:164:    public func handle(key: KeyEvent): ?String {
+packages/core/src/command_widgets.cj:17:public class Menu <: Widget {
+packages/core/src/command_widgets.cj:191:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/command_widgets.cj:227:public class Toast {
+packages/core/src/command_widgets.cj:239:public class ToastManager <: Widget {
+packages/core/src/command_widgets.cj:248:    public func push(toast: Toast): Unit {
+packages/core/src/command_widgets.cj:252:    public func count(): Int64 {
+packages/core/src/command_widgets.cj:256:    public func tick(): Unit {
+packages/core/src/command_widgets.cj:267:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/command_widgets.cj:277:public class Spinner <: Widget {
+packages/core/src/command_widgets.cj:288:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/command_widgets.cj:296:public class Dialog <: Widget {
+packages/core/src/command_widgets.cj:326:    public func handle(key: KeyEvent): ?String {
+packages/core/src/command_widgets.cj:340:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/command_widgets.cj:362:public class ConfirmDialog <: Widget {
+packages/core/src/command_widgets.cj:366:    public func handle(key: KeyEvent): ?Bool {
+packages/core/src/command_widgets.cj:373:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/command_widgets.cj:44:    public func handle(key: KeyEvent): ?String {
+packages/core/src/command_widgets.cj:5:public class MenuItem {
+packages/core/src/command_widgets.cj:66:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/command_widgets.cj:89:public class MenuBar <: Widget {
+packages/core/src/content_widgets.cj:111:    public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
+packages/core/src/content_widgets.cj:139:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:14:public enum TranscriptItemStatus {
+packages/core/src/content_widgets.cj:175:public class ComposerSubmit {
+packages/core/src/content_widgets.cj:182:public class Composer <: Widget {
+packages/core/src/content_widgets.cj:195:    public func handle(key: KeyEvent): ?ComposerSubmit {
+packages/core/src/content_widgets.cj:22:public class TranscriptItem {
+packages/core/src/content_widgets.cj:230:    public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool {
+packages/core/src/content_widgets.cj:239:    public func currentSlashHints(): Array<String> {
+packages/core/src/content_widgets.cj:248:    public func render(areaRect: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:266:public class ActivityStep {
+packages/core/src/content_widgets.cj:280:public class ActivityTimeline <: Widget {
+packages/core/src/content_widgets.cj:289:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:305:public class RequestDialog <: Widget {
+packages/core/src/content_widgets.cj:322:    public func handle(key: KeyEvent): ?String {
+packages/core/src/content_widgets.cj:334:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:343:public type DecisionDialog = RequestDialog
+packages/core/src/content_widgets.cj:437:public class SaveDiagnostic {
+packages/core/src/content_widgets.cj:447:public class EditorBuffer {
+packages/core/src/content_widgets.cj:464:    public func setReadOnly(readonly: Bool): Unit {
+packages/core/src/content_widgets.cj:469:    public func markSaved(path!: String = ""): Unit {
+packages/core/src/content_widgets.cj:476:    public func markSaveFailed(message: String): Unit {
+packages/core/src/content_widgets.cj:481:public class BufferSet {
+packages/core/src/content_widgets.cj:491:    public func size(): Int64 { buffers.size }
+packages/core/src/content_widgets.cj:493:    public func activeBuffer(): ?EditorBuffer {
+packages/core/src/content_widgets.cj:499:    public func add(buffer: EditorBuffer): Int64 {
+packages/core/src/content_widgets.cj:506:    public func openOrSelect(buffer: EditorBuffer): Int64 {
+packages/core/src/content_widgets.cj:519:    public func close(index: Int64): ?EditorBuffer {
+packages/core/src/content_widgets.cj:527:    public func next(): ?EditorBuffer {
+packages/core/src/content_widgets.cj:533:    public func previous(): ?EditorBuffer {
+packages/core/src/content_widgets.cj:539:    public func select(index: Int64): ?EditorBuffer {
+packages/core/src/content_widgets.cj:53:public class Transcript {
+packages/core/src/content_widgets.cj:545:    public func remember(path: String): Unit {
+packages/core/src/content_widgets.cj:559:    public func recentFiles(): Array<String> {
+packages/core/src/content_widgets.cj:563:    public func tabTitles(): Array<String> {
+packages/core/src/content_widgets.cj:572:public class SearchPanel <: Widget {
+packages/core/src/content_widgets.cj:583:    public func updateFrom(buffer: TextBuffer): Unit {
+packages/core/src/content_widgets.cj:587:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:593:public class ReplacePanel <: Widget {
+packages/core/src/content_widgets.cj:5:public enum TranscriptItemKind {
+packages/core/src/content_widgets.cj:605:    public func apply(buffer: TextBuffer): Int64 {
+packages/core/src/content_widgets.cj:60:    public func append(item: TranscriptItem): Unit {
+packages/core/src/content_widgets.cj:610:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:616:public class TextDocumentView <: Widget {
+packages/core/src/content_widgets.cj:629:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:638:public class SyntaxRule {
+packages/core/src/content_widgets.cj:647:public class SyntaxHighlighter {
+packages/core/src/content_widgets.cj:64:    public func size(): Int64 {
+packages/core/src/content_widgets.cj:652:    public func add(rule: SyntaxRule): Unit { rules.add(rule) }
+packages/core/src/content_widgets.cj:653:    public func styleFor(text: String): Style {
+packages/core/src/content_widgets.cj:661:public class SoftWrapView <: Widget {
+packages/core/src/content_widgets.cj:668:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:673:public class TextEditor <: Widget {
+packages/core/src/content_widgets.cj:684:    public func handle(key: KeyEvent): Bool { area.handle(key) }
+packages/core/src/content_widgets.cj:686:    public func render(areaRect: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:68:    public func get(index: Int64): ?TranscriptItem {
+packages/core/src/content_widgets.cj:72:    public func toArray(): Array<TranscriptItem> {
+packages/core/src/content_widgets.cj:76:    public func toggleCollapsed(id: String): Bool {
+packages/core/src/content_widgets.cj:87:public class TranscriptView <: Widget {
+packages/core/src/data_widgets.cj:110:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/data_widgets.cj:140:    public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
+packages/core/src/data_widgets.cj:186:    public func sortBy(column: Int64, descending!: Bool = false): Unit {
+packages/core/src/data_widgets.cj:18:    public func pageCount(): Int64 {
+packages/core/src/data_widgets.cj:192:    public func clearSort(): Unit {
+packages/core/src/data_widgets.cj:197:    public func resizeColumn(column: Int64, width: Int64): Bool {
+packages/core/src/data_widgets.cj:203:    public func setFrozenColumns(count: Int64): Unit {
+packages/core/src/data_widgets.cj:207:    public func setFilter(text: String): Unit {
+packages/core/src/data_widgets.cj:213:    public func toggleSelectedRow(): Unit {
+packages/core/src/data_widgets.cj:228:    public func isSelected(row: Int64): Bool {
+packages/core/src/data_widgets.cj:235:    public func selectedRowIndices(): Array<Int64> {
+packages/core/src/data_widgets.cj:23:    public func offset(): Int64 {
+packages/core/src/data_widgets.cj:27:    public func next(): Unit {
+packages/core/src/data_widgets.cj:31:    public func previous(): Unit {
+packages/core/src/data_widgets.cj:35:    public func handle(key: KeyEvent): Bool {
+packages/core/src/data_widgets.cj:377:public class TreeNode {
+packages/core/src/data_widgets.cj:393:    public func add(child: TreeNode): Unit {
+packages/core/src/data_widgets.cj:397:    public func childNodes(): Array<TreeNode> {
+packages/core/src/data_widgets.cj:402:public class Tree <: Widget {
+packages/core/src/data_widgets.cj:426:    public func toggleSelected(): Unit {
+packages/core/src/data_widgets.cj:433:    public func selectedId(): ?String {
+packages/core/src/data_widgets.cj:442:    public func selectById(id: String): Bool {
+packages/core/src/data_widgets.cj:453:    public func findById(id: String): ?TreeNode {
+packages/core/src/data_widgets.cj:463:    public func expandAll(): Unit {
+packages/core/src/data_widgets.cj:469:    public func collapseAll(): Unit {
+packages/core/src/data_widgets.cj:477:    public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
+packages/core/src/data_widgets.cj:489:    public func expandSelected(): Unit {
+packages/core/src/data_widgets.cj:496:    public func collapseSelected(): Unit {
+packages/core/src/data_widgets.cj:503:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/data_widgets.cj:54:public class TableColumn {
+packages/core/src/data_widgets.cj:587:public class FilePicker <: Widget {
+packages/core/src/data_widgets.cj:602:    public func refresh(): Unit {
+packages/core/src/data_widgets.cj:625:    public func selectedEntry(): ?String {
+packages/core/src/data_widgets.cj:633:    public func selectedPath(): ?String {
+packages/core/src/data_widgets.cj:640:    public func chooseSelected(): ?String {
+packages/core/src/data_widgets.cj:644:    public func setSearch(text: String): Unit {
+packages/core/src/data_widgets.cj:651:    public func toggleHidden(): Unit {
+packages/core/src/data_widgets.cj:656:    public func selectedInfo(): ?FileEntryInfo {
+packages/core/src/data_widgets.cj:665:    public func enterSelected(): Bool {
+packages/core/src/data_widgets.cj:66:public class VirtualTable <: Widget {
+packages/core/src/data_widgets.cj:680:    public func parent(): Bool {
+packages/core/src/data_widgets.cj:690:    public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
+packages/core/src/data_widgets.cj:6:public class Paginator {
+packages/core/src/data_widgets.cj:718:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/data_widgets.cj:723:public class FileEntryInfo {
+packages/core/src/document.cj:100:public struct DocumentTheme {
+packages/core/src/document.cj:187:    public func headingStyle(level: Int64): Style {
+packages/core/src/document.cj:19:public enum DocumentLineKind {
+packages/core/src/document.cj:200:public type MarkdownTheme = DocumentTheme
+packages/core/src/document.cj:201:public type MarkdownDocument = Document
+packages/core/src/document.cj:203:public class DocumentHighlight {
+packages/core/src/document.cj:213:public class DocumentFoldRange {
+packages/core/src/document.cj:222:    public func contains(offset: Int64): Bool {
+packages/core/src/document.cj:227:public class DocumentViewState {
+packages/core/src/document.cj:241:    public func folds(): Array<DocumentFoldRange> {
+packages/core/src/document.cj:245:    public func clearFolds(): Unit {
+packages/core/src/document.cj:249:    public func isFolded(startOffset: Int64, endOffset: Int64): Bool {
+packages/core/src/document.cj:256:    public func setFolded(startOffset: Int64, endOffset: Int64, folded: Bool): Unit {
+packages/core/src/document.cj:269:    public func toggleFold(startOffset: Int64, endOffset: Int64): Bool {
+packages/core/src/document.cj:276:public class DocumentView <: Widget {
+packages/core/src/document.cj:311:    public func renderedLineCount(width: Int64): Int64 {
+packages/core/src/document.cj:315:    public func sourceOffsetForRenderedLine(width: Int64, renderedLine: Int64): ?Int64 {
+packages/core/src/document.cj:327:    public func sourceOffsetAtRenderedLine(width: Int64, renderedLine: Int64): ?Int64 {
+packages/core/src/document.cj:331:    public func sourceOffsetsForRenderedLines(width: Int64): Array<Int64> {
+packages/core/src/document.cj:346:    public func renderedLineForSourceOffset(width: Int64, sourceOffset: Int64): Int64 {
+packages/core/src/document.cj:368:    public func linkAtRenderedLine(width: Int64, renderedLine: Int64): ?String {
+packages/core/src/document.cj:37:public class DocumentLine {
+packages/core/src/document.cj:380:    public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool {
+packages/core/src/document.cj:409:    public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64 {
+packages/core/src/document.cj:414:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/document.cj:567:public class MarkdownView <: Widget {
+packages/core/src/document.cj:594:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/document.cj:5:public class RichSpan {
+packages/core/src/document.cj:84:public class Document {
+packages/core/src/dom_style.cj:11:public enum CssFlexDirection {
+packages/core/src/dom_style.cj:122:    public func patch(declarations: StyleDeclaration): ComputedStyle {
+packages/core/src/dom_style.cj:16:public enum CssSelectorRelation {
+packages/core/src/dom_style.cj:183:    public func contentBox(area: Rect): Rect {
+packages/core/src/dom_style.cj:187:    public func copy(): ComputedStyle {
+packages/core/src/dom_style.cj:207:public class CssSelector {
+packages/core/src/dom_style.cj:238:    public func matches(node: ViewNode): Bool {
+packages/core/src/dom_style.cj:255:    public func specificity(): Int64 {
+packages/core/src/dom_style.cj:293:public class CssRule {
+packages/core/src/dom_style.cj:29:public class StyleDeclaration {
+packages/core/src/dom_style.cj:306:    public func matches(node: ViewNode): Bool {
+packages/core/src/dom_style.cj:310:    public func comesBefore(other: CssRule): Bool {
+packages/core/src/dom_style.cj:5:public enum CssDisplay {
+packages/core/src/dom_style.cj:66:public class ComputedStyle {
+packages/core/src/event.cj:111:public struct KeyEvent {
+packages/core/src/event.cj:133:public enum MouseButton {
+packages/core/src/event.cj:142:public enum MouseKind {
+packages/core/src/event.cj:150:public struct MouseEvent {
+packages/core/src/event.cj:165:public struct TickEvent {
+packages/core/src/event.cj:179:public enum TimerMode {
+packages/core/src/event.cj:184:public enum FrameMissPolicy {
+packages/core/src/event.cj:189:public struct TimerEvent {
+packages/core/src/event.cj:203:public enum Event {
+packages/core/src/event.cj:230:public struct PressedKey {
+packages/core/src/event.cj:250:public class InputState {
+packages/core/src/event.cj:259:    public func handle(event: Event): Array<Event> {
+packages/core/src/event.cj:274:    public func advance(deltaMillis: Int64): Array<Event> {
+packages/core/src/event.cj:291:    public func isPressed(key: KeyEvent): Bool {
+packages/core/src/event.cj:295:    public func pressedKeys(): Array<PressedKey> {
+packages/core/src/event.cj:29:public enum KeyProtocol {
+packages/core/src/event.cj:303:    public func modifiers(): KeyModifier {
+packages/core/src/event.cj:307:    public func clear(): Unit {
+packages/core/src/event.cj:35:public struct KeyModifier <: Equatable<KeyModifier> {
+packages/core/src/event.cj:362:public class EventParser {
+packages/core/src/event.cj:370:    public func push(bytes: Array<Byte>): Array<Event> {
+packages/core/src/event.cj:384:    public func readEvents(): Array<Event> {
+packages/core/src/event.cj:401:    public func readEvent(): ?Event {
+packages/core/src/event.cj:416:    public func lastReadBytes(): Int64 {
+packages/core/src/event.cj:420:    public func flushEsc(): Array<Event> {
+packages/core/src/event.cj:429:    public func flushEscAfterPolls(polls: Int64): Array<Event> {
+packages/core/src/event.cj:8:public enum KeyCode {
+packages/core/src/form_widgets.cj:133:    public func handle(key: KeyEvent): Bool {
+packages/core/src/form_widgets.cj:147:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/form_widgets.cj:171:public class Select <: Widget {
+packages/core/src/form_widgets.cj:192:    public func selectedValue(): ?String {
+packages/core/src/form_widgets.cj:196:    public func handle(key: KeyEvent): ?String {
+packages/core/src/form_widgets.cj:216:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/form_widgets.cj:233:public class Dropdown <: Widget {
+packages/core/src/form_widgets.cj:257:    public func selectedValue(): ?String {
+packages/core/src/form_widgets.cj:261:    public func handle(key: KeyEvent): ?String {
+packages/core/src/form_widgets.cj:288:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/form_widgets.cj:303:public class ColorPicker <: Widget {
+packages/core/src/form_widgets.cj:312:    public func selectedColor(): ?Color {
+packages/core/src/form_widgets.cj:316:    public func handle(key: KeyEvent): Bool {
+packages/core/src/form_widgets.cj:324:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/form_widgets.cj:336:public class MultiSelect <: Widget {
+packages/core/src/form_widgets.cj:351:    public func selectedIndices(): Array<Int64> { selectedItems.toArray() }
+packages/core/src/form_widgets.cj:353:    public func toggle(): Unit {
+packages/core/src/form_widgets.cj:35:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/form_widgets.cj:363:    public func handle(key: KeyEvent): Bool {
+packages/core/src/form_widgets.cj:372:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/form_widgets.cj:381:public class DatePicker <: Widget {
+packages/core/src/form_widgets.cj:392:    public func value(): String { "${year}-${pad2(month)}-${pad2(day)}" }
+packages/core/src/form_widgets.cj:394:    public func handle(key: KeyEvent): Bool {
+packages/core/src/form_widgets.cj:404:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/form_widgets.cj:49:public class Checkbox <: Widget {
+packages/core/src/form_widgets.cj:5:public class Button <: Widget {
+packages/core/src/form_widgets.cj:79:    public func handle(key: KeyEvent): Bool {
+packages/core/src/form_widgets.cj:89:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/form_widgets.cj:97:public class RadioGroup <: Widget {
+packages/core/src/geometry.cj:117:    public func withFlex(flex: Flex): Layout {
+packages/core/src/geometry.cj:121:    public func withGap(gap: Int64): Layout {
+packages/core/src/geometry.cj:125:    public func withMargin(margin: Spacing): Layout {
+packages/core/src/geometry.cj:129:    public func split(area: Rect): Array<Rect> {
+packages/core/src/geometry.cj:233:public struct SizeHint {
+packages/core/src/geometry.cj:24:public struct Position {
+packages/core/src/geometry.cj:258:public interface Sizable {
+packages/core/src/geometry.cj:262:public class Grid {
+packages/core/src/geometry.cj:275:    public func split(area: Rect): Array<Array<Rect>> {
+packages/core/src/geometry.cj:286:public struct FlexItem {
+packages/core/src/geometry.cj:298:public class FlexLayout {
+packages/core/src/geometry.cj:309:    public func split(area: Rect): Array<Rect> {
+packages/core/src/geometry.cj:331:public class LayoutCache {
+packages/core/src/geometry.cj:338:    public func get(area: Rect, compute: (Rect) -> Array<Rect>): Array<Rect> {
+packages/core/src/geometry.cj:33:public enum Direction {
+packages/core/src/geometry.cj:348:    public func invalidate(): Unit {
+packages/core/src/geometry.cj:38:public enum Constraint {
+packages/core/src/geometry.cj:3:public struct Rect <: Equatable<Rect> {
+packages/core/src/geometry.cj:46:public enum Flex {
+packages/core/src/geometry.cj:53:public struct Spacing {
+packages/core/src/geometry.cj:78:    public func inner(area: Rect): Rect {
+packages/core/src/geometry.cj:88:public class Layout {
+packages/core/src/keymap.cj:16:    public func matches(key: KeyEvent): Bool {
+packages/core/src/keymap.cj:24:public class KeyMap {
+packages/core/src/keymap.cj:33:    public func add(binding: KeyBinding): Unit {
+packages/core/src/keymap.cj:37:    public func actionFor(key: KeyEvent): ?String {
+packages/core/src/keymap.cj:44:    public func all(): Array<KeyBinding> {
+packages/core/src/keymap.cj:49:public class HelpView <: Widget {
+packages/core/src/keymap.cj:5:public class KeyBinding {
+packages/core/src/keymap.cj:60:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/lib_test.cj:103:    public func render(frame: Frame, area: Rect): Unit {
+packages/core/src/lib_test.cj:108:    public func handle(event: Event): HandleResult {
+packages/core/src/lib_test.cj:121:    public func focusId(): ?String {
+packages/core/src/lib_test.cj:12:    public func write(buffer: Array<Byte>): Unit {
+packages/core/src/lib_test.cj:18:    public func flush(): Unit {}
+packages/core/src/lib_test.cj:32:    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit {
+packages/core/src/lib_test.cj:39:    public func close(): Unit {
+packages/core/src/lib_test.cj:73:    public func render(frame: Frame): Unit {
+packages/core/src/lib_test.cj:77:    public func update(event: Event): ControlFlow {
+packages/core/src/media.cj:102:    public func sameRenderContent(other: MediaPlacement): Bool {
+packages/core/src/media.cj:113:public enum MediaOpKind {
+packages/core/src/media.cj:118:public class MediaOp {
+packages/core/src/media.cj:128:public struct MediaRuntimeOptions {
+packages/core/src/media.cj:140:public class MediaCacheEntry {
+packages/core/src/media.cj:14:public enum MediaProtocol {
+packages/core/src/media.cj:152:public class MediaCache {
+packages/core/src/media.cj:163:    public func get(key: String): ?MediaFrameData {
+packages/core/src/media.cj:175:    public func put(key: String, frame: MediaFrameData, bytes!: Int64 = 0): Unit {
+packages/core/src/media.cj:182:    public func size(): Int64 { entries.size }
+packages/core/src/media.cj:183:    public func byteSize(): Int64 { usedBytes }
+packages/core/src/media.cj:206:public class MediaRuntime {
+packages/core/src/media.cj:20:public enum MediaFit {
+packages/core/src/media.cj:218:    public func cacheKey(source: MediaSource, area: Rect, protocol: MediaProtocol, frameIndex!: Int64 = 0): String {
+packages/core/src/media.cj:222:    public func frameFor(source: MediaSource, area: Rect, protocol: MediaProtocol, frameIndex!: Int64 = 0): MediaFrameData {
+packages/core/src/media.cj:234:public func diffMediaPlacements(previous: Array<MediaPlacement>, next: Array<MediaPlacement>): Array<MediaOp> {
+packages/core/src/media.cj:254:public func mediaFallbackText(source: MediaSource): String {
+packages/core/src/media.cj:260:public func mediaProtocolName(protocol: MediaProtocol): String {
+packages/core/src/media.cj:27:public class MediaSource {
+packages/core/src/media.cj:41:public class MediaFrameData {
+packages/core/src/media.cj:5:public enum MediaKind {
+packages/core/src/media.cj:75:public class MediaPlacement {
+packages/core/src/navigation.cj:100:    public func handle(key: KeyEvent): Bool {
+packages/core/src/navigation.cj:10:public class ScreenStack {
+packages/core/src/navigation.cj:112:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/navigation.cj:125:public class StatusBarProgress {
+packages/core/src/navigation.cj:159:public class StatusBar <: Widget {
+packages/core/src/navigation.cj:15:    public func push(screen: Screen): Unit {
+packages/core/src/navigation.cj:177:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/navigation.cj:19:    public func pop(): ?Screen {
+packages/core/src/navigation.cj:213:public class Viewport <: Widget {
+packages/core/src/navigation.cj:226:    public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
+packages/core/src/navigation.cj:238:    public func scroll(delta: Int64, viewportHeight: Int64): Unit {
+packages/core/src/navigation.cj:242:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/navigation.cj:26:    public func replace(screen: Screen): Unit {
+packages/core/src/navigation.cj:33:    public func current(): ?Screen {
+packages/core/src/navigation.cj:38:    public func size(): Int64 {
+packages/core/src/navigation.cj:43:public class Modal <: Widget {
+packages/core/src/navigation.cj:5:public interface Screen {
+packages/core/src/navigation.cj:67:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/navigation.cj:82:public class Tabs <: Widget {
+packages/core/src/pty.cj:101:public struct PtyExitStatus {
+packages/core/src/pty.cj:119:public interface PtyProcess {
+packages/core/src/pty.cj:128:public interface PtyRuntime {
+packages/core/src/pty.cj:140:public enum EventSourceInterest {
+packages/core/src/pty.cj:146:public interface EventSource {
+packages/core/src/pty.cj:155:public class FakePtyProcess <: PtyProcess {
+packages/core/src/pty.cj:167:    public func id(): String { processId }
+packages/core/src/pty.cj:169:    public func write(bytes: Array<Byte>): Bool {
+packages/core/src/pty.cj:174:    public func writeText(text: String): Bool {
+packages/core/src/pty.cj:178:    public func resize(size: PtySize): Bool {
+packages/core/src/pty.cj:183:    public func signal(signal: PtySignal): Bool {
+packages/core/src/pty.cj:188:    public func close(): Unit {
+packages/core/src/pty.cj:193:public class FakePtyRuntime <: PtyRuntime {
+packages/core/src/pty.cj:199:    public func start(id: String, spec: PtySpec): Event {
+packages/core/src/pty.cj:206:    public func process(id: String): ?PtyProcess {
+packages/core/src/pty.cj:213:    public func fakeProcess(id: String): ?FakePtyProcess {
+packages/core/src/pty.cj:218:    public func sources(): Array<EventSource> { [] }
+packages/core/src/pty.cj:220:    public func injectOutput(id: String, bytes: Array<Byte>, stream!: PtyOutputStream = PtyOutputStream.Stdout): Unit {
+packages/core/src/pty.cj:224:    public func injectText(id: String, text: String, stream!: PtyOutputStream = PtyOutputStream.Stdout): Unit {
+packages/core/src/pty.cj:228:    public func injectExit(id: String, status: PtyExitStatus): Unit {
+packages/core/src/pty.cj:233:    public func injectFailure(id: String, message: String): Unit {
+packages/core/src/pty.cj:238:    public func write(id: String, bytes: Array<Byte>): Event {
+packages/core/src/pty.cj:246:    public func resize(id: String, size: PtySize): Event {
+packages/core/src/pty.cj:254:    public func signal(id: String, signal: PtySignal): Event {
+packages/core/src/pty.cj:262:    public func close(id: String): Event {
+packages/core/src/pty.cj:273:    public func drain(): Array<Event> {
+packages/core/src/pty.cj:281:    public func activeCount(): Int64 {
+packages/core/src/pty.cj:301:public class UnsupportedPtyRuntime <: PtyRuntime {
+packages/core/src/pty.cj:304:    public func start(id: String, spec: PtySpec): Event {
+packages/core/src/pty.cj:308:    public func process(id: String): ?PtyProcess {
+packages/core/src/pty.cj:313:    public func write(id: String, bytes: Array<Byte>): Event {
+packages/core/src/pty.cj:317:    public func resize(id: String, size: PtySize): Event {
+packages/core/src/pty.cj:321:    public func signal(id: String, signal: PtySignal): Event {
+packages/core/src/pty.cj:325:    public func close(id: String): Event {
+packages/core/src/pty.cj:329:    public func sources(): Array<EventSource> { [] }
+packages/core/src/pty.cj:331:    public func drain(): Array<Event> { [] }
+packages/core/src/pty.cj:333:    public func activeCount(): Int64 { 0 }
+packages/core/src/pty.cj:336:public class LinuxPtyRuntime <: PtyRuntime {
+packages/core/src/pty.cj:342:    public func start(id: String, spec: PtySpec): Event {
+packages/core/src/pty.cj:408:    public func process(id: String): ?PtyProcess {
+packages/core/src/pty.cj:415:    public func write(id: String, bytes: Array<Byte>): Event {
+packages/core/src/pty.cj:423:    public func resize(id: String, size: PtySize): Event {
+packages/core/src/pty.cj:431:    public func signal(id: String, signal: PtySignal): Event {
+packages/core/src/pty.cj:439:    public func close(id: String): Event {
+packages/core/src/pty.cj:449:    public func sources(): Array<EventSource> {
+packages/core/src/pty.cj:458:    public func drain(): Array<Event> {
+packages/core/src/pty.cj:479:    public func activeCount(): Int64 { processes.size }
+packages/core/src/pty.cj:494:public class LinuxPtyProcess <: PtyProcess & EventSource {
+packages/core/src/pty.cj:513:    public func id(): String { processId }
+packages/core/src/pty.cj:515:    public func fd(): ?Int32 {
+packages/core/src/pty.cj:519:    public func interests(): EventSourceInterest { EventSourceInterest.Read }
+packages/core/src/pty.cj:521:    public func stderrSource(): EventSource {
+packages/core/src/pty.cj:525:    public func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit {
+packages/core/src/pty.cj:540:    public func write(bytes: Array<Byte>): Bool {
+packages/core/src/pty.cj:552:    public func writeText(text: String): Bool {
+packages/core/src/pty.cj:556:    public func resize(size: PtySize): Bool {
+packages/core/src/pty.cj:572:    public func signal(signal: PtySignal): Bool {
+packages/core/src/pty.cj:577:    public func close(): Unit {
+packages/core/src/pty.cj:57:public enum PtyOutputStream {
+packages/core/src/pty.cj:618:    public func drain(): Array<Event> { [] }
+packages/core/src/pty.cj:620:    public func pollExit(): ?PtyExitStatus {
+packages/core/src/pty.cj:62:public struct PtySize {
+packages/core/src/pty.cj:637:    public func reap(): PtyExitStatus {
+packages/core/src/pty.cj:680:    public func id(): String { process.id() + ":stderr" }
+packages/core/src/pty.cj:681:    public func fd(): ?Int32 { process.stderrFdValue() }
+packages/core/src/pty.cj:682:    public func interests(): EventSourceInterest { EventSourceInterest.Read }
+packages/core/src/pty.cj:684:    public func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit {
+packages/core/src/pty.cj:689:    public func drain(): Array<Event> { [] }
+packages/core/src/pty.cj:690:    public func close(): Unit { process.closeStderrFdOnly() }
+packages/core/src/pty.cj:72:public class PtySpec {
+packages/core/src/pty.cj:94:public enum PtySignal {
+packages/core/src/style.cj:118:    public func serialize(): String {
+packages/core/src/style.cj:123:public enum StyleState {
+packages/core/src/style.cj:132:public class StyleClass {
+packages/core/src/style.cj:156:    public func resolve(state!: StyleState = StyleState.Normal, base!: Style = Style.default()): Style {
+packages/core/src/style.cj:168:public class StyleSheet {
+packages/core/src/style.cj:179:    public func add(styleClass: StyleClass): Unit {
+packages/core/src/style.cj:183:    public func addRule(rule: StyleRule): Unit {
+packages/core/src/style.cj:187:    public func addCssRule(rule: CssRule): Unit {
+packages/core/src/style.cj:192:    public func resolve(name: String, state!: StyleState = StyleState.Normal, base!: Style = Style.default()): Style {
+packages/core/src/style.cj:19:public struct Modifier <: Equatable<Modifier> {
+packages/core/src/style.cj:201:    public func resolveSelector(selector: String, state!: StyleState = StyleState.Normal, base!: Style = Style.default()): Style {
+packages/core/src/style.cj:211:    public func compute(node: ViewNode, inherited!: ComputedStyle = ComputedStyle.default()): ComputedStyle {
+packages/core/src/style.cj:219:    public func apply(root: ViewNode, area: Rect): Unit {
+packages/core/src/style.cj:223:    public func size(): Int64 {
+packages/core/src/style.cj:343:public class StyleRule {
+packages/core/src/style.cj:354:    public func matches(selector: String, state: StyleState): Bool {
+packages/core/src/style.cj:359:public struct DesignTokens {
+packages/core/src/style.cj:373:public class ThemePack {
+packages/core/src/style.cj:40:public struct Style <: Equatable<Style> {
+packages/core/src/style.cj:53:    public func withFg(color: Color): Style {
+packages/core/src/style.cj:59:    public func withBg(color: Color): Style {
+packages/core/src/style.cj:5:public enum Color {
+packages/core/src/style.cj:65:    public func withModifier(modifier: Modifier): Style {
+packages/core/src/style.cj:71:    public func patch(other: Style): Style {
+packages/core/src/style.cj:90:public struct Theme {
+packages/core/src/terminal.cj:1018:public class DebugOverlay <: Widget {
+packages/core/src/terminal.cj:1027:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/terminal.cj:1051:public class TerminalMode {
+packages/core/src/terminal.cj:105:    public func renderWidget(widget: Widget, area: Rect): Unit {
+packages/core/src/terminal.cj:109:    public func canvas(area!: Rect = this.area): Canvas {
+packages/core/src/terminal.cj:113:    public func renderNode(node: ViewNode, sheet: StyleSheet): Unit {
+packages/core/src/terminal.cj:118:    public func fill(area: Rect, style: Style): Unit {
+packages/core/src/terminal.cj:125:    public func addMedia(placement: MediaPlacement): Unit {
+packages/core/src/terminal.cj:129:    public func setCursor(position: Position): Unit {
+packages/core/src/terminal.cj:133:    public func getCursor(): ?Position {
+packages/core/src/terminal.cj:138:public enum RenderMode {
+packages/core/src/terminal.cj:143:public class Terminal {
+packages/core/src/terminal.cj:155:    public func draw(render: (Frame) -> Unit): RenderMetrics {
+packages/core/src/terminal.cj:208:    public func clear(): Unit {
+packages/core/src/terminal.cj:268:public enum KeyboardProtocolMode {
+packages/core/src/terminal.cj:275:public enum TerminalProbeMode {
+packages/core/src/terminal.cj:281:public struct KeyboardOptions {
+packages/core/src/terminal.cj:300:public class TerminalSession {
+packages/core/src/terminal.cj:340:    public func start(): Bool {
+packages/core/src/terminal.cj:370:    public func stop(): Unit {
+packages/core/src/terminal.cj:386:    public func run(action: () -> Unit): Unit {
+packages/core/src/terminal.cj:52:public interface Backend {
+packages/core/src/terminal.cj:579:public interface TerminalDriver {
+packages/core/src/terminal.cj:587:public class LinuxTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:590:    public func name(): String { "linux-glibc" }
+packages/core/src/terminal.cj:591:    public func enterRawMode(): Bool { TerminalMode.enterRawMode() }
+packages/core/src/terminal.cj:592:    public func restore(): Unit { TerminalMode.restore() }
+packages/core/src/terminal.cj:593:    public func size(): ?Rect { TerminalMode.size() }
+packages/core/src/terminal.cj:594:    public func capabilities(backend: Backend): TerminalCapabilities {
+packages/core/src/terminal.cj:599:public class FallbackTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:605:    public func name(): String { "fallback" }
+packages/core/src/terminal.cj:606:    public func enterRawMode(): Bool { false }
+packages/core/src/terminal.cj:607:    public func restore(): Unit {}
+packages/core/src/terminal.cj:608:    public func size(): ?Rect { Some(area) }
+packages/core/src/terminal.cj:609:    public func capabilities(backend: Backend): TerminalCapabilities {
+packages/core/src/terminal.cj:622:public class AnsiBackend <: Backend {
+packages/core/src/terminal.cj:633:    public func clear(): Unit {
+packages/core/src/terminal.cj:637:    public func moveTo(x: Int64, y: Int64): Unit {
+packages/core/src/terminal.cj:641:    public func enterAlternateScreen(): Unit { write("${ESC}[?1049h") }
+packages/core/src/terminal.cj:642:    public func leaveAlternateScreen(): Unit { write("${ESC}[?1049l") }
+packages/core/src/terminal.cj:643:    public func hideCursor(): Unit { write("${ESC}[?25l") }
+packages/core/src/terminal.cj:644:    public func showCursor(): Unit { write("${ESC}[?25h") }
+packages/core/src/terminal.cj:645:    public func enableMouse(): Unit { write("${ESC}[?1000h${ESC}[?1006h") }
+packages/core/src/terminal.cj:646:    public func disableMouse(): Unit { write("${ESC}[?1006l${ESC}[?1000l") }
+packages/core/src/terminal.cj:647:    public func enableBracketedPaste(): Unit { write("${ESC}[?2004h") }
+packages/core/src/terminal.cj:648:    public func disableBracketedPaste(): Unit { write("${ESC}[?2004l") }
+packages/core/src/terminal.cj:650:    public func size(): Rect {
+packages/core/src/terminal.cj:657:    public func draw(buffer: Buffer): Unit {
+packages/core/src/terminal.cj:674:    public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit {
+packages/core/src/terminal.cj:693:    public func drawMedia(ops: Array<MediaOp>): Unit {
+packages/core/src/terminal.cj:703:    public func write(text: String): Unit {
+packages/core/src/terminal.cj:707:    public func flush(): Unit {
+packages/core/src/terminal.cj:71:public struct RenderDiffSpan {
+packages/core/src/terminal.cj:735:public class TestBackend <: Backend {
+packages/core/src/terminal.cj:748:    public func clear(): Unit {
+packages/core/src/terminal.cj:752:    public func moveTo(x: Int64, y: Int64): Unit {
+packages/core/src/terminal.cj:756:    public func enterAlternateScreen(): Unit { write("${ESC}[?1049h") }
+packages/core/src/terminal.cj:757:    public func leaveAlternateScreen(): Unit { write("${ESC}[?1049l") }
+packages/core/src/terminal.cj:758:    public func hideCursor(): Unit { write("${ESC}[?25l") }
+packages/core/src/terminal.cj:759:    public func showCursor(): Unit { write("${ESC}[?25h") }
+packages/core/src/terminal.cj:760:    public func enableMouse(): Unit { write("${ESC}[?1000h${ESC}[?1006h") }
+packages/core/src/terminal.cj:761:    public func disableMouse(): Unit { write("${ESC}[?1006l${ESC}[?1000l") }
+packages/core/src/terminal.cj:762:    public func enableBracketedPaste(): Unit { write("${ESC}[?2004h") }
+packages/core/src/terminal.cj:763:    public func disableBracketedPaste(): Unit { write("${ESC}[?2004l") }
+packages/core/src/terminal.cj:765:    public func size(): Rect {
+packages/core/src/terminal.cj:769:    public func setSize(area: Rect): Unit {
+packages/core/src/terminal.cj:773:    public func draw(buffer: Buffer): Unit {
+packages/core/src/terminal.cj:781:    public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit {
+packages/core/src/terminal.cj:789:    public func drawMedia(ops: Array<MediaOp>): Unit {
+packages/core/src/terminal.cj:796:    public func write(text: String): Unit {
+packages/core/src/terminal.cj:802:    public func flush(): Unit {}
+packages/core/src/terminal.cj:804:    public func output(): String {
+packages/core/src/terminal.cj:808:    public func clearOutput(): Unit {
+packages/core/src/terminal.cj:814:    public func lastBuffer(): ?Buffer {
+packages/core/src/terminal.cj:818:    public func lastDiffOps(): Int64 {
+packages/core/src/terminal.cj:822:    public func lastDiffWrites(): Int64 {
+packages/core/src/terminal.cj:826:    public func lastMediaOps(): Array<MediaOp> {
+packages/core/src/terminal.cj:831:    public func mediaFrameCount(): Int64 {
+packages/core/src/terminal.cj:835:    public func snapshot(): String {
+packages/core/src/terminal.cj:842:    public func snapshots(): Array<String> {
+packages/core/src/terminal.cj:846:    public func snapshotAt(index: Int64): String {
+packages/core/src/terminal.cj:851:    public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool {
+packages/core/src/terminal.cj:85:public struct RenderDiffPlan {
+packages/core/src/terminal.cj:860:    public func assertSnapshot(expected: String): Bool {
+packages/core/src/terminal.cj:864:    public func assertSnapshotAt(index: Int64, expected: String): Bool {
+packages/core/src/terminal.cj:868:    public func assertLastMediaOpCount(expected: Int64): Bool {
+packages/core/src/terminal.cj:881:public struct TerminalCapabilities {
+packages/core/src/terminal.cj:95:public class Frame {
+packages/core/src/terminal.cj:987:public struct RenderMetrics {
+packages/core/src/text.cj:19:public func displayWidth(r: Rune): Int64 {
+packages/core/src/text.cj:7:public func displayWidth(text: String): Int64 {
+packages/core/src/text_area.cj:109:public type HighlightSpan = TextDecoration
+packages/core/src/text_area.cj:111:public class LineHighlight {
+packages/core/src/text_area.cj:121:public class MarkdownHighlightCache {
+packages/core/src/text_area.cj:129:    public func highlights(text: String): Array<TextDecoration> {
+packages/core/src/text_area.cj:1336:public func markdownDecorations(text: String): Array<TextDecoration> {
+packages/core/src/text_area.cj:1359:public func markdownLineHighlights(text: String): Array<LineHighlight> {
+packages/core/src/text_area.cj:138:    public func lineHighlights(text: String): Array<LineHighlight> {
+packages/core/src/text_area.cj:143:    public func visibleHighlights(text: String, firstLine!: Int64 = 0, lineCount!: Int64 = 40): Array<TextDecoration> {
+packages/core/src/text_area.cj:1464:public class MarkdownEditorBehavior {
+packages/core/src/text_area.cj:1469:    public func applyHighlights(area: TextArea): Unit {
+packages/core/src/text_area.cj:1473:    public func invalidate(): Unit {
+packages/core/src/text_area.cj:1477:    public func handle(area: TextArea, key: KeyEvent): Bool {
+packages/core/src/text_area.cj:1509:    public func toggleBold(area: TextArea): Bool {
+packages/core/src/text_area.cj:1513:    public func toggleItalic(area: TextArea): Bool {
+packages/core/src/text_area.cj:1517:    public func toggleCode(area: TextArea): Bool {
+packages/core/src/text_area.cj:1521:    public func insertLink(area: TextArea, url!: String = "https://example.com"): Bool {
+packages/core/src/text_area.cj:1530:    public func insertImage(area: TextArea, url!: String = "image.png", alt!: String = "alt"): Bool {
+packages/core/src/text_area.cj:1547:    public func insertReferenceLink(area: TextArea, id!: String = "ref"): Bool {
+packages/core/src/text_area.cj:1556:    public func insertReferenceDefinition(area: TextArea, id!: String = "ref", url!: String = "https://example.com", title!: String = ""): Bool {
+packages/core/src/text_area.cj:1562:    public func insertFrontmatter(area: TextArea, title!: String = "Untitled"): Bool {
+packages/core/src/text_area.cj:1572:    public func insertTable(area: TextArea): Bool {
+packages/core/src/text_area.cj:1577:    public func insertCodeFence(area: TextArea, language!: String = ""): Bool {
+packages/core/src/text_area.cj:1583:public class MarkdownTextEditor <: Widget {
+packages/core/src/text_area.cj:158:    public func recomputeCount(): Int64 {
+packages/core/src/text_area.cj:1592:    public func handle(key: KeyEvent): Bool {
+packages/core/src/text_area.cj:1596:    public func render(areaRect: Rect, buffer: Buffer): Unit {
+packages/core/src/text_area.cj:162:    public func invalidate(): Unit {
+packages/core/src/text_area.cj:169:public class TextArea <: Widget {
+packages/core/src/text_area.cj:231:    public func handle(key: KeyEvent): Bool {
+packages/core/src/text_area.cj:312:    public func handleVimNavigation(key: KeyEvent): Bool {
+packages/core/src/text_area.cj:331:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/text_area.cj:35:public class TextAreaCaret {
+packages/core/src/text_area.cj:362:    public func cursorPosition(area: Rect): Position {
+packages/core/src/text_area.cj:375:    public func cursorPositions(area: Rect): Array<Position> {
+packages/core/src/text_area.cj:393:    public func select(start: Int64, end: Int64): Unit {
+packages/core/src/text_area.cj:398:    public func clearSelection(): Unit {
+packages/core/src/text_area.cj:403:    public func hasSelection(): Bool {
+packages/core/src/text_area.cj:410:    public func selectedText(): String {
+packages/core/src/text_area.cj:417:    public func selectedRange(): ?(Int64, Int64) {
+packages/core/src/text_area.cj:421:    public func carets(): Array<TextAreaCaret> {
+packages/core/src/text_area.cj:428:    public func setCarets(carets: Array<TextAreaCaret>): Unit {
+packages/core/src/text_area.cj:443:    public func addCaret(caret: TextAreaCaret): Unit {
+packages/core/src/text_area.cj:450:    public func clearExtraCarets(): Unit {
+packages/core/src/text_area.cj:454:    public func selectedTexts(): Array<String> {
+packages/core/src/text_area.cj:45:public class TextCompletionRequest {
+packages/core/src/text_area.cj:465:    public func copySelectionTo(clipboard: Clipboard): Bool {
+packages/core/src/text_area.cj:471:    public func cutSelectionTo(clipboard: Clipboard): Bool {
+packages/core/src/text_area.cj:477:    public func pasteFrom(clipboard: Clipboard): Unit {
+packages/core/src/text_area.cj:481:    public func deleteSelection(): Unit {
+packages/core/src/text_area.cj:489:    public func paste(text: String): Unit {
+packages/core/src/text_area.cj:494:    public func setDecorations(decorations: Array<TextDecoration>): Unit {
+packages/core/src/text_area.cj:498:    public func setValue(value: String, cursor!: Int64 = -1): Unit {
+packages/core/src/text_area.cj:508:    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+packages/core/src/text_area.cj:543:    public func beginCompletion(requestId: String): TextCompletionRequest {
+packages/core/src/text_area.cj:554:    public func completionCommand(requestId: String, provider: (TextCompletionRequest) -> TextCompletionResult): Command {
+packages/core/src/text_area.cj:559:    public func handleCompletionEvent(event: Event): Bool {
+packages/core/src/text_area.cj:571:    public func clearHistory(): Unit {
+packages/core/src/text_area.cj:576:    public func undo(): Bool {
+packages/core/src/text_area.cj:585:    public func redo(): Bool {
+packages/core/src/text_area.cj:604:    public func findNext(needle: String): ?Int64 {
+packages/core/src/text_area.cj:614:    public func findPrevious(needle: String): ?Int64 {
+packages/core/src/text_area.cj:624:    public func moveWordLeft(): Unit {
+packages/core/src/text_area.cj:629:    public func moveWordRight(): Unit {
+packages/core/src/text_area.cj:69:public class TextCompletionItem {
+packages/core/src/text_area.cj:81:public class TextCompletionResult {
+packages/core/src/text_area.cj:97:public class TextDecoration {
+packages/core/src/text_buffer.cj:106:    public func deleteRange(range: TextRange): TextPosition {
+packages/core/src/text_buffer.cj:10:public class MemoryClipboard <: Clipboard {
+packages/core/src/text_buffer.cj:113:    public func slice(range: TextRange): String {
+packages/core/src/text_buffer.cj:131:    public func wordLeft(position: TextPosition): TextPosition {
+packages/core/src/text_buffer.cj:136:    public func wordRight(position: TextPosition): TextPosition {
+packages/core/src/text_buffer.cj:141:    public func findPrevious(needle: String, start!: TextPosition = TextPosition(Int64.Max, Int64.Max)): ?TextPosition {
+packages/core/src/text_buffer.cj:149:    public func findAll(needle: String): Array<TextRange> {
+packages/core/src/text_buffer.cj:163:    public func replaceAll(needle: String, replacement: String): Int64 {
+packages/core/src/text_buffer.cj:17:    public func getText(): String {
+packages/core/src/text_buffer.cj:187:    public func beginUndoGroup(): Unit {
+packages/core/src/text_buffer.cj:194:    public func endUndoGroup(): Unit {
+packages/core/src/text_buffer.cj:208:    public func positionToOffset(position: TextPosition): Int64 {
+packages/core/src/text_buffer.cj:212:    public func offsetToPosition(offset: Int64): TextPosition {
+packages/core/src/text_buffer.cj:21:    public func setText(text: String): Unit {
+packages/core/src/text_buffer.cj:237:    public func deleteBackward(position: TextPosition): TextPosition {
+packages/core/src/text_buffer.cj:256:    public func deleteForward(position: TextPosition): TextPosition {
+packages/core/src/text_buffer.cj:26:public struct TextPosition <: Equatable<TextPosition> {
+packages/core/src/text_buffer.cj:271:    public func undo(): Bool {
+packages/core/src/text_buffer.cj:280:    public func redo(): Bool {
+packages/core/src/text_buffer.cj:289:    public func find(needle: String, start!: TextPosition = TextPosition(0, 0)): ?TextPosition {
+packages/core/src/text_buffer.cj:301:    public func clampPosition(position: TextPosition): TextPosition {
+packages/core/src/text_buffer.cj:40:public struct TextRange {
+packages/core/src/text_buffer.cj:54:    public func isEmpty(): Bool {
+packages/core/src/text_buffer.cj:59:public class TextBuffer {
+packages/core/src/text_buffer.cj:5:public interface Clipboard {
+packages/core/src/text_buffer.cj:70:    public func setText(text: String): Unit {
+packages/core/src/text_buffer.cj:78:    public func text(): String {
+packages/core/src/text_buffer.cj:82:    public func lineCount(): Int64 {
+packages/core/src/text_buffer.cj:86:    public func line(index: Int64): String {
+packages/core/src/text_buffer.cj:91:    public func insert(position: TextPosition, text: String): TextPosition {
+packages/core/src/text_buffer.cj:98:    public func replace(range: TextRange, text: String): TextPosition {
+packages/core/src/visual_widgets.cj:10:public enum ProgressBarLabelMode {
+packages/core/src/visual_widgets.cj:18:public class ProgressBarSymbols {
+packages/core/src/visual_widgets.cj:201:public class Sparkline <: Widget {
+packages/core/src/visual_widgets.cj:212:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/visual_widgets.cj:224:public class Gauge <: Widget {
+packages/core/src/visual_widgets.cj:245:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/visual_widgets.cj:250:public class Chart <: Widget {
+packages/core/src/visual_widgets.cj:261:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/visual_widgets.cj:279:public class LogView <: Widget {
+packages/core/src/visual_widgets.cj:292:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/visual_widgets.cj:306:public class SplitPane <: Widget {
+packages/core/src/visual_widgets.cj:319:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/visual_widgets.cj:328:public class Wizard <: Widget {
+packages/core/src/visual_widgets.cj:32:public class ProgressBarSegment {
+packages/core/src/visual_widgets.cj:341:    public func next(): Unit { current = min(max(0, steps.size - 1), current + 1) }
+packages/core/src/visual_widgets.cj:342:    public func previous(): Unit { current = max(0, current - 1) }
+packages/core/src/visual_widgets.cj:344:    public func handle(key: KeyEvent): Bool {
+packages/core/src/visual_widgets.cj:352:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/visual_widgets.cj:365:public class Accordion <: Widget {
+packages/core/src/visual_widgets.cj:376:    public func handle(key: KeyEvent): Bool {
+packages/core/src/visual_widgets.cj:384:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/visual_widgets.cj:398:public class Breadcrumb <: Widget {
+packages/core/src/visual_widgets.cj:401:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/visual_widgets.cj:412:public class TreeTable <: Widget {
+packages/core/src/visual_widgets.cj:419:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/visual_widgets.cj:44:public class ProgressBar <: Widget {
+packages/core/src/visual_widgets.cj:5:public enum ProgressBarDirection {
+packages/core/src/visual_widgets.cj:89:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/widget_base.cj:15:public enum TextAlign {
+packages/core/src/widget_base.cj:5:public interface Widget {
+packages/core/src/widget_base.cj:9:public enum WrapMode {
+packages/core/src/widgets.cj:112:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/widgets.cj:141:public class ListState {
+packages/core/src/widgets.cj:14:    public func inner(area: Rect): Rect {
+packages/core/src/widgets.cj:150:    public func select(index: ?Int64): Unit {
+packages/core/src/widgets.cj:154:    public func next(total: Int64): Unit {
+packages/core/src/widgets.cj:167:    public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit {
+packages/core/src/widgets.cj:183:    public func previous(total: Int64): Unit {
+packages/core/src/widgets.cj:196:    public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit {
+packages/core/src/widgets.cj:214:public class Table <: Widget {
+packages/core/src/widgets.cj:21:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/widgets.cj:244:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/widgets.cj:302:public class TableState {
+packages/core/src/widgets.cj:311:    public func select(index: ?Int64): Unit {
+packages/core/src/widgets.cj:315:    public func next(total: Int64): Unit {
+packages/core/src/widgets.cj:328:    public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit {
+packages/core/src/widgets.cj:344:    public func previous(total: Int64): Unit {
+packages/core/src/widgets.cj:357:    public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit {
+packages/core/src/widgets.cj:375:public class Scrollbar <: Widget {
+packages/core/src/widgets.cj:396:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/widgets.cj:414:public class Input <: Widget {
+packages/core/src/widgets.cj:439:    public func handle(key: KeyEvent): Bool {
+packages/core/src/widgets.cj:43:public class Paragraph <: Widget {
+packages/core/src/widgets.cj:466:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/widgets.cj:481:    public func cursorPosition(area: Rect): Position {
+packages/core/src/widgets.cj:490:    public func setValue(value: String, cursor!: Int64 = -1): Unit {
+packages/core/src/widgets.cj:496:    public func clear(): Unit {
+packages/core/src/widgets.cj:502:    public func moveToStart(): Unit {
+packages/core/src/widgets.cj:507:    public func moveToEnd(): Unit {
+packages/core/src/widgets.cj:548:public class FileDialog <: Widget {
+packages/core/src/widgets.cj:555:    public func selectedPath(): ?String { picker.selectedPath() }
+packages/core/src/widgets.cj:556:    public func handle(key: KeyEvent, viewportHeight: Int64): Bool { picker.handle(key, viewportHeight) }
+packages/core/src/widgets.cj:557:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/widgets.cj:5:public class Block <: Widget {
+packages/core/src/widgets.cj:67:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/widgets.cj:85:public class List <: Widget {
+packages/diff/src/diff.cj:137:public class DiffView <: Widget {
+packages/diff/src/diff.cj:13:public class DiffLine {
+packages/diff/src/diff.cj:154:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/diff/src/diff.cj:27:public class DiffHunk {
+packages/diff/src/diff.cj:39:public class DiffFile {
+packages/diff/src/diff.cj:50:    public func addedLines(): Int64 {
+packages/diff/src/diff.cj:54:    public func deletedLines(): Int64 {
+packages/diff/src/diff.cj:69:public class DiffDocument {
+packages/diff/src/diff.cj:6:public enum DiffLineKind {
+packages/diff/src/diff.cj:76:    public func addedLines(): Int64 {
+packages/diff/src/diff.cj:82:    public func deletedLines(): Int64 {
+packages/diff/src/diff.cj:89:public func parseUnifiedDiff(text: String): DiffDocument {
+packages/game/src/game.cj:106:    public func entities(): Array<EntityId> {
+packages/game/src/game.cj:110:    public func size(): Int64 { ids.size }
+packages/game/src/game.cj:112:    public func clearDead(world: EntityWorld): Unit {
+packages/game/src/game.cj:132:public struct Vec2 <: Equatable<Vec2> {
+packages/game/src/game.cj:145:    public func plus(other: Vec2): Vec2 { Vec2(x: x + other.x, y: y + other.y) }
+packages/game/src/game.cj:146:    public func minus(other: Vec2): Vec2 { Vec2(x: x - other.x, y: y - other.y) }
+packages/game/src/game.cj:147:    public func scale(value: Float64): Vec2 { Vec2(x: x * value, y: y * value) }
+packages/game/src/game.cj:150:public struct Aabb <: Equatable<Aabb> {
+packages/game/src/game.cj:170:    public func moved(delta: Vec2): Aabb {
+packages/game/src/game.cj:174:    public func overlaps(other: Aabb): Bool {
+packages/game/src/game.cj:179:public struct Transform2D {
+packages/game/src/game.cj:188:    public func bounds(): Aabb {
+packages/game/src/game.cj:18:public class EntityWorld {
+packages/game/src/game.cj:193:public struct Velocity2D {
+packages/game/src/game.cj:200:public struct Sprite2D {
+packages/game/src/game.cj:212:public struct SpriteFrame {
+packages/game/src/game.cj:222:public class SpriteAnimation {
+packages/game/src/game.cj:233:    public func reset(): Unit {
+packages/game/src/game.cj:238:    public func advance(deltaMillis: Int64): Sprite2D {
+packages/game/src/game.cj:251:    public func current(): Sprite2D {
+packages/game/src/game.cj:256:public struct Camera2D {
+packages/game/src/game.cj:25:    public func create(): EntityId {
+packages/game/src/game.cj:266:public enum ColliderKind {
+packages/game/src/game.cj:271:public struct Collider2D {
+packages/game/src/game.cj:285:public enum BodyType {
+packages/game/src/game.cj:291:public struct RigidBody2D {
+packages/game/src/game.cj:305:public struct CollisionEvent {
+packages/game/src/game.cj:323:public struct TileMarker <: Equatable<TileMarker> {
+packages/game/src/game.cj:32:    public func destroy(id: EntityId): Bool {
+packages/game/src/game.cj:339:public class PhysicsWorld {
+packages/game/src/game.cj:351:    public func step(
+packages/game/src/game.cj:370:    public func overlaps(
+packages/game/src/game.cj:42:    public func isAlive(id: EntityId): Bool {
+packages/game/src/game.cj:49:    public func entities(): Array<EntityId> {
+packages/game/src/game.cj:517:public class GameInputState {
+packages/game/src/game.cj:523:    public func beginFrame(): Unit {
+packages/game/src/game.cj:529:    public func handle(event: Event): Unit {
+packages/game/src/game.cj:53:    public func frame(): Int64 { frameValue }
+packages/game/src/game.cj:553:    public func pressed(code: KeyCode): Bool {
+packages/game/src/game.cj:557:    public func justPressed(code: KeyCode): Bool {
+packages/game/src/game.cj:55:    public func advanceFrame(): Int64 {
+packages/game/src/game.cj:561:    public func axis(negative: KeyCode, positive: KeyCode): Int64 {
+packages/game/src/game.cj:568:public class SpriteRenderer {
+packages/game/src/game.cj:571:    public func render(
+packages/game/src/game.cj:592:    public func drawSprite(canvas: Canvas, transform: Transform2D, sprite: Sprite2D, camera: Camera2D): Unit {
+packages/game/src/game.cj:612:public class TileMap {
+packages/game/src/game.cj:61:public class ComponentStore<T> {
+packages/game/src/game.cj:625:    public func isSolid(x: Int64, y: Int64): Bool {
+packages/game/src/game.cj:629:    public func tileAt(x: Int64, y: Int64): String {
+packages/game/src/game.cj:634:    public func find(symbol: String): Array<TileMarker> {
+packages/game/src/game.cj:646:    public func findAny(symbols: Array<String>): Array<TileMarker> {
+packages/game/src/game.cj:659:    public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId> {
+packages/game/src/game.cj:674:    public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style = Style(fg: Color.White)): Unit {
+packages/game/src/game.cj:67:    public func insert(id: EntityId, value: T): Unit {
+packages/game/src/game.cj:6:public struct EntityId <: Equatable<EntityId> {
+packages/game/src/game.cj:78:    public func remove(id: EntityId): Bool {
+packages/game/src/game.cj:89:    public func has(id: EntityId): Bool {
+packages/game/src/game.cj:93:    public func get(id: EntityId): ?T {
+packages/game/src/game.cj:99:    public func set(id: EntityId, value: T): Bool {
+packages/markdown/src/markdown.cj:13:public func markdownDocument(text: String, theme!: DocumentTheme = DocumentTheme()): Document {
+packages/markdown/src/markdown.cj:17:public func markdownAstToDocument(ast: MarkdownDocument, theme!: DocumentTheme = DocumentTheme()): Document {
+packages/markdown/src/markdown.cj:31:public class OutlineNode {
+packages/markdown/src/markdown.cj:45:public class MarkdownPreviewIndex {
+packages/markdown/src/markdown.cj:52:    public func renderedLineCount(): Int64 {
+packages/markdown/src/markdown.cj:56:    public func sourceOffsetForRenderedLine(line: Int64): ?Int64 {
+packages/markdown/src/markdown.cj:61:    public func renderedLineForSourceOffset(offset: Int64): Int64 {
+packages/markdown/src/markdown.cj:70:public func markdownOutline(ast: MarkdownDocument): Array<OutlineNode> {
+packages/markdown/src/markdown.cj:76:public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex {
+packages/markdown/src/markdown.cj:7:public class Markdown {
+packages/media/src/media.cj:114:public enum AsciiRenderMode {
+packages/media/src/media.cj:120:public struct AsciiRenderOptions {
+packages/media/src/media.cj:153:    public func frameMillis(): Int64 {
+packages/media/src/media.cj:157:    public func sampleWidth(): Int64 {
+packages/media/src/media.cj:164:    public func sampleHeight(): Int64 {
+packages/media/src/media.cj:173:public struct AsciiFrame {
+packages/media/src/media.cj:184:    public func text(): String {
+packages/media/src/media.cj:188:    public func hasColors(): Bool {
+packages/media/src/media.cj:192:    public func colorAt(row: Int64, column: Int64): Color {
+packages/media/src/media.cj:200:public class AsciiAnimation {
+packages/media/src/media.cj:209:    public func frameCount(): Int64 {
+packages/media/src/media.cj:213:    public func isEmpty(): Bool {
+packages/media/src/media.cj:217:    public func totalDurationMillis(): Int64 {
+packages/media/src/media.cj:21:public interface MediaAdapter {
+packages/media/src/media.cj:225:    public func frameAtIndex(index: Int64): AsciiFrame {
+packages/media/src/media.cj:230:    public func frameAtElapsed(elapsedMillis: Int64): AsciiFrame {
+packages/media/src/media.cj:241:public interface AsciiAnimationDecoder {
+packages/media/src/media.cj:245:public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {
+packages/media/src/media.cj:252:    public func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation {
+packages/media/src/media.cj:259:    public func commandFor(source: MediaSource, options: AsciiRenderOptions): String {
+packages/media/src/media.cj:25:public class FallbackMediaAdapter <: MediaAdapter {
+packages/media/src/media.cj:264:public class AsciiAnimationView <: Widget {
+packages/media/src/media.cj:28:    public func decode(request: MediaDecodeRequest): MediaFrameData {
+packages/media/src/media.cj:291:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/media/src/media.cj:318:public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame {
+packages/media/src/media.cj:33:public class ExternalMediaAdapter <: MediaAdapter {
+packages/media/src/media.cj:391:public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol {
+packages/media/src/media.cj:397:public func mediaPlacementWithAdapter(
+packages/media/src/media.cj:44:    public func decode(request: MediaDecodeRequest): MediaFrameData {
+packages/media/src/media.cj:7:public class MediaDecodeRequest {
+packages/media/src/media.cj:99:    public func commandFor(request: MediaDecodeRequest): String {
+packages/media/src/media_test.cj:8:public class MediaExtensionTest {
+packages/terminal/src/terminal.cj:14:public class AnsiToken {
+packages/terminal/src/terminal.cj:237:public class TerminalTranscript {
+packages/terminal/src/terminal.cj:249:    public func append(text: String): Unit {
+packages/terminal/src/terminal.cj:24:public func parseAnsi(text: String): Array<AnsiToken> {
+packages/terminal/src/terminal.cj:255:    public func chunkCount(): Int64 {
+packages/terminal/src/terminal.cj:260:public class TerminalView <: Widget {
+packages/terminal/src/terminal.cj:271:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/terminal/src/terminal.cj:58:public class TerminalScreen {
+packages/terminal/src/terminal.cj:6:public enum AnsiTokenKind {
+packages/terminal/src/terminal.cj:72:    public func cell(x: Int64, y: Int64): Cell {
+packages/terminal/src/terminal.cj:76:    public func lineText(y: Int64): String {
+packages/terminal/src/terminal.cj:86:    public func feed(text: String): Unit {
+packages/terminal/src/terminal.cj:92:    public func render(area: Rect, target: Buffer): Unit {

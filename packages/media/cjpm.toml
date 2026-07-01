@@ -1,0 +1,16 @@
+[package]
+  cjc-version = "1.1.0"
+  name = "media"
+  organization = ""
+  description = "Image and rich-media adapters for cjtui"
+  version = "0.1.0"
+  target-dir = ""
+  script-dir = ""
+  output-type = "static"
+  compile-option = ""
+  override-compile-option = ""
+  link-option = ""
+  package-configuration = {}
+
+[dependencies]
+  "core" = { path = "../core", output-type = "static" }
