@@ -17,7 +17,7 @@ Game helpers follow the same boundary: core owns terminal events, timing, metric
 
 ## Current Extensions
 
-`packages/markdown` provides the `markdown` package. It depends on the standalone `cj_markdown` parser and only adapts `MarkdownDocument` into `core.Document`.
+`packages/markdown` provides the `markdown` package. It depends on the in-repository `cj_markdown` parser and only adapts `MarkdownDocument` into `core.Document`.
 
 The parser package handles source ranges, diagnostics, ATX/setext headings, merged paragraphs with soft-break source mapping, nested lists, task list items, indented block quotes, fenced code blocks with language info, pipe tables with alignment and escaped pipes, horizontal rules, HTML blocks/inline HTML, reference links/images, shortcut reference links, multi-backtick inline code, strong/emphasis/strikethrough, autolinks, and common escapes.
 

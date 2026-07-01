@@ -43,7 +43,7 @@ Module layout:
 - `packages/core/src/document.cj` owns the rich document model and `DocumentView`.
 - `packages/core/src/widgets.cj` keeps general-purpose widgets.
 - `packages/markdown` owns Markdown AST to `Document` conversion.
-- `../cj_markdown` owns Markdown tokenization, parsing, AST, diagnostics, and source ranges.
+- `packages/cj_markdown` owns Markdown tokenization, parsing, AST, diagnostics, and source ranges.
 
 Content extension boundary:
 
@@ -56,7 +56,7 @@ Content extension boundary:
 - `AppTestRunner` is the headless workflow runner for deterministic app tests. It replays `HeadlessScript` steps, emits synthetic `TickEvent`s, captures frame buffers and snapshots, and reports snapshot mismatches through `SnapshotDiff`.
 - `Component.handle(event)` returns `HandleResult`, so focused dispatch can distinguish ignored events, consumed events, exit requests, and commands. `EventRouter.handleResult()` preserves those details; the older `handle()` helpers remain wrappers when only `ControlFlow` is needed.
 - `MarkdownEditorBehavior` keeps Markdown-specific editor behavior outside the parser layer. It provides cached syntax highlighting, visible-line highlight extraction for large documents, ordered/unordered/task list continuation, empty-marker list termination, multi-line indentation and outdent, paired delimiter insertion, closing-delimiter skipping, selection wrapping, link/image/reference wrapping, frontmatter insertion, and Markdown commands for bold, italic, inline code, links, images, reference links, tables, and code fences.
-- `markdown` depends on the standalone `cj_markdown` parser and maps its AST, source ranges, nested lists, links, images, tasks, HTML, nested emphasis/strong, strikethrough, table alignment, and diagnostics into `Document`.
+- `markdown` depends on the in-repository `cj_markdown` parser and maps its AST, source ranges, nested lists, links, images, tasks, HTML, nested emphasis/strong, strikethrough, table alignment, and diagnostics into `Document`.
 - `markdown` also provides `markdownOutline()` and `markdownPreviewIndex()` helpers for outline panels and source/preview synchronization.
 - `terminal` provides ANSI token parsing, `TerminalScreen`, bounded `TerminalTranscript`, and `TerminalView` with search highlighting.
 - `diff` provides unified diff parsing, `DiffDocument` line summaries, and `DiffView` with inline or side-by-side rendering.

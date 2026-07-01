@@ -8,8 +8,4 @@ if ! command -v cjc >/dev/null 2>&1; then
     exit 127
 fi
 
-if [[ -z "${CJ_MARKDOWN_DIR:-}" ]]; then
-    export CJ_MARKDOWN_DIR="$(cd "$ROOT/.." && pwd)/cj_markdown"
-fi
-
 "$ROOT/scripts/release_gate.sh"

@@ -93,7 +93,7 @@ scripts/release_gate.sh
 
 The gate runs parser tests, extension tests, core tests, event script validation, golden snapshot validation, API baseline checks, example builds, smoke checks, and pressure-oriented scenarios.
 
-`packages/markdown` depends on the standalone `cj_markdown` checkout. By default the gate expects it at `../cj_markdown`; set `CJ_MARKDOWN_DIR=/path/to/cj_markdown` when it lives elsewhere.
+`packages/markdown` depends on the in-repository `packages/cj_markdown` parser package, so a clean checkout can run the full gate without a sibling parser checkout.
 
 ## Notes
 

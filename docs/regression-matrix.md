@@ -10,7 +10,7 @@ scripts/run_regression_matrix.sh
 
 Matrix lanes:
 
-- Markdown parser tests: `${CJ_MARKDOWN_DIR:-../cj_markdown}`
+- Markdown parser tests: `packages/cj_markdown`
 - Markdown adapter tests: `packages/markdown`
 - Terminal output adapter tests: `packages/terminal`
 - Diff adapter tests: `packages/diff`
@@ -40,6 +40,6 @@ The generated `docs/api-index.txt` uses repo-relative paths so module splits do 
 
 External dependencies:
 
-- `packages/markdown` depends on the standalone `cj_markdown` package. Set `CJ_MARKDOWN_DIR` when the parser checkout is not a sibling of this repository.
+- `packages/markdown` depends on the in-repository `packages/cj_markdown` package.
 - The GitHub Actions workflow expects a Cangjie SDK on `PATH` or a `CANGJIE_SDK_URL` secret that points to a downloadable SDK archive.
-- For full CI coverage, configure `CJ_MARKDOWN_REPOSITORY` so the workflow can check out the standalone parser into the expected sibling path.
+- Full CI coverage runs from a single checkout; no sibling Markdown parser repository is required.

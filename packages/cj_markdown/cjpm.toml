@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "markdown"
+  name = "cj_markdown"
   organization = ""
-  description = "Markdown document adapter for cjtui"
+  description = "Markdown parser for Cangjie with source ranges"
   version = "0.1.0"
   target-dir = ""
   script-dir = ""
@@ -13,5 +13,3 @@
   package-configuration = {}
 
 [dependencies]
-  "core" = { path = "../core", output-type = "static" }
-  "cj_markdown" = { path = "../cj_markdown", output-type = "static" }

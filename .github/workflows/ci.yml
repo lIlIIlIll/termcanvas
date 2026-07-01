@@ -10,18 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CANGJIE_SDK_URL: ${{ secrets.CANGJIE_SDK_URL }}
-      CJ_MARKDOWN_REPOSITORY: ${{ secrets.CJ_MARKDOWN_REPOSITORY }}
     steps:
       - uses: actions/checkout@v4
         with:
           path: cj_tui
-
-      - name: Checkout cj_markdown dependency
-        if: env.CJ_MARKDOWN_REPOSITORY != ''
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ env.CJ_MARKDOWN_REPOSITORY }}
-          path: cj_markdown
 
       - name: Install Cangjie SDK from explicit URL
         if: env.CANGJIE_SDK_URL != ''
@@ -47,6 +39,4 @@ jobs:
       - name: Run release gate
         shell: bash
         working-directory: cj_tui
-        env:
-          CJ_MARKDOWN_DIR: ${{ github.workspace }}/cj_markdown
         run: scripts/ci_gate.sh

@@ -2,8 +2,6 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PLAYGROUND="$(cd "$ROOT/.." && pwd)"
-CJ_MARKDOWN_DIR="${CJ_MARKDOWN_DIR:-$PLAYGROUND/cj_markdown}"
 
 run_cjpm_test() {
     local dir="$1"
@@ -12,13 +10,7 @@ run_cjpm_test() {
     "$ROOT/scripts/cangjie_cmd.sh" "$dir" cjpm test --no-color
 }
 
-if [[ ! -d "$CJ_MARKDOWN_DIR" ]]; then
-    echo "missing cj_markdown dependency: $CJ_MARKDOWN_DIR" >&2
-    echo "set CJ_MARKDOWN_DIR to the standalone cj_markdown checkout" >&2
-    exit 2
-fi
-
-run_cjpm_test "$CJ_MARKDOWN_DIR" "cj_markdown tests"
+run_cjpm_test "$ROOT/packages/cj_markdown" "cj_markdown tests"
 run_cjpm_test "$ROOT/packages/core" "core tests"
 run_cjpm_test "$ROOT/packages/markdown" "markdown adapter tests"
 run_cjpm_test "$ROOT/packages/terminal" "terminal tests"
