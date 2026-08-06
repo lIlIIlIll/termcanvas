@@ -23,6 +23,8 @@ public enum TranscriptItemStatus {
     | Failed
     | Cancelled
     | Rejected
+    | TimedOut
+    | Expired
     | Conflict
 }
 
@@ -552,6 +554,8 @@ public func statusMark(
         case TranscriptItemStatus.Failed => "✗"
         case TranscriptItemStatus.Cancelled => "–"
         case TranscriptItemStatus.Rejected => "⊘"
+        case TranscriptItemStatus.TimedOut => "⌛"
+        case TranscriptItemStatus.Expired => "⌛"
         case TranscriptItemStatus.Conflict => "!"
     }
 }
@@ -590,6 +594,8 @@ public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): St
         case TranscriptItemStatus.Failed => base.patch(Style(fg: Color.Red))
         case TranscriptItemStatus.Cancelled => base.patch(Style(fg: Color.Yellow))
         case TranscriptItemStatus.Rejected => base.patch(Style(fg: Color.Red))
+        case TranscriptItemStatus.TimedOut => base.patch(Style(fg: Color.Red))
+        case TranscriptItemStatus.Expired => base.patch(Style(fg: Color.Yellow))
         case TranscriptItemStatus.Conflict => base.patch(Style(fg: Color.Yellow))
     }
 }
@@ -606,6 +612,8 @@ public func transcriptStatusLabel(status: TranscriptItemStatus): String {
         case TranscriptItemStatus.Failed => "failed"
         case TranscriptItemStatus.Cancelled => "cancelled"
         case TranscriptItemStatus.Rejected => "rejected"
+        case TranscriptItemStatus.TimedOut => "timed out"
+        case TranscriptItemStatus.Expired => "expired"
         case TranscriptItemStatus.Conflict => "conflict"
     }
 }

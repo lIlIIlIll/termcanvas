@@ -48,6 +48,20 @@ class CjTuiComponentPrimitivesTest {
         @Expect(collapsed.lines.size, 1)
         @Expect(collapsed.lines[0].spans[0].text, "◐ ")
         @Expect(collapsed.lines[0].spans[3].text, "  ▸")
+
+        let timedOut = transcriptCardDocument(TranscriptItem(
+            "shell-timeout",
+            title: "Run command",
+            status: TranscriptItemStatus.TimedOut
+        ))
+        let expired = transcriptCardDocument(TranscriptItem(
+            "approval-expired",
+            title: "Approval",
+            status: TranscriptItemStatus.Expired
+        ))
+        @Expect(timedOut.lines[0].spans[0].text, "⌛ ")
+        @Expect(timedOut.lines[0].spans[2].text, " · timed out")
+        @Expect(expired.lines[0].spans[2].text, " · expired")
     }
 
     @TestCase
