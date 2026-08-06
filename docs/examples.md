@@ -17,6 +17,7 @@ The examples are application-shaped rather than one-widget snippets. Each app de
 - `taskpad`: task-board app with `Input`, `ListState`, `KeyMap`, `CommandPalette`, `ToastManager`, and command-driven updates.
 - `form_studio`: profile form app with focus routing, paste handling, `Input`, `TextArea`, `Checkbox`, `RadioGroup`, `Select`, `Dropdown`, `MultiSelect`, `DatePicker`, and `Button`.
 - `crystal_caves`: multi-level side-scrolling platform game using `game` tile markers, sensor pickups, hazards, patrol enemies, sprite animation, and camera scrolling.
+- `game_pressure_suite`: compact six-category game pressure suite covering roguelike, snake, 2048, minesweeper, turn-based strategy, and lightweight real-time action loops with tick/input/render pressure.
 - `gif_ascii`: ffmpeg-decodable media-to-ASCII animation viewer using `FfmpegAsciiAnimationDecoder`, `AsciiAnimationView`, ASCII/half-block/braille render modes, optional RGB color, binary threshold control, tick-driven playback, pause, zoom, and speed controls.
 - `ops_dashboard`: real-time operations dashboard using `targetFps`, `TimerSpec`, `TickEvent`, `ProgressBar`, `Sparkline`, `Gauge`, `Chart`, `LogView`, and `StatusBar`.
 - `data_browser`: data/file browser using `VirtualTable`, `Tree`, `FilePicker`, `FileDialog`, and `Paginator`.
@@ -24,10 +25,10 @@ The examples are application-shaped rather than one-widget snippets. Each app de
 - `terminal_lab`: terminal lab using PTY commands/events, `LinuxPtyRuntime`, `terminal`, `TerminalView`, and `diff`.
 - `media_gallery`: media-capability app using `TerminalCapabilities`, media protocol fallback, frame media placements, DOM media nodes, document image rows, and `media`.
 - `style_lab`: DOM/CSS/layout/canvas app using `ViewNode`, `StyleSheet`, flex layout, `Canvas`, and `SizeGuard`.
-- `oh_my_pi_skin`: oh-my-pi inspired terminal skin using `Canvas`, true-color styles, `TerminalCapabilities`, `Composer`, `CommandPalette`, and tick animation.
+- `oh_my_pi_skin`: oh-my-pi inspired terminal skin using `Canvas`, an interactive animated todo tree, true-color styles, `TerminalCapabilities`, `Composer`, `CommandPalette`, and independent region timers.
 - `command_center`: command runtime app using async tasks, timers, menus, dialogs, spinner, and toasts.
 - `assistant_console`: transcript console using `TranscriptView`, `Composer`, `ActivityTimeline`, `RequestDialog`, `DecisionDialog`, and rich `Document` content.
-- `btm_clone`: bottom/btm-style monitor using full-screen `Canvas`, animated metric graphs, resource panels, process-table selection, and sort hotkeys.
+- `btm_clone`: bottom/btm-style monitor using component-scoped datasource sampling, dirty-rendered resource panels, process-table selection, sort hotkeys, and a `--headless-smoke` regression path for profiler/dirty isolation.
 - `arcade`: playable canvas app using `InputState`, held-key handling, `TickEvent`, `Canvas`, `SizeGuard`, resize fallback, and `AppMetrics`.
 - `debug_lab`: terminal diagnostics app using `TerminalCapabilities`, `KeyboardOptions`, mouse move, focus events, `AppMetrics`, `RenderMetrics`, and `DebugOverlay`.
 

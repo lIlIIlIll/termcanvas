@@ -314,4 +314,93 @@ class CjTuiBoundaryExtremeTest {
         DocumentView(Document([DocumentLine(DocumentLineKind.Paragraph, "abcdef")])).render(buffer.area, buffer)
         @Expect(!buffer.getCell(0, 0).symbol.isEmpty())
     }
+
+    @TestCase
+    func graphemeClustersKeepCombiningAndEmojiSequencesTogether(): Unit {
+        let accent = "e\u{0301}"
+        @Expect(graphemeClusters(accent).size, 1)
+        @Expect(displayWidth(accent), 1)
+        @Expect(truncate(accent + "x", 1), accent)
+
+        let family = "\u{1F469}\u{200D}\u{1F4BB}"
+        @Expect(graphemeClusters(family).size, 1)
+        @Expect(displayWidth(family), 2)
+        @Expect(nextGraphemeOffset(family + "!", 0), family.size)
+    }
+
+    @TestCase
+    func textBufferDeletesWholeGraphemeClusters(): Unit {
+        let accent = "e\u{0301}"
+        let buffer = TextBuffer(text: accent + "x")
+        let pos = buffer.deleteBackward(TextPosition(0, accent.size))
+        @Expect(pos, TextPosition(0, 0))
+        @Expect(buffer.text(), "x")
+
+        let emoji = "\u{1F469}\u{200D}\u{1F4BB}"
+        let emojiBuffer = TextBuffer(text: emoji + "!")
+        _ = emojiBuffer.deleteForward(TextPosition(0, 0))
+        @Expect(emojiBuffer.text(), "!")
+    }
+
+    @TestCase
+    func bufferExposesExplicitWideCellKinds(): Unit {
+        let buffer = Buffer(Rect(0, 0, 4, 1))
+        buffer.setString(0, 0, "界a")
+        match (buffer.getCell(0, 0).kind) {
+            case CellKind.WideLead => ()
+            case _ => @Expect(false)
+        }
+        match (buffer.getCell(1, 0).kind) {
+            case CellKind.WideCont => ()
+            case _ => @Expect(false)
+        }
+        match (buffer.getCell(2, 0).kind) {
+            case CellKind.Normal => ()
+            case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func asciiFastPathClearsWideCellContinuations(): Unit {
+        let buffer = Buffer(Rect(0, 0, 4, 1))
+        buffer.setString(0, 0, "界界")
+        buffer.setString(1, 0, "abc")
+        @Expect(buffer.getCell(0, 0).symbol, " ")
+        @Expect(buffer.getCell(1, 0).symbol, "a")
+        @Expect(buffer.getCell(2, 0).symbol, "b")
+        @Expect(buffer.getCell(3, 0).symbol, "c")
+        match (buffer.getCell(1, 0).kind) {
+            case CellKind.Normal => ()
+            case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func fillRectClearsWideCellContinuationsWithoutStringPath(): Unit {
+        let buffer = Buffer(Rect(0, 0, 4, 1))
+        buffer.setString(0, 0, "界a")
+        buffer.fillRect(Rect(1, 0, 2, 1), style: Style(bg: Color.Blue))
+        @Expect(buffer.getCell(0, 0).symbol, " ")
+        @Expect(buffer.getCell(1, 0).symbol, " ")
+        @Expect(buffer.getCell(2, 0).symbol, " ")
+        match (buffer.getCell(1, 0).kind) {
+            case CellKind.Normal => ()
+            case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func ambiguousWidthIsConfigurableAndDefaultsNarrow(): Unit {
+        @Expect(displayWidth("·"), 1)
+        @Expect(displayWidth("·", options: TextWidthOptions(ambiguousWidth: AmbiguousWidth.Wide)), 2)
+    }
+
+    @TestCase
+    func markdownDecorationsSurviveEmojiListMarkers(): Unit {
+        // Regression: the task-marker decoration compared
+        // line[markerEnd..markerEnd+3] on UTF-8 bytes; a 4-byte emoji right
+        // after the list marker split a rune and threw. Now byte-compares.
+        let spans = markdownDecorations("- 🎯 任务一\n- [x] ✅ 已完成\n")
+        @Expect(spans.size > 0)
+    }
 }

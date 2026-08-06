@@ -3,55 +3,81 @@ package core
 import std.collection.*
 
 @FastNative
+@When[os != "Windows"]
 foreign func forkpty(amaster: CPointer<Int32>, name: CPointer<UInt8>, termp: CPointer<Unit>, winp: CPointer<Unit>): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func openpty(amaster: CPointer<Int32>, aslave: CPointer<Int32>, name: CPointer<UInt8>, termp: CPointer<Unit>, winp: CPointer<Unit>): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func fork(): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func dup2(oldfd: Int32, newfd: Int32): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func pipe(pipefd: CPointer<Int32>): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func execvp(file: CString, argv: CPointer<CString>): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func chdir(path: CString): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func putenv(str: CString): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func fcntl(fd: Int32, cmd: Int32, value: Int32): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func kill(pid: Int32, sig: Int32): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func waitpid(pid: Int32, status: CPointer<Int32>, options: Int32): Int32
 
 @FastNative
+@When[os != "Windows"]
 foreign func write(fd: Int32, buf: CPointer<Unit>, count: UIntNative): IntNative
 
+@When[os != "Windows"]
 const F_GETFL: Int32 = 3
+@When[os != "Windows"]
 const F_SETFL: Int32 = 4
+@When[os != "Windows"]
 const F_GETFD: Int32 = 1
+@When[os != "Windows"]
 const F_SETFD: Int32 = 2
+@When[os != "Windows"]
 const FD_CLOEXEC: Int32 = 1
+@When[os != "Windows"]
 const O_NONBLOCK: Int32 = 0x800
+@When[os != "Windows"]
 const WNOHANG: Int32 = 1
+@When[os != "Windows"]
 const SIGINT: Int32 = 2
+@When[os != "Windows"]
 const SIGTERM: Int32 = 15
+@When[os != "Windows"]
 const SIGKILL: Int32 = 9
+@When[os != "Windows"]
 const SIGWINCH: Int32 = 28
+@When[os != "Windows"]
 const TIOCSWINSZ: UInt64 = 0x5414
+@When[os != "Windows"]
 const WINSIZE_BYTES: Int64 = 8
 const PTY_READ_BYTES: Int64 = 4096
+@When[os != "Windows"]
 const STDERR_FILENO: Int32 = 2
 
 public enum PtyOutputStream {
@@ -333,6 +359,7 @@ public class UnsupportedPtyRuntime <: PtyRuntime {
     public func activeCount(): Int64 { 0 }
 }
 
+@When[os != "Windows"]
 public class LinuxPtyRuntime <: PtyRuntime {
     private let processes = ArrayList<LinuxPtyProcess>()
     private let events = ArrayList<Event>()
@@ -491,6 +518,7 @@ public class LinuxPtyRuntime <: PtyRuntime {
     }
 }
 
+@When[os != "Windows"]
 public class LinuxPtyProcess <: PtyProcess & EventSource {
     private let processId: String
     private let masterFd: Int32
@@ -670,6 +698,7 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
     }
 }
 
+@When[os != "Windows"]
 class LinuxPtyStderrSource <: EventSource {
     private let process: LinuxPtyProcess
 
@@ -699,6 +728,7 @@ func ptySignalName(signal: PtySignal): String {
     }
 }
 
+@When[os != "Windows"]
 func childExec(spec: PtySpec): Unit {
     if (!spec.cwd.isEmpty()) {
         let cwd = unsafe { LibC.mallocCString(spec.cwd) }
@@ -724,6 +754,7 @@ func childExec(spec: PtySpec): Unit {
     while (true) {}
 }
 
+@When[os != "Windows"]
 func childExecWithStreams(spec: PtySpec, masterFd: Int32, slaveFd: Int32, stderrReadFd: Int32, stderrWriteFd: Int32): Unit {
     unsafe {
         _ = close(masterFd)
@@ -737,6 +768,7 @@ func childExecWithStreams(spec: PtySpec, masterFd: Int32, slaveFd: Int32, stderr
     childExec(spec)
 }
 
+@When[os != "Windows"]
 func configureFd(fd: Int32): Unit {
     unsafe {
         let flags = fcntl(fd, F_GETFL, 0)
@@ -746,6 +778,7 @@ func configureFd(fd: Int32): Unit {
     }
 }
 
+@When[os != "Windows"]
 func makeWinsize(size: PtySize): Array<UInt8> {
     let out = Array<UInt8>(WINSIZE_BYTES, repeat: 0)
     writeUInt16LE(out, 0, UInt16(size.rows))
@@ -753,11 +786,13 @@ func makeWinsize(size: PtySize): Array<UInt8> {
     out
 }
 
+@When[os != "Windows"]
 func writeUInt16LE(bytes: Array<UInt8>, offset: Int64, value: UInt16): Unit {
     bytes[offset] = UInt8(value & 0xFF)
     bytes[offset + 1] = UInt8((value >> 8) & 0xFF)
 }
 
+@When[os != "Windows"]
 func signalNumber(signal: PtySignal): Int32 {
     match (signal) {
         case PtySignal.Interrupt => SIGINT
@@ -767,6 +802,7 @@ func signalNumber(signal: PtySignal): Int32 {
     }
 }
 
+@When[os != "Windows"]
 func decodeExitStatus(raw: Int32): PtyExitStatus {
     let signal = raw & 0x7F
     if (signal == 0) {

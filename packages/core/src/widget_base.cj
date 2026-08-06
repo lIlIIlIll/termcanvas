@@ -59,6 +59,13 @@ func themedDisabled(style: Style, theme: ?Theme): Style {
     }
 }
 
+func themedError(style: Style, theme: ?Theme): Style {
+    match (theme) {
+        case Some(t) => t.error.patch(style)
+        case None => style
+    }
+}
+
 func themedAccent(style: Style, theme: ?Theme): Style {
     match (theme) {
         case Some(t) => t.accent.patch(style)
@@ -93,4 +100,11 @@ func containsIndex(items: ArrayList<Int64>, value: Int64): Bool {
 
 func pad2(value: Int64): String {
     if (value < 10) { "0${value}" } else { "${value}" }
+}
+
+func isBorderNone(kind: BorderKind): Bool {
+    match (kind) {
+        case BorderKind.NoBorder => true
+        case _ => false
+    }
 }

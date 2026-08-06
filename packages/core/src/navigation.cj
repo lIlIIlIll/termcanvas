@@ -47,6 +47,12 @@ public class Modal <: Widget {
     private let width: Int64
     private let height: Int64
     private let style: Style
+    private let borderKind: BorderKind
+    private let backgroundStyle: Style
+    private let borderStyle: Style
+    private let titleStyle: Style
+    private let bodyDocument: ?Document
+    private let documentScroll: Int64
 
     public init(
         title!: String = "",
@@ -54,7 +60,13 @@ public class Modal <: Widget {
         buttons!: Array<String> = [],
         width!: Int64 = 40,
         height!: Int64 = 8,
-        style!: Style = Style.default()
+        style!: Style = Style.default(),
+        borderKind!: BorderKind = BorderKind.Ascii,
+        backgroundStyle!: Style = Style.default(),
+        borderStyle!: Style = Style.default(),
+        titleStyle!: Style = Style.default(),
+        bodyDocument!: ?Document = None,
+        documentScroll!: Int64 = 0
     ) {
         this.title = title
         this.body = body
@@ -62,6 +74,12 @@ public class Modal <: Widget {
         this.width = max(4, width)
         this.height = max(3, height)
         this.style = style
+        this.borderKind = borderKind
+        this.backgroundStyle = backgroundStyle
+        this.borderStyle = if (borderStyle == Style.default()) { style } else { borderStyle }
+        this.titleStyle = if (titleStyle == Style.default()) { style } else { titleStyle }
+        this.bodyDocument = bodyDocument
+        this.documentScroll = max(0, documentScroll)
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
@@ -69,10 +87,22 @@ public class Modal <: Widget {
         let w = min(area.width, width)
         let h = min(area.height, height)
         let target = Rect(area.x + max(0, (area.width - w) / 2), area.y + max(0, (area.height - h) / 2), w, h)
-        let block = Block(title: title, style: style)
+        buffer.fill(target, Cell(" ", style: style))
+        let block = Block(BlockOptions(
+            title: title,
+            borderKind: borderKind,
+            backgroundStyle: backgroundStyle,
+            borderStyle: borderStyle,
+            titleStyle: titleStyle
+        ))
         block.render(target, buffer)
         let inner = block.inner(target)
-        Paragraph(body, wrap: WrapMode.Word, style: style).render(inner, buffer)
+        match (bodyDocument) {
+            case Some(document) =>
+                DocumentView(document, scroll: documentScroll).render(inner, buffer)
+            case None =>
+                Paragraph(body, wrap: WrapMode.Word, style: style).render(inner, buffer)
+        }
         if (buttons.size > 0 && inner.height > 0) {
             buffer.setString(inner.x, inner.bottom - 1, truncate(join(buttons, "  "), inner.width), style: style)
         }

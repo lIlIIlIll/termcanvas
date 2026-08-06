@@ -2,9 +2,38 @@ package cjtui_btm_clone
 
 import core.*
 import std.collection.*
+import std.deriving.*
 import std.fs.*
 import std.sort.*
 import std.time.*
+
+@FastNative
+@When[os != "Windows"]
+foreign func statvfs(path: CString, buf: CPointer<StatVfs>): Int32
+
+@C
+@When[os != "Windows"]
+struct StatVfs {
+    StatVfs(
+        let f_bsize: UIntNative,
+        let f_frsize: UIntNative,
+        let f_blocks: UIntNative,
+        let f_bfree: UIntNative,
+        let f_bavail: UIntNative,
+        let f_files: UIntNative,
+        let f_ffree: UIntNative,
+        let f_favail: UIntNative,
+        let f_fsid: UIntNative,
+        let f_flag: Int32,
+        let f_namemax: UIntNative,
+        let f_spare0: Int32,
+        let f_spare1: Int32,
+        let f_spare2: Int32,
+        let f_spare3: Int32,
+        let f_spare4: Int32,
+        let f_spare5: Int32
+    ) {}
+}
 
 let BG = Color.Rgb(5, 8, 13)
 let PANEL = Color.Rgb(9, 14, 22)
@@ -17,11 +46,17 @@ let GREEN = Color.Rgb(91, 218, 129)
 let YELLOW = Color.Rgb(235, 192, 85)
 let RED = Color.Rgb(238, 91, 91)
 let MAGENTA = Color.Rgb(198, 127, 255)
+let PROCESS_NORMAL_STYLE = Style(fg: TEXT, bg: PANEL)
+let PROCESS_SELECTED_STYLE = Style(fg: BG, bg: CYAN, modifier: Modifier.strong())
 
 let PAGE_BYTES: Int64 = 4096
 let MAX_PROCESSES: Int64 = 200
 let HISTORY_CAPACITY: Int64 = 120
+let MIN_REFRESH_MILLIS: Int64 = 250
+let MAX_REFRESH_MILLIS: Int64 = 5000
+let REFRESH_STEP_MILLIS: Int64 = 250
 
+@Derive[Equatable]
 enum SortMode {
     | Cpu
     | Memory
@@ -152,6 +187,20 @@ class NetCounters {
     }
 }
 
+class ProcessSnapshotResult {
+    let requestId: Int64
+    let sortMode: SortMode
+    let filter: String
+    let snapshot: MetricSnapshot
+
+    init(requestId: Int64, sortMode: SortMode, filter: String, snapshot: MetricSnapshot) {
+        this.requestId = requestId
+        this.sortMode = sortMode
+        this.filter = filter
+        this.snapshot = snapshot
+    }
+}
+
 class DiskSample {
     let mount: String
     let usedBytes: Int64
@@ -211,6 +260,28 @@ class ProcessSample {
     }
 }
 
+class ProcessDisplayRow {
+    let pid: String
+    let cpu: String
+    let mem: String
+    let virt: String
+    let state: String
+    let command: String
+
+    init(proc: ProcessSample, commandWidth: Int64) {
+        this.pid = padLeft("${proc.pid}", 5)
+        this.cpu = padLeft(percent2(proc.cpuPercent100), 7)
+        this.mem = padLeft(percent2(proc.memPercent100) + "%(" + bytesText(proc.rssBytes) + ")", 14)
+        this.virt = padLeft(bytesText(proc.virtBytes), 8)
+        this.state = truncateLocal(proc.state, 2)
+        this.command = truncateLocal(proc.command, commandWidth)
+    }
+
+    func columns(): Array<String> {
+        [pid, cpu, mem, virt, state, command]
+    }
+}
+
 class MetricSnapshot {
     let cpu: CpuSnapshot
     let mem: MemSnapshot
@@ -261,9 +332,13 @@ class ProcFsSampler {
     private var previousCpu = CpuCounters()
     private var previousCores: Array<CpuCounters> = []
     private var previousNet = NetCounters()
+    private var previousNetTime: ?MonoTime = None
     private var previousProc = HashMap<Int64, ProcPrev>()
     private var lastCpuTotalDelta: Int64 = 1
+    private var lastCpuCoreCount: Int64 = 1
+    private var lastMemTotalKb: Int64 = 1
     private var initialized = false
+    private var netInitialized = false
 
     func sample(sortMode: SortMode, filter: String): MetricSnapshot {
         let start = MonoTime.now()
@@ -272,11 +347,38 @@ class ProcFsSampler {
         let mem = sampleMem()
         let net = sampleNet()
         let disks = sampleDisks()
-        let (processes, scanned, skipped) = sampleProcesses(lastCpuTotalDelta, max(1, mem.totalKb), sortMode, filter)
+        lastMemTotalKb = max(1, mem.totalKb)
+        let (processes, scanned, skipped) = sampleProcesses(processCpuDelta(), lastMemTotalKb, sortMode, filter)
         initialized = true
         let elapsed = max(0, (MonoTime.now() - start).toMilliseconds())
         if (cpu.cores.size == 0) { error = "cpu unavailable" }
         MetricSnapshot(cpu, mem, net, disks, processes, scanned, skipped, elapsed, error)
+    }
+
+    func sampleCpuOnly(): CpuSnapshot {
+        sampleCpu()
+    }
+
+    func sampleMemoryOnly(): MemSnapshot {
+        sampleMem()
+    }
+
+    func sampleNetworkOnly(): NetSnapshot {
+        sampleNet()
+    }
+
+    func sampleDisksOnly(): Array<DiskSample> {
+        sampleDisks()
+    }
+
+    func sampleProcessesOnly(sortMode: SortMode, filter: String): MetricSnapshot {
+        let start = MonoTime.now()
+        let cpu = sampleCpuTotalsOnly()
+        let memTotalKb = sampleMemTotalKbOnly()
+        let (processes, scanned, skipped) = sampleProcesses(processCpuDelta(), memTotalKb, sortMode, filter)
+        let elapsed = max(0, (MonoTime.now() - start).toMilliseconds())
+        let error = if (cpu.cores.size == 0) { "cpu unavailable" } else { "" }
+        MetricSnapshot(CpuSnapshot(), MemSnapshot(), NetSnapshot(), [], processes, scanned, skipped, elapsed, error)
     }
 
     private func sampleCpu(): CpuSnapshot {
@@ -295,6 +397,7 @@ class ProcFsSampler {
                     }
                 }
                 lastCpuTotalDelta = max(1, total.total - previousCpu.total)
+                lastCpuCoreCount = max(1, cores.size)
                 let usage = cpuUsage(total, previousCpu)
                 let coreUsages = ArrayList<Int64>()
                 for (i in 0..cores.size) {
@@ -305,6 +408,33 @@ class ProcFsSampler {
                 previousCores = cores.toArray()
                 CpuSnapshot(usage, coreUsages.toArray())
         }
+    }
+
+    private func sampleCpuTotalsOnly(): CpuSnapshot {
+        let text = readTextSafe("/proc/stat")
+        match (text) {
+            case None => return CpuSnapshot()
+            case Some(body) =>
+                var total = CpuCounters()
+                var cores: Int64 = 0
+                for (line in splitBy(body, b'\n')) {
+                    if (line.startsWith("cpu ")) {
+                        total = parseCpuLine(line)
+                    } else if (line.startsWith("cpu") && line.size > 3 && isDigit(line[3])) {
+                        cores++
+                    }
+                    if (cores > 0 && !line.startsWith("cpu")) { break }
+                }
+                let usage = cpuUsage(total, previousCpu)
+                lastCpuTotalDelta = max(1, total.total - previousCpu.total)
+                lastCpuCoreCount = max(1, cores)
+                previousCpu = total
+                CpuSnapshot(usage, [])
+        }
+    }
+
+    private func processCpuDelta(): Int64 {
+        max(1, lastCpuTotalDelta / max(1, lastCpuCoreCount))
     }
 
     private func sampleMem(): MemSnapshot {
@@ -327,7 +457,24 @@ class ProcFsSampler {
                         case _ => ()
                     }
                 }
+                lastMemTotalKb = max(1, total)
                 MemSnapshot(total, max(0, total - available), swapTotal, max(0, swapTotal - swapFree))
+        }
+    }
+
+    private func sampleMemTotalKbOnly(): Int64 {
+        match (readTextSafe("/proc/meminfo")) {
+            case None => lastMemTotalKb
+            case Some(body) =>
+                for (line in splitBy(body, b'\n')) {
+                    if (!line.startsWith("MemTotal:")) { continue }
+                    let fields = words(line)
+                    if (fields.size >= 2) {
+                        lastMemTotalKb = max(1, parseInt(fields[1]))
+                        return lastMemTotalKb
+                    }
+                }
+                lastMemTotalKb
         }
     }
 
@@ -335,6 +482,7 @@ class ProcFsSampler {
         match (readTextSafe("/proc/net/dev")) {
             case None => NetSnapshot()
             case Some(body) =>
+                let now = MonoTime.now()
                 var rx: Int64 = 0
                 var tx: Int64 = 0
                 for (line in splitBy(body, b'\n')) {
@@ -349,9 +497,16 @@ class ProcFsSampler {
                         tx += parseInt(fields[8])
                     }
                 }
-                let rxRate = if (initialized) { max(0, rx - previousNet.rx) } else { 0 }
-                let txRate = if (initialized) { max(0, tx - previousNet.tx) } else { 0 }
+                let elapsedMillis = match (previousNetTime) {
+                    case Some(prev) => max(1, (now - prev).toMilliseconds())
+                    case None => 1000
+                }
+                let ready = initialized || netInitialized
+                let rxRate = if (ready) { max(0, rx - previousNet.rx) * 1000 / elapsedMillis } else { 0 }
+                let txRate = if (ready) { max(0, tx - previousNet.tx) * 1000 / elapsedMillis } else { 0 }
                 previousNet = NetCounters(rx, tx)
+                previousNetTime = Some(now)
+                netInitialized = true
                 NetSnapshot(rxRate, txRate)
         }
     }
@@ -386,11 +541,16 @@ class ProcFsSampler {
                 let pid = parsePid(entry.name)
                 if (pid < 0) { continue }
                 scanned++
-                match (readProcess(pid, totalDelta, memTotalKb)) {
+                match (readProcess(pid, totalDelta, memTotalKb, false)) {
                     case Some(proc) =>
                         nextPrev.add(pid, ProcPrev(proc.cpuTotal, proc.startTime))
-                        if (filter.isEmpty() || proc.name.contains(filter) || proc.command.contains(filter) || "${proc.pid}".contains(filter)) {
+                        if (filter.isEmpty() || proc.name.contains(filter) || "${proc.pid}".contains(filter)) {
                             rows.add(proc)
+                        } else {
+                            let cmd = processCommand(pid, proc.name)
+                            if (cmd.contains(filter)) {
+                                rows.add(ProcessSample(proc.pid, proc.name, cmd, proc.state, proc.cpuPercent100, proc.memPercent100, proc.virtBytes, proc.rssBytes, proc.startTime, proc.cpuTotal))
+                            }
                         }
                     case None => skipped++
                 }
@@ -403,10 +563,14 @@ class ProcFsSampler {
         while (rows.size > MAX_PROCESSES) {
             rows.remove(at: rows.size - 1)
         }
-        (rows.toArray(), scanned, skipped)
+        let enriched = ArrayList<ProcessSample>()
+        for (proc in rows) {
+            enriched.add(withDisplayCommand(proc))
+        }
+        (enriched.toArray(), scanned, skipped)
     }
 
-    private func readProcess(pid: Int64, totalDelta: Int64, memTotalKb: Int64): ?ProcessSample {
+    private func readProcess(pid: Int64, totalDelta: Int64, memTotalKb: Int64, includeCommand: Bool): ?ProcessSample {
         match (readTextSafe("/proc/${pid}/stat")) {
             case None => return None
             case Some(stat) =>
@@ -422,11 +586,17 @@ class ProcFsSampler {
                                 }
                             case None => ()
                         }
-                        let cmd = processCommand(pid, raw.name)
+                        let cmd = if (includeCommand) { processCommand(pid, raw.name) } else { raw.name }
                         let memPercent100 = clampLocal(raw.rssBytes * 10000 / max(1, memTotalKb * 1024), 0, 10000)
                         Some(ProcessSample(pid, raw.name, cmd, raw.state, cpuPercent100, memPercent100, raw.virtBytes, raw.rssBytes, raw.startTime, raw.cpuTotal))
                 }
         }
+    }
+
+    private func withDisplayCommand(proc: ProcessSample): ProcessSample {
+        if (proc.command != proc.name) { return proc }
+        let cmd = processCommand(proc.pid, proc.name)
+        ProcessSample(proc.pid, proc.name, cmd, proc.state, proc.cpuPercent100, proc.memPercent100, proc.virtBytes, proc.rssBytes, proc.startTime, proc.cpuTotal)
     }
 }
 
@@ -449,9 +619,20 @@ class RawProcStat {
 }
 
 class BtmClone <: Widget {
-    private let sampler = ProcFsSampler()
+    private let processSampler = ProcFsSampler()
+    private let cpuSampler = ProcFsSampler()
+    private let memorySampler = ProcFsSampler()
+    private let networkSampler = ProcFsSampler()
+    private let diskSampler = ProcFsSampler()
+    private let host = ComponentHost()
+    private var processSource: ?DataSource<ProcessSnapshotResult> = None
+    private var cpuSource: ?AsyncDataSource<CpuSnapshot> = None
+    private var memorySource: ?AsyncDataSource<MemSnapshot> = None
+    private var networkSource: ?AsyncDataSource<NetSnapshot> = None
+    private var diskSource: ?AsyncDataSource<Array<DiskSample>> = None
     private var snapshot = MetricSnapshot()
-    private var frame: Int64 = 0
+    private var processRows: Array<ProcessDisplayRow> = []
+    private var processRowsCommandWidth: Int64 = -1
     private var selected: Int64 = 0
     private var processOffset: Int64 = 0
     private var sortMode = SortMode.Cpu
@@ -459,61 +640,94 @@ class BtmClone <: Widget {
     private var filtering = false
     private var filter = ""
     private var showDetail = false
+    private var showProfiler = false
     private let cpuHistory = HistoryRing(HISTORY_CAPACITY)
     private let memHistory = HistoryRing(HISTORY_CAPACITY)
     private let netHistory = HistoryRing(HISTORY_CAPACITY)
+    private var cpuValues: Array<Int64> = []
+    private var memValues: Array<Int64> = []
+    private var netValues: Array<Int64> = []
+    private var lastArea: ?Rect = None
+    private var lastProcessArea: ?Rect = None
+    private var lastProcessVisibleRows: Int64 = 0
+    private var dataClock: Int64 = 0
+    private var processRequestId: Int64 = 0
+    private var latestAppliedProcessRequestId: Int64 = 0
+    private var refreshMillis: Int64 = 1000
 
     init() {
+        processSource = Some(DataSource<ProcessSnapshotResult>("processes", idleMillis: 2))
+        cpuSource = Some(AsyncDataSource<CpuSnapshot>("cpu", { => cpuSampler.sampleCpuOnly() }))
+        memorySource = Some(AsyncDataSource<MemSnapshot>("memory", { => memorySampler.sampleMemoryOnly() }))
+        networkSource = Some(AsyncDataSource<NetSnapshot>("network", { => networkSampler.sampleNetworkOnly() }))
+        diskSource = Some(AsyncDataSource<Array<DiskSample>>("disk", { => diskSampler.sampleDisksOnly() }, lowPriority: true))
         refresh()
+        seedDataSources()
+        host.add("header", HeaderPanel(this), area: Rect(0, 0, 0, 0), focused: false)
+        host.add("cpu", CpuPanel(this), area: Rect(0, 0, 0, 0), focused: false)
+        host.add("memory", MemoryPanel(this), area: Rect(0, 0, 0, 0), focused: false)
+        host.add("network", NetworkPanel(this), area: Rect(0, 0, 0, 0), focused: false)
+        host.add("disk", DiskPanel(this), area: Rect(0, 0, 0, 0), focused: false)
+        host.add("processes", ProcessTablePanel(this), area: Rect(0, 0, 0, 0))
+        host.add("footer", FooterPanel(this), area: Rect(0, 0, 0, 0), focused: false)
     }
 
     func update(event: Event): UpdateResult {
         match (event) {
-            case Event.KeyDown(key) => handleKey(key)
-            case Event.Tick(tick) =>
-                frame = tick.frameIndex
-                UpdateResult.next()
+            case Event.KeyDown(key) =>
+                if (filtering) {
+                    return handleKey(key)
+                }
+                let routed = host.update(event)
+                if (hasBtmEffect(routed)) { return routed }
+                handleKey(key)
+            case Event.Tick(_) => UpdateResult.next()
             case Event.Timer(timer) =>
-                if (timer.id == "sample" && !paused) { refresh() }
-                UpdateResult.next()
+                if (timer.id.startsWith("component:")) {
+                    host.update(event)
+                } else {
+                    UpdateResult.next()
+                }
             case Event.Capabilities(_) =>
-                UpdateResult.withCommand(Command.StartTimer(TimerSpec("sample", Duration.second)))
-            case _ => UpdateResult.next()
+                host.mount()
+            case _ => host.update(event)
         }
     }
 
     private func handleKey(key: KeyEvent): UpdateResult {
         if (filtering) {
+            var changed = false
             match (key.code) {
                 case KeyCode.Esc =>
                     filtering = false
                     if (!filter.isEmpty()) {
                         filter = ""
-                        refresh()
+                        refreshProcessesOnly()
+                        changed = true
                     }
                 case KeyCode.Enter =>
                     filtering = false
-                    refresh()
+                    refreshProcessesOnly()
+                    changed = true
                 case KeyCode.Backspace =>
                     if (!filter.isEmpty()) {
                         filter = filter[..max(0, filter.size - 1)]
-                        refresh()
+                        refreshProcessesOnly()
+                        changed = true
                     }
                 case KeyCode.Char(ch) =>
                     filter += ch.toString()
-                    refresh()
+                    refreshProcessesOnly()
+                    changed = true
                 case _ => ()
             }
-            return UpdateResult.next()
+            if (changed) {
+                return dirtyHeaderFooterProcesses()
+            }
+            return dirtyFooterArea()
         }
         match (key.code) {
             case KeyCode.CtrlC | KeyCode.Char(r'q') => UpdateResult.exit()
-            case KeyCode.Down | KeyCode.Char(r'j') =>
-                selected = min(max(0, snapshot.processes.size - 1), selected + 1)
-                UpdateResult.next()
-            case KeyCode.Up | KeyCode.Char(r'k') =>
-                selected = max(0, selected - 1)
-                UpdateResult.next()
             case KeyCode.Char(r'c') => setSort(SortMode.Cpu)
             case KeyCode.Char(r'm') => setSort(SortMode.Memory)
             case KeyCode.Char(r'p') => setSort(SortMode.Pid)
@@ -523,30 +737,272 @@ class BtmClone <: Widget {
                 UpdateResult.next()
             case KeyCode.Char(r' ') =>
                 paused = !paused
-                UpdateResult.next()
+                dirtyKnownArea()
+            case KeyCode.Char(r'd') =>
+                showProfiler = !showProfiler
+                dirtyKnownArea()
+            case KeyCode.Char(r'+') | KeyCode.Char(r'=') => adjustRefreshInterval(-REFRESH_STEP_MILLIS)
+            case KeyCode.Char(r'-') | KeyCode.Char(r'_') => adjustRefreshInterval(REFRESH_STEP_MILLIS)
             case KeyCode.Enter =>
                 showDetail = !showDetail
-                UpdateResult.next()
+                dirtyProcessesArea()
             case _ => UpdateResult.next()
         }
     }
 
     private func setSort(mode: SortMode): UpdateResult {
         sortMode = mode
-        refresh()
-        UpdateResult.next()
+        refreshProcessesOnly()
+        dirtyHeaderFooterProcesses()
     }
 
-    private func refresh(): Unit {
-        snapshot = sampler.sample(sortMode, filter)
+    public func refreshInterval(): Duration {
+        Duration.millisecond * refreshMillis
+    }
+
+    private func adjustRefreshInterval(deltaMillis: Int64): UpdateResult {
+        let next = clampLocal(refreshMillis + deltaMillis, MIN_REFRESH_MILLIS, MAX_REFRESH_MILLIS)
+        if (next == refreshMillis) {
+            return dirtyFooterArea()
+        }
+        refreshMillis = next
+        UpdateResult(command: restartRefreshTimers(), dirtyRects: dirtyFooterRects())
+    }
+
+    private func restartRefreshTimers(): Command {
+        Command.Batch([
+            Command.RestartTimer(TimerSpec("component:cpu:cpu", refreshInterval())),
+            Command.RestartTimer(TimerSpec("component:memory:memory", refreshInterval())),
+            Command.RestartTimer(TimerSpec("component:network:network", refreshInterval())),
+            Command.RestartTimer(TimerSpec("component:disk:disk", refreshInterval())),
+            Command.RestartTimer(TimerSpec("component:processes:proc", refreshInterval()))
+        ])
+    }
+
+    public func refresh(): Unit {
+        snapshot = processSampler.sample(sortMode, filter)
+        invalidateProcessRows()
         selected = clampLocal(selected, 0, max(0, snapshot.processes.size - 1))
         processOffset = clampLocal(processOffset, 0, max(0, snapshot.processes.size - 1))
+        updateHistory()
+    }
+
+    private func refreshProcessesOnly(): Unit {
+        let next = processSampler.sampleProcessesOnly(sortMode, filter)
+        snapshot = MetricSnapshot(snapshot.cpu, snapshot.mem, snapshot.net, snapshot.disks, next.processes, next.scanned, next.skipped, next.sampleMillis, next.error)
+        invalidateProcessRows()
+        selected = clampLocal(selected, 0, max(0, snapshot.processes.size - 1))
+        processOffset = clampLocal(processOffset, 0, max(0, snapshot.processes.size - 1))
+    }
+
+    private func updateHistory(): Unit {
         cpuHistory.push(snapshot.cpu.usage)
         memHistory.push(snapshot.mem.percent())
         netHistory.push(snapshot.net.percent())
+        updateHistoryArrays()
+    }
+
+    private func updateHistoryArrays(): Unit {
+        cpuValues = cpuHistory.toArray()
+        memValues = memHistory.toArray()
+        netValues = netHistory.toArray()
+    }
+
+    private func seedDataSources(): Unit {
+        match (processSource) {
+            case Some(item) => _ = item.set(ProcessSnapshotResult(0, sortMode, filter, snapshot))
+            case None => ()
+        }
+        match (cpuSource) {
+            case Some(item) => _ = item.dataSource().set(snapshot.cpu)
+            case None => ()
+        }
+        match (memorySource) {
+            case Some(item) => _ = item.dataSource().set(snapshot.mem)
+            case None => ()
+        }
+        match (networkSource) {
+            case Some(item) => _ = item.dataSource().set(snapshot.net)
+            case None => ()
+        }
+        match (diskSource) {
+            case Some(item) => _ = item.dataSource().set(snapshot.disks)
+            case None => ()
+        }
+    }
+
+    private func nextDataClock(): Int64 {
+        dataClock++
+        dataClock
+    }
+
+    private func markNavigation(): Unit {
+        match (processSource) {
+            case Some(source) => source.markActivity(nextDataClock())
+            case None => ()
+        }
+    }
+
+    private func nextProcessRequestId(): Int64 {
+        processRequestId++
+        processRequestId
+    }
+
+    public func refreshMetricPanel(ctx: ComponentContext, panelId: String): ComponentResult {
+        if (paused) { return ComponentResult.ignored() }
+        match (panelId) {
+            case "cpu" =>
+                match (cpuSource) {
+                    case Some(source) => _ = source.refresh(ctx, nowMillis: nextDataClock())
+                    case None => ()
+                }
+            case "memory" =>
+                match (memorySource) {
+                    case Some(source) => _ = source.refresh(ctx, nowMillis: nextDataClock())
+                    case None => ()
+                }
+            case "network" =>
+                match (networkSource) {
+                    case Some(source) => _ = source.refresh(ctx, nowMillis: nextDataClock())
+                    case None => ()
+                }
+            case "disk" =>
+                match (diskSource) {
+                    case Some(source) => _ = source.refresh(ctx, nowMillis: nextDataClock())
+                    case None => ()
+                }
+            case _ => ()
+        }
+        ComponentResult(handled: true)
+    }
+
+    public func applyMetricSample(ctx: ComponentContext, panelId: String): ComponentResult {
+        if (paused) { return ComponentResult.ignored() }
+        match (panelId) {
+            case "cpu" =>
+                match (cpuSource) {
+                    case Some(source) =>
+                        match (source.latest()) {
+                            case Some(cpu) =>
+                                snapshot = MetricSnapshot(cpu, snapshot.mem, snapshot.net, snapshot.disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
+                                cpuHistory.push(snapshot.cpu.usage)
+                                updateHistoryArrays()
+                            case None => ()
+                        }
+                    case None => ()
+                }
+            case "memory" =>
+                match (memorySource) {
+                    case Some(source) =>
+                        match (source.latest()) {
+                            case Some(mem) =>
+                                snapshot = MetricSnapshot(snapshot.cpu, mem, snapshot.net, snapshot.disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
+                                memHistory.push(snapshot.mem.percent())
+                                updateHistoryArrays()
+                            case None => ()
+                        }
+                    case None => ()
+                }
+            case "network" =>
+                match (networkSource) {
+                    case Some(source) =>
+                        match (source.latest()) {
+                            case Some(net) =>
+                                snapshot = MetricSnapshot(snapshot.cpu, snapshot.mem, net, snapshot.disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
+                                netHistory.push(snapshot.net.percent())
+                                updateHistoryArrays()
+                            case None => ()
+                        }
+                    case None => ()
+                }
+            case "disk" =>
+                match (diskSource) {
+                    case Some(source) =>
+                        match (source.latest()) {
+                            case Some(disks) =>
+                                snapshot = MetricSnapshot(snapshot.cpu, snapshot.mem, snapshot.net, disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
+                            case None => ()
+                        }
+                    case None => ()
+                }
+            case _ => ()
+        }
+        ComponentResult(handled: true, dirty: Dirty.Global(dirtyPanelAndHeader(ctx.area)), propagation: EventPropagation.Stop)
+    }
+
+    private func applyProcessSource(): Unit {
+        match (processSource) {
+            case Some(item) =>
+                match (item.latest()) {
+                    case Some(next) =>
+                        if (next.requestId < latestAppliedProcessRequestId || next.sortMode != sortMode || next.filter != filter) {
+                            return
+                        }
+                        latestAppliedProcessRequestId = next.requestId
+                        let processSnapshot = next.snapshot
+                        snapshot = MetricSnapshot(snapshot.cpu, snapshot.mem, snapshot.net, snapshot.disks, processSnapshot.processes, processSnapshot.scanned, processSnapshot.skipped, processSnapshot.sampleMillis, processSnapshot.error)
+                        invalidateProcessRows()
+                        selected = clampLocal(selected, 0, max(0, snapshot.processes.size - 1))
+                        processOffset = clampLocal(processOffset, 0, max(0, snapshot.processes.size - 1))
+                    case None => ()
+                }
+            case None => ()
+        }
+    }
+
+    public func requestProcessSample(ctx: ComponentContext): ComponentResult {
+        if (paused) { return ComponentResult.ignored() }
+        match (processSource) {
+            case Some(source) =>
+                let requestId = nextProcessRequestId()
+                let requestSort = sortMode
+                let requestFilter = filter
+                _ = source.refresh(ctx, { => ProcessSnapshotResult(requestId, requestSort, requestFilter, processSampler.sampleProcessesOnly(requestSort, requestFilter)) }, nowMillis: nextDataClock(), lowPriority: true)
+            case None => ()
+        }
+        ComponentResult(handled: true)
+    }
+
+    public func applyProcessSample(): ComponentResult {
+        if (paused) { return ComponentResult.ignored() }
+        applyProcessSource()
+        let dirty = dirtyHeaderFooterProcesses().dirtyRects
+        ComponentResult(handled: true, dirty: match (dirty) {
+            case Some(rects) => Dirty.Global(rects)
+            case None => Dirty.Self
+        }, propagation: EventPropagation.Stop)
+    }
+
+    public func moveProcessSelection(delta: Int64): UpdateResult {
+        let beforeSelected = selected
+        let beforeOffset = processOffset
+        selected = clampLocal(selected + delta, 0, max(0, snapshot.processes.size - 1))
+        markNavigation()
+        selectionDirty(beforeSelected, beforeOffset)
+    }
+
+    public func toggleProcessDetail(): UpdateResult {
+        showDetail = !showDetail
+        dirtyProcessesArea()
+    }
+
+    private func invalidateProcessRows(): Unit {
+        processRows = []
+        processRowsCommandWidth = -1
+    }
+
+    private func ensureProcessRows(commandWidth: Int64): Unit {
+        if (processRowsCommandWidth == commandWidth && processRows.size == snapshot.processes.size) { return }
+        let rows = ArrayList<ProcessDisplayRow>()
+        for (proc in snapshot.processes) {
+            rows.add(ProcessDisplayRow(proc, commandWidth))
+        }
+        processRows = rows.toArray()
+        processRowsCommandWidth = commandWidth
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        lastArea = Some(area)
         let canvas = Canvas(buffer, area)
         canvas.fillRect(area, Style(bg: BG))
         if (area.width < 86 || area.height < 26) {
@@ -560,14 +1016,58 @@ class BtmClone <: Widget {
             Constraint.Min(8),
             Constraint.Length(1)
         ]).withGap(1).split(area)
-        renderTopBar(canvas, rows[0])
-        renderCpu(canvas, rows[1])
+        renderTopBar(buffer, rows[0])
+        renderCpu(buffer, canvas, rows[1])
         let mid = Layout.horizontal([Constraint.Percent(34), Constraint.Percent(33), Constraint.Min(24)]).withGap(1).split(rows[2])
-        renderMemory(canvas, mid[0])
-        renderNetwork(canvas, mid[1])
-        renderDisks(canvas, mid[2])
-        renderProcesses(canvas, rows[3])
-        renderBottomBar(canvas, rows[4])
+        renderMemory(buffer, canvas, mid[0])
+        renderNetwork(buffer, canvas, mid[1])
+        renderDisks(buffer, canvas, mid[2])
+        renderProcesses(buffer, canvas, rows[3])
+        renderBottomBar(buffer, rows[4])
+    }
+
+    public func renderFrame(frame: Frame): Unit {
+        let area = frame.area
+        lastArea = Some(area)
+        for (dirty in frame.dirtyRects()) {
+            let target = intersectLocal(area, dirty)
+            if (target.width > 0 && target.height > 0) {
+                frame.fill(target, Style(bg: BG))
+            }
+        }
+        let canvas = frame.canvas(area: area)
+        if (area.width < 86 || area.height < 26) {
+            if (frame.isDirty(area)) {
+                renderSmall(canvas, area)
+            }
+            return
+        }
+        let rows = Layout.vertical([
+            Constraint.Length(1),
+            Constraint.Percent(42),
+            Constraint.Percent(25),
+            Constraint.Min(8),
+            Constraint.Length(1)
+        ]).withGap(1).split(area)
+        let mid = Layout.horizontal([Constraint.Percent(34), Constraint.Percent(33), Constraint.Min(24)]).withGap(1).split(rows[2])
+        _ = host.setArea("header", rows[0])
+        _ = host.setArea("cpu", rows[1])
+        _ = host.setArea("memory", mid[0])
+        _ = host.setArea("network", mid[1])
+        _ = host.setArea("disk", mid[2])
+        _ = host.setArea("processes", rows[3])
+        _ = host.setArea("footer", rows[4])
+        host.render(frame)
+        if (showProfiler) {
+            frame.renderWidget(
+                ProfilerOverlay(host.profiler()),
+                Rect(area.x + 2, area.y + 2, min(area.width - 4, 72), min(area.height - 4, 10))
+            )
+        }
+    }
+
+    public func profilerSnapshot(): ProfilerSnapshot {
+        host.profilerSnapshot()
     }
 
     private func renderSmall(canvas: Canvas, area: Rect): Unit {
@@ -575,18 +1075,31 @@ class BtmClone <: Widget {
         canvas.drawText(area.x + 1, area.y + 3, "resize terminal, q quits", Style(fg: MUTED, bg: BG))
     }
 
-    private func renderTopBar(canvas: Canvas, area: Rect): Unit {
+    private func renderTopBar(buffer: Buffer, area: Rect): Unit {
         let bg = Color.Rgb(14, 20, 30)
-        canvas.fillRect(area, Style(bg: bg))
         let mode = if (paused) { "PAUSED" } else { "LIVE" }
-        canvas.drawText(area.x + 1, area.y, " btm  cpu  mem  net  disk  proc ", Style(fg: BG, bg: CYAN, modifier: Modifier.strong()))
-        canvas.drawText(area.x + 34, area.y, mode, Style(fg: if (paused) { YELLOW } else { GREEN }, bg: bg, modifier: Modifier.strong()))
-        canvas.drawText(max(area.x + 1, area.right - 56), area.y, "cpu ${snapshot.cpu.usage}%  mem ${snapshot.mem.percent()}%  scan ${snapshot.sampleMillis}ms  pids ${snapshot.scanned}", Style(fg: MUTED, bg: bg))
+        HeaderBar(
+            "btm " + mode,
+            left: "cpu  mem  net  disk  proc",
+            right: "cpu ${snapshot.cpu.usage}%  mem ${snapshot.mem.percent()}%  scan ${snapshot.sampleMillis}ms  pids ${snapshot.scanned}",
+            style: Style(fg: TEXT, bg: bg, modifier: Modifier.strong())
+        ).render(area, buffer)
     }
 
-    private func renderCpu(canvas: Canvas, area: Rect): Unit {
-        let inner = panel(canvas, area, " CPU ")
-        drawGraph(canvas, inner, cpuHistory.toArray(), 100, CYAN, "CPU", "%")
+    public func renderTopBarFrame(frame: Frame, area: Rect): Unit {
+        let bg = Color.Rgb(14, 20, 30)
+        let mode = if (paused) { "PAUSED" } else { "LIVE" }
+        frame.renderWidget(HeaderBar(
+            "btm " + mode,
+            left: "cpu  mem  net  disk  proc",
+            right: "cpu ${snapshot.cpu.usage}%  mem ${snapshot.mem.percent()}%  scan ${snapshot.sampleMillis}ms  pids ${snapshot.scanned}",
+            style: Style(fg: TEXT, bg: bg, modifier: Modifier.strong())
+        ), area)
+    }
+
+    private func renderCpu(buffer: Buffer, canvas: Canvas, area: Rect): Unit {
+        let inner = panel(buffer, area, " CPU ")
+        drawGraph(canvas, inner, cpuValues, 100, CYAN, "CPU", "%")
         let side = Rect(inner.right - 24, inner.y + 1, 22, min(10, inner.height - 2))
         canvas.fillRect(side, Style(bg: Color.Rgb(7, 12, 19)))
         canvas.strokeRect(side, Style(fg: GRID, bg: Color.Rgb(7, 12, 19)))
@@ -600,24 +1113,59 @@ class BtmClone <: Widget {
         }
     }
 
-    private func renderMemory(canvas: Canvas, area: Rect): Unit {
-        let inner = panel(canvas, area, " Memory ")
-        drawGraph(canvas, Rect(inner.x, inner.y, inner.width, max(3, inner.height - 4)), memHistory.toArray(), 100, GREEN, "RAM", "%")
-        let y = inner.bottom - 3
-        drawMeter(canvas, inner.x + 1, y, max(8, inner.width - 2), snapshot.mem.percent(), GREEN, "RAM " + bytesText(snapshot.mem.usedKb * 1024) + " / " + bytesText(snapshot.mem.totalKb * 1024))
-        drawMeter(canvas, inner.x + 1, y + 1, max(8, inner.width - 2), snapshot.mem.swapPercent(), BLUE, "SWP " + bytesText(snapshot.mem.swapUsedKb * 1024) + " / " + bytesText(snapshot.mem.swapTotalKb * 1024))
+    public func renderCpuFrame(frame: Frame, area: Rect): Unit {
+        let canvas = frame.canvas(area: area)
+        let inner = panelFrame(frame, area, " CPU ")
+        drawGraph(canvas, inner, cpuValues, 100, CYAN, "CPU", "%")
+        let side = Rect(inner.right - 24, inner.y + 1, 22, min(10, inner.height - 2))
+        canvas.fillRect(side, Style(bg: Color.Rgb(7, 12, 19)))
+        canvas.strokeRect(side, Style(fg: GRID, bg: Color.Rgb(7, 12, 19)))
+        let cores = snapshot.cpu.cores
+        let limit = min(6, cores.size)
+        for (i in 0..limit) {
+            canvas.drawText(side.x + 2, side.y + 1 + i, "CPU${i}  ${padLeft("${cores[i]}", 3)}%", Style(fg: colorForIndex(i), bg: Color.Rgb(7, 12, 19)))
+        }
+        if (cores.size == 0) {
+            canvas.drawText(side.x + 2, side.y + 1, "cpu unavailable", Style(fg: RED, bg: Color.Rgb(7, 12, 19)))
+        }
     }
 
-    private func renderNetwork(canvas: Canvas, area: Rect): Unit {
-        let inner = panel(canvas, area, " Network ")
-        drawGraph(canvas, Rect(inner.x, inner.y, inner.width, max(3, inner.height - 3)), netHistory.toArray(), 100, BLUE, "NET", "%")
+    private func renderMemory(buffer: Buffer, canvas: Canvas, area: Rect): Unit {
+        let inner = panel(buffer, area, " Memory ")
+        drawGraph(canvas, Rect(inner.x, inner.y, inner.width, max(3, inner.height - 4)), memValues, 100, GREEN, "RAM", "%")
+        let y = inner.bottom - 3
+        drawMeter(buffer, inner.x + 1, y, max(8, inner.width - 2), snapshot.mem.percent(), GREEN, "RAM " + bytesText(snapshot.mem.usedKb * 1024) + " / " + bytesText(snapshot.mem.totalKb * 1024))
+        drawMeter(buffer, inner.x + 1, y + 1, max(8, inner.width - 2), snapshot.mem.swapPercent(), BLUE, "SWP " + bytesText(snapshot.mem.swapUsedKb * 1024) + " / " + bytesText(snapshot.mem.swapTotalKb * 1024))
+    }
+
+    public func renderMemoryFrame(frame: Frame, area: Rect): Unit {
+        let canvas = frame.canvas(area: area)
+        let inner = panelFrame(frame, area, " Memory ")
+        drawGraph(canvas, Rect(inner.x, inner.y, inner.width, max(3, inner.height - 4)), memValues, 100, GREEN, "RAM", "%")
+        let y = inner.bottom - 3
+        drawMeterFrame(frame, inner.x + 1, y, max(8, inner.width - 2), snapshot.mem.percent(), GREEN, "RAM " + bytesText(snapshot.mem.usedKb * 1024) + " / " + bytesText(snapshot.mem.totalKb * 1024))
+        drawMeterFrame(frame, inner.x + 1, y + 1, max(8, inner.width - 2), snapshot.mem.swapPercent(), BLUE, "SWP " + bytesText(snapshot.mem.swapUsedKb * 1024) + " / " + bytesText(snapshot.mem.swapTotalKb * 1024))
+    }
+
+    private func renderNetwork(buffer: Buffer, canvas: Canvas, area: Rect): Unit {
+        let inner = panel(buffer, area, " Network ")
+        drawGraph(canvas, Rect(inner.x, inner.y, inner.width, max(3, inner.height - 3)), netValues, 100, BLUE, "NET", "%")
         let y = inner.bottom - 2
         canvas.drawText(inner.x + 1, y, "RX " + rateText(snapshot.net.rxRate), Style(fg: BLUE, bg: PANEL))
         canvas.drawText(inner.x + max(18, inner.width / 2), y, "TX " + rateText(snapshot.net.txRate), Style(fg: CYAN, bg: PANEL))
     }
 
-    private func renderDisks(canvas: Canvas, area: Rect): Unit {
-        let inner = panel(canvas, area, " Disks ")
+    public func renderNetworkFrame(frame: Frame, area: Rect): Unit {
+        let canvas = frame.canvas(area: area)
+        let inner = panelFrame(frame, area, " Network ")
+        drawGraph(canvas, Rect(inner.x, inner.y, inner.width, max(3, inner.height - 3)), netValues, 100, BLUE, "NET", "%")
+        let y = inner.bottom - 2
+        canvas.drawText(inner.x + 1, y, "RX " + rateText(snapshot.net.rxRate), Style(fg: BLUE, bg: PANEL))
+        canvas.drawText(inner.x + max(18, inner.width / 2), y, "TX " + rateText(snapshot.net.txRate), Style(fg: CYAN, bg: PANEL))
+    }
+
+    private func renderDisks(buffer: Buffer, canvas: Canvas, area: Rect): Unit {
+        let inner = panel(buffer, area, " Disks ")
         let limit = min(snapshot.disks.size, max(0, (inner.height - 1) / 2))
         for (i in 0..limit) {
             let disk = snapshot.disks[i]
@@ -629,23 +1177,140 @@ class BtmClone <: Widget {
         }
     }
 
-    private func renderProcesses(canvas: Canvas, area: Rect): Unit {
-        let inner = panel(canvas, area, " Processes ")
-        canvas.drawText(inner.x + 1, inner.y, " PID      CPU%       MEM(RSS)     VIRT   S  COMMAND", Style(fg: CYAN, bg: PANEL, modifier: Modifier.strong()))
-        canvas.drawText(inner.x + 1, inner.y + 1, repeatLocal("-", max(1, inner.width - 2)), Style(fg: GRID, bg: PANEL))
-        let detailRows = if (showDetail) { 4 } else { 0 }
-        let visibleRows = max(0, inner.height - 2 - detailRows)
-        ensureProcessVisible(visibleRows)
-        let limit = min(max(0, snapshot.processes.size - processOffset), visibleRows)
+    public func renderDisksFrame(frame: Frame, area: Rect): Unit {
+        let canvas = frame.canvas(area: area)
+        let inner = panelFrame(frame, area, " Disks ")
+        let limit = min(snapshot.disks.size, max(0, (inner.height - 1) / 2))
         for (i in 0..limit) {
-            let rowIndex = processOffset + i
-            let proc = snapshot.processes[rowIndex]
-            let style = if (rowIndex == selected) { Style(fg: BG, bg: CYAN, modifier: Modifier.strong()) } else { Style(fg: TEXT, bg: PANEL) }
-            canvas.drawText(inner.x + 1, inner.y + 2 + i, processRow(proc, inner.width - 2), style)
+            let disk = snapshot.disks[i]
+            let label = disk.mount + " " + if (disk.totalBytes > 0) { bytesText(disk.usedBytes) + "/" + bytesText(disk.totalBytes) } else { "unknown" }
+            drawDisk(canvas, inner.x + 1, inner.y + 1 + i * 2, inner.width - 2, disk.percent(), label, colorForIndex(i))
         }
+        if (limit == 0) {
+            canvas.drawText(inner.x + 1, inner.y + 1, "no mount data", Style(fg: MUTED, bg: PANEL))
+        }
+    }
+
+    private func renderProcesses(buffer: Buffer, canvas: Canvas, area: Rect): Unit {
+        let inner = panel(buffer, area, " Processes ")
+        let detailRows = if (showDetail) { 4 } else { 0 }
+        let tableArea = Rect(inner.x + 1, inner.y, max(1, inner.width - 2), max(0, inner.height - detailRows))
+        let visibleRows = max(0, tableArea.height - 1)
+        lastProcessArea = Some(tableArea)
+        lastProcessVisibleRows = visibleRows
+        ensureProcessVisible(visibleRows)
+        let commandWidth = max(12, tableArea.width - 44)
+        ensureProcessRows(commandWidth)
+        let table = VirtualTable(
+            [
+                TableColumn("PID", width: 5, align: TextAlign.Right),
+                TableColumn("CPU%", width: 7, align: TextAlign.Right),
+                TableColumn("MEM(RSS)", width: 14, align: TextAlign.Right),
+                TableColumn("VIRT", width: 8, align: TextAlign.Right),
+                TableColumn("S", width: 2),
+                TableColumn("COMMAND", width: commandWidth)
+            ],
+            snapshot.processes.size,
+            { index => processRows[index].columns() },
+            offset: processOffset,
+            selectedRow: Some(selected),
+            style: PROCESS_NORMAL_STYLE,
+            selectedStyle: PROCESS_SELECTED_STYLE,
+            cellStyle: PROCESS_SELECTED_STYLE
+        )
+        table.render(tableArea, buffer)
         if (showDetail && selected < snapshot.processes.size) {
             renderProcessDetail(canvas, Rect(inner.x + 1, inner.bottom - 4, inner.width - 2, 4), snapshot.processes[selected])
         }
+    }
+
+    public func renderProcessesFrame(frame: Frame, area: Rect): Unit {
+        let block = panelBlock(" Processes ")
+        let inner = block.inner(area)
+        let detailRows = if (showDetail) { 4 } else { 0 }
+        let tableArea = Rect(inner.x + 1, inner.y, max(1, inner.width - 2), max(0, inner.height - detailRows))
+        let visibleRows = max(0, tableArea.height - 1)
+        lastProcessArea = Some(tableArea)
+        lastProcessVisibleRows = visibleRows
+        ensureProcessVisible(visibleRows)
+        if (isProcessRowOnlyDirty(frame, tableArea)) {
+            renderProcessRows(frame, tableArea)
+            return
+        }
+        frame.renderWidget(Panel(block: block), area)
+        let commandWidth = max(12, tableArea.width - 44)
+        ensureProcessRows(commandWidth)
+        let table = VirtualTable(
+            [
+                TableColumn("PID", width: 5, align: TextAlign.Right),
+                TableColumn("CPU%", width: 7, align: TextAlign.Right),
+                TableColumn("MEM(RSS)", width: 14, align: TextAlign.Right),
+                TableColumn("VIRT", width: 8, align: TextAlign.Right),
+                TableColumn("S", width: 2),
+                TableColumn("COMMAND", width: commandWidth)
+            ],
+            snapshot.processes.size,
+            { index => processRows[index].columns() },
+            offset: processOffset,
+            selectedRow: Some(selected),
+            style: PROCESS_NORMAL_STYLE,
+            selectedStyle: PROCESS_SELECTED_STYLE,
+            cellStyle: PROCESS_SELECTED_STYLE
+        )
+        frame.renderWidget(table, tableArea)
+        if (showDetail && selected < snapshot.processes.size) {
+            renderProcessDetail(frame.canvas(area: area), Rect(inner.x + 1, inner.bottom - 4, inner.width - 2, 4), snapshot.processes[selected])
+        }
+    }
+
+    private func isProcessRowOnlyDirty(frame: Frame, tableArea: Rect): Bool {
+        var hit = false
+        for (dirty in frame.dirtyRects()) {
+            let target = intersectLocal(dirty, tableArea)
+            if (target.width <= 0 || target.height <= 0) { continue }
+            hit = true
+            if (target.x < tableArea.x || target.right > tableArea.right) { return false }
+            if (target.y <= tableArea.y || target.bottom > tableArea.bottom) { return false }
+        }
+        hit
+    }
+
+    private func renderProcessRows(frame: Frame, tableArea: Rect): Unit {
+        frame.renderWidget(ProcessRowsWidget(this, frame.dirtyRects(), tableArea), tableArea)
+    }
+
+    public func renderProcessRowsBuffer(buffer: Buffer, tableArea: Rect, dirtyRects: Array<Rect>): Unit {
+        let commandWidth = max(12, tableArea.width - 44)
+        ensureProcessRows(commandWidth)
+        for (dirty in dirtyRects) {
+            let target = intersectLocal(dirty, tableArea)
+            if (target.width <= 0 || target.height <= 0) { continue }
+            for (y in target.y..target.bottom) {
+                let visible = y - tableArea.y - 1
+                if (visible < 0) { continue }
+                let index = processOffset + visible
+                if (index >= 0 && index < processRows.size) {
+                    renderProcessRowBuffer(buffer, tableArea, y, processRows[index], index == selected)
+                }
+            }
+        }
+    }
+
+    private func renderProcessRowBuffer(buffer: Buffer, tableArea: Rect, y: Int64, row: ProcessDisplayRow, active: Bool): Unit {
+        let style = if (active) { PROCESS_SELECTED_STYLE } else { PROCESS_NORMAL_STYLE }
+        buffer.fillRect(tableArea.x, y, tableArea.width, 1, style: style)
+        var x = tableArea.x
+        buffer.writeAsciiSpanUnchecked(x, y, row.pid, style: style)
+        x += 6
+        buffer.writeAsciiSpanUnchecked(x, y, row.cpu, style: style)
+        x += 8
+        buffer.writeAsciiSpanUnchecked(x, y, row.mem, style: style)
+        x += 15
+        buffer.writeAsciiSpanUnchecked(x, y, row.virt, style: style)
+        x += 9
+        buffer.writeAsciiSpanUnchecked(x, y, row.state, style: style)
+        x += 3
+        writeAsciiOrText(buffer, x, y, row.command, style)
     }
 
     private func ensureProcessVisible(visibleRows: Int64): Unit {
@@ -664,6 +1329,83 @@ class BtmClone <: Widget {
         processOffset = clampLocal(processOffset, 0, max(0, count - visibleRows))
     }
 
+    private func selectionDirty(beforeSelected: Int64, beforeOffset: Int64): UpdateResult {
+        if (lastProcessVisibleRows > 0) {
+            ensureProcessVisible(lastProcessVisibleRows)
+        }
+        match (lastProcessArea) {
+            case Some(area) =>
+                let dirty = DirtyRects()
+                if (beforeOffset != processOffset) {
+                    dirty.add(area)
+                } else {
+                    addProcessRowDirty(dirty, area, beforeSelected, processOffset)
+                    addProcessRowDirty(dirty, area, selected, processOffset)
+                    if (showDetail) {
+                        dirty.add(Rect(area.x, area.bottom, area.width, 4))
+                    }
+                }
+                UpdateResult(dirtyRects: Some(dirty))
+            case None => UpdateResult.next()
+        }
+    }
+
+    public func dirtyProcessesArea(): UpdateResult {
+        match (host.node("processes")) {
+            case Some(node) => UpdateResult.dirty(node.area())
+            case None =>
+                match (lastProcessArea) {
+                    case Some(area) => UpdateResult.dirty(area)
+                    case None => UpdateResult.next()
+                }
+        }
+    }
+
+    private func dirtyKnownArea(): UpdateResult {
+        match (lastArea) {
+            case Some(area) => UpdateResult.dirty(area)
+            case None => UpdateResult.next()
+        }
+    }
+
+    private func dirtyFooterRects(): ?DirtyRects {
+        match (host.node("footer")) {
+            case Some(node) =>
+                let dirty = DirtyRects()
+                dirty.add(node.area())
+                Some(dirty)
+            case None => None
+        }
+    }
+
+    private func dirtyFooterArea(): UpdateResult {
+        match (dirtyFooterRects()) {
+            case Some(dirty) => UpdateResult(dirtyRects: Some(dirty))
+            case None => dirtyKnownArea()
+        }
+    }
+
+    private func dirtyHeaderFooterProcesses(): UpdateResult {
+        let dirty = DirtyRects()
+        for (id in ["header", "processes", "footer"]) {
+            match (host.node(id)) {
+                case Some(node) => dirty.add(node.area())
+                case None => ()
+            }
+        }
+        if (dirty.isEmpty()) { dirtyKnownArea() } else { UpdateResult(dirtyRects: Some(dirty)) }
+    }
+
+    private func dirtyPanelAndHeader(area: Rect): DirtyRects {
+        let dirty = DirtyRects()
+        dirty.add(area)
+        match (host.node("header")) {
+            case Some(node) => dirty.add(node.area())
+            case None => ()
+        }
+        dirty
+    }
+
     private func renderProcessDetail(canvas: Canvas, area: Rect, proc: ProcessSample): Unit {
         canvas.fillRect(area, Style(bg: Color.Rgb(7, 12, 19)))
         canvas.strokeRect(area, Style(fg: GRID, bg: Color.Rgb(7, 12, 19)))
@@ -672,13 +1414,32 @@ class BtmClone <: Widget {
         canvas.drawText(area.x + 2, area.y + 2, truncateLocal(proc.command, max(1, area.width - 4)), Style(fg: MUTED, bg: Color.Rgb(7, 12, 19)))
     }
 
-    private func renderBottomBar(canvas: Canvas, area: Rect): Unit {
+    private func renderBottomBar(buffer: Buffer, area: Rect): Unit {
         let bg = Color.Rgb(14, 20, 30)
-        canvas.fillRect(area, Style(bg: bg))
         let search = if (filtering) { "search: " + filter + "_" } else if (!filter.isEmpty()) { "filter: " + filter } else { "" }
-        let left = "q quit  j/k move  c/m/p/n sort  / search  space pause  enter detail"
-        canvas.drawText(area.x + 1, area.y, truncateLocal(left, max(1, area.width - 30)), Style(fg: TEXT, bg: bg))
-        canvas.drawText(max(area.x + 1, area.right - 28), area.y, truncateLocal(search + " " + sortLabel(), 27), Style(fg: CYAN, bg: bg))
+        FooterBar(
+            left: "q quit  j/k move  +/- refresh  c/m/p/n sort  / search  space pause  enter detail  d profiler",
+            right: search + " " + sortLabel() + "  refresh: " + refreshLabel(),
+            style: Style(fg: TEXT, bg: bg)
+        ).render(area, buffer)
+    }
+
+    public func renderBottomBarFrame(frame: Frame, area: Rect): Unit {
+        let bg = Color.Rgb(14, 20, 30)
+        let search = if (filtering) { "search: " + filter + "_" } else if (!filter.isEmpty()) { "filter: " + filter } else { "" }
+        frame.renderWidget(FooterBar(
+            left: "q quit  j/k move  +/- refresh  c/m/p/n sort  / search  space pause  enter detail  d profiler",
+            right: search + " " + sortLabel() + "  refresh: " + refreshLabel(),
+            style: Style(fg: TEXT, bg: bg)
+        ), area)
+    }
+
+    private func refreshLabel(): String {
+        if (refreshMillis % 1000 == 0) {
+            "${refreshMillis / 1000}s"
+        } else {
+            "${refreshMillis}ms"
+        }
     }
 
     private func sortLabel(): String {
@@ -688,6 +1449,213 @@ class BtmClone <: Widget {
             case SortMode.Pid => "sort: PID"
             case SortMode.Name => "sort: NAME"
         }
+    }
+}
+
+class HeaderPanel <: RuntimeComponent {
+    private let owner: BtmClone
+
+    init(owner: BtmClone) { this.owner = owner }
+
+    public func mount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
+    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
+    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
+    }
+    public func update(event: Event, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
+        match (event) {
+            case Event.ComponentTick(_) => ComponentResult.withDirty(Dirty.Self)
+            case _ => ComponentResult.ignored()
+        }
+    }
+    public func render(frame: Frame, area: Rect): Unit { owner.renderTopBarFrame(frame, area) }
+    public func focusId(): ?String { None }
+}
+
+class CpuPanel <: RuntimeComponent {
+    private let owner: BtmClone
+
+    init(owner: BtmClone) { this.owner = owner }
+
+    public func mount(ctx: ComponentContext): ComponentResult {
+        ctx.startTimer("cpu", owner.refreshInterval(), priority: TimerPriority.Normal)
+        ComponentResult.ignored()
+    }
+    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
+    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
+    }
+    public func update(event: Event, ctx: ComponentContext): ComponentResult {
+        match (event) {
+            case Event.ComponentTick(_) => owner.refreshMetricPanel(ctx, "cpu")
+            case Event.DataReady(_, _) => owner.applyMetricSample(ctx, "cpu")
+            case Event.DataFailed(_, _, _) => ComponentResult.withDirty(Dirty.Self)
+            case _ => ComponentResult.ignored()
+        }
+    }
+    public func render(frame: Frame, area: Rect): Unit { owner.renderCpuFrame(frame, area) }
+    public func focusId(): ?String { None }
+}
+
+class MemoryPanel <: RuntimeComponent {
+    private let owner: BtmClone
+
+    init(owner: BtmClone) { this.owner = owner }
+
+    public func mount(ctx: ComponentContext): ComponentResult {
+        ctx.startTimer("memory", owner.refreshInterval(), priority: TimerPriority.Normal)
+        ComponentResult.ignored()
+    }
+    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
+    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
+    }
+    public func update(event: Event, ctx: ComponentContext): ComponentResult {
+        match (event) {
+            case Event.ComponentTick(_) => owner.refreshMetricPanel(ctx, "memory")
+            case Event.DataReady(_, _) => owner.applyMetricSample(ctx, "memory")
+            case Event.DataFailed(_, _, _) => ComponentResult.withDirty(Dirty.Self)
+            case _ => ComponentResult.ignored()
+        }
+    }
+    public func render(frame: Frame, area: Rect): Unit { owner.renderMemoryFrame(frame, area) }
+    public func focusId(): ?String { None }
+}
+
+class NetworkPanel <: RuntimeComponent {
+    private let owner: BtmClone
+
+    init(owner: BtmClone) { this.owner = owner }
+
+    public func mount(ctx: ComponentContext): ComponentResult {
+        ctx.startTimer("network", owner.refreshInterval(), priority: TimerPriority.Normal)
+        ComponentResult.ignored()
+    }
+    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
+    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
+    }
+    public func update(event: Event, ctx: ComponentContext): ComponentResult {
+        match (event) {
+            case Event.ComponentTick(_) => owner.refreshMetricPanel(ctx, "network")
+            case Event.DataReady(_, _) => owner.applyMetricSample(ctx, "network")
+            case Event.DataFailed(_, _, _) => ComponentResult.withDirty(Dirty.Self)
+            case _ => ComponentResult.ignored()
+        }
+    }
+    public func render(frame: Frame, area: Rect): Unit { owner.renderNetworkFrame(frame, area) }
+    public func focusId(): ?String { None }
+}
+
+class DiskPanel <: RuntimeComponent {
+    private let owner: BtmClone
+
+    init(owner: BtmClone) { this.owner = owner }
+
+    public func mount(ctx: ComponentContext): ComponentResult {
+        ctx.startTimer("disk", owner.refreshInterval(), priority: TimerPriority.Normal)
+        ComponentResult.ignored()
+    }
+    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
+    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
+    }
+    public func update(event: Event, ctx: ComponentContext): ComponentResult {
+        match (event) {
+            case Event.ComponentTick(_) => owner.refreshMetricPanel(ctx, "disk")
+            case Event.DataReady(_, _) => owner.applyMetricSample(ctx, "disk")
+            case Event.DataFailed(_, _, _) => ComponentResult.withDirty(Dirty.Self)
+            case _ => ComponentResult.ignored()
+        }
+    }
+    public func render(frame: Frame, area: Rect): Unit { owner.renderDisksFrame(frame, area) }
+    public func focusId(): ?String { None }
+}
+
+class ProcessTablePanel <: RuntimeComponent {
+    private let owner: BtmClone
+
+    init(owner: BtmClone) { this.owner = owner }
+
+    public func mount(ctx: ComponentContext): ComponentResult {
+        ctx.startTimer("proc", owner.refreshInterval(), priority: TimerPriority.Low)
+        ComponentResult.ignored()
+    }
+    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
+    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
+    }
+    public func update(event: Event, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
+        match (event) {
+            case Event.ComponentTick(_) => owner.requestProcessSample(ctx)
+            case Event.DataReady(_, _) => owner.applyProcessSample()
+            case Event.DataFailed(_, _, _) => ComponentResult.withDirty(Dirty.Self)
+            case Event.KeyDown(key) =>
+                match (key.code) {
+                    case KeyCode.Down | KeyCode.Char(r'j') =>
+                        let result = owner.moveProcessSelection(1)
+                        ComponentResult(handled: true, command: result.command, dirty: match (result.dirtyRects) {
+                            case Some(rects) => Dirty.Global(rects)
+                            case None => Dirty.Self
+                        }, propagation: EventPropagation.Stop)
+                    case KeyCode.Up | KeyCode.Char(r'k') =>
+                        let result = owner.moveProcessSelection(-1)
+                        ComponentResult(handled: true, command: result.command, dirty: match (result.dirtyRects) {
+                            case Some(rects) => Dirty.Global(rects)
+                            case None => Dirty.Self
+                        }, propagation: EventPropagation.Stop)
+                    case KeyCode.Enter =>
+                        let result = owner.toggleProcessDetail()
+                        ComponentResult(handled: true, command: result.command, dirty: match (result.dirtyRects) {
+                            case Some(rects) => Dirty.Global(rects)
+                            case None => Dirty.Self
+                        }, propagation: EventPropagation.Stop)
+                    case _ => ComponentResult.ignored()
+                }
+            case _ => ComponentResult.ignored()
+        }
+    }
+    public func render(frame: Frame, area: Rect): Unit { owner.renderProcessesFrame(frame, area) }
+    public func focusId(): ?String { Some("processes") }
+}
+
+class FooterPanel <: RuntimeComponent {
+    private let owner: BtmClone
+
+    init(owner: BtmClone) { this.owner = owner }
+
+    public func mount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
+    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
+    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
+    }
+    public func update(event: Event, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
+        match (event) {
+            case Event.ComponentTick(_) => ComponentResult.withDirty(Dirty.Self)
+            case _ => ComponentResult.ignored()
+        }
+    }
+    public func render(frame: Frame, area: Rect): Unit { owner.renderBottomBarFrame(frame, area) }
+    public func focusId(): ?String { None }
+}
+
+class ProcessRowsWidget <: Widget {
+    private let owner: BtmClone
+    private let dirtyRects: Array<Rect>
+    private let tableArea: Rect
+
+    init(owner: BtmClone, dirtyRects: Array<Rect>, tableArea: Rect) {
+        this.owner = owner
+        this.dirtyRects = dirtyRects
+        this.tableArea = tableArea
+    }
+
+    public func render(area: Rect, buffer: Buffer): Unit {
+        if (area.width <= 0 || area.height <= 0) { return }
+        owner.renderProcessRowsBuffer(buffer, tableArea, dirtyRects)
     }
 }
 
@@ -748,6 +1716,37 @@ func sortProcesses(rows: ArrayList<ProcessSample>, mode: SortMode): Unit {
 }
 
 func statDisk(mount: String): DiskSample {
+    statDiskUnix(mount)
+}
+
+@When[os != "Windows"]
+func statDiskUnix(mount: String): DiskSample {
+    var result = DiskSample(mount)
+    try (path = unsafe { LibC.mallocCString(mount).asResource() }) {
+        let info = LibC.malloc<StatVfs>(count: 1)
+        if (!info.isNull()) {
+            try {
+                let rc = unsafe { statvfs(path.value, info) }
+                if (rc == 0) {
+                    let raw = unsafe { info.read() }
+                    let blockSize = max(1, Int64(raw.f_frsize))
+                    let totalBlocks = Int64(raw.f_blocks)
+                    let availableBlocks = Int64(raw.f_bavail)
+                    let usedBlocks = max(0, totalBlocks - availableBlocks)
+                    result = DiskSample(mount, usedBlocks * blockSize, totalBlocks * blockSize)
+                }
+            } finally {
+                unsafe { LibC.free(info) }
+            }
+        }
+    } catch (_) {
+        result = DiskSample(mount)
+    }
+    result
+}
+
+@When[os == "Windows"]
+func statDiskUnix(mount: String): DiskSample {
     DiskSample(mount)
 }
 
@@ -886,15 +1885,32 @@ func replaceNulWithSpace(text: String): String {
     out
 }
 
-func processRow(proc: ProcessSample, width: Int64): String {
-    let mem = percent2(proc.memPercent100) + "%(" + bytesText(proc.rssBytes) + ")"
-    let row = padLeft("${proc.pid}", 5) + " " +
-        padLeft(percent2(proc.cpuPercent100), 7) + " " +
-        padLeft(mem, 14) + " " +
-        padLeft(bytesText(proc.virtBytes), 8) + " " +
-        padRight(proc.state, 2) + " " +
-        proc.command
-    fitRow(row, width)
+func writeAsciiOrText(buffer: Buffer, x: Int64, y: Int64, text: String, style: Style): Unit {
+    if (!buffer.writeAsciiSpan(x, y, text, style: style)) {
+        buffer.setString(x, y, text, style: style)
+    }
+}
+
+func addProcessRowDirty(dirty: DirtyRects, area: Rect, selected: Int64, offset: Int64): Unit {
+    let row = selected - offset + 1
+    if (row >= 1 && row < area.height) {
+        dirty.add(Rect(area.x, area.y + row, area.width, 1))
+    }
+}
+
+func hasBtmEffect(result: UpdateResult): Bool {
+    match (result.flow) {
+        case ControlFlow.Exit => return true
+        case _ => ()
+    }
+    match (result.command) {
+        case Command.Noop => ()
+        case _ => return true
+    }
+    match (result.dirtyRects) {
+        case Some(rects) => !rects.isEmpty()
+        case None => false
+    }
 }
 
 func percent2(value100: Int64): String {
@@ -942,24 +1958,47 @@ func drawGraph(canvas: Canvas, area: Rect, values: Array<Int64>, maxValue: Int64
     canvas.drawText(area.right - 6, area.bottom - 1, "0", Style(fg: MUTED, bg: PANEL))
 }
 
-func panel(canvas: Canvas, area: Rect, title: String): Rect {
-    canvas.fillRect(area, Style(bg: PANEL))
-    canvas.strokeRect(area, Style(fg: GRID, bg: PANEL))
-    if (area.width > 4) {
-        canvas.drawText(area.x + 2, area.y, title, Style(fg: CYAN, bg: PANEL, modifier: Modifier.strong()))
-    }
-    if (area.width < 2 || area.height < 2) {
-        return Rect(area.x, area.y, 0, 0)
-    }
-    Rect(area.x + 1, area.y + 1, area.width - 2, area.height - 2)
+func panel(buffer: Buffer, area: Rect, title: String): Rect {
+    Panel(panelBlockOptions(title)).renderInner(area, buffer)
 }
 
-func drawMeter(canvas: Canvas, x: Int64, y: Int64, width: Int64, percent: Int64, color: Color, label: String): Unit {
-    let w = max(6, width)
-    let barW = max(4, w - 28)
-    let fill = clampLocal(percent, 0, 100) * barW / 100
-    canvas.drawText(x, y, truncateLocal(label, 26), Style(fg: TEXT, bg: PANEL))
-    canvas.drawText(x + 27, y, "[" + repeatLocal("=", fill) + repeatLocal(" ", max(0, barW - fill)) + "]", Style(fg: color, bg: PANEL))
+func panelFrame(frame: Frame, area: Rect, title: String): Rect {
+    let block = panelBlock(title)
+    frame.renderWidget(Panel(block: block), area)
+    block.inner(area)
+}
+
+func panelBlock(title: String): Block {
+    Block(panelBlockOptions(title))
+}
+
+func panelBlockOptions(title: String): BlockOptions {
+    BlockOptions(
+        title: title,
+        backgroundStyle: Style(bg: PANEL),
+        borderStyle: Style(fg: GRID, bg: PANEL),
+        titleStyle: Style(fg: CYAN, bg: PANEL, modifier: Modifier.strong())
+    )
+}
+
+func drawMeter(buffer: Buffer, x: Int64, y: Int64, width: Int64, percent: Int64, color: Color, label: String): Unit {
+    Meter(
+        truncateLocal(label, 26),
+        clampLocal(percent, 0, 100),
+        total: 100,
+        style: Style(fg: TEXT, bg: PANEL),
+        fillStyle: Style(fg: color, bg: PANEL)
+    ).render(Rect(x, y, max(1, width), 1), buffer)
+}
+
+func drawMeterFrame(frame: Frame, x: Int64, y: Int64, width: Int64, percent: Int64, color: Color, label: String): Unit {
+    frame.renderWidget(Meter(
+        truncateLocal(label, 26),
+        clampLocal(percent, 0, 100),
+        total: 100,
+        style: Style(fg: TEXT, bg: PANEL),
+        fillStyle: Style(fg: color, bg: PANEL)
+    ), Rect(x, y, max(1, width), 1))
 }
 
 func drawDisk(canvas: Canvas, x: Int64, y: Int64, width: Int64, percent: Int64, label: String, color: Color): Unit {
@@ -1014,6 +2053,14 @@ func clampLocal(value: Int64, low: Int64, high: Int64): Int64 {
     min(max(value, low), high)
 }
 
+func intersectLocal(left: Rect, right: Rect): Rect {
+    let x1 = max(left.x, right.x)
+    let y1 = max(left.y, right.y)
+    let x2 = min(left.right, right.right)
+    let y2 = min(left.bottom, right.bottom)
+    Rect(x1, y1, max(0, x2 - x1), max(0, y2 - y1))
+}
+
 func repeatLocal(text: String, count: Int64): String {
     var out = ""
     var i: Int64 = 0
@@ -1028,22 +2075,274 @@ func padLeft(text: String, width: Int64): String {
     if (text.size >= width) { text } else { repeatLocal(" ", width - text.size) + text }
 }
 
-func padRight(text: String, width: Int64): String {
-    if (text.size >= width) { text } else { text + repeatLocal(" ", width - text.size) }
-}
-
 func truncateLocal(text: String, width: Int64): String {
     if (width <= 0) { "" } else if (text.size <= width) { text } else { text[0..width] }
 }
 
-func fitRow(text: String, width: Int64): String {
-    if (text.size >= width) { truncateLocal(text, width) } else { text + repeatLocal(" ", width - text.size) }
+func btmProfile(snapshot: ProfilerSnapshot, id: String): ?ProfilerEntry {
+    snapshot.find(id)
 }
 
-main(): Int64 {
+func profileRenderCount(snapshot: ProfilerSnapshot, id: String): Int64 {
+    match (btmProfile(snapshot, id)) {
+        case Some(entry) => entry.renderCount
+        case None => -1
+    }
+}
+
+func profileUpdateCount(snapshot: ProfilerSnapshot, id: String): Int64 {
+    match (btmProfile(snapshot, id)) {
+        case Some(entry) => entry.updateCount
+        case None => -1
+    }
+}
+
+func dirtyRectCount(result: UpdateResult): Int64 {
+    match (result.dirtyRects) {
+        case Some(rects) => rects.rects().size
+        case None => -1
+    }
+}
+
+func dirtyRectText(result: UpdateResult): String {
+    match (result.dirtyRects) {
+        case Some(rects) =>
+            var out = ""
+            for (rect in rects.rects()) {
+                if (!out.isEmpty()) { out += ";" }
+                out += "${rect.x},${rect.y},${rect.width},${rect.height}"
+            }
+            out
+        case None => "none"
+    }
+}
+
+func runAsyncCommand(app: BtmClone, command: Command): UpdateResult {
+    match (command) {
+        case Command.AsyncTask(id, task) =>
+            app.update(Event.AsyncCompleted(id, task()))
+        case Command.Batch(items) =>
+            var out = UpdateResult.next()
+            for (item in items) {
+                out = runAsyncCommand(app, item)
+            }
+            out
+        case _ => UpdateResult.next()
+    }
+}
+
+func commandHasAsyncTask(command: Command): Bool {
+    match (command) {
+        case Command.AsyncTask(_, _) => true
+        case Command.Batch(items) =>
+            for (item in items) {
+                if (commandHasAsyncTask(item)) { return true }
+            }
+            false
+        case _ => false
+    }
+}
+
+func commandHasRestartTimer(command: Command): Bool {
+    match (command) {
+        case Command.RestartTimer(_) => true
+        case Command.Batch(items) =>
+            for (item in items) {
+                if (commandHasRestartTimer(item)) { return true }
+            }
+            false
+        case _ => false
+    }
+}
+
+func btmSmokeFail(message: String): Int64 {
+    eprintln("btm_clone headless smoke failed: " + message)
+    1
+}
+
+func runBtmCloneHeadlessSmoke(): Int64 {
     let app = BtmClone()
-    App(targetFps: 10, rawMode: true, alternateScreen: true, hideCursor: true).runWithCommands(
-        { frame => frame.renderWidget(app, frame.area) },
+    let area = Rect(0, 0, 100, 32)
+    let backend = TestBackend(area: area)
+    let terminal = Terminal(backend, renderMode: RenderMode.Diff)
+    _ = terminal.draw { frame => app.renderFrame(frame) }
+    if (!backend.snapshot().contains("btm LIVE")) {
+        return btmSmokeFail("initial snapshot missing header")
+    }
+    if (backend.snapshot().contains("unknown")) {
+        return btmSmokeFail("disk panel still has unknown capacity")
+    }
+
+    let slower = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'-'))))
+    if (!commandHasRestartTimer(slower.command)) {
+        return btmSmokeFail("refresh interval shortcut did not restart timers")
+    }
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: slower.dirtyRects)
+    if (!backend.snapshot().contains("refresh: 1250ms")) {
+        return btmSmokeFail("refresh interval did not increase in footer")
+    }
+    let faster = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'+'))))
+    if (!commandHasRestartTimer(faster.command)) {
+        return btmSmokeFail("refresh interval restore did not restart timers")
+    }
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: faster.dirtyRects)
+    if (!backend.snapshot().contains("refresh: 1s")) {
+        return btmSmokeFail("refresh interval did not restore in footer")
+    }
+
+    let beforeCpu = app.profilerSnapshot()
+    let cpuPoll = app.update(Event.Timer(TimerEvent("component:cpu:cpu", elapsedMillis: 500)))
+    if (!commandHasAsyncTask(cpuPoll.command)) {
+        return btmSmokeFail("cpu timer did not start async datasource")
+    }
+    let cpuReady = runAsyncCommand(app, cpuPoll.command)
+    let cpuMetrics = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: cpuReady.dirtyRects)
+    let afterCpu = app.profilerSnapshot()
+    if (profileUpdateCount(afterCpu, "cpu") <= profileUpdateCount(beforeCpu, "cpu")) {
+        return btmSmokeFail("cpu datasource did not update cpu panel")
+    }
+    if (profileRenderCount(afterCpu, "processes") != profileRenderCount(beforeCpu, "processes")) {
+        return btmSmokeFail("processes rendered during cpu datasource before=${profileRenderCount(beforeCpu, "processes")} after=${profileRenderCount(afterCpu, "processes")} dirty=${dirtyRectCount(cpuReady)} rects=${dirtyRectText(cpuReady)} drawDirty=${cpuMetrics.dirtyRects} rendered=${cpuMetrics.renderedCells} full=${cpuMetrics.fullRedraw}")
+    }
+
+    let beforeNav = app.profilerSnapshot()
+    let nav = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: nav.dirtyRects)
+    let afterNav = app.profilerSnapshot()
+    if (profileUpdateCount(afterNav, "processes") <= profileUpdateCount(beforeNav, "processes")) {
+        return btmSmokeFail("process table did not receive navigation")
+    }
+    if (profileRenderCount(afterNav, "cpu") != profileRenderCount(beforeNav, "cpu")) {
+        return btmSmokeFail("cpu rendered during process navigation")
+    }
+    if (profileRenderCount(afterNav, "memory") != profileRenderCount(beforeNav, "memory")) {
+        return btmSmokeFail("memory rendered during process navigation")
+    }
+    if (profileRenderCount(afterNav, "network") != profileRenderCount(beforeNav, "network")) {
+        return btmSmokeFail("network rendered during process navigation")
+    }
+    if (profileRenderCount(afterNav, "disk") != profileRenderCount(beforeNav, "disk")) {
+        return btmSmokeFail("disk rendered during process navigation")
+    }
+
+    let beforeScroll = app.profilerSnapshot()
+    var scrollI: Int64 = 0
+    while (scrollI < 80) {
+        let scroll = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+        let scrollMetrics = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: scroll.dirtyRects)
+        if (scrollMetrics.fullRedraw) {
+            return btmSmokeFail("process navigation triggered full redraw")
+        }
+        scrollI++
+    }
+    let afterScroll = app.profilerSnapshot()
+    if (profileRenderCount(afterScroll, "cpu") != profileRenderCount(beforeScroll, "cpu")) {
+        return btmSmokeFail("cpu rendered during continuous process navigation")
+    }
+    if (profileRenderCount(afterScroll, "memory") != profileRenderCount(beforeScroll, "memory")) {
+        return btmSmokeFail("memory rendered during continuous process navigation")
+    }
+    if (profileRenderCount(afterScroll, "network") != profileRenderCount(beforeScroll, "network")) {
+        return btmSmokeFail("network rendered during continuous process navigation")
+    }
+    if (profileRenderCount(afterScroll, "disk") != profileRenderCount(beforeScroll, "disk")) {
+        return btmSmokeFail("disk rendered during continuous process navigation")
+    }
+
+    let startFilter = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'/'))))
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: startFilter.dirtyRects)
+    let beforeFilter = app.profilerSnapshot()
+    let typeJ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'j'))))
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: typeJ.dirtyRects)
+    let afterFilter = app.profilerSnapshot()
+    if (!backend.snapshot().contains("search: j_")) {
+        return btmSmokeFail("filter input did not capture j")
+    }
+    if (profileUpdateCount(afterFilter, "processes") != profileUpdateCount(beforeFilter, "processes")) {
+        return btmSmokeFail("filter input was routed through process table")
+    }
+    let finishFilter = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: finishFilter.dirtyRects)
+
+    let detailOpen = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: detailOpen.dirtyRects)
+    if (!backend.snapshot().contains(" detail ")) {
+        return btmSmokeFail("process detail did not render")
+    }
+    let detailClose = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: detailClose.dirtyRects)
+    if (backend.snapshot().contains(" detail ")) {
+        return btmSmokeFail("process detail remained after close")
+    }
+
+    let beforeProc = app.profilerSnapshot()
+    var procPoll = app.update(Event.Timer(TimerEvent("component:processes:proc", elapsedMillis: 1000)))
+    if (!commandHasAsyncTask(procPoll.command)) {
+        procPoll = app.update(Event.Timer(TimerEvent("component:processes:proc", elapsedMillis: 1000)))
+    }
+    if (!commandHasAsyncTask(procPoll.command)) {
+        return btmSmokeFail("proc datasource polling did not start after idle retry")
+    }
+    let procReady = runAsyncCommand(app, procPoll.command)
+    let procMetrics = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: procReady.dirtyRects)
+    let afterProc = app.profilerSnapshot()
+    if (profileUpdateCount(afterProc, "processes") <= profileUpdateCount(beforeProc, "processes")) {
+        return btmSmokeFail("proc datasource did not update process panel")
+    }
+    if (profileRenderCount(afterProc, "cpu") != profileRenderCount(beforeProc, "cpu")) {
+        return btmSmokeFail("cpu rendered during proc datasource completion before=${profileRenderCount(beforeProc, "cpu")} after=${profileRenderCount(afterProc, "cpu")} dirty=${dirtyRectCount(procReady)} rects=${dirtyRectText(procReady)} drawDirty=${procMetrics.dirtyRects} rendered=${procMetrics.renderedCells} full=${procMetrics.fullRedraw}")
+    }
+    match (afterProc.hottest()) {
+        case Some(_) => ()
+        case None => return btmSmokeFail("profiler has no hottest component")
+    }
+
+    println("btm_clone headless smoke ok")
+    0
+}
+
+func runBtmCloneHeadlessBench(iterations: Int64): Int64 {
+    let app = BtmClone()
+    let area = Rect(0, 0, 100, 32)
+    let backend = TestBackend(area: area)
+    let terminal = Terminal(backend, renderMode: RenderMode.Diff)
+    _ = terminal.draw({ frame => app.renderFrame(frame) })
+
+    let total = max(1, iterations)
+    var i: Int64 = 0
+    var direction: Int64 = 1
+    var dirtyCells: Int64 = 0
+    var renderedCells: Int64 = 0
+    var diffWrites: Int64 = 0
+    var fullRedraws: Int64 = 0
+    let start = MonoTime.now()
+    while (i < total) {
+        let keyCode = if (direction > 0) { KeyCode.Down } else { KeyCode.Up }
+        let result = app.update(Event.KeyDown(KeyEvent(keyCode)))
+        let metrics = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: result.dirtyRects)
+        dirtyCells += metrics.dirtyCells
+        renderedCells += metrics.renderedCells
+        diffWrites += metrics.diffWrites
+        if (metrics.fullRedraw) { fullRedraws++ }
+        if (i % 80 == 79) { direction = -direction }
+        i++
+    }
+    let elapsed = max(1, (MonoTime.now() - start).toMilliseconds())
+    println("btm_clone headless bench iterations=${total} elapsed_ms=${elapsed} avg_us=${elapsed * 1000 / total} dirty_cells=${dirtyCells} rendered_cells=${renderedCells} diff_writes=${diffWrites} full_redraws=${fullRedraws}")
+    0
+}
+
+main(args: Array<String>): Int64 {
+    if (args.size > 0 && args[0] == "--headless-smoke") {
+        return runBtmCloneHeadlessSmoke()
+    }
+    if (args.size > 0 && args[0] == "--headless-bench") {
+        let iterations = if (args.size > 1) { parseInt(args[1]) } else { Int64(5000) }
+        return runBtmCloneHeadlessBench(iterations)
+    }
+    let app = BtmClone()
+    App(rawMode: true, alternateScreen: true, hideCursor: true).runWithCommands(
+        { frame => app.renderFrame(frame) },
         { event => app.update(event) }
     )
     0

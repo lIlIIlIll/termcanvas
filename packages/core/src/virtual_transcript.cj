@@ -19,6 +19,11 @@ public interface VirtualTranscriptSource {
         itemTitle(index)
     }
     func itemFooter(_: Int64): String { "" }
+    // A structured event with no visible body or footer may use only the
+    // title rail. This avoids spending a second terminal row on an empty
+    // `╰─` while preserving the normal two-ended rail for meaningful
+    // summaries and expanded content.
+    func itemUsesCompactCardChrome(_: Int64): Bool { false }
     func revision(index: Int64): Int64
     func document(index: Int64, width: Int64, themeKey: String): Document
     // Per-entry border theme; falls back to the view-wide card theme when
@@ -73,6 +78,7 @@ class VirtualTranscriptCacheEntry {
     var measured: Bool = false
     var height: Int64 = 1
     var chrome: Bool = false
+    var compactChrome: Bool = false
 }
 
 class TranscriptHeightIndex {
@@ -312,7 +318,7 @@ public class VirtualTranscriptView <: Widget {
                         case Some(value) => value
                         case None => cardTheme
                     }
-                    let totalRows = entry.rows.size + 2
+                    let totalRows = if (entry.compactChrome) { 1 } else { entry.rows.size + 2 }
                     buffer.fillRect(
                         Rect(area.x, y, area.width, available),
                         style: entryTheme.borderBackground
@@ -487,11 +493,12 @@ public class VirtualTranscriptView <: Widget {
             entry.themeKey = themeKey
             let usesChrome = cardChrome && source.itemUsesCardChrome(index)
             entry.chrome = usesChrome
+            entry.compactChrome = usesChrome && source.itemUsesCompactCardChrome(index)
             let contentWidth = if (usesChrome) { max(1, itemWidth - 2) } else { itemWidth }
             entry.document = source.document(index, contentWidth, themeKey)
             entry.rows = DocumentView(entry.document).layoutRows(contentWidth)
             if (usesChrome) {
-                entry.height = max(1, entry.rows.size) + 3
+                entry.height = if (entry.compactChrome) { 2 } else { max(1, entry.rows.size) + 3 }
             } else {
                 entry.height = max(1, entry.rows.size) + 1
             }

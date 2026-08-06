@@ -143,6 +143,30 @@ class VirtualTranscriptTests {
         @Expect(snapshot.contains("+- "))
         @Expect(snapshot.contains("|  "))
     }
+
+    @TestCase
+    func compactCardChromeOmitsEmptyFooterRow(): Unit {
+        let source = CompactChromeTranscriptSource()
+        let view = VirtualTranscriptView(source)
+        view.setCardChrome(true)
+        let backend = TestBackend(area: Rect(0, 0, 50, 5))
+        let terminal = Terminal(backend, renderMode: RenderMode.Diff)
+
+        _ = terminal.draw { frame => frame.renderWidget(view, frame.area) }
+        let snapshot = backend.snapshot()
+        @Expect(snapshot.contains("╭─ ✓ GitHub · completed"))
+        @Expect(!snapshot.contains("╰─"))
+        @Expect(!snapshot.contains("│ "))
+    }
+}
+
+class CompactChromeTranscriptSource <: VirtualTranscriptSource {
+    public func size(): Int64 { 1 }
+    public func itemId(_: Int64): String { "compact-card" }
+    public func itemTitle(_: Int64): String { "✓ GitHub · completed" }
+    public func itemUsesCompactCardChrome(_: Int64): Bool { true }
+    public func revision(_: Int64): Int64 { 0 }
+    public func document(_: Int64, _: Int64, _: String): Document { Document([]) }
 }
 
 class Utf8BoundarySource <: VirtualTranscriptSource {

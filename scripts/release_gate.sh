@@ -12,6 +12,8 @@ run_cjpm_test() {
 
 run_cjpm_test "$ROOT/packages/cj_markdown" "cj_markdown tests"
 run_cjpm_test "$ROOT/packages/core" "core tests"
+run_cjpm_test "$ROOT/packages/document" "document facade tests"
+run_cjpm_test "$ROOT/packages/editor" "editor facade tests"
 run_cjpm_test "$ROOT/packages/markdown" "markdown adapter tests"
 run_cjpm_test "$ROOT/packages/terminal" "terminal tests"
 run_cjpm_test "$ROOT/packages/diff" "diff tests"
@@ -27,11 +29,17 @@ echo "==> golden snapshot files"
 echo "==> api index"
 "$ROOT/scripts/generate_api_index.sh" --check
 
+echo "==> unicode generated data"
+python3 "$ROOT/scripts/generate_unicode_tables.py" --check
+
 echo "==> examples"
 "$ROOT/scripts/build_examples.sh"
 
 echo "==> example smoke checks"
 "$ROOT/scripts/test_examples.sh"
+
+echo "==> scripted example workflows"
+"$ROOT/scripts/cangjie_cmd.sh" "$ROOT/packages/example_smoke" cjpm run
 
 echo "==> pressure gate"
 "$ROOT/scripts/run_pressure.sh"

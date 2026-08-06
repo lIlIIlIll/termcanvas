@@ -1,6 +1,7 @@
 package core
 
 import std.collection.*
+import std.env.*
 
 public enum TranscriptItemKind {
     | Text
@@ -13,10 +14,60 @@ public enum TranscriptItemKind {
 
 public enum TranscriptItemStatus {
     | Pending
+    | Queued
     | Running
+    | Streaming
     | Done
+    | Awaiting
+    | Approved
     | Failed
     | Cancelled
+    | Rejected
+    | Conflict
+}
+
+public class TranscriptCardOption {
+    public let label: String
+    public let selected: Bool
+
+    public init(label: String, selected!: Bool = false) {
+        this.label = label
+        this.selected = selected
+    }
+}
+
+public class TranscriptCardTheme {
+    public let style: Style
+    public let titleStyle: Style
+    public let mutedStyle: Style
+    public let selectedStyle: Style
+    public let bodyIndent: Int64
+    public let bodyLimit: Int64
+    public let borderStyle: Style
+    public let borderBackground: Style
+    public let topTitleStyle: Style
+
+    public init(
+        style!: Style = Style.default(),
+        titleStyle!: Style = Style(modifier: Modifier.strong()),
+        mutedStyle!: Style = Style(fg: Color.Indexed(8)),
+        selectedStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()),
+        bodyIndent!: Int64 = 2,
+        bodyLimit!: Int64 = 12,
+        borderStyle!: Style = Style(fg: Color.Indexed(8)),
+        borderBackground!: Style = Style.default(),
+        topTitleStyle!: Style = Style(modifier: Modifier.strong())
+    ) {
+        this.style = style
+        this.titleStyle = titleStyle
+        this.mutedStyle = mutedStyle
+        this.selectedStyle = selectedStyle
+        this.bodyIndent = max(0, bodyIndent)
+        this.bodyLimit = max(0, bodyLimit)
+        this.borderStyle = borderStyle
+        this.borderBackground = borderBackground
+        this.topTitleStyle = topTitleStyle
+    }
 }
 
 public class TranscriptItem {
@@ -28,6 +79,10 @@ public class TranscriptItem {
     public var collapsed: Bool
     public let timestamp: String
     public let duration: String
+    public let stateLabel: String
+    public let activityFrame: Int64
+    public let options: Array<TranscriptCardOption>
+    public let footer: String
 
     public init(
         id: String,
@@ -37,7 +92,11 @@ public class TranscriptItem {
         status!: TranscriptItemStatus = TranscriptItemStatus.Done,
         collapsed!: Bool = false,
         timestamp!: String = "",
-        duration!: String = ""
+        duration!: String = "",
+        stateLabel!: String = "",
+        activityFrame!: Int64 = 0,
+        options!: Array<TranscriptCardOption> = [],
+        footer!: String = ""
     ) {
         this.id = id
         this.kind = kind
@@ -47,6 +106,10 @@ public class TranscriptItem {
         this.collapsed = collapsed
         this.timestamp = timestamp
         this.duration = duration
+        this.stateLabel = stateLabel
+        this.activityFrame = max(0, activityFrame)
+        this.options = options
+        this.footer = footer
     }
 }
 
@@ -91,6 +154,7 @@ public class TranscriptView <: Widget {
     private let block: ?Block
     private let style: Style
     private let selectedStyle: Style
+    private let cardTheme: TranscriptCardTheme
 
     public init(
         transcript: Transcript,
@@ -98,7 +162,8 @@ public class TranscriptView <: Widget {
         selected!: Int64 = 0,
         block!: ?Block = None,
         style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
+        cardTheme!: ?TranscriptCardTheme = None
     ) {
         this.transcript = transcript
         this.offset = max(0, offset)
@@ -106,6 +171,10 @@ public class TranscriptView <: Widget {
         this.block = block
         this.style = style
         this.selectedStyle = selectedStyle
+        this.cardTheme = match (cardTheme) {
+            case Some(value) => value
+            case None => TranscriptCardTheme(style: style)
+        }
     }
 
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
@@ -149,14 +218,26 @@ public class TranscriptView <: Widget {
         while (index < transcript.size() && y < target.bottom) {
             match (transcript.get(index)) {
                 case Some(item) =>
-                    let headerStyle = if (index == selected) { selectedStyle } else { transcriptStatusStyle(item.status, style) }
-                    buffer.setString(target.x, y, truncate(transcriptHeader(item), target.width), style: headerStyle)
-                    y++
-                    if (!item.collapsed && y < target.bottom) {
-                        let height = min(target.bottom - y, max(1, item.body.lines.size))
-                        DocumentView(item.body).render(Rect(target.x + 2, y, max(0, target.width - 2), height), buffer)
-                        y += height
+                    let theme = if (index == selected) {
+                        TranscriptCardTheme(
+                            style: cardTheme.style,
+                            titleStyle: selectedStyle,
+                            mutedStyle: cardTheme.mutedStyle,
+                            selectedStyle: cardTheme.selectedStyle,
+                            bodyIndent: cardTheme.bodyIndent,
+                            bodyLimit: cardTheme.bodyLimit
+                        )
+                    } else {
+                        cardTheme
                     }
+                    let document = transcriptCardDocument(item, theme: theme)
+                    let height = min(target.bottom - y, max(1, document.lines.size))
+                    DocumentView(document).render(
+                        Rect(target.x, y, target.width, height),
+                        buffer
+                    )
+                    y += height
+                    if (y < target.bottom) { y++ }
                 case None => ()
             }
             index++
@@ -184,7 +265,17 @@ public class Composer <: Widget {
     private let history = ArrayList<String>()
     private let slashHints: Array<String>
     private var historyIndex: Int64 = -1
+    private var historyDraft = ""
+    private var visualScroll: Int64 = 0
     private let block: ?Block
+    private var cachedWrapRevision: Int64 = -1
+    private var cachedWrapWidth: Int64 = -1
+    private var cachedWrapLines: Array<String> = []
+    private var cachedCursorRevision: Int64 = -1
+    private var cachedCursorWidth: Int64 = -1
+    private var cachedCursorOffset: Int64 = -1
+    private var cachedCursorRow: Int64 = 0
+    private var cachedCursorColumn: Int64 = 0
 
     public init(value!: String = "", slashHints!: Array<String> = [], block!: ?Block = None) {
         this.area = TextArea(value: value, block: block, placeholder: "message")
@@ -202,10 +293,15 @@ public class Composer <: Widget {
                     submit()
                 }
             case KeyCode.Up =>
-                if (area.value.isEmpty() && history.size > 0) {
-                    historyIndex = if (historyIndex < 0) { history.size - 1 } else { max(0, historyIndex - 1) }
+                if (history.size > 0 &&
+                    (historyIndex >= 0 || area.value.isEmpty())) {
+                    if (historyIndex < 0) {
+                        historyDraft = area.value
+                        historyIndex = history.size - 1
+                    } else {
+                        historyIndex = max(0, historyIndex - 1)
+                    }
                     area.setValue(history[historyIndex])
-                    area.cursor = area.value.size
                     None
                 } else {
                     _ = area.handle(key)
@@ -213,9 +309,13 @@ public class Composer <: Widget {
                 }
             case KeyCode.Down =>
                 if (historyIndex >= 0 && history.size > 0) {
-                    historyIndex = min(history.size - 1, historyIndex + 1)
-                    area.setValue(history[historyIndex])
-                    area.cursor = area.value.size
+                    if (historyIndex < history.size - 1) {
+                        historyIndex++
+                        area.setValue(history[historyIndex])
+                    } else {
+                        historyIndex = -1
+                        area.setValue(historyDraft)
+                    }
                     None
                 } else {
                     _ = area.handle(key)
@@ -245,12 +345,106 @@ public class Composer <: Widget {
         out.toArray()
     }
 
+    public func completionVisible(): Bool {
+        area.completionVisible()
+    }
+
+    public func cancelCompletion(): Bool {
+        area.cancelCompletion()
+    }
+
+    public func visualHeight(width: Int64, maximum: Int64): Int64 {
+        if (width <= 0 || maximum <= 0) { return 1 }
+        let textRows = max(1, layoutLines(width).size)
+        min(maximum, textRows + area.completionRows(
+            maximum: max(0, maximum - textRows)
+        ))
+    }
+
+    public func cursorPosition(areaRect: Rect): Position {
+        var target = areaRect
+        match (block) {
+            case Some(value) => target = value.inner(areaRect)
+            case None => ()
+        }
+        if (target.width <= 0 || target.height <= 0) {
+            return Position(target.x, target.y)
+        }
+        let (row, column) = cursorLayout(target.width)
+        visualScroll = max(0, row - target.height + 1)
+        Position(
+            target.x + min(column, target.width),
+            target.y + clamp(
+                row - visualScroll,
+                0,
+                max(0, target.height - 1)
+            )
+        )
+    }
+
     public func render(areaRect: Rect, buffer: Buffer): Unit {
-        area.render(areaRect, buffer)
+        var target = areaRect
+        match (block) {
+            case Some(value) =>
+                value.render(areaRect, buffer)
+                target = value.inner(areaRect)
+            case None => ()
+        }
+        if (target.width <= 0 || target.height <= 0) { return }
+        if (area.value.isEmpty()) {
+            buffer.setString(
+                target.x,
+                target.y,
+                truncate("message", target.width),
+                style: Style(fg: Color.Indexed(8))
+            )
+        } else {
+            let lines = layoutLines(target.width)
+            _ = cursorPosition(areaRect)
+            for (row in 0..target.height) {
+                let index = row + visualScroll
+                if (index >= lines.size) { break }
+                buffer.setString(
+                    target.x,
+                    target.y + row,
+                    truncate(lines[index], target.width)
+                )
+            }
+        }
         let hints = currentSlashHints()
         if (hints.size > 0 && areaRect.height > 1) {
             buffer.setString(areaRect.x + 1, areaRect.bottom - 1, truncate(join(hints, "  "), max(0, areaRect.width - 2)), style: Style(fg: Color.Indexed(8)))
         }
+        area.renderCompletionOverlay(target, buffer)
+    }
+
+    private func layoutLines(width: Int64): Array<String> {
+        if (width <= 0) { return [] }
+        let revision = area.editRevision()
+        if (cachedWrapRevision != revision || cachedWrapWidth != width) {
+            cachedWrapRevision = revision
+            cachedWrapWidth = width
+            cachedWrapLines = wrapText(area.value, width, WrapMode.Character)
+        }
+        cachedWrapLines
+    }
+
+    private func cursorLayout(width: Int64): (Int64, Int64) {
+        let revision = area.editRevision()
+        if (cachedCursorRevision == revision && cachedCursorWidth == width && cachedCursorOffset == area.cursor) {
+            return (cachedCursorRow, cachedCursorColumn)
+        }
+        let lines = if (area.cursor == area.value.size) {
+            layoutLines(width)
+        } else {
+            wrapText(area.value[..area.cursor], width, WrapMode.Character)
+        }
+        cachedCursorRevision = revision
+        cachedCursorWidth = width
+        cachedCursorOffset = area.cursor
+        cachedCursorRow = max(0, lines.size - 1)
+        cachedCursorColumn = if (lines.isEmpty()) { 0 } else { displayWidth(lines[lines.size - 1]) }
+        (cachedCursorRow, cachedCursorColumn)
     }
 
     private func submit(): ?ComposerSubmit {
@@ -258,6 +452,7 @@ public class Composer <: Widget {
         if (text.isEmpty()) { return None }
         history.add(text)
         historyIndex = -1
+        historyDraft = ""
         area.setValue("")
         Some(ComposerSubmit(text))
     }
@@ -342,31 +537,172 @@ public class RequestDialog <: Widget {
 
 public type DecisionDialog = RequestDialog
 
-func transcriptHeader(item: TranscriptItem): String {
-    let collapse = if (item.collapsed) { "+ " } else { "- " }
-    let title = if (item.title.isEmpty()) { item.id } else { item.title }
-    let time = if (item.timestamp.isEmpty()) { "" } else { " " + item.timestamp }
-    collapse + statusMark(item.status) + " " + title + time
-}
-
-func statusMark(status: TranscriptItemStatus): String {
+public func statusMark(
+    status: TranscriptItemStatus,
+    activityFrame!: Int64 = 0
+): String {
     match (status) {
-        case TranscriptItemStatus.Pending => "?"
-        case TranscriptItemStatus.Running => ">"
-        case TranscriptItemStatus.Done => "*"
-        case TranscriptItemStatus.Failed => "!"
-        case TranscriptItemStatus.Cancelled => "x"
+        case TranscriptItemStatus.Pending => "○"
+        case TranscriptItemStatus.Queued => "✓"
+        case TranscriptItemStatus.Running => runningStatusMark(activityFrame)
+        case TranscriptItemStatus.Streaming => streamingStatusMark(activityFrame)
+        case TranscriptItemStatus.Done => "✓"
+        case TranscriptItemStatus.Awaiting => "?"
+        case TranscriptItemStatus.Approved => "✓"
+        case TranscriptItemStatus.Failed => "✗"
+        case TranscriptItemStatus.Cancelled => "–"
+        case TranscriptItemStatus.Rejected => "⊘"
+        case TranscriptItemStatus.Conflict => "!"
     }
 }
 
-func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style {
+func runningStatusMark(frame: Int64): String {
+    match (frame % 4) {
+        case 0 => "◐"
+        case 1 => "◓"
+        case 2 => "◑"
+        case _ => "◒"
+    }
+}
+
+func streamingStatusMark(frame: Int64): String {
+    match (frame % 4) {
+        case 0 => "⋮"
+        case 1 => "⋰"
+        case 2 => "⋯"
+        case _ => "⋱"
+    }
+}
+
+public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style {
+    match (getVariable("NO_COLOR")) {
+        case Some(_) => return base
+        case None => ()
+    }
     match (status) {
         case TranscriptItemStatus.Pending => base.patch(Style(fg: Color.Indexed(8)))
+        case TranscriptItemStatus.Queued => base.patch(Style(fg: Color.Green))
         case TranscriptItemStatus.Running => base.patch(Style(fg: Color.Cyan))
+        case TranscriptItemStatus.Streaming => base.patch(Style(fg: Color.Cyan))
         case TranscriptItemStatus.Done => base.patch(Style(fg: Color.Green))
+        case TranscriptItemStatus.Awaiting => base.patch(Style(fg: Color.Yellow))
+        case TranscriptItemStatus.Approved => base.patch(Style(fg: Color.Green))
         case TranscriptItemStatus.Failed => base.patch(Style(fg: Color.Red))
         case TranscriptItemStatus.Cancelled => base.patch(Style(fg: Color.Yellow))
+        case TranscriptItemStatus.Rejected => base.patch(Style(fg: Color.Red))
+        case TranscriptItemStatus.Conflict => base.patch(Style(fg: Color.Yellow))
     }
+}
+
+public func transcriptStatusLabel(status: TranscriptItemStatus): String {
+    match (status) {
+        case TranscriptItemStatus.Pending => "pending"
+        case TranscriptItemStatus.Queued => "queued"
+        case TranscriptItemStatus.Running => "running"
+        case TranscriptItemStatus.Streaming => "streaming"
+        case TranscriptItemStatus.Done => "completed"
+        case TranscriptItemStatus.Awaiting => "awaiting approval"
+        case TranscriptItemStatus.Approved => "approved"
+        case TranscriptItemStatus.Failed => "failed"
+        case TranscriptItemStatus.Cancelled => "cancelled"
+        case TranscriptItemStatus.Rejected => "rejected"
+        case TranscriptItemStatus.Conflict => "conflict"
+    }
+}
+
+public func transcriptCardDocument(
+    item: TranscriptItem,
+    theme!: TranscriptCardTheme = TranscriptCardTheme()
+): Document {
+    let lines = ArrayList<DocumentLine>()
+    let title = if (item.title.isEmpty()) { item.id } else { item.title }
+    let state = if (item.stateLabel.isEmpty()) {
+        transcriptStatusLabel(item.status)
+    } else {
+        item.stateLabel
+    }
+    let header = ArrayList<RichSpan>()
+    header.add(RichSpan(
+        statusMark(item.status, activityFrame: item.activityFrame) + " ",
+        style: transcriptStatusStyle(item.status, theme.style)
+    ))
+    header.add(RichSpan(title, style: theme.titleStyle))
+    if (!state.isEmpty()) {
+        header.add(RichSpan(" · " + state, style: theme.mutedStyle))
+    }
+    if (!item.duration.isEmpty()) {
+        header.add(RichSpan(" · " + item.duration, style: theme.mutedStyle))
+    }
+    if (item.collapsed) {
+        header.add(RichSpan("  ▸", style: theme.mutedStyle))
+    }
+    lines.add(DocumentLine(DocumentLineKind.Paragraph, header.toArray()))
+    if (!item.collapsed) {
+        let limit = if (theme.bodyLimit == 0) {
+            item.body.lines.size
+        } else {
+            min(theme.bodyLimit, item.body.lines.size)
+        }
+        for (index in 0..limit) {
+            lines.add(indentTranscriptLine(
+                item.body.lines[index],
+                theme.bodyIndent,
+                theme.style
+            ))
+        }
+        if (limit < item.body.lines.size) {
+            lines.add(DocumentLine(
+                DocumentLineKind.Paragraph,
+                transcriptIndent(theme.bodyIndent) + "…",
+                style: theme.mutedStyle
+            ))
+        }
+        for (option in item.options) {
+            lines.add(DocumentLine(
+                DocumentLineKind.Paragraph,
+                transcriptIndent(theme.bodyIndent) +
+                    if (option.selected) { "› " } else { "  " } +
+                    option.label,
+                style: if (option.selected) {
+                    theme.selectedStyle
+                } else {
+                    theme.style
+                }
+            ))
+        }
+        if (!item.footer.isEmpty()) {
+            lines.add(DocumentLine(
+                DocumentLineKind.Paragraph,
+                transcriptIndent(theme.bodyIndent) + item.footer,
+                style: theme.mutedStyle
+            ))
+        }
+    }
+    Document(lines.toArray())
+}
+
+func indentTranscriptLine(
+    line: DocumentLine,
+    width: Int64,
+    style: Style
+): DocumentLine {
+    let spans = ArrayList<RichSpan>()
+    spans.add(RichSpan(transcriptIndent(width), style: style))
+    spans.add(all: line.spans)
+    DocumentLine(
+        line.kind,
+        spans.toArray(),
+        quoteDepth: line.quoteDepth,
+        media: line.media,
+        mediaFit: line.mediaFit,
+        mediaHeight: line.mediaHeight
+    )
+}
+
+func transcriptIndent(width: Int64): String {
+    var result = ""
+    for (_ in 0..max(0, width)) { result += " " }
+    result
 }
 
 func insertPair(area: TextArea, left: String, right: String): Bool {
@@ -692,4 +1028,3 @@ public class TextEditor <: Widget {
         }
     }
 }
-

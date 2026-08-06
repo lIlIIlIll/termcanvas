@@ -8,14 +8,17 @@ import std.fs.*
 
 class TestOutput <: OutputStream {
     let bytes = ArrayList<Byte>()
+    var writeCalls: Int64 = 0
+    var flushCalls: Int64 = 0
 
     public func write(buffer: Array<Byte>): Unit {
+        writeCalls++
         for (b in buffer) {
             bytes.add(b)
         }
     }
 
-    public func flush(): Unit {}
+    public func flush(): Unit { flushCalls++ }
 
     func text(): String {
         unsafe { String.fromUtf8Unchecked(bytes.toArray()) }
@@ -41,6 +44,118 @@ class CountingEventWaiter <: EventWaiter {
     }
 }
 
+class ResizeChangingWaiter <: EventWaiter {
+    private let backend: TestBackend
+    private let nextArea: Rect
+    var waits: Int64 = 0
+    var closed: Bool = false
+    var lastTimeoutMillis: Int64 = -2
+
+    init(backend: TestBackend, nextArea: Rect) {
+        this.backend = backend
+        this.nextArea = nextArea
+    }
+
+    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit {
+        waits++
+        lastTimeoutMillis = timeoutMillis
+        backend.setSize(nextArea)
+        if (previousReadBytes < -1 || sources.size < 0) { return }
+    }
+
+    public func close(): Unit {
+        closed = true
+    }
+}
+
+class ChunkedInputSource <: InputSource {
+    private let chunks = ArrayList<Array<Byte>>()
+
+    init(chunks: Array<Array<Byte>>) {
+        for (chunk in chunks) {
+            this.chunks.add(chunk)
+        }
+    }
+
+    public func readAvailable(maxBytes: Int64): Array<Byte> {
+        if (maxBytes <= 0 || chunks.size == 0) { return [] }
+        let chunk = chunks[0]
+        chunks.remove(at: 0)
+        if (chunk.size <= maxBytes) { return chunk }
+        chunk[..maxBytes]
+    }
+}
+
+class RecordingInputSource <: InputSource {
+    var maximumRequested: Int64 = 0
+
+    public func readAvailable(maxBytes: Int64): Array<Byte> {
+        maximumRequested = maxBytes
+        []
+    }
+}
+
+class CountingWidget <: Widget {
+    var renders: Int64 = 0
+    let text: String
+
+    init(text: String) {
+        this.text = text
+    }
+
+    public func render(area: Rect, buffer: Buffer): Unit {
+        renders++
+        buffer.setString(area.x, area.y, text)
+    }
+}
+
+class RestoreFailingDriver <: TerminalDriver {
+    public init() {}
+
+    public func name(): String { "restore-failing" }
+    public func enterRawMode(): Bool { true }
+    public func restore(): Unit { throw Exception("restore failed") }
+    public func size(): ?Rect { Some(Rect(0, 0, 8, 2)) }
+    public func capabilities(backend: Backend): TerminalCapabilities {
+        TerminalCapabilities(size: backend.size())
+    }
+}
+
+class ObservedTerminalDriver <: TerminalDriver {
+    var rawEnters: Int64 = 0
+    var restores: Int64 = 0
+    var capabilityCalls: Int64 = 0
+
+    public init() {}
+
+    public func name(): String { "observed-driver" }
+    public func enterRawMode(): Bool {
+        rawEnters++
+        true
+    }
+    public func restore(): Unit {
+        restores++
+    }
+    public func size(): ?Rect { Some(Rect(0, 0, 9, 3)) }
+    public func capabilities(backend: Backend): TerminalCapabilities {
+        capabilityCalls++
+        TerminalCapabilities(size: backend.size(), driverName: name())
+    }
+}
+
+class FixedComponentLayoutProvider <: ComponentLayoutProvider {
+    private let rects: Array<Rect>
+
+    init(rects: Array<Rect>) {
+        this.rects = rects
+    }
+
+    public func split(area: Rect, count: Int64): Array<Rect> {
+        if (area.width < 0 || count < 0) { return [] }
+        rects
+    }
+}
+
 func readText(path: String): String {
     unsafe { String.fromUtf8Unchecked(File.readFrom(Path(path))) }
 }
@@ -61,6 +176,110 @@ func countOccurrences(text: String, needle: String): Int64 {
         }
     }
     count
+}
+
+func stripComment(line: String): String {
+    var i: Int64 = 0
+    while (i < line.size) {
+        if (line[i] == b'#') { return line[..i] }
+        i++
+    }
+    line
+}
+
+func trimAscii(text: String): String {
+    var start: Int64 = 0
+    var end = text.size
+    while (start < end && isAsciiWhitespace(text[start])) {
+        start++
+    }
+    while (end > start && isAsciiWhitespace(text[end - 1])) {
+        end--
+    }
+    text[start..end]
+}
+
+func isAsciiWhitespace(ch: Byte): Bool {
+    ch == b' ' || ch == b'\t' || ch == b'\r' || ch == b'\n'
+}
+
+func asciiTokens(text: String): Array<String> {
+    let tokens = ArrayList<String>()
+    var i: Int64 = 0
+    while (i < text.size) {
+        while (i < text.size && isAsciiWhitespace(text[i])) {
+            i++
+        }
+        let start = i
+        while (i < text.size && !isAsciiWhitespace(text[i])) {
+            i++
+        }
+        if (i > start) {
+            tokens.add(text[start..i])
+        }
+    }
+    tokens.toArray()
+}
+
+func parseHexUInt32(token: String): UInt32 {
+    var value: UInt32 = 0
+    for (ch in unsafe { token.rawData() }) {
+        value = value * 16u32 + hexDigitValue(ch)
+    }
+    value
+}
+
+func hexDigitValue(ch: Byte): UInt32 {
+    if (ch >= b'0' && ch <= b'9') { return UInt32(ch - b'0') }
+    if (ch >= b'a' && ch <= b'f') { return UInt32(ch - b'a') + 10u32 }
+    if (ch >= b'A' && ch <= b'F') { return UInt32(ch - b'A') + 10u32 }
+    0u32
+}
+
+func addOffsetIfNew(offsets: ArrayList<Int64>, offset: Int64): Unit {
+    if (offsets.size == 0 || offsets[offsets.size - 1] != offset) {
+        offsets.add(offset)
+    }
+}
+
+func graphemeOffsets(text: String): Array<Int64> {
+    let offsets = ArrayList<Int64>()
+    var offset: Int64 = 0
+    offsets.add(0)
+    while (offset < text.size) {
+        offset = nextGraphemeOffset(text, offset)
+        offsets.add(offset)
+    }
+    offsets.toArray()
+}
+
+func sameOffsets(left: Array<Int64>, right: Array<Int64>): Bool {
+    if (left.size != right.size) { return false }
+    var i: Int64 = 0
+    while (i < left.size) {
+        if (left[i] != right[i]) { return false }
+        i++
+    }
+    true
+}
+
+func parseGraphemeBreakTestCase(line: String): (String, Array<Int64>) {
+    let tokens = asciiTokens(trimAscii(stripComment(line)))
+    let builder = StringBuilder()
+    let expected = ArrayList<Int64>()
+    var byteOffset: Int64 = 0
+    for (token in tokens) {
+        if (token == "÷") {
+            addOffsetIfNew(expected, byteOffset)
+        } else if (token == "×") {
+            ()
+        } else {
+            let r = Rune(parseHexUInt32(token))
+            builder.append(r)
+            byteOffset += r.toString().size
+        }
+    }
+    (builder.toString(), expected.toArray())
 }
 
 class DemoScreen <: Screen {
@@ -121,6 +340,175 @@ class CountingComponent <: Component {
     public func focusId(): ?String {
         Some(id)
     }
+}
+
+class RuntimeProbeComponent <: RuntimeComponent {
+    let id: String
+    let text: String
+    var mounts: Int64 = 0
+    var unmounts: Int64 = 0
+    var updates: Int64 = 0
+    var renders: Int64 = 0
+    var resizes: Int64 = 0
+    var tickEvents: Int64 = 0
+    var lastEventText: String = ""
+    var resultDirty: Dirty = Dirty.Clean
+    var resultHandled: Bool = false
+    var stopOnUpdate: Bool = false
+    var startTimerOnMount: Bool = false
+    var poller: ?AsyncPoller = None
+
+    init(id: String, text!: String = "x") {
+        this.id = id
+        this.text = text
+    }
+
+    public func mount(ctx: ComponentContext): ComponentResult {
+        mounts++
+        if (startTimerOnMount) {
+            ctx.startTimer("sample", Duration.millisecond * 10)
+        }
+        ComponentResult.ignored()
+    }
+
+    public func unmount(ctx: ComponentContext): ComponentResult {
+        unmounts++
+        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
+        ComponentResult.ignored()
+    }
+
+    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
+        resizes++
+        if (ctx.componentId.isEmpty() || oldArea == newArea) { return ComponentResult.ignored() }
+        ComponentResult.withDirty(Dirty.Self)
+    }
+
+    public func update(event: Event, ctx: ComponentContext): ComponentResult {
+        updates++
+        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
+        match (event) {
+            case Event.ComponentTick(tick) =>
+                tickEvents++
+                lastEventText = tick.componentId + ":" + tick.timerId
+                ComponentResult.consumed(dirty: Dirty.Self)
+            case Event.AsyncCompleted(id, inner) =>
+                match (poller) {
+                    case Some(p) => p.complete()
+                    case None => ()
+                }
+                match (inner) {
+                    case Event.Message(text) => lastEventText = id + ":" + text
+                    case _ => lastEventText = id
+                }
+                ComponentResult.consumed(dirty: Dirty.Self)
+            case Event.DataReady(id, version) =>
+                lastEventText = id + ":" + "${version}"
+                ComponentResult.consumed(dirty: Dirty.Self)
+            case Event.DataFailed(id, _, message) =>
+                lastEventText = id + ":error:" + message
+                ComponentResult.consumed(dirty: Dirty.Self)
+            case Event.DataCancelled(id, version) =>
+                lastEventText = id + ":cancelled:" + "${version}"
+                ComponentResult.consumed(dirty: Dirty.Self)
+            case Event.KeyDown(key) =>
+                match (key.code) {
+                    case KeyCode.Up =>
+                        if (resultHandled) {
+                            ComponentResult(handled: true, dirty: resultDirty, propagation: if (stopOnUpdate) { EventPropagation.Stop } else { EventPropagation.Continue })
+                        } else {
+                            ComponentResult.ignored()
+                        }
+                    case _ => ComponentResult.ignored()
+                }
+            case Event.Message(text) =>
+                lastEventText = text
+                if (resultHandled) {
+                    ComponentResult(handled: true, dirty: resultDirty, propagation: if (stopOnUpdate) { EventPropagation.Stop } else { EventPropagation.Continue })
+                } else {
+                    ComponentResult.ignored()
+                }
+            case _ => ComponentResult.ignored()
+        }
+    }
+
+    public func render(frame: Frame, area: Rect): Unit {
+        renders++
+        frame.renderWidget(Paragraph(text), area)
+    }
+
+    public func focusId(): ?String {
+        Some(id)
+    }
+}
+
+class RuntimeTableRows {
+    var calls: Int64 = 0
+
+    func row(index: Int64): Array<String> {
+        calls++
+        ["${index}", "row-${index}"]
+    }
+}
+
+class DataSourceProbeComponent <: RuntimeComponent {
+    let source = DataSource<Int64>("proc", debounceMillis: 10, idleMillis: 5)
+    var lastEventText = ""
+
+    public func mount(ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
+        ComponentResult.ignored()
+    }
+
+    public func unmount(ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
+        ComponentResult.ignored()
+    }
+
+    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
+        if (ctx.componentId.isEmpty() || oldArea == newArea) { return ComponentResult.ignored() }
+        ComponentResult.withDirty(Dirty.Self)
+    }
+
+    public func update(event: Event, ctx: ComponentContext): ComponentResult {
+        match (event) {
+            case Event.Message(text) =>
+                match (text) {
+                    case "activity" =>
+                        source.markActivity(100)
+                        ComponentResult.consumed()
+                    case "poll-idle-blocked" =>
+                        if (!source.refresh(ctx, { => Int64(1) }, nowMillis: 102, lowPriority: true)) {
+                            lastEventText = "blocked"
+                        }
+                        ComponentResult.consumed()
+                    case "poll" =>
+                        if (source.refresh(ctx, { => Int64(2) }, nowMillis: 106, lowPriority: true)) {
+                            lastEventText = "pending"
+                        }
+                        ComponentResult.consumed()
+                    case "cancel" =>
+                        source.cancel(ctx)
+                        ComponentResult.consumed()
+                    case _ => ComponentResult.ignored()
+                }
+            case Event.DataReady(id, version) =>
+                lastEventText = id + ":" + "${version}"
+                ComponentResult.consumed(dirty: Dirty.Self)
+            case Event.DataFailed(id, _, message) =>
+                lastEventText = id + ":error:" + message
+                ComponentResult.consumed(dirty: Dirty.Self)
+            case Event.DataCancelled(id, version) =>
+                lastEventText = id + ":cancelled:" + "${version}"
+                ComponentResult.consumed(dirty: Dirty.Self)
+            case _ => ComponentResult.ignored()
+        }
+    }
+
+    public func render(frame: Frame, area: Rect): Unit {
+        frame.renderWidget(Paragraph("data"), area)
+    }
+
+    public func focusId(): ?String { Some("data") }
 }
 
 class CommandCounter {
@@ -303,6 +691,56 @@ class CjTuiCoreTest {
             }
             case _ => @Expect(false)
         }
+    }
+
+    @TestCase
+    func eventParserReadsFromInjectedInputSource(): Unit {
+        let parser = EventParser(inputSource: ChunkedInputSource([[0x1B, b'['], [b'A']]))
+        @Expect(parser.readEvents().size, 0)
+        let events = parser.readEvents()
+        @Expect(parser.lastReadBytes(), 1)
+        @Expect(events.size, 1)
+        match (events[0]) {
+            case Event.KeyDown(key) => match (key.code) {
+                case KeyCode.Up => ()
+                case _ => @Expect(false)
+            }
+            case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func eventParserDrainsTerminalInputBurst(): Unit {
+        let input = RecordingInputSource()
+        let parser = EventParser(inputSource: input)
+        @Expect(parser.readEvents().size, 0)
+        @Expect(input.maximumRequested, 4096)
+    }
+
+    @TestCase
+    func pendingWheelReversalKeepsLatestDirection(): Unit {
+        let up = Event.Mouse(MouseEvent(MouseKind.Scroll, MouseButton.WheelUp, 2, 3))
+        let down = Event.Mouse(MouseEvent(MouseKind.Scroll, MouseButton.WheelDown, 2, 3))
+        let events = coalescePendingScrollReversal([up, up, up, down, down])
+        @Expect(events.size, 2)
+        for (event in events) {
+            match (event) {
+                case Event.Mouse(mouse) => match (mouse.button) {
+                    case MouseButton.WheelDown => ()
+                    case _ => @Expect(false)
+                }
+                case _ => @Expect(false)
+            }
+        }
+    }
+
+    @TestCase
+    func nonWheelEventSeparatesScrollBursts(): Unit {
+        let up = Event.Mouse(MouseEvent(MouseKind.Scroll, MouseButton.WheelUp, 2, 3))
+        let click = Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, 2, 3))
+        let down = Event.Mouse(MouseEvent(MouseKind.Scroll, MouseButton.WheelDown, 2, 3))
+        let events = coalescePendingScrollReversal([up, click, down])
+        @Expect(events.size, 3)
     }
 
     @TestCase
@@ -631,7 +1069,54 @@ class CjTuiCoreTest {
             frame.renderWidget(Paragraph("ok"), frame.area)
             frame.setCursor(Position(2, 1))
         }
+        terminal.draw { frame =>
+            frame.renderWidget(Paragraph("next"), frame.area)
+            frame.setCursor(Position(3, 1))
+        }
+        @Expect(out.text().contains("\u{1B}[?25h"))
         @Expect(out.text().contains("\u{1B}[2;3H"))
+        @Expect(out.text().contains("\u{1B}[2;4H"))
+        @Expect(countOccurrences(out.text(), "\u{1B}[?25h"), 1)
+
+        terminal.draw { frame =>
+            frame.renderWidget(Paragraph("done"), frame.area)
+        }
+        terminal.draw { frame =>
+            frame.renderWidget(Paragraph("still done"), frame.area)
+        }
+        @Expect(out.text().contains("\u{1B}[?25l"))
+        @Expect(countOccurrences(out.text(), "\u{1B}[?25l"), 1)
+    }
+
+    @TestCase
+    func ansiBackendBatchesEachFullAndDiffFrameIntoOneWrite(): Unit {
+        let fullOut = TestOutput()
+        let fullBackend = AnsiBackend(output: fullOut, fallbackArea: Rect(0, 0, 8, 2))
+        let full = Buffer(Rect(0, 0, 8, 2))
+        full.setString(0, 0, "中文🙂", style: Style(fg: Color.Cyan))
+        full.setString(0, 1, "e\u{301} ansi", style: Style.default())
+        fullBackend.draw(full)
+        @Expect(fullOut.writeCalls, 1)
+        @Expect(fullOut.flushCalls, 1)
+        @Expect(fullOut.text().contains("中文🙂"))
+        @Expect(fullOut.text().contains("e\u{301} ansi"))
+
+        let diffOut = TestOutput()
+        let diffBackend = AnsiBackend(output: diffOut, fallbackArea: Rect(0, 0, 8, 2))
+        diffBackend.drawDiff(
+            full,
+            RenderDiffPlan(
+                4,
+                [
+                    RenderDiffSpan(0, 0, "中文", Style(fg: Color.Cyan)),
+                    RenderDiffSpan(4, 1, "🙂", Style.default())
+                ]
+            )
+        )
+        @Expect(diffOut.writeCalls, 1)
+        @Expect(diffOut.flushCalls, 1)
+        @Expect(diffOut.text().contains("中文"))
+        @Expect(diffOut.text().contains("🙂"))
     }
 
     @TestCase
@@ -668,6 +1153,18 @@ class CjTuiCoreTest {
         @Expect(text.contains("\u{1B}[?25h"))
         @Expect(text.contains("\u{1B}[?1049l"))
         @Expect(!session.rawModeEnabled)
+    }
+
+    @TestCase
+    func terminalSessionEnablesBracketedPasteByDefault(): Unit {
+        let out = TestOutput()
+        let backend = AnsiBackend(output: out, fallbackArea: Rect(0, 0, 8, 2))
+        TerminalSession(backend, rawMode: false, alternateScreen: false, hideCursor: false).run {
+            backend.write("body")
+        }
+        let text = out.text()
+        @Expect(text.contains("\u{1B}[?2004h"))
+        @Expect(text.contains("\u{1B}[?2004l"))
     }
 
     @TestCase
@@ -728,6 +1225,32 @@ class CjTuiCoreTest {
         @Expect(afterStopAgain, beforeStopAgain)
         @Expect(countOccurrences(afterStopAgain, "\u{1B}[?1049l"), 1)
         @Expect(countOccurrences(afterStopAgain, "\u{1B}[?25h"), 1)
+    }
+
+    @TestCase
+    func terminalSessionRunReportsPrimaryAndRestoreErrors(): Unit {
+        let out = TestOutput()
+        let backend = AnsiBackend(output: out, fallbackArea: Rect(0, 0, 8, 2))
+        let session = TerminalSession(
+            backend,
+            driver: RestoreFailingDriver(),
+            rawMode: true,
+            alternateScreen: false,
+            bracketedPaste: false,
+            hideCursor: false
+        )
+
+        var message = ""
+        try {
+            session.run {
+                throw Exception("update failed")
+            }
+        } catch (e: Exception) {
+            message = e.message
+        }
+
+        @Expect(message.contains("update failed"))
+        @Expect(message.contains("restore failed"))
     }
 
     @TestCase
@@ -808,10 +1331,66 @@ class CjTuiCoreTest {
             rawMode: false,
             alternateScreen: false,
             hideCursor: false,
-            keyboard: KeyboardOptions(mode: KeyboardProtocolMode.Auto, probe: TerminalProbeMode.Active)
+            probeInputSource: ChunkedInputSource([unsafe { "\u{1B}[?1u".rawData() }]),
+            keyboard: KeyboardOptions(mode: KeyboardProtocolMode.Auto, probe: TerminalProbeMode.Active, probeBudgetMillis: 250)
         ).run { autoBackend.write("body") }
-        @Expect(autoOut.text().contains("\u{1B}[?u\u{1B}[>1u\u{1B}[>4;2m"))
+        @Expect(autoOut.text().contains("\u{1B}[?u"))
+        @Expect(autoOut.text().contains("\u{1B}[>1u\u{1B}[>4;2m"))
         @Expect(autoOut.text().contains("\u{1B}[<1u\u{1B}[>4;0m"))
+    }
+
+    @TestCase
+    func terminalProbeConsumesResponsesWithinClampedBudget(): Unit {
+        let out = TestOutput()
+        let backend = AnsiBackend(output: out, fallbackArea: Rect(0, 0, 8, 2))
+        let result = TerminalProbe.run(
+            backend,
+            ChunkedInputSource([unsafe { "\u{1B}[?1u".rawData() }]),
+            base: TerminalCapabilities(size: Rect(0, 0, 8, 2), keyboardProtocol: KeyProtocol.Basic, keyUp: false),
+            budgetMillis: 250
+        )
+        @Expect(result.budgetMillis, 100)
+        @Expect(result.consumedBytes.size > 0)
+        @Expect(out.text().contains("\u{1B}[?u"))
+        match (result.capabilities.keyboardProtocol) {
+            case KeyProtocol.Kitty => ()
+            case _ => @Expect(false)
+        }
+        @Expect(result.capabilities.keyUp)
+    }
+
+    @TestCase
+    func terminalSessionStoresProbeResultForAutoActiveKeyboard(): Unit {
+        let out = TestOutput()
+        let backend = AnsiBackend(output: out, fallbackArea: Rect(0, 0, 8, 2))
+        let session = TerminalSession(
+            backend,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            probeInputSource: ChunkedInputSource([unsafe { "\u{1B}[?1u".rawData() }]),
+            keyboard: KeyboardOptions(mode: KeyboardProtocolMode.Auto, probe: TerminalProbeMode.Active)
+        )
+        session.run { backend.write("body") }
+        match (session.probeResult()) {
+            case Some(result) =>
+                @Expect(result.consumedBytes.size > 0)
+                match (result.capabilities.keyboardProtocol) {
+                    case KeyProtocol.Kitty => ()
+                    case _ => @Expect(false)
+                }
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func platformDefaultsSelectLinuxDriverAndWaiterOnLinux(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        @Expect(defaultTerminalDriver().capabilities(backend).driverName, "linux-glibc")
+
+        let waiter = defaultEventWaiter()
+        waiter.wait(0, previousReadBytes: 0, sources: [])
+        waiter.close()
     }
 
     @TestCase
@@ -822,6 +1401,25 @@ class CjTuiCoreTest {
         @Expect(displayWidth("\u{FE0F}"), 0)
         @Expect(displayWidth("\u{2764}\u{FE0F}"), 1)
         @Expect(displayWidth("\u{1F469}\u{200D}\u{1F4BB}") >= 2)
+    }
+
+    @TestCase
+    func unicode17GraphemeBreakTestFixturePasses(): Unit {
+        let fixture = readText("tests/unicode/17.0.0/GraphemeBreakTest.txt")
+        var cases: Int64 = 0
+        var mismatches: Int64 = 0
+        for (line in splitLines(fixture)) {
+            let body = trimAscii(stripComment(line))
+            if (body.isEmpty()) { continue }
+            let (text, expected) = parseGraphemeBreakTestCase(line)
+            let actual = graphemeOffsets(text)
+            if (!sameOffsets(actual, expected)) {
+                mismatches++
+            }
+            cases++
+        }
+        @Expect(cases >= 700)
+        @Expect(mismatches, 0)
     }
 
     @TestCase
@@ -887,7 +1485,7 @@ class CjTuiCoreTest {
     }
 
     @TestCase
-    func eventRouterDispatchesGlobalKeysThenFocusedComponent(): Unit {
+    func eventRouterDispatchesFocusedComponentBeforeGlobalFallback(): Unit {
         let keymap = KeyMap()
         keymap.add(KeyBinding([KeyEvent(KeyCode.Char(r'q'))], "quit"))
         let router = EventRouter(globalKeys: keymap)
@@ -903,11 +1501,11 @@ class CjTuiCoreTest {
             case ControlFlow.Exit => ()
             case _ => @Expect(false)
         }
-        @Expect(first.handled, 0)
+        @Expect(first.handled, 1)
 
         @Expect(router.focusManager().focus("second"))
         _ = router.handle(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))))
-        @Expect(first.handled, 0)
+        @Expect(first.handled, 1)
         @Expect(second.handled, 1)
         let handled = router.handleResult(Event.KeyDown(KeyEvent(KeyCode.Char(r'h'))))
         @Expect(handled.handled)
@@ -933,6 +1531,20 @@ class CjTuiCoreTest {
     }
 
     @TestCase
+    func textAreaRenderReusesLineCacheAcrossStableFrames(): Unit {
+        let value = "one\ntwo\nthree\nfour\nfive\nsix"
+        let area = TextArea(value: value, cursor: 0, lineNumbers: true)
+        let buffer = Buffer(Rect(0, 0, 20, 4))
+        area.render(Rect(0, 0, 20, 4), buffer)
+        @Expect(area.lineCacheRebuildCount(), 1)
+        area.render(Rect(0, 0, 20, 4), buffer)
+        @Expect(area.lineCacheRebuildCount(), 1)
+        area.paste("x")
+        area.render(Rect(0, 0, 20, 4), buffer)
+        @Expect(area.lineCacheRebuildCount(), 2)
+    }
+
+    @TestCase
     func commandRuntimeProcessesBatchMessagesAndQuit(): Unit {
         let queue = ArrayList<Command>()
         let counter = CommandCounter()
@@ -942,12 +1554,14 @@ class CjTuiCoreTest {
             Command.Async("job"),
             Command.AsyncTask("task", { => Event.Message("load") }),
             Command.AsyncExec("printf", "/usr/bin/printf ok"),
+            Command.AsyncExecArgs("printf-args", "/usr/bin/printf", ["ok"]),
             Command.Emit(Event.Tick(TickEvent())),
             Command.StartTimer(TimerSpec("test", Duration.millisecond, mode: TimerMode.OneShot)),
             Command.StopTimer("test"),
-            Command.Exec("/usr/bin/printf ok")
+            Command.Exec("/usr/bin/printf ok"),
+            Command.ExecArgs("printf-sync-args", "/usr/bin/printf", ["ok"])
         ])), queue))
-        @Expect(queue.size, 8)
+        @Expect(queue.size, 10)
         let running = App.processCommands({ event => counter.update(event) }, queue, asyncRuntime: runtime)
         @Expect(running)
         while (runtime.pendingCount() > 0) {
@@ -961,6 +1575,13 @@ class CjTuiCoreTest {
 
         match (App.executeCommand("/usr/bin/printf ok")) {
             case Event.ExecResult(_, code, output) =>
+                @Expect(code, 0)
+                @Expect(output, "ok")
+            case _ => @Expect(false)
+        }
+        match (App.executeCommandArgs("args", "/usr/bin/printf", ["ok"])) {
+            case Event.ExecResult(id, code, output) =>
+                @Expect(id, "args")
                 @Expect(code, 0)
                 @Expect(output, "ok")
             case _ => @Expect(false)
@@ -996,6 +1617,20 @@ class CjTuiCoreTest {
         @Expect(queue.size, 0)
         @Expect(counter.messages, 2)
         @Expect(counter.ticks, 1)
+    }
+
+    @TestCase
+    func terminalLifecycleCommandsAreSafeInHeadlessProcessing(): Unit {
+        let queue = ArrayList<Command>()
+        queue.add(Command.ResetTerminal)
+        queue.add(Command.Suspend)
+        let (running, changed) = App.processCommandsWithEvents(
+            {_ => UpdateResult.next()},
+            queue
+        )
+        @Expect(running)
+        @Expect(changed)
+        @Expect(queue.size, 0)
     }
 
     @TestCase
@@ -1174,6 +1809,10 @@ class CjTuiCoreTest {
 
     @TestCase
     func transcriptComposerTimelineAndRequestWidgetsWork(): Unit {
+        @Expect(statusMark(TranscriptItemStatus.Streaming, activityFrame: 0), "⋮")
+        @Expect(statusMark(TranscriptItemStatus.Streaming, activityFrame: 1), "⋰")
+        @Expect(statusMark(TranscriptItemStatus.Running, activityFrame: 0), "◐")
+        @Expect(statusMark(TranscriptItemStatus.Running, activityFrame: 1), "◓")
         let transcript = Transcript(items: [
             TranscriptItem("one", title: "First", body: Document.plain("hello")),
             TranscriptItem("two", kind: TranscriptItemKind.Error, title: "Error", body: Document.plain("bad"), status: TranscriptItemStatus.Failed, collapsed: true)
@@ -1181,7 +1820,7 @@ class CjTuiCoreTest {
         let view = TranscriptView(transcript, selected: 0)
         let buffer = Buffer(Rect(0, 0, 40, 12))
         view.render(Rect(0, 0, 40, 5), buffer)
-        @Expect(buffer.getCell(4, 0).symbol, "F")
+        @Expect(buffer.getCell(2, 0).symbol, "F")
         @Expect(view.handle(KeyEvent(KeyCode.Down), 5))
         @Expect(view.selected, 1)
         @Expect(view.handle(KeyEvent(KeyCode.Enter), 5))
@@ -1210,6 +1849,28 @@ class CjTuiCoreTest {
             case None => @Expect(true)
         }
         @Expect(composer.area.value, "/r")
+        composer.area.setValue("/open")
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, "/open")
+            case None => @Expect(false)
+        }
+        _ = composer.handle(KeyEvent(KeyCode.Up))
+        @Expect(composer.area.value, "/open")
+        _ = composer.handle(KeyEvent(KeyCode.Up))
+        @Expect(composer.area.value, "/r")
+        _ = composer.handle(KeyEvent(KeyCode.Up))
+        @Expect(composer.area.value, "/r")
+        _ = composer.handle(KeyEvent(KeyCode.Down))
+        @Expect(composer.area.value, "/open")
+        _ = composer.handle(KeyEvent(KeyCode.Down))
+        @Expect(composer.area.value, "")
+        composer.area.setValue("abcdefgh")
+        @Expect(composer.visualHeight(4, 8), 2)
+        let composerBuffer = Buffer(Rect(0, 0, 4, 2))
+        composer.render(composerBuffer.area, composerBuffer)
+        @Expect(composerBuffer.getCell(0, 0).symbol, "a")
+        @Expect(composerBuffer.getCell(0, 1).symbol, "e")
+        @Expect(composer.cursorPosition(composerBuffer.area).y, 1)
 
         ActivityTimeline([
             ActivityStep("queued"),
@@ -1668,6 +2329,22 @@ class CjTuiCoreTest {
         @Expect(area.handle(KeyEvent(KeyCode.Enter)))
         @Expect(area.value, "private")
 
+        let cancellable = area.beginCompletion("cancel")
+        @Expect(area.handleCompletionEvent(Event.TextCompletion(
+            "cancel",
+            TextCompletionResult(
+                cancellable.requestId,
+                cancellable.revision,
+                cancellable.prefixStart,
+                cancellable.prefixEnd,
+                [TextCompletionItem("private")]
+            )
+        )))
+        @Expect(area.completionVisible())
+        @Expect(area.cancelCompletion())
+        @Expect(!area.completionVisible())
+        @Expect(!area.cancelCompletion())
+
         let staleRequest = area.beginCompletion("stale")
         area.paste("!")
         let stale = Event.TextCompletion("stale", TextCompletionResult(staleRequest.requestId, staleRequest.revision, staleRequest.prefixStart, staleRequest.prefixEnd, [TextCompletionItem("ignored")]))
@@ -1675,15 +2352,65 @@ class CjTuiCoreTest {
     }
 
     @TestCase
+    func textAreaSupportsReadlineStyleControlKeys(): Unit {
+        let move = TextArea(value: "zero\nalpha beta\ngamma", cursor: 10)
+        @Expect(move.handle(KeyEvent(KeyCode.Char(r'a'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(move.cursor, 5)
+        @Expect(move.handle(KeyEvent(KeyCode.Char(r'e'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(move.cursor, 15)
+        @Expect(move.handle(KeyEvent(KeyCode.Char(r'b'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(move.cursor, 14)
+        @Expect(move.handle(KeyEvent(KeyCode.Char(r'f'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(move.cursor, 15)
+
+        let killStart = TextArea(value: "zero\nalpha beta\ngamma", cursor: 10)
+        @Expect(killStart.handle(KeyEvent(KeyCode.Char(r'u'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(killStart.value, "zero\n beta\ngamma")
+        @Expect(killStart.cursor, 5)
+        @Expect(killStart.handle(KeyEvent(KeyCode.Char(r'z'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(killStart.value, "zero\nalpha beta\ngamma")
+
+        let killEnd = TextArea(value: "zero\nalpha beta\ngamma", cursor: 10)
+        @Expect(killEnd.handle(KeyEvent(KeyCode.Char(r'k'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(killEnd.value, "zero\nalpha\ngamma")
+        @Expect(killEnd.cursor, 10)
+
+        let killWord = TextArea(value: "zero\nalpha beta\ngamma", cursor: 15)
+        @Expect(killWord.handle(KeyEvent(KeyCode.Char(r'w'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(killWord.value, "zero\nalpha \ngamma")
+        @Expect(killWord.cursor, 11)
+
+        let unbound = TextArea(value: "safe", cursor: 4)
+        @Expect(!unbound.handle(KeyEvent(KeyCode.Char(r'p'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(unbound.value, "safe")
+
+        let readOnly = TextArea(value: "locked", cursor: 3, readOnly: true)
+        @Expect(!readOnly.handle(KeyEvent(KeyCode.Char(r'u'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(readOnly.value, "locked")
+
+        let composer = Composer(value: "alpha beta")
+        composer.area.cursor = 5
+        match (composer.handle(KeyEvent(
+            KeyCode.Char(r'u'),
+            modifiers: KeyModifier(ctrl: true)
+        ))) {
+            case Some(_) => @Expect(false)
+            case None => @Expect(true)
+        }
+        @Expect(composer.area.value, " beta")
+        @Expect(composer.area.cursor, 0)
+    }
+
+    @TestCase
     func textAreaSupportsPagingControlKeysAndLineNumbers(): Unit {
         let area = TextArea(value: "one\ntwo\nthree\nfour\nfive\nsix", cursor: 0, lineNumbers: true)
         @Expect(area.handle(KeyEvent(KeyCode.PageDown)))
         @Expect(area.cursor > 0)
-        @Expect(area.handle(KeyEvent(KeyCode.Char(r'a'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(area.handle(KeyEvent(KeyCode.Home, modifiers: KeyModifier(ctrl: true))))
         @Expect(area.cursor, 0)
-        @Expect(area.handle(KeyEvent(KeyCode.Char(r'e'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(area.handle(KeyEvent(KeyCode.End, modifiers: KeyModifier(ctrl: true))))
         @Expect(area.cursor, area.value.size)
-        @Expect(area.handle(KeyEvent(KeyCode.Char(r'a'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(area.handle(KeyEvent(KeyCode.Home, modifiers: KeyModifier(ctrl: true))))
         @Expect(area.handle(KeyEvent(KeyCode.Char(r'Z'))))
         @Expect(area.value.startsWith("Z"))
         @Expect(area.handle(KeyEvent(KeyCode.Char(r'z'), modifiers: KeyModifier(ctrl: true))))
@@ -1873,8 +2600,18 @@ class CjTuiCoreTest {
         }
 
         let buffer = Buffer(Rect(0, 0, 24, 8))
-        Modal(title: "M", body: "Hello modal", buttons: ["OK"], width: 12, height: 5).render(buffer.area, buffer)
+        buffer.fill(buffer.area, Cell("X"))
+        Modal(
+            title: "M",
+            body: "Hello modal",
+            buttons: ["OK"],
+            width: 12,
+            height: 5,
+            style: Style(fg: Color.White, bg: Color.Blue)
+        ).render(buffer.area, buffer)
         @Expect(buffer.getCell(8, 1).symbol, "M")
+        @Expect(buffer.getCell(16, 3).symbol, " ")
+        @Expect(buffer.getCell(16, 3).style, Style(fg: Color.White, bg: Color.Blue))
 
         let tabs = Tabs(["A", "B"], selected: 0)
         @Expect(tabs.handle(KeyEvent(KeyCode.Right)))
@@ -2269,6 +3006,481 @@ class CjTuiCoreTest {
     }
 
     @TestCase
+    func dirtyRectRenderSkipsUntouchedWidgets(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 12, 3))
+        let terminal = Terminal(backend)
+        let left = CountingWidget("left")
+        let right = CountingWidget("right")
+
+        _ = terminal.draw { frame =>
+            frame.renderWidget(left, Rect(0, 0, 5, 1))
+            frame.renderWidget(right, Rect(6, 0, 5, 1))
+        }
+        @Expect(left.renders, 1)
+        @Expect(right.renders, 1)
+
+        let dirty = DirtyRects.full(Rect(0, 0, 5, 1))
+        let metrics = terminal.draw({ frame =>
+            frame.renderWidget(left, Rect(0, 0, 5, 1))
+            frame.renderWidget(right, Rect(6, 0, 5, 1))
+        }, dirtyRects: Some(dirty))
+        @Expect(left.renders, 2)
+        @Expect(right.renders, 1)
+        @Expect(metrics.renderedCells <= 5)
+        @Expect(metrics.dirtyRects, 1)
+        @Expect(backend.snapshot().contains("right"))
+    }
+
+    @TestCase
+    func dirtyRectRenderClearsOnlyTouchedRegionAndPreservesRest(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 12, 2))
+        let terminal = Terminal(backend)
+        _ = terminal.draw { frame =>
+            frame.canvas().drawText(0, 0, "abcdefghij", Style.default())
+            frame.canvas().drawText(0, 1, "stable", Style.default())
+        }
+
+        let dirty = DirtyRects.full(Rect(0, 0, 3, 1))
+        let metrics = terminal.draw({ frame =>
+            frame.canvas().drawText(0, 0, "xy", Style.default())
+            frame.canvas().drawText(0, 1, "changed-but-outside-dirty", Style.default())
+        }, dirtyRects: Some(dirty))
+        @Expect(!metrics.fullRedraw)
+        @Expect(metrics.renderedCells <= 3)
+        @Expect(backend.assertCell(0, 0, "x"))
+        @Expect(backend.assertCell(1, 0, "y"))
+        @Expect(backend.assertCell(2, 0, " "))
+        @Expect(backend.snapshot().contains("stable"))
+        @Expect(!backend.snapshot().contains("changed"))
+    }
+
+    @TestCase
+    func componentHostMountUnmountManagesComponentTimers(): Unit {
+        let probe = RuntimeProbeComponent("cpu")
+        probe.startTimerOnMount = true
+        let host = ComponentHost().add("cpu", probe, area: Rect(0, 0, 10, 2))
+
+        let mounted = host.mount()
+        @Expect(probe.mounts, 1)
+        match (mounted.command) {
+            case Command.StartTimer(spec) => @Expect(spec.id, "component:cpu:sample")
+            case _ => @Expect(false)
+        }
+
+        let unmounted = host.unmount()
+        @Expect(probe.unmounts, 1)
+        match (unmounted.command) {
+            case Command.StopTimer(id) => @Expect(id, "component:cpu:sample")
+            case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func componentHostMapsLocalDirtyToGlobalRects(): Unit {
+        let probe = RuntimeProbeComponent("table")
+        probe.resultHandled = true
+        probe.resultDirty = Dirty.LocalRows([1, 3])
+        let host = ComponentHost().add("table", probe, area: Rect(5, 4, 20, 6))
+
+        let result = host.dispatchTo("table", Event.Message("dirty"))
+        match (result.dirtyRects) {
+            case Some(rects) =>
+                @Expect(rects.intersects(Rect(5, 5, 20, 1)))
+                @Expect(rects.intersects(Rect(5, 7, 20, 1)))
+                @Expect(!rects.intersects(Rect(5, 4, 20, 1)))
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func componentHostDirtyRenderSkipsUntouchedComponents(): Unit {
+        let left = RuntimeProbeComponent("left", text: "left")
+        let right = RuntimeProbeComponent("right", text: "right")
+        let host = ComponentHost()
+            .add("left", left, area: Rect(0, 0, 5, 1))
+            .add("right", right, area: Rect(6, 0, 5, 1))
+        let backend = TestBackend(area: Rect(0, 0, 12, 2))
+        let terminal = Terminal(backend)
+
+        _ = terminal.draw { frame => host.render(frame) }
+        @Expect(left.renders, 1)
+        @Expect(right.renders, 1)
+
+        left.resultHandled = true
+        left.resultDirty = Dirty.Self
+        let update = host.dispatchTo("left", Event.Message("update-left"))
+        let metrics = terminal.draw({ frame => host.render(frame) }, dirtyRects: update.dirtyRects)
+        @Expect(left.renders, 2)
+        @Expect(right.renders, 1)
+        @Expect(metrics.renderedCells <= 5)
+        @Expect(backend.snapshot().contains("right"))
+    }
+
+    @TestCase
+    func componentHostRoutesFocusedKeysAndComponentTimers(): Unit {
+        let cpu = RuntimeProbeComponent("cpu")
+        let proc = RuntimeProbeComponent("proc")
+        proc.resultHandled = true
+        proc.resultDirty = Dirty.Local(Rect(0, 1, 8, 1))
+        let host = ComponentHost()
+            .add("cpu", cpu, area: Rect(0, 0, 8, 2))
+            .add("proc", proc, area: Rect(0, 2, 8, 4))
+        @Expect(host.focusManager().focus("proc"))
+
+        let keyResult = host.update(Event.KeyDown(KeyEvent(KeyCode.Up)))
+        @Expect(cpu.updates, 0)
+        @Expect(proc.updates, 1)
+        match (keyResult.dirtyRects) {
+            case Some(rects) => @Expect(rects.intersects(Rect(0, 3, 8, 1)))
+            case None => @Expect(false)
+        }
+
+        let tick = TimerEvent("component:cpu:sample", elapsedMillis: 10, firedCount: 1)
+        let tickResult = host.update(Event.Timer(tick))
+        @Expect(cpu.tickEvents, 1)
+        @Expect(proc.tickEvents, 0)
+        @Expect(cpu.lastEventText, "cpu:sample")
+        match (tickResult.dirtyRects) {
+            case Some(rects) => @Expect(rects.covers(Rect(0, 0, 8, 2)))
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func componentHostRoutesAsyncPollerResultsAndProfilesWork(): Unit {
+        let probe = RuntimeProbeComponent("data")
+        let poller = AsyncPoller("refresh", { => Event.Message("loaded") })
+        probe.poller = Some(poller)
+        let host = ComponentHost().add("data", probe, area: Rect(2, 3, 10, 2))
+        let ctx = ComponentContext("data", area: Rect(2, 3, 10, 2))
+
+        @Expect(poller.request(ctx, nowMillis: 100))
+        @Expect(poller.isPending())
+        let commands = ctx.drainCommands()
+        @Expect(commands.size, 1)
+        match (commands[0]) {
+            case Command.AsyncTask(id, _) => @Expect(id, "component-async:data:refresh")
+            case _ => @Expect(false)
+        }
+
+        let result = host.update(Event.AsyncCompleted("component-async:data:refresh", Event.Message("loaded")))
+        @Expect(probe.lastEventText, "refresh:loaded")
+        @Expect(!poller.isPending())
+        match (result.dirtyRects) {
+            case Some(rects) => @Expect(rects.covers(Rect(2, 3, 10, 2)))
+            case None => @Expect(false)
+        }
+        match (host.componentProfile("data")) {
+            case Some(profile) =>
+                @Expect(profile.updateCount >= 1)
+                @Expect(profile.dirtyCells >= 20)
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func componentDataSourceRoutesTypedReadyEventsAndProfilerOverlayWorks(): Unit {
+        let probe = RuntimeProbeComponent("metrics")
+        let source = DataSource<Int64>("cpu")
+        let host = ComponentHost().add("metrics", probe, area: Rect(1, 2, 12, 3))
+        let ctx = ComponentContext("metrics", area: Rect(1, 2, 12, 3))
+
+        @Expect(source.refresh(ctx, { => Int64(42) }, nowMillis: 100))
+        @Expect(source.isPending())
+        @Expect(source.isStale())
+        let commands = ctx.drainCommands()
+        @Expect(commands.size, 1)
+        var asyncId = ""
+        var inner = Event.Message("missing")
+        match (commands[0]) {
+            case Command.AsyncTask(id, task) =>
+                asyncId = id
+                inner = task()
+            case _ => @Expect(false)
+        }
+        @Expect(asyncId, "component-data:metrics:cpu:1")
+        match (source.latest()) {
+            case Some(value) => @Expect(value, 42)
+            case None => @Expect(false)
+        }
+        @Expect(!source.isPending())
+        @Expect(!source.isStale())
+
+        let result = host.update(Event.AsyncCompleted(asyncId, inner))
+        @Expect(probe.lastEventText, "cpu:1")
+        match (result.dirtyRects) {
+            case Some(rects) => @Expect(rects.covers(Rect(1, 2, 12, 3)))
+            case None => @Expect(false)
+        }
+        let overlay = ProfilerOverlay(host.profiler())
+        let overlayBuffer = Buffer(Rect(0, 0, 48, 4))
+        overlay.render(Rect(0, 0, 48, 4), overlayBuffer)
+        let snapshot = overlay.snapshot()
+        match (snapshot.hottest()) {
+            case Some(entry) =>
+                @Expect(entry.id, "metrics")
+                @Expect(entry.asyncCount >= 1)
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func dataSourceDebounceIdleCancelFailureAndProfilerStateAreObservable(): Unit {
+        let probe = DataSourceProbeComponent()
+        let host = ComponentHost().add("metrics", probe, area: Rect(1, 2, 12, 3))
+
+        _ = host.dispatchTo("metrics", Event.Message("activity"))
+        let blocked = host.dispatchTo("metrics", Event.Message("poll-idle-blocked"))
+        @Expect(probe.lastEventText, "blocked")
+        match (blocked.command) {
+            case Command.Noop => ()
+            case _ => @Expect(false)
+        }
+
+        let poll = host.dispatchTo("metrics", Event.Message("poll"))
+        @Expect(probe.source.isPending())
+        match (host.profilerSnapshot().find("metrics")) {
+            case Some(entry) =>
+                @Expect(entry.pendingDataSources, 1)
+                @Expect(entry.lowPriorityDataPolls, 1)
+            case None => @Expect(false)
+        }
+        var asyncId = ""
+        match (poll.command) {
+            case Command.AsyncTask(id, _) => asyncId = id
+            case _ => @Expect(false)
+        }
+        let duplicate = host.dispatchTo("metrics", Event.Message("poll"))
+        match (duplicate.command) {
+            case Command.Noop => ()
+            case _ => @Expect(false)
+        }
+
+        let cancel = host.dispatchTo("metrics", Event.Message("cancel"))
+        @Expect(!probe.source.isPending())
+        @Expect(probe.source.isStale())
+        match (probe.source.error()) {
+            case Some(message) => @Expect(message, "cancelled")
+            case None => @Expect(false)
+        }
+        var cancelId = ""
+        match (cancel.command) {
+            case Command.CancelAsync(id) => cancelId = id
+            case _ => @Expect(false)
+        }
+        @Expect(cancelId, asyncId)
+        let cancelResult = host.update(Event.AsyncCancelled(cancelId))
+        @Expect(probe.lastEventText, "proc:cancelled:1")
+        match (cancelResult.dirtyRects) {
+            case Some(rects) => @Expect(rects.covers(Rect(1, 2, 12, 3)))
+            case None => @Expect(false)
+        }
+        match (host.profilerSnapshot().find("metrics")) {
+            case Some(entry) =>
+                @Expect(entry.pendingDataSources, 0)
+                match (entry.lastError) {
+                    case Some(message) => @Expect(message, "cancelled")
+                    case None => @Expect(false)
+                }
+            case None => @Expect(false)
+        }
+
+        let failed = probe.source.fail("boom")
+        @Expect(probe.source.isStale())
+        match (failed.error) {
+            case Some(message) => @Expect(message, "boom")
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func componentProfilerSnapshotSupportsSortingLookupAndReset(): Unit {
+        let host = ComponentHost()
+            .add("fast", RuntimeProbeComponent("fast"), area: Rect(0, 0, 4, 1))
+            .add("slow", RuntimeProbeComponent("slow"), area: Rect(0, 1, 8, 2))
+        _ = host.dispatchTo("fast", Event.Message("hit"))
+        _ = host.dispatchTo("slow", Event.DataFailed("load", 1, "offline"))
+        let backend = TestBackend(area: Rect(0, 0, 12, 4))
+        let terminal = Terminal(backend)
+        _ = terminal.draw { frame => host.render(frame) }
+
+        let snapshot = host.profilerSnapshot()
+        match (snapshot.find("slow")) {
+            case Some(entry) =>
+                @Expect(entry.id, "slow")
+                match (entry.lastError) {
+                    case Some(message) => @Expect(message, "offline")
+                    case None => @Expect(false)
+                }
+            case None => @Expect(false)
+        }
+        @Expect(snapshot.sortedByRender().size, 2)
+        @Expect(snapshot.sortedByUpdate().size, 2)
+        @Expect(snapshot.sortedByAsync().size, 2)
+
+        host.profiler().resetFrameCounters()
+        match (host.profilerSnapshot().find("slow")) {
+            case Some(entry) =>
+                @Expect(entry.updateCount, 0)
+                @Expect(entry.renderCount, 0)
+                @Expect(entry.asyncCount, 0)
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func focusedComponentHandledKeyPrecedesGlobalKey(): Unit {
+        let focused = RuntimeProbeComponent("focused")
+        focused.resultHandled = true
+        focused.resultDirty = Dirty.Self
+        let host = ComponentHost().add("focused", focused, area: Rect(0, 0, 10, 2))
+        host.addGlobalKey(KeyBinding([KeyEvent(KeyCode.Up)], "global-up"))
+        @Expect(host.focusManager().focus("focused"))
+
+        let result = host.update(Event.KeyDown(KeyEvent(KeyCode.Up)))
+        @Expect(focused.updates, 1)
+        match (result.command) {
+            case Command.Noop => ()
+            case _ => @Expect(false)
+        }
+        match (result.dirtyRects) {
+            case Some(rects) => @Expect(rects.covers(Rect(0, 0, 10, 2)))
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func componentContainerRenderDoesNotMutateChildLayout(): Unit {
+        let child = RuntimeProbeComponent("child", text: "child")
+        let childHost = ComponentHost().add("child", child, area: Rect(0, 0, 1, 1))
+        let grid = DashboardGrid(1, 1, regions: [DashboardRegion("child", 0, 0)])
+        let container = ComponentContainer(childHost, grid)
+        let parent = ComponentHost().add("container", container, area: Rect(0, 0, 20, 4))
+        _ = parent.mountAll()
+        _ = parent.resizeAllComponents(Rect(0, 0, 20, 4))
+
+        match (childHost.node("child")) {
+            case Some(node) => @Expect(node.area(), Rect(0, 0, 20, 4))
+            case None => @Expect(false)
+        }
+        let backend = TestBackend(area: Rect(0, 0, 20, 4))
+        let terminal = Terminal(backend)
+        _ = terminal.draw { frame => parent.renderDirty(frame) }
+        match (childHost.node("child")) {
+            case Some(node) => @Expect(node.area(), Rect(0, 0, 20, 4))
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func componentHostDefaultLayoutStillSplitsVertically(): Unit {
+        let host = ComponentHost()
+            .add("top", RuntimeProbeComponent("top"), area: Rect(0, 0, 1, 1))
+            .add("bottom", RuntimeProbeComponent("bottom"), area: Rect(0, 0, 1, 1))
+        let result = host.resizeAllComponents(Rect(0, 0, 20, 5))
+
+        match (host.node("top")) {
+            case Some(node) => @Expect(node.area(), Rect(0, 0, 20, 2))
+            case None => @Expect(false)
+        }
+        match (host.node("bottom")) {
+            case Some(node) => @Expect(node.area(), Rect(0, 2, 20, 3))
+            case None => @Expect(false)
+        }
+        match (result.dirtyRects) {
+            case Some(rects) =>
+                @Expect(rects.covers(Rect(0, 0, 20, 2)))
+                @Expect(rects.covers(Rect(0, 2, 20, 3)))
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func componentHostCanUseCustomLayoutProvider(): Unit {
+        let provider = FixedComponentLayoutProvider([
+            Rect(0, 0, 6, 4),
+            Rect(6, 0, 14, 3),
+            Rect(6, 3, 14, 1)
+        ])
+        let host = ComponentHost(layoutProvider: provider)
+            .add("sidebar", RuntimeProbeComponent("sidebar"), area: Rect(0, 0, 1, 1))
+            .add("main", RuntimeProbeComponent("main"), area: Rect(0, 0, 1, 1))
+            .add("status", RuntimeProbeComponent("status"), area: Rect(0, 0, 1, 1))
+        let result = host.resizeAllComponents(Rect(0, 0, 20, 4))
+
+        match (host.node("sidebar")) {
+            case Some(node) => @Expect(node.area(), Rect(0, 0, 6, 4))
+            case None => @Expect(false)
+        }
+        match (host.node("main")) {
+            case Some(node) => @Expect(node.area(), Rect(6, 0, 14, 3))
+            case None => @Expect(false)
+        }
+        match (host.node("status")) {
+            case Some(node) => @Expect(node.area(), Rect(6, 3, 14, 1))
+            case None => @Expect(false)
+        }
+        match (result.dirtyRects) {
+            case Some(rects) =>
+                @Expect(rects.covers(Rect(0, 0, 6, 4)))
+                @Expect(rects.covers(Rect(6, 0, 14, 3)))
+                @Expect(rects.covers(Rect(6, 3, 14, 1)))
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func componentWrappersExposeLocalDirtyForInputAndTextArea(): Unit {
+        let input = Input()
+        let inputHost = ComponentHost().add("input", InputComponent(input, focusId: Some("input")), area: Rect(0, 0, 20, 1))
+        @Expect(inputHost.focusManager().focus("input"))
+        let inputResult = inputHost.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'a'))))
+        match (inputResult.dirtyRects) {
+            case Some(rects) => @Expect(rects.covers(Rect(0, 0, 20, 1)))
+            case None => @Expect(false)
+        }
+
+        let textArea = TextArea(value: "alpha\nbeta", cursor: 0)
+        let textHost = ComponentHost().add("text", TextAreaComponent(textArea, focusId: Some("text")), area: Rect(0, 2, 30, 4))
+        @Expect(textHost.focusManager().focus("text"))
+        let textResult = textHost.update(Event.KeyDown(KeyEvent(KeyCode.PageDown)))
+        match (textResult.dirtyRects) {
+            case Some(rects) => @Expect(rects.intersects(Rect(0, 2, 30, 4)))
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func virtualTableExposesDirtyRowsBodyHeaderAndCacheControls(): Unit {
+        let rowsProvider = RuntimeTableRows()
+        let table = VirtualTable(
+            [TableColumn("ID", width: 4), TableColumn("Name", width: 8)],
+            100,
+            { index => rowsProvider.row(index) },
+            offset: 10,
+            selectedRow: Some(12)
+        )
+        let area = Rect(4, 5, 20, 6)
+        let header = table.dirtyHeader(area)
+        @Expect(header.covers(Rect(4, 5, 20, 1)))
+        let body = table.dirtyBody(area)
+        @Expect(body.covers(Rect(4, 6, 20, 5)))
+        let rows = table.dirtyRows(area, [12, 14])
+        @Expect(rows.intersects(Rect(4, 8, 20, 1)))
+        @Expect(rows.intersects(Rect(4, 10, 20, 1)))
+        let selection = table.dirtySelectionChange(area, Some(12), Some(13))
+        @Expect(selection.intersects(Rect(4, 8, 20, 1)))
+        @Expect(selection.intersects(Rect(4, 9, 20, 1)))
+
+        let buffer = Buffer(area)
+        table.render(area, buffer)
+        @Expect(rowsProvider.calls > 0)
+        @Expect(table.cachedRowCount() > 0)
+        table.clearCachedRows()
+        @Expect(table.cachedRowCount(), 0)
+    }
+
+    @TestCase
     func appMetricsAndHeadlessRunnerCaptureFrames(): Unit {
         let script = HeadlessScript()
             .key(KeyEvent(KeyCode.Char(r'a')))
@@ -2308,6 +3520,24 @@ class CjTuiCoreTest {
             case None => @Expect(false)
         }
         @Expect(result.metrics.averageFps() > 0)
+    }
+
+    @TestCase
+    func headlessRunnerCanMeasureWithoutRetainingFrameArtifacts(): Unit {
+        let result = AppTestRunner.run(
+            HeadlessScript().tick(count: 3).resize(Rect(0, 0, 12, 2)),
+            { frame => frame.renderWidget(Paragraph("performance"), frame.area) },
+            { _ => UpdateResult.next() },
+            options: HeadlessRunOptions(
+                area: Rect(0, 0, 8, 1),
+                captureBuffers: false,
+                captureSnapshots: false
+            )
+        )
+        @Expect(result.passed())
+        @Expect(result.frames.size, 0)
+        @Expect(result.snapshots.size, 0)
+        @Expect(result.metrics.frames().size, 5)
     }
 
     @TestCase
@@ -2363,6 +3593,242 @@ class CjTuiCoreTest {
             caught = true
         }
         @Expect(caught)
+        @Expect(waiter.closed)
+    }
+
+    @TestCase
+    func appUsesInjectedInputSourceForHighLevelLoop(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let input = ChunkedInputSource([unsafe { "q".rawData() }])
+        let app = App(
+            backend: backend,
+            inputSource: input,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false
+        )
+        let sawQuit = IntState()
+        app.run(
+            { frame => frame.renderWidget(Paragraph("input"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.KeyDown(key) =>
+                        match (key.code) {
+                            case KeyCode.Char(r'q') =>
+                                sawQuit.set(1)
+                                ControlFlow.Exit
+                            case _ => ControlFlow.Continue
+                        }
+                    case _ => ControlFlow.Continue
+                }
+            }
+        )
+        @Expect(sawQuit.get(), 1)
+    }
+
+    @TestCase
+    func appPaintsBetweenBufferedKeyEvents(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let input = ChunkedInputSource([
+            unsafe { "abc".rawData() },
+            unsafe { "q".rawData() }
+        ])
+        let app = App(
+            backend: backend,
+            inputSource: input,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false
+        )
+        let value = StringState()
+        app.run(
+            { frame =>
+                frame.renderWidget(Paragraph(value.get()), frame.area)
+            },
+            { event =>
+                match (event) {
+                    case Event.KeyDown(key) =>
+                        match (key.code) {
+                            case KeyCode.Char(r'q') => ControlFlow.Exit
+                            case KeyCode.Char(r) =>
+                                value.set(value.get() + runeToString(r))
+                                ControlFlow.Continue
+                            case _ => ControlFlow.Continue
+                        }
+                    case _ => ControlFlow.Continue
+                }
+            }
+        )
+        @Expect(value.get(), "abc")
+        @Expect(backend.snapshots().size, 4)
+        @Expect(backend.snapshots()[1].contains("a"), true)
+        @Expect(backend.snapshots()[2].contains("ab"), true)
+        @Expect(backend.snapshot().contains("abc"))
+    }
+
+    @TestCase
+    func appSkipsFramesForBufferedUnchangedInput(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let wheelDown = "\u{1B}[<65;3;4M"
+        let input = ChunkedInputSource([
+            unsafe { (wheelDown + wheelDown + wheelDown + wheelDown).rawData() },
+            unsafe { "q".rawData() }
+        ])
+        let app = App(
+            backend: backend,
+            inputSource: input,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            mouse: false
+        )
+        let wheelEvents = IntState()
+        app.runWithCommands(
+            { frame => frame.renderWidget(Paragraph("bottom"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.Mouse(_) =>
+                        wheelEvents.set(wheelEvents.get() + 1)
+                        UpdateResult.unchanged()
+                    case Event.KeyDown(key) => match (key.code) {
+                        case KeyCode.Char(r'q') => UpdateResult.exit()
+                        case _ => UpdateResult.next()
+                    }
+                    case _ => UpdateResult.next()
+                }
+            }
+        )
+        @Expect(wheelEvents.get(), 4)
+        // Initial paint only: boundary wheel input is consumed without
+        // repeatedly rendering the unchanged application state.
+        @Expect(backend.snapshots().size, 1)
+    }
+
+    @TestCase
+    func appUsesInjectedTerminalDriverForCapabilitiesAndSession(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let driver = ObservedTerminalDriver()
+        let app = App(
+            backend: backend,
+            terminalDriver: driver,
+            rawMode: true,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false
+        )
+        let driverName = StringState()
+        app.runWithCommands(
+            { frame => frame.renderWidget(Paragraph("driver"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.Capabilities(caps) =>
+                        driverName.set(caps.driverName)
+                        UpdateResult.exit()
+                    case _ => UpdateResult.next()
+                }
+            }
+        )
+        @Expect(driverName.get(), "observed-driver")
+        @Expect(driver.rawEnters, 1)
+        @Expect(driver.restores, 1)
+        @Expect(driver.capabilityCalls, 1)
+    }
+
+    @TestCase
+    func activeProbeDoesNotConsumeInjectedAppInputSource(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let input = ChunkedInputSource([unsafe { "q".rawData() }])
+        let probe = ChunkedInputSource([unsafe { "\u{1B}[?1u".rawData() }])
+        let app = App(
+            backend: backend,
+            inputSource: input,
+            probeInputSource: probe,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            keyboard: KeyboardOptions(mode: KeyboardProtocolMode.Auto, probe: TerminalProbeMode.Active)
+        )
+        let sawQuit = IntState()
+        app.run(
+            { frame => frame.renderWidget(Paragraph("probe"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.KeyDown(key) =>
+                        match (key.code) {
+                            case KeyCode.Char(r'q') =>
+                                sawQuit.set(1)
+                                ControlFlow.Exit
+                            case _ => ControlFlow.Continue
+                        }
+                    case _ => ControlFlow.Continue
+                }
+            }
+        )
+        @Expect(sawQuit.get(), 1)
+    }
+
+    @TestCase
+    func resizePollingUsesResizePollIntervalInsteadOfIdleSleep(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let waiter = ResizeChangingWaiter(backend, Rect(0, 0, 12, 3))
+        let app = App(
+            backend: backend,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            idleSleep: Duration.millisecond,
+            resizePollEvery: Duration.millisecond * 250,
+            eventWaiter: waiter
+        )
+        let sawResize = IntState()
+        app.run(
+            { frame => frame.renderWidget(Paragraph("resize"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.Resize(area) =>
+                        if (area.width == 12 && area.height == 3) { sawResize.set(1) }
+                        ControlFlow.Exit
+                    case _ => ControlFlow.Continue
+                }
+            }
+        )
+        @Expect(sawResize.get(), 1)
+        @Expect(waiter.waits, 1)
+        @Expect(waiter.lastTimeoutMillis, 250)
+        @Expect(waiter.closed)
+    }
+
+    @TestCase
+    func tickDeadlineStillWinsOverLongResizePollInterval(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let waiter = CountingEventWaiter()
+        let app = App(
+            backend: backend,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            tickEvery: Some(Duration.millisecond * 5),
+            idleSleep: Duration.millisecond,
+            resizePollEvery: Duration.millisecond * 250,
+            eventWaiter: waiter
+        )
+        app.run(
+            { frame => frame.renderWidget(Paragraph("tick"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.Tick(_) => ControlFlow.Exit
+                    case _ => ControlFlow.Continue
+                }
+            }
+        )
+        @Expect(waiter.waits > 0)
+        @Expect(waiter.lastTimeoutMillis <= 5)
         @Expect(waiter.closed)
     }
 

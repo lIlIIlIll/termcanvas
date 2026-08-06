@@ -5,29 +5,86 @@ import std.process.*
 import std.time.*
 
 @FastNative
+@When[os == "Linux"]
 foreign func epoll_create1(flags: Int32): Int32
 
 @FastNative
+@When[os == "Linux"]
 foreign func epoll_ctl(epfd: Int32, op: Int32, fd: Int32, event: CPointer<Unit>): Int32
 
 @FastNative
+@When[os == "Linux"]
 foreign func epoll_wait(epfd: Int32, events: CPointer<Unit>, maxevents: Int32, timeout: Int32): Int32
+
+@FastNative
+@When[os == "macOS"]
+foreign func poll(fds: CPointer<Unit>, nfds: UInt32, timeout: Int32): Int32
+
+@FastNative
+@When[os == "Windows"]
+foreign func WaitForSingleObject(handle: CPointer<Unit>, milliseconds: UInt32): UInt32
 
 @FastNative
 foreign func close(fd: Int32): Int32
 
+@FastNative
+@When[os != "Windows"]
+foreign func getpid(): Int32
+
+@When[os == "Linux"]
+const APP_SIGTSTP: Int32 = 20
+@When[os == "macOS"]
+const APP_SIGTSTP: Int32 = 18
+
+@When[os == "Linux"]
 let EPOLL_CTL_ADD: Int32 = 1
+@When[os == "Linux"]
 let EPOLL_CTL_DEL: Int32 = 2
+@When[os == "Linux"]
 let EPOLL_CTL_MOD: Int32 = 3
+@When[os == "Linux"]
 let EPOLLIN: UInt32 = 0x001
+@When[os == "Linux"]
 let EPOLLOUT: UInt32 = 0x004
+@When[os == "Linux"]
 let EPOLLERR: UInt32 = 0x008
+@When[os == "Linux"]
 let EPOLLHUP: UInt32 = 0x010
+@When[os == "Linux"]
+let EPOLLET: UInt32 = 0x8000_0000u32
+@When[os == "Linux"]
 let EPOLL_EVENT_BYTES: Int64 = 16
+@When[os == "macOS"]
+let POLLIN_FLAG: Int16 = 0x0001
+@When[os == "macOS"]
+let POLLOUT_FLAG: Int16 = 0x0004
+@When[os == "macOS"]
+let POLLERR_FLAG: Int16 = 0x0008
+@When[os == "macOS"]
+let POLLHUP_FLAG: Int16 = 0x0010
+@When[os == "macOS"]
+let POLLFD_BYTES: Int64 = 8
+@When[os == "Windows"]
+let WAIT_TIMEOUT_MILLIS: UInt32 = 0x0000_0102u32
+@When[os == "Windows"]
+let WAIT_FAILED_RESULT: UInt32 = 0xFFFF_FFFFu32
+@When[os == "Windows"]
+let INFINITE_WAIT: UInt32 = 0xFFFF_FFFFu32
 
 public enum ControlFlow {
     | Continue
     | Exit
+}
+
+// Optional, low-overhead hooks for end-to-end latency tracing.  The default
+// App path keeps this disabled; applications opt in explicitly when running a
+// diagnostic session.
+public interface AppTraceSink {
+    func inputReceived(event: Event, eventQueueLength: Int64): Unit
+    func eventDispatchCompleted(): Unit
+    func stateUpdateCompleted(): Unit
+    func renderStarted(): Unit
+    func eventLoopStall(task: String, durationNanos: Int64): Unit
 }
 
 public struct TimerSpec {
@@ -52,6 +109,7 @@ public enum Command {
     | Async(String)
     | AsyncTask(String, () -> Event)
     | AsyncExec(String, String)
+    | AsyncExecArgs(String, String, Array<String>)
     | CancelAsync(String)
     | PtyStart(String, PtySpec)
     | PtyWrite(String, Array<Byte>)
@@ -62,7 +120,15 @@ public enum Command {
     | StopTimer(String)
     | RestartTimer(TimerSpec)
     | Exec(String)
+    | ExecArgs(String, String, Array<String>)
+    | ResetTerminal
+    | Suspend
     | Batch(Array<Command>)
+}
+
+class TerminalLifecycleRequests {
+    var resetRequested: Bool = false
+    var suspendRequested: Bool = false
 }
 
 public struct FrameMetrics {
@@ -77,6 +143,8 @@ public struct FrameMetrics {
     public let terminalSize: Rect
     public let droppedTicks: Int64
     public let tickDeltaMillis: Int64
+    public let renderedCells: Int64
+    public let dirtyRects: Int64
 
     public init(
         frameIndex!: Int64 = 0,
@@ -89,7 +157,9 @@ public struct FrameMetrics {
         diffWrites!: Int64 = 0,
         terminalSize!: Rect = Rect(0, 0, 0, 0),
         droppedTicks!: Int64 = 0,
-        tickDeltaMillis!: Int64 = 0
+        tickDeltaMillis!: Int64 = 0,
+        renderedCells!: Int64 = 0,
+        dirtyRects!: Int64 = 0
     ) {
         this.frameIndex = max(0, frameIndex)
         this.fps = max(0, fps)
@@ -102,6 +172,8 @@ public struct FrameMetrics {
         this.terminalSize = terminalSize
         this.droppedTicks = max(0, droppedTicks)
         this.tickDeltaMillis = max(0, tickDeltaMillis)
+        this.renderedCells = max(0, renderedCells)
+        this.dirtyRects = max(0, dirtyRects)
     }
 }
 
@@ -133,7 +205,9 @@ public class AppMetrics {
             diffWrites: render.diffWrites,
             terminalSize: render.size,
             droppedTicks: droppedTicks,
-            tickDeltaMillis: tickDeltaMillis
+            tickDeltaMillis: tickDeltaMillis,
+            renderedCells: render.renderedCells,
+            dirtyRects: render.dirtyRects
         ))
     }
 
@@ -300,6 +374,10 @@ public class AsyncRuntime {
         start(id, { => App.executeCommand(commandLine) })
     }
 
+    public func startExecArgs(id: String, program: String, args: Array<String>): Event {
+        start(id, { => App.executeCommandArgs(id, program, args) })
+    }
+
     public func cancel(id: String): Bool {
         for (task in tasks) {
             if (task.id == id) {
@@ -374,17 +452,70 @@ public class NoopEventWaiter <: EventWaiter {
     public func close(): Unit {}
 }
 
+@When[os == "Linux"]
+public func defaultEventWaiter(): EventWaiter {
+    LinuxEpollEventWaiter()
+}
+
+@When[os == "macOS"]
+public func defaultEventWaiter(): EventWaiter {
+    MacOSPollEventWaiter()
+}
+
+@When[os == "Windows"]
+public func defaultEventWaiter(): EventWaiter {
+    WindowsConsoleEventWaiter()
+}
+
+@When[os == "Windows"]
+public class WindowsConsoleEventWaiter <: EventWaiter {
+    private var closed: Bool = false
+
+    public init() {}
+
+    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit {
+        if (closed) { return }
+        if (previousReadBytes > 0) { return }
+        let timeout = windowsWaitTimeout(timeoutMillis)
+        let input = unsafe { GetStdHandle(STD_INPUT_HANDLE) }
+        let result = unsafe { WaitForSingleObject(input, timeout) }
+        if (result == WAIT_FAILED_RESULT || result == WAIT_TIMEOUT_MILLIS) { return }
+        if (sources.size < 0) { return }
+    }
+
+    public func close(): Unit {
+        closed = true
+    }
+}
+
 public struct UpdateResult {
     public let flow: ControlFlow
     public let command: Command
+    public let dirtyRects: ?DirtyRects
+    // Most existing update handlers mutate state and rely on the app loop's
+    // compatibility full redraw when no dirty rectangles are supplied.  Keep
+    // that default, but let boundary/no-op handlers explicitly suppress a
+    // frame so buffered input cannot build an expensive redraw backlog.
+    public let renderRequested: Bool
 
-    public init(flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop) {
+    public init(
+        flow!: ControlFlow = ControlFlow.Continue,
+        command!: Command = Command.Noop,
+        dirtyRects!: ?DirtyRects = None,
+        renderRequested!: Bool = true
+    ) {
         this.flow = flow
         this.command = command
+        this.dirtyRects = dirtyRects
+        this.renderRequested = renderRequested
     }
 
     public static func next(): UpdateResult {
         UpdateResult()
+    }
+
+    public static func unchanged(): UpdateResult {
+        UpdateResult(renderRequested: false)
     }
 
     public static func exit(): UpdateResult {
@@ -393,6 +524,19 @@ public struct UpdateResult {
 
     public static func withCommand(command: Command): UpdateResult {
         UpdateResult(command: command)
+    }
+
+    public static func dirty(area: Rect): UpdateResult {
+        UpdateResult(dirtyRects: Some(DirtyRects.full(area)))
+    }
+
+    public func withDirty(area: Rect): UpdateResult {
+        let rects = match (dirtyRects) {
+            case Some(existing) => existing.copy()
+            case None => DirtyRects()
+        }
+        rects.add(area)
+        UpdateResult(flow: flow, command: command, dirtyRects: Some(rects), renderRequested: true)
     }
 }
 
@@ -871,11 +1015,16 @@ public class EventRouter {
     public func handleResult(event: Event, actionHandler: (String) -> HandleResult): HandleResult {
         match (event) {
             case Event.KeyDown(key) =>
+                if (focus.handle(key)) { return HandleResult.consumed() }
+                let focused = routeToFocused(event)
+                if (focused.handled || !isContinueFlow(focused.flow) || !isNoopCommand(focused.command)) {
+                    return focused
+                }
                 match (globalKeys.actionFor(key)) {
                     case Some(action) => return actionHandler(action)
                     case None => ()
                 }
-                if (focus.handle(key)) { return HandleResult.consumed() }
+                return focused
             case _ => ()
         }
         routeToFocused(event)
@@ -895,6 +1044,26 @@ public class EventRouter {
             case None => HandleResult.ignored()
         }
     }
+}
+
+func isContinueFlow(flow: ControlFlow): Bool {
+    match (flow) {
+        case ControlFlow.Continue => true
+        case ControlFlow.Exit => false
+    }
+}
+
+func isNoopCommand(command: Command): Bool {
+    match (command) {
+        case Command.Noop => true
+        case _ => false
+    }
+}
+
+@When[os == "Windows"]
+func windowsWaitTimeout(timeoutMillis: Int64): UInt32 {
+    if (timeoutMillis < 0) { return INFINITE_WAIT }
+    UInt32(min(timeoutMillis, Int64(0xFFFF_FFFEu32)))
 }
 
 public class EventScript {
@@ -974,7 +1143,7 @@ public class EventScript {
     }
 
     public func runWithCommands(update: (Event) -> UpdateResult): ControlFlow {
-        let commandQueue = ArrayList<Command>()
+                let commandQueue = ArrayList<Command>()
         let asyncRuntime = AsyncRuntime()
         for (event in events) {
             if (!App.applyUpdateResult(update(event), commandQueue)) {
@@ -1212,6 +1381,7 @@ public class EventScenario {
 public enum HeadlessStep {
     | Input(Event)
     | Tick(Int64)
+    | WaitMillis(Int64)
     | Resize(Rect)
     | Render
     | ExpectSnapshot(String)
@@ -1239,6 +1409,9 @@ public class HeadlessScript {
     public func message(text: String): HeadlessScript { event(Event.Message(text)) }
     public func resize(area: Rect): HeadlessScript { add(HeadlessStep.Resize(area)) }
     public func tick(count!: Int64 = 1): HeadlessScript { add(HeadlessStep.Tick(count)) }
+    public func waitMillis(milliseconds: Int64): HeadlessScript {
+        add(HeadlessStep.WaitMillis(max(0, milliseconds)))
+    }
     public func render(): HeadlessScript { add(HeadlessStep.Render) }
     public func expectSnapshot(snapshot: String): HeadlessScript { add(HeadlessStep.ExpectSnapshot(snapshot)) }
     public func expectCell(x: Int64, y: Int64, symbol: String): HeadlessScript { add(HeadlessStep.ExpectCell(x, y, symbol)) }
@@ -1292,7 +1465,10 @@ public class HeadlessRunResult {
 
 public class AppTestRunner {
     public static func run(script: HeadlessScript, render: (Frame) -> Unit, update: (Event) -> UpdateResult, options!: HeadlessRunOptions = HeadlessRunOptions()): HeadlessRunResult {
-        let backend = TestBackend(area: options.area)
+        let backend = TestBackend(
+            area: options.area,
+            captureSnapshots: options.captureSnapshots
+        )
         let terminal = Terminal(backend)
         let commandQueue = ArrayList<Command>()
         let asyncRuntime = AsyncRuntime()
@@ -1319,6 +1495,21 @@ public class AppTestRunner {
                         flow = AppTestRunner.dispatch(Event.Tick(TickEvent(deltaMillis: options.tickDeltaMillis, elapsedMillis: frameIndex * options.tickDeltaMillis, frameIndex: frameIndex)), update, commandQueue, asyncRuntime, flow)
                         AppTestRunner.capture(terminal, backend, render, options, frames, snapshots, metrics, frameIndex, commandQueue.size, droppedTicks, lastTickDelta)
                     }
+                case HeadlessStep.WaitMillis(milliseconds) =>
+                    sleep(Duration.millisecond * milliseconds)
+                    frameIndex++
+                    flow = AppTestRunner.dispatch(
+                        Event.Tick(TickEvent(
+                            deltaMillis: milliseconds,
+                            elapsedMillis: frameIndex * options.tickDeltaMillis,
+                            frameIndex: frameIndex
+                        )),
+                        update,
+                        commandQueue,
+                        asyncRuntime,
+                        flow
+                    )
+                    AppTestRunner.capture(terminal, backend, render, options, frames, snapshots, metrics, frameIndex, commandQueue.size, droppedTicks, lastTickDelta)
                 case HeadlessStep.Resize(area) =>
                     backend.setSize(area)
                     frameIndex++
@@ -1486,6 +1677,9 @@ func sameFlow(left: ControlFlow, right: ControlFlow): Bool {
 
 public class App {
     private let backend: Backend
+    private let inputSource: InputSource
+    private let terminalDriver: TerminalDriver
+    private let probeInputSource: InputSource
     private let rawMode: Bool
     private let alternateScreen: Bool
     private let mouse: Bool
@@ -1498,20 +1692,25 @@ public class App {
     private let tickEvery: ?Duration
     private let missPolicy: FrameMissPolicy
     private let idleSleep: Duration
+    private let resizePollEvery: Duration
     private let ptyRuntime: PtyRuntime
     private let eventWaiter: EventWaiter
     private let metrics: ?AppMetrics
     private let renderMode: RenderMode
+    private let traceSink: ?AppTraceSink
 
     public init(
         backend!: Backend = AnsiBackend(),
+        inputSource!: InputSource = StdinInputSource(),
+        terminalDriver!: TerminalDriver = defaultTerminalDriver(),
+        probeInputSource!: InputSource = StdinInputSource(),
         renderMode!: RenderMode = RenderMode.Diff,
         rawMode!: Bool = true,
         alternateScreen!: Bool = true,
         mouse!: Bool = false,
         mouseMove!: Bool = false,
         focusEvents!: Bool = false,
-        bracketedPaste!: Bool = false,
+        bracketedPaste!: Bool = true,
         hideCursor!: Bool = true,
         keyboard!: KeyboardOptions = KeyboardOptions(),
         resize!: Bool = true,
@@ -1519,11 +1718,16 @@ public class App {
         targetFps!: ?Int64 = None,
         missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop,
         idleSleep!: Duration = Duration.millisecond * 10,
+        resizePollEvery!: Duration = Duration.millisecond * 250,
         ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(),
-        eventWaiter!: EventWaiter = LinuxEpollEventWaiter(),
-        metrics!: ?AppMetrics = None
+        eventWaiter!: EventWaiter = defaultEventWaiter(),
+        metrics!: ?AppMetrics = None,
+        traceSink!: ?AppTraceSink = None
     ) {
         this.backend = backend
+        this.inputSource = inputSource
+        this.terminalDriver = terminalDriver
+        this.probeInputSource = probeInputSource
         this.renderMode = renderMode
         this.rawMode = rawMode
         this.alternateScreen = alternateScreen
@@ -1537,9 +1741,11 @@ public class App {
         this.tickEvery = App.resolveTickEvery(tickEvery, targetFps)
         this.missPolicy = missPolicy
         this.idleSleep = if (idleSleep <= Duration.Zero) { Duration.Zero } else { idleSleep }
+        this.resizePollEvery = if (resizePollEvery <= Duration.Zero) { Duration.millisecond * 250 } else { resizePollEvery }
         this.ptyRuntime = ptyRuntime
         this.eventWaiter = eventWaiter
         this.metrics = metrics
+        this.traceSink = traceSink
     }
 
     public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit {
@@ -1548,12 +1754,16 @@ public class App {
 
     public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit {
         let terminal = Terminal(backend, renderMode: renderMode)
-        let parser = EventParser()
+        let parser = EventParser(inputSource: inputSource)
         let commandQueue = ArrayList<Command>()
+        let pendingInputEvents = ArrayList<Event>()
         let asyncRuntime = AsyncRuntime()
         let timerRuntime = TimerRuntime()
-        TerminalSession(
+        let lifecycle = TerminalLifecycleRequests()
+        let session = TerminalSession(
             backend,
+            driver: terminalDriver,
+            probeInputSource: probeInputSource,
             rawMode: rawMode,
             alternateScreen: alternateScreen,
             mouse: mouse,
@@ -1562,33 +1772,92 @@ public class App {
             bracketedPaste: bracketedPaste,
             hideCursor: hideCursor,
             keyboard: keyboard
-        ).run {
+        )
+        session.run {
             try {
                 var running = true
+                var pendingInputIndex: Int64 = 0
                 var lastSize = backend.size()
                 var dirty = true
+                let pendingDirty = DirtyRects()
                 var frameIndex: Int64 = 0
                 var droppedTickCount: Int64 = 0
                 var lastTickDelta: Int64 = 0
                 let startedAt = MonoTime.now()
+                var lastLoopStartedAt = startedAt
+                var lastLoopTask = "startup"
                 var lastTick = startedAt
                 var nextTick: ?MonoTime = match (tickEvery) {
                     case Some(every) => Some(startedAt + every)
                     case None => None
                 }
-                running = App.applyUpdateResult(update(Event.Capabilities(TerminalCapabilities.detect(backend: backend))), commandQueue)
+                running = App.applyUpdateResult(
+                    dispatchUpdate(
+                        update,
+                        Event.Capabilities(terminalDriver.capabilities(backend)),
+                        commandQueue.size
+                    ),
+                    commandQueue,
+                    dirtySink: Some(pendingDirty)
+                )
                 if (running) {
-                    let (nextRunning, changed) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, timerRuntime: timerRuntime)
+                    let (nextRunning, changed) = App.processCommandsWithLifecycle(
+                        {event => dispatchUpdate(update, event, commandQueue.size)},
+                        commandQueue,
+                        asyncRuntime,
+                        ptyRuntime,
+                        timerRuntime,
+                        Some(pendingDirty),
+                        Some(lifecycle)
+                    )
                     running = nextRunning
                     if (changed) { dirty = true }
                 }
                 while (running) {
+                    let loopStartedAt = MonoTime.now()
+                    let loopInterval = (loopStartedAt - lastLoopStartedAt).toNanoseconds()
+                    if (loopInterval > 100_000_000) {
+                        match (traceSink) {
+                            case Some(trace) => trace.eventLoopStall(lastLoopTask, loopInterval)
+                            case None => ()
+                        }
+                    }
+                    lastLoopStartedAt = loopStartedAt
+                    lastLoopTask = "event_processing"
+                    if (lifecycle.suspendRequested) {
+                        lifecycle.suspendRequested = false
+                        session.stop()
+                        App.suspendCurrentProcess()
+                        _ = session.start()
+                        terminal.clear()
+                        pendingDirty.clear()
+                        dirty = true
+                    }
+                    if (lifecycle.resetRequested) {
+                        lifecycle.resetRequested = false
+                        terminal.clear()
+                        pendingDirty.clear()
+                        dirty = true
+                    }
                     let now = MonoTime.now()
                     let currentSize = backend.size()
                     if (resize && currentSize != lastSize) {
-                        running = App.applyUpdateResult(update(Event.Resize(currentSize)), commandQueue)
+                        pendingDirty.clear()
+                        running = App.applyUpdateResult(
+                            dispatchUpdate(update, Event.Resize(currentSize), commandQueue.size),
+                            commandQueue,
+                            dirtySink: Some(pendingDirty)
+                        )
                         if (running) {
-                            let (nextRunning, _) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, timerRuntime: timerRuntime)
+                            let (nextRunning, _) = App.processCommandsWithLifecycle(
+                                {event => dispatchUpdate(update, event, commandQueue.size)},
+                                commandQueue,
+                                asyncRuntime,
+                                ptyRuntime,
+                                timerRuntime,
+                                Some(pendingDirty),
+                                Some(lifecycle)
+                            )
                             running = nextRunning
                         }
                         dirty = true
@@ -1596,21 +1865,48 @@ public class App {
                     }
                     for (event in timerRuntime.drain(now)) {
                         if (running) {
-                            running = App.applyUpdateResult(update(event), commandQueue)
+                            running = App.applyUpdateResult(
+                                dispatchUpdate(update, event, commandQueue.size),
+                                commandQueue,
+                                dirtySink: Some(pendingDirty)
+                            )
                             dirty = true
                             if (running) {
-                                let (nextRunning, _) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, timerRuntime: timerRuntime)
+                                let (nextRunning, _) = App.processCommandsWithLifecycle(
+                                    {event => dispatchUpdate(update, event, commandQueue.size)},
+                                    commandQueue,
+                                    asyncRuntime,
+                                    ptyRuntime,
+                                    timerRuntime,
+                                    Some(pendingDirty),
+                                    Some(lifecycle)
+                                )
                                 running = nextRunning
                             }
                         }
                     }
                     if (dirty) {
-                        let renderMetrics = terminal.draw(render)
+                        match (traceSink) {
+                            case Some(trace) => trace.renderStarted()
+                            case None => ()
+                        }
+                        let renderMetrics = if (pendingDirty.isEmpty()) {
+                            terminal.draw(render)
+                        } else {
+                            terminal.draw(render, dirtyRects: Some(pendingDirty.copy()))
+                        }
                         match (metrics) {
-                            case Some(m) => m.record(renderMetrics, frameIndex: frameIndex, eventQueueLength: commandQueue.size, droppedTicks: droppedTickCount, tickDeltaMillis: lastTickDelta)
+                            case Some(m) => m.record(
+                                renderMetrics,
+                                frameIndex: frameIndex,
+                                eventQueueLength: max(0, pendingInputEvents.size - pendingInputIndex) + commandQueue.size,
+                                droppedTicks: droppedTickCount,
+                                tickDeltaMillis: lastTickDelta
+                            )
                             case None => ()
                         }
                         dirty = false
+                        pendingDirty.clear()
                     }
                     match (nextTick) {
                         case Some(due) =>
@@ -1623,54 +1919,126 @@ public class App {
                                 frameIndex++
                                 droppedTickCount += dropped
                                 lastTickDelta = durationMillis(now - lastTick)
-                                running = App.applyUpdateResult(update(Event.Tick(TickEvent(
-                                    deltaMillis: lastTickDelta,
-                                    elapsedMillis: durationMillis(now - startedAt),
-                                    frameIndex: frameIndex,
-                                    droppedFrames: dropped
-                                ))), commandQueue)
+                                running = App.applyUpdateResult(
+                                    dispatchUpdate(
+                                        update,
+                                        Event.Tick(TickEvent(
+                                            deltaMillis: lastTickDelta,
+                                            elapsedMillis: durationMillis(now - startedAt),
+                                            frameIndex: frameIndex,
+                                            droppedFrames: dropped
+                                        )),
+                                        commandQueue.size
+                                    ),
+                                    commandQueue,
+                                    dirtySink: Some(pendingDirty)
+                                )
                                 lastTick = now
                                 nextTick = Some(nextDue(now, due, every, missPolicy))
                                 dirty = true
                                 if (running) {
-                                    let (nextRunning, _) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, timerRuntime: timerRuntime)
+                                    let (nextRunning, _) = App.processCommandsWithLifecycle(
+                                        {event => dispatchUpdate(update, event, commandQueue.size)},
+                                        commandQueue,
+                                        asyncRuntime,
+                                        ptyRuntime,
+                                        timerRuntime,
+                                        Some(pendingDirty),
+                                        Some(lifecycle)
+                                    )
                                     running = nextRunning
                                 }
                             } else if (running) {
-                                let (nextRunning, changed) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, timerRuntime: timerRuntime)
+                                let (nextRunning, changed) = App.processCommandsWithLifecycle(
+                                    {event => dispatchUpdate(update, event, commandQueue.size)},
+                                    commandQueue,
+                                    asyncRuntime,
+                                    ptyRuntime,
+                                    timerRuntime,
+                                    Some(pendingDirty),
+                                    Some(lifecycle)
+                                )
                                 running = nextRunning
                                 dirty = dirty || changed
                             }
                         case None =>
                             if (running) {
-                                let (nextRunning, changed) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, timerRuntime: timerRuntime)
+                                let (nextRunning, changed) = App.processCommandsWithLifecycle(
+                                    {event => dispatchUpdate(update, event, commandQueue.size)},
+                                    commandQueue,
+                                    asyncRuntime,
+                                    ptyRuntime,
+                                    timerRuntime,
+                                    Some(pendingDirty),
+                                    Some(lifecycle)
+                                )
                                 running = nextRunning
                                 dirty = dirty || changed
                             }
                     }
-                    match (parser.readEvent()) {
-                        case Some(event) =>
-                            running = App.applyUpdateResult(update(event), commandQueue)
-                            dirty = true
-                            if (running) {
-                                let (nextRunning, _) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, timerRuntime: timerRuntime)
-                                running = nextRunning
-                            }
-                        case None =>
+                    if (pendingInputIndex >= pendingInputEvents.size) {
+                        pendingInputEvents.clear()
+                        pendingInputIndex = 0
+                        for (event in coalescePendingScrollReversal(parser.readEvents())) {
+                            pendingInputEvents.add(event)
+                        }
+                    }
+                    if (pendingInputIndex < pendingInputEvents.size) {
+                        // Paint between buffered input events.  Draining the
+                        // complete parser batch before rendering makes key
+                        // repeat appear as groups of characters even when each
+                        // individual composer update is fast.
+                        // Keep a cursor instead of shifting the ArrayList for
+                        // every repeated key.  Large terminal bursts therefore
+                        // remain linear rather than quadratic.
+                        let event = pendingInputEvents[pendingInputIndex]
+                        pendingInputIndex++
+                        let result = dispatchUpdate(
+                            update,
+                            event,
+                            max(0, pendingInputEvents.size - pendingInputIndex) + commandQueue.size
+                        )
+                        running = App.applyUpdateResult(result, commandQueue, dirtySink: Some(pendingDirty))
+                        dirty = dirty || result.renderRequested
+                        if (running) {
+                            let (nextRunning, changed) = App.processCommandsWithLifecycle(
+                                {event => dispatchUpdate(update, event, commandQueue.size)},
+                                commandQueue,
+                                asyncRuntime,
+                                ptyRuntime,
+                                timerRuntime,
+                                Some(pendingDirty),
+                                Some(lifecycle)
+                            )
+                            running = nextRunning
+                            dirty = dirty || changed
+                        }
+                    } else {
                             var flushed = false
                             let escPolls = max(1, keyboard.escDelayMillis / max(1, durationMillis(idleSleep)))
                             for (event in parser.flushEscAfterPolls(escPolls)) {
                                 flushed = true
                                 if (running) {
-                                    running = App.applyUpdateResult(update(event), commandQueue)
-                                    dirty = true
+                                    let result = dispatchUpdate(update, event, commandQueue.size)
+                                    running = App.applyUpdateResult(result, commandQueue, dirtySink: Some(pendingDirty))
+                                    dirty = dirty || result.renderRequested
                                     if (running) {
-                                        let (nextRunning, _) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, timerRuntime: timerRuntime)
+                                        let (nextRunning, changed) = App.processCommandsWithLifecycle(
+                                            {event => dispatchUpdate(update, event, commandQueue.size)},
+                                            commandQueue,
+                                            asyncRuntime,
+                                            ptyRuntime,
+                                            timerRuntime,
+                                            Some(pendingDirty),
+                                            Some(lifecycle)
+                                        )
                                         running = nextRunning
+                                        dirty = dirty || changed
                                     }
                                 }
                             }
                             if (running && !flushed && commandQueue.size == 0) {
+                                lastLoopTask = "event_wait"
                                 eventWaiter.wait(waitTimeoutMillis(asyncRuntime, timerRuntime, nextTick), previousReadBytes: parser.lastReadBytes(), sources: ptyRuntime.sources())
                             }
                     }
@@ -1679,6 +2047,31 @@ public class App {
                 eventWaiter.close()
             }
         }
+    }
+
+    private func dispatchUpdate(
+        update: (Event) -> UpdateResult,
+        event: Event,
+        eventQueueLength: Int64
+    ): UpdateResult {
+        let started = MonoTime.now()
+        match (traceSink) {
+            case Some(trace) =>
+                trace.inputReceived(event, max(0, eventQueueLength))
+                trace.eventDispatchCompleted()
+            case None => ()
+        }
+        let result = update(event)
+        let elapsed = (MonoTime.now() - started).toNanoseconds()
+        match (traceSink) {
+            case Some(trace) =>
+                trace.stateUpdateCompleted()
+                if (elapsed > 100_000_000) {
+                    trace.eventLoopStall("state_update", elapsed)
+                }
+            case None => ()
+        }
+        result
     }
 
     private func waitTimeoutMillis(asyncRuntime: AsyncRuntime, timerRuntime: TimerRuntime, nextTick: ?MonoTime): Int64 {
@@ -1695,7 +2088,13 @@ public class App {
                 }
             case None => ()
         }
-        if (resize || asyncRuntime.pendingCount() > 0) {
+        if (resize) {
+            wait = match (wait) {
+                case Some(current) => Some(min(current, durationMillis(resizePollEvery)))
+                case None => Some(durationMillis(resizePollEvery))
+            }
+        }
+        if (asyncRuntime.pendingCount() > 0) {
             wait = match (wait) {
                 case Some(current) => Some(min(current, durationMillis(idleSleep)))
                 case None => Some(durationMillis(idleSleep))
@@ -1707,8 +2106,12 @@ public class App {
         }
     }
 
-    public static func applyUpdateResult(result: UpdateResult, commandQueue: ArrayList<Command>): Bool {
+    public static func applyUpdateResult(result: UpdateResult, commandQueue: ArrayList<Command>, dirtySink!: ?DirtyRects = None): Bool {
         App.enqueue(result.command, commandQueue)
+        match ((dirtySink, result.dirtyRects)) {
+            case (Some(sink), Some(rects)) => sink.addAll(rects)
+            case _ => ()
+        }
         match (result.flow) {
             case ControlFlow.Continue => true
             case ControlFlow.Exit => false
@@ -1731,7 +2134,28 @@ public class App {
         commandQueue: ArrayList<Command>,
         asyncRuntime!: AsyncRuntime = AsyncRuntime(),
         ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(),
-        timerRuntime!: TimerRuntime = TimerRuntime()
+        timerRuntime!: TimerRuntime = TimerRuntime(),
+        dirtySink!: ?DirtyRects = None
+    ): (Bool, Bool) {
+        App.processCommandsWithLifecycle(
+            update,
+            commandQueue,
+            asyncRuntime,
+            ptyRuntime,
+            timerRuntime,
+            dirtySink,
+            None
+        )
+    }
+
+    private static func processCommandsWithLifecycle(
+        update: (Event) -> UpdateResult,
+        commandQueue: ArrayList<Command>,
+        asyncRuntime: AsyncRuntime,
+        ptyRuntime: PtyRuntime,
+        timerRuntime: TimerRuntime,
+        dirtySink: ?DirtyRects,
+        lifecycle: ?TerminalLifecycleRequests
     ): (Bool, Bool) {
         var changed = false
         while (commandQueue.size > 0) {
@@ -1742,39 +2166,42 @@ public class App {
                 case Command.Quit => return (false, changed)
                 case Command.Emit(event) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(event), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(event), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.Message(text) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(Event.Message(text)), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(Event.Message(text)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.Async(name) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(asyncRuntime.start(name, { => Event.Message("async:" + name) })), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(asyncRuntime.start(name, { => Event.Message("async:" + name) })), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.AsyncTask(id, task) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(asyncRuntime.start(id, task)), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(asyncRuntime.start(id, task)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.AsyncExec(id, commandLine) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(asyncRuntime.startExec(id, commandLine)), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(asyncRuntime.startExec(id, commandLine)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
+                case Command.AsyncExecArgs(id, program, args) =>
+                    changed = true
+                    if (!App.applyUpdateResult(update(asyncRuntime.startExecArgs(id, program, args)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.CancelAsync(id) =>
                     if (asyncRuntime.cancel(id)) {
                         changed = true
-                        if (!App.applyUpdateResult(update(Event.AsyncCancelled(id)), commandQueue)) { return (false, changed) }
+                        if (!App.applyUpdateResult(update(Event.AsyncCancelled(id)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                     }
                 case Command.PtyStart(id, spec) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(ptyRuntime.start(id, spec)), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(ptyRuntime.start(id, spec)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.PtyWrite(id, bytes) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(ptyRuntime.write(id, bytes)), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(ptyRuntime.write(id, bytes)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.PtyResize(id, size) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(ptyRuntime.resize(id, size)), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(ptyRuntime.resize(id, size)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.PtySendSignal(id, signal) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(ptyRuntime.signal(id, signal)), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(ptyRuntime.signal(id, signal)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.PtyClose(id) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(ptyRuntime.close(id)), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(ptyRuntime.close(id)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.StartTimer(spec) =>
                     timerRuntime.start(spec, MonoTime.now())
                 case Command.StopTimer(id) =>
@@ -1784,7 +2211,22 @@ public class App {
                     timerRuntime.start(spec, MonoTime.now())
                 case Command.Exec(commandLine) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(App.executeCommand(commandLine)), commandQueue)) { return (false, changed) }
+                    if (!App.applyUpdateResult(update(App.executeCommand(commandLine)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
+                case Command.ExecArgs(id, program, args) =>
+                    changed = true
+                    if (!App.applyUpdateResult(update(App.executeCommandArgs(id, program, args)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
+                case Command.ResetTerminal =>
+                    changed = true
+                    match (lifecycle) {
+                        case Some(requests) => requests.resetRequested = true
+                        case None => ()
+                    }
+                case Command.Suspend =>
+                    changed = true
+                    match (lifecycle) {
+                        case Some(requests) => requests.suspendRequested = true
+                        case None => ()
+                    }
                 case Command.Batch(commands) =>
                     for (item in commands) {
                         App.enqueue(item, commandQueue)
@@ -1793,18 +2235,26 @@ public class App {
         }
         for (event in asyncRuntime.drain()) {
             changed = true
-            if (!App.applyUpdateResult(update(event), commandQueue)) { return (false, changed) }
+            if (!App.applyUpdateResult(update(event), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
         }
         for (event in ptyRuntime.drain()) {
             changed = true
-            if (!App.applyUpdateResult(update(event), commandQueue)) { return (false, changed) }
+            if (!App.applyUpdateResult(update(event), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
         }
         if (commandQueue.size > 0) {
-            let (running, nestedChanged) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, timerRuntime: timerRuntime)
+            let (running, nestedChanged) = App.processCommandsWithLifecycle(update, commandQueue, asyncRuntime, ptyRuntime, timerRuntime, dirtySink, lifecycle)
             return (running, changed || nestedChanged)
         }
         (true, changed)
     }
+
+    @When[os != "Windows"]
+    private static func suspendCurrentProcess(): Unit {
+        unsafe { _ = kill(getpid(), APP_SIGTSTP) }
+    }
+
+    @When[os == "Windows"]
+    private static func suspendCurrentProcess(): Unit {}
 
     private static func resolveTickEvery(
         explicit: ?Duration,
@@ -1828,13 +2278,20 @@ public class App {
         if (parts.size == 0) {
             return Event.ExecResult(commandLine, 127, "empty command")
         }
+        App.executeCommandArgs(commandLine, parts[0], parts[1..])
+    }
+
+    public static func executeCommandArgs(id: String, program: String, args: Array<String>): Event {
+        if (program.isEmpty()) {
+            return Event.ExecResult(id, 127, "empty command")
+        }
         try {
-            let (code, out, err) = executeWithOutput(parts[0], parts[1..])
+            let (code, out, err) = executeWithOutput(program, args)
             let stdout = unsafe { String.fromUtf8Unchecked(out) }
             let stderr = unsafe { String.fromUtf8Unchecked(err) }
-            Event.ExecResult(commandLine, code, stdout + stderr)
+            Event.ExecResult(id, code, stdout + stderr)
         } catch (e: Exception) {
-            Event.ExecResult(commandLine, 127, e.message)
+            Event.ExecResult(id, 127, e.message)
         }
     }
 
@@ -1851,18 +2308,74 @@ public class App {
 
 }
 
+// Input in one parser batch has not been painted yet.  If a contiguous wheel
+// burst reverses direction, retaining the older direction makes the UI replay
+// stale movement before reacting to the user's latest intent.  Keep only the
+// final direction in that burst; all non-wheel events remain ordered and form
+// hard coalescing boundaries.
+func coalescePendingScrollReversal(events: Array<Event>): Array<Event> {
+    let result = ArrayList<Event>()
+    var scrollStart: Int64 = -1
+    var scrollDirection: Int64 = 0
+    for (event in events) {
+        let direction = match (event) {
+            case Event.Mouse(mouse) => match ((mouse.kind, mouse.button)) {
+                case (MouseKind.Scroll, MouseButton.WheelUp) => 1
+                case (MouseKind.Scroll, MouseButton.WheelDown) => -1
+                case _ => 0
+            }
+            case _ => 0
+        }
+        if (direction == 0) {
+            scrollStart = -1
+            scrollDirection = 0
+            result.add(event)
+            continue
+        }
+        if (scrollStart < 0) {
+            scrollStart = result.size
+            scrollDirection = direction
+        } else if (direction != scrollDirection) {
+            while (result.size > scrollStart) {
+                result.remove(at: result.size - 1)
+            }
+            scrollDirection = direction
+        }
+        result.add(event)
+    }
+    result.toArray()
+}
+
+public func defaultApp(): App {
+    App()
+}
+
+public func runApp(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit {
+    defaultApp().run(render, update)
+}
+
+public func runAppWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit {
+    defaultApp().runWithCommands(render, update)
+}
+
+@When[os == "Linux"]
 public class LinuxEpollEventWaiter <: EventWaiter {
     private var epfd: Int32
     private var active: Bool = false
     private var closed: Bool = false
-    private var readyAfterEmptyRead: Int64 = 0
     private let registeredSources = ArrayList<EpollRegisteredSource>()
 
     public init() {
         epfd = unsafe { epoll_create1(0) }
         if (epfd >= 0) {
             let event = Array<UInt8>(EPOLL_EVENT_BYTES, repeat: 0)
-            writeUInt32LE(event, 0, EPOLLIN | EPOLLERR | EPOLLHUP)
+            // Linux raw mode uses VMIN=0 so an empty read returns zero rather
+            // than blocking.  Level-triggered epoll can consequently report
+            // stdin as readable again after the parser has already drained
+            // it.  Use edge-triggering and keep stdin registered: removing it
+            // after an empty read silently degrades input to the 250 ms resize
+            // poll, which makes key repeat and Backspace arrive in groups.
+            writeUInt32LE(event, 0, EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLET)
             writeInt32LE(event, 4, STDIN_FILENO)
             var added = false
             unsafe {
@@ -1902,21 +2415,13 @@ public class LinuxEpollEventWaiter <: EventWaiter {
                 if (fd == STDIN_FILENO) {
                     if ((flags & (EPOLLERR | EPOLLHUP)) != 0) {
                         removeStdin()
-                    } else if (previousReadBytes <= 0) {
-                        readyAfterEmptyRead++
-                        if (readyAfterEmptyRead >= 2) {
-                            removeStdin()
-                        }
-                    } else {
-                        readyAfterEmptyRead = 0
                     }
                 } else {
                     notifySource(sources, fd, flags)
                 }
             }
-        } else {
-            readyAfterEmptyRead = 0
         }
+        if (previousReadBytes < -1) { return }
     }
 
     private func reconcileSources(sources: Array<EventSource>): Unit {
@@ -2024,7 +2529,6 @@ public class LinuxEpollEventWaiter <: EventWaiter {
             unsafe { _ = close(epfd) }
             epfd = -1
             active = false
-            readyAfterEmptyRead = 0
             while (registeredSources.size > 0) {
                 registeredSources.remove(at: 0)
             }
@@ -2036,7 +2540,6 @@ public class LinuxEpollEventWaiter <: EventWaiter {
         if (!active || epfd < 0) { return }
         unsafe { _ = epoll_ctl(epfd, EPOLL_CTL_DEL, STDIN_FILENO, CPointer<Unit>()) }
         active = false
-        readyAfterEmptyRead = 0
     }
 
     private func hasDesiredSource(sources: ArrayList<EpollRegisteredSource>, fd: Int32): Bool {
@@ -2056,6 +2559,84 @@ public class LinuxEpollEventWaiter <: EventWaiter {
     }
 }
 
+@When[os == "macOS"]
+public class MacOSPollEventWaiter <: EventWaiter {
+    private var closed: Bool = false
+
+    public init() {}
+
+    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit {
+        if (closed) { return }
+        let entries = pollEntries(sources)
+        if (entries.size == 0) { return }
+        let bytes = Array<UInt8>(POLLFD_BYTES * entries.size, repeat: 0)
+        for (i in 0..entries.size) {
+            let entry = entries[i]
+            let offset = i * POLLFD_BYTES
+            writeInt32LE(bytes, offset, entry.fd)
+            writeInt16LE(bytes, offset + 4, entry.events)
+            writeInt16LE(bytes, offset + 6, 0)
+        }
+        let timeout = if (timeoutMillis < 0) { Int32(-1) } else { Int32(min(timeoutMillis, 1000)) }
+        var ready: Int32 = 0
+        unsafe {
+            let handle = acquireArrayRawData(bytes)
+            ready = poll(CPointer<Unit>(handle.pointer), UInt32(entries.size), timeout)
+            releaseArrayRawData(handle)
+        }
+        if (ready <= 0) { return }
+        for (i in 0..entries.size) {
+            let revents = readInt16LE(bytes, i * POLLFD_BYTES + 6)
+            if (revents == 0) { continue }
+            let entry = entries[i]
+            match (entry.source) {
+                case Some(source) => source.onReady(
+                    (revents & POLLIN_FLAG) != 0,
+                    (revents & POLLOUT_FLAG) != 0,
+                    (revents & POLLERR_FLAG) != 0,
+                    (revents & POLLHUP_FLAG) != 0
+                )
+                case None => ()
+            }
+        }
+        if (previousReadBytes < -1) { return }
+    }
+
+    public func close(): Unit {
+        closed = true
+    }
+
+    private func pollEntries(sources: Array<EventSource>): Array<PollRegisteredSource> {
+        let entries = ArrayList<PollRegisteredSource>()
+        entries.add(PollRegisteredSource(STDIN_FILENO, POLLIN_FLAG | POLLERR_FLAG | POLLHUP_FLAG))
+        for (source in sources) {
+            match (source.fd()) {
+                case Some(fd) =>
+                    if (fd == STDIN_FILENO || hasPollEntry(entries, fd)) { continue }
+                    entries.add(PollRegisteredSource(fd, interestsToPoll(source.interests()) | POLLERR_FLAG | POLLHUP_FLAG, source: Some(source)))
+                case None => ()
+            }
+        }
+        entries.toArray()
+    }
+
+    private func hasPollEntry(entries: ArrayList<PollRegisteredSource>, fd: Int32): Bool {
+        for (entry in entries) {
+            if (entry.fd == fd) { return true }
+        }
+        false
+    }
+
+    private func interestsToPoll(interest: EventSourceInterest): Int16 {
+        match (interest) {
+            case EventSourceInterest.Read => POLLIN_FLAG
+            case EventSourceInterest.Write => POLLOUT_FLAG
+            case EventSourceInterest.ReadWrite => POLLIN_FLAG | POLLOUT_FLAG
+        }
+    }
+}
+
+@When[os == "Linux"]
 class EpollRegisteredSource {
     let fd: Int32
     var events: UInt32
@@ -2066,6 +2647,20 @@ class EpollRegisteredSource {
     }
 }
 
+@When[os == "macOS"]
+class PollRegisteredSource {
+    let fd: Int32
+    let events: Int16
+    let source: ?EventSource
+
+    init(fd: Int32, events: Int16, source!: ?EventSource = None) {
+        this.fd = fd
+        this.events = events
+        this.source = source
+    }
+}
+
+@When[os != "Windows"]
 func writeUInt32LE(bytes: Array<UInt8>, offset: Int64, value: UInt32): Unit {
     bytes[offset] = UInt8(value & 0xFF)
     bytes[offset + 1] = UInt8((value >> 8) & 0xFF)
@@ -2073,10 +2668,19 @@ func writeUInt32LE(bytes: Array<UInt8>, offset: Int64, value: UInt32): Unit {
     bytes[offset + 3] = UInt8((value >> 24) & 0xFF)
 }
 
+@When[os != "Windows"]
 func writeInt32LE(bytes: Array<UInt8>, offset: Int64, value: Int32): Unit {
     writeUInt32LE(bytes, offset, UInt32(value))
 }
 
+@When[os == "macOS"]
+func writeInt16LE(bytes: Array<UInt8>, offset: Int64, value: Int16): Unit {
+    let raw = UInt16(value)
+    bytes[offset] = UInt8(raw & 0xFF)
+    bytes[offset + 1] = UInt8((raw >> 8) & 0xFF)
+}
+
+@When[os == "Linux"]
 func readUInt32LE(bytes: Array<UInt8>, offset: Int64): UInt32 {
     UInt32(bytes[offset]) |
         (UInt32(bytes[offset + 1]) << 8) |
@@ -2084,8 +2688,14 @@ func readUInt32LE(bytes: Array<UInt8>, offset: Int64): UInt32 {
         (UInt32(bytes[offset + 3]) << 24)
 }
 
+@When[os == "Linux"]
 func readInt32LE(bytes: Array<UInt8>, offset: Int64): Int32 {
     Int32(readUInt32LE(bytes, offset))
+}
+
+@When[os == "macOS"]
+func readInt16LE(bytes: Array<UInt8>, offset: Int64): Int16 {
+    Int16(UInt16(bytes[offset]) | (UInt16(bytes[offset + 1]) << 8))
 }
 
 func splitCommandLine(commandLine: String): Array<String> {

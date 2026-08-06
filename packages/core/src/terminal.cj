@@ -9,6 +9,7 @@ const STDIN_FILENO: Int32 = 0
 const STDOUT_FILENO: Int32 = 1
 const TCSAFLUSH: Int32 = 2
 const TIOCGWINSZ: UInt64 = 0x5413
+const MACOS_TIOCGWINSZ: UInt64 = 0x40087468
 const TUI_SIGHUP: Int32 = 1
 const TUI_SIGINT: Int32 = 2
 const TUI_SIGQUIT: Int32 = 3
@@ -32,22 +33,89 @@ const IEXTEN: UInt32 = 0x8000u32
 const ISIG: UInt32 = 0x0001u32
 
 @FastNative
+@When[os == "Linux"]
 foreign func tcgetattr(fd: Int32, termios: CPointer<Unit>): Int32
 
 @FastNative
+@When[os == "macOS"]
+foreign func tcgetattr(fd: Int32, termios: CPointer<Unit>): Int32
+
+@FastNative
+@When[os == "Linux"]
 foreign func tcsetattr(fd: Int32, optionalActions: Int32, termios: CPointer<Unit>): Int32
 
 @FastNative
+@When[os == "macOS"]
+foreign func tcsetattr(fd: Int32, optionalActions: Int32, termios: CPointer<Unit>): Int32
+
+@FastNative
+@When[os == "Linux"]
 foreign func ioctl(fd: Int32, request: UInt64, argp: CPointer<Unit>): Int32
 
 @FastNative
+@When[os == "macOS"]
+foreign func ioctl(fd: Int32, request: UInt64, argp: CPointer<Unit>): Int32
+
+@FastNative
+@When[os == "Linux"]
 foreign func isatty(fd: Int32): Int32
+
+@FastNative
+@When[os == "macOS"]
+foreign func isatty(fd: Int32): Int32
+
+@FastNative
+@When[os == "macOS"]
+foreign func cfmakeraw(termios: CPointer<Unit>): Unit
+
+@FastNative
+@When[os == "Windows"]
+foreign func GetStdHandle(nStdHandle: Int32): CPointer<Unit>
+
+@FastNative
+@When[os == "Windows"]
+foreign func GetConsoleMode(handle: CPointer<Unit>, mode: CPointer<UInt32>): Int32
+
+@FastNative
+@When[os == "Windows"]
+foreign func SetConsoleMode(handle: CPointer<Unit>, mode: UInt32): Int32
+
+@FastNative
+@When[os == "Windows"]
+foreign func GetConsoleScreenBufferInfo(handle: CPointer<Unit>, info: CPointer<Unit>): Int32
 
 @FastNative
 foreign func signal(signum: Int32, handler: CFunc<(Int32) -> Unit>): CFunc<(Int32) -> Unit>
 
 @FastNative
 foreign func _exit(status: Int32): Unit
+
+@When[os == "Windows"]
+let STD_INPUT_HANDLE: Int32 = -10
+@When[os == "Windows"]
+let STD_OUTPUT_HANDLE: Int32 = -11
+@When[os == "Windows"]
+let ENABLE_PROCESSED_INPUT: UInt32 = 0x0001u32
+@When[os == "Windows"]
+let ENABLE_LINE_INPUT: UInt32 = 0x0002u32
+@When[os == "Windows"]
+let ENABLE_ECHO_INPUT: UInt32 = 0x0004u32
+@When[os == "Windows"]
+let ENABLE_WINDOW_INPUT: UInt32 = 0x0008u32
+@When[os == "Windows"]
+let ENABLE_QUICK_EDIT_MODE: UInt32 = 0x0040u32
+@When[os == "Windows"]
+let ENABLE_EXTENDED_FLAGS: UInt32 = 0x0080u32
+@When[os == "Windows"]
+let ENABLE_VIRTUAL_TERMINAL_INPUT: UInt32 = 0x0200u32
+@When[os == "Windows"]
+let ENABLE_PROCESSED_OUTPUT: UInt32 = 0x0001u32
+@When[os == "Windows"]
+let ENABLE_VIRTUAL_TERMINAL_PROCESSING: UInt32 = 0x0004u32
+@When[os == "Windows"]
+let DISABLE_NEWLINE_AUTO_RETURN: UInt32 = 0x0008u32
+@When[os == "Windows"]
+let CONSOLE_SCREEN_BUFFER_INFO_BYTES: Int64 = 22
 
 public interface Backend {
     func clear(): Unit
@@ -95,15 +163,23 @@ public struct RenderDiffPlan {
 public class Frame {
     public let area: Rect
     private let buffer: Buffer
+    private let dirty: ?DirtyRects
     private var cursor: ?Position = None
 
-    public init(area: Rect, buffer: Buffer) {
+    public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None) {
         this.area = area
         this.buffer = buffer
+        this.dirty = dirty
     }
 
     public func renderWidget(widget: Widget, area: Rect): Unit {
+        if (!isDirty(area)) { return }
         widget.render(area, buffer)
+    }
+
+    public func renderComponent(node: ComponentNode): Unit {
+        if (!isDirty(node.area())) { return }
+        node.render(this)
     }
 
     public func canvas(area!: Rect = this.area): Canvas {
@@ -111,14 +187,39 @@ public class Frame {
     }
 
     public func renderNode(node: ViewNode, sheet: StyleSheet): Unit {
+        if (!isDirty(area)) { return }
         node.setArea(area)
         node.render(this, sheet)
     }
 
     public func fill(area: Rect, style: Style): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
-        for (y in area.y..area.bottom) {
-            buffer.setString(area.x, y, repeat(" ", area.width), style: style)
+        buffer.fill(area, style: style)
+    }
+
+    public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit {
+        if (width <= 0 || height <= 0) { return }
+        buffer.fillRect(x, y, width, height, style: style)
+    }
+
+    public func isDirty(area: Rect): Bool {
+        match (dirty) {
+            case Some(rects) => rects.intersects(area)
+            case None => true
+        }
+    }
+
+    public func isDirtyCell(x: Int64, y: Int64): Bool {
+        match (dirty) {
+            case Some(rects) => rects.intersectsCell(x, y)
+            case None => true
+        }
+    }
+
+    public func dirtyRects(): Array<Rect> {
+        match (dirty) {
+            case Some(rects) => rects.rects()
+            case None => [area]
         }
     }
 
@@ -146,6 +247,7 @@ public class Terminal {
     private var front: ?Buffer = None
     private var back: ?Buffer = None
     private var previousMedia: Array<MediaPlacement> = []
+    private var cursorVisible: Bool = false
 
     public init(backend: Backend, renderMode!: RenderMode = RenderMode.Diff) {
         this.backend = backend
@@ -153,15 +255,49 @@ public class Terminal {
     }
 
     public func draw(render: (Frame) -> Unit): RenderMetrics {
+        draw(render, dirtyRects: None)
+    }
+
+    public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics {
         let area = backend.size()
         if (!frontMatches(area)) {
             front = None
             back = None
         }
-        let buffer = acquireBackBuffer(area)
-        let frame = Frame(area, buffer)
+        let effectiveDirty = effectiveDirtyRects(area, dirtyRects)
+        let diffMode = match (renderMode) {
+            case RenderMode.Diff => true
+            case RenderMode.Full => false
+        }
+        let partialRender = diffMode && !effectiveDirty.isEmpty() && !effectiveDirty.covers(area) && frontMatches(area) && hasFront()
+        var previousDirty: ?DirtyCellSnapshot = None
+        var copiedCells: Int64 = 0
+        let buffer = if (partialRender) {
+            match (front) {
+                case Some(current) =>
+                    let snapshot = DirtyCellSnapshot(current, effectiveDirty)
+                    copiedCells = snapshot.cellCount()
+                    previousDirty = Some(snapshot)
+                    current.clearDirty(effectiveDirty)
+                    current.setWriteClip(Some(effectiveDirty))
+                    current
+                case None =>
+                    let fresh = acquireBackBuffer(area)
+                    fresh.reset()
+                    copiedCells = area.width * area.height
+                    fresh
+            }
+        } else {
+            let fresh = acquireBackBuffer(area)
+            fresh.reset()
+            copiedCells = area.width * area.height
+            fresh
+        }
+        let frameDirty: ?DirtyRects = if (partialRender) { Some(effectiveDirty) } else { None }
+        let frame = Frame(area, buffer, dirty: frameDirty)
         let renderStart = MonoTime.now()
         render(frame)
+        buffer.setWriteClip(None)
         let renderMillis = durationMillis(MonoTime.now() - renderStart)
         let drawStart = MonoTime.now()
         var dirtyCells = area.width * area.height
@@ -171,27 +307,54 @@ public class Terminal {
             case RenderMode.Full =>
                 backend.draw(buffer)
             case RenderMode.Diff =>
-                match (front) {
-                    case Some(prev) =>
-                        let plan = renderDiffPlan(prev, buffer)
-                        dirtyCells = plan.dirtyCells
-                        diffWrites = plan.spans.size
-                        fullRedraw = false
-                        backend.drawDiff(buffer, plan)
-                    case None => backend.draw(buffer)
+                if (partialRender) {
+                    match (previousDirty) {
+                        case Some(prev) =>
+                            let plan = renderDiffPlan(prev, buffer, dirtyRects: Some(effectiveDirty))
+                            dirtyCells = plan.dirtyCells
+                            diffWrites = plan.spans.size
+                            fullRedraw = false
+                            backend.drawDiff(buffer, plan)
+                        case None => backend.draw(buffer)
+                    }
+                } else {
+                    match (front) {
+                        case Some(prev) =>
+                            let plan = renderDiffPlan(prev, buffer)
+                            dirtyCells = plan.dirtyCells
+                            diffWrites = plan.spans.size
+                            fullRedraw = false
+                            backend.drawDiff(buffer, plan)
+                        case None => backend.draw(buffer)
+                    }
                 }
         }
         let media = buffer.mediaPlacements()
         let mediaOps = diffMediaPlacements(previousMedia, media)
         backend.drawMedia(mediaOps)
-        if (let Some(cursor) <- frame.getCursor()) {
-            backend.moveTo(cursor.x, cursor.y)
-            backend.flush()
+        match (frame.getCursor()) {
+            case Some(cursor) =>
+                if (!cursorVisible) {
+                    backend.showCursor()
+                }
+                cursorVisible = true
+                backend.moveTo(cursor.x, cursor.y)
+                backend.flush()
+            case None =>
+                if (cursorVisible) {
+                    backend.hideCursor()
+                    backend.flush()
+                }
+                cursorVisible = false
         }
         let drawMillis = durationMillis(MonoTime.now() - drawStart)
-        let oldFront = front
-        front = Some(buffer)
-        back = oldFront
+        if (partialRender) {
+            front = Some(buffer)
+        } else {
+            let oldFront = front
+            front = Some(buffer)
+            back = oldFront
+        }
         previousMedia = media
         RenderMetrics(
             size: area,
@@ -201,7 +364,10 @@ public class Terminal {
             fullRedraw: fullRedraw,
             renderMillis: renderMillis,
             drawMillis: drawMillis,
-            totalMillis: renderMillis + drawMillis
+            totalMillis: renderMillis + drawMillis,
+            renderedCells: if (partialRender) { effectiveDirty.cellCount() } else { area.width * area.height },
+            dirtyRects: if (partialRender) { effectiveDirty.rects().size } else { if (area.width > 0 && area.height > 0) { Int64(1) } else { Int64(0) } },
+            copiedCells: copiedCells
         )
     }
 
@@ -220,6 +386,13 @@ public class Terminal {
         }
     }
 
+    private func hasFront(): Bool {
+        match (front) {
+            case Some(_) => true
+            case None => false
+        }
+    }
+
     private func acquireBackBuffer(area: Rect): Buffer {
         match (back) {
             case Some(buffer) =>
@@ -232,16 +405,84 @@ public class Terminal {
             case None => Buffer(area)
         }
     }
+
+    private func effectiveDirtyRects(area: Rect, dirtyRects: ?DirtyRects): DirtyRects {
+        match (dirtyRects) {
+            case Some(rects) =>
+                let out = DirtyRects()
+                for (rect in rects.rects()) {
+                    out.add(intersect(area, rect))
+                }
+                if (out.isEmpty()) { DirtyRects.full(area) } else { out }
+            case None => DirtyRects.full(area)
+        }
+    }
 }
 
-func renderDiffPlan(previous: Buffer, next: Buffer): RenderDiffPlan {
+class DirtyCellSnapshot {
+    let area: Rect
+    private let rectsValue: Array<Rect>
+    private let cells: Array<Cell>
+
+    init(previous: Buffer, dirtyRects: DirtyRects) {
+        area = previous.area
+        let rects = ArrayList<Rect>()
+        let copied = ArrayList<Cell>()
+        for (rect in dirtyRects.rects()) {
+            let target = intersect(previous.area, rect)
+            if (target.width <= 0 || target.height <= 0) { continue }
+            rects.add(target)
+            for (y in target.y..target.bottom) {
+                for (x in target.x..target.right) {
+                    copied.add(previous.getCell(x, y))
+                }
+            }
+        }
+        rectsValue = rects.toArray()
+        cells = copied.toArray()
+    }
+
+    func cellCount(): Int64 {
+        cells.size
+    }
+
+    func getCell(x: Int64, y: Int64): Cell {
+        var offset: Int64 = 0
+        for (rect in rectsValue) {
+            let count = rect.width * rect.height
+            if (x >= rect.x && x < rect.right && y >= rect.y && y < rect.bottom) {
+                return cells[offset + (y - rect.y) * rect.width + (x - rect.x)]
+            }
+            offset += count
+        }
+        Cell()
+    }
+}
+
+func renderDiffPlan(previous: Buffer, next: Buffer, dirtyRects!: ?DirtyRects = None): RenderDiffPlan {
+    renderDiffPlanWithPrevious({ x, y => previous.getCell(x, y) }, previous.area, next, dirtyRects: dirtyRects)
+}
+
+func renderDiffPlan(previous: DirtyCellSnapshot, next: Buffer, dirtyRects!: ?DirtyRects = None): RenderDiffPlan {
+    renderDiffPlanWithPrevious({ x, y => previous.getCell(x, y) }, previous.area, next, dirtyRects: dirtyRects)
+}
+
+func renderDiffPlanWithPrevious(previousCell: (Int64, Int64) -> Cell, previousArea: Rect, next: Buffer, dirtyRects!: ?DirtyRects = None): RenderDiffPlan {
     let spans = ArrayList<RenderDiffSpan>()
     var dirtyCells: Int64 = 0
+    let scanRects = match (dirtyRects) {
+        case Some(rects) => rects.rects()
+        case None => [next.area]
+    }
+    for (scan in scanRects) {
+        let target = intersect(next.area, scan)
     for (y in next.area.y..next.area.bottom) {
+        if (y < target.y || y >= target.bottom) { continue }
         var x = next.area.x
-        while (x < next.area.right) {
+        if (target.width > 0) { x = target.x }
+        while (x < target.right) {
             let cell = next.getCell(x, y)
-            if (previous.area == next.area && previous.getCell(x, y) == cell) {
+            if (previousArea == next.area && previousCell(x, y) == cell) {
                 x++
                 continue
             }
@@ -251,9 +492,9 @@ func renderDiffPlan(previous: Buffer, next: Buffer): RenderDiffPlan {
             text.append(cell.symbol)
             dirtyCells++
             x++
-            while (x < next.area.right) {
+            while (x < target.right) {
                 let nextCell = next.getCell(x, y)
-                if (previous.area == next.area && previous.getCell(x, y) == nextCell) { break }
+                if (previousArea == next.area && previousCell(x, y) == nextCell) { break }
                 if (nextCell.style != style) { break }
                 text.append(nextCell.symbol)
                 dirtyCells++
@@ -261,6 +502,7 @@ func renderDiffPlan(previous: Buffer, next: Buffer): RenderDiffPlan {
             }
             spans.add(RenderDiffSpan(start, y, text.toString(), style))
         }
+    }
     }
     RenderDiffPlan(dirtyCells, spans.toArray())
 }
@@ -281,25 +523,72 @@ public enum TerminalProbeMode {
 public struct KeyboardOptions {
     public let mode: KeyboardProtocolMode
     public let probe: TerminalProbeMode
+    public let probeBudgetMillis: Int64
     public let escDelayMillis: Int64
     public let repeatHeldMillis: Int64
 
     public init(
         mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic,
         probe!: TerminalProbeMode = TerminalProbeMode.Disabled,
+        probeBudgetMillis!: Int64 = 100,
         escDelayMillis!: Int64 = 25,
         repeatHeldMillis!: Int64 = 120
     ) {
         this.mode = mode
         this.probe = probe
+        this.probeBudgetMillis = clamp(probeBudgetMillis, 0, 100)
         this.escDelayMillis = max(0, escDelayMillis)
         this.repeatHeldMillis = max(1, repeatHeldMillis)
+    }
+}
+
+public struct TerminalProbeResult {
+    public let capabilities: TerminalCapabilities
+    public let consumedBytes: Array<Byte>
+    public let budgetMillis: Int64
+    public let elapsedMillis: Int64
+
+    public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64) {
+        this.capabilities = capabilities
+        this.consumedBytes = consumedBytes
+        this.budgetMillis = clamp(budgetMillis, 0, 100)
+        this.elapsedMillis = max(0, elapsedMillis)
+    }
+}
+
+public class TerminalProbe {
+    public static func run(
+        backend: Backend,
+        inputSource: InputSource,
+        base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend),
+        budgetMillis!: Int64 = 100
+    ): TerminalProbeResult {
+        let budget = clamp(budgetMillis, 0, 100)
+        let started = MonoTime.now()
+        backend.write("${ESC}[?u")
+        backend.flush()
+        let consumed = ArrayList<Byte>()
+        var elapsed: Int64 = 0
+        while (elapsed <= budget) {
+            let chunk = inputSource.readAvailable(256)
+            if (chunk.size == 0) { break }
+            for (b in chunk) { consumed.add(b) }
+            elapsed = durationMillis(MonoTime.now() - started)
+        }
+        let bytes = consumed.toArray()
+        TerminalProbeResult(
+            probedCapabilities(base, bytes),
+            consumedBytes: bytes,
+            budgetMillis: budget,
+            elapsedMillis: min(durationMillis(MonoTime.now() - started), budget)
+        )
     }
 }
 
 public class TerminalSession {
     private let backend: Backend
     private let driver: TerminalDriver
+    private let probeInputSource: InputSource
     private let rawMode: Bool
     private let alternateScreen: Bool
     private let mouse: Bool
@@ -310,23 +599,26 @@ public class TerminalSession {
     private let keyboard: KeyboardOptions
     private var active: Bool = false
     private var rawActive: Bool = false
+    private var lastProbe: ?TerminalProbeResult = None
 
     public prop rawModeEnabled: Bool { get() { rawActive } }
 
     public init(
         backend: Backend,
-        driver!: TerminalDriver = LinuxTerminalDriver(),
+        driver!: TerminalDriver = defaultTerminalDriver(),
+        probeInputSource!: InputSource = StdinInputSource(),
         rawMode!: Bool = true,
         alternateScreen!: Bool = true,
         mouse!: Bool = false,
         mouseMove!: Bool = false,
         focusEvents!: Bool = false,
-        bracketedPaste!: Bool = false,
+        bracketedPaste!: Bool = true,
         hideCursor!: Bool = true,
         keyboard!: KeyboardOptions = KeyboardOptions()
     ) {
         this.backend = backend
         this.driver = driver
+        this.probeInputSource = probeInputSource
         this.rawMode = rawMode
         this.alternateScreen = alternateScreen
         this.mouse = mouse
@@ -337,6 +629,10 @@ public class TerminalSession {
         this.keyboard = keyboard
     }
 
+    public func probeResult(): ?TerminalProbeResult {
+        lastProbe
+    }
+
     public func start(): Bool {
         if (active) { return true }
         if (alternateScreen) { backend.enterAlternateScreen() }
@@ -345,13 +641,13 @@ public class TerminalSession {
         if (mouseMove) { backend.write("${ESC}[?1003h${ESC}[?1006h") }
         if (focusEvents) { backend.write("${ESC}[?1004h") }
         if (bracketedPaste) { backend.enableBracketedPaste() }
-        enableKeyboardProtocol()
         let rawOk = if (rawMode) { driver.enterRawMode() } else { true }
         rawActive = rawMode && rawOk
         if (rawMode && !rawOk) {
             rollbackStartedModes()
             return false
         }
+        enableKeyboardProtocol()
         active = true
         TerminalSignalGuard.activate(
             raw: rawActive,
@@ -387,8 +683,14 @@ public class TerminalSession {
         start()
         try {
             action()
-        } finally {
             stop()
+        } catch (primary: Exception) {
+            try {
+                stop()
+            } catch (restore: Exception) {
+                throw Exception("terminal session failed: ${primary.message}; terminal restore failed: ${restore.message}")
+            }
+            throw primary
         }
     }
 
@@ -416,7 +718,13 @@ public class TerminalSession {
                     case TerminalProbeMode.Disabled => ()
                     case TerminalProbeMode.EnvOnly => ()
                     case TerminalProbeMode.Active =>
-                        backend.write("${ESC}[?u${ESC}[>1u${ESC}[>4;2m")
+                        lastProbe = Some(TerminalProbe.run(
+                            backend,
+                            probeInputSource,
+                            base: driver.capabilities(backend),
+                            budgetMillis: keyboard.probeBudgetMillis
+                        ))
+                        backend.write("${ESC}[>1u${ESC}[>4;2m")
                 }
         }
     }
@@ -438,6 +746,36 @@ public class TerminalSession {
 @C
 func tuiTerminalSignalHandler(signum: Int32): Unit {
     TerminalSignalGuard.restoreFromSignal(signum)
+}
+
+@When[os == "Linux"]
+func restoreNativeRawMode(): Unit {
+    TerminalMode.restore()
+}
+
+@When[os == "macOS"]
+func restoreNativeRawMode(): Unit {
+    MacOSTerminalMode.restore()
+}
+
+@When[os == "Windows"]
+func restoreNativeRawMode(): Unit {
+    WindowsConsoleMode.restore()
+}
+
+@When[os != "Windows"]
+func writeAnsiToStdout(text: String): Unit {
+    unsafe {
+        let bytes = text.rawData()
+        let handle = acquireArrayRawData(bytes)
+        _ = write(STDOUT_FILENO, CPointer<Unit>(handle.pointer), UIntNative(bytes.size))
+        releaseArrayRawData(handle)
+    }
+}
+
+@When[os == "Windows"]
+func writeAnsiToStdout(text: String): Unit {
+    if (text.isEmpty()) { return }
 }
 
 class TerminalSignalGuard {
@@ -498,7 +836,7 @@ class TerminalSignalGuard {
         if (active && !restoring) {
             restoring = true
             restoreAnsiModes()
-            if (raw) { TerminalMode.restore() }
+            if (raw) { restoreNativeRawMode() }
             active = false
         }
         unsafe { _exit(128 + signum) }
@@ -567,12 +905,7 @@ class TerminalSignalGuard {
 
     private static func writeAnsi(text: String): Unit {
         if (text.isEmpty()) { return }
-        unsafe {
-            let bytes = text.rawData()
-            let handle = acquireArrayRawData(bytes)
-            _ = write(STDOUT_FILENO, CPointer<Unit>(handle.pointer), UIntNative(bytes.size))
-            releaseArrayRawData(handle)
-        }
+        writeAnsiToStdout(text)
     }
 }
 
@@ -584,6 +917,7 @@ public interface TerminalDriver {
     func capabilities(backend: Backend): TerminalCapabilities
 }
 
+@When[os == "Linux"]
 public class LinuxTerminalDriver <: TerminalDriver {
     public init() {}
 
@@ -619,12 +953,107 @@ public class FallbackTerminalDriver <: TerminalDriver {
     }
 }
 
+@When[os != "macOS"]
+public class MacOSTerminalDriver <: TerminalDriver {
+    private let fallback: FallbackTerminalDriver
+
+    public init(area!: Rect = Rect(0, 0, 80, 24)) {
+        fallback = FallbackTerminalDriver(area: area)
+    }
+
+    public func name(): String { "macos-fallback" }
+    public func enterRawMode(): Bool { false }
+    public func restore(): Unit {}
+    public func size(): ?Rect { fallback.size() }
+    public func capabilities(backend: Backend): TerminalCapabilities {
+        TerminalCapabilities(
+            size: backend.size(),
+            trueColor: false,
+            mouse: false,
+            bracketedPaste: false,
+            alternateScreen: false,
+            unicode: true,
+            driverName: name()
+        )
+    }
+}
+
+@When[os == "macOS"]
+public class MacOSTerminalDriver <: TerminalDriver {
+    public init(area!: Rect = Rect(0, 0, 80, 24)) {
+        if (area.width < 0) { return }
+    }
+
+    public func name(): String { "macos-termios" }
+    public func enterRawMode(): Bool { MacOSTerminalMode.enterRawMode() }
+    public func restore(): Unit { MacOSTerminalMode.restore() }
+    public func size(): ?Rect { MacOSTerminalMode.size() }
+    public func capabilities(backend: Backend): TerminalCapabilities {
+        TerminalCapabilities.detect(backend: backend, driverName: name())
+    }
+}
+
+@When[os != "Windows"]
+public class WindowsTerminalDriver <: TerminalDriver {
+    private let fallback: FallbackTerminalDriver
+
+    public init(area!: Rect = Rect(0, 0, 80, 24)) {
+        fallback = FallbackTerminalDriver(area: area)
+    }
+
+    public func name(): String { "windows-fallback" }
+    public func enterRawMode(): Bool { false }
+    public func restore(): Unit {}
+    public func size(): ?Rect { fallback.size() }
+    public func capabilities(backend: Backend): TerminalCapabilities {
+        TerminalCapabilities(
+            size: backend.size(),
+            trueColor: false,
+            mouse: false,
+            bracketedPaste: false,
+            alternateScreen: false,
+            unicode: true,
+            driverName: name()
+        )
+    }
+}
+
+@When[os == "Windows"]
+public class WindowsTerminalDriver <: TerminalDriver {
+    public init(area!: Rect = Rect(0, 0, 80, 24)) {
+        if (area.width < 0) { return }
+    }
+
+    public func name(): String { "windows-vt" }
+    public func enterRawMode(): Bool { WindowsConsoleMode.enterRawMode() }
+    public func restore(): Unit { WindowsConsoleMode.restore() }
+    public func size(): ?Rect { WindowsConsoleMode.size() }
+    public func capabilities(backend: Backend): TerminalCapabilities {
+        TerminalCapabilities.detect(backend: backend, driverName: name())
+    }
+}
+
+@When[os == "Linux"]
+public func defaultTerminalDriver(): TerminalDriver {
+    LinuxTerminalDriver()
+}
+
+@When[os == "macOS"]
+public func defaultTerminalDriver(): TerminalDriver {
+    MacOSTerminalDriver()
+}
+
+@When[os == "Windows"]
+public func defaultTerminalDriver(): TerminalDriver {
+    WindowsTerminalDriver()
+}
+
 public class AnsiBackend <: Backend {
     private let output: OutputStream
     private let driver: TerminalDriver
     private let fallbackArea: Rect
 
-    public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = LinuxTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24)) {
+    public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24)) {
         this.output = output
         this.driver = driver
         this.fallbackArea = fallbackArea
@@ -655,19 +1084,21 @@ public class AnsiBackend <: Backend {
     }
 
     public func draw(buffer: Buffer): Unit {
+        let batch = StringBuilder()
         var current = Style.default()
         for (y in buffer.area.y..buffer.area.bottom) {
-            moveTo(buffer.area.x, y)
+            batch.append("${ESC}[${y + 1};${buffer.area.x + 1}H")
             for (x in buffer.area.x..buffer.area.right) {
                 let cell = buffer.getCell(x, y)
                 if (cell.style != current) {
-                    write(styleToAnsi(cell.style))
+                    batch.append(styleToAnsi(cell.style))
                     current = cell.style
                 }
-                write(cell.symbol)
+                batch.append(cell.symbol)
             }
         }
-        write(styleToAnsi(Style.default()))
+        batch.append(styleToAnsi(Style.default()))
+        write(batch.toString())
         flush()
     }
 
@@ -677,16 +1108,18 @@ public class AnsiBackend <: Backend {
             flush()
             return
         }
+        let batch = StringBuilder()
         var current = Style.default()
         for (span in plan.spans) {
-            moveTo(span.x, span.y)
+            batch.append("${ESC}[${span.y + 1};${span.x + 1}H")
             if (span.style != current) {
-                write(styleToAnsi(span.style))
+                batch.append(styleToAnsi(span.style))
                 current = span.style
             }
-            write(span.text)
+            batch.append(span.text)
         }
-        write(styleToAnsi(Style.default()))
+        batch.append(styleToAnsi(Style.default()))
+        write(batch.toString())
         flush()
     }
 
@@ -738,11 +1171,19 @@ public class TestBackend <: Backend {
     private var latest: ?Buffer = None
     private let frames = ArrayList<String>()
     private let mediaFrames = ArrayList<Array<MediaOp>>()
+    // Snapshotting every frame is useful for golden tests, but it is not
+    // part of rendering itself.  Headless performance runs can keep the
+    // live buffer while avoiding a full terminal-sized String allocation.
+    private let captureSnapshots: Bool
     private var latestDiffOps: Int64 = 0
     private var latestDiffWrites: Int64 = 0
 
-    public init(area!: Rect = Rect(0, 0, 80, 24)) {
+    public init(
+        area!: Rect = Rect(0, 0, 80, 24),
+        captureSnapshots!: Bool = true
+    ) {
         this.area = area
+        this.captureSnapshots = captureSnapshots
     }
 
     public func clear(): Unit {
@@ -774,7 +1215,9 @@ public class TestBackend <: Backend {
         latest = Some(buffer)
         latestDiffOps = buffer.area.width * buffer.area.height
         latestDiffWrites = if (buffer.area.height > 0) { buffer.area.height } else { 0 }
-        frames.add(bufferSnapshot(buffer))
+        if (captureSnapshots) {
+            frames.add(bufferSnapshot(buffer))
+        }
         write("<draw>")
     }
 
@@ -782,7 +1225,9 @@ public class TestBackend <: Backend {
         latest = Some(next)
         latestDiffOps = plan.dirtyCells
         latestDiffWrites = plan.spans.size
-        frames.add(bufferSnapshot(next))
+        if (captureSnapshots) {
+            frames.add(bufferSnapshot(next))
+        }
         write("<diff:${latestDiffOps}:${latestDiffWrites}>")
     }
 
@@ -984,6 +1429,32 @@ public struct TerminalCapabilities {
     }
 }
 
+func probedCapabilities(base: TerminalCapabilities, bytes: Array<Byte>): TerminalCapabilities {
+    let text = unsafe { String.fromUtf8Unchecked(bytes) }
+    let kittyKeyboard = text.contains("${ESC}[?") && text.contains("u")
+    TerminalCapabilities(
+        size: base.size,
+        trueColor: base.trueColor,
+        colorLevel: base.colorLevel,
+        mouse: base.mouse,
+        mouseMove: base.mouseMove,
+        focusEvents: base.focusEvents,
+        bracketedPaste: base.bracketedPaste,
+        alternateScreen: base.alternateScreen,
+        unicode: base.unicode,
+        kittyGraphics: base.kittyGraphics,
+        sixel: base.sixel,
+        osc8: base.osc8,
+        keyboardProtocol: if (kittyKeyboard) { KeyProtocol.Kitty } else { base.keyboardProtocol },
+        keyUp: base.keyUp || kittyKeyboard,
+        keyRepeat: base.keyRepeat,
+        recommendedFps: base.recommendedFps,
+        cellWidthPixels: base.cellWidthPixels,
+        cellHeightPixels: base.cellHeightPixels,
+        driverName: base.driverName
+    )
+}
+
 public struct RenderMetrics {
     public let size: Rect
     public let dirtyCells: Int64
@@ -993,6 +1464,9 @@ public struct RenderMetrics {
     public let renderMillis: Int64
     public let drawMillis: Int64
     public let totalMillis: Int64
+    public let renderedCells: Int64
+    public let dirtyRects: Int64
+    public let copiedCells: Int64
 
     public init(
         size!: Rect = Rect(0, 0, 0, 0),
@@ -1002,7 +1476,10 @@ public struct RenderMetrics {
         fullRedraw!: Bool = false,
         renderMillis!: Int64 = 0,
         drawMillis!: Int64 = 0,
-        totalMillis!: Int64 = 0
+        totalMillis!: Int64 = 0,
+        renderedCells!: Int64 = 0,
+        dirtyRects!: Int64 = 0,
+        copiedCells!: Int64 = 0
     ) {
         this.size = size
         this.dirtyCells = max(0, dirtyCells)
@@ -1012,6 +1489,9 @@ public struct RenderMetrics {
         this.renderMillis = max(0, renderMillis)
         this.drawMillis = max(0, drawMillis)
         this.totalMillis = max(0, totalMillis)
+        this.renderedCells = max(0, renderedCells)
+        this.dirtyRects = max(0, dirtyRects)
+        this.copiedCells = max(0, copiedCells)
     }
 }
 
@@ -1038,19 +1518,21 @@ public class DebugOverlay <: Widget {
 func bufferSnapshot(buffer: Buffer): String {
     let lines = ArrayList<String>()
     for (y in buffer.area.y..buffer.area.bottom) {
-        var line = ""
+        let line = StringBuilder()
         for (x in buffer.area.x..buffer.area.right) {
             let symbol = buffer.getCell(x, y).symbol
-            line += if (symbol.isEmpty()) { " " } else { symbol }
+            line.append(if (symbol.isEmpty()) { " " } else { symbol })
         }
-        lines.add(line)
+        lines.add(line.toString())
     }
     join(lines.toArray(), "\n")
 }
 
+@When[os == "Linux"]
 public class TerminalMode {
     private static var saved: ?Array<UInt8> = None
     private static var active: Bool = false
+    private static var depth: Int64 = 0
     private static var lastErrorValue: ?String = None
 
     public static func lastError(): ?String {
@@ -1059,6 +1541,7 @@ public class TerminalMode {
 
     public static func enterRawMode(): Bool {
         if (active) {
+            depth++
             lastErrorValue = None
             return true
         }
@@ -1090,6 +1573,7 @@ public class TerminalMode {
         }
         saved = original
         active = true
+        depth = 1
         lastErrorValue = None
         atExit { TerminalMode.restore() }
         true
@@ -1097,6 +1581,10 @@ public class TerminalMode {
 
     public static func restore(): Unit {
         if (!active) { return }
+        if (depth > 1) {
+            depth--
+            return
+        }
         if (let Some(termios) <- saved) {
             unsafe {
                 let handle = acquireArrayRawData(termios)
@@ -1105,6 +1593,7 @@ public class TerminalMode {
             }
         }
         active = false
+        depth = 0
         saved = None
     }
 
@@ -1142,5 +1631,216 @@ public class TerminalMode {
         writeUInt32(termios, 12, lflag)
         termios[TERMIOS_CC_OFFSET + VMIN] = 0
         termios[TERMIOS_CC_OFFSET + VTIME] = 0
+    }
+}
+
+@When[os == "macOS"]
+public class MacOSTerminalMode {
+    private static var saved: ?Array<UInt8> = None
+    private static var active: Bool = false
+    private static var depth: Int64 = 0
+    private static var lastErrorValue: ?String = None
+    private static let TERMIOS_BUFFER_SIZE: Int64 = 128
+
+    public static func lastError(): ?String {
+        lastErrorValue
+    }
+
+    public static func enterRawMode(): Bool {
+        if (active) {
+            depth++
+            lastErrorValue = None
+            return true
+        }
+        if (unsafe { isatty(STDIN_FILENO) } == 0) {
+            lastErrorValue = Some("stdin is not a tty")
+            return false
+        }
+        let original = Array<UInt8>(TERMIOS_BUFFER_SIZE, repeat: 0)
+        unsafe {
+            let handle = acquireArrayRawData(original)
+            let rc = tcgetattr(STDIN_FILENO, CPointer<Unit>(handle.pointer))
+            releaseArrayRawData(handle)
+            if (rc != 0) {
+                lastErrorValue = Some("tcgetattr failed")
+                return false
+            }
+        }
+        var raw = Array<UInt8>(TERMIOS_BUFFER_SIZE, repeat: 0)
+        original.copyTo(raw, 0, 0, original.size)
+        unsafe {
+            let handle = acquireArrayRawData(raw)
+            cfmakeraw(CPointer<Unit>(handle.pointer))
+            let rc = tcsetattr(STDIN_FILENO, TCSAFLUSH, CPointer<Unit>(handle.pointer))
+            releaseArrayRawData(handle)
+            if (rc != 0) {
+                lastErrorValue = Some("tcsetattr failed")
+                return false
+            }
+        }
+        saved = original
+        active = true
+        depth = 1
+        lastErrorValue = None
+        atExit { MacOSTerminalMode.restore() }
+        true
+    }
+
+    public static func restore(): Unit {
+        if (!active) { return }
+        if (depth > 1) {
+            depth--
+            return
+        }
+        if (let Some(termios) <- saved) {
+            unsafe {
+                let handle = acquireArrayRawData(termios)
+                _ = tcsetattr(STDIN_FILENO, TCSAFLUSH, CPointer<Unit>(handle.pointer))
+                releaseArrayRawData(handle)
+            }
+        }
+        active = false
+        depth = 0
+        saved = None
+    }
+
+    public static func size(): ?Rect {
+        if (unsafe { isatty(STDOUT_FILENO) } == 0) {
+            return None
+        }
+        let winsize = Array<UInt8>(8, repeat: 0)
+        unsafe {
+            let handle = acquireArrayRawData(winsize)
+            let rc = ioctl(STDOUT_FILENO, MACOS_TIOCGWINSZ, CPointer<Unit>(handle.pointer))
+            releaseArrayRawData(handle)
+            if (rc != 0) { return None }
+        }
+        let rows = readUInt16(winsize, 0)
+        let cols = readUInt16(winsize, 2)
+        if (rows == 0 || cols == 0) {
+            return None
+        }
+        Some(Rect(0, 0, Int64(cols), Int64(rows)))
+    }
+}
+
+@When[os == "Windows"]
+public class WindowsConsoleMode {
+    private static var savedInputMode: ?UInt32 = None
+    private static var savedOutputMode: ?UInt32 = None
+    private static var active: Bool = false
+    private static var depth: Int64 = 0
+    private static var lastErrorValue: ?String = None
+
+    public static func lastError(): ?String {
+        lastErrorValue
+    }
+
+    public static func enterRawMode(): Bool {
+        if (active) {
+            depth++
+            lastErrorValue = None
+            return true
+        }
+        let input = inputHandle()
+        let output = outputHandle()
+        match (readConsoleMode(input)) {
+            case Some(inputMode) =>
+                match (readConsoleMode(output)) {
+                    case Some(outputMode) =>
+                        let rawInput = windowsRawInputMode(inputMode)
+                        let vtOutput = windowsVtOutputMode(outputMode)
+                        if (unsafe { SetConsoleMode(input, rawInput) } == 0) {
+                            lastErrorValue = Some("SetConsoleMode input failed")
+                            return false
+                        }
+                        if (unsafe { SetConsoleMode(output, vtOutput) } == 0) {
+                            _ = unsafe { SetConsoleMode(input, inputMode) }
+                            lastErrorValue = Some("SetConsoleMode output failed")
+                            return false
+                        }
+                        savedInputMode = Some(inputMode)
+                        savedOutputMode = Some(outputMode)
+                        active = true
+                        depth = 1
+                        lastErrorValue = None
+                        atExit { WindowsConsoleMode.restore() }
+                        true
+                    case None =>
+                        lastErrorValue = Some("GetConsoleMode output failed")
+                        false
+                }
+            case None =>
+                lastErrorValue = Some("GetConsoleMode input failed")
+                false
+        }
+    }
+
+    public static func restore(): Unit {
+        if (!active) { return }
+        if (depth > 1) {
+            depth--
+            return
+        }
+        if (let Some(mode) <- savedInputMode) {
+            _ = unsafe { SetConsoleMode(inputHandle(), mode) }
+        }
+        if (let Some(mode) <- savedOutputMode) {
+            _ = unsafe { SetConsoleMode(outputHandle(), mode) }
+        }
+        active = false
+        depth = 0
+        savedInputMode = None
+        savedOutputMode = None
+    }
+
+    public static func size(): ?Rect {
+        let output = outputHandle()
+        let info = Array<UInt8>(CONSOLE_SCREEN_BUFFER_INFO_BYTES, repeat: 0)
+        unsafe {
+            let handle = acquireArrayRawData(info)
+            let rc = GetConsoleScreenBufferInfo(output, CPointer<Unit>(handle.pointer))
+            releaseArrayRawData(handle)
+            if (rc == 0) { return None }
+        }
+        let left = Int64(readUInt16(info, 10))
+        let top = Int64(readUInt16(info, 12))
+        let right = Int64(readUInt16(info, 14))
+        let bottom = Int64(readUInt16(info, 16))
+        if (right < left || bottom < top) { return None }
+        let width = right - left + 1
+        let height = bottom - top + 1
+        if (width <= 0 || height <= 0) { return None }
+        Some(Rect(0, 0, width, height))
+    }
+
+    private static func inputHandle(): CPointer<Unit> {
+        unsafe { GetStdHandle(STD_INPUT_HANDLE) }
+    }
+
+    private static func outputHandle(): CPointer<Unit> {
+        unsafe { GetStdHandle(STD_OUTPUT_HANDLE) }
+    }
+
+    private static func readConsoleMode(handle: CPointer<Unit>): ?UInt32 {
+        let mode = Array<UInt32>(1, repeat: 0u32)
+        unsafe {
+            let raw = acquireArrayRawData(mode)
+            let rc = GetConsoleMode(handle, CPointer<UInt32>(raw.pointer))
+            releaseArrayRawData(raw)
+            if (rc == 0) { return None }
+        }
+        Some(mode[0])
+    }
+
+    private static func windowsRawInputMode(mode: UInt32): UInt32 {
+        var raw = mode
+        raw = raw & ((ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT | ENABLE_QUICK_EDIT_MODE) ^ 0xFFFF_FFFFu32)
+        raw = raw | ENABLE_PROCESSED_INPUT | ENABLE_WINDOW_INPUT | ENABLE_EXTENDED_FLAGS | ENABLE_VIRTUAL_TERMINAL_INPUT
+        raw
+    }
+
+    private static func windowsVtOutputMode(mode: UInt32): UInt32 {
+        mode | ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN
     }
 }

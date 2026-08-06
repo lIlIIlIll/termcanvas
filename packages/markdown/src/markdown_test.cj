@@ -29,7 +29,8 @@ class MarkdownExtensionTest {
 
     @TestCase
     func rendersChineseMarkdownTable(): Unit {
-        let doc = Markdown.parse("| 姓名 | 角色 | 状态 |\n| --- | --- | --- |\n| 张三 | 开发者 | 正常 |\n| 李四 | 测试员 | 休假 |")
+        let doc = Markdown.parse(
+            "| 姓名 | 角色 | 状态 |\n| --- | --- | --- |\n| 张三 | 开发者 | 正常 |\n| 李四 | 测试员 | 休假 |")
         @Expect(doc.lines.size, 3)
         match (doc.lines[0].kind) {
             case DocumentLineKind.TableHeader => ()
@@ -45,9 +46,18 @@ class MarkdownExtensionTest {
     }
 
     @TestCase
+    func preservesMarkdownHardBreaksAsDocumentRows(): Unit {
+        let doc = Markdown.parse("/help — Show help  \n/setup — Configure providers")
+        @Expect(doc.lines.size, 2)
+        @Expect(doc.lines[0].spans[0].text, "/help — Show help")
+        @Expect(doc.lines[1].spans[0].text, "/setup — Configure providers")
+    }
+
+    @TestCase
     func rendersParsedDocumentWithMarkdownView(): Unit {
         let buffer = Buffer(Rect(0, 0, 20, 4))
-        DocumentView(Markdown.parse("# Title\n[link](https://example.com)\n**strong**")).render(Rect(0, 0, 20, 3), buffer)
+        DocumentView(Markdown.parse("# Title\n[link](https://example.com)\n**strong**")).render(Rect(0, 0, 20, 3),
+            buffer)
         @Expect(buffer.getCell(0, 0).symbol, "#")
         @Expect(buffer.getCell(2, 0).symbol, "T")
         @Expect(buffer.getCell(0, 1).symbol, "l")
@@ -187,7 +197,8 @@ class MarkdownExtensionTest {
 
     @TestCase
     func rendersFocusedMarkdownPreviewCases(): Unit {
-        let doc = Markdown.parse("# Title\n\n- item\n\n```cj\nmain\n```\n\n| 名 | 值 |\n| --- | --- |\n| 张三 | 正常 |\n\n[link](https://example.com) **strong** *em* ~~old~~ `code`")
+        let doc = Markdown.parse(
+            "# Title\n\n- item\n\n```cj\nmain\n```\n\n| 名 | 值 |\n| --- | --- |\n| 张三 | 正常 |\n\n[link](https://example.com) **strong** *em* ~~old~~ `code`")
         var hasLink = false
         var hasStrong = false
         var hasItalic = false
@@ -199,10 +210,18 @@ class MarkdownExtensionTest {
                     case Some(_) => hasLink = true
                     case None => ()
                 }
-                if (span.style == DocumentTheme().strong) { hasStrong = true }
-                if (span.style == DocumentTheme().emphasis) { hasItalic = true }
-                if (span.style == DocumentTheme().strikethrough) { hasStrike = true }
-                if (span.style == DocumentTheme().inlineCode) { hasInlineCode = true }
+                if (span.style == DocumentTheme().strong) {
+                    hasStrong = true
+                }
+                if (span.style == DocumentTheme().emphasis) {
+                    hasItalic = true
+                }
+                if (span.style == DocumentTheme().strikethrough) {
+                    hasStrike = true
+                }
+                if (span.style == DocumentTheme().inlineCode) {
+                    hasInlineCode = true
+                }
             }
         }
         @Expect(hasLink)
@@ -288,7 +307,8 @@ class MarkdownExtensionTest {
 
     @TestCase
     func rendersFencedCodeBlockInsideListItem(): Unit {
-        let doc = Markdown.parse("1. 第一项\n\n   ```go\n   func main() {\n       fmt.Println(\"Hello\")\n   }\n   ```\n\n2. 第二项")
+        let doc = Markdown.parse(
+            "1. 第一项\n\n   ```go\n   func main() {\n       fmt.Println(\"Hello\")\n   }\n   ```\n\n2. 第二项")
         @Expect(doc.lines.size, 5)
         match (doc.lines[0].kind) {
             case DocumentLineKind.ListItem(true) => @Expect(doc.lines[0].spans[0].text, "第一项")
@@ -355,7 +375,9 @@ func renderedRow(buffer: Buffer, y: Int64, width: Int64): String {
 
 func firstLineIndexContaining(doc: Document, needle: String): Int64 {
     for (i in 0..doc.lines.size) {
-        if (lineText(doc.lines[i]).contains(needle)) { return i }
+        if (lineText(doc.lines[i]).contains(needle)) {
+            return i
+        }
     }
     0
 }
@@ -379,14 +401,20 @@ func lineText(line: DocumentLine): String {
 }
 
 func byteIndex(text: String, needle: String): Int64 {
-    if (needle.isEmpty()) { return 0 }
+    if (needle.isEmpty()) {
+        return 0
+    }
     var i: Int64 = 0
     while (i + needle.size <= text.size) {
         var ok = true
         for (j in 0..needle.size) {
-            if (text[i + j] != needle[j]) { ok = false }
+            if (text[i + j] != needle[j]) {
+                ok = false
+            }
         }
-        if (ok) { return i }
+        if (ok) {
+            return i
+        }
         i++
     }
     -1

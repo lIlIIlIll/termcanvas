@@ -11,7 +11,9 @@ The stable boundary is:
 - `DocumentTheme`
 - `DocumentView`
 
-Extensions convert content formats into `Document`, then applications render the result with `DocumentView`.
+Extensions convert content formats into `Document`, then applications render the result with `DocumentView`. `packages/document` exposes that rich-document surface as the experimental document package facade while `core` keeps the same types available for pre-1.0 compatibility.
+
+`packages/editor` exposes the experimental editor package facade for text buffers, text areas, completion requests/results, syntax highlighting, Markdown-aware editing behavior, search/replace panels, and editor shell widgets. Format adapters should stay out of the editor package unless they are editor behavior rather than parsing policy.
 
 Game helpers follow the same boundary: core owns terminal events, timing, metrics, canvas, buffers, and layout, while game-specific entity/component storage, physics, tile maps, and sprite rendering live in `packages/game`.
 
@@ -30,7 +32,8 @@ The adapter maps the AST into `Document`, exposes `markdownOutline()` for headin
 `packages/game` provides the `game` package. It includes `EntityWorld`, generic `ComponentStore<T>`, `GameInputState`, `PhysicsWorld` with continuous swept AABB collision and sensor-overlap queries, `TileMap` with symbol lookup and marker discovery, `Sprite2D`, `SpriteFrame`, `SpriteAnimation`, `Camera2D`, and `SpriteRenderer`. It is intentionally engine-shaped but small: applications own gameplay rules, assets, levels, and persistence.
 
 ```cangjie
-import core.*
+import core.{Buffer, Rect}
+import document.*
 import markdown.*
 
 let doc = Markdown.parse("# Title\n\n- item")
@@ -76,13 +79,14 @@ Game and simulation extensions:
 
 Near-term priority:
 
-1. `RichText` / `Document` / `DocumentView`
-2. `markdown`
-3. `terminal`
-4. `diff`
-5. `cjtui_syntax`
-6. `cjtui_json`
-7. `media`
-8. `game`
-9. `cjtui_html`
-10. `cjtui_diagnostics`
+1. `document`
+2. `editor`
+3. `markdown`
+4. `terminal`
+5. `diff`
+6. `cjtui_syntax`
+7. `cjtui_json`
+8. `media`
+9. `game`
+10. `cjtui_html`
+11. `cjtui_diagnostics`

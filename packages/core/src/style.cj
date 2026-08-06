@@ -94,6 +94,9 @@ public struct Theme {
     public let disabled: Style
     public let error: Style
     public let accent: Style
+    public let success: Style
+    public let warning: Style
+    public let info: Style
 
     public init(
         normal!: Style = Style.default(),
@@ -101,7 +104,10 @@ public struct Theme {
         selected!: Style = Style(fg: Color.Black, bg: Color.White),
         disabled!: Style = Style(fg: Color.Indexed(8)),
         error!: Style = Style(fg: Color.Red),
-        accent!: Style = Style(fg: Color.Cyan)
+        accent!: Style = Style(fg: Color.Cyan),
+        success!: Style = Style(fg: Color.Green),
+        warning!: Style = Style(fg: Color.Yellow),
+        info!: Style = Style(fg: Color.Cyan)
     ) {
         this.normal = normal
         this.focused = focused
@@ -109,6 +115,9 @@ public struct Theme {
         this.disabled = disabled
         this.error = error
         this.accent = accent
+        this.success = success
+        this.warning = warning
+        this.info = info
     }
 
     public static func default(): Theme {
@@ -116,7 +125,7 @@ public struct Theme {
     }
 
     public func serialize(): String {
-        "normal=${styleName(normal)}\nfocused=${styleName(focused)}\nselected=${styleName(selected)}\ndisabled=${styleName(disabled)}\nerror=${styleName(error)}\naccent=${styleName(accent)}"
+        "normal=${styleName(normal)}\nfocused=${styleName(focused)}\nselected=${styleName(selected)}\ndisabled=${styleName(disabled)}\nerror=${styleName(error)}\naccent=${styleName(accent)}\nsuccess=${styleName(success)}\nwarning=${styleName(warning)}\ninfo=${styleName(info)}"
     }
 }
 
@@ -127,6 +136,19 @@ public enum StyleState {
     | Disabled
     | Error
     | Accent
+}
+
+public enum ComponentVariant {
+    | Plain
+    | Filled
+    | Outline
+    | Subtle
+}
+
+public enum ComponentDensity {
+    | Compact
+    | Normal
+    | Comfortable
 }
 
 public class StyleClass {
@@ -361,12 +383,34 @@ public struct DesignTokens {
     public let padding: Int64
     public let radius: Int64
     public let accent: Color
+    public let density: ComponentDensity
+    public let compactSpacing: Int64
+    public let comfortableSpacing: Int64
 
-    public init(gap!: Int64 = 1, padding!: Int64 = 1, radius!: Int64 = 0, accent!: Color = Color.Cyan) {
+    public init(
+        gap!: Int64 = 1,
+        padding!: Int64 = 1,
+        radius!: Int64 = 0,
+        accent!: Color = Color.Cyan,
+        density!: ComponentDensity = ComponentDensity.Normal,
+        compactSpacing!: Int64 = 0,
+        comfortableSpacing!: Int64 = 2
+    ) {
         this.gap = max(0, gap)
         this.padding = max(0, padding)
         this.radius = max(0, radius)
         this.accent = accent
+        this.density = density
+        this.compactSpacing = max(0, compactSpacing)
+        this.comfortableSpacing = max(0, comfortableSpacing)
+    }
+
+    public func spacing(): Int64 {
+        match (density) {
+            case ComponentDensity.Compact => compactSpacing
+            case ComponentDensity.Normal => padding
+            case ComponentDensity.Comfortable => comfortableSpacing
+        }
     }
 }
 
@@ -381,6 +425,62 @@ public class ThemePack {
         this.theme = theme
         this.tokens = tokens
         this.sheet = sheet
+    }
+
+    public static func default(): ThemePack {
+        let sheet = StyleSheet()
+        sheet.add(StyleClass("block", normal: Style(fg: Color.Indexed(8)), focused: Style(fg: Color.Cyan), error: Style(fg: Color.Red)))
+        sheet.add(StyleClass("panel", normal: Style(fg: Color.Indexed(8)), focused: Style(fg: Color.Cyan), error: Style(fg: Color.Red)))
+        sheet.add(StyleClass("list", selected: Style(fg: Color.Black, bg: Color.White)))
+        sheet.add(StyleClass("table", normal: Style.default(), selected: Style(fg: Color.Black, bg: Color.White)))
+        sheet.add(StyleClass("button", focused: Style(fg: Color.Black, bg: Color.White), disabled: Style(fg: Color.Indexed(8))))
+        sheet.add(StyleClass("input", focused: Style(fg: Color.Black, bg: Color.White), error: Style(fg: Color.Red)))
+        sheet.add(StyleClass("dialog", normal: Style(fg: Color.White), focused: Style(fg: Color.Cyan)))
+        sheet.add(StyleClass("alert", normal: Style(fg: Color.Yellow), error: Style(fg: Color.Red)))
+        sheet.add(StyleClass("dashboard", normal: Style(fg: Color.Cyan), selected: Style(fg: Color.Green)))
+        ThemePack("default", sheet: sheet)
+    }
+}
+
+public class ComponentStyleResolver {
+    public let pack: ThemePack
+
+    public init(pack!: ThemePack = ThemePack.default()) {
+        this.pack = pack
+    }
+
+    public func style(
+        component: String,
+        state!: StyleState = StyleState.Normal,
+        variant!: ComponentVariant = ComponentVariant.Plain,
+        base!: Style = Style.default()
+    ): Style {
+        let resolved = pack.sheet.resolve(component, state: state, base: semanticBase(variant, base))
+        match (state) {
+            case StyleState.Error => pack.theme.error.patch(resolved)
+            case StyleState.Accent => pack.theme.accent.patch(resolved)
+            case StyleState.Focused => pack.theme.focused.patch(resolved)
+            case StyleState.Selected => pack.theme.selected.patch(resolved)
+            case StyleState.Disabled => pack.theme.disabled.patch(resolved)
+            case StyleState.Normal => pack.theme.normal.patch(resolved)
+        }
+    }
+
+    public func padding(): Spacing {
+        Spacing.all(pack.tokens.spacing())
+    }
+
+    public func borderKind(): BorderKind {
+        if (pack.tokens.radius > 0) { BorderKind.Rounded } else { BorderKind.Ascii }
+    }
+
+    private func semanticBase(variant: ComponentVariant, base: Style): Style {
+        match (variant) {
+            case ComponentVariant.Plain => base
+            case ComponentVariant.Filled => Style(bg: Color.Indexed(0)).patch(base)
+            case ComponentVariant.Outline => Style(fg: pack.tokens.accent).patch(base)
+            case ComponentVariant.Subtle => Style(fg: Color.Indexed(8)).patch(base)
+        }
     }
 }
 

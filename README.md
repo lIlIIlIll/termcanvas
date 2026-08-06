@@ -7,7 +7,7 @@ It provides:
 - ANSI backend: clear screen, cursor movement, SGR colors/styles, alternate screen, mouse and bracketed paste modes.
 - Backend abstraction: `Backend`, `AnsiBackend`, and `TestBackend`.
 - Terminal mode: raw-mode enter/restore through direct libc FFI.
-- Buffer: styled cells, full draw, diff draw, double-buffered frame reuse, and frame copies for test capture.
+- Buffer: styled cells, explicit wide-cell lead/continuation state, full draw, diff draw, double-buffered frame reuse, and frame copies for test capture.
 - App runtime: `App`, `ControlFlow`, `RenderMode`, `AppMetrics`, `FrameMetrics`, `EventWaiter`, and `FocusManager`, with dirty-driven redraw, span-coalesced partial refresh, FPS/debug metrics, real-time `Duration` ticks, timers, and injectable idle waiting across stdin and registered event sources.
 - Command runtime: `Command`, `UpdateResult`, `TimerSpec`, `TimerRuntime`, `Subscription`, and `App.runWithCommands()` for emitted events, messages, async placeholders, real-time timers, synchronous exec-result messages, batches, and quit effects.
 - PTY runtime: `PtySpec`, `PtyProcess`, `PtyRuntime`, `PtySignal`, PTY Command/Event variants, `LinuxPtyRuntime` for Linux/glibc PTY processes, and `FakePtyRuntime` for deterministic tests.
@@ -16,8 +16,8 @@ It provides:
 - Widgets: `Block`, `Paragraph`, `List`, `Table`, `Scrollbar`, `Input`, `Button`, `Checkbox`, `RadioGroup`, `Select`, `Dropdown`, `MultiSelect`, `DatePicker`, `ProgressBar`, `TextArea`, `Composer`, `TranscriptView`, `ActivityTimeline`, `RequestDialog`, `Tabs`, `Modal`, `Viewport`, `Tree`, `VirtualTable`, `FilePicker`, `FileDialog`, `ConfirmDialog`, `MenuBar`, `Menu`, `CommandPalette`, `ToastManager`, `Spinner`, `Dialog`, `Sparkline`, `Gauge`, `Chart`, `DocumentView`, `MarkdownView`, `LogView`, `SplitPane`, `Wizard`, `Accordion`, `Breadcrumb`, `TreeTable`, `ColorPicker`, `SearchPanel`, `ReplacePanel`, `TextDocumentView`, `TextEditor`, `SoftWrapView`, `HelpView`, and `DebugOverlay`.
 - Extensions: Markdown, terminal transcript, diff, media, and game helpers live outside core; `packages/game` provides `game` ECS, input, continuous AABB physics, tile maps, tile markers, sensor overlaps, sprite animation, and sprite rendering.
 - Stateful selection helpers: `ListState` and `TableState`.
-- Text helpers: Unicode display width, paragraph wrapping, text alignment, `TextBuffer`, selection/range editing, find/replace helpers, grouped undo, true color, and theme styles.
-- Events: key down/up/repeat/held, arrows, text, Ctrl/Alt keys, delayed bare Esc, Tab/BackTab, PageUp/PageDown, Insert, F1-F12, CSI/Kitty/modifyOtherKeys modifiers, mouse move/drag/scroll, focus, bracketed paste, tick, timer, capabilities, and resize.
+- Text helpers: grapheme-aware Unicode display width, configurable East Asian ambiguous width, paragraph wrapping, text alignment, `TextBuffer`, selection/range editing, find/replace helpers, grouped undo, true color, and theme styles.
+- Events: key down/up/repeat/held, arrows, text, Ctrl/Alt keys, delayed bare Esc, Tab/BackTab, PageUp/PageDown, Insert, F1-F12, CSI/Kitty/modifyOtherKeys modifiers, mouse move/drag/scroll, focus, bracketed paste enabled by default, tick, timer, capabilities, and resize.
 - Layout and drawing helpers with length, percent, min, max, ratio, gap, margin, flex placement, `Grid`, `FlexLayout`, `LayoutCache`, `SizeHint`, `Canvas`, `Surface`, `SizeGuard`, and centered viewport helpers.
 - Headless testing: `AppTestRunner`, `HeadlessScript`, frame buffer/snapshot capture, synthetic ticks, mixed input replay, and snapshot diff helpers.
 
@@ -27,19 +27,20 @@ It provides:
 import core.*
 
 main(): Int64 {
-    let backend = AnsiBackend()
-    let terminal = Terminal(backend)
-    TerminalSession(backend, rawMode: false).run {
-        terminal.draw { frame =>
+    runAppWithCommands(
+        { frame =>
             frame.renderWidget(
                 Paragraph("Hello, cjtui", block: Block(title: "Demo")),
                 frame.area
             )
-        }
-    }
+        },
+        { _ => UpdateResult.next() }
+    )
     0
 }
 ```
+
+Use `Terminal`, `Backend`, and `TerminalSession` directly when writing a custom backend, low-level terminal test, or advanced session wrapper.
 
 ## Examples
 
@@ -52,6 +53,7 @@ Run from any application example directory:
 - `examples/taskpad`: task-board app with input, keymap, command palette, and toasts.
 - `examples/form_studio`: form workflow with focus routing, paste, common form widgets, and status feedback.
 - `examples/game_demo`: game extension demo with ECS stores, continuous collision physics, tile maps, sprites, and debug metrics.
+- `examples/game_pressure_suite`: six-category game pressure suite covering roguelike, snake, 2048, minesweeper, turn-based strategy, and lightweight real-time action loops.
 - `examples/gif_ascii`: ffmpeg-decodable media-to-ASCII animation viewer using ASCII/half-block/braille render modes, optional RGB color, binary threshold control, tick-driven playback, pause, zoom, and speed controls.
 - `examples/crystal_caves`: multi-level side-scrolling platform game with tile markers, sensor pickups, hazards, patrol enemies, sprite animation, and camera scrolling.
 - `examples/ops_dashboard`: real-time dashboard with ticks, timers, progress, charts, logs, and status bars.
@@ -60,7 +62,7 @@ Run from any application example directory:
 - `examples/terminal_lab`: terminal, PTY, transcript, and diff lab.
 - `examples/media_gallery`: terminal media capability and fallback gallery.
 - `examples/style_lab`: DOM/CSS, layout, and canvas lab.
-- `examples/oh_my_pi_skin`: oh-my-pi inspired terminal skin with canvas-drawn hero, welcome card, transcript, composer, command palette, and status line.
+- `examples/oh_my_pi_skin`: oh-my-pi inspired terminal skin with a canvas-drawn hero, independently timed animated todo tree, transcript, composer, command palette, and status line.
 - `examples/command_center`: command runtime, async task, timer, dialog, spinner, and toast app.
 - `examples/assistant_console`: transcript, composer, activity timeline, and request dialog console.
 - `examples/btm_clone`: bottom/btm-style system monitor replica with full-screen canvas graphs, resource panels, process selection, and sort hotkeys.
@@ -73,15 +75,17 @@ Run from any application example directory:
 - `Terminal` owns frame drawing, front/back buffer reuse, and buffer diffing.
 - `Terminal.draw()` returns `RenderMetrics`; `AppMetrics` records per-frame FPS, render/draw time, queue length, dirty cells, diff write spans, terminal size, and dropped ticks for `DebugOverlay` or custom diagnostics.
 - `TerminalSession` owns terminal modes and restores/rolls back raw mode, cursor, mouse, paste, and alternate screen state.
-- `TerminalDriver`, `LinuxTerminalDriver`, and `FallbackTerminalDriver` separate terminal mode/capability behavior from rendering backends.
+- `TerminalDriver`, `LinuxTerminalDriver`, `MacOSTerminalDriver`, `WindowsTerminalDriver`, and `FallbackTerminalDriver` separate terminal mode/capability behavior from rendering backends.
 - `App` provides a small event loop around `Terminal`, `TerminalSession`, `EventParser`, and an injectable `EventWaiter`.
-- `App.runWithCommands()` lets update handlers return `UpdateResult` with queued `Command.Emit`, `Command.Message`, `Command.Async`, timer commands, `Command.Exec`, PTY commands, `Command.Batch`, or `Command.Quit` effects. `Command.Exec` uses `std.process.executeWithOutput`; PTY commands use the configured `PtyRuntime`.
-- `LinuxEpollEventWaiter` is the default idle wait implementation on Linux/glibc. `NoopEventWaiter` and custom `EventWaiter` implementations are available for tests and future platform backends.
+- `App.runWithCommands()` lets update handlers return `UpdateResult` with queued `Command.Emit`, `Command.Message`, `Command.Async`, timer commands, `Command.ExecArgs` / `Command.AsyncExecArgs`, convenience `Command.Exec` / `Command.AsyncExec`, PTY commands, `Command.Batch`, or `Command.Quit` effects. The `*ExecArgs` variants pass explicit argv to `std.process.executeWithOutput`; the string variants use only a simple command-line splitter. PTY commands use the configured `PtyRuntime`.
+- `defaultEventWaiter()` selects `LinuxEpollEventWaiter` on Linux/glibc, `MacOSPollEventWaiter` on macOS, and `WindowsConsoleEventWaiter` on Windows. Windows terminal mode itself uses the experimental VT console driver; Windows external `EventSource` readiness is still not equivalent to POSIX fd readiness. Custom `InputSource`, `TerminalDriver`, probe input, and `EventWaiter` implementations remain injectable.
 - `FocusManager` tracks string IDs and handles Tab/BackTab focus movement.
-- `KeyMap` maps key bindings to action names, `HelpView` renders those bindings, and `EventRouter` routes global keys before focused component events.
+- `KeyMap` maps key bindings to action names, `HelpView` renders those bindings, and `EventRouter` routes focused component events before falling back to global keys.
 - `ScreenStack` provides push/pop/replace navigation for screen-oriented apps.
 - `ViewNode` provides retained-tree style rendering, dirty tracking, id lookup, class query, and capture/target/bubble style event dispatch.
 - `RichSpan`, `DocumentLine`, `Document`, `DocumentTheme`, and `DocumentView` form the core rich-document rendering boundary. Core renders spans, paragraphs, headings, lists, quotes, code blocks, tables, scroll, wrap, and theme styles; format parsing stays in extensions.
+- `packages/document` provides the experimental document package facade for those rich-document model and view types while `core` keeps the compatibility surface during the pre-1.0 split.
+- `packages/editor` provides the experimental editor package facade for `TextBuffer`, `TextArea`, completion, syntax highlighting, Markdown editing behavior, and editor shell widgets while `core` keeps the compatibility surface during the pre-1.0 split.
 - Official content extensions should convert external formats into `Document`: `packages/markdown` provides the first adapter as the `markdown` package.
 - `packages/terminal`, `packages/diff`, `packages/media`, and `packages/game` provide terminal-output, unified-diff, media, and game-specific helpers while keeping application policy separate.
 
@@ -91,7 +95,7 @@ Run from any application example directory:
 scripts/release_gate.sh
 ```
 
-The gate runs parser tests, extension tests, core tests, event script validation, golden snapshot validation, API baseline checks, example builds, smoke checks, and pressure-oriented scenarios.
+The gate runs parser tests, extension tests, core tests, event script validation, golden snapshot validation, API baseline checks, Unicode generated-data drift checks, example builds, smoke checks, and pressure-oriented scenarios.
 
 `packages/markdown` depends on the in-repository `packages/cj_markdown` parser package, so a clean checkout can run the full gate without a sibling parser checkout.
 
@@ -102,6 +106,7 @@ The gate runs parser tests, extension tests, core tests, event script validation
 - `List` and `Table` still accept direct `selected`/`offset` style arguments where supported; pass `ListState` or `TableState` when selection and scrolling should persist across frames.
 - `Input` supports placeholder text, helper methods such as `setValue()`/`clear()`, and horizontal viewport adjustment so the cursor remains visible in narrow areas.
 - `TextArea` supports multiline editing, multi-caret and mouse selection, paste insertion, find next/previous, word movement, cursor movement, PageUp/PageDown, Ctrl+A/Ctrl+E, optional line numbers with click navigation, fold ranges, async completion results, and vertical scrolling.
+- `displayWidth`, `graphemeClusters`, `nextGraphemeOffset`, and `previousGraphemeOffset` use Unicode 17.0.0 grapheme-break data for cursor movement, truncation, wrapping, and `TextBuffer` deletion. The release gate checks the generated tables and the full official `GraphemeBreakTest.txt` fixture.
 - `Paragraph` supports `WrapMode.NoWrap`, `WrapMode.Word`, `WrapMode.Character`, and `TextAlign.Left`/`Center`/`Right`.
 - `Color.Rgb(r, g, b)` renders true color SGR sequences.
 - `Theme.default()` provides normal/focused/selected/disabled/error/accent styles for newer form widgets.
@@ -119,4 +124,4 @@ The gate runs parser tests, extension tests, core tests, event script validation
 
 ## Platform Notes
 
-The default driver and default event waiter target Linux/glibc. `TerminalMode` uses fixed Linux/glibc `termios` and `winsize` layouts through direct FFI to libc, and `LinuxEpollEventWaiter` uses epoll for idle waits and external event sources. `FallbackTerminalDriver` plus a custom or `NoopEventWaiter` provides a conservative no-raw-mode path for unsupported platforms. Use `TerminalSession` to restore raw mode, cursor visibility, mouse mode, paste mode, and the alternate screen on normal exit or exceptions.
+Default terminal setup is selected through `defaultTerminalDriver()` and `defaultEventWaiter()`. Linux/glibc selects `LinuxTerminalDriver` plus `LinuxEpollEventWaiter`; macOS selects `MacOSTerminalDriver` plus `MacOSPollEventWaiter`; Windows selects `WindowsTerminalDriver` plus `WindowsConsoleEventWaiter` for console input/deadline waiting. Windows external event-source readiness remains experimental because `EventSource` exposes POSIX-style file descriptors. `TerminalMode` is the Linux/glibc raw-mode implementation; `MacOSTerminalMode` uses Darwin termios with `cfmakeraw()` and `poll()`; `WindowsConsoleMode` preserves Win32 console modes while enabling virtual terminal input/output. Use `TerminalSession` to restore raw mode, cursor visibility, mouse mode, paste mode, and the alternate screen on normal exit or exceptions.

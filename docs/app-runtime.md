@@ -16,7 +16,8 @@ Commands:
 - `Command.Message(text)`: feed `Event.Message(text)` back into update.
 - `Command.Async(name)`: compatibility helper; starts a task that completes with `Event.Message("async:" + name)`.
 - `Command.AsyncTask(id, task)`: spawn a Cangjie task and report `AsyncStarted`, then `AsyncCompleted`, `AsyncFailed`, or `AsyncCancelled`.
-- `Command.AsyncExec(id, text)`: run a command in an async task and return an `ExecResult` through `AsyncCompleted`.
+- `Command.AsyncExec(id, text)`: convenience helper that splits a simple command line, runs it in an async task, and returns an `ExecResult` through `AsyncCompleted`.
+- `Command.AsyncExecArgs(id, program, args)`: run `program` with explicit argv in an async task and return an `ExecResult` through `AsyncCompleted`.
 - `Command.CancelAsync(id)`: request cooperative cancellation for a pending async task.
 - `Command.PtyStart(id, spec)`: start a PTY process through the configured `PtyRuntime`.
 - `Command.PtyWrite(id, bytes)`: write bytes to the PTY master stream.
@@ -26,8 +27,11 @@ Commands:
 - `Command.StartTimer(TimerSpec(id, every, mode, missPolicy))`: start a real Duration-based timer.
 - `Command.StopTimer(id)`: stop a timer.
 - `Command.RestartTimer(spec)`: replace an existing timer with a new schedule.
-- `Command.Exec(text)`: split a simple command line, run it synchronously with `std.process.executeWithOutput`, and feed `Event.ExecResult(command, code, output)` back into update.
+- `Command.Exec(text)`: convenience helper that splits a simple command line, runs it synchronously with `std.process.executeWithOutput`, and feeds `Event.ExecResult(command, code, output)` back into update.
+- `Command.ExecArgs(id, program, args)`: run `program` with explicit argv synchronously and feed `Event.ExecResult(id, code, output)` back into update.
 - `Command.Batch(commands)`: enqueue commands in order. Nested batches are flattened by the public command queue path, including batches passed directly to `App.processCommandsWithEvents`.
+
+Prefer the `*ExecArgs` variants when command names or arguments come from user input, file paths, or structured application state. The string-based `Exec` and `AsyncExec` variants are convenience APIs for short literal commands and use only the library's simple command-line splitter.
 
 Component routing:
 
@@ -36,6 +40,13 @@ Component routing:
 - `HandleResult.consumed()` stops focused/component propagation without exiting.
 - `HandleResult.exit()` requests app exit.
 - `HandleResult.withCommand(command)` consumes the event and queues an effect when routed through `EventRouter.handleResult()`.
+- `RuntimeComponent` is the stateful component-tree interface for mount/unmount, resize, update, render, and optional focus id.
+- `ComponentHost` owns component nodes, routes focused keys and component timers, maps local `Dirty` values to global `DirtyRects`, skips rendering nodes outside the current dirty region, and exposes `ComponentProfile` counters for update/render/timer activity.
+- `ComponentLayoutProvider` controls how a host area is split across mounted components. The default `VerticalComponentLayoutProvider` keeps the historical vertical equal split; applications can inject a provider for sidebars, main panes, status bars, popups, or other app-specific placement.
+- `ComponentContext.startTimer()` registers component-scoped timers. Host timer ids use the `component:<componentId>:<timerId>` form and are delivered back to the component as `Event.ComponentTick`.
+- `ComponentContext.pollAsync()`, `AsyncPoller`, and `IdleTask` are compatibility background sampling hooks. `DataSource<T>` / `AsyncDataSource<T>` are the preferred typed path: they keep `latest`, `version`, `stale`, `error`, and pending state, suppress duplicate pending refreshes, support debounce/idle guards, and route completion to the owning component as `Event.DataReady`, `Event.DataFailed`, or `Event.DataCancelled`.
+- `ComponentProfiler` records component update/render/timer/async activity plus pending datasource and last-error state. `ComponentHost.profilerSnapshot()` returns a testable snapshot with lookup and sorted views, and `ProfilerOverlay` renders a compact in-app view of the hottest components.
+- `Dirty.Clean`, `Dirty.Self`, `Dirty.Local(rect)`, `Dirty.LocalRows(rows)`, and `Dirty.Global(rects)` let a child describe local invalidation without knowing its absolute screen position.
 
 Real-time ticks:
 
@@ -56,16 +67,29 @@ Frame metrics and debug overlay:
 Terminal input:
 
 - `KeyboardOptions` controls enhanced keyboard protocol mode (`Basic`, `ModifyOtherKeys`, `Kitty`, or `Auto`) and probe mode (`Disabled`, `EnvOnly`, or `Active`).
+- Active probing uses `TerminalProbe.run()` with an injected `InputSource`; probe response bytes are consumed by the probe and are not passed to the normal `EventParser`. `KeyboardOptions.probeBudgetMillis` is clamped to 100ms.
 - `KeyboardOptions.escDelayMillis` controls how long the app loop waits before treating a bare `Esc` byte as `KeyCode.Esc`; `Esc` followed by a printable or control byte is parsed as an Alt-modified key.
+- `App` enables bracketed paste by default. Pass `bracketedPaste: false` only for applications that intentionally want pasted bytes parsed as normal key input.
+- `App(inputSource: ..., terminalDriver: ..., probeInputSource: ...)` injects parser input, terminal mode/capability behavior, and active-probe input independently. This is the preferred path for deterministic app tests and custom terminal backends.
 - `App(mouseMove: true, focusEvents: true, keyboard: KeyboardOptions(...))` enables mouse move tracking, focus events, and enhanced key reporting through `TerminalSession`.
 - `Event.Capabilities(TerminalCapabilities)` is emitted once at startup so applications can choose color, image, keyboard, and refresh fallbacks.
+
+Convenience entry points:
+
+- `defaultApp()` returns `App()` with the platform-selected backend driver, diff renderer, raw-mode session, bracketed paste, and default event waiter.
+- `runApp(render, update)` and `runAppWithCommands(render, update)` run the default app without manually constructing `App`.
 
 Event waiting:
 
 - `EventWaiter` is the idle-wait abstraction used by `App` after it drains commands, timers, async tasks, and parsed input.
-- `LinuxEpollEventWaiter` is the default implementation. It waits on stdin and `PtyRuntime.sources()` / other `EventSource` file descriptors.
+- `defaultEventWaiter()` selects the default implementation: `LinuxEpollEventWaiter` on Linux/glibc, `MacOSPollEventWaiter` on macOS, and `WindowsConsoleEventWaiter` on Windows for console input and deadline waits.
+- `defaultTerminalDriver()` selects the matching terminal mode implementation: Linux termios, macOS termios, or the experimental Windows VT console driver.
+- `LinuxEpollEventWaiter` waits on stdin and `PtyRuntime.sources()` / other `EventSource` file descriptors.
+- `MacOSPollEventWaiter` waits on stdin and injected `EventSource` file descriptors through `poll()`.
+- `WindowsConsoleEventWaiter` waits on the Windows console input handle and timer deadlines. External `EventSource` readiness on Windows should use a custom waiter until the source interface grows native HANDLE support.
 - `NoopEventWaiter` is useful for deterministic tests or unsupported platforms where terminal input is not available.
 - `App` closes the configured waiter on normal exit and when render/update throws.
+- When resize polling is enabled, `App(resizePollEvery: Duration.millisecond * 250)` controls the idle resize check cadence. Tick deadlines, timers, async polling, and resize polling all participate in the same minimum-timeout calculation, so a long resize poll interval does not delay ticks.
 
 Async events:
 
@@ -73,6 +97,14 @@ Async events:
 - `Event.AsyncCompleted(id, event)`
 - `Event.AsyncFailed(id, message)`
 - `Event.AsyncCancelled(id)`
+
+Component-scoped async ids generated by `ComponentContext.pollAsync()` are implementation detail strings. Components normally see the completion through their own `update(Event.AsyncCompleted(localId, event), ctx)` path.
+
+Data source events:
+
+- `Event.DataReady(sourceId, version)`
+- `Event.DataFailed(sourceId, version, message)`
+- `Event.DataCancelled(sourceId, version)`
 
 Text completion events:
 

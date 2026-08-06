@@ -5,6 +5,12 @@ import std.unittest.testmacro.*
 
 @Test
 class MarkdownParserTest {
+    private var rngState: Int64 = 20260804
+
+    private func nextRandom(): Int64 {
+        rngState = (rngState * 1103515245 + 12345) % 2147483647
+        rngState
+    }
     @TestCase
     func parsesBlockKindsAndMetadata(): Unit {
         let doc = parseMarkdown("# Title ###\n\n- item\n  1. ordered\n> quote\n```cj\nmain\n```\n| a | b |\n| :--- | ---: |\n| c | d |")
@@ -273,6 +279,38 @@ class MarkdownParserTest {
     }
 
     @TestCase
+    func parsesChineseListItemsRuneSafe(): Unit {
+        // Regression: the task-marker check sliced the line with a character
+        // index on UTF-8 bytes; a multi-byte character right after the list
+        // marker split a rune and threw IllegalArgumentException. Parsing
+        // must succeed and keep the full text.
+        let doc = parseMarkdown("- 🎯 中文任务\n- [x] ✅ 已完成\n12. 有序中文项")
+        var sawUnchecked = false
+        var sawChecked = false
+        var sawOrdered = false
+        for (block in doc.blocks) {
+            match (block.kind) {
+                case MarkdownBlockKind.List =>
+                    for (child in block.children) {
+                        match (child.kind) {
+                            case MarkdownBlockKind.TaskListItem(checked, _) =>
+                                sawChecked = checked
+                                @Expect(child.text, "✅ 已完成")
+                            case MarkdownBlockKind.ListItem(ordered, _) =>
+                                if (ordered) { sawOrdered = true }
+                                if (child.text == "🎯 中文任务") { sawUnchecked = true }
+                            case _ => ()
+                        }
+                    }
+                case _ => ()
+            }
+        }
+        @Expect(sawUnchecked)
+        @Expect(sawChecked)
+        @Expect(sawOrdered)
+    }
+
+    @TestCase
     func nestsListItemsAndIndentedBlockQuotes(): Unit {
         let doc = parseMarkdown("- parent\n  - child\n    - grandchild")
         match (doc.blocks[0].kind) {
@@ -328,6 +366,78 @@ class MarkdownParserTest {
                 }
                 @Expect(doc.blocks[0].children[1].text, "第二项")
             case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func parsesUtf8BoundarySamples(): Unit {
+        // Shared UTF-8 boundary corpus (mirrored in cj_tui core lib_test.cj
+        // and agent_tui tui.cj headless): every parse must succeed (no
+        // split-rune exceptions) and keep the sample's marker text.
+        let samples = [
+            ("ascii", "plain ascii body\n\n- item one\n- item two\n\n# Heading\n\n```cj\nmain()\n```\n", "item one"),
+            ("two-byte", "Café résumé naïve €50\n\n- édition spéciale\n- piñata ñoño\n", "édition spéciale"),
+            ("three-byte", "中文标题\n\n- 列表项一\n- 列表项二\n\n## 二级标题\n\n| 列A | 列B |\n| --- | --- |\n| 甲 | 乙 |\n\n这是一段很长的中文内容。\n", "列表项一"),
+            ("four-byte", "🎯 任务列表\n\n- 🎯 任务一\n- [x] ✅ 已完成\n- 🚀 启动\n\n> 引用 🎉\n", "任务一"),
+            ("zwj", "家庭 👨👩👧 组合\n\n- 👨👩👧 三个人\n- 组合 🧑🤝🧑 与 🇨🇳\n", "👨👩👧 三个人"),
+            ("mixed-long", "🚀 综合样本\n\n# 标题一\n\n- 🎯 中文任务 éé\n- [x] ✅ 完成项\n- 👨👩👧 家庭项\n\n## 二级 **加粗中文**\n\n1. 有序一\n2. 有序二\n\n```\n代码块中文\n```\n\n| 名称 | 状态 |\n| --- | --- |\n| 中文 | ✅ |\n\n很长的一段内容…\n", "中文任务 éé")
+        ]
+        for (sample in samples) {
+            let doc = parseMarkdown(sample[1])
+            @Expect(doc.blocks.size > 0)
+            var sawMarker = false
+            for (block in doc.blocks) {
+                if (collectBlockText(block).contains(sample[2])) {
+                    sawMarker = true
+                }
+            }
+            if (!sawMarker) {
+                println("utf8 sample marker missing: " + sample[0])
+            }
+            @Expect(sawMarker)
+        }
+    }
+
+    private func collectBlockText(block: MarkdownBlock): String {
+        var out = block.text
+        for (child in block.children) {
+            out += collectBlockText(child)
+        }
+        out
+    }
+
+    @TestCase
+    func fuzzesUtf8MarkdownDeterministically(): Unit {
+        // Fixed-seed pseudo-random markdown over a mixed ASCII / 2-byte /
+        // 3-byte / 4-byte / ZWJ character table. Parsing must never throw;
+        // failures print the sample index and its text for reproduction.
+        let chars = [
+            "a", "b", "c", "d", "e", "1", "2", "3", " ", " ",
+            "-", "*", "#", ">", "|", "`", "[", "]", "(", ")",
+            "_", "~", ".", "+", "\n", "é", "ñ", "€", "中", "文",
+            "任", "务", "🎯", "✅", "🚀", "👨👩👧"
+        ]
+        for (sampleNo in 0..120) {
+            var text = ""
+            let lines = 3 + (nextRandom() % 8)
+            for (l in 0..lines) {
+                let count = 2 + (nextRandom() % 24)
+                for (c in 0..count) {
+                    text += chars[Int64(nextRandom() % chars.size)]
+                }
+                if (l + 1 < lines) { text += "\n" }
+            }
+            var ok = false
+            try {
+                let doc = parseMarkdown(text)
+                ok = true
+            } catch (_: Exception) {
+                println("utf8 fuzz sample " + sampleNo.toString() + " threw")
+            }
+            if (!ok) {
+                println("---- sample text ----\n" + text)
+                @Expect(false)
+            }
         }
     }
 }
