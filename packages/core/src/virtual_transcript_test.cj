@@ -43,6 +43,18 @@ class VirtualTranscriptTests {
     }
 
     @TestCase
+    func defaultRenderingDoesNotEventuallyMaterializeTheWholeSource(): Unit {
+        let source = CountingTranscriptSource(1000)
+        let view = VirtualTranscriptView(source)
+        let backend = TestBackend(area: Rect(0, 0, 80, 20))
+        let terminal = Terminal(backend, renderMode: RenderMode.Diff)
+        for (_ in 0..150) {
+            _ = terminal.draw { frame => frame.renderWidget(view, frame.area) }
+        }
+        @Expect(source.documentCalls < 128)
+    }
+
+    @TestCase
     func streamingRevisionInvalidatesOnlyChangedCard(): Unit {
         let source = CountingTranscriptSource(10000)
         let state = VirtualTranscriptState()

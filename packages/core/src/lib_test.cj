@@ -95,6 +95,23 @@ class RecordingInputSource <: InputSource {
     }
 }
 
+class BufferedInputSource <: InputSource {
+    private let bytes: Array<Byte>
+    private var offset: Int64 = 0
+
+    init(bytes: Array<Byte>) {
+        this.bytes = bytes
+    }
+
+    public func readAvailable(maxBytes: Int64): Array<Byte> {
+        if (maxBytes <= 0 || offset >= bytes.size) { return [] }
+        let end = min(bytes.size, offset + maxBytes)
+        let chunk = bytes[offset..end]
+        offset = end
+        chunk
+    }
+}
+
 class CountingWidget <: Widget {
     var renders: Int64 = 0
     let text: String
@@ -696,9 +713,8 @@ class CjTuiCoreTest {
     @TestCase
     func eventParserReadsFromInjectedInputSource(): Unit {
         let parser = EventParser(inputSource: ChunkedInputSource([[0x1B, b'['], [b'A']]))
-        @Expect(parser.readEvents().size, 0)
         let events = parser.readEvents()
-        @Expect(parser.lastReadBytes(), 1)
+        @Expect(parser.lastReadBytes(), 3)
         @Expect(events.size, 1)
         match (events[0]) {
             case Event.KeyDown(key) => match (key.code) {
@@ -715,6 +731,30 @@ class CjTuiCoreTest {
         let parser = EventParser(inputSource: input)
         @Expect(parser.readEvents().size, 0)
         @Expect(input.maximumRequested, 4096)
+    }
+
+    @TestCase
+    func eventParserContinuesAfterBoundedEdgeTriggeredDrain(): Unit {
+        let bytes = Array<Byte>(70000, repeat: b'a')
+        bytes[0] = 0x1B
+        bytes[1] = b'['
+        bytes[2] = b'2'
+        bytes[3] = b'0'
+        bytes[4] = b'0'
+        bytes[5] = b'~'
+        bytes[69994] = 0x1B
+        bytes[69995] = b'['
+        bytes[69996] = b'2'
+        bytes[69997] = b'0'
+        bytes[69998] = b'1'
+        bytes[69999] = b'~'
+        let parser = EventParser(inputSource: BufferedInputSource(bytes))
+        @Expect(parser.readEvents().size, 0)
+        @Expect(parser.lastReadBytes(), 65536)
+        @Expect(parser.hasPendingInputDrain())
+        @Expect(parser.readEvents().size, 1)
+        @Expect(parser.lastReadBytes(), 4464)
+        @Expect(!parser.hasPendingInputDrain())
     }
 
     @TestCase
@@ -3594,6 +3634,46 @@ class CjTuiCoreTest {
         }
         @Expect(caught)
         @Expect(waiter.closed)
+    }
+
+    @TestCase
+    func appClosesOnlyPtysStartedByItsOwnSession(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let runtime = FakePtyRuntime()
+        match (runtime.start("external", PtySpec("/bin/sh"))) {
+            case Event.PtyStarted(_) => ()
+            case _ => @Expect(false)
+        }
+        let app = App(
+            backend: backend,
+            ptyRuntime: runtime,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false
+        )
+        app.runWithCommands(
+            { frame => frame.renderWidget(Paragraph("pty"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.Capabilities(_) => UpdateResult.withCommand(Command.Batch([
+                        Command.PtyStart("owned", PtySpec("/bin/sh")),
+                        Command.Quit
+                    ]))
+                    case _ => UpdateResult.next()
+                }
+            }
+        )
+        @Expect(runtime.activeCount(), 1)
+        match (runtime.fakeProcess("external")) {
+            case Some(_) => @Expect(true)
+            case None => @Expect(false)
+        }
+        match (runtime.fakeProcess("owned")) {
+            case Some(_) => @Expect(false)
+            case None => @Expect(true)
+        }
+        _ = runtime.close("external")
     }
 
     @TestCase

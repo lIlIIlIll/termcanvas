@@ -129,6 +129,40 @@ public enum Command {
 class TerminalLifecycleRequests {
     var resetRequested: Bool = false
     var suspendRequested: Bool = false
+    private let ownedPtys = ArrayList<String>()
+
+    func trackPty(id: String): Unit {
+        for (owned in ownedPtys) {
+            if (owned == id) { return }
+        }
+        ownedPtys.add(id)
+    }
+
+    func releasePty(id: String): Unit {
+        var index: Int64 = 0
+        while (index < ownedPtys.size) {
+            if (ownedPtys[index] == id) {
+                ownedPtys.remove(at: index)
+                return
+            }
+            index++
+        }
+    }
+
+    func closeOwnedPtys(runtime: PtyRuntime): Unit {
+        var index = ownedPtys.size
+        while (index > 0) {
+            index--
+            let id = ownedPtys[index]
+            try {
+                _ = runtime.close(id)
+            } catch (_: Exception) {
+                // Session shutdown is best effort.  Continue closing the
+                // remaining PTYs and preserve the primary application error.
+            }
+        }
+        ownedPtys.clear()
+    }
 }
 
 public struct FrameMetrics {
@@ -319,6 +353,10 @@ public class TimerRuntime {
         }
         best
     }
+
+    func clear(): Unit {
+        timers.clear()
+    }
 }
 
 func durationMillis(duration: Duration): Int64 {
@@ -413,6 +451,13 @@ public class AsyncRuntime {
 
     public func pendingCount(): Int64 {
         tasks.size
+    }
+
+    func cancelAll(): Unit {
+        for (task in tasks) {
+            task.cancelRequested = true
+            task.future.cancel()
+        }
     }
 }
 
@@ -1816,7 +1861,11 @@ public class App {
                 while (running) {
                     let loopStartedAt = MonoTime.now()
                     let loopInterval = (loopStartedAt - lastLoopStartedAt).toNanoseconds()
-                    if (loopInterval > 100_000_000) {
+                    // A deliberate blocking wait is idle time, not an event
+                    // loop stall. Reporting every normal 250 ms wait creates
+                    // diagnostic traffic while the application is otherwise
+                    // quiescent and obscures actual render/update stalls.
+                    if (lastLoopTask != "event_wait" && loopInterval > 100_000_000) {
                         match (traceSink) {
                             case Some(trace) => trace.eventLoopStall(lastLoopTask, loopInterval)
                             case None => ()
@@ -2013,6 +2062,51 @@ public class App {
                             running = nextRunning
                             dirty = dirty || changed
                         }
+                        // A large decoded burst can otherwise force a full
+                        // render after every queued event.  Once the backlog
+                        // crosses the high-water mark, preserve event order
+                        // but consume the current decoded snapshot (up to a
+                        // fixed fairness cap) before the next paint. A time
+                        // slice here can repeatedly interleave an expensive
+                        // paint with a growing backlog, so it does not provide
+                        // fairness in practice. Small interactive bursts retain
+                        // the existing paint-between-keys behavior.
+                        if (running && pendingInputEvents.size - pendingInputIndex >= 4) {
+                            var batchCount: Int64 = 0
+                            while (
+                                running &&
+                                pendingInputIndex < pendingInputEvents.size &&
+                                batchCount < 256
+                            ) {
+                                let queuedEvent = pendingInputEvents[pendingInputIndex]
+                                pendingInputIndex++
+                                batchCount++
+                                let queuedResult = dispatchUpdate(
+                                    update,
+                                    queuedEvent,
+                                    max(0, pendingInputEvents.size - pendingInputIndex) + commandQueue.size
+                                )
+                                running = App.applyUpdateResult(
+                                    queuedResult,
+                                    commandQueue,
+                                    dirtySink: Some(pendingDirty)
+                                )
+                                dirty = dirty || queuedResult.renderRequested
+                                if (running) {
+                                    let (nextRunning, changed) = App.processCommandsWithLifecycle(
+                                        {event => dispatchUpdate(update, event, commandQueue.size)},
+                                        commandQueue,
+                                        asyncRuntime,
+                                        ptyRuntime,
+                                        timerRuntime,
+                                        Some(pendingDirty),
+                                        Some(lifecycle)
+                                    )
+                                    running = nextRunning
+                                    dirty = dirty || changed
+                                }
+                            }
+                        }
                     } else {
                             var flushed = false
                             let escPolls = max(1, keyboard.escDelayMillis / max(1, durationMillis(idleSleep)))
@@ -2037,14 +2131,22 @@ public class App {
                                     }
                                 }
                             }
-                            if (running && !flushed && commandQueue.size == 0) {
+                            if (running && !flushed && commandQueue.size == 0 && !parser.hasPendingInputDrain()) {
                                 lastLoopTask = "event_wait"
                                 eventWaiter.wait(waitTimeoutMillis(asyncRuntime, timerRuntime, nextTick), previousReadBytes: parser.lastReadBytes(), sources: ptyRuntime.sources())
                             }
                     }
                 }
             } finally {
-                eventWaiter.close()
+                timerRuntime.clear()
+                asyncRuntime.cancelAll()
+                lifecycle.closeOwnedPtys(ptyRuntime)
+                try {
+                    eventWaiter.close()
+                } catch (_: Exception) {
+                    // Do not replace the application/session failure with a
+                    // best-effort waiter cleanup failure.
+                }
             }
         }
     }
@@ -2189,7 +2291,15 @@ public class App {
                     }
                 case Command.PtyStart(id, spec) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(ptyRuntime.start(id, spec)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
+                    let event = ptyRuntime.start(id, spec)
+                    match (event) {
+                        case Event.PtyStarted(_) => match (lifecycle) {
+                            case Some(requests) => requests.trackPty(id)
+                            case None => ()
+                        }
+                        case _ => ()
+                    }
+                    if (!App.applyUpdateResult(update(event), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.PtyWrite(id, bytes) =>
                     changed = true
                     if (!App.applyUpdateResult(update(ptyRuntime.write(id, bytes)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
@@ -2201,7 +2311,15 @@ public class App {
                     if (!App.applyUpdateResult(update(ptyRuntime.signal(id, signal)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.PtyClose(id) =>
                     changed = true
-                    if (!App.applyUpdateResult(update(ptyRuntime.close(id)), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
+                    let event = ptyRuntime.close(id)
+                    match (event) {
+                        case Event.PtyExited(_, _) => match (lifecycle) {
+                            case Some(requests) => requests.releasePty(id)
+                            case None => ()
+                        }
+                        case _ => ()
+                    }
+                    if (!App.applyUpdateResult(update(event), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
                 case Command.StartTimer(spec) =>
                     timerRuntime.start(spec, MonoTime.now())
                 case Command.StopTimer(id) =>
@@ -2239,6 +2357,17 @@ public class App {
         }
         for (event in ptyRuntime.drain()) {
             changed = true
+            match (event) {
+                case Event.PtyExited(id, _) => match (lifecycle) {
+                    case Some(requests) => requests.releasePty(id)
+                    case None => ()
+                }
+                case Event.PtyFailed(id, _) => match (lifecycle) {
+                    case Some(requests) => requests.releasePty(id)
+                    case None => ()
+                }
+                case _ => ()
+            }
             if (!App.applyUpdateResult(update(event), commandQueue, dirtySink: dirtySink)) { return (false, changed) }
         }
         if (commandQueue.size > 0) {

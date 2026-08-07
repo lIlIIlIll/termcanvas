@@ -29,6 +29,9 @@ echo "==> golden snapshot files"
 echo "==> api index"
 "$ROOT/scripts/generate_api_index.sh" --check
 
+echo "==> versioned api contract"
+"$ROOT/scripts/generate_api_contract.sh" --check
+
 echo "==> unicode generated data"
 python3 "$ROOT/scripts/generate_unicode_tables.py" --check
 

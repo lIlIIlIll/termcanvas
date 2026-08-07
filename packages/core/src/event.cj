@@ -405,10 +405,11 @@ public class InputState {
 
 public class EventParser {
     private let inputSource: InputSource
-    private let pending = ArrayList<Byte>()
-    private let ready = ArrayList<Event>()
+    private var pending = ArrayList<Byte>()
+    private var ready = ArrayList<Event>()
     private var lastReadByteCount: Int64 = 0
     private var pendingEscPolls: Int64 = 0
+    private var inputDrainPending = false
 
     public init(inputSource!: InputSource = StdinInputSource()) {
         this.inputSource = inputSource
@@ -434,14 +435,26 @@ public class EventParser {
         // frames, so a later direction reversal appears seconds late.
         // Drain a normal terminal input burst in one pass; parsing remains
         // incremental when a paste or escape sequence exceeds this window.
-        let bytes = inputSource.readAvailable(4096)
-        lastReadByteCount = bytes.size
-        if (bytes.size > 0) {
+        var drained: Int64 = 0
+        inputDrainPending = false
+        while (drained < 65536) {
+            let bytes = inputSource.readAvailable(min(4096, 65536 - drained))
+            if (bytes.isEmpty()) {
+                break
+            }
+            drained += bytes.size
             for (event in parseBytes(bytes)) {
                 ready.add(event)
             }
             pendingEscPolls = 0
+            if (drained >= 65536) {
+                // A bounded drain keeps input floods fair to timers and PTYs.
+                // The App must immediately continue parsing rather than wait
+                // for a new EPOLLET edge while stdin may still be readable.
+                inputDrainPending = true
+            }
         }
+        lastReadByteCount = drained
         drainReady()
     }
 
@@ -462,6 +475,10 @@ public class EventParser {
 
     public func lastReadBytes(): Int64 {
         lastReadByteCount
+    }
+
+    public func hasPendingInputDrain(): Bool {
+        inputDrainPending
     }
 
     public func flushEsc(): Array<Event> {
@@ -737,8 +754,16 @@ public class EventParser {
     }
 
     private func drop(n: Int64): Unit {
-        for (_ in 0..n) {
-            pending.remove(at: 0)
+        let count = min(max(0, n), pending.size)
+        if (count == 0) { return }
+        if (count == pending.size) {
+            pending = ArrayList<Byte>()
+            return
+        }
+        let remaining = pending.toArray()[count..]
+        pending = ArrayList<Byte>()
+        for (byte in remaining) {
+            pending.add(byte)
         }
     }
 
@@ -778,9 +803,7 @@ public class EventParser {
 
     private func drainReady(): Array<Event> {
         let events = ready.toArray()
-        while (ready.size > 0) {
-            ready.remove(at: 0)
-        }
+        ready = ArrayList<Event>()
         events
     }
 }

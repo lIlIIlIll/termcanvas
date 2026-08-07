@@ -599,6 +599,13 @@ public class TerminalSession {
     private let keyboard: KeyboardOptions
     private var active: Bool = false
     private var rawActive: Bool = false
+    private var alternateActive: Bool = false
+    private var cursorHidden: Bool = false
+    private var mouseActive: Bool = false
+    private var mouseMoveActive: Bool = false
+    private var focusActive: Bool = false
+    private var pasteActive: Bool = false
+    private var keyboardActive: Bool = false
     private var lastProbe: ?TerminalProbeResult = None
 
     public prop rawModeEnabled: Bool { get() { rawActive } }
@@ -635,48 +642,52 @@ public class TerminalSession {
 
     public func start(): Bool {
         if (active) { return true }
-        if (alternateScreen) { backend.enterAlternateScreen() }
-        if (hideCursor) { backend.hideCursor() }
-        if (mouse) { backend.enableMouse() }
-        if (mouseMove) { backend.write("${ESC}[?1003h${ESC}[?1006h") }
-        if (focusEvents) { backend.write("${ESC}[?1004h") }
-        if (bracketedPaste) { backend.enableBracketedPaste() }
-        let rawOk = if (rawMode) { driver.enterRawMode() } else { true }
-        rawActive = rawMode && rawOk
-        if (rawMode && !rawOk) {
-            rollbackStartedModes()
-            return false
+        try {
+            if (alternateScreen) { backend.enterAlternateScreen(); alternateActive = true }
+            if (hideCursor) { backend.hideCursor(); cursorHidden = true }
+            if (mouse) { backend.enableMouse(); mouseActive = true }
+            if (mouseMove) { backend.write("${ESC}[?1003h${ESC}[?1006h"); mouseMoveActive = true }
+            if (focusEvents) { backend.write("${ESC}[?1004h"); focusActive = true }
+            if (bracketedPaste) { backend.enableBracketedPaste(); pasteActive = true }
+            let rawOk = if (rawMode) { driver.enterRawMode() } else { true }
+            rawActive = rawMode && rawOk
+            if (rawMode && !rawOk) {
+                let cleanupFailure = cleanupStartedModes()
+                if (cleanupFailure != "") {
+                    throw Exception("terminal raw mode failed; terminal rollback failed: ${cleanupFailure}")
+                }
+                return false
+            }
+            enableKeyboardProtocol()
+            keyboardActive = true
+            active = true
+            TerminalSignalGuard.activate(
+                raw: rawActive,
+                alternateScreen: alternateActive,
+                mouse: mouseActive,
+                mouseMove: mouseMoveActive,
+                focusEvents: focusActive,
+                bracketedPaste: pasteActive,
+                hideCursor: cursorHidden,
+                keyboard: keyboard
+            )
+            atExit { this.stop() }
+            rawOk
+        } catch (setup: Exception) {
+            let cleanupFailure = cleanupStartedModes()
+            if (cleanupFailure != "") {
+                throw Exception("terminal setup failed: ${setup.message}; terminal rollback failed: ${cleanupFailure}")
+            }
+            throw setup
         }
-        enableKeyboardProtocol()
-        active = true
-        TerminalSignalGuard.activate(
-            raw: rawActive,
-            alternateScreen: alternateScreen,
-            mouse: mouse,
-            mouseMove: mouseMove,
-            focusEvents: focusEvents,
-            bracketedPaste: bracketedPaste,
-            hideCursor: hideCursor,
-            keyboard: keyboard
-        )
-        atExit { this.stop() }
-        rawOk
     }
 
     public func stop(): Unit {
         if (!active) { return }
-        disableKeyboardProtocol()
-        if (rawMode) { driver.restore() }
-        rawActive = false
-        if (bracketedPaste) { backend.disableBracketedPaste() }
-        if (focusEvents) { backend.write("${ESC}[?1004l") }
-        if (mouseMove) { backend.write("${ESC}[?1003l${ESC}[?1006l") }
-        if (mouse) { backend.disableMouse() }
-        if (hideCursor) { backend.showCursor() }
-        if (alternateScreen) { backend.leaveAlternateScreen() }
-        backend.flush()
-        active = false
-        TerminalSignalGuard.deactivate()
+        let cleanupFailure = cleanupStartedModes()
+        if (cleanupFailure != "") {
+            throw Exception(cleanupFailure)
+        }
     }
 
     public func run(action: () -> Unit): Unit {
@@ -694,16 +705,44 @@ public class TerminalSession {
         }
     }
 
-    private func rollbackStartedModes(): Unit {
-        rawActive = false
-        if (bracketedPaste) { backend.disableBracketedPaste() }
-        disableKeyboardProtocol()
-        if (focusEvents) { backend.write("${ESC}[?1004l") }
-        if (mouseMove) { backend.write("${ESC}[?1003l${ESC}[?1006l") }
-        if (mouse) { backend.disableMouse() }
-        if (hideCursor) { backend.showCursor() }
-        if (alternateScreen) { backend.leaveAlternateScreen() }
-        backend.flush()
+    private func cleanupStartedModes(): String {
+        var failures = ""
+        if (keyboardActive) {
+            try { disableKeyboardProtocol() } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
+            keyboardActive = false
+        }
+        if (rawActive) {
+            try { driver.restore() } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
+            rawActive = false
+        }
+        if (pasteActive) {
+            try { backend.disableBracketedPaste() } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
+            pasteActive = false
+        }
+        if (focusActive) {
+            try { backend.write("${ESC}[?1004l") } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
+            focusActive = false
+        }
+        if (mouseMoveActive) {
+            try { backend.write("${ESC}[?1003l${ESC}[?1006l") } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
+            mouseMoveActive = false
+        }
+        if (mouseActive) {
+            try { backend.disableMouse() } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
+            mouseActive = false
+        }
+        if (cursorHidden) {
+            try { backend.showCursor() } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
+            cursorHidden = false
+        }
+        if (alternateActive) {
+            try { backend.leaveAlternateScreen() } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
+            alternateActive = false
+        }
+        try { backend.flush() } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
+        active = false
+        TerminalSignalGuard.deactivate()
+        failures
     }
 
     private func enableKeyboardProtocol(): Unit {
@@ -740,6 +779,14 @@ public class TerminalSession {
                     case _ => ()
                 }
         }
+    }
+}
+
+func appendCleanupFailure(current: String, error: Exception): String {
+    if (current == "") {
+        "terminal restore failed: " + error.message
+    } else {
+        current + "; " + error.message
     }
 }
 

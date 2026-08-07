@@ -175,6 +175,27 @@ public class VisibleRange {
     }
 }
 
+// A narrow, read-only diagnostics contract for profiling hosts. Keeping the
+// counters in one snapshot avoids growing the view API for every new probe.
+public class VirtualTranscriptMetrics {
+    public let materialized: Int64
+    public let cacheEntries: Int64
+    public let measuredEntries: Int64
+    public let cachedRows: Int64
+
+    public init(
+        materialized: Int64,
+        cacheEntries: Int64,
+        measuredEntries: Int64,
+        cachedRows: Int64
+    ) {
+        this.materialized = materialized
+        this.cacheEntries = cacheEntries
+        this.measuredEntries = measuredEntries
+        this.cachedRows = cachedRows
+    }
+}
+
 public class VirtualTranscriptView <: Widget {
     private let source: VirtualTranscriptSource
     public let state: VirtualTranscriptState
@@ -200,7 +221,7 @@ public class VirtualTranscriptView <: Widget {
         state!: VirtualTranscriptState = VirtualTranscriptState(),
         themeKey!: String = "default",
         overscanViewports!: Int64 = 2,
-        backgroundBatch!: Int64 = 8
+        backgroundBatch!: Int64 = 0
     ) {
         this.source = source
         this.state = state
@@ -253,6 +274,19 @@ public class VirtualTranscriptView <: Widget {
     }
 
     public func materializedCount(): Int64 { materializedCountValue }
+
+    public func metrics(): VirtualTranscriptMetrics {
+        var count: Int64 = 0
+        var rows: Int64 = 0
+        for (entry in entries where entry.measured) { count++ }
+        for (entry in entries where entry.measured) { rows += entry.rows.size }
+        VirtualTranscriptMetrics(
+            materializedCountValue,
+            entries.size,
+            count,
+            rows
+        )
+    }
 
     public func handle(key: KeyEvent): Bool {
         let page = max(1, viewportRows)
