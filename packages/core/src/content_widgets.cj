@@ -48,6 +48,12 @@ public class TranscriptCardTheme {
     public let borderStyle: Style
     public let borderBackground: Style
     public let topTitleStyle: Style
+    // Transcript hosts can opt individual items into a complete terminal
+    // frame or a borderless, full-width background block.  Defaults retain
+    // the historical left-rail rendering for existing clients.
+    public let fullFrame: Bool
+    public let fillBackground: Bool
+    public let contentPadding: Spacing
 
     public init(
         style!: Style = Style.default(),
@@ -58,7 +64,10 @@ public class TranscriptCardTheme {
         bodyLimit!: Int64 = 12,
         borderStyle!: Style = Style(fg: Color.Indexed(8)),
         borderBackground!: Style = Style.default(),
-        topTitleStyle!: Style = Style(modifier: Modifier.strong())
+        topTitleStyle!: Style = Style(modifier: Modifier.strong()),
+        fullFrame!: Bool = false,
+        fillBackground!: Bool = false,
+        contentPadding!: Spacing = Spacing.zero()
     ) {
         this.style = style
         this.titleStyle = titleStyle
@@ -69,6 +78,9 @@ public class TranscriptCardTheme {
         this.borderStyle = borderStyle
         this.borderBackground = borderBackground
         this.topTitleStyle = topTitleStyle
+        this.fullFrame = fullFrame
+        this.fillBackground = fillBackground
+        this.contentPadding = contentPadding
     }
 }
 

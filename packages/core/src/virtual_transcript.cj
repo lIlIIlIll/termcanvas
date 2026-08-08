@@ -79,6 +79,10 @@ class VirtualTranscriptCacheEntry {
     var height: Int64 = 1
     var chrome: Bool = false
     var compactChrome: Bool = false
+    var fullFrame: Bool = false
+    var fillBackground: Bool = false
+    var contentPadding: Spacing = Spacing.zero()
+    var footerRow: Bool = false
 }
 
 class TranscriptHeightIndex {
@@ -347,11 +351,41 @@ public class VirtualTranscriptView <: Widget {
                 )
                 var row = skip
                 var out: Int64 = 0
-                if (entry.chrome) {
-                    let entryTheme = match (source.itemCardTheme(index)) {
-                        case Some(value) => value
-                        case None => cardTheme
+                let entryTheme = match (source.itemCardTheme(index)) {
+                    case Some(value) => value
+                    case None => cardTheme
+                }
+                if (entry.fullFrame) {
+                    let totalRows = framedRowCount(entry)
+                    let footer = source.itemFooter(index)
+                    // Resolve the outer frame once for the whole card.  Body,
+                    // footer, empty-output and separator rows must all reuse
+                    // these absolute columns; content padding is strictly an
+                    // interior concern.
+                    let geometry = FullFrameGeometry(
+                        area.x,
+                        area.width,
+                        entry.contentPadding
+                    )
+                    buffer.fillRect(
+                        Rect(area.x, y, area.width, available),
+                        style: entryTheme.borderBackground
+                    )
+                    while (row < totalRows && out < available) {
+                        renderFullFrameRow(
+                            buffer,
+                            y + out,
+                            row,
+                            entry,
+                            footer,
+                            entryTheme,
+                            unicode,
+                            geometry
+                        )
+                        row++
+                        out++
                     }
+                } else if (entry.chrome) {
                     let totalRows = if (entry.compactChrome) { 1 } else { entry.rows.size + 2 }
                     buffer.fillRect(
                         Rect(area.x, y, area.width, available),
@@ -389,6 +423,26 @@ public class VirtualTranscriptView <: Widget {
                         } else {
                             buffer.setString(area.x, y + out, bodyRail, style: entryTheme.borderStyle)
                             renderStyledLine(buffer, area.x + (if (unicode) { 2 } else { 3 }), y + out, entry.rows[row - 1], area.width - (if (unicode) { 2 } else { 3 }))
+                        }
+                        row++
+                        out++
+                    }
+                } else if (entry.fillBackground) {
+                    buffer.fillRect(
+                        Rect(area.x, y, area.width, available),
+                        style: entryTheme.borderBackground
+                    )
+                    let contentStart = entry.contentPadding.top
+                    let contentEnd = contentStart + entry.rows.size
+                    while (row < max(1, entry.height - 1) && out < available) {
+                        if (row >= contentStart && row < contentEnd) {
+                            renderStyledLine(
+                                buffer,
+                                area.x + entry.contentPadding.left,
+                                y + out,
+                                entry.rows[row - contentStart],
+                                max(1, area.width - entry.contentPadding.left - entry.contentPadding.right)
+                            )
                         }
                         row++
                         out++
@@ -526,13 +580,35 @@ public class VirtualTranscriptView <: Widget {
             entry.width = itemWidth
             entry.themeKey = themeKey
             let usesChrome = cardChrome && source.itemUsesCardChrome(index)
+            let entryTheme = match (source.itemCardTheme(index)) {
+                case Some(value) => value
+                case None => cardTheme
+            }
             entry.chrome = usesChrome
             entry.compactChrome = usesChrome && source.itemUsesCompactCardChrome(index)
-            let contentWidth = if (usesChrome) { max(1, itemWidth - 2) } else { itemWidth }
+            entry.fullFrame = usesChrome && entryTheme.fullFrame
+            entry.fillBackground = !usesChrome && entryTheme.fillBackground
+            entry.contentPadding = entryTheme.contentPadding
+            entry.footerRow = entry.fullFrame && source.itemFooter(index) != ""
+            let chromeColumns = if (entry.fullFrame) {
+                2
+            } else if (usesChrome) {
+                2
+            } else {
+                0
+            }
+            let contentWidth = max(
+                1,
+                itemWidth - chromeColumns - entry.contentPadding.left - entry.contentPadding.right
+            )
             entry.document = source.document(index, contentWidth, themeKey)
             entry.rows = DocumentView(entry.document).layoutRows(contentWidth)
-            if (usesChrome) {
+            if (entry.fullFrame) {
+                entry.height = framedRowCount(entry) + 1
+            } else if (usesChrome) {
                 entry.height = if (entry.compactChrome) { 2 } else { max(1, entry.rows.size) + 3 }
+            } else if (entry.fillBackground) {
+                entry.height = entry.contentPadding.top + max(1, entry.rows.size) + entry.contentPadding.bottom + 1
             } else {
                 entry.height = max(1, entry.rows.size) + 1
             }
@@ -541,5 +617,133 @@ public class VirtualTranscriptView <: Widget {
             materializedCountValue++
         }
         entry
+    }
+}
+
+func framedRowCount(entry: VirtualTranscriptCacheEntry): Int64 {
+    2 + entry.contentPadding.top + entry.rows.size + entry.contentPadding.bottom + if (entry.footerRow) { 1 } else { 0 }
+}
+
+class FullFrameGeometry {
+    let leftBorderX: Int64
+    let rightBorderX: Int64
+    let contentX: Int64
+    let contentWidth: Int64
+    let cardWidth: Int64
+
+    init(x: Int64, width: Int64, padding: Spacing) {
+        cardWidth = max(0, width)
+        leftBorderX = x
+        rightBorderX = x + max(0, cardWidth - 1)
+        contentX = x + 1 + padding.left
+        contentWidth = max(
+            0,
+            cardWidth - 2 - padding.left - padding.right
+        )
+    }
+}
+
+func renderFullFrameRow(
+    buffer: Buffer,
+    y: Int64,
+    row: Int64,
+    entry: VirtualTranscriptCacheEntry,
+    footer: String,
+    theme: TranscriptCardTheme,
+    unicode: Bool,
+    geometry: FullFrameGeometry
+): Unit {
+    let x = geometry.leftBorderX
+    let width = geometry.cardWidth
+    if (width <= 0) { return }
+    let horizontal = if (unicode) { "─" } else { "-" }
+    let topLeft = if (unicode) { "╭" } else { "+" }
+    let topRight = if (unicode) { "╮" } else { "+" }
+    let bottomLeft = if (unicode) { "╰" } else { "+" }
+    let bottomRight = if (unicode) { "╯" } else { "+" }
+    let vertical = if (unicode) { "│" } else { "|" }
+    let separatorLeft = if (unicode) { "├" } else { "+" }
+    let separatorRight = if (unicode) { "┤" } else { "+" }
+    let totalRows = framedRowCount(entry)
+    if (row == 0) {
+        renderFrameRule(buffer, x, y, width, topLeft, topRight, horizontal, theme.borderStyle)
+        return
+    }
+    if (row == totalRows - 1) {
+        renderFrameRule(buffer, x, y, width, bottomLeft, bottomRight, horizontal, theme.borderStyle)
+        return
+    }
+    if (width == 1) {
+        buffer.setString(geometry.leftBorderX, y, vertical, style: theme.borderStyle)
+        return
+    }
+    let contentStart = 1 + entry.contentPadding.top
+    let contentEnd = contentStart + entry.rows.size
+    if (row >= contentStart && row < contentEnd) {
+        let line = entry.rows[row - contentStart]
+        if (line.horizontalRule) {
+            renderFrameRule(buffer, x, y, width, separatorLeft, separatorRight, horizontal, theme.borderStyle)
+            renderFrameRuleLabel(buffer, x, y, width, line.ruleLabel, theme.borderStyle)
+            return
+        } else {
+            if (geometry.contentWidth > 0) {
+                renderStyledLine(
+                    buffer,
+                    geometry.contentX,
+                    y,
+                    line,
+                    geometry.contentWidth
+                )
+            }
+        }
+    } else if (entry.footerRow && row == totalRows - 2 && geometry.contentWidth > 0) {
+        buffer.setString(
+            geometry.contentX,
+            y,
+            truncate(footer, geometry.contentWidth),
+            style: theme.mutedStyle
+        )
+    }
+    // Draw the outer sides last so neither styled content, a footer update,
+    // nor an empty-output row can erase or shift the frame columns.
+    buffer.setString(geometry.leftBorderX, y, vertical, style: theme.borderStyle)
+    buffer.setString(geometry.rightBorderX, y, vertical, style: theme.borderStyle)
+}
+
+func renderFrameRule(
+    buffer: Buffer,
+    x: Int64,
+    y: Int64,
+    width: Int64,
+    left: String,
+    right: String,
+    horizontal: String,
+    style: Style
+): Unit {
+    if (width <= 0) { return }
+    if (width == 1) {
+        buffer.setString(x, y, left, style: style)
+        return
+    }
+    buffer.setString(x, y, left + repeat(horizontal, max(0, width - 2)) + right, style: style)
+}
+
+func renderFrameRuleLabel(
+    buffer: Buffer,
+    x: Int64,
+    y: Int64,
+    width: Int64,
+    label: Array<RichSpan>,
+    borderStyle: Style
+): Unit {
+    let textWidth = displayWidth(spansText(label))
+    if (textWidth <= 0 || width < 7) { return }
+    let available = max(1, width - 6)
+    buffer.setString(x + 3, y, " ", style: borderStyle)
+    let rendered = StyledLine(label)
+    renderStyledLine(buffer, x + 4, y, rendered, available)
+    let shown = min(textWidth, available)
+    if (x + 4 + shown < x + width - 1) {
+        buffer.setString(x + 4 + shown, y, " ", style: borderStyle)
     }
 }

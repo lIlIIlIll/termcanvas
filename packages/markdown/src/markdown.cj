@@ -7,19 +7,31 @@ import core.{Document, DocumentLine, DocumentLineKind, DocumentTheme, DocumentVi
 import std.collection.*
 
 public class Markdown {
-    public static func parse(text: String, theme!: DocumentTheme = DocumentTheme()): Document {
-        markdownDocument(text, theme: theme)
+    public static func parse(
+        text: String,
+        theme!: DocumentTheme = DocumentTheme(),
+        preserveSoftBreaks!: Bool = false
+    ): Document {
+        markdownDocument(text, theme: theme, preserveSoftBreaks: preserveSoftBreaks)
     }
 }
 
-public func markdownDocument(text: String, theme!: DocumentTheme = DocumentTheme()): Document {
-    markdownAstToDocument(parseMarkdown(text), theme: theme)
+public func markdownDocument(
+    text: String,
+    theme!: DocumentTheme = DocumentTheme(),
+    preserveSoftBreaks!: Bool = false
+): Document {
+    markdownAstToDocument(parseMarkdown(text), theme: theme, preserveSoftBreaks: preserveSoftBreaks)
 }
 
-public func markdownAstToDocument(ast: MarkdownDocument, theme!: DocumentTheme = DocumentTheme()): Document {
+public func markdownAstToDocument(
+    ast: MarkdownDocument,
+    theme!: DocumentTheme = DocumentTheme(),
+    preserveSoftBreaks!: Bool = false
+): Document {
     let lines = ArrayList<DocumentLine>()
     for (block in ast.blocks) {
-        appendBlock(lines, block, theme, quoteDepth: 0)
+        appendBlock(lines, block, theme, quoteDepth: 0, preserveSoftBreaks: preserveSoftBreaks)
     }
     for (diagnostic in ast.diagnostics) {
         lines.add(
@@ -86,7 +98,13 @@ public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPrev
     MarkdownPreviewIndex(DocumentView(document).sourceOffsetsForRenderedLines(width))
 }
 
-func appendBlock(lines: ArrayList<DocumentLine>, block: MarkdownBlock, theme: DocumentTheme, quoteDepth!: Int64 = 0): Unit {
+func appendBlock(
+    lines: ArrayList<DocumentLine>,
+    block: MarkdownBlock,
+    theme: DocumentTheme,
+    quoteDepth!: Int64 = 0,
+    preserveSoftBreaks!: Bool = false
+): Unit {
     match (block.kind) {
         case MarkdownBlockKind.Blank => lines.add(DocumentLine(DocumentLineKind.Blank, "", quoteDepth: quoteDepth))
         case MarkdownBlockKind.Heading(level) => lines.add(
@@ -94,7 +112,7 @@ func appendBlock(lines: ArrayList<DocumentLine>, block: MarkdownBlock, theme: Do
                 inlineSpans(block.inlines, theme, theme.headingStyle(level), fallbackText: block.text,
                     source: block.range), quoteDepth: quoteDepth))
         case MarkdownBlockKind.List => for (child in block.children) {
-            appendBlock(lines, child, theme, quoteDepth: quoteDepth)
+            appendBlock(lines, child, theme, quoteDepth: quoteDepth, preserveSoftBreaks: preserveSoftBreaks)
         }
         case MarkdownBlockKind.ListItem(ordered, level) =>
             lines.add(
@@ -102,17 +120,18 @@ func appendBlock(lines: ArrayList<DocumentLine>, block: MarkdownBlock, theme: Do
                     indentedSpans(level,
                         inlineSpans(block.inlines, theme, theme.list, fallbackText: block.text, source: block.range),
                         theme.list), quoteDepth: quoteDepth))
-            appendChildren(lines, block.children, theme, quoteDepth: quoteDepth)
+            appendChildren(lines, block.children, theme, quoteDepth: quoteDepth, preserveSoftBreaks: preserveSoftBreaks)
         case MarkdownBlockKind.TaskListItem(checked, level) =>
             lines.add(
                 DocumentLine(DocumentLineKind.TaskListItem(checked),
                     indentedSpans(level,
                         inlineSpans(block.inlines, theme, theme.list, fallbackText: block.text, source: block.range),
                         theme.list), quoteDepth: quoteDepth))
-            appendChildren(lines, block.children, theme, quoteDepth: quoteDepth)
+            appendChildren(lines, block.children, theme, quoteDepth: quoteDepth, preserveSoftBreaks: preserveSoftBreaks)
         case MarkdownBlockKind.Quote =>
             if (block.children.size > 0) {
-                appendChildren(lines, block.children, theme, quoteDepth: quoteDepth + 1)
+                appendChildren(lines, block.children, theme, quoteDepth: quoteDepth + 1,
+                    preserveSoftBreaks: preserveSoftBreaks)
             } else {
                 lines.add(
                     DocumentLine(DocumentLineKind.Quote,
@@ -144,7 +163,7 @@ func appendBlock(lines: ArrayList<DocumentLine>, block: MarkdownBlock, theme: Do
                     )
                 )
             } else {
-                appendParagraphLines(lines, block, theme, quoteDepth)
+                appendParagraphLines(lines, block, theme, quoteDepth, preserveSoftBreaks)
             }
     }
 }
@@ -153,7 +172,8 @@ func appendParagraphLines(
     lines: ArrayList<DocumentLine>,
     block: MarkdownBlock,
     theme: DocumentTheme,
-    quoteDepth: Int64
+    quoteDepth: Int64,
+    preserveSoftBreaks: Bool
 ): Unit {
     let spans = ArrayList<RichSpan>()
     var sawHardBreak = false
@@ -163,6 +183,16 @@ func appendParagraphLines(
                 lines.add(DocumentLine(DocumentLineKind.Paragraph, spans.toArray(), quoteDepth: quoteDepth))
                 spans.clear()
                 sawHardBreak = true
+            case MarkdownInlineKind.SoftBreak =>
+                if (preserveSoftBreaks) {
+                    lines.add(DocumentLine(DocumentLineKind.Paragraph, spans.toArray(), quoteDepth: quoteDepth))
+                    spans.clear()
+                    sawHardBreak = true
+                } else {
+                    for (span in inlineSpans([item], theme, theme.paragraph)) {
+                        spans.add(span)
+                    }
+                }
             case _ => for (span in inlineSpans([item], theme, theme.paragraph)) {
                 spans.add(span)
             }
@@ -181,10 +211,15 @@ func appendParagraphLines(
     }
 }
 
-func appendChildren(lines: ArrayList<DocumentLine>, children: Array<MarkdownBlock>, theme: DocumentTheme,
-    quoteDepth!: Int64 = 0): Unit {
+func appendChildren(
+    lines: ArrayList<DocumentLine>,
+    children: Array<MarkdownBlock>,
+    theme: DocumentTheme,
+    quoteDepth!: Int64 = 0,
+    preserveSoftBreaks!: Bool = false
+): Unit {
     for (child in children) {
-        appendBlock(lines, child, theme, quoteDepth: quoteDepth)
+        appendBlock(lines, child, theme, quoteDepth: quoteDepth, preserveSoftBreaks: preserveSoftBreaks)
     }
 }
 

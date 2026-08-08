@@ -79,29 +79,29 @@ packages/core/src/app.cj:1800:    public func runWithCommands(render: (Frame) ->
 packages/core/src/app.cj:214:public class AppMetrics {
 packages/core/src/app.cj:219:    public func record(frame: FrameMetrics): Unit {
 packages/core/src/app.cj:223:    public func record(
-packages/core/src/app.cj:2473:public func defaultApp(): App {
-packages/core/src/app.cj:2477:public func runApp(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit {
-packages/core/src/app.cj:2481:public func runAppWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit {
-packages/core/src/app.cj:2486:public class LinuxEpollEventWaiter <: EventWaiter {
+packages/core/src/app.cj:2478:public func defaultApp(): App {
+packages/core/src/app.cj:2482:public func runApp(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit {
+packages/core/src/app.cj:2486:public func runAppWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit {
 packages/core/src/app.cj:248:    public func lastFrame(): ?FrameMetrics {
-packages/core/src/app.cj:2518:    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit {
+packages/core/src/app.cj:2491:public class LinuxEpollEventWaiter <: EventWaiter {
+packages/core/src/app.cj:2523:    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit {
 packages/core/src/app.cj:253:    public func frames(): Array<FrameMetrics> {
 packages/core/src/app.cj:257:    public func averageFps(): Int64 {
-packages/core/src/app.cj:2651:    public func close(): Unit {
-packages/core/src/app.cj:2687:public class MacOSPollEventWaiter <: EventWaiter {
-packages/core/src/app.cj:2692:    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit {
+packages/core/src/app.cj:2656:    public func close(): Unit {
+packages/core/src/app.cj:2692:public class MacOSPollEventWaiter <: EventWaiter {
+packages/core/src/app.cj:2697:    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit {
 packages/core/src/app.cj:270:    public func droppedTicks(): Int64 {
-packages/core/src/app.cj:2729:    public func close(): Unit {
+packages/core/src/app.cj:2734:    public func close(): Unit {
 packages/core/src/app.cj:277:    public func reset(): Unit {
-packages/core/src/app.cj:2851:public class FocusManager {
-packages/core/src/app.cj:2858:    public func add(id: String, enabled!: Bool = true): Unit {
-packages/core/src/app.cj:2866:    public func remove(id: String): Unit {
-packages/core/src/app.cj:2880:    public func focus(id: String): Bool {
-packages/core/src/app.cj:2887:    public func current(): ?String {
-packages/core/src/app.cj:2892:    public func isFocused(id: String): Bool {
-packages/core/src/app.cj:2899:    public func next(): ?String {
-packages/core/src/app.cj:2903:    public func previous(): ?String {
-packages/core/src/app.cj:2907:    public func handle(key: KeyEvent): Bool {
+packages/core/src/app.cj:2856:public class FocusManager {
+packages/core/src/app.cj:2863:    public func add(id: String, enabled!: Bool = true): Unit {
+packages/core/src/app.cj:2871:    public func remove(id: String): Unit {
+packages/core/src/app.cj:2885:    public func focus(id: String): Bool {
+packages/core/src/app.cj:2892:    public func current(): ?String {
+packages/core/src/app.cj:2897:    public func isFocused(id: String): Bool {
+packages/core/src/app.cj:2904:    public func next(): ?String {
+packages/core/src/app.cj:2908:    public func previous(): ?String {
+packages/core/src/app.cj:2912:    public func handle(key: KeyEvent): Bool {
 packages/core/src/app.cj:297:public class TimerRuntime {
 packages/core/src/app.cj:393:public class AsyncRuntime {
 packages/core/src/app.cj:398:    public func start(id: String, task: () -> Event): Event {
@@ -418,75 +418,75 @@ packages/core/src/container_widgets.cj:73:public class Overlay <: Widget {
 packages/core/src/container_widgets.cj:82:    public func render(area: Rect, buffer: Buffer): Unit {
 packages/core/src/container_widgets.cj:90:public class Padding <: Widget {
 packages/core/src/container_widgets.cj:99:    public func render(area: Rect, buffer: Buffer): Unit {
-packages/core/src/content_widgets.cj:1005:public class SoftWrapView <: Widget {
-packages/core/src/content_widgets.cj:1012:    public func render(area: Rect, buffer: Buffer): Unit {
-packages/core/src/content_widgets.cj:1017:public class TextEditor <: Widget {
-packages/core/src/content_widgets.cj:1028:    public func handle(key: KeyEvent): Bool { area.handle(key) }
-packages/core/src/content_widgets.cj:1030:    public func render(areaRect: Rect, buffer: Buffer): Unit {
-packages/core/src/content_widgets.cj:118:public class Transcript {
-packages/core/src/content_widgets.cj:125:    public func append(item: TranscriptItem): Unit {
-packages/core/src/content_widgets.cj:129:    public func size(): Int64 {
-packages/core/src/content_widgets.cj:133:    public func get(index: Int64): ?TranscriptItem {
-packages/core/src/content_widgets.cj:137:    public func toArray(): Array<TranscriptItem> {
-packages/core/src/content_widgets.cj:141:    public func toggleCollapsed(id: String): Bool {
-packages/core/src/content_widgets.cj:152:public class TranscriptView <: Widget {
+packages/core/src/content_widgets.cj:1003:public class SyntaxHighlighter {
+packages/core/src/content_widgets.cj:1008:    public func add(rule: SyntaxRule): Unit { rules.add(rule) }
+packages/core/src/content_widgets.cj:1009:    public func styleFor(text: String): Style {
+packages/core/src/content_widgets.cj:1017:public class SoftWrapView <: Widget {
+packages/core/src/content_widgets.cj:1024:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:1029:public class TextEditor <: Widget {
+packages/core/src/content_widgets.cj:1040:    public func handle(key: KeyEvent): Bool { area.handle(key) }
+packages/core/src/content_widgets.cj:1042:    public func render(areaRect: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:130:public class Transcript {
+packages/core/src/content_widgets.cj:137:    public func append(item: TranscriptItem): Unit {
+packages/core/src/content_widgets.cj:141:    public func size(): Int64 {
+packages/core/src/content_widgets.cj:145:    public func get(index: Int64): ?TranscriptItem {
+packages/core/src/content_widgets.cj:149:    public func toArray(): Array<TranscriptItem> {
+packages/core/src/content_widgets.cj:153:    public func toggleCollapsed(id: String): Bool {
 packages/core/src/content_widgets.cj:15:public enum TranscriptItemStatus {
-packages/core/src/content_widgets.cj:182:    public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
-packages/core/src/content_widgets.cj:210:    public func render(area: Rect, buffer: Buffer): Unit {
-packages/core/src/content_widgets.cj:258:public class ComposerSubmit {
-packages/core/src/content_widgets.cj:265:public class Composer <: Widget {
-packages/core/src/content_widgets.cj:288:    public func handle(key: KeyEvent): ?ComposerSubmit {
+packages/core/src/content_widgets.cj:164:public class TranscriptView <: Widget {
+packages/core/src/content_widgets.cj:194:    public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
+packages/core/src/content_widgets.cj:222:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:270:public class ComposerSubmit {
+packages/core/src/content_widgets.cj:277:public class Composer <: Widget {
+packages/core/src/content_widgets.cj:300:    public func handle(key: KeyEvent): ?ComposerSubmit {
 packages/core/src/content_widgets.cj:31:public class TranscriptCardOption {
-packages/core/src/content_widgets.cj:332:    public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool {
-packages/core/src/content_widgets.cj:341:    public func currentSlashHints(): Array<String> {
-packages/core/src/content_widgets.cj:350:    public func completionVisible(): Bool {
-packages/core/src/content_widgets.cj:354:    public func cancelCompletion(): Bool {
-packages/core/src/content_widgets.cj:358:    public func visualHeight(width: Int64, maximum: Int64): Int64 {
-packages/core/src/content_widgets.cj:366:    public func cursorPosition(areaRect: Rect): Position {
-packages/core/src/content_widgets.cj:387:    public func render(areaRect: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:344:    public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool {
+packages/core/src/content_widgets.cj:353:    public func currentSlashHints(): Array<String> {
+packages/core/src/content_widgets.cj:362:    public func completionVisible(): Bool {
+packages/core/src/content_widgets.cj:366:    public func cancelCompletion(): Bool {
+packages/core/src/content_widgets.cj:370:    public func visualHeight(width: Int64, maximum: Int64): Int64 {
+packages/core/src/content_widgets.cj:378:    public func cursorPosition(areaRect: Rect): Position {
+packages/core/src/content_widgets.cj:399:    public func render(areaRect: Rect, buffer: Buffer): Unit {
 packages/core/src/content_widgets.cj:41:public class TranscriptCardTheme {
-packages/core/src/content_widgets.cj:463:public class ActivityStep {
-packages/core/src/content_widgets.cj:477:public class ActivityTimeline <: Widget {
-packages/core/src/content_widgets.cj:486:    public func render(area: Rect, buffer: Buffer): Unit {
-packages/core/src/content_widgets.cj:502:public class RequestDialog <: Widget {
-packages/core/src/content_widgets.cj:519:    public func handle(key: KeyEvent): ?String {
-packages/core/src/content_widgets.cj:531:    public func render(area: Rect, buffer: Buffer): Unit {
-packages/core/src/content_widgets.cj:540:public type DecisionDialog = RequestDialog
-packages/core/src/content_widgets.cj:542:public func statusMark(
-packages/core/src/content_widgets.cj:581:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style {
-packages/core/src/content_widgets.cj:603:public func transcriptStatusLabel(status: TranscriptItemStatus): String {
-packages/core/src/content_widgets.cj:621:public func transcriptCardDocument(
+packages/core/src/content_widgets.cj:475:public class ActivityStep {
+packages/core/src/content_widgets.cj:489:public class ActivityTimeline <: Widget {
+packages/core/src/content_widgets.cj:498:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:514:public class RequestDialog <: Widget {
+packages/core/src/content_widgets.cj:531:    public func handle(key: KeyEvent): ?String {
+packages/core/src/content_widgets.cj:543:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:552:public type DecisionDialog = RequestDialog
+packages/core/src/content_widgets.cj:554:public func statusMark(
+packages/core/src/content_widgets.cj:593:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style {
+packages/core/src/content_widgets.cj:615:public func transcriptStatusLabel(status: TranscriptItemStatus): String {
+packages/core/src/content_widgets.cj:633:public func transcriptCardDocument(
 packages/core/src/content_widgets.cj:6:public enum TranscriptItemKind {
-packages/core/src/content_widgets.cj:75:public class TranscriptItem {
-packages/core/src/content_widgets.cj:781:public class SaveDiagnostic {
-packages/core/src/content_widgets.cj:791:public class EditorBuffer {
-packages/core/src/content_widgets.cj:808:    public func setReadOnly(readonly: Bool): Unit {
-packages/core/src/content_widgets.cj:813:    public func markSaved(path!: String = ""): Unit {
-packages/core/src/content_widgets.cj:820:    public func markSaveFailed(message: String): Unit {
-packages/core/src/content_widgets.cj:825:public class BufferSet {
-packages/core/src/content_widgets.cj:835:    public func size(): Int64 { buffers.size }
-packages/core/src/content_widgets.cj:837:    public func activeBuffer(): ?EditorBuffer {
-packages/core/src/content_widgets.cj:843:    public func add(buffer: EditorBuffer): Int64 {
-packages/core/src/content_widgets.cj:850:    public func openOrSelect(buffer: EditorBuffer): Int64 {
-packages/core/src/content_widgets.cj:863:    public func close(index: Int64): ?EditorBuffer {
-packages/core/src/content_widgets.cj:871:    public func next(): ?EditorBuffer {
-packages/core/src/content_widgets.cj:877:    public func previous(): ?EditorBuffer {
-packages/core/src/content_widgets.cj:883:    public func select(index: Int64): ?EditorBuffer {
-packages/core/src/content_widgets.cj:889:    public func remember(path: String): Unit {
-packages/core/src/content_widgets.cj:903:    public func recentFiles(): Array<String> {
-packages/core/src/content_widgets.cj:907:    public func tabTitles(): Array<String> {
-packages/core/src/content_widgets.cj:916:public class SearchPanel <: Widget {
-packages/core/src/content_widgets.cj:927:    public func updateFrom(buffer: TextBuffer): Unit {
-packages/core/src/content_widgets.cj:931:    public func render(area: Rect, buffer: Buffer): Unit {
-packages/core/src/content_widgets.cj:937:public class ReplacePanel <: Widget {
-packages/core/src/content_widgets.cj:949:    public func apply(buffer: TextBuffer): Int64 {
-packages/core/src/content_widgets.cj:954:    public func render(area: Rect, buffer: Buffer): Unit {
-packages/core/src/content_widgets.cj:960:public class TextDocumentView <: Widget {
-packages/core/src/content_widgets.cj:973:    public func render(area: Rect, buffer: Buffer): Unit {
-packages/core/src/content_widgets.cj:982:public class SyntaxRule {
-packages/core/src/content_widgets.cj:991:public class SyntaxHighlighter {
-packages/core/src/content_widgets.cj:996:    public func add(rule: SyntaxRule): Unit { rules.add(rule) }
-packages/core/src/content_widgets.cj:997:    public func styleFor(text: String): Style {
+packages/core/src/content_widgets.cj:793:public class SaveDiagnostic {
+packages/core/src/content_widgets.cj:803:public class EditorBuffer {
+packages/core/src/content_widgets.cj:820:    public func setReadOnly(readonly: Bool): Unit {
+packages/core/src/content_widgets.cj:825:    public func markSaved(path!: String = ""): Unit {
+packages/core/src/content_widgets.cj:832:    public func markSaveFailed(message: String): Unit {
+packages/core/src/content_widgets.cj:837:public class BufferSet {
+packages/core/src/content_widgets.cj:847:    public func size(): Int64 { buffers.size }
+packages/core/src/content_widgets.cj:849:    public func activeBuffer(): ?EditorBuffer {
+packages/core/src/content_widgets.cj:855:    public func add(buffer: EditorBuffer): Int64 {
+packages/core/src/content_widgets.cj:862:    public func openOrSelect(buffer: EditorBuffer): Int64 {
+packages/core/src/content_widgets.cj:875:    public func close(index: Int64): ?EditorBuffer {
+packages/core/src/content_widgets.cj:87:public class TranscriptItem {
+packages/core/src/content_widgets.cj:883:    public func next(): ?EditorBuffer {
+packages/core/src/content_widgets.cj:889:    public func previous(): ?EditorBuffer {
+packages/core/src/content_widgets.cj:895:    public func select(index: Int64): ?EditorBuffer {
+packages/core/src/content_widgets.cj:901:    public func remember(path: String): Unit {
+packages/core/src/content_widgets.cj:915:    public func recentFiles(): Array<String> {
+packages/core/src/content_widgets.cj:919:    public func tabTitles(): Array<String> {
+packages/core/src/content_widgets.cj:928:public class SearchPanel <: Widget {
+packages/core/src/content_widgets.cj:939:    public func updateFrom(buffer: TextBuffer): Unit {
+packages/core/src/content_widgets.cj:943:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:949:public class ReplacePanel <: Widget {
+packages/core/src/content_widgets.cj:961:    public func apply(buffer: TextBuffer): Int64 {
+packages/core/src/content_widgets.cj:966:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:972:public class TextDocumentView <: Widget {
+packages/core/src/content_widgets.cj:985:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/content_widgets.cj:994:public class SyntaxRule {
 packages/core/src/dashboard_widgets.cj:106:public class TimeSeriesChart <: Widget {
 packages/core/src/dashboard_widgets.cj:117:    public func render(area: Rect, buffer: Buffer): Unit {
 packages/core/src/dashboard_widgets.cj:130:public class HeaderBar <: Widget {
@@ -603,9 +603,9 @@ packages/core/src/document.cj:37:public class DocumentLine {
 packages/core/src/document.cj:385:    public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool {
 packages/core/src/document.cj:414:    public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64 {
 packages/core/src/document.cj:419:    public func render(area: Rect, buffer: Buffer): Unit {
-packages/core/src/document.cj:588:public class MarkdownView <: Widget {
+packages/core/src/document.cj:592:public class MarkdownView <: Widget {
 packages/core/src/document.cj:5:public class RichSpan {
-packages/core/src/document.cj:615:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/document.cj:619:    public func render(area: Rect, buffer: Buffer): Unit {
 packages/core/src/document.cj:84:public class Document {
 packages/core/src/dom_style.cj:11:public enum CssFlexDirection {
 packages/core/src/dom_style.cj:122:    public func patch(declarations: StyleDeclaration): ComputedStyle {
@@ -1184,44 +1184,56 @@ packages/core/src/text_buffer.cj:82:    public func lineCount(): Int64 {
 packages/core/src/text_buffer.cj:86:    public func line(index: Int64): String {
 packages/core/src/text_buffer.cj:91:    public func insert(position: TextPosition, text: String): TextPosition {
 packages/core/src/text_buffer.cj:98:    public func replace(range: TextRange, text: String): TextPosition {
-packages/core/src/virtual_transcript.cj:166:public class VisibleRange {
-packages/core/src/virtual_transcript.cj:180:public class VirtualTranscriptMetrics {
-packages/core/src/virtual_transcript.cj:199:public class VirtualTranscriptView <: Widget {
-packages/core/src/virtual_transcript.cj:234:    public func setThemeKey(value: String): Unit {
-packages/core/src/virtual_transcript.cj:240:    public func setCardChrome(enabled: Bool): Unit {
-packages/core/src/virtual_transcript.cj:248:    public func setUnicode(enabled: Bool): Unit {
-packages/core/src/virtual_transcript.cj:254:    public func setCardTheme(theme: TranscriptCardTheme): Unit {
-packages/core/src/virtual_transcript.cj:258:    public func invalidateItem(id: String): Bool {
-packages/core/src/virtual_transcript.cj:271:    public func totalRows(): Int64 {
-packages/core/src/virtual_transcript.cj:276:    public func materializedCount(): Int64 { materializedCountValue }
-packages/core/src/virtual_transcript.cj:278:    public func metrics(): VirtualTranscriptMetrics {
-packages/core/src/virtual_transcript.cj:291:    public func handle(key: KeyEvent): Bool {
-packages/core/src/virtual_transcript.cj:304:    public func render(area: Rect, buffer: Buffer): Unit {
+packages/core/src/virtual_transcript.cj:170:public class VisibleRange {
+packages/core/src/virtual_transcript.cj:184:public class VirtualTranscriptMetrics {
+packages/core/src/virtual_transcript.cj:203:public class VirtualTranscriptView <: Widget {
+packages/core/src/virtual_transcript.cj:238:    public func setThemeKey(value: String): Unit {
+packages/core/src/virtual_transcript.cj:244:    public func setCardChrome(enabled: Bool): Unit {
+packages/core/src/virtual_transcript.cj:252:    public func setUnicode(enabled: Bool): Unit {
+packages/core/src/virtual_transcript.cj:258:    public func setCardTheme(theme: TranscriptCardTheme): Unit {
+packages/core/src/virtual_transcript.cj:262:    public func invalidateItem(id: String): Bool {
+packages/core/src/virtual_transcript.cj:275:    public func totalRows(): Int64 {
+packages/core/src/virtual_transcript.cj:280:    public func materializedCount(): Int64 { materializedCountValue }
+packages/core/src/virtual_transcript.cj:282:    public func metrics(): VirtualTranscriptMetrics {
+packages/core/src/virtual_transcript.cj:295:    public func handle(key: KeyEvent): Bool {
+packages/core/src/virtual_transcript.cj:308:    public func render(area: Rect, buffer: Buffer): Unit {
 packages/core/src/virtual_transcript.cj:34:public class VirtualTranscriptState {
 packages/core/src/virtual_transcript.cj:52:    public func scrollBy(delta: Int64, totalRows: Int64, viewportRows: Int64): Unit {
 packages/core/src/virtual_transcript.cj:58:    public func home(): Unit {
 packages/core/src/virtual_transcript.cj:65:    public func end(totalRows: Int64, viewportRows: Int64): Unit {
 packages/core/src/virtual_transcript.cj:7:public interface VirtualTranscriptSource {
-packages/core/src/virtual_transcript_test.cj:176:    public func size(): Int64 { 1 }
-packages/core/src/virtual_transcript_test.cj:177:    public func itemId(_: Int64): String { "compact-card" }
-packages/core/src/virtual_transcript_test.cj:178:    public func itemTitle(_: Int64): String { "✓ GitHub · completed" }
-packages/core/src/virtual_transcript_test.cj:179:    public func itemUsesCompactCardChrome(_: Int64): Bool { true }
 packages/core/src/virtual_transcript_test.cj:17:    public func size(): Int64 { count }
-packages/core/src/virtual_transcript_test.cj:180:    public func revision(_: Int64): Int64 { 0 }
-packages/core/src/virtual_transcript_test.cj:181:    public func document(_: Int64, _: Int64, _: String): Document { Document([]) }
 packages/core/src/virtual_transcript_test.cj:18:    public func itemId(index: Int64): String { "item-${index}" }
-packages/core/src/virtual_transcript_test.cj:191:    public func size(): Int64 { samples.size }
-packages/core/src/virtual_transcript_test.cj:192:    public func itemId(index: Int64): String { "item-utf8-${index}" }
-packages/core/src/virtual_transcript_test.cj:193:    public func revision(index: Int64): Int64 { 0 }
-packages/core/src/virtual_transcript_test.cj:194:    public func document(index: Int64, width: Int64, themeKey: String): Document {
 packages/core/src/virtual_transcript_test.cj:19:    public func revision(index: Int64): Int64 { revisions[index] }
-packages/core/src/virtual_transcript_test.cj:202:    public func size(): Int64 { 1 }
-packages/core/src/virtual_transcript_test.cj:203:    public func itemId(index: Int64): String { "title-width-${index}" }
-packages/core/src/virtual_transcript_test.cj:204:    public func revision(index: Int64): Int64 {
-packages/core/src/virtual_transcript_test.cj:208:    public func itemUsesCardChrome(index: Int64): Bool {
 packages/core/src/virtual_transcript_test.cj:20:    public func document(index: Int64, width: Int64, themeKey: String): Document {
-packages/core/src/virtual_transcript_test.cj:212:    public func itemTitleForWidth(index: Int64, width: Int64): String {
-packages/core/src/virtual_transcript_test.cj:218:    public func document(index: Int64, width: Int64, themeKey: String): Document {
+packages/core/src/virtual_transcript_test.cj:216:    public func size(): Int64 { 1 }
+packages/core/src/virtual_transcript_test.cj:217:    public func itemId(_: Int64): String { "full-frame" }
+packages/core/src/virtual_transcript_test.cj:218:    public func revision(_: Int64): Int64 { 0 }
+packages/core/src/virtual_transcript_test.cj:219:    public func itemFooter(_: Int64): String { "〈Wall: 12ms | Exit: 0〉" }
+packages/core/src/virtual_transcript_test.cj:220:    public func itemCardTheme(_: Int64): ?TranscriptCardTheme {
+packages/core/src/virtual_transcript_test.cj:228:    public func document(_: Int64, _: Int64, _: String): Document {
+packages/core/src/virtual_transcript_test.cj:243:    public func size(): Int64 { 1 }
+packages/core/src/virtual_transcript_test.cj:244:    public func itemId(_: Int64): String { "background" }
+packages/core/src/virtual_transcript_test.cj:245:    public func itemUsesCardChrome(_: Int64): Bool { false }
+packages/core/src/virtual_transcript_test.cj:246:    public func revision(_: Int64): Int64 { 0 }
+packages/core/src/virtual_transcript_test.cj:247:    public func itemCardTheme(_: Int64): ?TranscriptCardTheme {
+packages/core/src/virtual_transcript_test.cj:254:    public func document(_: Int64, width: Int64, _: String): Document {
+packages/core/src/virtual_transcript_test.cj:261:    public func size(): Int64 { 1 }
+packages/core/src/virtual_transcript_test.cj:262:    public func itemId(_: Int64): String { "compact-card" }
+packages/core/src/virtual_transcript_test.cj:263:    public func itemTitle(_: Int64): String { "✓ GitHub · completed" }
+packages/core/src/virtual_transcript_test.cj:264:    public func itemUsesCompactCardChrome(_: Int64): Bool { true }
+packages/core/src/virtual_transcript_test.cj:265:    public func revision(_: Int64): Int64 { 0 }
+packages/core/src/virtual_transcript_test.cj:266:    public func document(_: Int64, _: Int64, _: String): Document { Document([]) }
+packages/core/src/virtual_transcript_test.cj:276:    public func size(): Int64 { samples.size }
+packages/core/src/virtual_transcript_test.cj:277:    public func itemId(index: Int64): String { "item-utf8-${index}" }
+packages/core/src/virtual_transcript_test.cj:278:    public func revision(index: Int64): Int64 { 0 }
+packages/core/src/virtual_transcript_test.cj:279:    public func document(index: Int64, width: Int64, themeKey: String): Document {
+packages/core/src/virtual_transcript_test.cj:287:    public func size(): Int64 { 1 }
+packages/core/src/virtual_transcript_test.cj:288:    public func itemId(index: Int64): String { "title-width-${index}" }
+packages/core/src/virtual_transcript_test.cj:289:    public func revision(index: Int64): Int64 {
+packages/core/src/virtual_transcript_test.cj:293:    public func itemUsesCardChrome(index: Int64): Bool {
+packages/core/src/virtual_transcript_test.cj:297:    public func itemTitleForWidth(index: Int64, width: Int64): String {
+packages/core/src/virtual_transcript_test.cj:303:    public func document(index: Int64, width: Int64, themeKey: String): Document {
 packages/core/src/visual_widgets.cj:10:public enum ProgressBarLabelMode {
 packages/core/src/visual_widgets.cj:18:public class ProgressBarSymbols {
 packages/core/src/visual_widgets.cj:201:public class Sparkline <: Widget {
@@ -1410,15 +1422,15 @@ packages/game/src/game.cj:78:    public func remove(id: EntityId): Bool {
 packages/game/src/game.cj:89:    public func has(id: EntityId): Bool {
 packages/game/src/game.cj:93:    public func get(id: EntityId): ?T {
 packages/game/src/game.cj:99:    public func set(id: EntityId, value: T): Bool {
-packages/markdown/src/markdown.cj:15:public func markdownDocument(text: String, theme!: DocumentTheme = DocumentTheme()): Document {
-packages/markdown/src/markdown.cj:19:public func markdownAstToDocument(ast: MarkdownDocument, theme!: DocumentTheme = DocumentTheme()): Document {
-packages/markdown/src/markdown.cj:36:public class OutlineNode {
-packages/markdown/src/markdown.cj:50:public class MarkdownPreviewIndex {
-packages/markdown/src/markdown.cj:57:    public func renderedLineCount(): Int64 {
-packages/markdown/src/markdown.cj:61:    public func sourceOffsetForRenderedLine(line: Int64): ?Int64 {
-packages/markdown/src/markdown.cj:68:    public func renderedLineForSourceOffset(offset: Int64): Int64 {
-packages/markdown/src/markdown.cj:79:public func markdownOutline(ast: MarkdownDocument): Array<OutlineNode> {
-packages/markdown/src/markdown.cj:85:public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex {
+packages/markdown/src/markdown.cj:19:public func markdownDocument(
+packages/markdown/src/markdown.cj:27:public func markdownAstToDocument(
+packages/markdown/src/markdown.cj:48:public class OutlineNode {
+packages/markdown/src/markdown.cj:62:public class MarkdownPreviewIndex {
+packages/markdown/src/markdown.cj:69:    public func renderedLineCount(): Int64 {
+packages/markdown/src/markdown.cj:73:    public func sourceOffsetForRenderedLine(line: Int64): ?Int64 {
+packages/markdown/src/markdown.cj:80:    public func renderedLineForSourceOffset(offset: Int64): Int64 {
+packages/markdown/src/markdown.cj:91:public func markdownOutline(ast: MarkdownDocument): Array<OutlineNode> {
+packages/markdown/src/markdown.cj:97:public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex {
 packages/markdown/src/markdown.cj:9:public class Markdown {
 packages/media/src/media.cj:114:public enum AsciiRenderMode {
 packages/media/src/media.cj:120:public struct AsciiRenderOptions {

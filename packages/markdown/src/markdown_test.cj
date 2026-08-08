@@ -54,6 +54,21 @@ class MarkdownExtensionTest {
     }
 
     @TestCase
+    func optionallyPreservesMarkdownSoftBreaksAsDocumentRows(): Unit {
+        let defaultDoc = Markdown.parse("first line\nsecond line")
+        @Expect(defaultDoc.lines.size, 1)
+        @Expect(defaultDoc.lines[0].spans[1].text, " ")
+
+        let preserved = Markdown.parse(
+            "first line\nsecond line",
+            preserveSoftBreaks: true
+        )
+        @Expect(preserved.lines.size, 2)
+        @Expect(preserved.lines[0].spans[0].text, "first line")
+        @Expect(preserved.lines[1].spans[0].text, "second line")
+    }
+
+    @TestCase
     func rendersParsedDocumentWithMarkdownView(): Unit {
         let buffer = Buffer(Rect(0, 0, 20, 4))
         DocumentView(Markdown.parse("# Title\n[link](https://example.com)\n**strong**")).render(Rect(0, 0, 20, 3),

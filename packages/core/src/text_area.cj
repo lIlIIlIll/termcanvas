@@ -1212,13 +1212,18 @@ public class TextArea <: Widget {
         let pos = cursorPosition(Rect(area.x, area.y, area.width, area.height))
         let startY = min(area.y + area.height - 1, pos.y + 1)
         let maxRows = min(5, area.y + area.height - startY)
-        for (i in 0..maxRows) {
-            if (i >= completionItems.size) { return }
-            let item = completionItems[i]
-            let prefix = if (i == completionIndex) { "> " } else { "  " }
+        let visibleRows = min(maxRows, completionItems.size)
+        var itemStart = max(0, completionIndex - visibleRows / 2)
+        if (itemStart + visibleRows > completionItems.size) {
+            itemStart = max(0, completionItems.size - visibleRows)
+        }
+        for (row in 0..visibleRows) {
+            let itemIndex = itemStart + row
+            let item = completionItems[itemIndex]
+            let prefix = if (itemIndex == completionIndex) { "> " } else { "  " }
             let text = if (item.detail.isEmpty()) { prefix + item.label } else { prefix + item.label + " " + item.detail }
-            let popupStyle = if (i == completionIndex) { selectedStyle } else { Style(fg: Color.Cyan) }
-            buffer.setString(pos.x, startY + i, truncate(text, max(0, area.x + area.width - pos.x)), style: popupStyle)
+            let popupStyle = if (itemIndex == completionIndex) { selectedStyle } else { Style(fg: Color.Cyan) }
+            buffer.setString(pos.x, startY + row, truncate(text, max(0, area.x + area.width - pos.x)), style: popupStyle)
         }
     }
 

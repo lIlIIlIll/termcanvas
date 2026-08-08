@@ -2389,6 +2389,39 @@ class CjTuiCoreTest {
         area.paste("!")
         let stale = Event.TextCompletion("stale", TextCompletionResult(staleRequest.requestId, staleRequest.revision, staleRequest.prefixStart, staleRequest.prefixEnd, [TextCompletionItem("ignored")]))
         @Expect(!area.handleCompletionEvent(stale))
+
+        let long = TextArea()
+        let longRequest = long.beginCompletion("long")
+        @Expect(long.handleCompletionEvent(Event.TextCompletion(
+            "long",
+            TextCompletionResult(
+                longRequest.requestId,
+                longRequest.revision,
+                longRequest.prefixStart,
+                longRequest.prefixEnd,
+                [
+                    TextCompletionItem("zero"),
+                    TextCompletionItem("one"),
+                    TextCompletionItem("two"),
+                    TextCompletionItem("three"),
+                    TextCompletionItem("four"),
+                    TextCompletionItem("five"),
+                    TextCompletionItem("six")
+                ]
+            )
+        )))
+        for (_ in 0..5) {
+            @Expect(long.handle(KeyEvent(KeyCode.Down)))
+        }
+        @Expect(long.completionRows(), 5)
+        let completionBuffer = Buffer(Rect(0, 0, 20, 6))
+        long.renderCompletionOverlay(completionBuffer.area, completionBuffer)
+        @Expect(completionBuffer.getCell(2, 1).symbol, "t")
+        @Expect(completionBuffer.getCell(0, 4).symbol, ">")
+        @Expect(completionBuffer.getCell(3, 4).symbol, "i")
+        @Expect(completionBuffer.getCell(2, 5).symbol, "s")
+        @Expect(long.handle(KeyEvent(KeyCode.Tab)))
+        @Expect(long.value, "five")
     }
 
     @TestCase

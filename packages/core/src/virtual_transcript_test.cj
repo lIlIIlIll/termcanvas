@@ -170,6 +170,212 @@ class VirtualTranscriptTests {
         @Expect(!snapshot.contains("╰─"))
         @Expect(!snapshot.contains("│ "))
     }
+
+    @TestCase
+    func fullFrameRendersOneContainerWithLabeledSeparatorAndFooter(): Unit {
+        let source = FullFrameTranscriptSource()
+        let view = VirtualTranscriptView(source)
+        view.setCardChrome(true)
+        let buffer = Buffer(Rect(0, 0, 32, 8))
+
+        view.render(buffer.area, buffer)
+
+        @Expect(buffer.getCell(0, 0).symbol, "╭")
+        @Expect(buffer.getCell(0, 0).style, Style(fg: Color.Indexed(8)))
+        @Expect(buffer.getCell(31, 0).symbol, "╮")
+        @Expect(buffer.getCell(1, 1).style, Style(fg: Color.Blue))
+        @Expect(buffer.getCell(0, 2).symbol, "├")
+        @Expect(buffer.getCell(4, 2).symbol, "O")
+        @Expect(buffer.getCell(4, 2).style, Style(fg: Color.Yellow))
+        @Expect(buffer.getCell(31, 2).symbol, "┤")
+        @Expect(buffer.getCell(1, 3).style, Style(fg: Color.Cyan))
+        @Expect(buffer.getCell(1, 4).symbol, "〈")
+        @Expect(buffer.getCell(1, 4).style, Style(fg: Color.Indexed(8)))
+        @Expect(buffer.getCell(0, 5).symbol, "╰")
+        @Expect(buffer.getCell(31, 5).symbol, "╯")
+    }
+
+    @TestCase
+    func runningNoOutputFrameKeepsBothSidesOnOneColumnAcrossResize(): Unit {
+        let source = RunningNoOutputTranscriptSource()
+        let view = VirtualTranscriptView(source)
+        view.setCardChrome(true)
+
+        for (width in [80, 120, 160]) {
+            let left: Int64 = 7
+            let top: Int64 = 1
+            let right = left + width - 1
+            let buffer = Buffer(Rect(0, 0, width + 14, 10))
+            view.render(Rect(left, top, width, 8), buffer)
+
+            @Expect(buffer.getCell(left, top).symbol, "╭")
+            @Expect(buffer.getCell(right, top).symbol, "╮")
+            @Expect(buffer.getCell(left, top + 1).symbol, "│")
+            @Expect(buffer.getCell(right, top + 1).symbol, "│")
+            @Expect(buffer.getCell(left, top + 2).symbol, "│")
+            @Expect(buffer.getCell(right, top + 2).symbol, "│")
+            @Expect(buffer.getCell(left, top + 3).symbol, "╰")
+            @Expect(buffer.getCell(right, top + 3).symbol, "╯")
+            @Expect(buffer.getCell(left + 2, top + 1).symbol, "$")
+            @Expect(buffer.getCell(left + 2, top + 2).symbol, "〈")
+            for (y in top..(top + 4)) {
+                @Expect(buffer.getCell(left + 1, y).symbol != "│")
+            }
+        }
+    }
+
+    @TestCase
+    func streamingOutputAddsSeparatorWithoutChangingOuterColumns(): Unit {
+        let source = StreamingFullFrameTranscriptSource()
+        let view = VirtualTranscriptView(source)
+        view.setCardChrome(true)
+        let area = Rect(5, 1, 80, 8)
+        let initial = Buffer(Rect(0, 0, 90, 10))
+
+        view.render(area, initial)
+        @Expect(initial.getCell(5, 2).symbol, "│")
+        @Expect(initial.getCell(84, 2).symbol, "│")
+        @Expect(initial.getCell(5, 3).symbol, "│")
+        @Expect(initial.getCell(84, 3).symbol, "│")
+        @Expect(initial.getCell(5, 4).symbol, "╰")
+        @Expect(initial.getCell(84, 4).symbol, "╯")
+
+        source.showOutput()
+        let visible = Buffer(Rect(0, 0, 90, 10))
+        view.render(area, visible)
+        @Expect(visible.getCell(5, 3).symbol, "├")
+        @Expect(visible.getCell(84, 3).symbol, "┤")
+        @Expect(visible.getCell(5, 4).symbol, "│")
+        @Expect(visible.getCell(84, 4).symbol, "│")
+        @Expect(visible.getCell(5, 5).symbol, "│")
+        @Expect(visible.getCell(84, 5).symbol, "│")
+        @Expect(visible.getCell(5, 6).symbol, "╰")
+        @Expect(visible.getCell(84, 6).symbol, "╯")
+    }
+
+    @TestCase
+    func backgroundBlockFillsFullWidthAndReflowsAtNewWidth(): Unit {
+        let source = BackgroundTranscriptSource()
+        let view = VirtualTranscriptView(source)
+        view.setCardChrome(true)
+        let first = Buffer(Rect(0, 0, 20, 8))
+
+        view.render(first.area, first)
+
+        @Expect(source.lastWidth, 16)
+        @Expect(first.getCell(0, 0).style, Style(bg: Color.Blue))
+        @Expect(first.getCell(19, 0).style, Style(bg: Color.Blue))
+        @Expect(first.getCell(2, 1).symbol, "这")
+        @Expect(first.getCell(19, 2).style, Style(bg: Color.Blue))
+
+        let resized = Buffer(Rect(0, 0, 30, 8))
+        view.render(resized.area, resized)
+        @Expect(source.lastWidth, 26)
+        @Expect(resized.getCell(29, 1).style, Style(bg: Color.Blue))
+    }
+}
+
+class FullFrameTranscriptSource <: VirtualTranscriptSource {
+    public func size(): Int64 { 1 }
+    public func itemId(_: Int64): String { "full-frame" }
+    public func revision(_: Int64): Int64 { 0 }
+    public func itemFooter(_: Int64): String { "〈Wall: 12ms | Exit: 0〉" }
+    public func itemCardTheme(_: Int64): ?TranscriptCardTheme {
+        Some(TranscriptCardTheme(
+            fullFrame: true,
+            bodyIndent: 0,
+            borderStyle: Style(fg: Color.Indexed(8)),
+            mutedStyle: Style(fg: Color.Indexed(8))
+        ))
+    }
+    public func document(_: Int64, _: Int64, _: String): Document {
+        Document([
+            DocumentLine(
+                DocumentLineKind.Paragraph,
+                [
+                    RichSpan("$", style: Style(fg: Color.Blue)),
+                    RichSpan(" printf ok", style: Style(fg: Color.Green))
+                ]
+            ),
+            DocumentLine(
+                DocumentLineKind.HorizontalRule,
+                [RichSpan("Output", style: Style(fg: Color.Yellow))]
+            ),
+            DocumentLine(DocumentLineKind.Paragraph, "ok", style: Style(fg: Color.Cyan))
+        ])
+    }
+}
+
+class RunningNoOutputTranscriptSource <: VirtualTranscriptSource {
+    public func size(): Int64 { 1 }
+    public func itemId(_: Int64): String { "running-no-output" }
+    public func revision(_: Int64): Int64 { 0 }
+    public func itemFooter(_: Int64): String { "〈Running · 12 ms〉" }
+    public func itemCardTheme(_: Int64): ?TranscriptCardTheme {
+        Some(TranscriptCardTheme(
+            fullFrame: true,
+            bodyIndent: 0,
+            borderStyle: Style(fg: Color.Indexed(8)),
+            mutedStyle: Style(fg: Color.Indexed(8)),
+            contentPadding: Spacing.symmetric(horizontal: 1, vertical: 0)
+        ))
+    }
+    public func document(_: Int64, _: Int64, _: String): Document {
+        Document.plain("$ mkdir -p /tmp/cube")
+    }
+}
+
+class StreamingFullFrameTranscriptSource <: VirtualTranscriptSource {
+    var revisionValue: Int64 = 0
+    var visible: Bool = false
+
+    public func size(): Int64 { 1 }
+    public func itemId(_: Int64): String { "streaming-full-frame" }
+    public func revision(_: Int64): Int64 { revisionValue }
+    public func itemFooter(_: Int64): String { "〈Running · 0.8 s〉" }
+    public func itemCardTheme(_: Int64): ?TranscriptCardTheme {
+        Some(TranscriptCardTheme(
+            fullFrame: true,
+            bodyIndent: 0,
+            borderStyle: Style(fg: Color.Indexed(8)),
+            mutedStyle: Style(fg: Color.Indexed(8)),
+            contentPadding: Spacing.symmetric(horizontal: 1, vertical: 0)
+        ))
+    }
+    public func document(_: Int64, _: Int64, _: String): Document {
+        if (!visible) {
+            return Document.plain("$ cmake --build build -j16")
+        }
+        Document([
+            DocumentLine(DocumentLineKind.Paragraph, "$ cmake --build build -j16"),
+            DocumentLine(DocumentLineKind.HorizontalRule, "Output"),
+            DocumentLine(DocumentLineKind.Paragraph, "compiling...")
+        ])
+    }
+    func showOutput(): Unit {
+        visible = true
+        revisionValue++
+    }
+}
+
+class BackgroundTranscriptSource <: VirtualTranscriptSource {
+    var lastWidth: Int64 = 0
+
+    public func size(): Int64 { 1 }
+    public func itemId(_: Int64): String { "background" }
+    public func itemUsesCardChrome(_: Int64): Bool { false }
+    public func revision(_: Int64): Int64 { 0 }
+    public func itemCardTheme(_: Int64): ?TranscriptCardTheme {
+        Some(TranscriptCardTheme(
+            fillBackground: true,
+            contentPadding: Spacing.symmetric(horizontal: 2, vertical: 1),
+            borderBackground: Style(bg: Color.Blue)
+        ))
+    }
+    public func document(_: Int64, width: Int64, _: String): Document {
+        lastWidth = width
+        Document.plain("这些失败原因中哪些是标准库实现导致的")
+    }
 }
 
 class CompactChromeTranscriptSource <: VirtualTranscriptSource {

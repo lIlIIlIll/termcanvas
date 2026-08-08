@@ -495,7 +495,11 @@ public class DocumentView <: Widget {
             case DocumentLineKind.TableHeader =>
                 rows.add(StyledLine(quotePrefixedSpans(line, theme.quoteStyle, applyCurrentSourceHighlight(applyHighlights(themedSpans(line.spans, theme.tableHeader), highlights), currentCursorSource(), currentSourceStyle))))
             case DocumentLineKind.HorizontalRule =>
-                rows.add(StyledLine(quotePrefixedSpans(line, theme.quoteStyle, [RichSpan(repeat("-", width), style: theme.table)])))
+                rows.add(StyledLine(
+                    quotePrefixedSpans(line, theme.quoteStyle, [RichSpan(repeat("-", width), style: theme.table)]),
+                    horizontalRule: true,
+                    ruleLabel: themedSpans(line.spans, theme.table)
+                ))
             case DocumentLineKind.Image =>
                 match (line.media) {
                     case Some(source) =>
@@ -622,12 +626,23 @@ class StyledLine {
     let media: ?MediaSource
     let mediaFit: MediaFit
     let mediaHeight: Int64
+    let horizontalRule: Bool
+    let ruleLabel: Array<RichSpan>
 
-    init(spans: Array<RichSpan>, media!: ?MediaSource = None, mediaFit!: MediaFit = MediaFit.Contain, mediaHeight!: Int64 = 0) {
+    init(
+        spans: Array<RichSpan>,
+        media!: ?MediaSource = None,
+        mediaFit!: MediaFit = MediaFit.Contain,
+        mediaHeight!: Int64 = 0,
+        horizontalRule!: Bool = false,
+        ruleLabel!: Array<RichSpan> = []
+    ) {
         this.spans = spans
         this.media = media
         this.mediaFit = mediaFit
         this.mediaHeight = max(0, mediaHeight)
+        this.horizontalRule = horizontalRule
+        this.ruleLabel = ruleLabel
     }
 }
 
