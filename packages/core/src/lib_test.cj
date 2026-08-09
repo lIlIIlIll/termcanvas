@@ -1931,6 +1931,110 @@ class CjTuiCoreTest {
     }
 
     @TestCase
+    func composerRetainsLargePastePayloadAndHistoryMetadata(): Unit {
+        let composer = Composer()
+        let payload = "  第一行🙂\nsecond e\u{301}  "
+        @Expect(composer.paste(payload, collapseThreshold: 4))
+        let marker = composer.area.value
+        @Expect(marker.startsWith("[pasted "))
+        @Expect(marker.contains(" bytes #1]"))
+        @Expect(!marker.contains("第一行"))
+
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, payload)
+            case None => @Expect(false)
+        }
+        @Expect(composer.area.value, "")
+
+        _ = composer.handle(KeyEvent(KeyCode.Up))
+        @Expect(composer.area.value, marker)
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, payload)
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func composerExpandsMultipleUnicodePastesInDisplayOrder(): Unit {
+        let composer = Composer()
+        let first = "甲🙂\nfirst"
+        let second = "e\u{301}乙\nsecond"
+        @Expect(composer.paste("prefix ", collapseThreshold: 100))
+        @Expect(composer.paste(first, collapseThreshold: 4))
+        @Expect(composer.paste(" + ", collapseThreshold: 100))
+        @Expect(composer.paste(second, collapseThreshold: 4))
+        @Expect(composer.paste(" suffix", collapseThreshold: 100))
+        @Expect(composer.area.value.contains(" bytes #1]"))
+        @Expect(composer.area.value.contains(" bytes #2]"))
+
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) =>
+                @Expect(submit.text, "prefix " + first + " + " + second + " suffix")
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func composerDeletesPayloadWithWholeMarker(): Unit {
+        let composer = Composer()
+        let payload = "retained payload"
+        @Expect(composer.paste("before ", collapseThreshold: 100))
+        let markerStart = composer.area.value.size
+        @Expect(composer.paste(payload, collapseThreshold: 4))
+        let markerEnd = composer.area.value.size
+        @Expect(composer.paste(" after", collapseThreshold: 100))
+        composer.area.select(markerStart, markerEnd)
+        match (composer.handle(KeyEvent(KeyCode.Backspace))) {
+            case Some(_) => @Expect(false)
+            case None => @Expect(true)
+        }
+        @Expect(composer.area.value, "before  after")
+        let noError: ?String = None
+        @Expect(composer.lastError, noError)
+
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, "before  after")
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func composerRejectsDamagedPasteMarkerAndPreservesDraft(): Unit {
+        let composer = Composer()
+        let payload = "payload with 中文🙂"
+        @Expect(composer.paste(payload, collapseThreshold: 4))
+        let marker = composer.area.value
+        composer.area.cursor = marker.size
+        _ = composer.handle(KeyEvent(KeyCode.Backspace))
+        let damagedDraft = composer.area.value
+
+        match (composer.lastError) {
+            case Some(message) => @Expect(message.contains("paste marker damaged"))
+            case None => @Expect(false)
+        }
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(_) => @Expect(false)
+            case None => @Expect(true)
+        }
+        @Expect(composer.area.value, damagedDraft)
+        let errorBuffer = Buffer(Rect(0, 0, 72, 3))
+        composer.render(errorBuffer.area, errorBuffer)
+        @Expect(errorBuffer.getCell(1, 2).symbol, "p")
+
+        _ = composer.handle(KeyEvent(
+            KeyCode.Char(r'z'),
+            modifiers: KeyModifier(ctrl: true)
+        ))
+        @Expect(composer.area.value, marker)
+        let noError: ?String = None
+        @Expect(composer.lastError, noError)
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, payload)
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
     func commandWidgetsRenderAndHandleActions(): Unit {
         let menu = Menu("File", [
             MenuItem("Open", action: "open"),
