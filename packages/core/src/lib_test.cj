@@ -1955,6 +1955,95 @@ class CjTuiCoreTest {
     }
 
     @TestCase
+    func composerDraftRoundTripsLargeUnicodeAcrossInstances(): Unit {
+        let builder = StringBuilder()
+        for (_ in 0..600) {
+            builder.append("中文🙂e\u{301}\n")
+        }
+        let payload = "  " + builder.toString() + "  "
+        @Expect(payload.size > 2000)
+
+        let source = Composer()
+        @Expect(source.paste(payload))
+        @Expect(source.area.value.startsWith("[pasted "))
+
+        let restored = Composer()
+        match (source.draftText()) {
+            case Some(draft) => restored.restoreDraft(draft)
+            case None => @Expect(false)
+        }
+        @Expect(restored.area.value.startsWith("[pasted "))
+        @Expect(!restored.area.value.contains("中文"))
+        @Expect(restored.draftText(), Some(payload))
+        match (restored.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, payload)
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func composerDraftPreservesEmptyValue(): Unit {
+        let composer = Composer()
+        @Expect(composer.draftText(), Some(""))
+        composer.restoreDraft("")
+        @Expect(composer.area.value, "")
+        @Expect(composer.draftText(), Some(""))
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(_) => @Expect(false)
+            case None => @Expect(true)
+        }
+    }
+
+    @TestCase
+    func composerRestoreDraftClearsOldPasteAndCompletionState(): Unit {
+        let composer = Composer()
+        let oldPayload = "old retained payload"
+        @Expect(composer.paste(oldPayload, collapseThreshold: 4))
+        let oldMarker = composer.area.value
+        composer.area.cursor = oldMarker.size
+        _ = composer.handle(KeyEvent(KeyCode.Backspace))
+        let noDraft: ?String = None
+        @Expect(composer.draftText(), noDraft)
+        match (composer.lastError) {
+            case Some(message) => @Expect(message.contains("paste marker damaged"))
+            case None => @Expect(false)
+        }
+
+        let completion = composer.area.beginCompletion("damaged-draft")
+        @Expect(composer.area.handleCompletionEvent(Event.TextCompletion(
+            completion.requestId,
+            TextCompletionResult(
+                completion.requestId,
+                completion.revision,
+                completion.prefixStart,
+                completion.prefixEnd,
+                [TextCompletionItem("replacement")]
+            )
+        )))
+        @Expect(composer.completionVisible())
+
+        var replacement = ""
+        for (_ in 0..600) {
+            replacement += "新草稿🙂\n"
+        }
+        @Expect(replacement.size > 2000)
+        composer.restoreDraft(replacement)
+        @Expect(!composer.completionVisible())
+        let noError: ?String = None
+        @Expect(composer.lastError, noError)
+        @Expect(composer.area.value.startsWith("[pasted "))
+        @Expect(composer.draftText(), Some(replacement))
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, replacement)
+            case None => @Expect(false)
+        }
+
+        composer.restoreDraft(oldMarker)
+        @Expect(composer.area.value, oldMarker)
+        @Expect(composer.draftText(), Some(oldMarker))
+    }
+
+    @TestCase
     func composerExpandsMultipleUnicodePastesInDisplayOrder(): Unit {
         let composer = Composer()
         let first = "甲🙂\nfirst"

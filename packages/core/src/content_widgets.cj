@@ -382,6 +382,22 @@ public class Composer <: Widget {
         true
     }
 
+    public func draftText(): ?String {
+        synchronizeAreaValue()
+        expandedSubmissionText(area.value)
+    }
+
+    public func restoreDraft(text: String): Unit {
+        clearRetainedPastes()
+        lastError = None
+        _ = area.cancelCompletion()
+        historyIndex = -1
+        historyDraft = ComposerHistoryEntry("", [])
+        area.setValue("")
+        trackedValue = ""
+        _ = paste(text)
+    }
+
     public func currentSlashHints(): Array<String> {
         if (!area.value.startsWith("/")) { return [] }
         let out = ArrayList<String>()
