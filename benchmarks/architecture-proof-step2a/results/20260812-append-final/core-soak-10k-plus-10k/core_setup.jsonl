@@ -1,0 +1,2 @@
+{"benchmark": "stream_d_new_item", "build_identifier": "848ef9fc7b181b5c2210def9eeb88ca67e7f5d35+bin:aa6266dcf84bcf62", "history_count": 10000, "kind": "setup", "metrics_mode": "off", "setup_nanos": 11358139}
+{"benchmark": "stream_d_new_item", "build_identifier": "848ef9fc7b181b5c2210def9eeb88ca67e7f5d35+bin:aa6266dcf84bcf62", "history_count": 10000, "kind": "setup", "metrics_mode": "on", "setup_nanos": 12904476}

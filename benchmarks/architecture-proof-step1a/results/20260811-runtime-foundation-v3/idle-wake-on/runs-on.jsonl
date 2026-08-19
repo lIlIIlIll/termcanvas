@@ -1,0 +1,1 @@
+{"benchmark": "external_idle_completion", "build_identifier": "sha256:c0f409bb64621f43c8a8e0f2bb9db02764fd5683ff7f441802dfa0075eb1ba49", "first_visible_frame_ms": 858.23808, "generated_unix_ns": 1786497035776415967, "history_count": 100000, "metrics_mode": "on", "process_returncode": 0, "pty_bytes": 15923, "rss_kb": 192732, "runtime_sdk_root": "", "sample_count": 30}
