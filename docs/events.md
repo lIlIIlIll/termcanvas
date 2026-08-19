@@ -27,4 +27,4 @@ Active terminal probe responses are intentionally consumed by `TerminalProbe` ra
 
 `KeyMap` maps one or more `KeyEvent` values to action names. `HelpView` can render those bindings.
 
-Widgets with `handle` methods consume relevant `KeyEvent` values and return `HandleResult`. Use this pattern with `FocusManager` or `EventRouter.handleResult()` to route events to the focused widget while preserving consumed/ignored status and optional commands.
+Widgets with `handle` methods consume relevant `KeyEvent` values and return `HandleResult`. Applications can combine this pattern with `FocusManager` in their update function while preserving consumed/ignored status and optional commands.

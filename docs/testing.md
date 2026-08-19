@@ -1,5 +1,18 @@
 # Testing
 
+Verification is layered:
+
+- package/core unittests prove local behavior;
+- headless scripts and snapshots prove deterministic application workflows;
+- all 17 current official examples are built and smoked against their machine
+  inventory;
+- API, architecture, and fitness validators enforce classified surface and
+  permanent invariants; and
+- `scripts/release_gate.sh` is the final repository-wide authority.
+
+Retired architecture self-tests and the retired `style_lab` example are not
+current workloads. Their historical results remain in ADR/evidence records.
+
 Use `TestBackend` for render tests:
 
 - `lastBuffer()` returns the most recent rendered buffer.
@@ -38,15 +51,28 @@ Use `AppTestRunner` for full headless app workflows. `HeadlessScript` can mix ke
 
 Use `SnapshotDiff.text(expected, actual)` or `SnapshotDiff.buffer(expected, actual)` when snapshot failures should include the first mismatching line and column.
 
-For component-runtime tests, prefer `ComponentHost` with small probe components and fixed `Rect`s. Assert local-to-global dirty mapping, timer routing through `Event.ComponentTick`, component-scoped async/data completion routing, and `ComponentProfile` / `ProfilerSnapshot` counters. These tests should assert structural behavior such as dirty rect coverage, update/render counts, skipped renders, datasource pending/error/version state, profiler lookup/sorting/reset behavior, and focused-vs-global key precedence, not elapsed-time thresholds.
-
-Deterministic performance regression tests live in the release gate as ordinary unittest cases, not as benchmarks. Do not assert wall-clock elapsed time in those tests. Prefer scale invariants such as dirty cell count, diff write spans, viewport row count, provider call count, visible window bounds, and component render/update counts. Current release-gate guards cover Terminal diff locality, the unsorted and unfiltered `VirtualTable` provider path, TextArea viewport/diff locality, and btm_clone component isolation through its headless smoke entry.
+Deterministic performance regression tests live in the release gate as ordinary unittest cases, not as benchmarks. Do not assert wall-clock elapsed time in those tests. Prefer scale invariants such as dirty cell count, diff write spans, viewport row count, provider call count, visible window bounds, and regional update/render counts. Current release-gate guards cover Terminal diff locality, the unsorted and unfiltered `VirtualTable` provider path, TextArea viewport/diff locality, and btm_clone timer, async-completion, focus, resize, and regional dirty isolation through its headless smoke entry.
 
 Use `@Bench` / `cjpm bench` for real elapsed-time and slope diagnosis. Benchmark cases are explicit and non-gating; they must not be run by release-gate scripts or used as release pass/fail thresholds. The core benchmark entrypoint is:
 
 ```bash
-DISABLE_ZOXIDE=1 CANGJIE_SDK_ROOT=/home/elliot/cangjie_sdk/daily scripts/cangjie_cmd.sh packages/core cjpm bench --filter=CjTuiPerformanceBench
+CANGJIE_SDK_ROOT=/path/to/20260817/cangjie \
+  scripts/cangjie_cmd.sh packages/core cjpm bench --filter=CjTuiPerformanceBench
 ```
+
+Canonical verification uses Cangjie
+`1.1.0-alpha.20260817040003` with cjpm `1.1.3`. The package manifests retain
+`cjc-version = "1.1.0"` as their language compatibility declaration; the exact
+compiler identity is enforced by `scripts/check_sdk.sh`. A mutable `daily` SDK
+may be used for local exploratory commands only and is not acceptance authority.
+`scripts/release_gate.sh` requires `CANGJIE_SDK_ROOT`, rejects any version other
+than the canonical compiler before building, and places every cjpm invocation in
+a target namespace containing the validated toolchain identity. This prevents
+objects produced by another compiler from satisfying the canonical gate.
+
+Cangjie `1.1.0-alpha.20260803040049` is not a valid verification compiler for
+this repository: its test-macro code generation produces a deterministic
+SIGSEGV while enumerating a legal suite containing `@Bench`.
 
 Additional workflow scripts:
 

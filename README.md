@@ -1,25 +1,39 @@
 # cjtui
 
-`cjtui` is a small Linux/glibc-first terminal UI library for Cangjie.
+`cjtui` is a Linux/glibc-first terminal UI library for Cangjie. Applications own
+their canonical state and update it from `Event`s in an `App` loop. Effects are
+returned as `Command`s, and immediate `Widget`s render the resulting state through
+`Frame` and `Buffer` to a `Backend`.
 
-It provides:
+The primary model is one path:
 
-- ANSI backend: clear screen, cursor movement, SGR colors/styles, alternate screen, mouse and bracketed paste modes.
-- Backend abstraction: `Backend`, `AnsiBackend`, and `TestBackend`.
-- Terminal mode: raw-mode enter/restore through direct libc FFI.
-- Buffer: styled cells, explicit wide-cell lead/continuation state, full draw, diff draw, double-buffered frame reuse, and frame copies for test capture.
-- App runtime: `App`, `ControlFlow`, `RenderMode`, `AppMetrics`, `FrameMetrics`, `EventWaiter`, and `FocusManager`, with dirty-driven redraw, span-coalesced partial refresh, FPS/debug metrics, real-time `Duration` ticks, timers, and injectable idle waiting across stdin and registered event sources.
-- Command runtime: `Command`, `UpdateResult`, `TimerSpec`, `TimerRuntime`, `Subscription`, and `App.runWithCommands()` for emitted events, messages, async placeholders, real-time timers, synchronous exec-result messages, batches, and quit effects.
-- PTY runtime: `PtySpec`, `PtyProcess`, `PtyRuntime`, `PtySignal`, PTY Command/Event variants, `LinuxPtyRuntime` for Linux/glibc PTY processes, and `FakePtyRuntime` for deterministic tests.
-- Component routing: `Component`, `HandleResult`, and `EventRouter` for focused event dispatch with global key bindings, consumed/ignored propagation, and command-producing handlers.
-- Reactive/view-tree helpers: `StringState`, `IntState`, `ViewNode` dirty tracking, class queries, and event context helpers.
-- Widgets: `Block`, `Paragraph`, `List`, `Table`, `Scrollbar`, `Input`, `Button`, `Checkbox`, `RadioGroup`, `Select`, `Dropdown`, `MultiSelect`, `DatePicker`, `ProgressBar`, `TextArea`, `Composer`, `TranscriptView`, `ActivityTimeline`, `RequestDialog`, `Tabs`, `Modal`, `Viewport`, `Tree`, `VirtualTable`, `FilePicker`, `FileDialog`, `ConfirmDialog`, `MenuBar`, `Menu`, `CommandPalette`, `ToastManager`, `Spinner`, `Dialog`, `Sparkline`, `Gauge`, `Chart`, `DocumentView`, `MarkdownView`, `LogView`, `SplitPane`, `Wizard`, `Accordion`, `Breadcrumb`, `TreeTable`, `ColorPicker`, `SearchPanel`, `ReplacePanel`, `TextDocumentView`, `TextEditor`, `SoftWrapView`, `HelpView`, and `DebugOverlay`.
-- Extensions: Markdown, terminal transcript, diff, media, and game helpers live outside core; `packages/game` provides `game` ECS, input, continuous AABB physics, tile maps, tile markers, sensor overlaps, sprite animation, and sprite rendering.
-- Stateful selection helpers: `ListState` and `TableState`.
-- Text helpers: grapheme-aware Unicode display width, configurable East Asian ambiguous width, paragraph wrapping, text alignment, `TextBuffer`, selection/range editing, find/replace helpers, grouped undo, true color, and theme styles.
-- Events: key down/up/repeat/held, arrows, text, Ctrl/Alt keys, delayed bare Esc, Tab/BackTab, PageUp/PageDown, Insert, F1-F12, CSI/Kitty/modifyOtherKeys modifiers, mouse move/drag/scroll, focus, bracketed paste enabled by default, tick, timer, capabilities, and resize.
-- Layout and drawing helpers with length, percent, min, max, ratio, gap, margin, flex placement, `Grid`, `FlexLayout`, `LayoutCache`, `SizeHint`, `Canvas`, `Surface`, `SizeGuard`, and centered viewport helpers.
-- Headless testing: `AppTestRunner`, `HeadlessScript`, frame buffer/snapshot capture, synthetic ticks, mixed input replay, and snapshot diff helpers.
+```text
+application-owned state
+        ↓
+App / update / Event / Command
+        ↓
+ordered, run-to-completion runtime
+        ↓
+DirtyRects / frame coalescing
+        ↓
+immediate Widget rendering
+        ↓
+Frame / Buffer / Backend
+```
+
+Key capabilities include:
+
+- application runtime, ordered commands, timers, async completions, and regional redraws;
+- immediate widgets, layout, styles/themes, text editing, rich documents, and Unicode-aware buffers;
+- keyboard, mouse, paste, focus, terminal capability, and resize events;
+- terminal/session restoration plus real and headless backends;
+- optional PTY, media, transcript, diff, editor, document, and game facilities; and
+- deterministic event, snapshot, headless-example, pressure, and release-gate testing.
+
+Not every exported declaration has the same support promise. Start with the stable
+primary path above; current experimental facilities are labelled in
+[`docs/api.md`](docs/api.md) and governed by
+[`docs/versioning.md`](docs/versioning.md).
 
 ## Minimal Use
 
@@ -48,46 +62,28 @@ Use `Terminal`, `Backend`, and `TerminalSession` directly when writing a custom 
 /home/elliot/.codex/scripts/codex_cangjie_env cjpm run
 ```
 
-Run from any application example directory:
-
-- `examples/taskpad`: task-board app with input, keymap, command palette, and toasts.
-- `examples/form_studio`: form workflow with focus routing, paste, common form widgets, and status feedback.
-- `examples/game_demo`: game extension demo with ECS stores, continuous collision physics, tile maps, sprites, and debug metrics.
-- `examples/game_pressure_suite`: six-category game pressure suite covering roguelike, snake, 2048, minesweeper, turn-based strategy, and lightweight real-time action loops.
-- `examples/gif_ascii`: ffmpeg-decodable media-to-ASCII animation viewer using ASCII/half-block/braille render modes, optional RGB color, binary threshold control, tick-driven playback, pause, zoom, and speed controls.
-- `examples/crystal_caves`: multi-level side-scrolling platform game with tile markers, sensor pickups, hazards, patrol enemies, sprite animation, and camera scrolling.
-- `examples/ops_dashboard`: real-time dashboard with ticks, timers, progress, charts, logs, and status bars.
-- `examples/data_browser`: data/file browser with virtual table, tree, file picker, file dialog, and paginator.
-- `examples/markdown_studio`: Markdown authoring app with editor behavior, completion, preview, and outline.
-- `examples/terminal_lab`: terminal, PTY, transcript, and diff lab.
-- `examples/media_gallery`: terminal media capability and fallback gallery.
-- `examples/style_lab`: DOM/CSS, layout, and canvas lab.
-- `examples/oh_my_pi_skin`: oh-my-pi inspired terminal skin with a canvas-drawn hero, independently timed animated todo tree, transcript, composer, command palette, and status line.
-- `examples/command_center`: command runtime, async task, timer, dialog, spinner, and toast app.
-- `examples/assistant_console`: transcript, composer, activity timeline, and request dialog console.
-- `examples/btm_clone`: bottom/btm-style system monitor replica with full-screen canvas graphs, resource panels, process selection, and sort hotkeys.
-- `examples/arcade`: playable canvas app with `InputState`, held-key handling, ticks, and resize fallback.
-- `examples/debug_lab`: capabilities, enhanced keyboard options, mouse/focus events, metrics, and debug overlay.
+Run from any application example directory. The authoritative taxonomy is in
+[`docs/examples.md`](docs/examples.md): eight recommended applications, two
+experimental applications, six feature demonstrations, and one pressure/proof
+workload. Start with `taskpad`; use `btm_clone` for a nontrivial experimental
+App/update example with timers, async completion, focus, and regional dirty
+rendering; use `media_gallery` for direct terminal-media and `DocumentLine.image`
+integration.
 
 ## Architecture
 
-- `Backend` is the rendering and terminal-control abstraction. Use `AnsiBackend` for real terminals and `TestBackend` for assertions.
-- `Terminal` owns frame drawing, front/back buffer reuse, and buffer diffing.
-- `Terminal.draw()` returns `RenderMetrics`; `AppMetrics` records per-frame FPS, render/draw time, queue length, dirty cells, diff write spans, terminal size, and dropped ticks for `DebugOverlay` or custom diagnostics.
-- `TerminalSession` owns terminal modes and restores/rolls back raw mode, cursor, mouse, paste, and alternate screen state.
-- `TerminalDriver`, `LinuxTerminalDriver`, `MacOSTerminalDriver`, `WindowsTerminalDriver`, and `FallbackTerminalDriver` separate terminal mode/capability behavior from rendering backends.
-- `App` provides a small event loop around `Terminal`, `TerminalSession`, `EventParser`, and an injectable `EventWaiter`.
-- `App.runWithCommands()` lets update handlers return `UpdateResult` with queued `Command.Emit`, `Command.Message`, `Command.Async`, timer commands, `Command.ExecArgs` / `Command.AsyncExecArgs`, convenience `Command.Exec` / `Command.AsyncExec`, PTY commands, `Command.Batch`, or `Command.Quit` effects. The `*ExecArgs` variants pass explicit argv to `std.process.executeWithOutput`; the string variants use only a simple command-line splitter. PTY commands use the configured `PtyRuntime`.
-- `defaultEventWaiter()` selects `LinuxEpollEventWaiter` on Linux/glibc, `MacOSPollEventWaiter` on macOS, and `WindowsConsoleEventWaiter` on Windows. Windows terminal mode itself uses the experimental VT console driver; Windows external `EventSource` readiness is still not equivalent to POSIX fd readiness. Custom `InputSource`, `TerminalDriver`, probe input, and `EventWaiter` implementations remain injectable.
-- `FocusManager` tracks string IDs and handles Tab/BackTab focus movement.
-- `KeyMap` maps key bindings to action names, `HelpView` renders those bindings, and `EventRouter` routes focused component events before falling back to global keys.
-- `ScreenStack` provides push/pop/replace navigation for screen-oriented apps.
-- `ViewNode` provides retained-tree style rendering, dirty tracking, id lookup, class query, and capture/target/bubble style event dispatch.
-- `RichSpan`, `DocumentLine`, `Document`, `DocumentTheme`, and `DocumentView` form the core rich-document rendering boundary. Core renders spans, paragraphs, headings, lists, quotes, code blocks, tables, scroll, wrap, and theme styles; format parsing stays in extensions.
-- `packages/document` provides the experimental document package facade for those rich-document model and view types while `core` keeps the compatibility surface during the pre-1.0 split.
-- `packages/editor` provides the experimental editor package facade for `TextBuffer`, `TextArea`, completion, syntax highlighting, Markdown editing behavior, and editor shell widgets while `core` keeps the compatibility surface during the pre-1.0 split.
-- Official content extensions should convert external formats into `Document`: `packages/markdown` provides the first adapter as the `markdown` package.
-- `packages/terminal`, `packages/diff`, `packages/media`, and `packages/game` provide terminal-output, unified-diff, media, and game-specific helpers while keeping application policy separate.
+`App` is the single top-level event owner. Its update function mutates
+application-owned state and returns effects; background work returns immutable
+completion events to that same update path rather than mutating widgets. The
+runtime drains accepted work in order and runs each update to completion before
+coalescing dirty regions into a frame. Widgets are immediate renderers over the
+current state and layout.
+
+`Backend`, `Terminal`, `TerminalSession`, `Frame`, and `Buffer` own terminal I/O,
+restoration, and presentation. Focus, media, PTY, transcripts, documents, and
+other facilities are shared or specialized capabilities attached to this model,
+not alternative UI architectures. See [`docs/architecture.md`](docs/architecture.md)
+for the current topology and ADR-008 for historical architecture decisions.
 
 ## Release Gate
 
@@ -114,10 +110,9 @@ The gate runs parser tests, extension tests, core tests, event script validation
 - `VirtualTable`, `Tree`, `FilePicker`, and `Paginator` expose keyboard navigation helpers for app-level event handlers. `VirtualTable` also supports sorting, filtering, selected cells, horizontal column viewport adjustment, frozen columns, column resizing, sort indicators, and multi-selection row tracking.
 - `Tree` supports selected ids, id lookup, expand-all, and collapse-all. `FilePicker` supports parent navigation, entering selected directories, choosing selected paths, hidden-file toggling, search filtering, directory-first sorting, selected metadata, and keeps directories visible when filtering by extension.
 - `Menu`, `MenuBar`, `CommandPalette`, `ToastManager`, `Spinner`, and `Dialog` cover common command surfaces.
-- `Sparkline`, `Gauge`, `Chart`, `DocumentView`, `MarkdownView`, `LogView`, `SplitPane`, `Wizard`, and `ColorPicker` cover common visualization and workflow surfaces.
+- `Sparkline`, `Gauge`, `Chart`, `DocumentView`, `MarkdownView`, `LogView`, and `ColorPicker` cover common visualization and workflow surfaces.
 - `ProgressBar` supports determinate, indeterminate, horizontal, vertical, segmented, custom-symbol, and label-mode rendering while keeping the simple `ProgressBar(value, total, label)` constructor form.
-- `MultiSelect`, `DatePicker`, `Accordion`, `Breadcrumb`, `TreeTable`, `FileDialog`, and `ConfirmDialog` cover additional application controls.
-- `StyleSheet` supports legacy class rules plus DOM/CSS selector rules over `ViewNode` trees. The CSS subset covers type/id/class, descendant/child, pseudo-state, `::part(...)`, specificity/source-order cascade, visual styles, box spacing, sizing, and block/flex terminal-cell layout.
+- `MultiSelect`, `DatePicker`, `FileDialog`, and `ConfirmDialog` cover additional application controls.
 - `scripts/run_event_script.sh`, `scripts/check_golden_snapshots.sh`, and `scripts/generate_api_index.sh` provide basic engineering workflow checks.
 - `Layout` supports `Constraint.Length`, `Percent`, `Min`, `Max`, and `Ratio`, plus `withGap`, `withMargin`, and `withFlex`.
 - See `docs/` for API overview, architecture, layout, app runtime, widgets, content extensions, events, testing, examples, widget gallery, and limitations.

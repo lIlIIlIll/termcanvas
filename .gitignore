@@ -1,6 +1,22 @@
 target/
 .cache/
+__pycache__/
+*.py[cod]
 *.cjo
+benchmarks/architecture-proof-step0/results/
+benchmarks/architecture-proof-step05/results/
+benchmarks/**/results/**/bin/
+benchmarks/**/results/**/build.log
+results/**/bin/
+results/**/build.log
 
 !docs/api-index.txt
+!docs/api-contract-v1.txt
+!docs/api-inventory.json
+!docs/stable-api-contract.txt
+!docs/experimental-api-contract.txt
+!architecture/api-classification.json
+!architecture/architecture-fitness.json
+!architecture/consolidation-baseline.json
+!architecture/evidence-index.json
 !packages/core/tests/fixtures/file_picker/notes.txt

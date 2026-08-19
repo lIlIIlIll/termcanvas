@@ -1,12 +1,20 @@
 # App Runtime
 
-`App.run(render, update)` is the small immediate-mode loop. The update function returns `ControlFlow.Continue` or `ControlFlow.Exit`.
+`App.run(render, update)` is the small immediate-mode loop. The application owns
+canonical state; update is the only owner that mutates it, and render paints that
+state with immediate widgets. The update function returns `ControlFlow.Continue`
+or `ControlFlow.Exit`.
 
 `App.runWithCommands(render, update)` uses `UpdateResult`:
 
 - `UpdateResult.next()` continues with no effect.
 - `UpdateResult.exit()` exits immediately.
 - `UpdateResult.withCommand(command)` queues an effect.
+
+Accepted events and command results enter the INTERNAL `RuntimeQueue` in order.
+Updates are run-to-completion with no recursive update nesting. Dirty frame work
+is then coalesced for presentation; this is internal scheduling, not a second
+public scheduler API.
 
 Commands:
 
@@ -32,21 +40,6 @@ Commands:
 - `Command.Batch(commands)`: enqueue commands in order. Nested batches are flattened by the public command queue path, including batches passed directly to `App.processCommandsWithEvents`.
 
 Prefer the `*ExecArgs` variants when command names or arguments come from user input, file paths, or structured application state. The string-based `Exec` and `AsyncExec` variants are convenience APIs for short literal commands and use only the library's simple command-line splitter.
-
-Component routing:
-
-- `Component.handle(event)` returns `HandleResult`.
-- `HandleResult.ignored()` leaves the event available for other routing paths.
-- `HandleResult.consumed()` stops focused/component propagation without exiting.
-- `HandleResult.exit()` requests app exit.
-- `HandleResult.withCommand(command)` consumes the event and queues an effect when routed through `EventRouter.handleResult()`.
-- `RuntimeComponent` is the stateful component-tree interface for mount/unmount, resize, update, render, and optional focus id.
-- `ComponentHost` owns component nodes, routes focused keys and component timers, maps local `Dirty` values to global `DirtyRects`, skips rendering nodes outside the current dirty region, and exposes `ComponentProfile` counters for update/render/timer activity.
-- `ComponentLayoutProvider` controls how a host area is split across mounted components. The default `VerticalComponentLayoutProvider` keeps the historical vertical equal split; applications can inject a provider for sidebars, main panes, status bars, popups, or other app-specific placement.
-- `ComponentContext.startTimer()` registers component-scoped timers. Host timer ids use the `component:<componentId>:<timerId>` form and are delivered back to the component as `Event.ComponentTick`.
-- `ComponentContext.pollAsync()`, `AsyncPoller`, and `IdleTask` are compatibility background sampling hooks. `DataSource<T>` / `AsyncDataSource<T>` are the preferred typed path: they keep `latest`, `version`, `stale`, `error`, and pending state, suppress duplicate pending refreshes, support debounce/idle guards, and route completion to the owning component as `Event.DataReady`, `Event.DataFailed`, or `Event.DataCancelled`.
-- `ComponentProfiler` records component update/render/timer/async activity plus pending datasource and last-error state. `ComponentHost.profilerSnapshot()` returns a testable snapshot with lookup and sorted views, and `ProfilerOverlay` renders a compact in-app view of the hottest components.
-- `Dirty.Clean`, `Dirty.Self`, `Dirty.Local(rect)`, `Dirty.LocalRows(rows)`, and `Dirty.Global(rects)` let a child describe local invalidation without knowing its absolute screen position.
 
 Real-time ticks:
 
@@ -91,6 +84,21 @@ Event waiting:
 - `App` closes the configured waiter on normal exit and when render/update throws.
 - When resize polling is enabled, `App(resizePollEvery: Duration.millisecond * 250)` controls the idle resize check cadence. Tick deadlines, timers, async polling, and resize polling all participate in the same minimum-timeout calculation, so a long resize poll interval does not delay ticks.
 
+`EventWaiter`, its concrete implementations, and `RuntimeQueue` are INTERNAL
+implementation boundaries. The `ExternalPort` producer contract is STABLE: it
+is an optional bounded external-delivery seam that wakes the same App queue, not
+a second event bus and not required by ordinary applications. Its runtime drain,
+readiness, closing-barrier, and state machinery remains non-public; counters and
+latency capture remain EXPERIMENTAL diagnostics.
+
+`tryEnqueue` is non-blocking and returns `Accepted`, `Full`, or `Closed`.
+`Accepted` means the value entered a running port and any required
+empty-to-nonempty wake became visible; it does not mean `App.update` ran and does
+not promise survival across shutdown. Concurrent successful calls are ordered by
+the port mutex, while each producer's sequential successful calls preserve that
+producer's program order. `close()` is idempotent, rejects later enqueue, and may
+discard accepted values not yet imported by the runtime.
+
 Async events:
 
 - `Event.AsyncStarted(id)`
@@ -98,7 +106,7 @@ Async events:
 - `Event.AsyncFailed(id, message)`
 - `Event.AsyncCancelled(id)`
 
-Component-scoped async ids generated by `ComponentContext.pollAsync()` are implementation detail strings. Components normally see the completion through their own `update(Event.AsyncCompleted(localId, event), ctx)` path.
+Async ids are application-owned correlation keys. Worker tasks publish immutable completion values, and the application update path is the only owner that applies them to canonical state.
 
 Data source events:
 
@@ -119,7 +127,19 @@ PTY events:
 - `Event.PtyExited(id, status)`
 - `Event.PtyFailed(id, message)`
 
-PTY stdout and stderr are separate event streams. `LinuxPtyRuntime` attaches stdin/stdout to the PTY slave and stderr to a separate nonblocking pipe, then reports both through `EventSource` readiness. Applications that need PTY support should construct `App(ptyRuntime: LinuxPtyRuntime())`; the default remains `UnsupportedPtyRuntime()` so ordinary apps do not fork processes implicitly.
+PTY stdout and stderr are separate event streams. The request/result values
+`PtySpec`, `PtySize`, `PtySignal`, `PtyOutputStream`, and `PtyExitStatus` are the
+STABLE data protocol carried by the existing `Command.Pty*` and `Event.Pty*`
+constructors. `PtyExitStatus` is either `Exited(code)` or `Signaled(signal)`.
+
+`LinuxPtyRuntime` attaches stdin/stdout to the PTY slave and stderr to a separate
+nonblocking pipe, then reports both through `EventSource` readiness. Applications
+that need PTY support should construct an `App`, call
+`app.attachPtyRuntime(LinuxPtyRuntime())` before `run`/`runWithCommands`, and then
+run the app. The default remains `UnsupportedPtyRuntime()` so ordinary apps do
+not fork processes implicitly. Attachment, runtime/process lifecycle, and
+readiness APIs remain EXPERIMENTAL even though the neutral data protocol is
+STABLE. ADR-011 records the boundary.
 
 `Subscription` is a small deterministic source of repeated events for tests and simple app loops. `AsyncRuntime` and `TimerRuntime` are used by `App.runWithCommands()`; apps normally do not need to construct them directly unless they are testing command queues.
 

@@ -11,9 +11,9 @@ The stable boundary is:
 - `DocumentTheme`
 - `DocumentView`
 
-Extensions convert content formats into `Document`, then applications render the result with `DocumentView`. `packages/document` exposes that rich-document surface as the experimental document package facade while `core` keeps the same types available for pre-1.0 compatibility.
+Extensions convert content formats into the canonical stable `core.Document`, then applications render the result with `core.DocumentView`. The former experimental `document` alias facade is retired; applications use the stable core document vocabulary directly.
 
-`packages/editor` exposes the experimental editor package facade for text buffers, text areas, completion requests/results, syntax highlighting, Markdown-aware editing behavior, search/replace panels, and editor shell widgets. Format adapters should stay out of the editor package unless they are editor behavior rather than parsing policy.
+The former experimental `packages/editor` facade and advanced editor shell are retired. Stable text-buffer, text-area, completion, and Markdown-editing declarations are used directly from `core`. Format adapters remain separate from editor behavior and parsing policy.
 
 Game helpers follow the same boundary: core owns terminal events, timing, metrics, canvas, buffers, and layout, while game-specific entity/component storage, physics, tile maps, and sprite rendering live in `packages/game`.
 
@@ -32,8 +32,7 @@ The adapter maps the AST into `Document`, exposes `markdownOutline()` for headin
 `packages/game` provides the `game` package. It includes `EntityWorld`, generic `ComponentStore<T>`, `GameInputState`, `PhysicsWorld` with continuous swept AABB collision and sensor-overlap queries, `TileMap` with symbol lookup and marker discovery, `Sprite2D`, `SpriteFrame`, `SpriteAnimation`, `Camera2D`, and `SpriteRenderer`. It is intentionally engine-shaped but small: applications own gameplay rules, assets, levels, and persistence.
 
 ```cangjie
-import core.{Buffer, Rect}
-import document.*
+import core.*
 import markdown.*
 
 let doc = Markdown.parse("# Title\n\n- item")
@@ -79,14 +78,13 @@ Game and simulation extensions:
 
 Near-term priority:
 
-1. `document`
-2. `editor`
-3. `markdown`
-4. `terminal`
-5. `diff`
-6. `cjtui_syntax`
-7. `cjtui_json`
-8. `media`
-9. `game`
-10. `cjtui_html`
-11. `cjtui_diagnostics`
+1. `editor`
+2. `markdown`
+3. `terminal`
+4. `diff`
+5. `cjtui_syntax`
+6. `cjtui_json`
+7. `media`
+8. `game`
+9. `cjtui_html`
+10. `cjtui_diagnostics`
