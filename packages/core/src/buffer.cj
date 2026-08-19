@@ -31,6 +31,11 @@ public class Buffer {
     private let cells: Array<Cell>
     private let media = ArrayList<MediaPlacement>()
     private var writeClip: ?DirtyRects = None
+    // Step-0 diagnostics are opt-in and reset for each render closure. These
+    // counters never participate in clipping, layout, or cell equality.
+    private var workMetricsEnabled: Bool = false
+    private var cellAttemptsValue: Int64 = 0
+    private var cellWritesValue: Int64 = 0
 
     public init(area: Rect) {
         this.area = area
@@ -56,11 +61,30 @@ public class Buffer {
         writeClip = clip
     }
 
+    func beginWorkMetrics(enabled: Bool): Unit {
+        workMetricsEnabled = enabled
+        cellAttemptsValue = 0
+        cellWritesValue = 0
+    }
+
+    func cellAttempts(): Int64 { cellAttemptsValue }
+
+    func cellWrites(): Int64 { cellWritesValue }
+
+    // Package-internal paint pruning hook. Widgets may use the Terminal's
+    // existing physical write clip to skip whole derived paint units; this
+    // does not create or widen damage and is never a correctness fallback.
+    func intersectsWriteClip(area: Rect): Bool {
+        match (writeClip) {
+            case Some(clip) => clip.intersects(area)
+            case None => true
+        }
+    }
+
     func clearDirty(rects: DirtyRects, style!: Style = Style.default()): Unit {
         let blank = Cell(" ", style: style)
         for (rect in rects.rects()) {
-            let expanded = Rect(rect.x - 1, rect.y, rect.width + 2, rect.height)
-            let target = intersect(area, expanded)
+            let target = intersect(area, rect)
             for (y in target.y..target.bottom) {
                 for (x in target.x..target.right) {
                     setCellRaw(x, y, blank)
@@ -77,6 +101,7 @@ public class Buffer {
     }
 
     public func setCell(x: Int64, y: Int64, cell: Cell): Unit {
+        if (workMetricsEnabled) { cellAttemptsValue++ }
         if (!isWritable(x, y)) { return }
         if (let Some(index) <- indexOf(x, y)) {
             if (isWideContinuation(cells[index]) && x > area.x) {
@@ -86,12 +111,16 @@ public class Buffer {
                 setCellRaw(x + 1, y, Cell(" "))
             }
             cells[index] = cell
+            if (workMetricsEnabled) { cellWritesValue++ }
         }
     }
 
     private func setCellRaw(x: Int64, y: Int64, cell: Cell): Unit {
+        if (workMetricsEnabled) { cellAttemptsValue++ }
+        if (!isWritable(x, y)) { return }
         if (let Some(index) <- indexOf(x, y)) {
             cells[index] = cell
+            if (workMetricsEnabled) { cellWritesValue++ }
         }
     }
 
@@ -235,15 +264,42 @@ public class Buffer {
     }
 
     public func setString(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit {
+        let _ = writeString(x, y, text, 0, false, style)
+    }
+
+    func writeStringClipped(
+        x: Int64,
+        y: Int64,
+        text: String,
+        maxWidth!: Int64,
+        style!: Style = Style.default()
+    ): Int64 {
+        writeString(x, y, text, maxWidth, true, style)
+    }
+
+    private func writeString(
+        x: Int64,
+        y: Int64,
+        text: String,
+        maxWidth: Int64,
+        bounded: Bool,
+        style: Style
+    ): Int64 {
+        if (text.isEmpty() || (bounded && maxWidth <= 0) || (!bounded && x >= area.right)) {
+            return 0
+        }
         let bytes = unsafe { text.rawData() }
         if (isPrintableAscii(bytes)) {
-            setAsciiString(x, y, bytes, style)
-            return
+            let count = if (bounded) { min(bytes.size, maxWidth) } else { bytes.size }
+            setAsciiRange(x, y, bytes, 0, count, style)
+            return count
         }
 
         var cx = x
+        var consumed: Int64 = 0
         var offset: Int64 = 0
-        while (offset < bytes.size && cx < area.right) {
+        while (offset < bytes.size &&
+               ((bounded && consumed < maxWidth) || (!bounded && cx < area.right))) {
             // Unicode UI chrome commonly prefixes an otherwise ASCII line
             // (for example `╭─ ✓ Run cargo test`).  Running the full
             // grapheme-break state machine for every trailing ASCII byte is
@@ -263,11 +319,17 @@ public class Buffer {
                     runEnd
                 }
                 if (safeEnd > offset) {
-                    let ascii = text[offset..safeEnd]
-                    let asciiBytes = unsafe { ascii.rawData() }
-                    setAsciiString(cx, y, asciiBytes, style)
-                    cx += asciiBytes.size
-                    offset = safeEnd
+                    let available = safeEnd - offset
+                    let asciiCount = if (bounded) {
+                        min(available, maxWidth - consumed)
+                    } else {
+                        available
+                    }
+                    let asciiEnd = offset + asciiCount
+                    setAsciiRange(cx, y, bytes, offset, asciiEnd, style)
+                    consumed += asciiCount
+                    cx = advanceCoordinate(cx, asciiCount)
+                    offset = asciiEnd
                     continue
                 }
             }
@@ -275,23 +337,48 @@ public class Buffer {
             let symbol = text[offset..next]
             let width = graphemeDisplayWidth(symbol)
             if (width > 0) {
-                if (width == 2 && cx + 1 >= area.right) {
+                if (bounded && width > maxWidth - consumed) {
                     break
                 }
-                setCell(cx, y, Cell(symbol, style: style, kind: if (width == 2) { CellKind.WideLead } else { CellKind.Normal }))
-                if (width == 2 && cx + 1 < area.right) {
-                    setCellRaw(cx + 1, y, Cell("", style: style, kind: CellKind.WideCont))
+                let fitsPhysical = cx < area.right && (width != 2 || cx + 1 < area.right)
+                if (!bounded && width == 2 && !fitsPhysical) {
+                    break
                 }
-                cx += width
+                let writableGroup = isWritable(cx, y) && (width != 2 || isWritable(cx + 1, y))
+                if (fitsPhysical && writableGroup) {
+                    setCell(cx, y, Cell(symbol, style: style, kind: if (width == 2) { CellKind.WideLead } else { CellKind.Normal }))
+                    if (width == 2) {
+                        setCellRaw(cx + 1, y, Cell("", style: style, kind: CellKind.WideCont))
+                    }
+                }
+                consumed += width
+                cx = advanceCoordinate(cx, width)
             }
             offset = next
         }
+        consumed
+    }
+
+    private func advanceCoordinate(value: Int64, amount: Int64): Int64 {
+        if (amount > 0 && value > Int64.Max - amount) { return Int64.Max }
+        value + amount
     }
 
     private func setAsciiString(x: Int64, y: Int64, bytes: Array<UInt8>, style: Style): Unit {
+        setAsciiRange(x, y, bytes, 0, bytes.size, style)
+    }
+
+    private func setAsciiRange(
+        x: Int64,
+        y: Int64,
+        bytes: Array<UInt8>,
+        start: Int64,
+        end: Int64,
+        style: Style
+    ): Unit {
         var cx = x
-        var offset: Int64 = 0
-        while (offset < bytes.size && cx < area.right) {
+        var offset = start
+        while (offset < end && cx < area.right) {
             setCell(cx, y, Cell(asciiByteToString(bytes[offset]), style: style))
             cx++
             offset++

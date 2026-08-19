@@ -228,18 +228,6 @@ public enum TimerPriority {
     | Low
 }
 
-public struct ComponentTickEvent {
-    public let componentId: String
-    public let timerId: String
-    public let tick: TimerEvent
-
-    public init(componentId: String, timerId: String, tick: TimerEvent) {
-        this.componentId = componentId
-        this.timerId = timerId
-        this.tick = tick
-    }
-}
-
 public enum Event {
     | KeyDown(KeyEvent)
     | KeyUp(KeyEvent)
@@ -266,7 +254,6 @@ public enum Event {
     | DataCancelled(String, Int64)
     | Tick(TickEvent)
     | Timer(TimerEvent)
-    | ComponentTick(ComponentTickEvent)
     | Resize(Rect)
     | Unknown(Array<Byte>)
 }

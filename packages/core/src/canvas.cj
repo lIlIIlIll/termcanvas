@@ -163,17 +163,26 @@ public class Canvas {
         if (tx >= clip.x) {
             buffer.setString(tx, ty, truncate(text, clip.right - tx), style: style)
         } else {
-            var dropped: Int64 = 0
+            let hiddenWidth = clip.x - tx
+            var droppedWidth: Int64 = 0
             var byteOffset: Int64 = 0
-            for (r in text.runes()) {
-                let w = displayWidth(r)
-                if (dropped + w <= clip.x - tx) {
-                    dropped += w
-                    byteOffset += r.toString().size
+            for (cluster in graphemeClusters(text)) {
+                if (droppedWidth + cluster.width <= hiddenWidth) {
+                    droppedWidth += cluster.width
+                    byteOffset = cluster.endOffset
+                } else {
+                    // A terminal grapheme is atomic. If it crosses the left
+                    // clip edge, omit it without shifting following text.
+                    if (droppedWidth < hiddenWidth) {
+                        droppedWidth += cluster.width
+                        byteOffset = cluster.endOffset
+                    }
+                    break
                 }
             }
-            if (byteOffset < text.size) {
-                buffer.setString(clip.x, ty, truncate(text[byteOffset..], clip.width), style: style)
+            let drawX = tx + droppedWidth
+            if (byteOffset < text.size && drawX < clip.right) {
+                buffer.setString(drawX, ty, truncate(text[byteOffset..], clip.right - drawX), style: style)
             }
         }
     }

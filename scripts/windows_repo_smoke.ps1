@@ -74,8 +74,6 @@ Add-Log "Repo=$Repo"
 Add-Log "Cjc=$Cjc"
 Add-Log "Cjpm=$Cjpm"
 
-Invoke-CjpmPackage (Join-Path $Repo "packages\document") @("test", "--no-color")
-Invoke-CjpmPackage (Join-Path $Repo "packages\editor") @("test", "--no-color")
 Invoke-CjpmPackage (Join-Path $Repo "packages\example_smoke") @("run")
 Invoke-CjpmPackage (Join-Path $Repo "examples\game_pressure_suite") @("build")
 

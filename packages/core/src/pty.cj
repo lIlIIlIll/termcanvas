@@ -95,6 +95,14 @@ public struct PtySize {
     }
 }
 
+func snapshotStrings(values: Array<String>): Array<String> {
+    let snapshot = ArrayList<String>()
+    for (value in values) {
+        snapshot.add(value)
+    }
+    snapshot.toArray()
+}
+
 public class PtySpec {
     public let command: String
     public let args: Array<String>
@@ -110,9 +118,9 @@ public class PtySpec {
         size!: PtySize = PtySize()
     ) {
         this.command = command
-        this.args = args
+        this.args = snapshotStrings(args)
         this.cwd = cwd
-        this.env = env
+        this.env = snapshotStrings(env)
         this.size = size
     }
 }
@@ -121,25 +129,11 @@ public enum PtySignal {
     | Interrupt
     | Terminate
     | Kill
-    | User(Int32)
 }
 
-public struct PtyExitStatus {
-    public let code: ?Int64
-    public let signal: ?Int32
-
-    public init(code!: ?Int64 = None, signal!: ?Int32 = None) {
-        this.code = code
-        this.signal = signal
-    }
-
-    public static func exited(code: Int64): PtyExitStatus {
-        PtyExitStatus(code: Some(code))
-    }
-
-    public static func signaled(signal: Int32): PtyExitStatus {
-        PtyExitStatus(signal: Some(signal))
-    }
+public enum PtyExitStatus {
+    | Exited(Int64)
+    | Signaled(Int32)
 }
 
 public interface PtyProcess {
@@ -172,6 +166,9 @@ public enum EventSourceInterest {
 public interface EventSource {
     func id(): String
     func fd(): ?Int32
+    // Windows wait handles are orthogonal to Unix file descriptors. The
+    // default keeps all existing PTY sources source-compatible.
+    func waitHandle(): ?CPointer<Unit> { None }
     func interests(): EventSourceInterest
     func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
     func drain(): Array<Event>
@@ -292,7 +289,7 @@ public class FakePtyRuntime <: PtyRuntime {
         } else {
             processes[index].close()
             processes.remove(at: index)
-            Event.PtyExited(id, PtyExitStatus.exited(0))
+            Event.PtyExited(id, PtyExitStatus.Exited(0))
         }
     }
 
@@ -671,7 +668,7 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
         }
         let raw = unsafe { statusPtr.read() }
         unsafe { LibC.free(statusPtr) }
-        if (pid == childPid) { decodeExitStatus(raw) } else { PtyExitStatus.signaled(SIGTERM) }
+        if (pid == childPid) { decodeExitStatus(raw) } else { PtyExitStatus.Signaled(SIGTERM) }
     }
 
     private func readAvailable(fd: Int32, stream: PtyOutputStream): Unit {
@@ -724,7 +721,6 @@ func ptySignalName(signal: PtySignal): String {
         case PtySignal.Interrupt => "interrupt"
         case PtySignal.Terminate => "terminate"
         case PtySignal.Kill => "kill"
-        case PtySignal.User(value) => "signal:${value}"
     }
 }
 
@@ -798,7 +794,6 @@ func signalNumber(signal: PtySignal): Int32 {
         case PtySignal.Interrupt => SIGINT
         case PtySignal.Terminate => SIGTERM
         case PtySignal.Kill => SIGKILL
-        case PtySignal.User(value) => value
     }
 }
 
@@ -806,8 +801,8 @@ func signalNumber(signal: PtySignal): Int32 {
 func decodeExitStatus(raw: Int32): PtyExitStatus {
     let signal = raw & 0x7F
     if (signal == 0) {
-        PtyExitStatus.exited(Int64((raw >> 8) & 0xFF))
+        PtyExitStatus.Exited(Int64((raw >> 8) & 0xFF))
     } else {
-        PtyExitStatus.signaled(signal)
+        PtyExitStatus.Signaled(signal)
     }
 }

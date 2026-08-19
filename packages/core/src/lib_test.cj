@@ -44,6 +44,34 @@ class CountingEventWaiter <: EventWaiter {
     }
 }
 
+class CountingAppTraceSink <: AppTraceSink {
+    var inputCallbacks: Int64 = 0
+    var dispatchCallbacks: Int64 = 0
+    var updateCallbacks: Int64 = 0
+    var renderCallbacks: Int64 = 0
+    var completedFrames: Int64 = 0
+
+    public func inputReceived(_: Event, eventQueueLength: Int64): Unit {
+        inputCallbacks++
+        if (eventQueueLength < 0) { throw Exception("negative event queue length") }
+    }
+
+    public func eventDispatchCompleted(): Unit { dispatchCallbacks++ }
+
+    public func stateUpdateCompleted(): Unit { updateCallbacks++ }
+
+    public func renderStarted(): Unit { renderCallbacks++ }
+
+    public func frameCompleted(metrics: RenderMetrics): Unit {
+        completedFrames++
+        if (metrics.renderedCells < 0) { throw Exception("negative rendered cells") }
+    }
+
+    public func eventLoopStall(task: String, durationNanos: Int64): Unit {
+        if (task.size < 0 || durationNanos < 0) { throw Exception("invalid stall trace") }
+    }
+}
+
 class ResizeChangingWaiter <: EventWaiter {
     private let backend: TestBackend
     private let nextArea: Rect
@@ -157,19 +185,6 @@ class ObservedTerminalDriver <: TerminalDriver {
     public func capabilities(backend: Backend): TerminalCapabilities {
         capabilityCalls++
         TerminalCapabilities(size: backend.size(), driverName: name())
-    }
-}
-
-class FixedComponentLayoutProvider <: ComponentLayoutProvider {
-    private let rects: Array<Rect>
-
-    init(rects: Array<Rect>) {
-        this.rects = rects
-    }
-
-    public func split(area: Rect, count: Int64): Array<Rect> {
-        if (area.width < 0 || count < 0) { return [] }
-        rects
     }
 }
 
@@ -299,163 +314,10 @@ func parseGraphemeBreakTestCase(line: String): (String, Array<Int64>) {
     (builder.toString(), expected.toArray())
 }
 
-class DemoScreen <: Screen {
-    let label: String
-
-    init(label: String) {
-        this.label = label
-    }
-
-    public func render(frame: Frame): Unit {
-        frame.renderWidget(Paragraph(label), frame.area)
-    }
-
-    public func update(event: Event): ControlFlow {
-        match (event) {
-            case Event.KeyDown(k) => match (k.code) {
-                case KeyCode.CtrlC => ControlFlow.Exit
-                case _ => ControlFlow.Continue
-            }
-            case _ => ControlFlow.Continue
-        }
-    }
-}
-
 func strongItalicTestModifier(): Modifier {
     var modifier = Modifier.strong()
     modifier.italic = true
     modifier
-}
-
-class CountingComponent <: Component {
-    let id: String
-    var handled: Int64 = 0
-    var rendered: Bool = false
-
-    init(id: String) {
-        this.id = id
-    }
-
-    public func render(frame: Frame, area: Rect): Unit {
-        rendered = true
-        frame.renderWidget(Paragraph(id), area)
-    }
-
-    public func handle(event: Event): HandleResult {
-        handled++
-        match (event) {
-            case Event.KeyDown(key) => match (key.code) {
-                case KeyCode.CtrlC => HandleResult.exit()
-                case KeyCode.Char(r'h') => HandleResult.consumed()
-                case KeyCode.Char(r'm') => HandleResult.withCommand(Command.Message(id))
-                case _ => HandleResult.ignored()
-            }
-            case _ => HandleResult.ignored()
-        }
-    }
-
-    public func focusId(): ?String {
-        Some(id)
-    }
-}
-
-class RuntimeProbeComponent <: RuntimeComponent {
-    let id: String
-    let text: String
-    var mounts: Int64 = 0
-    var unmounts: Int64 = 0
-    var updates: Int64 = 0
-    var renders: Int64 = 0
-    var resizes: Int64 = 0
-    var tickEvents: Int64 = 0
-    var lastEventText: String = ""
-    var resultDirty: Dirty = Dirty.Clean
-    var resultHandled: Bool = false
-    var stopOnUpdate: Bool = false
-    var startTimerOnMount: Bool = false
-    var poller: ?AsyncPoller = None
-
-    init(id: String, text!: String = "x") {
-        this.id = id
-        this.text = text
-    }
-
-    public func mount(ctx: ComponentContext): ComponentResult {
-        mounts++
-        if (startTimerOnMount) {
-            ctx.startTimer("sample", Duration.millisecond * 10)
-        }
-        ComponentResult.ignored()
-    }
-
-    public func unmount(ctx: ComponentContext): ComponentResult {
-        unmounts++
-        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
-        ComponentResult.ignored()
-    }
-
-    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
-        resizes++
-        if (ctx.componentId.isEmpty() || oldArea == newArea) { return ComponentResult.ignored() }
-        ComponentResult.withDirty(Dirty.Self)
-    }
-
-    public func update(event: Event, ctx: ComponentContext): ComponentResult {
-        updates++
-        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
-        match (event) {
-            case Event.ComponentTick(tick) =>
-                tickEvents++
-                lastEventText = tick.componentId + ":" + tick.timerId
-                ComponentResult.consumed(dirty: Dirty.Self)
-            case Event.AsyncCompleted(id, inner) =>
-                match (poller) {
-                    case Some(p) => p.complete()
-                    case None => ()
-                }
-                match (inner) {
-                    case Event.Message(text) => lastEventText = id + ":" + text
-                    case _ => lastEventText = id
-                }
-                ComponentResult.consumed(dirty: Dirty.Self)
-            case Event.DataReady(id, version) =>
-                lastEventText = id + ":" + "${version}"
-                ComponentResult.consumed(dirty: Dirty.Self)
-            case Event.DataFailed(id, _, message) =>
-                lastEventText = id + ":error:" + message
-                ComponentResult.consumed(dirty: Dirty.Self)
-            case Event.DataCancelled(id, version) =>
-                lastEventText = id + ":cancelled:" + "${version}"
-                ComponentResult.consumed(dirty: Dirty.Self)
-            case Event.KeyDown(key) =>
-                match (key.code) {
-                    case KeyCode.Up =>
-                        if (resultHandled) {
-                            ComponentResult(handled: true, dirty: resultDirty, propagation: if (stopOnUpdate) { EventPropagation.Stop } else { EventPropagation.Continue })
-                        } else {
-                            ComponentResult.ignored()
-                        }
-                    case _ => ComponentResult.ignored()
-                }
-            case Event.Message(text) =>
-                lastEventText = text
-                if (resultHandled) {
-                    ComponentResult(handled: true, dirty: resultDirty, propagation: if (stopOnUpdate) { EventPropagation.Stop } else { EventPropagation.Continue })
-                } else {
-                    ComponentResult.ignored()
-                }
-            case _ => ComponentResult.ignored()
-        }
-    }
-
-    public func render(frame: Frame, area: Rect): Unit {
-        renders++
-        frame.renderWidget(Paragraph(text), area)
-    }
-
-    public func focusId(): ?String {
-        Some(id)
-    }
 }
 
 class RuntimeTableRows {
@@ -467,65 +329,40 @@ class RuntimeTableRows {
     }
 }
 
-class DataSourceProbeComponent <: RuntimeComponent {
-    let source = DataSource<Int64>("proc", debounceMillis: 10, idleMillis: 5)
-    var lastEventText = ""
+// Package-local mutable boxes for closure-driven runtime tests. They remain in
+// *_test.cj so test fixture convenience does not become production API.
+class StringState {
+    private var value: String
+    private var dirty: Bool = false
 
-    public func mount(ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
-        ComponentResult.ignored()
+    init(value!: String = "") {
+        this.value = value
     }
 
-    public func unmount(ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
-        ComponentResult.ignored()
-    }
+    func get(): String { value }
 
-    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty() || oldArea == newArea) { return ComponentResult.ignored() }
-        ComponentResult.withDirty(Dirty.Self)
-    }
-
-    public func update(event: Event, ctx: ComponentContext): ComponentResult {
-        match (event) {
-            case Event.Message(text) =>
-                match (text) {
-                    case "activity" =>
-                        source.markActivity(100)
-                        ComponentResult.consumed()
-                    case "poll-idle-blocked" =>
-                        if (!source.refresh(ctx, { => Int64(1) }, nowMillis: 102, lowPriority: true)) {
-                            lastEventText = "blocked"
-                        }
-                        ComponentResult.consumed()
-                    case "poll" =>
-                        if (source.refresh(ctx, { => Int64(2) }, nowMillis: 106, lowPriority: true)) {
-                            lastEventText = "pending"
-                        }
-                        ComponentResult.consumed()
-                    case "cancel" =>
-                        source.cancel(ctx)
-                        ComponentResult.consumed()
-                    case _ => ComponentResult.ignored()
-                }
-            case Event.DataReady(id, version) =>
-                lastEventText = id + ":" + "${version}"
-                ComponentResult.consumed(dirty: Dirty.Self)
-            case Event.DataFailed(id, _, message) =>
-                lastEventText = id + ":error:" + message
-                ComponentResult.consumed(dirty: Dirty.Self)
-            case Event.DataCancelled(id, version) =>
-                lastEventText = id + ":cancelled:" + "${version}"
-                ComponentResult.consumed(dirty: Dirty.Self)
-            case _ => ComponentResult.ignored()
+    func set(value: String): Unit {
+        if (this.value != value) {
+            this.value = value
+            dirty = true
         }
     }
 
-    public func render(frame: Frame, area: Rect): Unit {
-        frame.renderWidget(Paragraph("data"), area)
+    func isDirty(): Bool { dirty }
+}
+
+class IntState {
+    private var value: Int64
+
+    init(value!: Int64 = 0) {
+        this.value = value
     }
 
-    public func focusId(): ?String { Some("data") }
+    func get(): Int64 { value }
+
+    func set(value: Int64): Unit {
+        this.value = value
+    }
 }
 
 class CommandCounter {
@@ -597,8 +434,84 @@ class FlowCounter {
     }
 }
 
+func ptyExitStatusText(status: PtyExitStatus): String {
+    match (status) {
+        case PtyExitStatus.Exited(code) => "exited:${code}"
+        case PtyExitStatus.Signaled(signal) => "signaled:${signal}"
+    }
+}
+
+func ptyExitEventText(event: Event): String {
+    match (event) {
+        case Event.PtyExited(id, status) => "${id}:${ptyExitStatusText(status)}"
+        case _ => "other"
+    }
+}
+
 @Test
 class CjTuiCoreTest {
+    @TestCase
+    func ptySpecSnapshotsCallerArraysAndKeepsDefaults(): Unit {
+        let args = ["-lc", "printf ok"]
+        let env = ["LANG=C", "TERM=xterm-256color"]
+        let spec = PtySpec("/bin/sh", args: args, env: env)
+
+        args[0] = "--changed"
+        env[0] = "LANG=changed"
+
+        @Expect(spec.command, "/bin/sh")
+        @Expect(spec.args[0], "-lc")
+        @Expect(spec.env[0], "LANG=C")
+        @Expect(spec.cwd, "")
+        @Expect(spec.size.cols, 80)
+        @Expect(spec.size.rows, 24)
+    }
+
+    @TestCase
+    func ptySizeClampsDimensionsAndKeepsExplicitValues(): Unit {
+        let defaults = PtySize()
+        @Expect(defaults.cols, 80)
+        @Expect(defaults.rows, 24)
+
+        let clamped = PtySize(cols: 0, rows: -5)
+        @Expect(clamped.cols, 1)
+        @Expect(clamped.rows, 1)
+
+        let explicit = PtySize(cols: 132, rows: 43)
+        @Expect(explicit.cols, 132)
+        @Expect(explicit.rows, 43)
+    }
+
+    @TestCase
+    func ptySignalExposesOnlyPortableIntentCases(): Unit {
+        @Expect(ptySignalName(PtySignal.Interrupt), "interrupt")
+        @Expect(ptySignalName(PtySignal.Terminate), "terminate")
+        @Expect(ptySignalName(PtySignal.Kill), "kill")
+    }
+
+    @TestCase
+    func ptyOutputStreamCasesRemainDistinct(): Unit {
+        let stdout = match (PtyOutputStream.Stdout) {
+            case PtyOutputStream.Stdout => "stdout"
+            case PtyOutputStream.Stderr => "stderr"
+        }
+        let stderr = match (PtyOutputStream.Stderr) {
+            case PtyOutputStream.Stdout => "stdout"
+            case PtyOutputStream.Stderr => "stderr"
+        }
+        @Expect(stdout, "stdout")
+        @Expect(stderr, "stderr")
+    }
+
+    @TestCase
+    func ptyExitStatusRepresentsExactlyOneTerminationReason(): Unit {
+        let exited = PtyExitStatus.Exited(7)
+        let signaled = PtyExitStatus.Signaled(15)
+        @Expect(ptyExitStatusText(exited), "exited:7")
+        @Expect(ptyExitStatusText(signaled), "signaled:15")
+        @Expect(ptyExitEventText(Event.PtyExited("shell", exited)), "shell:exited:7")
+    }
+
     @TestCase
     func layoutSplitsHorizontally(): Unit {
         let chunks = Layout.horizontal([Constraint.Length(10), Constraint.Percent(50), Constraint.Min(1)])
@@ -1517,57 +1430,14 @@ class CjTuiCoreTest {
         focus.add("submit")
         @Expect(focus.current(), Some("name"))
         @Expect(focus.next(), Some("submit"))
+        @Expect(focus.previous(), Some("name"))
+        @Expect(focus.handle(KeyEvent(KeyCode.Tab)))
+        @Expect(focus.current(), Some("submit"))
         @Expect(focus.handle(KeyEvent(KeyCode.BackTab)))
         @Expect(focus.current(), Some("name"))
         @Expect(!focus.focus("disabled"))
         focus.remove("name")
         @Expect(focus.current(), Some("submit"))
-    }
-
-    @TestCase
-    func eventRouterDispatchesFocusedComponentBeforeGlobalFallback(): Unit {
-        let keymap = KeyMap()
-        keymap.add(KeyBinding([KeyEvent(KeyCode.Char(r'q'))], "quit"))
-        let router = EventRouter(globalKeys: keymap)
-        let first = CountingComponent("first")
-        let second = CountingComponent("second")
-        router.add(first)
-        router.add(second)
-
-        let flow = router.handle(Event.KeyDown(KeyEvent(KeyCode.Char(r'q'))), { action =>
-            if (action == "quit") { ControlFlow.Exit } else { ControlFlow.Continue }
-        })
-        match (flow) {
-            case ControlFlow.Exit => ()
-            case _ => @Expect(false)
-        }
-        @Expect(first.handled, 1)
-
-        @Expect(router.focusManager().focus("second"))
-        _ = router.handle(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))))
-        @Expect(first.handled, 1)
-        @Expect(second.handled, 1)
-        let handled = router.handleResult(Event.KeyDown(KeyEvent(KeyCode.Char(r'h'))))
-        @Expect(handled.handled)
-        match (handled.flow) {
-            case ControlFlow.Continue => ()
-            case _ => @Expect(false)
-        }
-        let command = router.handleResult(Event.KeyDown(KeyEvent(KeyCode.Char(r'm'))))
-        @Expect(command.handled)
-        match (command.command) {
-            case Command.Message(text) => @Expect(text, "second")
-            case _ => @Expect(false)
-        }
-
-        let backend = TestBackend(area: Rect(0, 0, 10, 2))
-        let terminal = Terminal(backend)
-        terminal.draw { frame =>
-            router.render(frame, Layout.vertical([Constraint.Length(1), Constraint.Length(1)]).split(frame.area))
-        }
-        @Expect(first.rendered)
-        @Expect(second.rendered)
-        @Expect(backend.snapshot().contains("first"))
     }
 
     @TestCase
@@ -1698,7 +1568,7 @@ class CjTuiCoreTest {
 
         runtime.injectText("shell", "stdout")
         runtime.injectText("shell", "stderr", stream: PtyOutputStream.Stderr)
-        runtime.injectExit("shell", PtyExitStatus.exited(0))
+        runtime.injectExit("shell", PtyExitStatus.Exited(0))
         @Expect(App.processCommands({ event => counter.update(event) }, queue, ptyRuntime: runtime))
         @Expect(counter.ptyOutputs, 2)
         @Expect(counter.ptyStdout, 1)
@@ -1739,9 +1609,9 @@ class CjTuiCoreTest {
                             sawStderr = true
                         }
                     case Event.PtyExited(_, status) =>
-                        match (status.code) {
-                            case Some(code) => @Expect(code, 0)
-                            case None => ()
+                        match (status) {
+                            case PtyExitStatus.Exited(code) => @Expect(code, 0)
+                            case PtyExitStatus.Signaled(_) => @Expect(false)
                         }
                         sawExit = true
                     case _ => ()
@@ -2169,24 +2039,7 @@ class CjTuiCoreTest {
     }
 
     @TestCase
-    func componentTreeStylesAndVisualWidgetsWork(): Unit {
-        let rootComponent = CountingComponent("root")
-        let childComponent = CountingComponent("child")
-        let tree = ViewNode("root", component: Some(rootComponent), area: Rect(0, 0, 8, 1), classes: ["panel"])
-        tree.add(ViewNode("child", component: Some(childComponent), area: Rect(0, 1, 8, 1), classes: ["panel", "leaf"]))
-        @Expect(tree.isDirty())
-        tree.clearDirty()
-        @Expect(!tree.isDirty())
-        tree.setArea(Rect(0, 0, 9, 1))
-        @Expect(tree.isDirty())
-        @Expect(tree.queryByClass("panel").size, 2)
-        let flow = tree.dispatch(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))), focusId: Some("child"))
-        match (flow) {
-            case ControlFlow.Continue => ()
-            case _ => @Expect(false)
-        }
-        @Expect(rootComponent.handled > 0)
-        @Expect(childComponent.handled > 0)
+    func legacyStateAndVisualWidgetsWork(): Unit {
         let stringState = StringState(value: "a")
         stringState.set("b")
         @Expect(stringState.isDirty())
@@ -2194,27 +2047,6 @@ class CjTuiCoreTest {
         intState.set(2)
         @Expect(intState.get(), 2)
 
-        let sheet = StyleSheet(classes: [StyleClass("danger", normal: Style(fg: Color.Red), focused: Style(bg: Color.White))])
-        sheet.addRule(StyleRule(".button", Style(fg: Color.Green), state: StyleState.Selected))
-        @Expect(sheet.resolve("danger", state: StyleState.Focused), Style(fg: Color.Red, bg: Color.White))
-        @Expect(sheet.resolveSelector(".button", state: StyleState.Selected), Style(fg: Color.Green))
-        let css = StyleSheet.parse("screen { color: white; background: blue; display: flex; gap: 1; } .danger:selected { color: red; } #child { width: 3; height: 1; }")
-        let dom = ViewNode("root", tag: "screen", area: Rect(0, 0, 8, 2))
-        let child = ViewNode("child", tag: "button", classes: ["danger"])
-        child.setState("selected")
-        dom.add(child)
-        css.apply(dom, Rect(0, 0, 8, 2))
-        @Expect(dom.computedStyle().style, Style(fg: Color.White, bg: Color.Blue))
-        @Expect(child.computedStyle().style, Style(fg: Color.Red, bg: Color.Blue))
-        @Expect(child.layoutBox(), Rect(0, 0, 3, 1))
-        let domBackend = TestBackend(area: Rect(0, 0, 8, 2))
-        Terminal(domBackend).draw { frame => frame.renderNode(dom, css) }
-        @Expect(domBackend.assertCell(0, 0, " ", style: Style(fg: Color.Red, bg: Color.Blue)))
-        let cascadeCss = StyleSheet.parse("#child { color: yellow; } .danger { color: green; } .danger { background: red; }")
-        cascadeCss.apply(dom, Rect(0, 0, 8, 2))
-        @Expect(child.computedStyle().style, Style(fg: Color.Yellow, bg: Color.Red))
-        let pack = ThemePack("default", tokens: DesignTokens(gap: 2))
-        @Expect(pack.tokens.gap, 2)
         @Expect(Theme.default().serialize().contains("normal="))
 
         let buffer = Buffer(Rect(0, 0, 30, 12))
@@ -2223,10 +2055,6 @@ class CjTuiCoreTest {
         Chart([1, 3, 2]).render(Rect(0, 2, 6, 3), buffer)
         DocumentView(Document([DocumentLine(DocumentLineKind.Heading(1), "Title")])).render(Rect(8, 0, 12, 2), buffer)
         LogView(["a", "b", "c"]).render(Rect(8, 2, 5, 2), buffer)
-        SplitPane(Paragraph("L"), Paragraph("R")).render(Rect(0, 6, 12, 1), buffer)
-        let wizard = Wizard(["One", "Two"], bodies: ["Body"])
-        wizard.next()
-        wizard.render(Rect(0, 7, 20, 2), buffer)
         let picker = ColorPicker()
         _ = picker.handle(KeyEvent(KeyCode.Right))
         picker.render(Rect(0, 10, 20, 1), buffer)
@@ -2334,12 +2162,6 @@ class CjTuiCoreTest {
         @Expect(mediaBuffer.mediaPlacements().size, 1)
         @Expect(mediaBuffer.mediaPlacements()[0].area.height, 3)
 
-        let domBackend = TestBackend(area: Rect(0, 0, 12, 4))
-        let node = ViewNode("hero", tag: "img", inlineStyle: StyleDeclaration.parse("width: 8; height: 2; object-fit: cover")).setMedia(mediaSource)
-        Terminal(domBackend).draw { frame => frame.renderNode(node, StyleSheet()) }
-        @Expect(domBackend.assertLastMediaOpCount(1))
-        @Expect(domBackend.lastMediaOps()[0].placement.area.width, 8)
-
         let sourced = DocumentView(Document([DocumentLine(DocumentLineKind.Paragraph, [RichSpan("abc", sourceRange: Some("12:15"))])]))
         match (sourced.sourceOffsetForRenderedLine(10, 0)) {
             case Some(offset) => @Expect(offset, 12)
@@ -2409,19 +2231,11 @@ class CjTuiCoreTest {
         @Expect(date.value(), "2026-05-29")
         date.render(Rect(0, 2, 12, 1), out)
 
-        Accordion(["One", "Two"], bodies: ["Body"]).render(Rect(0, 3, 16, 4), out)
-        Breadcrumb(["home", "docs"]).render(Rect(0, 7, 20, 1), out)
-        TreeTable(Tree([TreeNode("r", "Root")]), Table(["A"], [["1"]])).render(Rect(0, 8, 24, 3), out)
         let fileDialog = FileDialog(path: ".", extension: ".cj")
         fileDialog.render(Rect(0, 11, 16, 3), out)
         let confirm = ConfirmDialog("Continue?")
         @Expect(confirm.handle(KeyEvent(KeyCode.Char(r'y'))), Some(true))
 
-        let highlighter = SyntaxHighlighter(rules: [SyntaxRule("error", Style(fg: Color.Red))])
-        @Expect(highlighter.styleFor("has error"), Style(fg: Color.Red))
-        SoftWrapView("hello world").render(Rect(18, 0, 8, 3), out)
-        let editor = TextEditor(value: "one")
-        editor.render(Rect(18, 4, 16, 5), out)
     }
 
     @TestCase
@@ -2801,37 +2615,6 @@ class CjTuiCoreTest {
         _ = highlightCache.visibleHighlights(largeDoc, firstLine: 1010, lineCount: 10)
         @Expect(highlightCache.recomputeCount(), 1)
 
-        let buffers = BufferSet()
-        @Expect(buffers.add(EditorBuffer(path: "a.md", title: "A", value: "a", markdownEditing: true)), 0)
-        @Expect(buffers.add(EditorBuffer(path: "b.md", title: "B", value: "b")), 1)
-        @Expect(buffers.openOrSelect(EditorBuffer(path: "a.md", title: "A2")), 0)
-        @Expect(buffers.size(), 2)
-        match (buffers.activeBuffer()) {
-            case Some(buffer) => @Expect(buffer.title, "A")
-            case None => @Expect(false)
-        }
-        @Expect(buffers.tabTitles()[0], "A")
-        match (buffers.next()) {
-            case Some(buffer) => @Expect(buffer.title, "B")
-            case None => @Expect(false)
-        }
-        match (buffers.previous()) {
-            case Some(buffer) => @Expect(buffer.title, "A")
-            case None => @Expect(false)
-        }
-        match (buffers.activeBuffer()) {
-            case Some(buffer) =>
-                buffer.setReadOnly(true)
-                @Expect(buffer.textArea.readOnly)
-                buffer.markSaveFailed("denied")
-                match (buffer.lastError) {
-                    case Some(error) => @Expect(error.message, "denied")
-                    case None => @Expect(false)
-                }
-            case None => @Expect(false)
-        }
-        @Expect(buffers.recentFiles().size, 2)
-
         let buffer = Buffer(Rect(0, 0, 12, 2))
         area.render(buffer.area, buffer)
         @Expect(buffer.getCell(0, 0).symbol, "1")
@@ -2855,30 +2638,8 @@ class CjTuiCoreTest {
     }
 
     @TestCase
-    func screenStackModalTabsAndViewportRender(): Unit {
-        let stack = ScreenStack()
-        stack.push(DemoScreen("one"))
-        stack.replace(DemoScreen("two"))
-        @Expect(stack.size(), 1)
-        match (stack.current()) {
-            case Some(_) => ()
-            case None => @Expect(false)
-        }
-
+    func tabsViewportAndStatusBarRender(): Unit {
         let buffer = Buffer(Rect(0, 0, 24, 8))
-        buffer.fill(buffer.area, Cell("X"))
-        Modal(
-            title: "M",
-            body: "Hello modal",
-            buttons: ["OK"],
-            width: 12,
-            height: 5,
-            style: Style(fg: Color.White, bg: Color.Blue)
-        ).render(buffer.area, buffer)
-        @Expect(buffer.getCell(8, 1).symbol, "M")
-        @Expect(buffer.getCell(16, 3).symbol, " ")
-        @Expect(buffer.getCell(16, 3).style, Style(fg: Color.White, bg: Color.Blue))
-
         let tabs = Tabs(["A", "B"], selected: 0)
         @Expect(tabs.handle(KeyEvent(KeyCode.Right)))
         @Expect(tabs.selected, 1)
@@ -3137,16 +2898,6 @@ class CjTuiCoreTest {
         @Expect(buffer.undo())
         @Expect(buffer.text(), "one two one")
 
-        let searchPanel = SearchPanel(query: "one")
-        searchPanel.updateFrom(buffer)
-        let replacePanel = ReplacePanel(query: "one", replacement: "ONE")
-        @Expect(replacePanel.apply(buffer), 2)
-        let doc = TextDocumentView(buffer.lineCount(), { i => buffer.line(i) })
-        let out = Buffer(Rect(0, 0, 20, 2))
-        searchPanel.render(Rect(0, 0, 20, 1), out)
-        replacePanel.render(Rect(0, 1, 20, 1), out)
-        doc.render(Rect(0, 0, 20, 1), out)
-        @Expect(buffer.undo())
     }
 
     @TestCase
@@ -3292,7 +3043,7 @@ class CjTuiCoreTest {
         }, dirtyRects: Some(dirty))
         @Expect(left.renders, 2)
         @Expect(right.renders, 1)
-        @Expect(metrics.renderedCells <= 5)
+        @Expect(metrics.renderedCells <= 6)
         @Expect(metrics.dirtyRects, 1)
         @Expect(backend.snapshot().contains("right"))
     }
@@ -3312,408 +3063,12 @@ class CjTuiCoreTest {
             frame.canvas().drawText(0, 1, "changed-but-outside-dirty", Style.default())
         }, dirtyRects: Some(dirty))
         @Expect(!metrics.fullRedraw)
-        @Expect(metrics.renderedCells <= 3)
+        @Expect(metrics.renderedCells <= 4)
         @Expect(backend.assertCell(0, 0, "x"))
         @Expect(backend.assertCell(1, 0, "y"))
         @Expect(backend.assertCell(2, 0, " "))
         @Expect(backend.snapshot().contains("stable"))
         @Expect(!backend.snapshot().contains("changed"))
-    }
-
-    @TestCase
-    func componentHostMountUnmountManagesComponentTimers(): Unit {
-        let probe = RuntimeProbeComponent("cpu")
-        probe.startTimerOnMount = true
-        let host = ComponentHost().add("cpu", probe, area: Rect(0, 0, 10, 2))
-
-        let mounted = host.mount()
-        @Expect(probe.mounts, 1)
-        match (mounted.command) {
-            case Command.StartTimer(spec) => @Expect(spec.id, "component:cpu:sample")
-            case _ => @Expect(false)
-        }
-
-        let unmounted = host.unmount()
-        @Expect(probe.unmounts, 1)
-        match (unmounted.command) {
-            case Command.StopTimer(id) => @Expect(id, "component:cpu:sample")
-            case _ => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func componentHostMapsLocalDirtyToGlobalRects(): Unit {
-        let probe = RuntimeProbeComponent("table")
-        probe.resultHandled = true
-        probe.resultDirty = Dirty.LocalRows([1, 3])
-        let host = ComponentHost().add("table", probe, area: Rect(5, 4, 20, 6))
-
-        let result = host.dispatchTo("table", Event.Message("dirty"))
-        match (result.dirtyRects) {
-            case Some(rects) =>
-                @Expect(rects.intersects(Rect(5, 5, 20, 1)))
-                @Expect(rects.intersects(Rect(5, 7, 20, 1)))
-                @Expect(!rects.intersects(Rect(5, 4, 20, 1)))
-            case None => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func componentHostDirtyRenderSkipsUntouchedComponents(): Unit {
-        let left = RuntimeProbeComponent("left", text: "left")
-        let right = RuntimeProbeComponent("right", text: "right")
-        let host = ComponentHost()
-            .add("left", left, area: Rect(0, 0, 5, 1))
-            .add("right", right, area: Rect(6, 0, 5, 1))
-        let backend = TestBackend(area: Rect(0, 0, 12, 2))
-        let terminal = Terminal(backend)
-
-        _ = terminal.draw { frame => host.render(frame) }
-        @Expect(left.renders, 1)
-        @Expect(right.renders, 1)
-
-        left.resultHandled = true
-        left.resultDirty = Dirty.Self
-        let update = host.dispatchTo("left", Event.Message("update-left"))
-        let metrics = terminal.draw({ frame => host.render(frame) }, dirtyRects: update.dirtyRects)
-        @Expect(left.renders, 2)
-        @Expect(right.renders, 1)
-        @Expect(metrics.renderedCells <= 5)
-        @Expect(backend.snapshot().contains("right"))
-    }
-
-    @TestCase
-    func componentHostRoutesFocusedKeysAndComponentTimers(): Unit {
-        let cpu = RuntimeProbeComponent("cpu")
-        let proc = RuntimeProbeComponent("proc")
-        proc.resultHandled = true
-        proc.resultDirty = Dirty.Local(Rect(0, 1, 8, 1))
-        let host = ComponentHost()
-            .add("cpu", cpu, area: Rect(0, 0, 8, 2))
-            .add("proc", proc, area: Rect(0, 2, 8, 4))
-        @Expect(host.focusManager().focus("proc"))
-
-        let keyResult = host.update(Event.KeyDown(KeyEvent(KeyCode.Up)))
-        @Expect(cpu.updates, 0)
-        @Expect(proc.updates, 1)
-        match (keyResult.dirtyRects) {
-            case Some(rects) => @Expect(rects.intersects(Rect(0, 3, 8, 1)))
-            case None => @Expect(false)
-        }
-
-        let tick = TimerEvent("component:cpu:sample", elapsedMillis: 10, firedCount: 1)
-        let tickResult = host.update(Event.Timer(tick))
-        @Expect(cpu.tickEvents, 1)
-        @Expect(proc.tickEvents, 0)
-        @Expect(cpu.lastEventText, "cpu:sample")
-        match (tickResult.dirtyRects) {
-            case Some(rects) => @Expect(rects.covers(Rect(0, 0, 8, 2)))
-            case None => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func componentHostRoutesAsyncPollerResultsAndProfilesWork(): Unit {
-        let probe = RuntimeProbeComponent("data")
-        let poller = AsyncPoller("refresh", { => Event.Message("loaded") })
-        probe.poller = Some(poller)
-        let host = ComponentHost().add("data", probe, area: Rect(2, 3, 10, 2))
-        let ctx = ComponentContext("data", area: Rect(2, 3, 10, 2))
-
-        @Expect(poller.request(ctx, nowMillis: 100))
-        @Expect(poller.isPending())
-        let commands = ctx.drainCommands()
-        @Expect(commands.size, 1)
-        match (commands[0]) {
-            case Command.AsyncTask(id, _) => @Expect(id, "component-async:data:refresh")
-            case _ => @Expect(false)
-        }
-
-        let result = host.update(Event.AsyncCompleted("component-async:data:refresh", Event.Message("loaded")))
-        @Expect(probe.lastEventText, "refresh:loaded")
-        @Expect(!poller.isPending())
-        match (result.dirtyRects) {
-            case Some(rects) => @Expect(rects.covers(Rect(2, 3, 10, 2)))
-            case None => @Expect(false)
-        }
-        match (host.componentProfile("data")) {
-            case Some(profile) =>
-                @Expect(profile.updateCount >= 1)
-                @Expect(profile.dirtyCells >= 20)
-            case None => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func componentDataSourceRoutesTypedReadyEventsAndProfilerOverlayWorks(): Unit {
-        let probe = RuntimeProbeComponent("metrics")
-        let source = DataSource<Int64>("cpu")
-        let host = ComponentHost().add("metrics", probe, area: Rect(1, 2, 12, 3))
-        let ctx = ComponentContext("metrics", area: Rect(1, 2, 12, 3))
-
-        @Expect(source.refresh(ctx, { => Int64(42) }, nowMillis: 100))
-        @Expect(source.isPending())
-        @Expect(source.isStale())
-        let commands = ctx.drainCommands()
-        @Expect(commands.size, 1)
-        var asyncId = ""
-        var inner = Event.Message("missing")
-        match (commands[0]) {
-            case Command.AsyncTask(id, task) =>
-                asyncId = id
-                inner = task()
-            case _ => @Expect(false)
-        }
-        @Expect(asyncId, "component-data:metrics:cpu:1")
-        match (source.latest()) {
-            case Some(value) => @Expect(value, 42)
-            case None => @Expect(false)
-        }
-        @Expect(!source.isPending())
-        @Expect(!source.isStale())
-
-        let result = host.update(Event.AsyncCompleted(asyncId, inner))
-        @Expect(probe.lastEventText, "cpu:1")
-        match (result.dirtyRects) {
-            case Some(rects) => @Expect(rects.covers(Rect(1, 2, 12, 3)))
-            case None => @Expect(false)
-        }
-        let overlay = ProfilerOverlay(host.profiler())
-        let overlayBuffer = Buffer(Rect(0, 0, 48, 4))
-        overlay.render(Rect(0, 0, 48, 4), overlayBuffer)
-        let snapshot = overlay.snapshot()
-        match (snapshot.hottest()) {
-            case Some(entry) =>
-                @Expect(entry.id, "metrics")
-                @Expect(entry.asyncCount >= 1)
-            case None => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func dataSourceDebounceIdleCancelFailureAndProfilerStateAreObservable(): Unit {
-        let probe = DataSourceProbeComponent()
-        let host = ComponentHost().add("metrics", probe, area: Rect(1, 2, 12, 3))
-
-        _ = host.dispatchTo("metrics", Event.Message("activity"))
-        let blocked = host.dispatchTo("metrics", Event.Message("poll-idle-blocked"))
-        @Expect(probe.lastEventText, "blocked")
-        match (blocked.command) {
-            case Command.Noop => ()
-            case _ => @Expect(false)
-        }
-
-        let poll = host.dispatchTo("metrics", Event.Message("poll"))
-        @Expect(probe.source.isPending())
-        match (host.profilerSnapshot().find("metrics")) {
-            case Some(entry) =>
-                @Expect(entry.pendingDataSources, 1)
-                @Expect(entry.lowPriorityDataPolls, 1)
-            case None => @Expect(false)
-        }
-        var asyncId = ""
-        match (poll.command) {
-            case Command.AsyncTask(id, _) => asyncId = id
-            case _ => @Expect(false)
-        }
-        let duplicate = host.dispatchTo("metrics", Event.Message("poll"))
-        match (duplicate.command) {
-            case Command.Noop => ()
-            case _ => @Expect(false)
-        }
-
-        let cancel = host.dispatchTo("metrics", Event.Message("cancel"))
-        @Expect(!probe.source.isPending())
-        @Expect(probe.source.isStale())
-        match (probe.source.error()) {
-            case Some(message) => @Expect(message, "cancelled")
-            case None => @Expect(false)
-        }
-        var cancelId = ""
-        match (cancel.command) {
-            case Command.CancelAsync(id) => cancelId = id
-            case _ => @Expect(false)
-        }
-        @Expect(cancelId, asyncId)
-        let cancelResult = host.update(Event.AsyncCancelled(cancelId))
-        @Expect(probe.lastEventText, "proc:cancelled:1")
-        match (cancelResult.dirtyRects) {
-            case Some(rects) => @Expect(rects.covers(Rect(1, 2, 12, 3)))
-            case None => @Expect(false)
-        }
-        match (host.profilerSnapshot().find("metrics")) {
-            case Some(entry) =>
-                @Expect(entry.pendingDataSources, 0)
-                match (entry.lastError) {
-                    case Some(message) => @Expect(message, "cancelled")
-                    case None => @Expect(false)
-                }
-            case None => @Expect(false)
-        }
-
-        let failed = probe.source.fail("boom")
-        @Expect(probe.source.isStale())
-        match (failed.error) {
-            case Some(message) => @Expect(message, "boom")
-            case None => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func componentProfilerSnapshotSupportsSortingLookupAndReset(): Unit {
-        let host = ComponentHost()
-            .add("fast", RuntimeProbeComponent("fast"), area: Rect(0, 0, 4, 1))
-            .add("slow", RuntimeProbeComponent("slow"), area: Rect(0, 1, 8, 2))
-        _ = host.dispatchTo("fast", Event.Message("hit"))
-        _ = host.dispatchTo("slow", Event.DataFailed("load", 1, "offline"))
-        let backend = TestBackend(area: Rect(0, 0, 12, 4))
-        let terminal = Terminal(backend)
-        _ = terminal.draw { frame => host.render(frame) }
-
-        let snapshot = host.profilerSnapshot()
-        match (snapshot.find("slow")) {
-            case Some(entry) =>
-                @Expect(entry.id, "slow")
-                match (entry.lastError) {
-                    case Some(message) => @Expect(message, "offline")
-                    case None => @Expect(false)
-                }
-            case None => @Expect(false)
-        }
-        @Expect(snapshot.sortedByRender().size, 2)
-        @Expect(snapshot.sortedByUpdate().size, 2)
-        @Expect(snapshot.sortedByAsync().size, 2)
-
-        host.profiler().resetFrameCounters()
-        match (host.profilerSnapshot().find("slow")) {
-            case Some(entry) =>
-                @Expect(entry.updateCount, 0)
-                @Expect(entry.renderCount, 0)
-                @Expect(entry.asyncCount, 0)
-            case None => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func focusedComponentHandledKeyPrecedesGlobalKey(): Unit {
-        let focused = RuntimeProbeComponent("focused")
-        focused.resultHandled = true
-        focused.resultDirty = Dirty.Self
-        let host = ComponentHost().add("focused", focused, area: Rect(0, 0, 10, 2))
-        host.addGlobalKey(KeyBinding([KeyEvent(KeyCode.Up)], "global-up"))
-        @Expect(host.focusManager().focus("focused"))
-
-        let result = host.update(Event.KeyDown(KeyEvent(KeyCode.Up)))
-        @Expect(focused.updates, 1)
-        match (result.command) {
-            case Command.Noop => ()
-            case _ => @Expect(false)
-        }
-        match (result.dirtyRects) {
-            case Some(rects) => @Expect(rects.covers(Rect(0, 0, 10, 2)))
-            case None => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func componentContainerRenderDoesNotMutateChildLayout(): Unit {
-        let child = RuntimeProbeComponent("child", text: "child")
-        let childHost = ComponentHost().add("child", child, area: Rect(0, 0, 1, 1))
-        let grid = DashboardGrid(1, 1, regions: [DashboardRegion("child", 0, 0)])
-        let container = ComponentContainer(childHost, grid)
-        let parent = ComponentHost().add("container", container, area: Rect(0, 0, 20, 4))
-        _ = parent.mountAll()
-        _ = parent.resizeAllComponents(Rect(0, 0, 20, 4))
-
-        match (childHost.node("child")) {
-            case Some(node) => @Expect(node.area(), Rect(0, 0, 20, 4))
-            case None => @Expect(false)
-        }
-        let backend = TestBackend(area: Rect(0, 0, 20, 4))
-        let terminal = Terminal(backend)
-        _ = terminal.draw { frame => parent.renderDirty(frame) }
-        match (childHost.node("child")) {
-            case Some(node) => @Expect(node.area(), Rect(0, 0, 20, 4))
-            case None => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func componentHostDefaultLayoutStillSplitsVertically(): Unit {
-        let host = ComponentHost()
-            .add("top", RuntimeProbeComponent("top"), area: Rect(0, 0, 1, 1))
-            .add("bottom", RuntimeProbeComponent("bottom"), area: Rect(0, 0, 1, 1))
-        let result = host.resizeAllComponents(Rect(0, 0, 20, 5))
-
-        match (host.node("top")) {
-            case Some(node) => @Expect(node.area(), Rect(0, 0, 20, 2))
-            case None => @Expect(false)
-        }
-        match (host.node("bottom")) {
-            case Some(node) => @Expect(node.area(), Rect(0, 2, 20, 3))
-            case None => @Expect(false)
-        }
-        match (result.dirtyRects) {
-            case Some(rects) =>
-                @Expect(rects.covers(Rect(0, 0, 20, 2)))
-                @Expect(rects.covers(Rect(0, 2, 20, 3)))
-            case None => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func componentHostCanUseCustomLayoutProvider(): Unit {
-        let provider = FixedComponentLayoutProvider([
-            Rect(0, 0, 6, 4),
-            Rect(6, 0, 14, 3),
-            Rect(6, 3, 14, 1)
-        ])
-        let host = ComponentHost(layoutProvider: provider)
-            .add("sidebar", RuntimeProbeComponent("sidebar"), area: Rect(0, 0, 1, 1))
-            .add("main", RuntimeProbeComponent("main"), area: Rect(0, 0, 1, 1))
-            .add("status", RuntimeProbeComponent("status"), area: Rect(0, 0, 1, 1))
-        let result = host.resizeAllComponents(Rect(0, 0, 20, 4))
-
-        match (host.node("sidebar")) {
-            case Some(node) => @Expect(node.area(), Rect(0, 0, 6, 4))
-            case None => @Expect(false)
-        }
-        match (host.node("main")) {
-            case Some(node) => @Expect(node.area(), Rect(6, 0, 14, 3))
-            case None => @Expect(false)
-        }
-        match (host.node("status")) {
-            case Some(node) => @Expect(node.area(), Rect(6, 3, 14, 1))
-            case None => @Expect(false)
-        }
-        match (result.dirtyRects) {
-            case Some(rects) =>
-                @Expect(rects.covers(Rect(0, 0, 6, 4)))
-                @Expect(rects.covers(Rect(6, 0, 14, 3)))
-                @Expect(rects.covers(Rect(6, 3, 14, 1)))
-            case None => @Expect(false)
-        }
-    }
-
-    @TestCase
-    func componentWrappersExposeLocalDirtyForInputAndTextArea(): Unit {
-        let input = Input()
-        let inputHost = ComponentHost().add("input", InputComponent(input, focusId: Some("input")), area: Rect(0, 0, 20, 1))
-        @Expect(inputHost.focusManager().focus("input"))
-        let inputResult = inputHost.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'a'))))
-        match (inputResult.dirtyRects) {
-            case Some(rects) => @Expect(rects.covers(Rect(0, 0, 20, 1)))
-            case None => @Expect(false)
-        }
-
-        let textArea = TextArea(value: "alpha\nbeta", cursor: 0)
-        let textHost = ComponentHost().add("text", TextAreaComponent(textArea, focusId: Some("text")), area: Rect(0, 2, 30, 4))
-        @Expect(textHost.focusManager().focus("text"))
-        let textResult = textHost.update(Event.KeyDown(KeyEvent(KeyCode.PageDown)))
-        match (textResult.dirtyRects) {
-            case Some(rects) => @Expect(rects.intersects(Rect(0, 2, 30, 4)))
-            case None => @Expect(false)
-        }
     }
 
     @TestCase
@@ -3832,7 +3187,64 @@ class CjTuiCoreTest {
         @Expect(waiter.closed)
         @Expect(waiter.lastTimeoutMillis >= 0)
         @Expect(waiter.lastPreviousReadBytes >= 0)
-        @Expect(waiter.lastSourceCount, 0)
+        // Step 1A registers the AsyncRuntime level-visible wake source even
+        // when no task is pending, so an idle completion never needs polling.
+        @Expect(waiter.lastSourceCount, 1)
+    }
+
+    @TestCase
+    func appTraceAttachmentIsPerInstanceAndActiveBeforeRun(): Unit {
+        let trace = CountingAppTraceSink()
+        let tracedApp = App(
+            backend: TestBackend(area: Rect(0, 0, 8, 2)),
+            inputSource: ChunkedInputSource([unsafe { "q".rawData() }]),
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            eventWaiter: CountingEventWaiter()
+        )
+        tracedApp.attachTraceSink(trace)
+        tracedApp.runWithCommands(
+            { frame => frame.renderWidget(Paragraph("trace"), frame.area) },
+            { event => match (event) {
+                case Event.KeyDown(_) => UpdateResult.exit()
+                case _ => UpdateResult.next()
+            }}
+        )
+        @Expect(trace.inputCallbacks > 0)
+        @Expect(trace.dispatchCallbacks, trace.inputCallbacks)
+        @Expect(trace.updateCallbacks, trace.inputCallbacks)
+        @Expect(trace.renderCallbacks > 0)
+        @Expect(trace.completedFrames, trace.renderCallbacks)
+        var lateAttachRejected = false
+        try {
+            tracedApp.attachTraceSink(CountingAppTraceSink())
+        } catch (error: Exception) {
+            lateAttachRejected = error.message.contains("before App.run")
+        }
+        @Expect(lateAttachRejected)
+
+        let inputsBeforeUntracedRun = trace.inputCallbacks
+        let framesBeforeUntracedRun = trace.completedFrames
+        let untracedApp = App(
+            backend: TestBackend(area: Rect(0, 0, 8, 2)),
+            inputSource: ChunkedInputSource([unsafe { "q".rawData() }]),
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            eventWaiter: CountingEventWaiter()
+        )
+        untracedApp.runWithCommands(
+            { frame => frame.renderWidget(Paragraph("plain"), frame.area) },
+            { event => match (event) {
+                case Event.KeyDown(_) => UpdateResult.exit()
+                case _ => UpdateResult.next()
+            }}
+        )
+        @Expect(trace.inputCallbacks, inputsBeforeUntracedRun)
+        @Expect(trace.completedFrames, framesBeforeUntracedRun)
     }
 
     @TestCase
@@ -3872,12 +3284,12 @@ class CjTuiCoreTest {
         }
         let app = App(
             backend: backend,
-            ptyRuntime: runtime,
             rawMode: false,
             alternateScreen: false,
             hideCursor: false,
             bracketedPaste: false
         )
+        app.attachPtyRuntime(runtime)
         app.runWithCommands(
             { frame => frame.renderWidget(Paragraph("pty"), frame.area) },
             { event =>
@@ -3899,7 +3311,39 @@ class CjTuiCoreTest {
             case Some(_) => @Expect(false)
             case None => @Expect(true)
         }
+        var lateAttachRejected = false
+        try {
+            app.attachPtyRuntime(FakePtyRuntime())
+        } catch (error: Exception) {
+            lateAttachRejected = error.message.contains("before App.run")
+        }
+        @Expect(lateAttachRejected)
         _ = runtime.close("external")
+    }
+
+    @TestCase
+    func appWithoutPtyAttachmentPreservesUnsupportedFailure(): Unit {
+        let failure = StringState()
+        let app = App(
+            backend: TestBackend(area: Rect(0, 0, 8, 2)),
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            eventWaiter: CountingEventWaiter()
+        )
+        app.runWithCommands(
+            {_ =>},
+            { event => match (event) {
+                case Event.Capabilities(_) =>
+                    UpdateResult.withCommand(Command.PtyStart("unsupported", PtySpec("shell")))
+                case Event.PtyFailed("unsupported", message) =>
+                    failure.set(message)
+                    UpdateResult.exit()
+                case _ => UpdateResult.next()
+            }}
+        )
+        @Expect(failure.get(), "pty runtime is not configured for shell")
     }
 
     @TestCase

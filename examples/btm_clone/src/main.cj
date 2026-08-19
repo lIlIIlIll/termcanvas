@@ -5,6 +5,7 @@ import std.collection.*
 import std.deriving.*
 import std.fs.*
 import std.sort.*
+import std.sync.*
 import std.time.*
 
 @FastNative
@@ -618,18 +619,36 @@ class RawProcStat {
     }
 }
 
+class BtmPanelCounters {
+    let id: String
+    var updateCount: Int64 = 0
+    var renderCount: Int64 = 0
+
+    init(id: String) {
+        this.id = id
+    }
+}
+
 class BtmClone <: Widget {
     private let processSampler = ProcFsSampler()
     private let cpuSampler = ProcFsSampler()
     private let memorySampler = ProcFsSampler()
     private let networkSampler = ProcFsSampler()
     private let diskSampler = ProcFsSampler()
-    private let host = ComponentHost()
-    private var processSource: ?DataSource<ProcessSnapshotResult> = None
-    private var cpuSource: ?AsyncDataSource<CpuSnapshot> = None
-    private var memorySource: ?AsyncDataSource<MemSnapshot> = None
-    private var networkSource: ?AsyncDataSource<NetSnapshot> = None
-    private var diskSource: ?AsyncDataSource<Array<DiskSample>> = None
+    private let metrics: AppMetrics
+    private let completionLock = Mutex()
+    private var completedProcess: ?ProcessSnapshotResult = None
+    private var completedCpu: ?CpuSnapshot = None
+    private var completedMemory: ?MemSnapshot = None
+    private var completedNetwork: ?NetSnapshot = None
+    private var completedDisks: ?Array<DiskSample> = None
+    private var processPending = false
+    private var cpuPending = false
+    private var memoryPending = false
+    private var networkPending = false
+    private var diskPending = false
+    private var processLastActivity: Int64 = 0
+    private let panelCounters = ArrayList<BtmPanelCounters>()
     private var snapshot = MetricSnapshot()
     private var processRows: Array<ProcessDisplayRow> = []
     private var processRowsCommandWidth: Int64 = -1
@@ -654,22 +673,20 @@ class BtmClone <: Widget {
     private var processRequestId: Int64 = 0
     private var latestAppliedProcessRequestId: Int64 = 0
     private var refreshMillis: Int64 = 1000
+    private var headerArea = Rect(0, 0, 0, 0)
+    private var cpuArea = Rect(0, 0, 0, 0)
+    private var memoryArea = Rect(0, 0, 0, 0)
+    private var networkArea = Rect(0, 0, 0, 0)
+    private var diskArea = Rect(0, 0, 0, 0)
+    private var processesArea = Rect(0, 0, 0, 0)
+    private var footerArea = Rect(0, 0, 0, 0)
 
-    init() {
-        processSource = Some(DataSource<ProcessSnapshotResult>("processes", idleMillis: 2))
-        cpuSource = Some(AsyncDataSource<CpuSnapshot>("cpu", { => cpuSampler.sampleCpuOnly() }))
-        memorySource = Some(AsyncDataSource<MemSnapshot>("memory", { => memorySampler.sampleMemoryOnly() }))
-        networkSource = Some(AsyncDataSource<NetSnapshot>("network", { => networkSampler.sampleNetworkOnly() }))
-        diskSource = Some(AsyncDataSource<Array<DiskSample>>("disk", { => diskSampler.sampleDisksOnly() }, lowPriority: true))
+    init(metrics!: AppMetrics = AppMetrics()) {
+        this.metrics = metrics
+        for (id in ["header", "cpu", "memory", "network", "disk", "processes", "footer"]) {
+            panelCounters.add(BtmPanelCounters(id))
+        }
         refresh()
-        seedDataSources()
-        host.add("header", HeaderPanel(this), area: Rect(0, 0, 0, 0), focused: false)
-        host.add("cpu", CpuPanel(this), area: Rect(0, 0, 0, 0), focused: false)
-        host.add("memory", MemoryPanel(this), area: Rect(0, 0, 0, 0), focused: false)
-        host.add("network", NetworkPanel(this), area: Rect(0, 0, 0, 0), focused: false)
-        host.add("disk", DiskPanel(this), area: Rect(0, 0, 0, 0), focused: false)
-        host.add("processes", ProcessTablePanel(this), area: Rect(0, 0, 0, 0))
-        host.add("footer", FooterPanel(this), area: Rect(0, 0, 0, 0), focused: false)
     }
 
     func update(event: Event): UpdateResult {
@@ -678,19 +695,31 @@ class BtmClone <: Widget {
                 if (filtering) {
                     return handleKey(key)
                 }
-                let routed = host.update(event)
-                if (hasBtmEffect(routed)) { return routed }
-                handleKey(key)
+                match (key.code) {
+                    case KeyCode.Down | KeyCode.Char(r'j') =>
+                        recordPanelUpdate("processes")
+                        moveProcessSelection(1)
+                    case KeyCode.Up | KeyCode.Char(r'k') =>
+                        recordPanelUpdate("processes")
+                        moveProcessSelection(-1)
+                    case KeyCode.Enter =>
+                        recordPanelUpdate("processes")
+                        toggleProcessDetail()
+                    case _ => handleKey(key)
+                }
             case Event.Tick(_) => UpdateResult.next()
             case Event.Timer(timer) =>
-                if (timer.id.startsWith("component:")) {
-                    host.update(event)
-                } else {
-                    UpdateResult.next()
+                match (timer.id) {
+                    case "cpu" | "memory" | "network" | "disk" => requestMetricSample(timer.id)
+                    case "proc" => requestProcessSample()
+                    case _ => UpdateResult.next()
                 }
-            case Event.Capabilities(_) =>
-                host.mount()
-            case _ => host.update(event)
+            case Event.AsyncCompleted(id, _) => applyAsyncCompletion(id)
+            case Event.AsyncFailed(id, _) => applyAsyncFailure(id)
+            case Event.AsyncCancelled(id) => applyAsyncFailure(id)
+            case Event.Capabilities(_) => UpdateResult(command: startRefreshTimers())
+            case Event.Resize(_) => dirtyKnownArea()
+            case _ => UpdateResult.next()
         }
     }
 
@@ -771,11 +800,21 @@ class BtmClone <: Widget {
 
     private func restartRefreshTimers(): Command {
         Command.Batch([
-            Command.RestartTimer(TimerSpec("component:cpu:cpu", refreshInterval())),
-            Command.RestartTimer(TimerSpec("component:memory:memory", refreshInterval())),
-            Command.RestartTimer(TimerSpec("component:network:network", refreshInterval())),
-            Command.RestartTimer(TimerSpec("component:disk:disk", refreshInterval())),
-            Command.RestartTimer(TimerSpec("component:processes:proc", refreshInterval()))
+            Command.RestartTimer(TimerSpec("cpu", refreshInterval())),
+            Command.RestartTimer(TimerSpec("memory", refreshInterval())),
+            Command.RestartTimer(TimerSpec("network", refreshInterval())),
+            Command.RestartTimer(TimerSpec("disk", refreshInterval())),
+            Command.RestartTimer(TimerSpec("proc", refreshInterval()))
+        ])
+    }
+
+    private func startRefreshTimers(): Command {
+        Command.Batch([
+            Command.StartTimer(TimerSpec("cpu", refreshInterval())),
+            Command.StartTimer(TimerSpec("memory", refreshInterval())),
+            Command.StartTimer(TimerSpec("network", refreshInterval())),
+            Command.StartTimer(TimerSpec("disk", refreshInterval())),
+            Command.StartTimer(TimerSpec("proc", refreshInterval()))
         ])
     }
 
@@ -808,39 +847,13 @@ class BtmClone <: Widget {
         netValues = netHistory.toArray()
     }
 
-    private func seedDataSources(): Unit {
-        match (processSource) {
-            case Some(item) => _ = item.set(ProcessSnapshotResult(0, sortMode, filter, snapshot))
-            case None => ()
-        }
-        match (cpuSource) {
-            case Some(item) => _ = item.dataSource().set(snapshot.cpu)
-            case None => ()
-        }
-        match (memorySource) {
-            case Some(item) => _ = item.dataSource().set(snapshot.mem)
-            case None => ()
-        }
-        match (networkSource) {
-            case Some(item) => _ = item.dataSource().set(snapshot.net)
-            case None => ()
-        }
-        match (diskSource) {
-            case Some(item) => _ = item.dataSource().set(snapshot.disks)
-            case None => ()
-        }
-    }
-
     private func nextDataClock(): Int64 {
         dataClock++
         dataClock
     }
 
     private func markNavigation(): Unit {
-        match (processSource) {
-            case Some(source) => source.markActivity(nextDataClock())
-            case None => ()
-        }
+        processLastActivity = nextDataClock()
     }
 
     private func nextProcessRequestId(): Int64 {
@@ -848,129 +861,254 @@ class BtmClone <: Widget {
         processRequestId
     }
 
-    public func refreshMetricPanel(ctx: ComponentContext, panelId: String): ComponentResult {
-        if (paused) { return ComponentResult.ignored() }
+    private func requestMetricSample(panelId: String): UpdateResult {
+        if (paused) { return UpdateResult.next() }
+        _ = nextDataClock()
         match (panelId) {
             case "cpu" =>
-                match (cpuSource) {
-                    case Some(source) => _ = source.refresh(ctx, nowMillis: nextDataClock())
-                    case None => ()
-                }
+                if (cpuPending) { return UpdateResult.next() }
+                cpuPending = true
+                recordPanelUpdate("cpu")
+                UpdateResult(command: Command.AsyncTask("btm:cpu", { =>
+                    publishCpu(cpuSampler.sampleCpuOnly())
+                    Event.Message("btm:cpu-ready")
+                }))
             case "memory" =>
-                match (memorySource) {
-                    case Some(source) => _ = source.refresh(ctx, nowMillis: nextDataClock())
-                    case None => ()
-                }
+                if (memoryPending) { return UpdateResult.next() }
+                memoryPending = true
+                recordPanelUpdate("memory")
+                UpdateResult(command: Command.AsyncTask("btm:memory", { =>
+                    publishMemory(memorySampler.sampleMemoryOnly())
+                    Event.Message("btm:memory-ready")
+                }))
             case "network" =>
-                match (networkSource) {
-                    case Some(source) => _ = source.refresh(ctx, nowMillis: nextDataClock())
-                    case None => ()
-                }
+                if (networkPending) { return UpdateResult.next() }
+                networkPending = true
+                recordPanelUpdate("network")
+                UpdateResult(command: Command.AsyncTask("btm:network", { =>
+                    publishNetwork(networkSampler.sampleNetworkOnly())
+                    Event.Message("btm:network-ready")
+                }))
             case "disk" =>
-                match (diskSource) {
-                    case Some(source) => _ = source.refresh(ctx, nowMillis: nextDataClock())
-                    case None => ()
-                }
-            case _ => ()
+                if (diskPending) { return UpdateResult.next() }
+                diskPending = true
+                recordPanelUpdate("disk")
+                UpdateResult(command: Command.AsyncTask("btm:disk", { =>
+                    publishDisks(diskSampler.sampleDisksOnly())
+                    Event.Message("btm:disk-ready")
+                }))
+            case _ => UpdateResult.next()
         }
-        ComponentResult(handled: true)
     }
 
-    public func applyMetricSample(ctx: ComponentContext, panelId: String): ComponentResult {
-        if (paused) { return ComponentResult.ignored() }
-        match (panelId) {
-            case "cpu" =>
-                match (cpuSource) {
-                    case Some(source) =>
-                        match (source.latest()) {
-                            case Some(cpu) =>
-                                snapshot = MetricSnapshot(cpu, snapshot.mem, snapshot.net, snapshot.disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
-                                cpuHistory.push(snapshot.cpu.usage)
-                                updateHistoryArrays()
-                            case None => ()
-                        }
-                    case None => ()
-                }
-            case "memory" =>
-                match (memorySource) {
-                    case Some(source) =>
-                        match (source.latest()) {
-                            case Some(mem) =>
-                                snapshot = MetricSnapshot(snapshot.cpu, mem, snapshot.net, snapshot.disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
-                                memHistory.push(snapshot.mem.percent())
-                                updateHistoryArrays()
-                            case None => ()
-                        }
-                    case None => ()
-                }
-            case "network" =>
-                match (networkSource) {
-                    case Some(source) =>
-                        match (source.latest()) {
-                            case Some(net) =>
-                                snapshot = MetricSnapshot(snapshot.cpu, snapshot.mem, net, snapshot.disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
-                                netHistory.push(snapshot.net.percent())
-                                updateHistoryArrays()
-                            case None => ()
-                        }
-                    case None => ()
-                }
-            case "disk" =>
-                match (diskSource) {
-                    case Some(source) =>
-                        match (source.latest()) {
-                            case Some(disks) =>
-                                snapshot = MetricSnapshot(snapshot.cpu, snapshot.mem, snapshot.net, disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
-                            case None => ()
-                        }
-                    case None => ()
-                }
-            case _ => ()
-        }
-        ComponentResult(handled: true, dirty: Dirty.Global(dirtyPanelAndHeader(ctx.area)), propagation: EventPropagation.Stop)
+    private func requestProcessSample(): UpdateResult {
+        if (paused || processPending) { return UpdateResult.next() }
+        let now = nextDataClock()
+        if (now - processLastActivity < 2) { return UpdateResult.next() }
+        processPending = true
+        recordPanelUpdate("processes")
+        let requestId = nextProcessRequestId()
+        let requestSort = sortMode
+        let requestFilter = filter
+        UpdateResult(command: Command.AsyncTask("btm:processes", { =>
+            publishProcess(ProcessSnapshotResult(
+                requestId,
+                requestSort,
+                requestFilter,
+                processSampler.sampleProcessesOnly(requestSort, requestFilter)
+            ))
+            Event.Message("btm:processes-ready")
+        }))
     }
 
-    private func applyProcessSource(): Unit {
-        match (processSource) {
-            case Some(item) =>
-                match (item.latest()) {
-                    case Some(next) =>
-                        if (next.requestId < latestAppliedProcessRequestId || next.sortMode != sortMode || next.filter != filter) {
-                            return
-                        }
-                        latestAppliedProcessRequestId = next.requestId
-                        let processSnapshot = next.snapshot
-                        snapshot = MetricSnapshot(snapshot.cpu, snapshot.mem, snapshot.net, snapshot.disks, processSnapshot.processes, processSnapshot.scanned, processSnapshot.skipped, processSnapshot.sampleMillis, processSnapshot.error)
-                        invalidateProcessRows()
-                        selected = clampLocal(selected, 0, max(0, snapshot.processes.size - 1))
-                        processOffset = clampLocal(processOffset, 0, max(0, snapshot.processes.size - 1))
+    private func applyAsyncCompletion(id: String): UpdateResult {
+        match (id) {
+            case "btm:cpu" =>
+                cpuPending = false
+                match (takeCpu()) {
+                    case Some(cpu) =>
+                        snapshot = MetricSnapshot(cpu, snapshot.mem, snapshot.net, snapshot.disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
+                        cpuHistory.push(cpu.usage)
+                        updateHistoryArrays()
                     case None => ()
                 }
+                recordPanelUpdate("cpu")
+                dirtyMetricPanel("cpu")
+            case "btm:memory" =>
+                memoryPending = false
+                match (takeMemory()) {
+                    case Some(mem) =>
+                        snapshot = MetricSnapshot(snapshot.cpu, mem, snapshot.net, snapshot.disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
+                        memHistory.push(mem.percent())
+                        updateHistoryArrays()
+                    case None => ()
+                }
+                recordPanelUpdate("memory")
+                dirtyMetricPanel("memory")
+            case "btm:network" =>
+                networkPending = false
+                match (takeNetwork()) {
+                    case Some(net) =>
+                        snapshot = MetricSnapshot(snapshot.cpu, snapshot.mem, net, snapshot.disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
+                        netHistory.push(net.percent())
+                        updateHistoryArrays()
+                    case None => ()
+                }
+                recordPanelUpdate("network")
+                dirtyMetricPanel("network")
+            case "btm:disk" =>
+                diskPending = false
+                match (takeDisks()) {
+                    case Some(disks) => snapshot = MetricSnapshot(snapshot.cpu, snapshot.mem, snapshot.net, disks, snapshot.processes, snapshot.scanned, snapshot.skipped, snapshot.sampleMillis, snapshot.error)
+                    case None => ()
+                }
+                recordPanelUpdate("disk")
+                dirtyMetricPanel("disk")
+            case "btm:processes" =>
+                processPending = false
+                match (takeProcess()) {
+                    case Some(next) => applyProcessCompletion(next)
+                    case None => ()
+                }
+                recordPanelUpdate("processes")
+                dirtyHeaderFooterProcesses()
+            case _ => UpdateResult.next()
+        }
+    }
+
+    private func applyAsyncFailure(id: String): UpdateResult {
+        match (id) {
+            case "btm:cpu" => cpuPending = false
+            case "btm:memory" => memoryPending = false
+            case "btm:network" => networkPending = false
+            case "btm:disk" => diskPending = false
+            case "btm:processes" => processPending = false
+            case _ => return UpdateResult.next()
+        }
+        dirtyPanelArea(if (id == "btm:processes") { "processes" } else { id[4..] })
+    }
+
+    private func applyProcessCompletion(next: ProcessSnapshotResult): Unit {
+        if (next.requestId < latestAppliedProcessRequestId || next.sortMode != sortMode || next.filter != filter) {
+            return
+        }
+        latestAppliedProcessRequestId = next.requestId
+        let processSnapshot = next.snapshot
+        snapshot = MetricSnapshot(snapshot.cpu, snapshot.mem, snapshot.net, snapshot.disks, processSnapshot.processes, processSnapshot.scanned, processSnapshot.skipped, processSnapshot.sampleMillis, processSnapshot.error)
+        invalidateProcessRows()
+        selected = clampLocal(selected, 0, max(0, snapshot.processes.size - 1))
+        processOffset = clampLocal(processOffset, 0, max(0, snapshot.processes.size - 1))
+    }
+
+    // Background tasks publish immutable samples into these app-local slots.
+    // Only update(Event) consumes them and mutates the canonical application state.
+    private func publishCpu(value: CpuSnapshot): Unit {
+        completionLock.lock()
+        try { completedCpu = Some(value) } finally { completionLock.unlock() }
+    }
+
+    private func publishMemory(value: MemSnapshot): Unit {
+        completionLock.lock()
+        try { completedMemory = Some(value) } finally { completionLock.unlock() }
+    }
+
+    private func publishNetwork(value: NetSnapshot): Unit {
+        completionLock.lock()
+        try { completedNetwork = Some(value) } finally { completionLock.unlock() }
+    }
+
+    private func publishDisks(value: Array<DiskSample>): Unit {
+        completionLock.lock()
+        try { completedDisks = Some(value) } finally { completionLock.unlock() }
+    }
+
+    private func publishProcess(value: ProcessSnapshotResult): Unit {
+        completionLock.lock()
+        try { completedProcess = Some(value) } finally { completionLock.unlock() }
+    }
+
+    private func takeCpu(): ?CpuSnapshot {
+        completionLock.lock()
+        try {
+            let value = completedCpu
+            completedCpu = None
+            value
+        } finally { completionLock.unlock() }
+    }
+
+    private func takeMemory(): ?MemSnapshot {
+        completionLock.lock()
+        try {
+            let value = completedMemory
+            completedMemory = None
+            value
+        } finally { completionLock.unlock() }
+    }
+
+    private func takeNetwork(): ?NetSnapshot {
+        completionLock.lock()
+        try {
+            let value = completedNetwork
+            completedNetwork = None
+            value
+        } finally { completionLock.unlock() }
+    }
+
+    private func takeDisks(): ?Array<DiskSample> {
+        completionLock.lock()
+        try {
+            let value = completedDisks
+            completedDisks = None
+            value
+        } finally { completionLock.unlock() }
+    }
+
+    private func takeProcess(): ?ProcessSnapshotResult {
+        completionLock.lock()
+        try {
+            let value = completedProcess
+            completedProcess = None
+            value
+        } finally { completionLock.unlock() }
+    }
+
+    private func panelProfile(id: String): ?BtmPanelCounters {
+        for (profile in panelCounters) {
+            if (profile.id == id) { return Some(profile) }
+        }
+        None
+    }
+
+    private func recordPanelUpdate(id: String): Unit {
+        match (panelProfile(id)) {
+            case Some(profile) => profile.updateCount++
             case None => ()
         }
     }
 
-    public func requestProcessSample(ctx: ComponentContext): ComponentResult {
-        if (paused) { return ComponentResult.ignored() }
-        match (processSource) {
-            case Some(source) =>
-                let requestId = nextProcessRequestId()
-                let requestSort = sortMode
-                let requestFilter = filter
-                _ = source.refresh(ctx, { => ProcessSnapshotResult(requestId, requestSort, requestFilter, processSampler.sampleProcessesOnly(requestSort, requestFilter)) }, nowMillis: nextDataClock(), lowPriority: true)
+    private func recordPanelRender(id: String): Unit {
+        match (panelProfile(id)) {
+            case Some(profile) => profile.renderCount++
             case None => ()
         }
-        ComponentResult(handled: true)
     }
 
-    public func applyProcessSample(): ComponentResult {
-        if (paused) { return ComponentResult.ignored() }
-        applyProcessSource()
-        let dirty = dirtyHeaderFooterProcesses().dirtyRects
-        ComponentResult(handled: true, dirty: match (dirty) {
-            case Some(rects) => Dirty.Global(rects)
-            case None => Dirty.Self
-        }, propagation: EventPropagation.Stop)
+    func panelUpdateCount(id: String): Int64 {
+        match (panelProfile(id)) {
+            case Some(profile) => profile.updateCount
+            case None => -1
+        }
+    }
+
+    func panelRenderCount(id: String): Int64 {
+        match (panelProfile(id)) {
+            case Some(profile) => profile.renderCount
+            case None => -1
+        }
+    }
+
+    func appliedProcessRequestId(): Int64 {
+        latestAppliedProcessRequestId
     }
 
     public func moveProcessSelection(delta: Int64): UpdateResult {
@@ -1050,24 +1188,47 @@ class BtmClone <: Widget {
             Constraint.Length(1)
         ]).withGap(1).split(area)
         let mid = Layout.horizontal([Constraint.Percent(34), Constraint.Percent(33), Constraint.Min(24)]).withGap(1).split(rows[2])
-        _ = host.setArea("header", rows[0])
-        _ = host.setArea("cpu", rows[1])
-        _ = host.setArea("memory", mid[0])
-        _ = host.setArea("network", mid[1])
-        _ = host.setArea("disk", mid[2])
-        _ = host.setArea("processes", rows[3])
-        _ = host.setArea("footer", rows[4])
-        host.render(frame)
+        headerArea = rows[0]
+        cpuArea = rows[1]
+        memoryArea = mid[0]
+        networkArea = mid[1]
+        diskArea = mid[2]
+        processesArea = rows[3]
+        footerArea = rows[4]
+        if (frame.isDirty(headerArea)) {
+            renderTopBarFrame(frame, headerArea)
+            recordPanelRender("header")
+        }
+        if (frame.isDirty(cpuArea)) {
+            renderCpuFrame(frame, cpuArea)
+            recordPanelRender("cpu")
+        }
+        if (frame.isDirty(memoryArea)) {
+            renderMemoryFrame(frame, memoryArea)
+            recordPanelRender("memory")
+        }
+        if (frame.isDirty(networkArea)) {
+            renderNetworkFrame(frame, networkArea)
+            recordPanelRender("network")
+        }
+        if (frame.isDirty(diskArea)) {
+            renderDisksFrame(frame, diskArea)
+            recordPanelRender("disk")
+        }
+        if (frame.isDirty(processesArea)) {
+            renderProcessesFrame(frame, processesArea)
+            recordPanelRender("processes")
+        }
+        if (frame.isDirty(footerArea)) {
+            renderBottomBarFrame(frame, footerArea)
+            recordPanelRender("footer")
+        }
         if (showProfiler) {
             frame.renderWidget(
-                ProfilerOverlay(host.profiler()),
-                Rect(area.x + 2, area.y + 2, min(area.width - 4, 72), min(area.height - 4, 10))
+                DebugOverlay(metrics),
+                Rect(area.x + 2, area.y + 2, min(area.width - 4, 72), 1)
             )
         }
-    }
-
-    public func profilerSnapshot(): ProfilerSnapshot {
-        host.profilerSnapshot()
     }
 
     private func renderSmall(canvas: Canvas, area: Rect): Unit {
@@ -1351,13 +1512,12 @@ class BtmClone <: Widget {
     }
 
     public func dirtyProcessesArea(): UpdateResult {
-        match (host.node("processes")) {
-            case Some(node) => UpdateResult.dirty(node.area())
-            case None =>
-                match (lastProcessArea) {
-                    case Some(area) => UpdateResult.dirty(area)
-                    case None => UpdateResult.next()
-                }
+        if (processesArea.width > 0 && processesArea.height > 0) {
+            return UpdateResult.dirty(processesArea)
+        }
+        match (lastProcessArea) {
+            case Some(area) => UpdateResult.dirty(area)
+            case None => UpdateResult.next()
         }
     }
 
@@ -1369,13 +1529,10 @@ class BtmClone <: Widget {
     }
 
     private func dirtyFooterRects(): ?DirtyRects {
-        match (host.node("footer")) {
-            case Some(node) =>
-                let dirty = DirtyRects()
-                dirty.add(node.area())
-                Some(dirty)
-            case None => None
-        }
+        if (footerArea.width <= 0 || footerArea.height <= 0) { return None }
+        let dirty = DirtyRects()
+        dirty.add(footerArea)
+        Some(dirty)
     }
 
     private func dirtyFooterArea(): UpdateResult {
@@ -1387,23 +1544,36 @@ class BtmClone <: Widget {
 
     private func dirtyHeaderFooterProcesses(): UpdateResult {
         let dirty = DirtyRects()
-        for (id in ["header", "processes", "footer"]) {
-            match (host.node(id)) {
-                case Some(node) => dirty.add(node.area())
-                case None => ()
-            }
+        for (area in [headerArea, processesArea, footerArea]) {
+            if (area.width > 0 && area.height > 0) { dirty.add(area) }
         }
         if (dirty.isEmpty()) { dirtyKnownArea() } else { UpdateResult(dirtyRects: Some(dirty)) }
     }
 
-    private func dirtyPanelAndHeader(area: Rect): DirtyRects {
-        let dirty = DirtyRects()
-        dirty.add(area)
-        match (host.node("header")) {
-            case Some(node) => dirty.add(node.area())
-            case None => ()
+    private func panelArea(id: String): Rect {
+        match (id) {
+            case "header" => headerArea
+            case "cpu" => cpuArea
+            case "memory" => memoryArea
+            case "network" => networkArea
+            case "disk" => diskArea
+            case "processes" => processesArea
+            case "footer" => footerArea
+            case _ => Rect(0, 0, 0, 0)
         }
-        dirty
+    }
+
+    private func dirtyPanelArea(id: String): UpdateResult {
+        let area = panelArea(id)
+        if (area.width > 0 && area.height > 0) { UpdateResult.dirty(area) } else { UpdateResult.next() }
+    }
+
+    private func dirtyMetricPanel(id: String): UpdateResult {
+        let dirty = DirtyRects()
+        let area = panelArea(id)
+        if (area.width > 0 && area.height > 0) { dirty.add(area) }
+        if (headerArea.width > 0 && headerArea.height > 0) { dirty.add(headerArea) }
+        if (dirty.isEmpty()) { dirtyKnownArea() } else { UpdateResult(dirtyRects: Some(dirty)) }
     }
 
     private func renderProcessDetail(canvas: Canvas, area: Rect, proc: ProcessSample): Unit {
@@ -1450,196 +1620,6 @@ class BtmClone <: Widget {
             case SortMode.Name => "sort: NAME"
         }
     }
-}
-
-class HeaderPanel <: RuntimeComponent {
-    private let owner: BtmClone
-
-    init(owner: BtmClone) { this.owner = owner }
-
-    public func mount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
-    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
-    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
-    }
-    public func update(event: Event, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
-        match (event) {
-            case Event.ComponentTick(_) => ComponentResult.withDirty(Dirty.Self)
-            case _ => ComponentResult.ignored()
-        }
-    }
-    public func render(frame: Frame, area: Rect): Unit { owner.renderTopBarFrame(frame, area) }
-    public func focusId(): ?String { None }
-}
-
-class CpuPanel <: RuntimeComponent {
-    private let owner: BtmClone
-
-    init(owner: BtmClone) { this.owner = owner }
-
-    public func mount(ctx: ComponentContext): ComponentResult {
-        ctx.startTimer("cpu", owner.refreshInterval(), priority: TimerPriority.Normal)
-        ComponentResult.ignored()
-    }
-    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
-    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
-    }
-    public func update(event: Event, ctx: ComponentContext): ComponentResult {
-        match (event) {
-            case Event.ComponentTick(_) => owner.refreshMetricPanel(ctx, "cpu")
-            case Event.DataReady(_, _) => owner.applyMetricSample(ctx, "cpu")
-            case Event.DataFailed(_, _, _) => ComponentResult.withDirty(Dirty.Self)
-            case _ => ComponentResult.ignored()
-        }
-    }
-    public func render(frame: Frame, area: Rect): Unit { owner.renderCpuFrame(frame, area) }
-    public func focusId(): ?String { None }
-}
-
-class MemoryPanel <: RuntimeComponent {
-    private let owner: BtmClone
-
-    init(owner: BtmClone) { this.owner = owner }
-
-    public func mount(ctx: ComponentContext): ComponentResult {
-        ctx.startTimer("memory", owner.refreshInterval(), priority: TimerPriority.Normal)
-        ComponentResult.ignored()
-    }
-    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
-    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
-    }
-    public func update(event: Event, ctx: ComponentContext): ComponentResult {
-        match (event) {
-            case Event.ComponentTick(_) => owner.refreshMetricPanel(ctx, "memory")
-            case Event.DataReady(_, _) => owner.applyMetricSample(ctx, "memory")
-            case Event.DataFailed(_, _, _) => ComponentResult.withDirty(Dirty.Self)
-            case _ => ComponentResult.ignored()
-        }
-    }
-    public func render(frame: Frame, area: Rect): Unit { owner.renderMemoryFrame(frame, area) }
-    public func focusId(): ?String { None }
-}
-
-class NetworkPanel <: RuntimeComponent {
-    private let owner: BtmClone
-
-    init(owner: BtmClone) { this.owner = owner }
-
-    public func mount(ctx: ComponentContext): ComponentResult {
-        ctx.startTimer("network", owner.refreshInterval(), priority: TimerPriority.Normal)
-        ComponentResult.ignored()
-    }
-    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
-    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
-    }
-    public func update(event: Event, ctx: ComponentContext): ComponentResult {
-        match (event) {
-            case Event.ComponentTick(_) => owner.refreshMetricPanel(ctx, "network")
-            case Event.DataReady(_, _) => owner.applyMetricSample(ctx, "network")
-            case Event.DataFailed(_, _, _) => ComponentResult.withDirty(Dirty.Self)
-            case _ => ComponentResult.ignored()
-        }
-    }
-    public func render(frame: Frame, area: Rect): Unit { owner.renderNetworkFrame(frame, area) }
-    public func focusId(): ?String { None }
-}
-
-class DiskPanel <: RuntimeComponent {
-    private let owner: BtmClone
-
-    init(owner: BtmClone) { this.owner = owner }
-
-    public func mount(ctx: ComponentContext): ComponentResult {
-        ctx.startTimer("disk", owner.refreshInterval(), priority: TimerPriority.Normal)
-        ComponentResult.ignored()
-    }
-    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
-    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
-    }
-    public func update(event: Event, ctx: ComponentContext): ComponentResult {
-        match (event) {
-            case Event.ComponentTick(_) => owner.refreshMetricPanel(ctx, "disk")
-            case Event.DataReady(_, _) => owner.applyMetricSample(ctx, "disk")
-            case Event.DataFailed(_, _, _) => ComponentResult.withDirty(Dirty.Self)
-            case _ => ComponentResult.ignored()
-        }
-    }
-    public func render(frame: Frame, area: Rect): Unit { owner.renderDisksFrame(frame, area) }
-    public func focusId(): ?String { None }
-}
-
-class ProcessTablePanel <: RuntimeComponent {
-    private let owner: BtmClone
-
-    init(owner: BtmClone) { this.owner = owner }
-
-    public func mount(ctx: ComponentContext): ComponentResult {
-        ctx.startTimer("proc", owner.refreshInterval(), priority: TimerPriority.Low)
-        ComponentResult.ignored()
-    }
-    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
-    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
-    }
-    public func update(event: Event, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
-        match (event) {
-            case Event.ComponentTick(_) => owner.requestProcessSample(ctx)
-            case Event.DataReady(_, _) => owner.applyProcessSample()
-            case Event.DataFailed(_, _, _) => ComponentResult.withDirty(Dirty.Self)
-            case Event.KeyDown(key) =>
-                match (key.code) {
-                    case KeyCode.Down | KeyCode.Char(r'j') =>
-                        let result = owner.moveProcessSelection(1)
-                        ComponentResult(handled: true, command: result.command, dirty: match (result.dirtyRects) {
-                            case Some(rects) => Dirty.Global(rects)
-                            case None => Dirty.Self
-                        }, propagation: EventPropagation.Stop)
-                    case KeyCode.Up | KeyCode.Char(r'k') =>
-                        let result = owner.moveProcessSelection(-1)
-                        ComponentResult(handled: true, command: result.command, dirty: match (result.dirtyRects) {
-                            case Some(rects) => Dirty.Global(rects)
-                            case None => Dirty.Self
-                        }, propagation: EventPropagation.Stop)
-                    case KeyCode.Enter =>
-                        let result = owner.toggleProcessDetail()
-                        ComponentResult(handled: true, command: result.command, dirty: match (result.dirtyRects) {
-                            case Some(rects) => Dirty.Global(rects)
-                            case None => Dirty.Self
-                        }, propagation: EventPropagation.Stop)
-                    case _ => ComponentResult.ignored()
-                }
-            case _ => ComponentResult.ignored()
-        }
-    }
-    public func render(frame: Frame, area: Rect): Unit { owner.renderProcessesFrame(frame, area) }
-    public func focusId(): ?String { Some("processes") }
-}
-
-class FooterPanel <: RuntimeComponent {
-    private let owner: BtmClone
-
-    init(owner: BtmClone) { this.owner = owner }
-
-    public func mount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
-    public func unmount(ctx: ComponentContext): ComponentResult { if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }; ComponentResult.ignored() }
-    public func resize(oldArea: Rect, newArea: Rect, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty() || oldArea == newArea) { ComponentResult.ignored() } else { ComponentResult.withDirty(Dirty.Self) }
-    }
-    public func update(event: Event, ctx: ComponentContext): ComponentResult {
-        if (ctx.componentId.isEmpty()) { return ComponentResult.ignored() }
-        match (event) {
-            case Event.ComponentTick(_) => ComponentResult.withDirty(Dirty.Self)
-            case _ => ComponentResult.ignored()
-        }
-    }
-    public func render(frame: Frame, area: Rect): Unit { owner.renderBottomBarFrame(frame, area) }
-    public func focusId(): ?String { None }
 }
 
 class ProcessRowsWidget <: Widget {
@@ -1898,21 +1878,6 @@ func addProcessRowDirty(dirty: DirtyRects, area: Rect, selected: Int64, offset: 
     }
 }
 
-func hasBtmEffect(result: UpdateResult): Bool {
-    match (result.flow) {
-        case ControlFlow.Exit => return true
-        case _ => ()
-    }
-    match (result.command) {
-        case Command.Noop => ()
-        case _ => return true
-    }
-    match (result.dirtyRects) {
-        case Some(rects) => !rects.isEmpty()
-        case None => false
-    }
-}
-
 func percent2(value100: Int64): String {
     let value = max(0, value100)
     let whole = value / 100
@@ -2079,24 +2044,6 @@ func truncateLocal(text: String, width: Int64): String {
     if (width <= 0) { "" } else if (text.size <= width) { text } else { text[0..width] }
 }
 
-func btmProfile(snapshot: ProfilerSnapshot, id: String): ?ProfilerEntry {
-    snapshot.find(id)
-}
-
-func profileRenderCount(snapshot: ProfilerSnapshot, id: String): Int64 {
-    match (btmProfile(snapshot, id)) {
-        case Some(entry) => entry.renderCount
-        case None => -1
-    }
-}
-
-func profileUpdateCount(snapshot: ProfilerSnapshot, id: String): Int64 {
-    match (btmProfile(snapshot, id)) {
-        case Some(entry) => entry.updateCount
-        case None => -1
-    }
-}
-
 func dirtyRectCount(result: UpdateResult): Int64 {
     match (result.dirtyRects) {
         case Some(rects) => rects.rects().size
@@ -2155,6 +2102,18 @@ func commandHasRestartTimer(command: Command): Bool {
     }
 }
 
+func commandStartsTimer(command: Command, id: String): Bool {
+    match (command) {
+        case Command.StartTimer(spec) => spec.id == id
+        case Command.Batch(items) =>
+            for (item in items) {
+                if (commandStartsTimer(item, id)) { return true }
+            }
+            false
+        case _ => false
+    }
+}
+
 func btmSmokeFail(message: String): Int64 {
     eprintln("btm_clone headless smoke failed: " + message)
     1
@@ -2171,6 +2130,13 @@ func runBtmCloneHeadlessSmoke(): Int64 {
     }
     if (backend.snapshot().contains("unknown")) {
         return btmSmokeFail("disk panel still has unknown capacity")
+    }
+
+    let startup = app.update(Event.Capabilities(TerminalCapabilities(size: area)))
+    for (timerId in ["cpu", "memory", "network", "disk", "proc"]) {
+        if (!commandStartsTimer(startup.command, timerId)) {
+            return btmSmokeFail("startup did not register application timer ${timerId}")
+        }
     }
 
     let slower = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'-'))))
@@ -2190,42 +2156,56 @@ func runBtmCloneHeadlessSmoke(): Int64 {
         return btmSmokeFail("refresh interval did not restore in footer")
     }
 
-    let beforeCpu = app.profilerSnapshot()
-    let cpuPoll = app.update(Event.Timer(TimerEvent("component:cpu:cpu", elapsedMillis: 500)))
+    let showDebug = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'd'))))
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: showDebug.dirtyRects)
+    if (!backend.snapshot().contains("fps=")) {
+        return btmSmokeFail("primary AppMetrics debug overlay did not render")
+    }
+    let hideDebug = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'd'))))
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: hideDebug.dirtyRects)
+
+    let beforeCpuUpdate = app.panelUpdateCount("cpu")
+    let beforeCpuProcessRender = app.panelRenderCount("processes")
+    let cpuPoll = app.update(Event.Timer(TimerEvent("cpu", elapsedMillis: 500)))
     if (!commandHasAsyncTask(cpuPoll.command)) {
         return btmSmokeFail("cpu timer did not start async datasource")
     }
     let cpuReady = runAsyncCommand(app, cpuPoll.command)
     let cpuMetrics = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: cpuReady.dirtyRects)
-    let afterCpu = app.profilerSnapshot()
-    if (profileUpdateCount(afterCpu, "cpu") <= profileUpdateCount(beforeCpu, "cpu")) {
+    if (app.panelUpdateCount("cpu") <= beforeCpuUpdate) {
         return btmSmokeFail("cpu datasource did not update cpu panel")
     }
-    if (profileRenderCount(afterCpu, "processes") != profileRenderCount(beforeCpu, "processes")) {
-        return btmSmokeFail("processes rendered during cpu datasource before=${profileRenderCount(beforeCpu, "processes")} after=${profileRenderCount(afterCpu, "processes")} dirty=${dirtyRectCount(cpuReady)} rects=${dirtyRectText(cpuReady)} drawDirty=${cpuMetrics.dirtyRects} rendered=${cpuMetrics.renderedCells} full=${cpuMetrics.fullRedraw}")
+    if (app.panelRenderCount("processes") != beforeCpuProcessRender) {
+        return btmSmokeFail("processes rendered during cpu datasource before=${beforeCpuProcessRender} after=${app.panelRenderCount("processes")} dirty=${dirtyRectCount(cpuReady)} rects=${dirtyRectText(cpuReady)} drawDirty=${cpuMetrics.dirtyRects} rendered=${cpuMetrics.renderedCells} full=${cpuMetrics.fullRedraw}")
     }
 
-    let beforeNav = app.profilerSnapshot()
+    let beforeNavUpdate = app.panelUpdateCount("processes")
+    let beforeNavCpu = app.panelRenderCount("cpu")
+    let beforeNavMemory = app.panelRenderCount("memory")
+    let beforeNavNetwork = app.panelRenderCount("network")
+    let beforeNavDisk = app.panelRenderCount("disk")
     let nav = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
     _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: nav.dirtyRects)
-    let afterNav = app.profilerSnapshot()
-    if (profileUpdateCount(afterNav, "processes") <= profileUpdateCount(beforeNav, "processes")) {
+    if (app.panelUpdateCount("processes") <= beforeNavUpdate) {
         return btmSmokeFail("process table did not receive navigation")
     }
-    if (profileRenderCount(afterNav, "cpu") != profileRenderCount(beforeNav, "cpu")) {
+    if (app.panelRenderCount("cpu") != beforeNavCpu) {
         return btmSmokeFail("cpu rendered during process navigation")
     }
-    if (profileRenderCount(afterNav, "memory") != profileRenderCount(beforeNav, "memory")) {
+    if (app.panelRenderCount("memory") != beforeNavMemory) {
         return btmSmokeFail("memory rendered during process navigation")
     }
-    if (profileRenderCount(afterNav, "network") != profileRenderCount(beforeNav, "network")) {
+    if (app.panelRenderCount("network") != beforeNavNetwork) {
         return btmSmokeFail("network rendered during process navigation")
     }
-    if (profileRenderCount(afterNav, "disk") != profileRenderCount(beforeNav, "disk")) {
+    if (app.panelRenderCount("disk") != beforeNavDisk) {
         return btmSmokeFail("disk rendered during process navigation")
     }
 
-    let beforeScroll = app.profilerSnapshot()
+    let beforeScrollCpu = app.panelRenderCount("cpu")
+    let beforeScrollMemory = app.panelRenderCount("memory")
+    let beforeScrollNetwork = app.panelRenderCount("network")
+    let beforeScrollDisk = app.panelRenderCount("disk")
     var scrollI: Int64 = 0
     while (scrollI < 80) {
         let scroll = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
@@ -2235,30 +2215,28 @@ func runBtmCloneHeadlessSmoke(): Int64 {
         }
         scrollI++
     }
-    let afterScroll = app.profilerSnapshot()
-    if (profileRenderCount(afterScroll, "cpu") != profileRenderCount(beforeScroll, "cpu")) {
+    if (app.panelRenderCount("cpu") != beforeScrollCpu) {
         return btmSmokeFail("cpu rendered during continuous process navigation")
     }
-    if (profileRenderCount(afterScroll, "memory") != profileRenderCount(beforeScroll, "memory")) {
+    if (app.panelRenderCount("memory") != beforeScrollMemory) {
         return btmSmokeFail("memory rendered during continuous process navigation")
     }
-    if (profileRenderCount(afterScroll, "network") != profileRenderCount(beforeScroll, "network")) {
+    if (app.panelRenderCount("network") != beforeScrollNetwork) {
         return btmSmokeFail("network rendered during continuous process navigation")
     }
-    if (profileRenderCount(afterScroll, "disk") != profileRenderCount(beforeScroll, "disk")) {
+    if (app.panelRenderCount("disk") != beforeScrollDisk) {
         return btmSmokeFail("disk rendered during continuous process navigation")
     }
 
     let startFilter = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'/'))))
     _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: startFilter.dirtyRects)
-    let beforeFilter = app.profilerSnapshot()
+    let beforeFilterProcessUpdate = app.panelUpdateCount("processes")
     let typeJ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'j'))))
     _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: typeJ.dirtyRects)
-    let afterFilter = app.profilerSnapshot()
     if (!backend.snapshot().contains("search: j_")) {
         return btmSmokeFail("filter input did not capture j")
     }
-    if (profileUpdateCount(afterFilter, "processes") != profileUpdateCount(beforeFilter, "processes")) {
+    if (app.panelUpdateCount("processes") != beforeFilterProcessUpdate) {
         return btmSmokeFail("filter input was routed through process table")
     }
     let finishFilter = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
@@ -2275,26 +2253,45 @@ func runBtmCloneHeadlessSmoke(): Int64 {
         return btmSmokeFail("process detail remained after close")
     }
 
-    let beforeProc = app.profilerSnapshot()
-    var procPoll = app.update(Event.Timer(TimerEvent("component:processes:proc", elapsedMillis: 1000)))
+    var stalePoll = app.update(Event.Timer(TimerEvent("proc", elapsedMillis: 900)))
+    if (!commandHasAsyncTask(stalePoll.command)) {
+        stalePoll = app.update(Event.Timer(TimerEvent("proc", elapsedMillis: 900)))
+    }
+    if (!commandHasAsyncTask(stalePoll.command)) {
+        return btmSmokeFail("stale process sample setup did not start")
+    }
+    let beforeStaleApply = app.appliedProcessRequestId()
+    let changeSort = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'm'))))
+    _ = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: changeSort.dirtyRects)
+    _ = runAsyncCommand(app, stalePoll.command)
+    if (app.appliedProcessRequestId() != beforeStaleApply) {
+        return btmSmokeFail("stale process completion replaced newer application state")
+    }
+
+    let beforeProcUpdate = app.panelUpdateCount("processes")
+    let beforeProcCpuRender = app.panelRenderCount("cpu")
+    var procPoll = app.update(Event.Timer(TimerEvent("proc", elapsedMillis: 1000)))
     if (!commandHasAsyncTask(procPoll.command)) {
-        procPoll = app.update(Event.Timer(TimerEvent("component:processes:proc", elapsedMillis: 1000)))
+        procPoll = app.update(Event.Timer(TimerEvent("proc", elapsedMillis: 1000)))
     }
     if (!commandHasAsyncTask(procPoll.command)) {
         return btmSmokeFail("proc datasource polling did not start after idle retry")
     }
     let procReady = runAsyncCommand(app, procPoll.command)
     let procMetrics = terminal.draw({ frame => app.renderFrame(frame) }, dirtyRects: procReady.dirtyRects)
-    let afterProc = app.profilerSnapshot()
-    if (profileUpdateCount(afterProc, "processes") <= profileUpdateCount(beforeProc, "processes")) {
+    if (app.panelUpdateCount("processes") <= beforeProcUpdate) {
         return btmSmokeFail("proc datasource did not update process panel")
     }
-    if (profileRenderCount(afterProc, "cpu") != profileRenderCount(beforeProc, "cpu")) {
-        return btmSmokeFail("cpu rendered during proc datasource completion before=${profileRenderCount(beforeProc, "cpu")} after=${profileRenderCount(afterProc, "cpu")} dirty=${dirtyRectCount(procReady)} rects=${dirtyRectText(procReady)} drawDirty=${procMetrics.dirtyRects} rendered=${procMetrics.renderedCells} full=${procMetrics.fullRedraw}")
+    if (app.panelRenderCount("cpu") != beforeProcCpuRender) {
+        return btmSmokeFail("cpu rendered during proc datasource completion before=${beforeProcCpuRender} after=${app.panelRenderCount("cpu")} dirty=${dirtyRectCount(procReady)} rects=${dirtyRectText(procReady)} drawDirty=${procMetrics.dirtyRects} rendered=${procMetrics.renderedCells} full=${procMetrics.fullRedraw}")
     }
-    match (afterProc.hottest()) {
-        case Some(_) => ()
-        case None => return btmSmokeFail("profiler has no hottest component")
+
+
+    let resizedBackend = TestBackend(area: Rect(0, 0, 120, 40))
+    let resizedTerminal = Terminal(resizedBackend, renderMode: RenderMode.Diff)
+    _ = resizedTerminal.draw({ frame => app.renderFrame(frame) })
+    if (!resizedBackend.snapshot().contains("btm LIVE") || !resizedBackend.snapshot().contains("Processes")) {
+        return btmSmokeFail("resize/layout render lost primary monitor regions")
     }
 
     println("btm_clone headless smoke ok")
@@ -2340,8 +2337,9 @@ main(args: Array<String>): Int64 {
         let iterations = if (args.size > 1) { parseInt(args[1]) } else { Int64(5000) }
         return runBtmCloneHeadlessBench(iterations)
     }
-    let app = BtmClone()
-    App(rawMode: true, alternateScreen: true, hideCursor: true).runWithCommands(
+    let metrics = AppMetrics()
+    let app = BtmClone(metrics: metrics)
+    App(rawMode: true, alternateScreen: true, hideCursor: true, metrics: Some(metrics)).runWithCommands(
         { frame => app.renderFrame(frame) },
         { event => app.update(event) }
     )

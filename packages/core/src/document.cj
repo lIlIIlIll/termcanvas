@@ -651,9 +651,13 @@ func renderStyledLine(buffer: Buffer, x: Int64, y: Int64, line: StyledLine, widt
     let right = x + width
     for (span in line.spans) {
         if (cx >= right) { return }
-        let part = truncate(span.text, right - cx)
-        buffer.setString(cx, y, part, style: span.style)
-        cx += displayWidth(part)
+        cx += buffer.writeStringClipped(
+            cx,
+            y,
+            span.text,
+            maxWidth: right - cx,
+            style: span.style
+        )
     }
     match (line.media) {
         case Some(source) =>

@@ -134,6 +134,10 @@ public interface Backend {
     func drawMedia(ops: Array<MediaOp>): Unit
     func write(text: String): Unit
     func flush(): Unit
+    // Optional Step-0 transport attribution. Backends that cannot expose a
+    // byte count retain -1, which means unavailable rather than zero.
+    func setInstrumentationEnabled(_: Bool): Unit {}
+    func diagnosticByteCount(): Int64 { -1 }
 }
 
 public struct RenderDiffSpan {
@@ -177,19 +181,8 @@ public class Frame {
         widget.render(area, buffer)
     }
 
-    public func renderComponent(node: ComponentNode): Unit {
-        if (!isDirty(node.area())) { return }
-        node.render(this)
-    }
-
     public func canvas(area!: Rect = this.area): Canvas {
         Canvas(buffer, area)
-    }
-
-    public func renderNode(node: ViewNode, sheet: StyleSheet): Unit {
-        if (!isDirty(area)) { return }
-        node.setArea(area)
-        node.render(this, sheet)
     }
 
     public func fill(area: Rect, style: Style): Unit {
@@ -244,14 +237,21 @@ public enum RenderMode {
 public class Terminal {
     private let backend: Backend
     private let renderMode: RenderMode
+    private let instrumentationEnabled: Bool
     private var front: ?Buffer = None
     private var back: ?Buffer = None
     private var previousMedia: Array<MediaPlacement> = []
     private var cursorVisible: Bool = false
 
-    public init(backend: Backend, renderMode!: RenderMode = RenderMode.Diff) {
+    public init(
+        backend: Backend,
+        renderMode!: RenderMode = RenderMode.Diff,
+        instrumentationEnabled!: Bool = false
+    ) {
         this.backend = backend
         this.renderMode = renderMode
+        this.instrumentationEnabled = instrumentationEnabled
+        backend.setInstrumentationEnabled(instrumentationEnabled)
     }
 
     public func draw(render: (Frame) -> Unit): RenderMetrics {
@@ -264,10 +264,19 @@ public class Terminal {
             front = None
             back = None
         }
-        let effectiveDirty = effectiveDirtyRects(area, dirtyRects)
+        let requestedDirty = effectiveDirtyRects(area, dirtyRects)
         let diffMode = match (renderMode) {
             case RenderMode.Diff => true
             case RenderMode.Full => false
+        }
+        let effectiveDirty = match (front) {
+            case Some(previous) =>
+                if (diffMode && !requestedDirty.covers(area)) {
+                    wideSafeDirtyRects(area, requestedDirty, previous)
+                } else {
+                    requestedDirty
+                }
+            case None => requestedDirty
         }
         let partialRender = diffMode && !effectiveDirty.isEmpty() && !effectiveDirty.covers(area) && frontMatches(area) && hasFront()
         var previousDirty: ?DirtyCellSnapshot = None
@@ -295,11 +304,17 @@ public class Terminal {
         }
         let frameDirty: ?DirtyRects = if (partialRender) { Some(effectiveDirty) } else { None }
         let frame = Frame(area, buffer, dirty: frameDirty)
+        buffer.beginWorkMetrics(instrumentationEnabled)
+        let totalStart = MonoTime.now()
         let renderStart = MonoTime.now()
         render(frame)
         buffer.setWriteClip(None)
-        let renderMillis = durationMillis(MonoTime.now() - renderStart)
+        let renderDuration = MonoTime.now() - renderStart
+        let renderNanos = renderDuration.toNanoseconds()
+        let renderMillis = durationMillis(renderDuration)
         let drawStart = MonoTime.now()
+        let byteCountBefore = backend.diagnosticByteCount()
+        var diffNanos: Int64 = 0
         var dirtyCells = area.width * area.height
         var diffWrites: Int64 = if (area.height > 0) { area.height } else { 0 }
         var fullRedraw = true
@@ -310,7 +325,9 @@ public class Terminal {
                 if (partialRender) {
                     match (previousDirty) {
                         case Some(prev) =>
+                            let diffStart = MonoTime.now()
                             let plan = renderDiffPlan(prev, buffer, dirtyRects: Some(effectiveDirty))
+                            diffNanos += (MonoTime.now() - diffStart).toNanoseconds()
                             dirtyCells = plan.dirtyCells
                             diffWrites = plan.spans.size
                             fullRedraw = false
@@ -320,7 +337,9 @@ public class Terminal {
                 } else {
                     match (front) {
                         case Some(prev) =>
+                            let diffStart = MonoTime.now()
                             let plan = renderDiffPlan(prev, buffer)
+                            diffNanos += (MonoTime.now() - diffStart).toNanoseconds()
                             dirtyCells = plan.dirtyCells
                             diffWrites = plan.spans.size
                             fullRedraw = false
@@ -347,7 +366,9 @@ public class Terminal {
                 }
                 cursorVisible = false
         }
-        let drawMillis = durationMillis(MonoTime.now() - drawStart)
+        let drawDuration = MonoTime.now() - drawStart
+        let drawNanos = drawDuration.toNanoseconds()
+        let drawMillis = durationMillis(drawDuration)
         if (partialRender) {
             front = Some(buffer)
         } else {
@@ -356,6 +377,12 @@ public class Terminal {
             back = oldFront
         }
         previousMedia = media
+        let byteCountAfter = backend.diagnosticByteCount()
+        let ansiBytes = if (byteCountBefore >= 0 && byteCountAfter >= byteCountBefore) {
+            byteCountAfter - byteCountBefore
+        } else {
+            -1
+        }
         RenderMetrics(
             size: area,
             dirtyCells: dirtyCells,
@@ -367,7 +394,14 @@ public class Terminal {
             totalMillis: renderMillis + drawMillis,
             renderedCells: if (partialRender) { effectiveDirty.cellCount() } else { area.width * area.height },
             dirtyRects: if (partialRender) { effectiveDirty.rects().size } else { if (area.width > 0 && area.height > 0) { Int64(1) } else { Int64(0) } },
-            copiedCells: copiedCells
+            copiedCells: copiedCells,
+            bufferCellAttempts: buffer.cellAttempts(),
+            bufferCellWrites: buffer.cellWrites(),
+            diffNanos: diffNanos,
+            writeNanos: max(0, drawNanos - diffNanos),
+            renderNanos: renderNanos,
+            totalNanos: (MonoTime.now() - totalStart).toNanoseconds(),
+            ansiBytes: ansiBytes
         )
     }
 
@@ -416,6 +450,30 @@ public class Terminal {
                 if (out.isEmpty()) { DirtyRects.full(area) } else { out }
             case None => DirtyRects.full(area)
         }
+    }
+
+    // Partial redraw has one correctness boundary for clearing, rendering, and
+    // diffing. A one-cell guard permits a newly rendered width-2 grapheme to
+    // cross either requested edge. The old front buffer then closes either
+    // outer edge over an existing lead/continuation pair. Work is proportional
+    // to dirty rows and their boundary neighborhood, never the whole surface.
+    private func wideSafeDirtyRects(area: Rect, requested: DirtyRects, previous: Buffer): DirtyRects {
+        let out = DirtyRects()
+        for (rect in requested.rects()) {
+            let target = intersect(area, rect)
+            for (y in target.y..target.bottom) {
+                var left = max(area.x, target.x - 1)
+                var right = min(area.right, target.right + 1)
+                if (left > area.x && isWideContinuation(previous.getCell(left, y))) {
+                    left--
+                }
+                if (right < area.right && isWideContinuation(previous.getCell(right, y))) {
+                    right++
+                }
+                out.add(Rect(left, y, right - left, 1))
+            }
+        }
+        out
     }
 }
 
@@ -1099,6 +1157,8 @@ public class AnsiBackend <: Backend {
     private let output: OutputStream
     private let driver: TerminalDriver
     private let fallbackArea: Rect
+    private var instrumentationEnabled: Bool = false
+    private var diagnosticBytesValue: Int64 = 0
 
     public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24)) {
         this.output = output
@@ -1181,7 +1241,17 @@ public class AnsiBackend <: Backend {
     }
 
     public func write(text: String): Unit {
-        output.write(unsafe { text.rawData() })
+        let data = unsafe { text.rawData() }
+        if (instrumentationEnabled) { diagnosticBytesValue += data.size }
+        output.write(data)
+    }
+
+    public func setInstrumentationEnabled(enabled: Bool): Unit {
+        instrumentationEnabled = enabled
+    }
+
+    public func diagnosticByteCount(): Int64 {
+        if (instrumentationEnabled) { diagnosticBytesValue } else { -1 }
     }
 
     public func flush(): Unit {
@@ -1514,6 +1584,15 @@ public struct RenderMetrics {
     public let renderedCells: Int64
     public let dirtyRects: Int64
     public let copiedCells: Int64
+    public let bufferCellAttempts: Int64
+    public let bufferCellWrites: Int64
+    public let diffCells: Int64
+    public let diffSpans: Int64
+    public let renderNanos: Int64
+    public let diffNanos: Int64
+    public let writeNanos: Int64
+    public let totalNanos: Int64
+    public let ansiBytes: Int64
 
     public init(
         size!: Rect = Rect(0, 0, 0, 0),
@@ -1526,7 +1605,14 @@ public struct RenderMetrics {
         totalMillis!: Int64 = 0,
         renderedCells!: Int64 = 0,
         dirtyRects!: Int64 = 0,
-        copiedCells!: Int64 = 0
+        copiedCells!: Int64 = 0,
+        bufferCellAttempts!: Int64 = 0,
+        bufferCellWrites!: Int64 = 0,
+        renderNanos!: Int64 = 0,
+        diffNanos!: Int64 = 0,
+        writeNanos!: Int64 = 0,
+        totalNanos!: Int64 = 0,
+        ansiBytes!: Int64 = -1
     ) {
         this.size = size
         this.dirtyCells = max(0, dirtyCells)
@@ -1539,6 +1625,15 @@ public struct RenderMetrics {
         this.renderedCells = max(0, renderedCells)
         this.dirtyRects = max(0, dirtyRects)
         this.copiedCells = max(0, copiedCells)
+        this.bufferCellAttempts = max(0, bufferCellAttempts)
+        this.bufferCellWrites = max(0, bufferCellWrites)
+        this.diffCells = max(0, dirtyCells)
+        this.diffSpans = max(0, diffWrites)
+        this.renderNanos = max(0, renderNanos)
+        this.diffNanos = max(0, diffNanos)
+        this.writeNanos = max(0, writeNanos)
+        this.totalNanos = max(0, totalNanos)
+        this.ansiBytes = if (ansiBytes < 0) { -1 } else { ansiBytes }
     }
 }
 

@@ -178,26 +178,6 @@ class CjTuiComponentPrimitivesTest {
     }
 
     @TestCase
-    func focusWrappersScopedKeysAndModalTrapWork(): Unit {
-        let scoped = ScopedKeyMap("editor")
-        scoped.add(KeyBinding([KeyEvent(KeyCode.Char(r'x'))], "cut"))
-        let focusable = FocusableWidget(
-            "editor",
-            Paragraph("body"),
-            scopedKeys: Some(scoped),
-            onAction: { _ => HandleResult.consumed() }
-        )
-        let result = focusable.handle(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))))
-        @Expect(result.handled)
-
-        let manager = FocusManager()
-        let trap = ModalFocusTrap(manager, ids: ["a", "b"])
-        @Expect(manager.current(), Some("a"))
-        @Expect(trap.handle(KeyEvent(KeyCode.Tab)))
-        @Expect(manager.current(), Some("b"))
-    }
-
-    @TestCase
     func dashboardStatusAndThemeResolverRenderPublicStates(): Unit {
         let buffer = Buffer(Rect(0, 0, 40, 10))
         MetricCard("CPU", "42%", detail: "user").render(Rect(0, 0, 10, 4), buffer)
@@ -215,8 +195,5 @@ class CjTuiComponentPrimitivesTest {
         @Expect(buffer.getCell(0, 6).symbol, "L")
         @Expect(buffer.getCell(0, 8).symbol, "W")
 
-        let resolver = ComponentStyleResolver(pack: ThemePack.default())
-        @Expect(resolver.style("alert", state: StyleState.Error), Style(fg: Color.Red))
-        @Expect(resolver.padding().left >= 0)
     }
 }

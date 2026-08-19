@@ -195,8 +195,11 @@ class CjTuiPerformanceRegressionTest {
         }, dirtyRects: Some(dirty))
 
         @Expect(!metrics.fullRedraw)
-        @Expect(metrics.renderedCells <= dirty.cellCount())
-        @Expect(metrics.copiedCells <= dirty.cellCount())
+        // Partial redraw reserves one boundary cell on each side so a new
+        // width-2 grapheme can be written atomically without widening to a row.
+        let boundaryAllowance: Int64 = 2
+        @Expect(metrics.renderedCells <= dirty.cellCount() + boundaryAllowance)
+        @Expect(metrics.copiedCells <= dirty.cellCount() + boundaryAllowance)
         @Expect(metrics.dirtyCells <= dirty.cellCount())
         @Expect(backend.snapshot().contains("header"))
         @Expect(backend.snapshot().contains("value: new"))

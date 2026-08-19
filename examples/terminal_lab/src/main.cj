@@ -61,7 +61,9 @@ class TerminalLab {
 
 main(): Int64 {
     let app = TerminalLab()
-    App(ptyRuntime: LinuxPtyRuntime()).runWithCommands(
+    let runtime = App()
+    runtime.attachPtyRuntime(LinuxPtyRuntime())
+    runtime.runWithCommands(
         { frame => app.render(frame) },
         { event => app.update(event) }
     )

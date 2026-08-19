@@ -3,6 +3,32 @@ package core
 import std.unittest.*
 import std.unittest.testmacro.*
 
+func documentStyledSpanCellsMatchLegacy(spans: Array<RichSpan>, width: Int64): Bool {
+    let origin: Int64 = 2
+    let bufferWidth = width + origin + 2
+    let expected = Buffer(Rect(0, 0, bufferWidth, 1))
+    var cx = origin
+    let right = origin + width
+    for (span in spans) {
+        if (cx >= right) { break }
+        let part = graphemePrefix(span.text, right - cx)
+        expected.setString(cx, 0, part, style: span.style)
+        cx += displayWidth(part)
+    }
+
+    let actual = Buffer(Rect(0, 0, bufferWidth, 1))
+    let document = Document([
+        DocumentLine(DocumentLineKind.Paragraph, spans)
+    ])
+    DocumentView(document, wrap: WrapMode.NoWrap).render(Rect(origin, 0, width, 1), actual)
+    for (x in 0..bufferWidth) {
+        if (actual.getCell(x, 0) != expected.getCell(x, 0)) {
+            return false
+        }
+    }
+    true
+}
+
 @Test
 class CjTuiBoundaryExtremeTest {
     @TestCase
@@ -313,6 +339,105 @@ class CjTuiBoundaryExtremeTest {
         let buffer = Buffer(Rect(0, 0, 1, 1))
         DocumentView(Document([DocumentLine(DocumentLineKind.Paragraph, "abcdef")])).render(buffer.area, buffer)
         @Expect(!buffer.getCell(0, 0).symbol.isEmpty())
+    }
+
+    @TestCase
+    func documentViewSinglePassWritePreservesStyledSpanBoundaries(): Unit {
+        let red = Style(fg: Color.Red)
+        let green = Style(fg: Color.Green)
+        let blue = Style(fg: Color.Blue)
+        let yellow = Style(fg: Color.Yellow)
+
+        let mixedSpans = [
+            RichSpan("ASCII ", style: red),
+            RichSpan("e\u{0301}", style: green),
+            RichSpan(" \u{1F469}\u{200D}\u{1F4BB} ", style: blue),
+            RichSpan("界·", style: yellow)
+        ]
+        @Expect(documentStyledSpanCellsMatchLegacy(mixedSpans, 14))
+        let mixed = Buffer(Rect(0, 0, 18, 1))
+        DocumentView(
+            Document([DocumentLine(DocumentLineKind.Paragraph, mixedSpans)]),
+            wrap: WrapMode.NoWrap
+        ).render(Rect(2, 0, 14, 1), mixed)
+        @Expect(mixed.getCell(1, 0), Cell())
+        @Expect(mixed.getCell(2, 0).symbol, "A")
+        @Expect(mixed.getCell(2, 0).style, red)
+        @Expect(mixed.getCell(8, 0).symbol, "e\u{0301}")
+        @Expect(mixed.getCell(8, 0).style, green)
+        @Expect(
+            mixed.getCell(10, 0),
+            Cell("\u{1F469}\u{200D}\u{1F4BB}", style: blue, kind: CellKind.WideLead)
+        )
+        @Expect(mixed.getCell(11, 0), Cell("", style: blue, kind: CellKind.WideCont))
+        @Expect(mixed.getCell(13, 0), Cell("界", style: yellow, kind: CellKind.WideLead))
+        @Expect(mixed.getCell(14, 0), Cell("", style: yellow, kind: CellKind.WideCont))
+        @Expect(mixed.getCell(15, 0).symbol, "·")
+        @Expect(mixed.getCell(15, 0).style, yellow)
+        @Expect(mixed.getCell(16, 0), Cell())
+
+        let splitSpans = [
+            RichSpan("e", style: red),
+            RichSpan("\u{0301}X", style: green),
+            RichSpan("\u{1F469}", style: blue),
+            RichSpan("\u{200D}\u{1F4BB}Z", style: yellow)
+        ]
+        @Expect(documentStyledSpanCellsMatchLegacy(splitSpans, 8))
+        let split = Buffer(Rect(0, 0, 12, 1))
+        DocumentView(
+            Document([DocumentLine(DocumentLineKind.Paragraph, splitSpans)]),
+            wrap: WrapMode.NoWrap
+        ).render(Rect(2, 0, 8, 1), split)
+        @Expect(split.getCell(2, 0).symbol, "e")
+        @Expect(split.getCell(2, 0).style, red)
+        @Expect(split.getCell(3, 0).symbol, "X")
+        @Expect(split.getCell(3, 0).style, green)
+        @Expect(split.getCell(4, 0), Cell("\u{1F469}", style: blue, kind: CellKind.WideLead))
+        @Expect(split.getCell(5, 0), Cell("", style: blue, kind: CellKind.WideCont))
+        @Expect(split.getCell(6, 0), Cell("\u{200D}", style: yellow))
+        @Expect(split.getCell(7, 0), Cell("\u{1F4BB}", style: yellow, kind: CellKind.WideLead))
+        @Expect(split.getCell(8, 0), Cell("", style: yellow, kind: CellKind.WideCont))
+        @Expect(split.getCell(9, 0), Cell("Z", style: yellow))
+
+        let edgeSpans = [
+            RichSpan("1234567", style: red),
+            RichSpan("界", style: green),
+            RichSpan("Z", style: blue)
+        ]
+        @Expect(documentStyledSpanCellsMatchLegacy(edgeSpans, 8))
+        let edge = Buffer(Rect(0, 0, 8, 1))
+        DocumentView(
+            Document([DocumentLine(DocumentLineKind.Paragraph, edgeSpans)]),
+            wrap: WrapMode.NoWrap
+        ).render(edge.area, edge)
+        @Expect(edge.getCell(7, 0).symbol, "Z")
+        @Expect(edge.getCell(7, 0).style, blue)
+
+        let narrowBuffer = Buffer(Rect(0, 0, 1, 1))
+        DocumentView(
+            Document([DocumentLine(DocumentLineKind.Paragraph, [
+                RichSpan("界", style: green),
+                RichSpan("Z", style: blue)
+            ])]),
+            wrap: WrapMode.NoWrap
+        ).render(Rect(0, 0, 2, 1), narrowBuffer)
+        @Expect(narrowBuffer.getCell(0, 0), Cell())
+
+        let escapeSpans = [
+            RichSpan("\u{1B}[31mred", style: red),
+            RichSpan("Z", style: green)
+        ]
+        @Expect(documentStyledSpanCellsMatchLegacy(escapeSpans, 8))
+        let escape = Buffer(Rect(0, 0, 8, 1))
+        DocumentView(
+            Document([DocumentLine(DocumentLineKind.Paragraph, escapeSpans)]),
+            wrap: WrapMode.NoWrap
+        ).render(escape.area, escape)
+        @Expect(escape.getCell(0, 0).symbol, "[")
+        @Expect(escape.getCell(0, 0).style, red)
+        @Expect(escape.getCell(6, 0).symbol, "d")
+        @Expect(escape.getCell(7, 0).symbol, "Z")
+        @Expect(escape.getCell(7, 0).style, green)
     }
 
     @TestCase
