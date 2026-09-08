@@ -1,24 +1,13 @@
-# Architecture Proof Step 0.5 — Consumer Attribution Bridge
+# Architecture Proof Step 0.5: Consumer Attribution Bridge
+
+## Status and applicability
 
 Step 0.5 is measurement-only. It connects the existing `cj_tui` metrics to
 the real `learn_agent_cj/agent_tui` consumer without changing event ordering,
 rendering, layout, invalidation, virtualization, or scheduling semantics.
-
-## Control-flow paths
-
-| Path ID | Conditions | Reachability | Observable result |
-| --- | --- | --- | --- |
-| P001 | `agent_tui` resolves `core` and `markdown` through sibling path dependencies | reachable | isolated build log, resolved real path, source hashes, and binary hash agree |
-| P002 | product trace disabled | reachable | no trace plumbing or core counters execute |
-| P003 | product trace enabled, core metrics disabled | reachable | stage timing is emitted; instrumentation counters are marked unavailable |
-| P004 | product trace and core metrics enabled | reachable | stage timing and frame-scoped counter deltas are emitted |
-| P005 | normal frame with transcript dirty | reachable | transcript and normal-region stages are attributed separately |
-| P006 | modal or plan-review frame | reachable | overlay stage is separated while any real background-region work remains visible in its own stage |
-| P007 | fixture appends to the existing streaming item | reachable | A/B/C workloads preserve item identity and expose reflow work |
-| P008 | fixture appends a new transcript item | reachable | D workload exposes count/index metadata work |
-| P009 | width or height changes | reachable | resize trace associates geometry change with transcript counters |
-| P010 | partial dirty rectangle intersects wide-cell guard columns | reachable, known risk | differential/product snapshot records whether adjacent cells are lost |
-| P011 | benchmark shuts down with tracing enabled | reachable | terminal exits and restores without trace-induced failure |
+Measurement and proof do not change product behavior. This contract covers the
+reachable consumer paths, the listed input domains, and the executed coverage
+boundary below; it does not turn an unavailable oracle into a product claim.
 
 ## Input domains
 
@@ -63,7 +52,33 @@ rendering, layout, invalidation, virtualization, or scheduling semantics.
 | T009 | S010 | P010 | wide-cell modal path | no silent oracle weakening | exact final screen comparison or explicit blocker | regression |
 | T010 | S011 | P002,P011 | focused consumer tests and PTY exit | behavior unchanged | test exit status and graceful process exit | lifecycle |
 | T011 | S002,S003 | P003,P004 | OFF/ON/OFF representative workloads | perturbation measured without correction | three raw distributions and execution order | performance |
-| T012 | S005,S006,S007,S008 | P005,P007,P008,P009 | closest core/product workloads | work—not latency—is correlated | metadata, documents, wrap and Buffer counters compared | performance |
+| T012 | S005,S006,S007,S008 | P005,P007,P008,P009 | closest core/product workloads | work, not latency, is correlated | metadata, documents, wrap and Buffer counters compared | performance |
+
+## Executed coverage boundary
+
+The real PTY driver records completed frames, terminal bytes, process exit, and
+all timing/counter fields above. It does not emulate the terminal into a Cell
+grid, so S003/S009/S010 do not claim a product-level final-screen hash. Existing
+core differential/wide-cell tests remain the Cell-level oracle. The product
+modal/CJK path was exercised without an observed crash or shutdown failure, but
+the known partial-dirty/wide-cell interaction remains unclosed rather than being
+silently treated as passed.
+
+## Control-flow paths
+
+| Path ID | Conditions | Reachability | Observable result |
+| --- | --- | --- | --- |
+| P001 | `agent_tui` resolves `core` and `markdown` through sibling path dependencies | reachable | isolated build log, resolved real path, source hashes, and binary hash agree |
+| P002 | product trace disabled | reachable | no trace plumbing or core counters execute |
+| P003 | product trace enabled, core metrics disabled | reachable | stage timing is emitted; instrumentation counters are marked unavailable |
+| P004 | product trace and core metrics enabled | reachable | stage timing and frame-scoped counter deltas are emitted |
+| P005 | normal frame with transcript dirty | reachable | transcript and normal-region stages are attributed separately |
+| P006 | modal or plan-review frame | reachable | overlay stage is separated while any real background-region work remains visible in its own stage |
+| P007 | fixture appends to the existing streaming item | reachable | A/B/C workloads preserve item identity and expose reflow work |
+| P008 | fixture appends a new transcript item | reachable | D workload exposes count/index metadata work |
+| P009 | width or height changes | reachable | resize trace associates geometry change with transcript counters |
+| P010 | partial dirty rectangle intersects wide-cell guard columns | reachable, known risk | differential/product snapshot records whether adjacent cells are lost |
+| P011 | benchmark shuts down with tracing enabled | reachable | terminal exits and restores without trace-induced failure |
 
 ## Stable attribution semantics
 
@@ -85,13 +100,3 @@ rendering, layout, invalidation, virtualization, or scheduling semantics.
 No ExternalPort, queue rewrite, scheduling/coalescing, OwnerToken, Region,
 VirtualTranscript index/cache change, AgentScreen decomposition, focus/overlay
 redesign, or partial-dirty correctness fix is part of Step 0.5.
-
-## Executed coverage boundary
-
-The real PTY driver records completed frames, terminal bytes, process exit, and
-all timing/counter fields above. It does not emulate the terminal into a Cell
-grid, so S003/S009/S010 do not claim a product-level final-screen hash. Existing
-core differential/wide-cell tests remain the Cell-level oracle. The product
-modal/CJK path was exercised without an observed crash or shutdown failure, but
-the known partial-dirty/wide-cell interaction remains unclosed rather than being
-silently treated as passed.
