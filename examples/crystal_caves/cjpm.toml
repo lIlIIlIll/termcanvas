@@ -1,0 +1,17 @@
+[package]
+  cjc-version = "1.1.0"
+  name = "cjtui_crystal_caves"
+  organization = ""
+  description = "Playable multi-level side-scrolling crystal cave game for cjtui"
+  version = "1.0.0"
+  target-dir = ""
+  script-dir = ""
+  output-type = "executable"
+  compile-option = ""
+  override-compile-option = ""
+  link-option = ""
+  package-configuration = {}
+
+[dependencies]
+  "core" = { path = "../../packages/core", output-type = "static" }
+  "game" = { path = "../../packages/game", output-type = "static" }

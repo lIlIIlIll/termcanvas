@@ -1,0 +1,30 @@
+target/
+.cache/
+__pycache__/
+*.py[cod]
+*.cjo
+
+# Generated benchmark/experiment output (not source)
+benchmarks/**/results/
+results/
+# Keep benchmark manifests; ignore only their generated results.
+!benchmarks/architecture-proof-step0/manifest.json
+!benchmarks/architecture-proof-step05/manifest.json
+
+# Review evidence artifacts: keep conclusions/reviews, drop logs/probes/artifacts
+docs/reviews/*/evidence/
+docs/reviews/*/artifact-manifest.sha256
+docs/reviews/*/coverage.csv
+docs/reviews/*/findings.json
+*.host.log
+
+!docs/api-index.txt
+!docs/api-contract-v1.txt
+!docs/api-inventory.json
+!docs/stable-api-contract.txt
+!docs/experimental-api-contract.txt
+!architecture/api-classification.json
+!architecture/architecture-fitness.json
+!architecture/consolidation-baseline.json
+!architecture/evidence-index.json
+!packages/core/tests/fixtures/file_picker/notes.txt

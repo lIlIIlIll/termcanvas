@@ -1,0 +1,303 @@
+[
+  {
+    "id": "RR-RT-01",
+    "title": "显式 PTY 关闭先交付退出，再交付尾部输出；同 ID 重启会把旧尾部放到新启动之后",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "runtime",
+    "record_index": 0,
+    "agent_status": "FIXED_VERIFIED_LINUX",
+    "files": [
+      "packages/core/src/app.cj",
+      "packages/core/src/pty.cj",
+      "packages/core/src/round2_runtime_test.cj"
+    ],
+    "record": "evidence/runtime-results.json"
+  },
+  {
+    "id": "RR-RT-02",
+    "title": "Headless 等待步骤发出正确 Tick，但帧指标仍使用旧时间差",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "runtime",
+    "record_index": 1,
+    "agent_status": "FIXED_VERIFIED_LINUX",
+    "files": [
+      "packages/core/src/app.cj",
+      "packages/core/src/round2_runtime_test.cj"
+    ],
+    "record": "evidence/runtime-results.json"
+  },
+  {
+    "id": "RR-RT-03",
+    "title": "主动探测新增空读重试后，会丢掉探测期间到达的普通按键",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "runtime",
+    "record_index": 2,
+    "agent_status": "FIXED_VERIFIED_LINUX",
+    "files": [
+      "packages/core/src/app.cj",
+      "packages/core/src/terminal.cj",
+      "packages/core/src/round2_runtime_test.cj"
+    ],
+    "record": "evidence/runtime-results.json"
+  },
+  {
+    "id": "RR-RT-04",
+    "title": "App 启动能力事件仍使用探测前的 driver 能力",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "runtime",
+    "record_index": 3,
+    "agent_status": "FIXED_VERIFIED_LINUX",
+    "files": [
+      "packages/core/src/app.cj",
+      "packages/core/src/terminal.cj",
+      "packages/core/src/round2_runtime_test.cj"
+    ],
+    "record": "evidence/runtime-results.json"
+  },
+  {
+    "id": "RIN-01",
+    "title": "宽字符错位覆盖旧宽字符时留下孤立 continuation",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "input",
+    "record_index": 0,
+    "agent_status": "FIXED_VERIFIED",
+    "files": [
+      "packages/core/src/buffer.cj",
+      "packages/core/src/audit_input_round2_test.cj"
+    ],
+    "record": "evidence/input-results.json"
+  },
+  {
+    "id": "RIN-02",
+    "title": "重叠选区删除会跳过较左选区并留下已选文字",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "input",
+    "record_index": 1,
+    "agent_status": "FIXED_VERIFIED",
+    "files": [
+      "packages/core/src/text_area.cj",
+      "packages/core/src/audit_input_round2_test.cj"
+    ],
+    "record": "evidence/input-results.json"
+  },
+  {
+    "id": "RIN-03",
+    "title": "相邻选区删除合到同一点后重复插入后续文本",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "input",
+    "record_index": 2,
+    "agent_status": "FIXED_VERIFIED",
+    "files": [
+      "packages/core/src/text_area.cj",
+      "packages/core/src/audit_input_round2_test.cj"
+    ],
+    "record": "evidence/input-results.json"
+  },
+  {
+    "id": "RIN-04",
+    "title": "折叠隐藏的额外 caret 仍返回折叠头可见坐标",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "input",
+    "record_index": 3,
+    "agent_status": "FIXED_VERIFIED",
+    "files": [
+      "packages/core/src/text_area.cj",
+      "packages/core/src/audit_input_round2_test.cj"
+    ],
+    "record": "evidence/input-results.json"
+  },
+  {
+    "id": "RW-01",
+    "title": "图表未超量程的大数值仍在高度换算中溢出",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "widgets",
+    "record_index": 0,
+    "agent_status": "FIXED_VERIFIED",
+    "files": [
+      "packages/core/src/dashboard_widgets.cj",
+      "packages/core/src/round2_widgets_test.cj"
+    ],
+    "record": "evidence/widgets-results.json"
+  },
+  {
+    "id": "RW-02",
+    "title": "直接 Widget.render 仍可通过宽字符配对修复改动传入区域外单元",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "widgets",
+    "record_index": 1,
+    "agent_status": "FIXED_VERIFIED",
+    "files": [
+      "packages/core/src/widgets.cj",
+      "packages/core/src/data_widgets.cj",
+      "packages/core/src/form_widgets.cj",
+      "packages/core/src/round2_widgets_test.cj"
+    ],
+    "record": "evidence/widgets-results.json"
+  },
+  {
+    "id": "RW-03",
+    "title": "普通 DocumentHighlight 会再次拆开单个字素并丢掉组合符",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "widgets",
+    "record_index": 2,
+    "agent_status": "FIXED_VERIFIED",
+    "files": [
+      "packages/core/src/document.cj",
+      "packages/core/src/round2_widgets_test.cj"
+    ],
+    "record": "evidence/widgets-results.json"
+  },
+  {
+    "id": "RW-04",
+    "title": "CommandPalette 尚未采用已经解析出的关联文本",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "widgets",
+    "record_index": 3,
+    "agent_status": "FIXED_VERIFIED",
+    "files": [
+      "packages/core/src/command_widgets.cj",
+      "packages/core/src/round2_widgets_test.cj"
+    ],
+    "record": "evidence/widgets-results.json"
+  },
+  {
+    "id": "RW-05",
+    "title": "VirtualTranscriptView 的左 padding 大于可用宽度时仍把正文画到区域外",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "widgets",
+    "record_index": 4,
+    "agent_status": "FIXED_VERIFIED",
+    "files": [
+      "packages/core/src/virtual_transcript.cj",
+      "packages/core/src/round2_widgets_test.cj"
+    ],
+    "record": "evidence/widgets-results.json"
+  },
+  {
+    "id": "RR-TOOL-01",
+    "title": "生成 Windows runner 时把赋值放在 param 前，使脚本参数块失效",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "local_fixtures_and_main_review",
+    "group": "tooling",
+    "record_index": 0,
+    "agent_status": "FIXED_LOCAL_FIXTURE_VERIFIED",
+    "files": [
+      "scripts/run_windows_smoke.sh",
+      "scripts/windows_repo_smoke.ps1",
+      "scripts/test_windows_smoke.py",
+      "scripts/release_gate.sh"
+    ],
+    "record": "evidence/tooling-results.json"
+  },
+  {
+    "id": "RR-TOOL-02",
+    "title": "注释中的合法 Unicode 分行符使 API 提取新增索引越界",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "tooling",
+    "record_index": 1,
+    "agent_status": "FIXED_VERIFIED",
+    "files": [
+      "scripts/api_contract.py",
+      "scripts/test_api_contract.py"
+    ],
+    "record": "evidence/tooling-results.json"
+  },
+  {
+    "id": "RR-TOOL-03",
+    "title": "显式 SDK 版本请求仍按子串筛选清单和 DevRepo 结果",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "local_fixtures_and_main_review",
+    "group": "tooling",
+    "record_index": 2,
+    "agent_status": "FIXED_LOCAL_FIXTURE_VERIFIED",
+    "files": [
+      "scripts/resolve_nightly_sdk.py",
+      "scripts/test_resolve_nightly_sdk.py",
+      "scripts/release_gate.sh"
+    ],
+    "record": "evidence/tooling-results.json"
+  },
+  {
+    "id": "RR-TOOL-04",
+    "title": "示例 smoke 的旧工作流说明没有随组件组合重定位更新",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "documentation_checked",
+    "group": "tooling",
+    "record_index": 3,
+    "agent_status": "FIXED_STATIC_VERIFIED",
+    "files": [
+      "docs/testing.md",
+      "docs/regression-matrix.md"
+    ],
+    "record": "evidence/tooling-results.json"
+  },
+  {
+    "id": "EXT-RR-01",
+    "title": "TerminalScreen 窄区域复制可留下孤立 WideLead",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "extensions",
+    "record_index": 0,
+    "agent_status": "fixed_verified",
+    "files": [
+      "packages/terminal/src/terminal.cj",
+      "packages/terminal/src/terminal_test.cj"
+    ],
+    "record": "evidence/extensions-results.json"
+  },
+  {
+    "id": "EXT-RR-02",
+    "title": "side-by-side 总宽度为 1 时写到传入区域之外",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "extensions",
+    "record_index": 1,
+    "agent_status": "fixed_verified",
+    "files": [
+      "packages/diff/src/diff.cj",
+      "packages/diff/src/diff_test.cj"
+    ],
+    "record": "evidence/extensions-results.json"
+  },
+  {
+    "id": "EXT-RR-03",
+    "title": "装箱容量已满且库存非空时状态仍显示 shipping box is empty",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "public_behavior_tests_and_main_review",
+    "group": "extensions",
+    "record_index": 2,
+    "agent_status": "fixed_verified",
+    "files": [
+      "examples/game_demo/src/main.cj",
+      "examples/game_demo/src/main_test.cj"
+    ],
+    "record": "evidence/extensions-results.json"
+  },
+  {
+    "id": "RR-REPORT-01",
+    "title": "CJTUI-047 汇总误述采样器修复方式",
+    "status": "addressed_and_reviewed",
+    "verification_mode": "documentation_checked",
+    "group": "tooling",
+    "record_index": 4,
+    "agent_status": "CORRECTED_STATIC_VERIFIED",
+    "files": [
+      "docs/reviews/2026-09-08-round2-fixes/errata.md"
+    ],
+    "record": "evidence/tooling-results.json"
+  }
+]

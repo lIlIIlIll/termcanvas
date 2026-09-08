@@ -1,0 +1,57 @@
+{
+  "gate": {
+    "command": [
+      "bash",
+      "scripts/release_gate.sh"
+    ],
+    "returncode": 0,
+    "elapsed_seconds": 601.55,
+    "source_manifest_sha256": "89816a6d23e7d39a4dc730c8d49f3d68b9392537ee8bb6e09fc72a3150173d65",
+    "changed_during_gate": [],
+    "log": "/tmp/cjtui-round2/logs/release-gate.log"
+  },
+  "package_tests": {
+    "cj_markdown": 19,
+    "core": 636,
+    "markdown": 19,
+    "terminal": 10,
+    "diff": 10,
+    "media": 11,
+    "game": 10
+  },
+  "distinct_package_tests": 715,
+  "example_tests": {
+    "assistant_console": 2,
+    "btm_clone": 2,
+    "data_browser": 1,
+    "form_studio": 2,
+    "game_demo": 6,
+    "markdown_studio": 2,
+    "oh_my_pi_skin": 3,
+    "ops_dashboard": 1,
+    "taskpad": 3,
+    "terminal_lab": 1
+  },
+  "distinct_example_tests": 23,
+  "examples_built": 17,
+  "python_tests": {
+    "api extractor fixtures": 17,
+    "SDK resolver local fixtures": 5,
+    "Windows smoke wrapper local fixtures": 3
+  },
+  "independent_combinations": {
+    "selection_sequences": 882,
+    "wide_clip_sequences": 2520,
+    "widget_region_sequences": 1575
+  },
+  "original_probe_sources_replayed": 5,
+  "public_declarations": 2449,
+  "declaration_changes": 0,
+  "not_executed": [
+    "native Windows and PowerShell execution",
+    "native macOS",
+    "old binary compatibility matrix",
+    "remote CI",
+    "long-running concurrent sampling measurement"
+  ]
+}

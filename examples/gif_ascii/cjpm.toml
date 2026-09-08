@@ -1,0 +1,17 @@
+[package]
+  cjc-version = "1.1.0"
+  name = "cjtui_gif_ascii"
+  organization = ""
+  description = "ffmpeg-decodable media to ASCII animation viewer example for cjtui"
+  version = "1.0.0"
+  target-dir = ""
+  script-dir = ""
+  output-type = "executable"
+  compile-option = ""
+  override-compile-option = ""
+  link-option = ""
+  package-configuration = {}
+
+[dependencies]
+  "core" = { path = "../../packages/core", output-type = "static" }
+  "media" = { path = "../../packages/media", output-type = "static" }

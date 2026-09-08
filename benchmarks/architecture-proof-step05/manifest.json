@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "name": "cj_tui-architecture-proof-step05-real-consumer",
+  "consumer": "learn_agent_cj/agent_app --fixture",
+  "measurement_boundary": "PTY input receipt through completed Terminal.draw and terminal flush; not photon latency",
+  "build": {
+    "mode": "release",
+    "procedure": "isolated consumer source snapshot with live cj_tui path dependency and empty target directory",
+    "sdk_root": "/home/elliot/cangjie_sdk/daily"
+  },
+  "terminal": {"width": 100, "height": 28, "term": "xterm-256color"},
+  "history_counts": [100, 1000, 10000, 100000],
+  "fixture_note": "consumer adds one dedicated live streaming card after the requested historical item count",
+  "samples_per_group": 120,
+  "warmup_operations": 0,
+  "statistics": ["n", "p50", "p95", "p99_when_n_at_least_100", "max"],
+  "metrics_modes": {
+    "off": "product trace and stage timing enabled; cj_tui hot counters disabled; latency source of truth",
+    "on": "same product trace with cj_tui Buffer and VirtualTranscript counters enabled; attribution source",
+    "off_repeat": "selected OFF/ON/OFF perturbation leg"
+  },
+  "workloads": [
+    {"name": "typing_ascii", "histories": [100000], "input": "a"},
+    {"name": "typing_cjk", "histories": [100000], "input": "cyclic 中文输入 runes"},
+    {"name": "backspace", "histories": [100000], "setup": "120 ASCII characters", "input": "Backspace"},
+    {"name": "cursor_left_right", "histories": [100000], "input": "alternating Left/Right"},
+    {"name": "key_repeat_up_down", "histories": [100000], "input": "alternating Up/Down"},
+    {"name": "scroll_line", "histories": [100, 1000, 10000, 100000], "input": "alternating wheel line scroll"},
+    {"name": "scroll_page", "histories": [100, 100000], "input": "alternating PageUp/PageDown"},
+    {"name": "scroll_continuous", "histories": [100, 100000], "input": "repeated Up"},
+    {"name": "stream_a_existing_no_wrap", "histories": [100, 1000, 10000, 100000], "input": "F5 fixture short append", "classification": "short existing-item append; repeated product updates can cross a wrap boundary and the current product trace has no direct height-changed bit"},
+    {"name": "stream_b_existing_wrap", "histories": [100, 1000, 10000, 100000], "input": "F6 fixture wrap-crossing append"},
+    {"name": "stream_c_complete_line", "histories": [100, 1000, 10000, 100000], "input": "F7 fixture newline append"},
+    {"name": "stream_d_append_item", "histories": [100, 1000, 10000, 100000], "input": "F9 fixture new UiCard"},
+    {"name": "resize_small_width", "histories": [100, 1000, 10000, 100000], "sizes": [[99, 28], [100, 28]]},
+    {"name": "resize_large_width", "histories": [100000], "sizes": [[60, 28], [120, 28]]},
+    {"name": "resize_continuous_width", "histories": [100000], "sizes": "60..120 x 28"},
+    {"name": "resize_height_only", "histories": [100000], "sizes": [[100, 18], [100, 36]]},
+    {"name": "resize_width_height", "histories": [100000], "sizes": [[60, 18], [120, 36]]},
+    {"name": "overlay_open", "histories": [100000], "input": "F4 deterministic fixture opens the existing Model modal; measured open, unmeasured Escape close"},
+    {"name": "overlay_close", "histories": [100000], "input": "unmeasured F4 deterministic Model modal open; measured Escape"},
+    {"name": "overlay_switch", "histories": [100000], "input": "unmeasured F4 deterministic Model modal open; measured j selection changes"}
+  ],
+  "perturbation_groups": [
+    "scroll_line/100000",
+    "stream_d_append_item/100000",
+    "resize_large_width/100000",
+    "overlay_open/100000"
+  ]
+}

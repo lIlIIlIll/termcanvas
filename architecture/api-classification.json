@@ -1,0 +1,472 @@
+{
+  "format_version": 1,
+  "policy": {
+    "language_public_is_stable": false,
+    "tiers": ["STABLE", "EXPERIMENTAL", "INTERNAL", "TEST_ONLY"],
+    "unclassified_production_public_is_error": true,
+    "contract_kind": "source-level",
+    "external_compatibility_census": "required before removal; not yet performed"
+  },
+  "source_roots": [
+    "packages/cj_markdown/src",
+    "packages/core/src",
+    "packages/diff/src",
+    "packages/game/src",
+    "packages/markdown/src",
+    "packages/media/src",
+    "packages/terminal/src"
+  ],
+  "excluded_paths": [
+    "packages/*/src/*_test.cj",
+    "packages/*/tests/**"
+  ],
+  "rules": [
+    {
+      "id": "core-render-primitives",
+      "match": {"package": "core", "symbols": ["CellKind", "Cell", "Buffer", "DrawOp", "DirtyRects", "Widget", "WrapMode", "TextAlign"]},
+      "stability": "STABLE", "subsystem": "render", "owner": "core/render",
+      "reason": "Immediate Widget, Buffer/Cell, and dirty-rectangle rendering are the proven rendering foundation.",
+      "consumer_evidence": "Used throughout core, examples, and the principal omp-cj consumer."
+    },
+    {
+      "id": "core-geometry",
+      "match": {"package": "core", "symbols": ["Rect", "Position", "Direction", "Constraint", "Flex", "Spacing", "Layout", "SizeHint", "Sizable", "Grid", "FlexItem", "FlexLayout", "LayoutCache"]},
+      "stability": "STABLE", "subsystem": "geometry", "owner": "core/geometry",
+      "reason": "Geometry and basic layout primitives have clear responsibility and broad usage.",
+      "consumer_evidence": "Used by all immediate rendering paths and real consumers."
+    },
+    {
+      "id": "core-text-unicode",
+      "match": {"package": "core", "symbols": ["AmbiguousWidth", "TextWidthOptions", "GraphemeCluster", "displayWidth", "graphemeClusters", "graphemeDisplayWidth", "cut", "graphemePrefix", "wrapText", "clampToRuneBoundary", "previousGraphemeOffset", "nextGraphemeOffset"]},
+      "stability": "STABLE", "subsystem": "text", "owner": "core/text",
+      "reason": "Unicode, grapheme, wrapping, and terminal width behavior are mature correctness primitives.",
+      "consumer_evidence": "Used by Buffer, Document, TextArea, VirtualTranscript, examples, and omp-cj."
+    },
+    {
+      "id": "core-style-stable",
+      "match": {"package": "core", "symbols": ["Color", "Modifier", "Style", "Theme"]},
+      "stability": "STABLE", "subsystem": "style", "owner": "core/style",
+      "reason": "The immediate-mode Style/Theme model supports the principal consumer without DOM/CSS.",
+      "consumer_evidence": "Broad core, example, and omp-cj usage."
+    },
+    {
+      "id": "core-style-state-experimental",
+      "match": {"package": "core", "symbols": ["StyleState"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Shared immediate-widget state value used by InlineAlert.",
+      "consumer_evidence": "InlineAlert is the current direct production consumer; no principal consumer adoption.",
+      "promotion_condition": "Two independent real consumers validate the same shared interaction-state semantics across immediate widgets.",
+      "sunset_condition": "Review with the experimental widget family if no second independent real consumer exists.",
+      "disposition": "review_with_experimental_widget_family"
+    },
+    {
+      "id": "core-app-stable",
+      "match": {"package": "core", "symbols": ["ControlFlow", "TimerSpec", "Command", "FrameMetrics", "AppMetrics", "UpdateResult", "HandleResult", "App", "defaultApp", "runApp", "runAppWithCommands"]},
+      "stability": "STABLE", "subsystem": "runtime", "owner": "core/runtime",
+      "reason": "App/update/Command and high-level frame metrics form the proven application runtime contract.",
+      "consumer_evidence": "Used by recommended examples and omp-cj."
+    },
+    {
+      "id": "core-app-observability-experimental",
+      "match": {"package": "core", "symbols": ["AppTraceSink", "RuntimeMetricsSnapshot"]},
+      "stability": "EXPERIMENTAL", "subsystem": "metrics", "owner": "core/observability",
+      "reason": "Detailed runtime attribution is valuable but its field-level compatibility is not frozen.",
+      "consumer_evidence": "Architecture proof and omp-cj perf trace.",
+      "promotion_condition": "A second operational consumer validates a small high-level metrics subset.",
+      "sunset_condition": "Detailed proof fields are reviewed in Phase 4G and may become test-only."
+    },
+    {
+      "id": "core-app-internal-runtime",
+      "match": {"package": "core", "symbols": ["TimerRuntime", "AsyncRuntime", "Subscription", "EventWaiter", "NoopEventWaiter", "defaultEventWaiter", "WindowsConsoleEventWaiter", "LinuxEpollEventWaiter", "MacOSPollEventWaiter"]},
+      "stability": "INTERNAL", "subsystem": "runtime", "owner": "core/runtime",
+      "reason": "Runtime implementation and platform wait machinery are not application architecture.",
+      "consumer_evidence": "Production runtime and tests; normal consumers use App."
+    },
+    {
+      "id": "core-app-test-support",
+      "match": {"package": "core", "symbols": ["EventScript", "ScenarioStep", "ScenarioResult", "SnapshotDiffResult", "SnapshotDiff", "EventScenario", "HeadlessStep", "HeadlessScript", "HeadlessRunOptions", "HeadlessRunResult", "AppTestRunner"]},
+      "stability": "TEST_ONLY", "subsystem": "test_support", "owner": "test-support",
+      "reason": "Deterministic headless and snapshot facilities support repository and consumer tests, not application runtime compatibility.",
+      "consumer_evidence": "Core tests, architecture proof, and omp-cj tests."
+    },
+    {
+      "id": "core-focus-manager-experimental",
+      "match": {"package": "core", "symbols": ["FocusManager"]},
+      "stability": "EXPERIMENTAL", "subsystem": "focus", "owner": "core/focus",
+      "reason": "The flat string-ID focus state is a neutral shared primitive, not a competing UI architecture, but its compatibility contract lacks independent production adoption.",
+      "consumer_evidence": "Recommended form_studio and core tests use it, while omp-cj owns its focus/modal behavior.",
+      "promotion_condition": "Two independent applications validate the same flat focus contract.",
+      "sunset_condition": "Revisit if form_studio retires and no independent real consumer appears.",
+      "disposition": "keep_core_shared_primitive_phase_4d_3"
+    },
+    {
+      "id": "core-app-external-port-member",
+      "match": {"package": "core", "qualified_symbols": ["App.runWithExternalPort"]},
+      "stability": "STABLE", "subsystem": "external_delivery", "owner": "core/runtime",
+      "reason": "The App integration entry exposes only the stable bounded producer contract; readiness and queue machinery remain implementation details.",
+      "consumer_evidence": "agent_tui production use, direct contract tests, and permanent runtime fitness workloads."
+    },
+    {
+      "id": "core-app-trace-attachment-member",
+      "match": {"package": "core", "qualified_symbols": ["App.attachTraceSink"]},
+      "stability": "EXPERIMENTAL", "subsystem": "metrics", "owner": "core/observability",
+      "reason": "Detailed tracing is an explicit pre-run observability opt-in, not part of normal stable App construction.",
+      "consumer_evidence": "omp-cj performance tracing and architecture proof.",
+      "promotion_condition": "A second operational consumer validates a reduced stable observability contract.",
+      "sunset_condition": "Phase 4G may replace detailed callbacks with a smaller high-level metrics surface."
+    },
+    {
+      "id": "core-app-pty-attachment-member",
+      "match": {"package": "core", "qualified_symbols": ["App.attachPtyRuntime"]},
+      "stability": "EXPERIMENTAL", "subsystem": "pty", "owner": "experimental/pty",
+      "reason": "PTY command execution is an explicit pre-run optional capability, not part of normal stable App construction.",
+      "consumer_evidence": "terminal_lab and PTY lifecycle tests; no principal consumer adoption.",
+      "promotion_condition": "Independent production adoption validates PTY process, readiness, and cross-platform lifecycle semantics.",
+      "sunset_condition": "Review PTY package ownership in Phase 4D before any stable promotion."
+    },
+    {
+      "id": "core-runtime-foundation-internal",
+      "match": {"package": "core", "symbols": ["RuntimeState", "OwnerToken", "OperationId", "OperationState", "OwnerRegistry", "OperationRecord", "OwnedAsyncCompletion", "CompletionDisposition", "AsyncOwnershipRuntime", "RuntimeEnvelope", "SequencedRuntimeItem", "RuntimeQueue", "RuntimeClock", "MonotonicRuntimeClock"]},
+      "stability": "INTERNAL", "subsystem": "runtime", "owner": "core/runtime",
+      "reason": "Queue, clock, and async-ownership machinery implement App invariants and are not consumer-facing architecture.",
+      "consumer_evidence": "Runtime implementation and focused tests only."
+    },
+    {
+      "id": "core-runtime-test-clock",
+      "match": {"package": "core", "symbols": ["TestClock"]},
+      "stability": "TEST_ONLY", "subsystem": "test_support", "owner": "test-support",
+      "reason": "Deterministic scheduling clock exists for runtime proof tests.",
+      "consumer_evidence": "Runtime tests only."
+    },
+    {
+      "id": "core-runtime-external-port",
+      "match": {"package": "core", "symbols": ["ExternalEnqueueResult", "ExternalPort"]},
+      "stability": "STABLE", "subsystem": "external_delivery", "owner": "core/runtime",
+      "reason": "Bounded nonblocking external delivery has a hardened producer-only surface with explicit result, ordering, wake, and close semantics.",
+      "consumer_evidence": "agent_tui production use, direct concurrent/close tests, architecture proof, and permanent runtime fitness workloads."
+    },
+    {
+      "id": "core-runtime-external-port-diagnostics",
+      "match": {"package": "core", "qualified_symbols": ["ExternalPort.enableLatencyMeasurement", "ExternalPort.size", "ExternalPort.acceptedCount", "ExternalPort.fullCount", "ExternalPort.closedCount", "ExternalPort.wakeSignals", "ExternalPort.wakeCoalesced"]},
+      "stability": "EXPERIMENTAL", "subsystem": "metrics", "owner": "core/observability",
+      "reason": "ExternalPort counters and latency capture are diagnostic proof surfaces, not producer delivery guarantees.",
+      "consumer_evidence": "omp-cj performance tracing and architecture fitness workloads.",
+      "promotion_condition": "A separate observability lifecycle review defines a small compatibility contract.",
+      "sunset_condition": "Internalize when no external diagnostics consumer remains."
+    },
+    {
+      "id": "core-runtime-scheduling-metrics",
+      "match": {"package": "core", "symbols": ["FrameSchedulingSnapshot"]},
+      "stability": "EXPERIMENTAL", "subsystem": "metrics", "owner": "core/observability",
+      "reason": "Frame scheduling is internal; only its diagnostic snapshot is exposed for attribution.",
+      "consumer_evidence": "Architecture proof and omp-cj perf trace.",
+      "promotion_condition": "Promote only a reduced high-level observability contract after a second operational consumer.",
+      "sunset_condition": "Phase 4G reviews proof-specific fields."
+    },
+    {
+      "id": "core-terminal-stable",
+      "match": {"package": "core", "symbols": ["Backend", "RenderDiffSpan", "RenderDiffPlan", "Frame", "RenderMode", "Terminal", "TerminalSession", "TerminalDriver", "TestBackend", "TerminalCapabilities", "RenderMetrics", "TerminalMode"]},
+      "stability": "STABLE", "subsystem": "terminal", "owner": "core/terminal",
+      "reason": "Backend, session, Frame, diff contract, and TestBackend are mature terminal boundaries.",
+      "consumer_evidence": "Core, examples, and principal consumer."
+    },
+    {
+      "id": "core-terminal-experimental",
+      "match": {"package": "core", "symbols": ["TerminalProbe", "LinuxTerminalDriver", "FallbackTerminalDriver", "MacOSTerminalDriver", "WindowsTerminalDriver"]},
+      "stability": "EXPERIMENTAL", "subsystem": "terminal", "owner": "core/terminal",
+      "reason": "Platform and probe details remain pre-1.0 integration surfaces.",
+      "consumer_evidence": "Core tests and default runtime integration.",
+      "promotion_condition": "Independent cross-platform consumers validate the same driver/probe contract.",
+      "sunset_condition": "Review platform-specific exports when package boundaries are consolidated."
+    },
+    {
+      "id": "core-observability-widget-experimental",
+      "match": {"package": "core", "symbols": ["DebugOverlay"]},
+      "stability": "EXPERIMENTAL", "subsystem": "metrics", "owner": "core/observability",
+      "reason": "The metrics presentation widget is useful for opt-in diagnostics, but its field order, output, styling, truncation, and empty-frame behavior are not a frozen compatibility promise.",
+      "consumer_evidence": "debug_lab and crystal_caves render it directly; btm_clone toggles it and asserts its headless output; the core snapshot/golden test covers metrics text and styling; principal consumers have no direct adoption.",
+      "promotion_condition": "Promote only after a principal application or two independent production applications adopt the widget and direct semantic tests freeze metrics field order, zero-frame output, truncation, style, and size handling.",
+      "sunset_condition": "Retire only after all current diagnostic/example adopters remove it and a fresh source, documentation, test, and consumer census finds no remaining shared observability owner or need for this presentation contract."
+    },
+    {
+      "id": "core-terminal-options-stable",
+      "match": {"package": "core", "symbols": ["KeyboardProtocolMode", "TerminalProbeMode", "KeyboardOptions", "TerminalProbeResult", "defaultTerminalDriver"]},
+      "stability": "STABLE", "subsystem": "terminal", "owner": "core/terminal",
+      "reason": "These options and result types are part of the documented TerminalSession/App construction boundary.",
+      "consumer_evidence": "App/TerminalSession public signatures, examples, and terminal tests."
+    },
+    {
+      "id": "core-terminal-internal",
+      "match": {"package": "core", "symbols": ["AnsiBackend", "MacOSTerminalMode", "WindowsConsoleMode"]},
+      "stability": "INTERNAL", "subsystem": "terminal", "owner": "core/terminal",
+      "reason": "Concrete presenter and platform mode implementations are behind Backend/TerminalDriver.",
+      "consumer_evidence": "TerminalSession implementation and tests."
+    },
+    {
+      "id": "core-terminal-proof-members",
+      "match": {"package": "core", "qualified_symbols": ["Terminal.setInstrumentationEnabled", "Terminal.diagnosticByteCount"]},
+      "stability": "TEST_ONLY", "subsystem": "test_support", "owner": "test-support",
+      "reason": "Raw terminal attribution controls were introduced for architecture proof.",
+      "consumer_evidence": "Benchmarks and tests."
+    },
+    {
+      "id": "core-terminal-capability-detect-member",
+      "match": {"package": "core", "qualified_symbols": ["TerminalCapabilities.detect"]},
+      "stability": "INTERNAL", "subsystem": "terminal", "owner": "core/terminal",
+      "reason": "Capability detection is implementation wiring behind TerminalSession and references the concrete presenter.",
+      "consumer_evidence": "Terminal runtime/tests."
+    },
+    {
+      "id": "core-event-stable",
+      "match": {"package": "core", "symbols": ["InputSource", "StdinInputSource", "KeyCode", "KeyProtocol", "KeyModifier", "KeyEvent", "MouseButton", "MouseKind", "MouseEvent", "TickEvent", "TimerMode", "FrameMissPolicy", "TimerEvent", "Event", "PressedKey", "InputState", "EventParser"]},
+      "stability": "STABLE", "subsystem": "event", "owner": "core/runtime",
+      "reason": "Input/event primitives and the single Event contract are the proven update boundary.",
+      "consumer_evidence": "Core, examples, and omp-cj."
+    },
+    {
+      "id": "core-event-internal",
+      "match": {"package": "core", "symbols": ["TimerPriority"]},
+      "stability": "INTERNAL", "subsystem": "runtime", "owner": "core/runtime",
+      "reason": "Timer priority is runtime scheduling policy, not an application compatibility promise.",
+      "consumer_evidence": "Runtime implementation/tests."
+    },
+    {
+      "id": "core-primitive-widgets-stable",
+      "match": {"package": "core", "symbols": ["VBox", "HBox", "Stack", "Overlay", "Padding", "Margin", "Centered", "Dock", "Scrollable", "BorderKind", "TitleAlign", "BoxState", "BorderSet", "BlockOptions", "Block", "Panel", "Paragraph", "List", "ListState", "Table", "TableState", "Scrollbar", "Input", "FileDialog", "Button", "Checkbox", "RadioGroup", "Select", "Dropdown"]},
+      "stability": "STABLE", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Common immediate widgets have focused behavior tests and broad example usage.",
+      "consumer_evidence": "Recommended examples; core primitives are also used by omp-cj."
+    },
+    {
+      "id": "core-widget-experimental",
+      "match": {"package": "core", "symbols": ["ColorPicker", "MultiSelect", "DatePicker", "MenuItem", "Menu", "MenuBar", "CommandPalette", "Toast", "ToastManager", "Spinner", "Dialog", "ConfirmDialog", "MetricCard", "Meter", "LegendItem", "Legend", "TimeSeriesChart", "HeaderBar", "FooterBar", "EmptyState", "ErrorBox", "LoadingOverlay", "Skeleton", "InlineAlert", "Sparkline", "Gauge", "Chart", "LogView"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Advanced widget families have examples but insufficient independent real-consumer evidence for a stable promise.",
+      "consumer_evidence": "Examples/tests primarily.",
+      "promotion_condition": "Two independent real consumers validate responsibility, lifecycle, and source compatibility.",
+      "sunset_condition": "Review per family rather than promoting the catalog wholesale."
+    },
+    {
+      "id": "core-progress-stable",
+      "match": {"package": "core", "symbols": ["ProgressBarDirection", "ProgressBarLabelMode", "ProgressBarSymbols", "ProgressBarSegment", "ProgressBar"]},
+      "stability": "STABLE", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Progress primitives are shared by stable status widgets and have focused public behavior.",
+      "consumer_evidence": "StatusBar, examples, and core tests."
+    },
+    {
+      "id": "core-navigation-stable",
+      "match": {"package": "core", "symbols": ["Tabs", "StatusBarProgress", "StatusBar", "Viewport"]},
+      "stability": "STABLE", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "These are immediate widgets with clear rendering responsibility.",
+      "consumer_evidence": "Multiple recommended examples and core tests."
+    },
+    {
+      "id": "core-data-stable",
+      "match": {"package": "core", "symbols": ["FilePicker", "FileEntryInfo", "SelectionMode", "SelectionModel", "ScrollState", "SortState", "FilterState", "KeyBinding", "KeyMap", "HelpView"]},
+      "stability": "STABLE", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Reusable state models, key maps, and FilePicker are mature public behavior surfaces.",
+      "consumer_evidence": "Multiple examples and public behavior tests."
+    },
+    {
+      "id": "core-data-experimental",
+      "match": {"package": "core", "symbols": ["Paginator", "TableColumn", "TableStatus", "VirtualTable", "TreeNode", "Tree"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Advanced data widgets have limited real-consumer evidence and evolving performance helpers.",
+      "consumer_evidence": "Examples/tests only.",
+      "promotion_condition": "Two independent real consumers validate the same data/virtualization contract.",
+      "sunset_condition": "Review per type family during API cleanup."
+    },
+    {
+      "id": "core-document-editor-stable",
+      "match": {"package": "core", "symbols": ["RichSpan", "DocumentLineKind", "DocumentLine", "Document", "DocumentTheme", "MarkdownTheme", "MarkdownDocument", "DocumentHighlight", "DocumentFoldRange", "DocumentViewState", "DocumentView", "MarkdownView", "Clipboard", "MemoryClipboard", "TextPosition", "TextRange", "TextBuffer", "TextAreaCaret", "TextCompletionRequest", "TextCompletionItem", "TextCompletionResult", "TextDecoration", "HighlightSpan", "LineHighlight", "MarkdownHighlightCache", "TextArea", "markdownDecorations", "markdownLineHighlights", "MarkdownEditorBehavior", "MarkdownTextEditor", "ComposerSubmit", "Composer"]},
+      "stability": "STABLE", "subsystem": "document_editor", "owner": "core/editor",
+      "reason": "Document, TextArea, and Composer control models are mature and used by the principal consumer.",
+      "consumer_evidence": "Core tests, recommended examples, and omp-cj."
+    },
+    {
+      "id": "core-editor-experimental",
+      "match": {"package": "core", "symbols": ["TranscriptItemKind", "TranscriptItemStatus", "TranscriptCardOption", "TranscriptCardTheme", "TranscriptItem", "Transcript", "TranscriptView", "ActivityStep", "ActivityTimeline", "RequestDialog", "DecisionDialog", "statusMark", "transcriptStatusStyle", "transcriptStatusLabel", "transcriptCardDocument"]},
+      "stability": "EXPERIMENTAL", "subsystem": "document_editor", "owner": "core/editor",
+      "reason": "Transcript workflow APIs have examples but the principal consumer uses specialized application models.",
+      "consumer_evidence": "Examples/tests; no shared independent consumer contract.",
+      "promotion_condition": "Two independent consumers validate the same transcript/workflow responsibilities.",
+      "sunset_condition": "Review per family; do not infer stability from facade aliases."
+    },
+    {
+      "id": "core-textarea-proof-member",
+      "match": {"package": "core", "qualified_symbols": ["TextArea.lineCacheRebuildCount"]},
+      "stability": "TEST_ONLY", "subsystem": "test_support", "owner": "test-support",
+      "reason": "The rebuild counter is a deterministic performance guard, not editing behavior.",
+      "consumer_evidence": "Performance tests."
+    },
+    {
+      "id": "core-virtual-transcript-public",
+      "match": {"package": "core", "symbols": ["VirtualTranscriptSource", "VirtualTranscriptState", "VirtualTranscriptView"]},
+      "stability": "EXPERIMENTAL", "subsystem": "virtual_transcript", "owner": "specialized/virtual_transcript",
+      "reason": "The specialized view is proven but currently has one independent real consumer family.",
+      "consumer_evidence": "omp-cj, proof fixture, and tests.",
+      "promotion_condition": "A second independent real consumer validates source/state/identity and bounded-work contracts.",
+      "sunset_condition": "Revisit if the narrow source/change contract fails real producer semantics."
+    },
+    {
+      "id": "core-virtual-transcript-internal",
+      "match": {"package": "core", "symbols": ["VirtualTranscriptAppendOnlyText", "VisibleRange"]},
+      "stability": "INTERNAL", "subsystem": "virtual_transcript", "owner": "specialized/virtual_transcript",
+      "reason": "Append and visible-range metadata implement the specialized view and are not generic virtualization API.",
+      "consumer_evidence": "VirtualTranscript implementation/tests."
+    },
+    {
+      "id": "core-virtual-transcript-metrics",
+      "match": {"package": "core", "symbols": ["VirtualTranscriptMetrics"]},
+      "stability": "EXPERIMENTAL", "subsystem": "metrics", "owner": "core/observability",
+      "reason": "Detailed structural counters are valuable attribution but not a frozen compatibility surface.",
+      "consumer_evidence": "Architecture proof and omp-cj perf trace.",
+      "promotion_condition": "Promote only a reduced consumer-neutral metrics subset after additional adoption.",
+      "sunset_condition": "Phase 4G separates permanent counters from proof-only counters."
+    },
+    {
+      "id": "core-virtual-transcript-proof-member",
+      "match": {"package": "core", "qualified_symbols": ["VirtualTranscriptView.instrumentationMetrics"]},
+      "stability": "TEST_ONLY", "subsystem": "test_support", "owner": "test-support",
+      "reason": "Raw instrumentation snapshot exists for proof attribution.",
+      "consumer_evidence": "Benchmarks and proof tests."
+    },
+    {
+      "id": "core-canvas-drawing-stable",
+      "match": {"package": "core", "symbols": ["Canvas"]},
+      "stability": "STABLE", "subsystem": "canvas", "owner": "core/render",
+      "reason": "The hardened narrow Canvas core provides terminal-cell coordinate, clipping, styled fill, grapheme-safe text, and Frame integration semantics without exposing surface policy.",
+      "consumer_evidence": "agent_tui and oh_my_pi_skin independently use the same fill/text contract; direct Canvas contract tests and rendering fitness protect clipping and wide-cell validity."
+    },
+    {
+      "id": "core-canvas-advanced-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Canvas.withClip", "Canvas.translated", "Canvas.viewport", "Canvas.hline", "Canvas.vline", "Canvas.strokeRect", "Canvas.drawLine", "Canvas.drawSprite", "Canvas.render", "Canvas.composite"]},
+      "stability": "EXPERIMENTAL", "subsystem": "canvas", "owner": "experimental/canvas",
+      "reason": "Transform, line/sprite, Widget bridge, and surface-composition conveniences remain outside the narrow stable drawing contract.",
+      "consumer_evidence": "Individual examples use subsets; same-contract adoption and direct edge semantics are not frozen per member.",
+      "promotion_condition": "Each convenience cohort gains direct semantic tests and independent same-contract adoption.",
+      "sunset_condition": "Review members independently; do not infer stability from the Canvas owner tier."
+    },
+    {
+      "id": "core-canvas-surface-policy-experimental",
+      "match": {"package": "core", "symbols": ["ResizePolicy", "ViewportFit", "SizeGuard", "Surface", "centeredViewport"]},
+      "stability": "EXPERIMENTAL", "subsystem": "canvas", "owner": "experimental/canvas",
+      "reason": "Surface composition and viewport/resize policy are separate evolving capabilities, not dependencies of the stable Canvas drawing core.",
+      "consumer_evidence": "Example-only subset adoption; Surface itself has no known real caller.",
+      "promotion_condition": "Independent consumers validate the same composition or policy contract with direct wide-cell and ownership tests.",
+      "sunset_condition": "Review composition and viewport/resize policy as separate cohorts."
+    },
+    {
+      "id": "core-pty-value-protocol-stable",
+      "match": {"package": "core", "symbols": ["PtyOutputStream", "PtySize", "PtySpec", "PtySignal", "PtyExitStatus"]},
+      "stability": "STABLE", "subsystem": "pty", "owner": "core/protocol",
+      "reason": "The hardened runtime-free PTY request/result value cohort is the stable payload protocol of Command.Pty* and Event.Pty*.",
+      "consumer_evidence": "Stable Command/Event signatures, direct value-contract tests, PTY runtime tests, and terminal_lab integration.",
+      "promotion_condition": "Satisfied by the Phase 5A-I owner decision and pre-stabilization contract hardening.",
+      "sunset_condition": "Stable compatibility policy applies; do not contract this cohort through experimental lifecycle rules."
+    },
+    {
+      "id": "core-pty-runtime-experimental",
+      "match": {"package": "core", "symbols": ["PtyProcess", "PtyRuntime", "EventSourceInterest", "EventSource"]},
+      "stability": "EXPERIMENTAL", "subsystem": "pty", "owner": "experimental/pty",
+      "reason": "PTY runtime attachment, process ownership, readiness, and lifecycle remain platform-shaped optional integration.",
+      "consumer_evidence": "terminal_lab/tests; no principal consumer dependency.",
+      "promotion_condition": "Independent production adoption validates process, readiness, cross-platform, and lifecycle semantics.",
+      "sunset_condition": "Review runtime integration separately without changing the stable PTY value protocol."
+    },
+    {
+      "id": "core-pty-test",
+      "match": {"package": "core", "symbols": ["FakePtyProcess", "FakePtyRuntime"]},
+      "stability": "TEST_ONLY", "subsystem": "test_support", "owner": "test-support",
+      "reason": "Fake PTY implementations support deterministic tests.",
+      "consumer_evidence": "Tests only."
+    },
+    {
+      "id": "core-pty-internal",
+      "match": {"package": "core", "symbols": ["UnsupportedPtyRuntime", "LinuxPtyRuntime", "LinuxPtyProcess"]},
+      "stability": "INTERNAL", "subsystem": "pty", "owner": "experimental/pty",
+      "reason": "Concrete platform implementation sits behind the experimental PTY interface.",
+      "consumer_evidence": "PTY integration and tests."
+    },
+    {
+      "id": "core-media-primitives-stable",
+      "match": {"package": "core", "symbols": ["MediaKind", "MediaProtocol", "MediaFit", "MediaSource", "MediaFrameData", "MediaPlacement", "MediaOpKind", "MediaOp", "diffMediaPlacements", "mediaFallbackText", "mediaProtocolName"]},
+      "stability": "STABLE", "subsystem": "render", "owner": "core/render",
+      "reason": "Media placement value types are embedded in stable Buffer, Document, Frame, and Backend contracts.",
+      "consumer_evidence": "Stable rendering signatures and media adapter tests."
+    },
+    {
+      "id": "core-app-detailed-metric-member",
+      "match": {"package": "core", "qualified_symbols": ["AppMetrics.runtime"]},
+      "stability": "EXPERIMENTAL", "subsystem": "metrics", "owner": "core/observability",
+      "reason": "The detailed runtime snapshot is not part of the stable high-level metrics promise.",
+      "consumer_evidence": "Architecture proof attribution.",
+      "promotion_condition": "A second operational consumer validates the exact snapshot contract.",
+      "sunset_condition": "Phase 4G may reduce or internalize proof-specific fields."
+    },
+    {
+      "id": "core-app-command-drain-members",
+      "match": {"package": "core", "qualified_symbols": ["App.processCommands", "App.processCommandsWithEvents"]},
+      "stability": "INTERNAL", "subsystem": "runtime", "owner": "core/runtime",
+      "reason": "Static command-drain helpers expose runtime implementation dependencies.",
+      "consumer_evidence": "Runtime implementation/tests."
+    },
+    {
+      "id": "core-frame-canvas-member",
+      "match": {"package": "core", "qualified_symbols": ["Frame.canvas"]},
+      "stability": "STABLE", "subsystem": "canvas", "owner": "core/render",
+      "reason": "Frame.canvas is the allocation-free integration path to the stable narrow Canvas drawing contract over the current Frame-owned Buffer.",
+      "consumer_evidence": "agent_tui production rendering, oh_my_pi_skin, direct Frame.canvas contract tests, and permanent rendering fitness."
+    },
+    {
+      "id": "cj-markdown-stable",
+      "match": {"package": "cj_markdown", "symbols": ["SourcePos", "SourceRange", "MarkdownDiagnosticSeverity", "MarkdownDiagnostic", "MarkdownBlockKind", "MarkdownInlineKind", "MarkdownTableAlign", "MarkdownInline", "MarkdownTableCell", "MarkdownTableRow", "MarkdownTable", "MarkdownBlock", "MarkdownDocument", "MarkdownParserOptions", "MarkdownParser", "parseMarkdown", "parseMarkdownWithOptions", "parseInline"]},
+      "stability": "STABLE", "subsystem": "markdown_parser", "owner": "packages/cj_markdown",
+      "reason": "The parser has a clear package boundary and supports the real markdown adapter consumer.",
+      "consumer_evidence": "markdown package, examples, and omp-cj transitive use."
+    },
+    {
+      "id": "markdown-adapter-stable",
+      "match": {"package": "markdown", "symbols": ["Markdown", "OutlineNode", "MarkdownPreviewIndex", "markdownDocument", "markdownAstToDocument", "markdownOutline", "markdownPreviewIndex"]},
+      "stability": "STABLE", "subsystem": "markdown_adapter", "owner": "packages/markdown",
+      "reason": "Markdown-to-Document conversion is an optional package with a real consumer.",
+      "consumer_evidence": "markdown_studio and omp-cj."
+    },
+    {
+      "id": "diff-package-experimental",
+      "match": {"package": "diff", "symbols": ["DiffLineKind", "DiffLine", "DiffHunk", "DiffFile", "DiffDocument", "parseUnifiedDiff", "DiffView"]},
+      "stability": "EXPERIMENTAL", "subsystem": "optional_extension", "owner": "packages/diff",
+      "reason": "Optional diff adapter has examples/tests but no independent production consumer evidence.",
+      "consumer_evidence": "Tests/examples only.",
+      "promotion_condition": "Independent production adoption validates parser and rendering contract.",
+      "sunset_condition": "Review during optional-package API stabilization."
+    },
+    {
+      "id": "media-package-experimental",
+      "match": {"package": "media", "symbols": ["MediaDecodeRequest", "MediaAdapter", "FallbackMediaAdapter", "ExternalMediaAdapter", "AsciiRenderMode", "AsciiRenderOptions", "AsciiFrame", "rgbaToAsciiFrame", "AsciiAnimation", "AsciiAnimationDecoder", "FfmpegAsciiAnimationDecoder", "AsciiAnimationView", "preferredMediaProtocol", "mediaPlacementWithAdapter"]},
+      "stability": "EXPERIMENTAL", "subsystem": "optional_extension", "owner": "packages/media",
+      "reason": "Optional media adapters are platform/tool dependent and examples-only.",
+      "consumer_evidence": "media_gallery/gif_ascii and tests.",
+      "promotion_condition": "Independent production adoption validates external-tool and protocol behavior.",
+      "sunset_condition": "Review with core media ownership."
+    },
+    {
+      "id": "game-package-experimental",
+      "match": {"package": "game", "symbols": ["EntityId", "EntityWorld", "ComponentStore", "Vec2", "Aabb", "BodyType", "Transform2D", "Velocity2D", "RigidBody2D", "ColliderKind", "Collider2D", "CollisionEvent", "PhysicsWorld", "SpriteFrame", "SpriteAnimation", "Sprite2D", "SpriteRenderer", "TileMarker", "TileMap", "Camera2D", "GameInputState"]},
+      "stability": "EXPERIMENTAL", "subsystem": "optional_extension", "owner": "packages/game",
+      "reason": "Game facilities are optional and examples-only.",
+      "consumer_evidence": "Game examples/tests.",
+      "promotion_condition": "Independent production adoption validates the same game-loop and entity contracts.",
+      "sunset_condition": "Review as an optional package, never as a core prerequisite."
+    },
+    {
+      "id": "terminal-package-experimental",
+      "match": {"package": "terminal", "symbols": ["AnsiTokenKind", "AnsiToken", "parseAnsi", "TerminalScreen", "TerminalTranscript", "TerminalView"]},
+      "stability": "EXPERIMENTAL", "subsystem": "optional_extension", "owner": "packages/terminal",
+      "reason": "ANSI screen/transcript emulation is an optional extension, distinct from core Backend/TerminalSession.",
+      "consumer_evidence": "terminal_lab/tests only.",
+      "promotion_condition": "Independent production consumers validate ANSI emulation semantics.",
+      "sunset_condition": "Review during optional-package API stabilization."
+    }
+  ]
+}
