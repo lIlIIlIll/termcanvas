@@ -5,28 +5,28 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   linux:
     runs-on: ubuntu-latest
     env:
       CANGJIE_SDK_URL: ${{ secrets.CANGJIE_SDK_URL }}
+      TOKEN: ${{ secrets.DEVREPO_TOKEN }}
+      CANGJIE_SDK_CHANNEL: main
     steps:
       - uses: actions/checkout@v4
         with:
           path: cj_tui
+          fetch-depth: 0
 
-      - name: Install Cangjie SDK from explicit URL
-        if: env.CANGJIE_SDK_URL != ''
+      - name: Install latest nightly Cangjie SDK
         shell: bash
+        working-directory: cj_tui
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/cangjie-sdk"
-          curl -fsSL "$CANGJIE_SDK_URL" -o "$RUNNER_TEMP/cangjie-sdk/sdk.tar.gz"
-          tar -xzf "$RUNNER_TEMP/cangjie-sdk/sdk.tar.gz" -C "$RUNNER_TEMP/cangjie-sdk" --strip-components=1
-          echo "$RUNNER_TEMP/cangjie-sdk/bin" >> "$GITHUB_PATH"
-          echo "CANGJIE_HOME=$RUNNER_TEMP/cangjie-sdk" >> "$GITHUB_ENV"
-          echo "CANGJIE_SDK_ROOT=$RUNNER_TEMP/cangjie-sdk" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=$RUNNER_TEMP/cangjie-sdk/lib:$RUNNER_TEMP/cangjie-sdk/runtime/lib:${LD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
+          scripts/resolve_nightly_sdk.py --install --emit-github-env
 
       - name: Verify Cangjie SDK
         shell: bash
@@ -37,6 +37,15 @@ jobs:
           command -v cjpm
 
       - name: Run release gate
+        id: release_gate
         shell: bash
         working-directory: cj_tui
         run: scripts/ci_gate.sh
+
+      - name: Archive nightly failure
+        if: failure() && steps.release_gate.outcome == 'failure' && github.event_name != 'pull_request'
+        shell: bash
+        working-directory: cj_tui
+        env:
+          CJ_TUI_PUSH_NIGHTLY_ARCHIVE: "1"
+        run: scripts/archive_nightly_failure.sh "${CJ_TUI_NIGHTLY_SDK_VERSION:-unknown-sdk}" "$GITHUB_SHA"

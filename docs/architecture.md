@@ -1,28 +1,99 @@
 # Architecture
 
-`cjtui` uses an immediate-mode render loop. Applications render widgets into a `Buffer`; `Terminal` compares the new buffer with the previous frame and asks a `Backend` to draw either a full frame or a diff.
+The current architecture has one primary application model: canonical state is
+owned by the application, events enter one `App` update path, and immediate
+widgets render the resulting state.
 
-Core layers:
+```text
+                    application state
+                           │
+                           ▼
+                    App / update
+                           │
+                ┌──────────┴──────────┐
+                │                     │
+             Command            Event/completion
+                │                     │
+                └──────────┬──────────┘
+                           ▼
+                    RuntimeQueue
+                  ordered processing
+                  run-to-completion
+                           │
+                           ▼
+                     DirtyRects
+                           │
+                    frame coalescing
+                           │
+                           ▼
+                 immediate Widget render
+                           │
+                           ▼
+                    Frame / Buffer
+                           │
+                           ▼
+                        Backend
+```
 
-- `Backend`: terminal control and drawing abstraction.
-- `TerminalSession`: raw mode, alternate screen, cursor, mouse, and paste lifecycle.
-- `TerminalDriver`: terminal mode and capability behavior for Linux/glibc or fallback environments.
-- `EventParser`: keyboard, mouse, scroll, and paste parsing.
-- `EventWaiter`: idle wait and external event-source readiness abstraction.
-- `App`: small render/update loop.
-- `Widget`: render-only components that draw into a `Buffer`.
-- `Component`: render plus event handling for stateful app pieces; handlers return `HandleResult`.
-- `ViewNode`: retained DOM host for component trees, selector matching, computed styles, and cell-based layout boxes.
-- `EventRouter`: dispatches global `KeyMap` bindings first, then sends events to the focused `Component`.
+## Ownership and Update
 
-`App.run()` keeps the simple `Event -> ControlFlow` model. `App.runWithCommands()` adds `Event -> UpdateResult`, where updates can enqueue messages, batches, async tasks, process commands, or quit requests. Messages re-enter the update function as `Event.Message`; async tasks are managed by `AsyncRuntime` and report lifecycle events back through the same update path.
+The application/model owns persistent domain state, selection, filters, layout
+inputs, and correlation IDs. `App.run()` supports a simple `Event -> ControlFlow`
+loop; `App.runWithCommands()` supports `Event -> UpdateResult` and ordered effects.
+Messages, timer events, async completions, process results, and external events all
+re-enter the same update owner.
 
-`App` accepts an injectable `EventWaiter`. The default `LinuxEpollEventWaiter` waits on stdin plus registered `EventSource` file descriptors. Tests and unsupported platforms can pass `NoopEventWaiter` or a custom implementation without changing render/update code.
+The INTERNAL `RuntimeQueue` preserves accepted-event order. It does not recurse
+into nested updates: each update runs to completion before the next queued item is
+processed. Background tasks compute values and publish completions; they do not
+mutate application or widget state directly.
 
-`FocusManager` remains the low-level focus primitive. `EventRouter` owns a `FocusManager` and registers each component's optional `focusId()`, so Tab and Shift-Tab can move focus without each app rewriting the same dispatch loop. `EventRouter.handleResult()` keeps consumed/ignored, exit, and command results intact; `handle()` remains a `ControlFlow` wrapper for simple apps.
+## Rendering and Presentation
 
-`Layout` supports fixed and proportional sizing with `Constraint.Length`, `Percent`, `Min`, `Max`, and `Ratio`. Use `withGap`, `withMargin`, and `withFlex` for spacing and placement when chunks do not consume all available space.
+Widgets are immediate renderers. They receive an area and render current state
+into a `Frame`/`Buffer`; they are not lifecycle hosts or canonical state owners.
+Applications derive layout with stable `Layout`, `Rect`, and `Constraint`
+primitives, return `DirtyRects`, and may invalidate only affected regions. The
+runtime coalesces presentation work without exposing a second public scheduler.
 
-`StyleSheet` now has two layers. Legacy `StyleClass` / `StyleRule` lookups remain available for direct class-style resolution, while the DOM path parses a controlled CSS subset into `CssRule` values. `StyleSheet.apply()` walks a `ViewNode` tree, computes inherited visual style, cascades matching rules by specificity and source order, applies inline declarations last, and assigns block or flex layout boxes in terminal cells. `Frame.renderNode()` is the high-level render entry point for DOM-styled trees.
+`Terminal` owns frame drawing, front/back buffer reuse, diff presentation, and
+render metrics. `TerminalSession` owns terminal mode setup and restoration.
+`Backend` is the public rendering boundary; concrete default backends and event
+waiters may be INTERNAL even when they live in `core`.
 
-`TextBuffer` is the reusable text model behind richer editors. It supports byte/rune-safe positions, ranges, find next/previous/all, replace all, word movement, undo/redo, and grouped undo for multi-step edits that should revert as one action.
+## Optional and Specialized Capabilities
+
+These capabilities attach to the primary model; none is a competing UI tree:
+
+- `KeyMap` is STABLE application policy. `FocusManager` is an EXPERIMENTAL
+  shared immediate-mode primitive.
+- `ExternalPort` is a STABLE advanced producer seam for bounded, non-blocking,
+  ordered external delivery into the same runtime. Readiness, drain, lifecycle
+  state, and diagnostic instrumentation remain nonstable implementation surfaces.
+- `Canvas` is a STABLE optional low-level terminal-cell drawing view over the
+  current caller/Frame-owned Buffer. Only construction, fill, text, and
+  `Frame.canvas` are stable; transforms, drawing conveniences, Surface
+  composition, and fit/resize policy remain EXPERIMENTAL.
+- PTY and platform-specific terminal integrations are optional/experimental and
+  use the same `Command`/`Event` update route.
+- Virtual transcript, media, diff, and game facilities
+  are specialized experimental families where the generated inventory says so.
+- Stable `Style`, `Theme`, `Color`, layout, document, and text primitives remain
+  part of immediate rendering; they do not imply a retained DOM/CSS runtime.
+
+## Stability Boundaries
+
+The exact tier of every declaration is defined by `docs/api-inventory.json`, not
+by its package name or by this diagram. See `docs/api.md` for the human map and
+`docs/versioning.md`/ADR-009 for the four-tier policy.
+
+Historical Component, ComponentHost, EventRouter, and retained ViewNode/CSS
+architectures are not current choices. ADR-008 records why they were evaluated
+and retired; architecture proof and migration evidence remain historical records.
+
+## Related Documents
+
+- `docs/getting-started.md`: stable primary-path introduction.
+- `docs/app-runtime.md`: commands, events, waiting, timers, and shutdown.
+- `docs/widgets.md`: immediate widget composition and state ownership.
+- `docs/testing.md`: unit, headless, example, validator, and release verification.

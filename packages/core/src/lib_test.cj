@@ -8,14 +8,17 @@ import std.fs.*
 
 class TestOutput <: OutputStream {
     let bytes = ArrayList<Byte>()
+    var writeCalls: Int64 = 0
+    var flushCalls: Int64 = 0
 
     public func write(buffer: Array<Byte>): Unit {
+        writeCalls++
         for (b in buffer) {
             bytes.add(b)
         }
     }
 
-    public func flush(): Unit {}
+    public func flush(): Unit { flushCalls++ }
 
     func text(): String {
         unsafe { String.fromUtf8Unchecked(bytes.toArray()) }
@@ -41,6 +44,150 @@ class CountingEventWaiter <: EventWaiter {
     }
 }
 
+class CountingAppTraceSink <: AppTraceSink {
+    var inputCallbacks: Int64 = 0
+    var dispatchCallbacks: Int64 = 0
+    var updateCallbacks: Int64 = 0
+    var renderCallbacks: Int64 = 0
+    var completedFrames: Int64 = 0
+
+    public func inputReceived(_: Event, eventQueueLength: Int64): Unit {
+        inputCallbacks++
+        if (eventQueueLength < 0) { throw Exception("negative event queue length") }
+    }
+
+    public func eventDispatchCompleted(): Unit { dispatchCallbacks++ }
+
+    public func stateUpdateCompleted(): Unit { updateCallbacks++ }
+
+    public func renderStarted(): Unit { renderCallbacks++ }
+
+    public func frameCompleted(metrics: RenderMetrics): Unit {
+        completedFrames++
+        if (metrics.renderedCells < 0) { throw Exception("negative rendered cells") }
+    }
+
+    public func eventLoopStall(task: String, durationNanos: Int64): Unit {
+        if (task.size < 0 || durationNanos < 0) { throw Exception("invalid stall trace") }
+    }
+}
+
+class ResizeChangingWaiter <: EventWaiter {
+    private let backend: TestBackend
+    private let nextArea: Rect
+    var waits: Int64 = 0
+    var closed: Bool = false
+    var lastTimeoutMillis: Int64 = -2
+
+    init(backend: TestBackend, nextArea: Rect) {
+        this.backend = backend
+        this.nextArea = nextArea
+    }
+
+    public func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit {
+        waits++
+        lastTimeoutMillis = timeoutMillis
+        backend.setSize(nextArea)
+        if (previousReadBytes < -1 || sources.size < 0) { return }
+    }
+
+    public func close(): Unit {
+        closed = true
+    }
+}
+
+class ChunkedInputSource <: InputSource {
+    private let chunks = ArrayList<Array<Byte>>()
+
+    init(chunks: Array<Array<Byte>>) {
+        for (chunk in chunks) {
+            this.chunks.add(chunk)
+        }
+    }
+
+    public func readAvailable(maxBytes: Int64): Array<Byte> {
+        if (maxBytes <= 0 || chunks.size == 0) { return [] }
+        let chunk = chunks[0]
+        chunks.remove(at: 0)
+        if (chunk.size <= maxBytes) { return chunk }
+        chunk[..maxBytes]
+    }
+}
+
+class RecordingInputSource <: InputSource {
+    var maximumRequested: Int64 = 0
+
+    public func readAvailable(maxBytes: Int64): Array<Byte> {
+        maximumRequested = maxBytes
+        []
+    }
+}
+
+class BufferedInputSource <: InputSource {
+    private let bytes: Array<Byte>
+    private var offset: Int64 = 0
+
+    init(bytes: Array<Byte>) {
+        this.bytes = bytes
+    }
+
+    public func readAvailable(maxBytes: Int64): Array<Byte> {
+        if (maxBytes <= 0 || offset >= bytes.size) { return [] }
+        let end = min(bytes.size, offset + maxBytes)
+        let chunk = bytes[offset..end]
+        offset = end
+        chunk
+    }
+}
+
+class CountingWidget <: Widget {
+    var renders: Int64 = 0
+    let text: String
+
+    init(text: String) {
+        this.text = text
+    }
+
+    public func render(area: Rect, buffer: Buffer): Unit {
+        renders++
+        buffer.setString(area.x, area.y, text)
+    }
+}
+
+class RestoreFailingDriver <: TerminalDriver {
+    public init() {}
+
+    public func name(): String { "restore-failing" }
+    public func enterRawMode(): Bool { true }
+    public func restore(): Unit { throw Exception("restore failed") }
+    public func size(): ?Rect { Some(Rect(0, 0, 8, 2)) }
+    public func capabilities(backend: Backend): TerminalCapabilities {
+        TerminalCapabilities(size: backend.size())
+    }
+}
+
+class ObservedTerminalDriver <: TerminalDriver {
+    var rawEnters: Int64 = 0
+    var restores: Int64 = 0
+    var capabilityCalls: Int64 = 0
+
+    public init() {}
+
+    public func name(): String { "observed-driver" }
+    public func enterRawMode(): Bool {
+        rawEnters++
+        true
+    }
+    public func restore(): Unit {
+        restores++
+    }
+    public func size(): ?Rect { Some(Rect(0, 0, 9, 3)) }
+    public func capabilities(backend: Backend): TerminalCapabilities {
+        capabilityCalls++
+        TerminalCapabilities(size: backend.size(), driverName: name())
+    }
+}
+
 func readText(path: String): String {
     unsafe { String.fromUtf8Unchecked(File.readFrom(Path(path))) }
 }
@@ -63,26 +210,108 @@ func countOccurrences(text: String, needle: String): Int64 {
     count
 }
 
-class DemoScreen <: Screen {
-    let label: String
-
-    init(label: String) {
-        this.label = label
+func stripComment(line: String): String {
+    var i: Int64 = 0
+    while (i < line.size) {
+        if (line[i] == b'#') { return line[..i] }
+        i++
     }
+    line
+}
 
-    public func render(frame: Frame): Unit {
-        frame.renderWidget(Paragraph(label), frame.area)
+func trimAscii(text: String): String {
+    var start: Int64 = 0
+    var end = text.size
+    while (start < end && isAsciiWhitespace(text[start])) {
+        start++
     }
+    while (end > start && isAsciiWhitespace(text[end - 1])) {
+        end--
+    }
+    text[start..end]
+}
 
-    public func update(event: Event): ControlFlow {
-        match (event) {
-            case Event.KeyDown(k) => match (k.code) {
-                case KeyCode.CtrlC => ControlFlow.Exit
-                case _ => ControlFlow.Continue
-            }
-            case _ => ControlFlow.Continue
+func isAsciiWhitespace(ch: Byte): Bool {
+    ch == b' ' || ch == b'\t' || ch == b'\r' || ch == b'\n'
+}
+
+func asciiTokens(text: String): Array<String> {
+    let tokens = ArrayList<String>()
+    var i: Int64 = 0
+    while (i < text.size) {
+        while (i < text.size && isAsciiWhitespace(text[i])) {
+            i++
+        }
+        let start = i
+        while (i < text.size && !isAsciiWhitespace(text[i])) {
+            i++
+        }
+        if (i > start) {
+            tokens.add(text[start..i])
         }
     }
+    tokens.toArray()
+}
+
+func parseHexUInt32(token: String): UInt32 {
+    var value: UInt32 = 0
+    for (ch in unsafe { token.rawData() }) {
+        value = value * 16u32 + hexDigitValue(ch)
+    }
+    value
+}
+
+func hexDigitValue(ch: Byte): UInt32 {
+    if (ch >= b'0' && ch <= b'9') { return UInt32(ch - b'0') }
+    if (ch >= b'a' && ch <= b'f') { return UInt32(ch - b'a') + 10u32 }
+    if (ch >= b'A' && ch <= b'F') { return UInt32(ch - b'A') + 10u32 }
+    0u32
+}
+
+func addOffsetIfNew(offsets: ArrayList<Int64>, offset: Int64): Unit {
+    if (offsets.size == 0 || offsets[offsets.size - 1] != offset) {
+        offsets.add(offset)
+    }
+}
+
+func graphemeOffsets(text: String): Array<Int64> {
+    let offsets = ArrayList<Int64>()
+    var offset: Int64 = 0
+    offsets.add(0)
+    while (offset < text.size) {
+        offset = nextGraphemeOffset(text, offset)
+        offsets.add(offset)
+    }
+    offsets.toArray()
+}
+
+func sameOffsets(left: Array<Int64>, right: Array<Int64>): Bool {
+    if (left.size != right.size) { return false }
+    var i: Int64 = 0
+    while (i < left.size) {
+        if (left[i] != right[i]) { return false }
+        i++
+    }
+    true
+}
+
+func parseGraphemeBreakTestCase(line: String): (String, Array<Int64>) {
+    let tokens = asciiTokens(trimAscii(stripComment(line)))
+    let builder = StringBuilder()
+    let expected = ArrayList<Int64>()
+    var byteOffset: Int64 = 0
+    for (token in tokens) {
+        if (token == "÷") {
+            addOffsetIfNew(expected, byteOffset)
+        } else if (token == "×") {
+            ()
+        } else {
+            let r = Rune(parseHexUInt32(token))
+            builder.append(r)
+            byteOffset += r.toString().size
+        }
+    }
+    (builder.toString(), expected.toArray())
 }
 
 func strongItalicTestModifier(): Modifier {
@@ -91,35 +320,48 @@ func strongItalicTestModifier(): Modifier {
     modifier
 }
 
-class CountingComponent <: Component {
-    let id: String
-    var handled: Int64 = 0
-    var rendered: Bool = false
+class RuntimeTableRows {
+    var calls: Int64 = 0
 
-    init(id: String) {
-        this.id = id
+    func row(index: Int64): Array<String> {
+        calls++
+        ["${index}", "row-${index}"]
+    }
+}
+
+// Package-local mutable boxes for closure-driven runtime tests. They remain in
+// *_test.cj so test fixture convenience does not become production API.
+class StringState {
+    private var value: String
+    private var dirty: Bool = false
+
+    init(value!: String = "") {
+        this.value = value
     }
 
-    public func render(frame: Frame, area: Rect): Unit {
-        rendered = true
-        frame.renderWidget(Paragraph(id), area)
-    }
+    func get(): String { value }
 
-    public func handle(event: Event): HandleResult {
-        handled++
-        match (event) {
-            case Event.KeyDown(key) => match (key.code) {
-                case KeyCode.CtrlC => HandleResult.exit()
-                case KeyCode.Char(r'h') => HandleResult.consumed()
-                case KeyCode.Char(r'm') => HandleResult.withCommand(Command.Message(id))
-                case _ => HandleResult.ignored()
-            }
-            case _ => HandleResult.ignored()
+    func set(value: String): Unit {
+        if (this.value != value) {
+            this.value = value
+            dirty = true
         }
     }
 
-    public func focusId(): ?String {
-        Some(id)
+    func isDirty(): Bool { dirty }
+}
+
+class IntState {
+    private var value: Int64
+
+    init(value!: Int64 = 0) {
+        this.value = value
+    }
+
+    func get(): Int64 { value }
+
+    func set(value: Int64): Unit {
+        this.value = value
     }
 }
 
@@ -192,8 +434,84 @@ class FlowCounter {
     }
 }
 
+func ptyExitStatusText(status: PtyExitStatus): String {
+    match (status) {
+        case PtyExitStatus.Exited(code) => "exited:${code}"
+        case PtyExitStatus.Signaled(signal) => "signaled:${signal}"
+    }
+}
+
+func ptyExitEventText(event: Event): String {
+    match (event) {
+        case Event.PtyExited(id, status) => "${id}:${ptyExitStatusText(status)}"
+        case _ => "other"
+    }
+}
+
 @Test
 class CjTuiCoreTest {
+    @TestCase
+    func ptySpecSnapshotsCallerArraysAndKeepsDefaults(): Unit {
+        let args = ["-lc", "printf ok"]
+        let env = ["LANG=C", "TERM=xterm-256color"]
+        let spec = PtySpec("/bin/sh", args: args, env: env)
+
+        args[0] = "--changed"
+        env[0] = "LANG=changed"
+
+        @Expect(spec.command, "/bin/sh")
+        @Expect(spec.args[0], "-lc")
+        @Expect(spec.env[0], "LANG=C")
+        @Expect(spec.cwd, "")
+        @Expect(spec.size.cols, 80)
+        @Expect(spec.size.rows, 24)
+    }
+
+    @TestCase
+    func ptySizeClampsDimensionsAndKeepsExplicitValues(): Unit {
+        let defaults = PtySize()
+        @Expect(defaults.cols, 80)
+        @Expect(defaults.rows, 24)
+
+        let clamped = PtySize(cols: 0, rows: -5)
+        @Expect(clamped.cols, 1)
+        @Expect(clamped.rows, 1)
+
+        let explicit = PtySize(cols: 132, rows: 43)
+        @Expect(explicit.cols, 132)
+        @Expect(explicit.rows, 43)
+    }
+
+    @TestCase
+    func ptySignalExposesOnlyPortableIntentCases(): Unit {
+        @Expect(ptySignalName(PtySignal.Interrupt), "interrupt")
+        @Expect(ptySignalName(PtySignal.Terminate), "terminate")
+        @Expect(ptySignalName(PtySignal.Kill), "kill")
+    }
+
+    @TestCase
+    func ptyOutputStreamCasesRemainDistinct(): Unit {
+        let stdout = match (PtyOutputStream.Stdout) {
+            case PtyOutputStream.Stdout => "stdout"
+            case PtyOutputStream.Stderr => "stderr"
+        }
+        let stderr = match (PtyOutputStream.Stderr) {
+            case PtyOutputStream.Stdout => "stdout"
+            case PtyOutputStream.Stderr => "stderr"
+        }
+        @Expect(stdout, "stdout")
+        @Expect(stderr, "stderr")
+    }
+
+    @TestCase
+    func ptyExitStatusRepresentsExactlyOneTerminationReason(): Unit {
+        let exited = PtyExitStatus.Exited(7)
+        let signaled = PtyExitStatus.Signaled(15)
+        @Expect(ptyExitStatusText(exited), "exited:7")
+        @Expect(ptyExitStatusText(signaled), "signaled:15")
+        @Expect(ptyExitEventText(Event.PtyExited("shell", exited)), "shell:exited:7")
+    }
+
     @TestCase
     func layoutSplitsHorizontally(): Unit {
         let chunks = Layout.horizontal([Constraint.Length(10), Constraint.Percent(50), Constraint.Min(1)])
@@ -303,6 +621,79 @@ class CjTuiCoreTest {
             }
             case _ => @Expect(false)
         }
+    }
+
+    @TestCase
+    func eventParserReadsFromInjectedInputSource(): Unit {
+        let parser = EventParser(inputSource: ChunkedInputSource([[0x1B, b'['], [b'A']]))
+        let events = parser.readEvents()
+        @Expect(parser.lastReadBytes(), 3)
+        @Expect(events.size, 1)
+        match (events[0]) {
+            case Event.KeyDown(key) => match (key.code) {
+                case KeyCode.Up => ()
+                case _ => @Expect(false)
+            }
+            case _ => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func eventParserDrainsTerminalInputBurst(): Unit {
+        let input = RecordingInputSource()
+        let parser = EventParser(inputSource: input)
+        @Expect(parser.readEvents().size, 0)
+        @Expect(input.maximumRequested, 4096)
+    }
+
+    @TestCase
+    func eventParserContinuesAfterBoundedEdgeTriggeredDrain(): Unit {
+        let bytes = Array<Byte>(70000, repeat: b'a')
+        bytes[0] = 0x1B
+        bytes[1] = b'['
+        bytes[2] = b'2'
+        bytes[3] = b'0'
+        bytes[4] = b'0'
+        bytes[5] = b'~'
+        bytes[69994] = 0x1B
+        bytes[69995] = b'['
+        bytes[69996] = b'2'
+        bytes[69997] = b'0'
+        bytes[69998] = b'1'
+        bytes[69999] = b'~'
+        let parser = EventParser(inputSource: BufferedInputSource(bytes))
+        @Expect(parser.readEvents().size, 0)
+        @Expect(parser.lastReadBytes(), 65536)
+        @Expect(parser.hasPendingInputDrain())
+        @Expect(parser.readEvents().size, 1)
+        @Expect(parser.lastReadBytes(), 4464)
+        @Expect(!parser.hasPendingInputDrain())
+    }
+
+    @TestCase
+    func pendingWheelReversalKeepsLatestDirection(): Unit {
+        let up = Event.Mouse(MouseEvent(MouseKind.Scroll, MouseButton.WheelUp, 2, 3))
+        let down = Event.Mouse(MouseEvent(MouseKind.Scroll, MouseButton.WheelDown, 2, 3))
+        let events = coalescePendingScrollReversal([up, up, up, down, down])
+        @Expect(events.size, 2)
+        for (event in events) {
+            match (event) {
+                case Event.Mouse(mouse) => match (mouse.button) {
+                    case MouseButton.WheelDown => ()
+                    case _ => @Expect(false)
+                }
+                case _ => @Expect(false)
+            }
+        }
+    }
+
+    @TestCase
+    func nonWheelEventSeparatesScrollBursts(): Unit {
+        let up = Event.Mouse(MouseEvent(MouseKind.Scroll, MouseButton.WheelUp, 2, 3))
+        let click = Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, 2, 3))
+        let down = Event.Mouse(MouseEvent(MouseKind.Scroll, MouseButton.WheelDown, 2, 3))
+        let events = coalescePendingScrollReversal([up, click, down])
+        @Expect(events.size, 3)
     }
 
     @TestCase
@@ -631,7 +1022,54 @@ class CjTuiCoreTest {
             frame.renderWidget(Paragraph("ok"), frame.area)
             frame.setCursor(Position(2, 1))
         }
+        terminal.draw { frame =>
+            frame.renderWidget(Paragraph("next"), frame.area)
+            frame.setCursor(Position(3, 1))
+        }
+        @Expect(out.text().contains("\u{1B}[?25h"))
         @Expect(out.text().contains("\u{1B}[2;3H"))
+        @Expect(out.text().contains("\u{1B}[2;4H"))
+        @Expect(countOccurrences(out.text(), "\u{1B}[?25h"), 1)
+
+        terminal.draw { frame =>
+            frame.renderWidget(Paragraph("done"), frame.area)
+        }
+        terminal.draw { frame =>
+            frame.renderWidget(Paragraph("still done"), frame.area)
+        }
+        @Expect(out.text().contains("\u{1B}[?25l"))
+        @Expect(countOccurrences(out.text(), "\u{1B}[?25l"), 1)
+    }
+
+    @TestCase
+    func ansiBackendBatchesEachFullAndDiffFrameIntoOneWrite(): Unit {
+        let fullOut = TestOutput()
+        let fullBackend = AnsiBackend(output: fullOut, fallbackArea: Rect(0, 0, 8, 2))
+        let full = Buffer(Rect(0, 0, 8, 2))
+        full.setString(0, 0, "中文🙂", style: Style(fg: Color.Cyan))
+        full.setString(0, 1, "e\u{301} ansi", style: Style.default())
+        fullBackend.draw(full)
+        @Expect(fullOut.writeCalls, 1)
+        @Expect(fullOut.flushCalls, 1)
+        @Expect(fullOut.text().contains("中文🙂"))
+        @Expect(fullOut.text().contains("e\u{301} ansi"))
+
+        let diffOut = TestOutput()
+        let diffBackend = AnsiBackend(output: diffOut, fallbackArea: Rect(0, 0, 8, 2))
+        diffBackend.drawDiff(
+            full,
+            RenderDiffPlan(
+                4,
+                [
+                    RenderDiffSpan(0, 0, "中文", Style(fg: Color.Cyan)),
+                    RenderDiffSpan(4, 1, "🙂", Style.default())
+                ]
+            )
+        )
+        @Expect(diffOut.writeCalls, 1)
+        @Expect(diffOut.flushCalls, 1)
+        @Expect(diffOut.text().contains("中文"))
+        @Expect(diffOut.text().contains("🙂"))
     }
 
     @TestCase
@@ -668,6 +1106,18 @@ class CjTuiCoreTest {
         @Expect(text.contains("\u{1B}[?25h"))
         @Expect(text.contains("\u{1B}[?1049l"))
         @Expect(!session.rawModeEnabled)
+    }
+
+    @TestCase
+    func terminalSessionEnablesBracketedPasteByDefault(): Unit {
+        let out = TestOutput()
+        let backend = AnsiBackend(output: out, fallbackArea: Rect(0, 0, 8, 2))
+        TerminalSession(backend, rawMode: false, alternateScreen: false, hideCursor: false).run {
+            backend.write("body")
+        }
+        let text = out.text()
+        @Expect(text.contains("\u{1B}[?2004h"))
+        @Expect(text.contains("\u{1B}[?2004l"))
     }
 
     @TestCase
@@ -728,6 +1178,32 @@ class CjTuiCoreTest {
         @Expect(afterStopAgain, beforeStopAgain)
         @Expect(countOccurrences(afterStopAgain, "\u{1B}[?1049l"), 1)
         @Expect(countOccurrences(afterStopAgain, "\u{1B}[?25h"), 1)
+    }
+
+    @TestCase
+    func terminalSessionRunReportsPrimaryAndRestoreErrors(): Unit {
+        let out = TestOutput()
+        let backend = AnsiBackend(output: out, fallbackArea: Rect(0, 0, 8, 2))
+        let session = TerminalSession(
+            backend,
+            driver: RestoreFailingDriver(),
+            rawMode: true,
+            alternateScreen: false,
+            bracketedPaste: false,
+            hideCursor: false
+        )
+
+        var message = ""
+        try {
+            session.run {
+                throw Exception("update failed")
+            }
+        } catch (e: Exception) {
+            message = e.message
+        }
+
+        @Expect(message.contains("update failed"))
+        @Expect(message.contains("restore failed"))
     }
 
     @TestCase
@@ -808,10 +1284,66 @@ class CjTuiCoreTest {
             rawMode: false,
             alternateScreen: false,
             hideCursor: false,
-            keyboard: KeyboardOptions(mode: KeyboardProtocolMode.Auto, probe: TerminalProbeMode.Active)
+            probeInputSource: ChunkedInputSource([unsafe { "\u{1B}[?1u".rawData() }]),
+            keyboard: KeyboardOptions(mode: KeyboardProtocolMode.Auto, probe: TerminalProbeMode.Active, probeBudgetMillis: 250)
         ).run { autoBackend.write("body") }
-        @Expect(autoOut.text().contains("\u{1B}[?u\u{1B}[>1u\u{1B}[>4;2m"))
+        @Expect(autoOut.text().contains("\u{1B}[?u"))
+        @Expect(autoOut.text().contains("\u{1B}[>1u\u{1B}[>4;2m"))
         @Expect(autoOut.text().contains("\u{1B}[<1u\u{1B}[>4;0m"))
+    }
+
+    @TestCase
+    func terminalProbeConsumesResponsesWithinClampedBudget(): Unit {
+        let out = TestOutput()
+        let backend = AnsiBackend(output: out, fallbackArea: Rect(0, 0, 8, 2))
+        let result = TerminalProbe.run(
+            backend,
+            ChunkedInputSource([unsafe { "\u{1B}[?1u".rawData() }]),
+            base: TerminalCapabilities(size: Rect(0, 0, 8, 2), keyboardProtocol: KeyProtocol.Basic, keyUp: false),
+            budgetMillis: 250
+        )
+        @Expect(result.budgetMillis, 100)
+        @Expect(result.consumedBytes.size > 0)
+        @Expect(out.text().contains("\u{1B}[?u"))
+        match (result.capabilities.keyboardProtocol) {
+            case KeyProtocol.Kitty => ()
+            case _ => @Expect(false)
+        }
+        @Expect(result.capabilities.keyUp)
+    }
+
+    @TestCase
+    func terminalSessionStoresProbeResultForAutoActiveKeyboard(): Unit {
+        let out = TestOutput()
+        let backend = AnsiBackend(output: out, fallbackArea: Rect(0, 0, 8, 2))
+        let session = TerminalSession(
+            backend,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            probeInputSource: ChunkedInputSource([unsafe { "\u{1B}[?1u".rawData() }]),
+            keyboard: KeyboardOptions(mode: KeyboardProtocolMode.Auto, probe: TerminalProbeMode.Active)
+        )
+        session.run { backend.write("body") }
+        match (session.probeResult()) {
+            case Some(result) =>
+                @Expect(result.consumedBytes.size > 0)
+                match (result.capabilities.keyboardProtocol) {
+                    case KeyProtocol.Kitty => ()
+                    case _ => @Expect(false)
+                }
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func platformDefaultsSelectLinuxDriverAndWaiterOnLinux(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        @Expect(defaultTerminalDriver().capabilities(backend).driverName, "linux-glibc")
+
+        let waiter = defaultEventWaiter()
+        waiter.wait(0, previousReadBytes: 0, sources: [])
+        waiter.close()
     }
 
     @TestCase
@@ -822,6 +1354,25 @@ class CjTuiCoreTest {
         @Expect(displayWidth("\u{FE0F}"), 0)
         @Expect(displayWidth("\u{2764}\u{FE0F}"), 1)
         @Expect(displayWidth("\u{1F469}\u{200D}\u{1F4BB}") >= 2)
+    }
+
+    @TestCase
+    func unicode17GraphemeBreakTestFixturePasses(): Unit {
+        let fixture = readText("tests/unicode/17.0.0/GraphemeBreakTest.txt")
+        var cases: Int64 = 0
+        var mismatches: Int64 = 0
+        for (line in splitLines(fixture)) {
+            let body = trimAscii(stripComment(line))
+            if (body.isEmpty()) { continue }
+            let (text, expected) = parseGraphemeBreakTestCase(line)
+            let actual = graphemeOffsets(text)
+            if (!sameOffsets(actual, expected)) {
+                mismatches++
+            }
+            cases++
+        }
+        @Expect(cases >= 700)
+        @Expect(mismatches, 0)
     }
 
     @TestCase
@@ -879,6 +1430,9 @@ class CjTuiCoreTest {
         focus.add("submit")
         @Expect(focus.current(), Some("name"))
         @Expect(focus.next(), Some("submit"))
+        @Expect(focus.previous(), Some("name"))
+        @Expect(focus.handle(KeyEvent(KeyCode.Tab)))
+        @Expect(focus.current(), Some("submit"))
         @Expect(focus.handle(KeyEvent(KeyCode.BackTab)))
         @Expect(focus.current(), Some("name"))
         @Expect(!focus.focus("disabled"))
@@ -887,49 +1441,17 @@ class CjTuiCoreTest {
     }
 
     @TestCase
-    func eventRouterDispatchesGlobalKeysThenFocusedComponent(): Unit {
-        let keymap = KeyMap()
-        keymap.add(KeyBinding([KeyEvent(KeyCode.Char(r'q'))], "quit"))
-        let router = EventRouter(globalKeys: keymap)
-        let first = CountingComponent("first")
-        let second = CountingComponent("second")
-        router.add(first)
-        router.add(second)
-
-        let flow = router.handle(Event.KeyDown(KeyEvent(KeyCode.Char(r'q'))), { action =>
-            if (action == "quit") { ControlFlow.Exit } else { ControlFlow.Continue }
-        })
-        match (flow) {
-            case ControlFlow.Exit => ()
-            case _ => @Expect(false)
-        }
-        @Expect(first.handled, 0)
-
-        @Expect(router.focusManager().focus("second"))
-        _ = router.handle(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))))
-        @Expect(first.handled, 0)
-        @Expect(second.handled, 1)
-        let handled = router.handleResult(Event.KeyDown(KeyEvent(KeyCode.Char(r'h'))))
-        @Expect(handled.handled)
-        match (handled.flow) {
-            case ControlFlow.Continue => ()
-            case _ => @Expect(false)
-        }
-        let command = router.handleResult(Event.KeyDown(KeyEvent(KeyCode.Char(r'm'))))
-        @Expect(command.handled)
-        match (command.command) {
-            case Command.Message(text) => @Expect(text, "second")
-            case _ => @Expect(false)
-        }
-
-        let backend = TestBackend(area: Rect(0, 0, 10, 2))
-        let terminal = Terminal(backend)
-        terminal.draw { frame =>
-            router.render(frame, Layout.vertical([Constraint.Length(1), Constraint.Length(1)]).split(frame.area))
-        }
-        @Expect(first.rendered)
-        @Expect(second.rendered)
-        @Expect(backend.snapshot().contains("first"))
+    func textAreaRenderReusesLineCacheAcrossStableFrames(): Unit {
+        let value = "one\ntwo\nthree\nfour\nfive\nsix"
+        let area = TextArea(value: value, cursor: 0, lineNumbers: true)
+        let buffer = Buffer(Rect(0, 0, 20, 4))
+        area.render(Rect(0, 0, 20, 4), buffer)
+        @Expect(area.lineCacheRebuildCount(), 1)
+        area.render(Rect(0, 0, 20, 4), buffer)
+        @Expect(area.lineCacheRebuildCount(), 1)
+        area.paste("x")
+        area.render(Rect(0, 0, 20, 4), buffer)
+        @Expect(area.lineCacheRebuildCount(), 2)
     }
 
     @TestCase
@@ -942,12 +1464,14 @@ class CjTuiCoreTest {
             Command.Async("job"),
             Command.AsyncTask("task", { => Event.Message("load") }),
             Command.AsyncExec("printf", "/usr/bin/printf ok"),
+            Command.AsyncExecArgs("printf-args", "/usr/bin/printf", ["ok"]),
             Command.Emit(Event.Tick(TickEvent())),
             Command.StartTimer(TimerSpec("test", Duration.millisecond, mode: TimerMode.OneShot)),
             Command.StopTimer("test"),
-            Command.Exec("/usr/bin/printf ok")
+            Command.Exec("/usr/bin/printf ok"),
+            Command.ExecArgs("printf-sync-args", "/usr/bin/printf", ["ok"])
         ])), queue))
-        @Expect(queue.size, 8)
+        @Expect(queue.size, 10)
         let running = App.processCommands({ event => counter.update(event) }, queue, asyncRuntime: runtime)
         @Expect(running)
         while (runtime.pendingCount() > 0) {
@@ -961,6 +1485,13 @@ class CjTuiCoreTest {
 
         match (App.executeCommand("/usr/bin/printf ok")) {
             case Event.ExecResult(_, code, output) =>
+                @Expect(code, 0)
+                @Expect(output, "ok")
+            case _ => @Expect(false)
+        }
+        match (App.executeCommandArgs("args", "/usr/bin/printf", ["ok"])) {
+            case Event.ExecResult(id, code, output) =>
+                @Expect(id, "args")
                 @Expect(code, 0)
                 @Expect(output, "ok")
             case _ => @Expect(false)
@@ -999,6 +1530,20 @@ class CjTuiCoreTest {
     }
 
     @TestCase
+    func terminalLifecycleCommandsAreSafeInHeadlessProcessing(): Unit {
+        let queue = ArrayList<Command>()
+        queue.add(Command.ResetTerminal)
+        queue.add(Command.Suspend)
+        let (running, changed) = App.processCommandsWithEvents(
+            {_ => UpdateResult.next()},
+            queue
+        )
+        @Expect(running)
+        @Expect(changed)
+        @Expect(queue.size, 0)
+    }
+
+    @TestCase
     func ptyRuntimeProcessesSplitStreamsAndControlCommands(): Unit {
         let queue = ArrayList<Command>()
         let counter = CommandCounter()
@@ -1023,7 +1568,7 @@ class CjTuiCoreTest {
 
         runtime.injectText("shell", "stdout")
         runtime.injectText("shell", "stderr", stream: PtyOutputStream.Stderr)
-        runtime.injectExit("shell", PtyExitStatus.exited(0))
+        runtime.injectExit("shell", PtyExitStatus.Exited(0))
         @Expect(App.processCommands({ event => counter.update(event) }, queue, ptyRuntime: runtime))
         @Expect(counter.ptyOutputs, 2)
         @Expect(counter.ptyStdout, 1)
@@ -1064,9 +1609,9 @@ class CjTuiCoreTest {
                             sawStderr = true
                         }
                     case Event.PtyExited(_, status) =>
-                        match (status.code) {
-                            case Some(code) => @Expect(code, 0)
-                            case None => ()
+                        match (status) {
+                            case PtyExitStatus.Exited(code) => @Expect(code, 0)
+                            case PtyExitStatus.Signaled(_) => @Expect(false)
                         }
                         sawExit = true
                     case _ => ()
@@ -1174,6 +1719,10 @@ class CjTuiCoreTest {
 
     @TestCase
     func transcriptComposerTimelineAndRequestWidgetsWork(): Unit {
+        @Expect(statusMark(TranscriptItemStatus.Streaming, activityFrame: 0), "⋮")
+        @Expect(statusMark(TranscriptItemStatus.Streaming, activityFrame: 1), "⋰")
+        @Expect(statusMark(TranscriptItemStatus.Running, activityFrame: 0), "◐")
+        @Expect(statusMark(TranscriptItemStatus.Running, activityFrame: 1), "◓")
         let transcript = Transcript(items: [
             TranscriptItem("one", title: "First", body: Document.plain("hello")),
             TranscriptItem("two", kind: TranscriptItemKind.Error, title: "Error", body: Document.plain("bad"), status: TranscriptItemStatus.Failed, collapsed: true)
@@ -1181,7 +1730,7 @@ class CjTuiCoreTest {
         let view = TranscriptView(transcript, selected: 0)
         let buffer = Buffer(Rect(0, 0, 40, 12))
         view.render(Rect(0, 0, 40, 5), buffer)
-        @Expect(buffer.getCell(4, 0).symbol, "F")
+        @Expect(buffer.getCell(2, 0).symbol, "F")
         @Expect(view.handle(KeyEvent(KeyCode.Down), 5))
         @Expect(view.selected, 1)
         @Expect(view.handle(KeyEvent(KeyCode.Enter), 5))
@@ -1210,6 +1759,28 @@ class CjTuiCoreTest {
             case None => @Expect(true)
         }
         @Expect(composer.area.value, "/r")
+        composer.area.setValue("/open")
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, "/open")
+            case None => @Expect(false)
+        }
+        _ = composer.handle(KeyEvent(KeyCode.Up))
+        @Expect(composer.area.value, "/open")
+        _ = composer.handle(KeyEvent(KeyCode.Up))
+        @Expect(composer.area.value, "/r")
+        _ = composer.handle(KeyEvent(KeyCode.Up))
+        @Expect(composer.area.value, "/r")
+        _ = composer.handle(KeyEvent(KeyCode.Down))
+        @Expect(composer.area.value, "/open")
+        _ = composer.handle(KeyEvent(KeyCode.Down))
+        @Expect(composer.area.value, "")
+        composer.area.setValue("abcdefgh")
+        @Expect(composer.visualHeight(4, 8), 2)
+        let composerBuffer = Buffer(Rect(0, 0, 4, 2))
+        composer.render(composerBuffer.area, composerBuffer)
+        @Expect(composerBuffer.getCell(0, 0).symbol, "a")
+        @Expect(composerBuffer.getCell(0, 1).symbol, "e")
+        @Expect(composer.cursorPosition(composerBuffer.area).y, 1)
 
         ActivityTimeline([
             ActivityStep("queued"),
@@ -1225,6 +1796,199 @@ class CjTuiCoreTest {
         }
         match (request.handle(KeyEvent(KeyCode.Enter))) {
             case Some(action) => @Expect(action, "Confirm")
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func composerRetainsLargePastePayloadAndHistoryMetadata(): Unit {
+        let composer = Composer()
+        let payload = "  第一行🙂\nsecond e\u{301}  "
+        @Expect(composer.paste(payload, collapseThreshold: 4))
+        let marker = composer.area.value
+        @Expect(marker.startsWith("[pasted "))
+        @Expect(marker.contains(" bytes #1]"))
+        @Expect(!marker.contains("第一行"))
+
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, payload)
+            case None => @Expect(false)
+        }
+        @Expect(composer.area.value, "")
+
+        _ = composer.handle(KeyEvent(KeyCode.Up))
+        @Expect(composer.area.value, marker)
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, payload)
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func composerDraftRoundTripsLargeUnicodeAcrossInstances(): Unit {
+        let builder = StringBuilder()
+        for (_ in 0..600) {
+            builder.append("中文🙂e\u{301}\n")
+        }
+        let payload = "  " + builder.toString() + "  "
+        @Expect(payload.size > 2000)
+
+        let source = Composer()
+        @Expect(source.paste(payload))
+        @Expect(source.area.value.startsWith("[pasted "))
+
+        let restored = Composer()
+        match (source.draftText()) {
+            case Some(draft) => restored.restoreDraft(draft)
+            case None => @Expect(false)
+        }
+        @Expect(restored.area.value.startsWith("[pasted "))
+        @Expect(!restored.area.value.contains("中文"))
+        @Expect(restored.draftText(), Some(payload))
+        match (restored.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, payload)
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func composerDraftPreservesEmptyValue(): Unit {
+        let composer = Composer()
+        @Expect(composer.draftText(), Some(""))
+        composer.restoreDraft("")
+        @Expect(composer.area.value, "")
+        @Expect(composer.draftText(), Some(""))
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(_) => @Expect(false)
+            case None => @Expect(true)
+        }
+    }
+
+    @TestCase
+    func composerRestoreDraftClearsOldPasteAndCompletionState(): Unit {
+        let composer = Composer()
+        let oldPayload = "old retained payload"
+        @Expect(composer.paste(oldPayload, collapseThreshold: 4))
+        let oldMarker = composer.area.value
+        composer.area.cursor = oldMarker.size
+        _ = composer.handle(KeyEvent(KeyCode.Backspace))
+        let noDraft: ?String = None
+        @Expect(composer.draftText(), noDraft)
+        match (composer.lastError) {
+            case Some(message) => @Expect(message.contains("paste marker damaged"))
+            case None => @Expect(false)
+        }
+
+        let completion = composer.area.beginCompletion("damaged-draft")
+        @Expect(composer.area.handleCompletionEvent(Event.TextCompletion(
+            completion.requestId,
+            TextCompletionResult(
+                completion.requestId,
+                completion.revision,
+                completion.prefixStart,
+                completion.prefixEnd,
+                [TextCompletionItem("replacement")]
+            )
+        )))
+        @Expect(composer.completionVisible())
+
+        var replacement = ""
+        for (_ in 0..600) {
+            replacement += "新草稿🙂\n"
+        }
+        @Expect(replacement.size > 2000)
+        composer.restoreDraft(replacement)
+        @Expect(!composer.completionVisible())
+        let noError: ?String = None
+        @Expect(composer.lastError, noError)
+        @Expect(composer.area.value.startsWith("[pasted "))
+        @Expect(composer.draftText(), Some(replacement))
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, replacement)
+            case None => @Expect(false)
+        }
+
+        composer.restoreDraft(oldMarker)
+        @Expect(composer.area.value, oldMarker)
+        @Expect(composer.draftText(), Some(oldMarker))
+    }
+
+    @TestCase
+    func composerExpandsMultipleUnicodePastesInDisplayOrder(): Unit {
+        let composer = Composer()
+        let first = "甲🙂\nfirst"
+        let second = "e\u{301}乙\nsecond"
+        @Expect(composer.paste("prefix ", collapseThreshold: 100))
+        @Expect(composer.paste(first, collapseThreshold: 4))
+        @Expect(composer.paste(" + ", collapseThreshold: 100))
+        @Expect(composer.paste(second, collapseThreshold: 4))
+        @Expect(composer.paste(" suffix", collapseThreshold: 100))
+        @Expect(composer.area.value.contains(" bytes #1]"))
+        @Expect(composer.area.value.contains(" bytes #2]"))
+
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) =>
+                @Expect(submit.text, "prefix " + first + " + " + second + " suffix")
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func composerDeletesPayloadWithWholeMarker(): Unit {
+        let composer = Composer()
+        let payload = "retained payload"
+        @Expect(composer.paste("before ", collapseThreshold: 100))
+        let markerStart = composer.area.value.size
+        @Expect(composer.paste(payload, collapseThreshold: 4))
+        let markerEnd = composer.area.value.size
+        @Expect(composer.paste(" after", collapseThreshold: 100))
+        composer.area.select(markerStart, markerEnd)
+        match (composer.handle(KeyEvent(KeyCode.Backspace))) {
+            case Some(_) => @Expect(false)
+            case None => @Expect(true)
+        }
+        @Expect(composer.area.value, "before  after")
+        let noError: ?String = None
+        @Expect(composer.lastError, noError)
+
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, "before  after")
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func composerRejectsDamagedPasteMarkerAndPreservesDraft(): Unit {
+        let composer = Composer()
+        let payload = "payload with 中文🙂"
+        @Expect(composer.paste(payload, collapseThreshold: 4))
+        let marker = composer.area.value
+        composer.area.cursor = marker.size
+        _ = composer.handle(KeyEvent(KeyCode.Backspace))
+        let damagedDraft = composer.area.value
+
+        match (composer.lastError) {
+            case Some(message) => @Expect(message.contains("paste marker damaged"))
+            case None => @Expect(false)
+        }
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(_) => @Expect(false)
+            case None => @Expect(true)
+        }
+        @Expect(composer.area.value, damagedDraft)
+        let errorBuffer = Buffer(Rect(0, 0, 72, 3))
+        composer.render(errorBuffer.area, errorBuffer)
+        @Expect(errorBuffer.getCell(1, 2).symbol, "p")
+
+        _ = composer.handle(KeyEvent(
+            KeyCode.Char(r'z'),
+            modifiers: KeyModifier(ctrl: true)
+        ))
+        @Expect(composer.area.value, marker)
+        let noError: ?String = None
+        @Expect(composer.lastError, noError)
+        match (composer.handle(KeyEvent(KeyCode.Enter))) {
+            case Some(submit) => @Expect(submit.text, payload)
             case None => @Expect(false)
         }
     }
@@ -1275,24 +2039,7 @@ class CjTuiCoreTest {
     }
 
     @TestCase
-    func componentTreeStylesAndVisualWidgetsWork(): Unit {
-        let rootComponent = CountingComponent("root")
-        let childComponent = CountingComponent("child")
-        let tree = ViewNode("root", component: Some(rootComponent), area: Rect(0, 0, 8, 1), classes: ["panel"])
-        tree.add(ViewNode("child", component: Some(childComponent), area: Rect(0, 1, 8, 1), classes: ["panel", "leaf"]))
-        @Expect(tree.isDirty())
-        tree.clearDirty()
-        @Expect(!tree.isDirty())
-        tree.setArea(Rect(0, 0, 9, 1))
-        @Expect(tree.isDirty())
-        @Expect(tree.queryByClass("panel").size, 2)
-        let flow = tree.dispatch(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))), focusId: Some("child"))
-        match (flow) {
-            case ControlFlow.Continue => ()
-            case _ => @Expect(false)
-        }
-        @Expect(rootComponent.handled > 0)
-        @Expect(childComponent.handled > 0)
+    func legacyStateAndVisualWidgetsWork(): Unit {
         let stringState = StringState(value: "a")
         stringState.set("b")
         @Expect(stringState.isDirty())
@@ -1300,27 +2047,6 @@ class CjTuiCoreTest {
         intState.set(2)
         @Expect(intState.get(), 2)
 
-        let sheet = StyleSheet(classes: [StyleClass("danger", normal: Style(fg: Color.Red), focused: Style(bg: Color.White))])
-        sheet.addRule(StyleRule(".button", Style(fg: Color.Green), state: StyleState.Selected))
-        @Expect(sheet.resolve("danger", state: StyleState.Focused), Style(fg: Color.Red, bg: Color.White))
-        @Expect(sheet.resolveSelector(".button", state: StyleState.Selected), Style(fg: Color.Green))
-        let css = StyleSheet.parse("screen { color: white; background: blue; display: flex; gap: 1; } .danger:selected { color: red; } #child { width: 3; height: 1; }")
-        let dom = ViewNode("root", tag: "screen", area: Rect(0, 0, 8, 2))
-        let child = ViewNode("child", tag: "button", classes: ["danger"])
-        child.setState("selected")
-        dom.add(child)
-        css.apply(dom, Rect(0, 0, 8, 2))
-        @Expect(dom.computedStyle().style, Style(fg: Color.White, bg: Color.Blue))
-        @Expect(child.computedStyle().style, Style(fg: Color.Red, bg: Color.Blue))
-        @Expect(child.layoutBox(), Rect(0, 0, 3, 1))
-        let domBackend = TestBackend(area: Rect(0, 0, 8, 2))
-        Terminal(domBackend).draw { frame => frame.renderNode(dom, css) }
-        @Expect(domBackend.assertCell(0, 0, " ", style: Style(fg: Color.Red, bg: Color.Blue)))
-        let cascadeCss = StyleSheet.parse("#child { color: yellow; } .danger { color: green; } .danger { background: red; }")
-        cascadeCss.apply(dom, Rect(0, 0, 8, 2))
-        @Expect(child.computedStyle().style, Style(fg: Color.Yellow, bg: Color.Red))
-        let pack = ThemePack("default", tokens: DesignTokens(gap: 2))
-        @Expect(pack.tokens.gap, 2)
         @Expect(Theme.default().serialize().contains("normal="))
 
         let buffer = Buffer(Rect(0, 0, 30, 12))
@@ -1329,10 +2055,6 @@ class CjTuiCoreTest {
         Chart([1, 3, 2]).render(Rect(0, 2, 6, 3), buffer)
         DocumentView(Document([DocumentLine(DocumentLineKind.Heading(1), "Title")])).render(Rect(8, 0, 12, 2), buffer)
         LogView(["a", "b", "c"]).render(Rect(8, 2, 5, 2), buffer)
-        SplitPane(Paragraph("L"), Paragraph("R")).render(Rect(0, 6, 12, 1), buffer)
-        let wizard = Wizard(["One", "Two"], bodies: ["Body"])
-        wizard.next()
-        wizard.render(Rect(0, 7, 20, 2), buffer)
         let picker = ColorPicker()
         _ = picker.handle(KeyEvent(KeyCode.Right))
         picker.render(Rect(0, 10, 20, 1), buffer)
@@ -1440,12 +2162,6 @@ class CjTuiCoreTest {
         @Expect(mediaBuffer.mediaPlacements().size, 1)
         @Expect(mediaBuffer.mediaPlacements()[0].area.height, 3)
 
-        let domBackend = TestBackend(area: Rect(0, 0, 12, 4))
-        let node = ViewNode("hero", tag: "img", inlineStyle: StyleDeclaration.parse("width: 8; height: 2; object-fit: cover")).setMedia(mediaSource)
-        Terminal(domBackend).draw { frame => frame.renderNode(node, StyleSheet()) }
-        @Expect(domBackend.assertLastMediaOpCount(1))
-        @Expect(domBackend.lastMediaOps()[0].placement.area.width, 8)
-
         let sourced = DocumentView(Document([DocumentLine(DocumentLineKind.Paragraph, [RichSpan("abc", sourceRange: Some("12:15"))])]))
         match (sourced.sourceOffsetForRenderedLine(10, 0)) {
             case Some(offset) => @Expect(offset, 12)
@@ -1515,19 +2231,11 @@ class CjTuiCoreTest {
         @Expect(date.value(), "2026-05-29")
         date.render(Rect(0, 2, 12, 1), out)
 
-        Accordion(["One", "Two"], bodies: ["Body"]).render(Rect(0, 3, 16, 4), out)
-        Breadcrumb(["home", "docs"]).render(Rect(0, 7, 20, 1), out)
-        TreeTable(Tree([TreeNode("r", "Root")]), Table(["A"], [["1"]])).render(Rect(0, 8, 24, 3), out)
         let fileDialog = FileDialog(path: ".", extension: ".cj")
         fileDialog.render(Rect(0, 11, 16, 3), out)
         let confirm = ConfirmDialog("Continue?")
         @Expect(confirm.handle(KeyEvent(KeyCode.Char(r'y'))), Some(true))
 
-        let highlighter = SyntaxHighlighter(rules: [SyntaxRule("error", Style(fg: Color.Red))])
-        @Expect(highlighter.styleFor("has error"), Style(fg: Color.Red))
-        SoftWrapView("hello world").render(Rect(18, 0, 8, 3), out)
-        let editor = TextEditor(value: "one")
-        editor.render(Rect(18, 4, 16, 5), out)
     }
 
     @TestCase
@@ -1668,10 +2376,109 @@ class CjTuiCoreTest {
         @Expect(area.handle(KeyEvent(KeyCode.Enter)))
         @Expect(area.value, "private")
 
+        let cancellable = area.beginCompletion("cancel")
+        @Expect(area.handleCompletionEvent(Event.TextCompletion(
+            "cancel",
+            TextCompletionResult(
+                cancellable.requestId,
+                cancellable.revision,
+                cancellable.prefixStart,
+                cancellable.prefixEnd,
+                [TextCompletionItem("private")]
+            )
+        )))
+        @Expect(area.completionVisible())
+        @Expect(area.cancelCompletion())
+        @Expect(!area.completionVisible())
+        @Expect(!area.cancelCompletion())
+
         let staleRequest = area.beginCompletion("stale")
         area.paste("!")
         let stale = Event.TextCompletion("stale", TextCompletionResult(staleRequest.requestId, staleRequest.revision, staleRequest.prefixStart, staleRequest.prefixEnd, [TextCompletionItem("ignored")]))
         @Expect(!area.handleCompletionEvent(stale))
+
+        let long = TextArea()
+        let longRequest = long.beginCompletion("long")
+        @Expect(long.handleCompletionEvent(Event.TextCompletion(
+            "long",
+            TextCompletionResult(
+                longRequest.requestId,
+                longRequest.revision,
+                longRequest.prefixStart,
+                longRequest.prefixEnd,
+                [
+                    TextCompletionItem("zero"),
+                    TextCompletionItem("one"),
+                    TextCompletionItem("two"),
+                    TextCompletionItem("three"),
+                    TextCompletionItem("four"),
+                    TextCompletionItem("five"),
+                    TextCompletionItem("six")
+                ]
+            )
+        )))
+        for (_ in 0..5) {
+            @Expect(long.handle(KeyEvent(KeyCode.Down)))
+        }
+        @Expect(long.completionRows(), 5)
+        let completionBuffer = Buffer(Rect(0, 0, 20, 6))
+        long.renderCompletionOverlay(completionBuffer.area, completionBuffer)
+        @Expect(completionBuffer.getCell(2, 1).symbol, "t")
+        @Expect(completionBuffer.getCell(0, 4).symbol, ">")
+        @Expect(completionBuffer.getCell(3, 4).symbol, "i")
+        @Expect(completionBuffer.getCell(2, 5).symbol, "s")
+        @Expect(long.handle(KeyEvent(KeyCode.Tab)))
+        @Expect(long.value, "five")
+    }
+
+    @TestCase
+    func textAreaSupportsReadlineStyleControlKeys(): Unit {
+        let move = TextArea(value: "zero\nalpha beta\ngamma", cursor: 10)
+        @Expect(move.handle(KeyEvent(KeyCode.Char(r'a'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(move.cursor, 5)
+        @Expect(move.handle(KeyEvent(KeyCode.Char(r'e'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(move.cursor, 15)
+        @Expect(move.handle(KeyEvent(KeyCode.Char(r'b'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(move.cursor, 14)
+        @Expect(move.handle(KeyEvent(KeyCode.Char(r'f'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(move.cursor, 15)
+
+        let killStart = TextArea(value: "zero\nalpha beta\ngamma", cursor: 10)
+        @Expect(killStart.handle(KeyEvent(KeyCode.Char(r'u'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(killStart.value, "zero\n beta\ngamma")
+        @Expect(killStart.cursor, 5)
+        @Expect(killStart.handle(KeyEvent(KeyCode.Char(r'z'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(killStart.value, "zero\nalpha beta\ngamma")
+
+        let killEnd = TextArea(value: "zero\nalpha beta\ngamma", cursor: 10)
+        @Expect(killEnd.handle(KeyEvent(KeyCode.Char(r'k'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(killEnd.value, "zero\nalpha\ngamma")
+        @Expect(killEnd.cursor, 10)
+
+        let killWord = TextArea(value: "zero\nalpha beta\ngamma", cursor: 15)
+        @Expect(killWord.handle(KeyEvent(KeyCode.Char(r'w'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(killWord.value, "zero\nalpha \ngamma")
+        @Expect(killWord.cursor, 11)
+
+        let unbound = TextArea(value: "safe", cursor: 4)
+        @Expect(!unbound.handle(KeyEvent(KeyCode.Char(r'p'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(unbound.value, "safe")
+
+        let readOnly = TextArea(value: "locked", cursor: 3, readOnly: true)
+        @Expect(!readOnly.handle(KeyEvent(KeyCode.Char(r'u'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(readOnly.value, "locked")
+
+        let composer = Composer(value: "alpha beta")
+        composer.area.cursor = 5
+        match (composer.handle(KeyEvent(
+            KeyCode.Char(r'u'),
+            modifiers: KeyModifier(ctrl: true)
+        ))) {
+            case Some(_) => @Expect(false)
+            case None => @Expect(true)
+        }
+        @Expect(composer.area.value, " beta")
+        @Expect(composer.area.cursor, 0)
     }
 
     @TestCase
@@ -1679,11 +2486,11 @@ class CjTuiCoreTest {
         let area = TextArea(value: "one\ntwo\nthree\nfour\nfive\nsix", cursor: 0, lineNumbers: true)
         @Expect(area.handle(KeyEvent(KeyCode.PageDown)))
         @Expect(area.cursor > 0)
-        @Expect(area.handle(KeyEvent(KeyCode.Char(r'a'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(area.handle(KeyEvent(KeyCode.Home, modifiers: KeyModifier(ctrl: true))))
         @Expect(area.cursor, 0)
-        @Expect(area.handle(KeyEvent(KeyCode.Char(r'e'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(area.handle(KeyEvent(KeyCode.End, modifiers: KeyModifier(ctrl: true))))
         @Expect(area.cursor, area.value.size)
-        @Expect(area.handle(KeyEvent(KeyCode.Char(r'a'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(area.handle(KeyEvent(KeyCode.Home, modifiers: KeyModifier(ctrl: true))))
         @Expect(area.handle(KeyEvent(KeyCode.Char(r'Z'))))
         @Expect(area.value.startsWith("Z"))
         @Expect(area.handle(KeyEvent(KeyCode.Char(r'z'), modifiers: KeyModifier(ctrl: true))))
@@ -1808,37 +2615,6 @@ class CjTuiCoreTest {
         _ = highlightCache.visibleHighlights(largeDoc, firstLine: 1010, lineCount: 10)
         @Expect(highlightCache.recomputeCount(), 1)
 
-        let buffers = BufferSet()
-        @Expect(buffers.add(EditorBuffer(path: "a.md", title: "A", value: "a", markdownEditing: true)), 0)
-        @Expect(buffers.add(EditorBuffer(path: "b.md", title: "B", value: "b")), 1)
-        @Expect(buffers.openOrSelect(EditorBuffer(path: "a.md", title: "A2")), 0)
-        @Expect(buffers.size(), 2)
-        match (buffers.activeBuffer()) {
-            case Some(buffer) => @Expect(buffer.title, "A")
-            case None => @Expect(false)
-        }
-        @Expect(buffers.tabTitles()[0], "A")
-        match (buffers.next()) {
-            case Some(buffer) => @Expect(buffer.title, "B")
-            case None => @Expect(false)
-        }
-        match (buffers.previous()) {
-            case Some(buffer) => @Expect(buffer.title, "A")
-            case None => @Expect(false)
-        }
-        match (buffers.activeBuffer()) {
-            case Some(buffer) =>
-                buffer.setReadOnly(true)
-                @Expect(buffer.textArea.readOnly)
-                buffer.markSaveFailed("denied")
-                match (buffer.lastError) {
-                    case Some(error) => @Expect(error.message, "denied")
-                    case None => @Expect(false)
-                }
-            case None => @Expect(false)
-        }
-        @Expect(buffers.recentFiles().size, 2)
-
         let buffer = Buffer(Rect(0, 0, 12, 2))
         area.render(buffer.area, buffer)
         @Expect(buffer.getCell(0, 0).symbol, "1")
@@ -1862,20 +2638,8 @@ class CjTuiCoreTest {
     }
 
     @TestCase
-    func screenStackModalTabsAndViewportRender(): Unit {
-        let stack = ScreenStack()
-        stack.push(DemoScreen("one"))
-        stack.replace(DemoScreen("two"))
-        @Expect(stack.size(), 1)
-        match (stack.current()) {
-            case Some(_) => ()
-            case None => @Expect(false)
-        }
-
+    func tabsViewportAndStatusBarRender(): Unit {
         let buffer = Buffer(Rect(0, 0, 24, 8))
-        Modal(title: "M", body: "Hello modal", buttons: ["OK"], width: 12, height: 5).render(buffer.area, buffer)
-        @Expect(buffer.getCell(8, 1).symbol, "M")
-
         let tabs = Tabs(["A", "B"], selected: 0)
         @Expect(tabs.handle(KeyEvent(KeyCode.Right)))
         @Expect(tabs.selected, 1)
@@ -2134,16 +2898,6 @@ class CjTuiCoreTest {
         @Expect(buffer.undo())
         @Expect(buffer.text(), "one two one")
 
-        let searchPanel = SearchPanel(query: "one")
-        searchPanel.updateFrom(buffer)
-        let replacePanel = ReplacePanel(query: "one", replacement: "ONE")
-        @Expect(replacePanel.apply(buffer), 2)
-        let doc = TextDocumentView(buffer.lineCount(), { i => buffer.line(i) })
-        let out = Buffer(Rect(0, 0, 20, 2))
-        searchPanel.render(Rect(0, 0, 20, 1), out)
-        replacePanel.render(Rect(0, 1, 20, 1), out)
-        doc.render(Rect(0, 0, 20, 1), out)
-        @Expect(buffer.undo())
     }
 
     @TestCase
@@ -2269,6 +3023,85 @@ class CjTuiCoreTest {
     }
 
     @TestCase
+    func dirtyRectRenderSkipsUntouchedWidgets(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 12, 3))
+        let terminal = Terminal(backend)
+        let left = CountingWidget("left")
+        let right = CountingWidget("right")
+
+        _ = terminal.draw { frame =>
+            frame.renderWidget(left, Rect(0, 0, 5, 1))
+            frame.renderWidget(right, Rect(6, 0, 5, 1))
+        }
+        @Expect(left.renders, 1)
+        @Expect(right.renders, 1)
+
+        let dirty = DirtyRects.full(Rect(0, 0, 5, 1))
+        let metrics = terminal.draw({ frame =>
+            frame.renderWidget(left, Rect(0, 0, 5, 1))
+            frame.renderWidget(right, Rect(6, 0, 5, 1))
+        }, dirtyRects: Some(dirty))
+        @Expect(left.renders, 2)
+        @Expect(right.renders, 1)
+        @Expect(metrics.renderedCells <= 6)
+        @Expect(metrics.dirtyRects, 1)
+        @Expect(backend.snapshot().contains("right"))
+    }
+
+    @TestCase
+    func dirtyRectRenderClearsOnlyTouchedRegionAndPreservesRest(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 12, 2))
+        let terminal = Terminal(backend)
+        _ = terminal.draw { frame =>
+            frame.canvas().drawText(0, 0, "abcdefghij", Style.default())
+            frame.canvas().drawText(0, 1, "stable", Style.default())
+        }
+
+        let dirty = DirtyRects.full(Rect(0, 0, 3, 1))
+        let metrics = terminal.draw({ frame =>
+            frame.canvas().drawText(0, 0, "xy", Style.default())
+            frame.canvas().drawText(0, 1, "changed-but-outside-dirty", Style.default())
+        }, dirtyRects: Some(dirty))
+        @Expect(!metrics.fullRedraw)
+        @Expect(metrics.renderedCells <= 4)
+        @Expect(backend.assertCell(0, 0, "x"))
+        @Expect(backend.assertCell(1, 0, "y"))
+        @Expect(backend.assertCell(2, 0, " "))
+        @Expect(backend.snapshot().contains("stable"))
+        @Expect(!backend.snapshot().contains("changed"))
+    }
+
+    @TestCase
+    func virtualTableExposesDirtyRowsBodyHeaderAndCacheControls(): Unit {
+        let rowsProvider = RuntimeTableRows()
+        let table = VirtualTable(
+            [TableColumn("ID", width: 4), TableColumn("Name", width: 8)],
+            100,
+            { index => rowsProvider.row(index) },
+            offset: 10,
+            selectedRow: Some(12)
+        )
+        let area = Rect(4, 5, 20, 6)
+        let header = table.dirtyHeader(area)
+        @Expect(header.covers(Rect(4, 5, 20, 1)))
+        let body = table.dirtyBody(area)
+        @Expect(body.covers(Rect(4, 6, 20, 5)))
+        let rows = table.dirtyRows(area, [12, 14])
+        @Expect(rows.intersects(Rect(4, 8, 20, 1)))
+        @Expect(rows.intersects(Rect(4, 10, 20, 1)))
+        let selection = table.dirtySelectionChange(area, Some(12), Some(13))
+        @Expect(selection.intersects(Rect(4, 8, 20, 1)))
+        @Expect(selection.intersects(Rect(4, 9, 20, 1)))
+
+        let buffer = Buffer(area)
+        table.render(area, buffer)
+        @Expect(rowsProvider.calls > 0)
+        @Expect(table.cachedRowCount() > 0)
+        table.clearCachedRows()
+        @Expect(table.cachedRowCount(), 0)
+    }
+
+    @TestCase
     func appMetricsAndHeadlessRunnerCaptureFrames(): Unit {
         let script = HeadlessScript()
             .key(KeyEvent(KeyCode.Char(r'a')))
@@ -2311,6 +3144,24 @@ class CjTuiCoreTest {
     }
 
     @TestCase
+    func headlessRunnerCanMeasureWithoutRetainingFrameArtifacts(): Unit {
+        let result = AppTestRunner.run(
+            HeadlessScript().tick(count: 3).resize(Rect(0, 0, 12, 2)),
+            { frame => frame.renderWidget(Paragraph("performance"), frame.area) },
+            { _ => UpdateResult.next() },
+            options: HeadlessRunOptions(
+                area: Rect(0, 0, 8, 1),
+                captureBuffers: false,
+                captureSnapshots: false
+            )
+        )
+        @Expect(result.passed())
+        @Expect(result.frames.size, 0)
+        @Expect(result.snapshots.size, 0)
+        @Expect(result.metrics.frames().size, 5)
+    }
+
+    @TestCase
     func appUsesInjectedEventWaiterAndClosesItOnExit(): Unit {
         let waiter = CountingEventWaiter()
         let backend = TestBackend(area: Rect(0, 0, 8, 2))
@@ -2336,7 +3187,64 @@ class CjTuiCoreTest {
         @Expect(waiter.closed)
         @Expect(waiter.lastTimeoutMillis >= 0)
         @Expect(waiter.lastPreviousReadBytes >= 0)
-        @Expect(waiter.lastSourceCount, 0)
+        // Step 1A registers the AsyncRuntime level-visible wake source even
+        // when no task is pending, so an idle completion never needs polling.
+        @Expect(waiter.lastSourceCount, 1)
+    }
+
+    @TestCase
+    func appTraceAttachmentIsPerInstanceAndActiveBeforeRun(): Unit {
+        let trace = CountingAppTraceSink()
+        let tracedApp = App(
+            backend: TestBackend(area: Rect(0, 0, 8, 2)),
+            inputSource: ChunkedInputSource([unsafe { "q".rawData() }]),
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            eventWaiter: CountingEventWaiter()
+        )
+        tracedApp.attachTraceSink(trace)
+        tracedApp.runWithCommands(
+            { frame => frame.renderWidget(Paragraph("trace"), frame.area) },
+            { event => match (event) {
+                case Event.KeyDown(_) => UpdateResult.exit()
+                case _ => UpdateResult.next()
+            }}
+        )
+        @Expect(trace.inputCallbacks > 0)
+        @Expect(trace.dispatchCallbacks, trace.inputCallbacks)
+        @Expect(trace.updateCallbacks, trace.inputCallbacks)
+        @Expect(trace.renderCallbacks > 0)
+        @Expect(trace.completedFrames, trace.renderCallbacks)
+        var lateAttachRejected = false
+        try {
+            tracedApp.attachTraceSink(CountingAppTraceSink())
+        } catch (error: Exception) {
+            lateAttachRejected = error.message.contains("before App.run")
+        }
+        @Expect(lateAttachRejected)
+
+        let inputsBeforeUntracedRun = trace.inputCallbacks
+        let framesBeforeUntracedRun = trace.completedFrames
+        let untracedApp = App(
+            backend: TestBackend(area: Rect(0, 0, 8, 2)),
+            inputSource: ChunkedInputSource([unsafe { "q".rawData() }]),
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            eventWaiter: CountingEventWaiter()
+        )
+        untracedApp.runWithCommands(
+            { frame => frame.renderWidget(Paragraph("plain"), frame.area) },
+            { event => match (event) {
+                case Event.KeyDown(_) => UpdateResult.exit()
+                case _ => UpdateResult.next()
+            }}
+        )
+        @Expect(trace.inputCallbacks, inputsBeforeUntracedRun)
+        @Expect(trace.completedFrames, framesBeforeUntracedRun)
     }
 
     @TestCase
@@ -2363,6 +3271,314 @@ class CjTuiCoreTest {
             caught = true
         }
         @Expect(caught)
+        @Expect(waiter.closed)
+    }
+
+    @TestCase
+    func appClosesOnlyPtysStartedByItsOwnSession(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let runtime = FakePtyRuntime()
+        match (runtime.start("external", PtySpec("/bin/sh"))) {
+            case Event.PtyStarted(_) => ()
+            case _ => @Expect(false)
+        }
+        let app = App(
+            backend: backend,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false
+        )
+        app.attachPtyRuntime(runtime)
+        app.runWithCommands(
+            { frame => frame.renderWidget(Paragraph("pty"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.Capabilities(_) => UpdateResult.withCommand(Command.Batch([
+                        Command.PtyStart("owned", PtySpec("/bin/sh")),
+                        Command.Quit
+                    ]))
+                    case _ => UpdateResult.next()
+                }
+            }
+        )
+        @Expect(runtime.activeCount(), 1)
+        match (runtime.fakeProcess("external")) {
+            case Some(_) => @Expect(true)
+            case None => @Expect(false)
+        }
+        match (runtime.fakeProcess("owned")) {
+            case Some(_) => @Expect(false)
+            case None => @Expect(true)
+        }
+        var lateAttachRejected = false
+        try {
+            app.attachPtyRuntime(FakePtyRuntime())
+        } catch (error: Exception) {
+            lateAttachRejected = error.message.contains("before App.run")
+        }
+        @Expect(lateAttachRejected)
+        _ = runtime.close("external")
+    }
+
+    @TestCase
+    func appWithoutPtyAttachmentPreservesUnsupportedFailure(): Unit {
+        let failure = StringState()
+        let app = App(
+            backend: TestBackend(area: Rect(0, 0, 8, 2)),
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            eventWaiter: CountingEventWaiter()
+        )
+        app.runWithCommands(
+            {_ =>},
+            { event => match (event) {
+                case Event.Capabilities(_) =>
+                    UpdateResult.withCommand(Command.PtyStart("unsupported", PtySpec("shell")))
+                case Event.PtyFailed("unsupported", message) =>
+                    failure.set(message)
+                    UpdateResult.exit()
+                case _ => UpdateResult.next()
+            }}
+        )
+        @Expect(failure.get(), "pty runtime is not configured for shell")
+    }
+
+    @TestCase
+    func appUsesInjectedInputSourceForHighLevelLoop(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let input = ChunkedInputSource([unsafe { "q".rawData() }])
+        let app = App(
+            backend: backend,
+            inputSource: input,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false
+        )
+        let sawQuit = IntState()
+        app.run(
+            { frame => frame.renderWidget(Paragraph("input"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.KeyDown(key) =>
+                        match (key.code) {
+                            case KeyCode.Char(r'q') =>
+                                sawQuit.set(1)
+                                ControlFlow.Exit
+                            case _ => ControlFlow.Continue
+                        }
+                    case _ => ControlFlow.Continue
+                }
+            }
+        )
+        @Expect(sawQuit.get(), 1)
+    }
+
+    @TestCase
+    func appPaintsBetweenBufferedKeyEvents(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let input = ChunkedInputSource([
+            unsafe { "abc".rawData() },
+            unsafe { "q".rawData() }
+        ])
+        let app = App(
+            backend: backend,
+            inputSource: input,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false
+        )
+        let value = StringState()
+        app.run(
+            { frame =>
+                frame.renderWidget(Paragraph(value.get()), frame.area)
+            },
+            { event =>
+                match (event) {
+                    case Event.KeyDown(key) =>
+                        match (key.code) {
+                            case KeyCode.Char(r'q') => ControlFlow.Exit
+                            case KeyCode.Char(r) =>
+                                value.set(value.get() + runeToString(r))
+                                ControlFlow.Continue
+                            case _ => ControlFlow.Continue
+                        }
+                    case _ => ControlFlow.Continue
+                }
+            }
+        )
+        @Expect(value.get(), "abc")
+        @Expect(backend.snapshots().size, 4)
+        @Expect(backend.snapshots()[1].contains("a"), true)
+        @Expect(backend.snapshots()[2].contains("ab"), true)
+        @Expect(backend.snapshot().contains("abc"))
+    }
+
+    @TestCase
+    func appSkipsFramesForBufferedUnchangedInput(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let wheelDown = "\u{1B}[<65;3;4M"
+        let input = ChunkedInputSource([
+            unsafe { (wheelDown + wheelDown + wheelDown + wheelDown).rawData() },
+            unsafe { "q".rawData() }
+        ])
+        let app = App(
+            backend: backend,
+            inputSource: input,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            mouse: false
+        )
+        let wheelEvents = IntState()
+        app.runWithCommands(
+            { frame => frame.renderWidget(Paragraph("bottom"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.Mouse(_) =>
+                        wheelEvents.set(wheelEvents.get() + 1)
+                        UpdateResult.unchanged()
+                    case Event.KeyDown(key) => match (key.code) {
+                        case KeyCode.Char(r'q') => UpdateResult.exit()
+                        case _ => UpdateResult.next()
+                    }
+                    case _ => UpdateResult.next()
+                }
+            }
+        )
+        @Expect(wheelEvents.get(), 4)
+        // Initial paint only: boundary wheel input is consumed without
+        // repeatedly rendering the unchanged application state.
+        @Expect(backend.snapshots().size, 1)
+    }
+
+    @TestCase
+    func appUsesInjectedTerminalDriverForCapabilitiesAndSession(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let driver = ObservedTerminalDriver()
+        let app = App(
+            backend: backend,
+            terminalDriver: driver,
+            rawMode: true,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false
+        )
+        let driverName = StringState()
+        app.runWithCommands(
+            { frame => frame.renderWidget(Paragraph("driver"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.Capabilities(caps) =>
+                        driverName.set(caps.driverName)
+                        UpdateResult.exit()
+                    case _ => UpdateResult.next()
+                }
+            }
+        )
+        @Expect(driverName.get(), "observed-driver")
+        @Expect(driver.rawEnters, 1)
+        @Expect(driver.restores, 1)
+        @Expect(driver.capabilityCalls, 1)
+    }
+
+    @TestCase
+    func activeProbeDoesNotConsumeInjectedAppInputSource(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let input = ChunkedInputSource([unsafe { "q".rawData() }])
+        let probe = ChunkedInputSource([unsafe { "\u{1B}[?1u".rawData() }])
+        let app = App(
+            backend: backend,
+            inputSource: input,
+            probeInputSource: probe,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            keyboard: KeyboardOptions(mode: KeyboardProtocolMode.Auto, probe: TerminalProbeMode.Active)
+        )
+        let sawQuit = IntState()
+        app.run(
+            { frame => frame.renderWidget(Paragraph("probe"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.KeyDown(key) =>
+                        match (key.code) {
+                            case KeyCode.Char(r'q') =>
+                                sawQuit.set(1)
+                                ControlFlow.Exit
+                            case _ => ControlFlow.Continue
+                        }
+                    case _ => ControlFlow.Continue
+                }
+            }
+        )
+        @Expect(sawQuit.get(), 1)
+    }
+
+    @TestCase
+    func resizePollingUsesResizePollIntervalInsteadOfIdleSleep(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let waiter = ResizeChangingWaiter(backend, Rect(0, 0, 12, 3))
+        let app = App(
+            backend: backend,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            idleSleep: Duration.millisecond,
+            resizePollEvery: Duration.millisecond * 250,
+            eventWaiter: waiter
+        )
+        let sawResize = IntState()
+        app.run(
+            { frame => frame.renderWidget(Paragraph("resize"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.Resize(area) =>
+                        if (area.width == 12 && area.height == 3) { sawResize.set(1) }
+                        ControlFlow.Exit
+                    case _ => ControlFlow.Continue
+                }
+            }
+        )
+        @Expect(sawResize.get(), 1)
+        @Expect(waiter.waits, 1)
+        @Expect(waiter.lastTimeoutMillis, 250)
+        @Expect(waiter.closed)
+    }
+
+    @TestCase
+    func tickDeadlineStillWinsOverLongResizePollInterval(): Unit {
+        let backend = TestBackend(area: Rect(0, 0, 8, 2))
+        let waiter = CountingEventWaiter()
+        let app = App(
+            backend: backend,
+            rawMode: false,
+            alternateScreen: false,
+            hideCursor: false,
+            bracketedPaste: false,
+            tickEvery: Some(Duration.millisecond * 5),
+            idleSleep: Duration.millisecond,
+            resizePollEvery: Duration.millisecond * 250,
+            eventWaiter: waiter
+        )
+        app.run(
+            { frame => frame.renderWidget(Paragraph("tick"), frame.area) },
+            { event =>
+                match (event) {
+                    case Event.Tick(_) => ControlFlow.Exit
+                    case _ => ControlFlow.Continue
+                }
+            }
+        )
+        @Expect(waiter.waits > 0)
+        @Expect(waiter.lastTimeoutMillis <= 5)
         @Expect(waiter.closed)
     }
 

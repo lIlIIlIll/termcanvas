@@ -63,6 +63,13 @@ public class TableColumn {
     }
 }
 
+public enum TableStatus {
+    | Ready
+    | Empty
+    | Loading
+    | Error(String)
+}
+
 public class VirtualTable <: Widget {
     private let columns: Array<TableColumn>
     private let rowCount: Int64
@@ -75,11 +82,22 @@ public class VirtualTable <: Widget {
     public var sortColumn: ?Int64 = None
     public var sortDescending: Bool = false
     public var filterText: String = ""
+    public var stickyHeader: Bool = true
+    public var status: TableStatus = TableStatus.Ready
+    public var emptyText: String = "No rows"
+    public var loadingText: String = "Loading"
     private let selectedRows = ArrayList<Int64>()
+    private let rowCacheIndices = ArrayList<Int64>()
+    private let rowCacheValues = ArrayList<Array<String>>()
     private let block: ?Block
     private let style: Style
     private let selectedStyle: Style
     private let cellStyle: Style
+    private let statusStyle: Style
+    private let selectionModel: ?SelectionModel
+    private let scrollState: ?ScrollState
+    private let sortState: ?SortState
+    private let filterState: ?FilterState
 
     public init(
         columns: Array<TableColumn>,
@@ -92,7 +110,12 @@ public class VirtualTable <: Widget {
         block!: ?Block = None,
         style!: Style = Style.default(),
         selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
-        cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan)
+        cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan),
+        statusStyle!: Style = Style(fg: Color.Indexed(8)),
+        selectionModel!: ?SelectionModel = None,
+        scrollState!: ?ScrollState = None,
+        sortState!: ?SortState = None,
+        filterState!: ?FilterState = None
     ) {
         this.columns = columns
         this.rowCount = max(0, rowCount)
@@ -105,9 +128,15 @@ public class VirtualTable <: Widget {
         this.style = style
         this.selectedStyle = selectedStyle
         this.cellStyle = cellStyle
+        this.statusStyle = statusStyle
+        this.selectionModel = selectionModel
+        this.scrollState = scrollState
+        this.sortState = sortState
+        this.filterState = filterState
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        syncExternalState()
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)
@@ -115,25 +144,30 @@ public class VirtualTable <: Widget {
         }
         if (target.width <= 0 || target.height <= 0) { return }
         ensureColumnVisible(target.width)
-        let indices = visibleIndices()
-        renderColumns(target.x, target.y, columnTitles(), buffer, Style(fg: Color.Yellow, modifier: Modifier.strong()), None)
-        let limit = max(0, target.height - 1)
+        let headerRows = if (stickyHeader) { Int64(1) } else { Int64(0) }
+        if (stickyHeader) {
+            renderColumns(target.x, target.y, columnTitles(), buffer, Style(fg: Color.Yellow, modifier: Modifier.strong()), None)
+        }
+        if (renderStatus(target, buffer, headerRows)) { return }
+        let limit = max(0, target.height - headerRows)
         for (row in 0..limit) {
             let index = offset + row
-            if (index >= indices.size) { return }
-            let sourceIndex = indices[index]
-            let active = match (selectedRow) {
-                case Some(v) => v == index
-                case None => false
-            } || isSelected(sourceIndex)
-            renderColumns(
-                target.x,
-                target.y + 1 + row,
-                rowAt(sourceIndex),
-                buffer,
-                if (active) { selectedStyle } else { style },
-                if (active) { selectedColumn } else { None }
-            )
+            match (sourceIndexAtVisible(index)) {
+                case Some(sourceIndex) =>
+                    let active = match (selectedRow) {
+                        case Some(v) => v == index
+                        case None => false
+                    } || isSelected(sourceIndex) || modelSelected(sourceIndex)
+                    renderColumns(
+                        target.x,
+                        target.y + headerRows + row,
+                        cachedRow(sourceIndex),
+                        buffer,
+                        if (active) { selectedStyle } else { style },
+                        if (active) { selectedColumn } else { None }
+                    )
+                case None => return
+            }
         }
     }
 
@@ -142,7 +176,7 @@ public class VirtualTable <: Widget {
             case Some(v) => v
             case None => 0
         }
-        let total = visibleIndices().size
+        let total = visibleRowCount()
         match (key.code) {
             case KeyCode.Up =>
                 selectedRow = Some(max(0, current - 1))
@@ -183,15 +217,78 @@ public class VirtualTable <: Widget {
         }
     }
 
+    public func handleWithDirty(key: KeyEvent, viewportHeight: Int64, area: Rect): ?DirtyRects {
+        let beforeOffset = offset
+        let beforeSelected = selectedRow
+        let beforeColumn = selectedColumn
+        if (!handle(key, viewportHeight)) { return None }
+        if (beforeOffset != offset || beforeColumn != selectedColumn) {
+            return Some(dirtyBody(area))
+        }
+        Some(dirtySelectionChange(area, beforeSelected, selectedRow))
+    }
+
+    public func dirtyHeader(area: Rect): DirtyRects {
+        let dirty = DirtyRects()
+        if (stickyHeader && area.height > 0) {
+            dirty.add(Rect(area.x, area.y, area.width, 1))
+        }
+        dirty
+    }
+
+    public func dirtyBody(area: Rect): DirtyRects {
+        let dirty = DirtyRects()
+        let headerRows = if (stickyHeader) { Int64(1) } else { Int64(0) }
+        dirty.add(Rect(area.x, area.y + headerRows, area.width, max(0, area.height - headerRows)))
+        dirty
+    }
+
+    public func dirtyRows(area: Rect, rows: Array<Int64>): DirtyRects {
+        let dirty = DirtyRects()
+        let headerRows = if (stickyHeader) { Int64(1) } else { Int64(0) }
+        for (row in rows) {
+            addVirtualTableRowDirty(dirty, area, Some(row), offset, headerRows)
+        }
+        if (dirty.isEmpty()) { dirty.add(area) }
+        dirty
+    }
+
+    public func dirtySelectionChange(area: Rect, before: ?Int64, after: ?Int64): DirtyRects {
+        let rows = ArrayList<Int64>()
+        match (before) {
+            case Some(row) => rows.add(row)
+            case None => ()
+        }
+        match (after) {
+            case Some(row) => rows.add(row)
+            case None => ()
+        }
+        dirtyRows(area, rows.toArray())
+    }
+
+    public func dirtyStatus(area: Rect): DirtyRects {
+        dirtyBody(area)
+    }
+
+    public func clearCachedRows(): Unit {
+        clearRowCache()
+    }
+
+    public func cachedRowCount(): Int64 {
+        rowCacheIndices.size
+    }
+
     public func sortBy(column: Int64, descending!: Bool = false): Unit {
         sortColumn = Some(clamp(column, 0, max(0, columns.size - 1)))
         sortDescending = descending
         offset = 0
+        clearRowCache()
     }
 
     public func clearSort(): Unit {
         sortColumn = None
         sortDescending = false
+        clearRowCache()
     }
 
     public func resizeColumn(column: Int64, width: Int64): Bool {
@@ -208,18 +305,30 @@ public class VirtualTable <: Widget {
         filterText = text
         offset = 0
         selectedRow = None
+        clearRowCache()
+    }
+
+    public func setStatus(status: TableStatus): Unit {
+        this.status = status
     }
 
     public func toggleSelectedRow(): Unit {
         match (selectedRow) {
             case Some(row) =>
-                let indices = visibleIndices()
-                if (row < 0 || row >= indices.size) { return }
-                let sourceIndex = indices[row]
-                if (isSelected(sourceIndex)) {
-                    removeSelected(sourceIndex)
-                } else {
-                    selectedRows.add(sourceIndex)
+                match (sourceIndexAtVisible(row)) {
+                    case Some(sourceIndex) =>
+                        match (selectionModel) {
+                            case Some(model) =>
+                                model.toggle(sourceIndex)
+                                return
+                            case None => ()
+                        }
+                        if (isSelected(sourceIndex)) {
+                            removeSelected(sourceIndex)
+                        } else {
+                            selectedRows.add(sourceIndex)
+                        }
+                    case None => return
                 }
             case None => ()
         }
@@ -283,12 +392,12 @@ public class VirtualTable <: Widget {
                 case Some(col) => if (col == i) { cellStyle } else { style }
                 case None => style
             }
-            buffer.setString(alignedX(cellArea, displayWidth(text), column.align), y, text, style: rowStyle)
+            buffer.setString(alignedX(cellArea, displayWidthFast(text), column.align), y, text, style: rowStyle)
             cx + column.width + 1
     }
 
     private func ensureSelectedVisible(viewportHeight: Int64): Unit {
-        let total = visibleIndices().size
+        let total = visibleRowCount()
         match (selectedRow) {
             case Some(row) =>
                 if (row < offset) {
@@ -330,9 +439,33 @@ public class VirtualTable <: Widget {
         rows.toArray()
     }
 
+    private func usesDerivedRows(): Bool {
+        if (!filterText.isEmpty()) { return true }
+        match (sortColumn) {
+            case Some(_) => true
+            case None => false
+        }
+    }
+
+    private func visibleRowCount(): Int64 {
+        if (!usesDerivedRows()) { return rowCount }
+        visibleIndices().size
+    }
+
+    private func sourceIndexAtVisible(index: Int64): ?Int64 {
+        if (index < 0) { return None }
+        if (!usesDerivedRows()) {
+            if (index >= rowCount) { return None }
+            return Some(index)
+        }
+        let indices = visibleIndices()
+        if (index >= indices.size) { return None }
+        Some(indices[index])
+    }
+
     private func matchesFilter(index: Int64): Bool {
         if (filterText.isEmpty()) { return true }
-        for (cell in rowAt(index)) {
+        for (cell in cachedRow(index)) {
             if (cell.contains(filterText)) { return true }
         }
         false
@@ -360,8 +493,73 @@ public class VirtualTable <: Widget {
     }
 
     private func valueAt(row: Int64, column: Int64): String {
-        let values = rowAt(row)
+        let values = cachedRow(row)
         if (column >= 0 && column < values.size) { values[column] } else { "" }
+    }
+
+    private func cachedRow(index: Int64): Array<String> {
+        for (i in 0..rowCacheIndices.size) {
+            if (rowCacheIndices[i] == index) {
+                return rowCacheValues[i]
+            }
+        }
+        let row = rowAt(index)
+        rowCacheIndices.add(index)
+        rowCacheValues.add(row)
+        row
+    }
+
+    private func clearRowCache(): Unit {
+        while (rowCacheIndices.size > 0) {
+            rowCacheIndices.remove(at: 0)
+            rowCacheValues.remove(at: 0)
+        }
+    }
+
+    private func renderStatus(area: Rect, buffer: Buffer, headerRows: Int64): Bool {
+        let y = area.y + headerRows
+        if (y >= area.bottom) { return true }
+        match (status) {
+            case TableStatus.Ready =>
+                if (visibleRowCount() == 0) {
+                    buffer.setString(area.x, y, truncate(emptyText, area.width), style: statusStyle)
+                    return true
+                }
+                false
+            case TableStatus.Empty =>
+                buffer.setString(area.x, y, truncate(emptyText, area.width), style: statusStyle)
+                true
+            case TableStatus.Loading =>
+                buffer.setString(area.x, y, truncate(loadingText, area.width), style: statusStyle)
+                true
+            case TableStatus.Error(message) =>
+                buffer.setString(area.x, y, truncate(message, area.width), style: Style(fg: Color.Red).patch(statusStyle))
+                true
+        }
+    }
+
+    private func syncExternalState(): Unit {
+        match (scrollState) {
+            case Some(state) => offset = state.offset
+            case None => ()
+        }
+        match (sortState) {
+            case Some(state) =>
+                sortColumn = state.column
+                sortDescending = state.descending
+            case None => ()
+        }
+        match (filterState) {
+            case Some(state) => filterText = state.query
+            case None => ()
+        }
+    }
+
+    private func modelSelected(index: Int64): Bool {
+        match (selectionModel) {
+            case Some(model) => model.isSelected(index)
+            case None => false
+        }
     }
 
     private func removeSelected(row: Int64): Unit {
@@ -371,6 +569,17 @@ public class VirtualTable <: Widget {
                 return
             }
         }
+    }
+}
+
+func addVirtualTableRowDirty(dirty: DirtyRects, area: Rect, selected: ?Int64, offset: Int64, headerRows: Int64): Unit {
+    match (selected) {
+        case Some(index) =>
+            let row = index - offset + headerRows
+            if (row >= 0 && row < area.height) {
+                dirty.add(Rect(area.x, area.y + row, area.width, 1))
+            }
+        case None => ()
     }
 }
 

@@ -21,7 +21,7 @@ Commands and overlays:
 - `MenuBar`, `Menu`, and `CommandPalette` expose action strings.
 - `ToastManager` renders short-lived notifications.
 - `Spinner` renders lightweight progress.
-- `Modal` and `Dialog` render centered overlays.
+- `Dialog` renders a centered overlay.
 
 Visuals and workflows:
 
@@ -29,4 +29,4 @@ Visuals and workflows:
 - `DocumentView` renders rich document nodes such as paragraphs, headings, lists, quotes, code blocks, table rows, and themed spans.
 - `MarkdownView` remains as a compatibility wrapper; Markdown parsing is provided by the `packages/markdown` adapter.
 - `LogView` renders tailing logs.
-- `SplitPane`, `Wizard`, and `ColorPicker` support common app workflows.
+- `ColorPicker` supports common app workflows.

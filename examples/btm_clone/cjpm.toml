@@ -9,7 +9,7 @@
   output-type = "executable"
   compile-option = ""
   override-compile-option = ""
-  link-option = ""
+  link-option = "--whole-archive -l:libclang_rt-profile.a --no-whole-archive"
   package-configuration = {}
 
 [dependencies]

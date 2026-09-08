@@ -195,6 +195,14 @@ public class TextArea <: Widget {
     private var completionItems: Array<TextCompletionItem> = []
     private var completionIndex: Int64 = 0
     private var completionOpen: Bool = false
+    private var cachedLineRevision: Int64 = -1
+    private var cachedLineTextSize: Int64 = -1
+    private var cachedLineFirstByte: UInt8 = 0u8
+    private var cachedLineLastByte: UInt8 = 0u8
+    private var cachedLines: Array<String> = []
+    private var cachedLineOffsets: Array<Int64> = []
+    private var cachedVisibleLines: Array<Int64> = []
+    private var cachedLineRebuilds: Int64 = 0
 
     public init(
         value!: String = "",
@@ -233,19 +241,35 @@ public class TextArea <: Widget {
         match (key.code) {
             case Char(r) =>
                 if (key.modifiers.ctrl && r == r'a') {
-                    cursor = 0
+                    cursor = lineStartForOffset(cursor)
+                    clearSelection()
+                    true
+                } else if (key.modifiers.ctrl && r == r'b') {
+                    cursor = previousRuneOffset(value, cursor)
                     clearSelection()
                     true
                 } else if (key.modifiers.ctrl && r == r'e') {
-                    cursor = value.size
+                    cursor = lineEnd(value, cursor)
                     clearSelection()
                     true
+                } else if (key.modifiers.ctrl && r == r'f') {
+                    cursor = nextRuneOffset(value, cursor)
+                    clearSelection()
+                    true
+                } else if (key.modifiers.ctrl && r == r'k') {
+                    if (readOnly) { false } else { deleteToLineEnd(); true }
+                } else if (key.modifiers.ctrl && r == r'u') {
+                    if (readOnly) { false } else { deleteToLineStart(); true }
+                } else if (key.modifiers.ctrl && r == r'w') {
+                    if (readOnly) { false } else { deletePreviousWord(); true }
                 } else if (key.modifiers.ctrl && r == r'z') {
                     _ = undo()
                     true
                 } else if (key.modifiers.ctrl && r == r'y') {
                     _ = redo()
                     true
+                } else if (key.modifiers.ctrl) {
+                    false
                 } else if (!readOnly) {
                     replaceSelectionOrInsert(runeToString(r))
                     true
@@ -298,7 +322,7 @@ public class TextArea <: Widget {
                 clearSelection()
                 true
             case Home =>
-                cursor = if (key.modifiers.ctrl) { 0 } else { lineStart(value, cursor) }
+                cursor = if (key.modifiers.ctrl) { 0 } else { lineStartForOffset(cursor) }
                 clearSelection()
                 true
             case End =>
@@ -307,6 +331,29 @@ public class TextArea <: Widget {
                 true
             case _ => false
         }
+    }
+
+    public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects {
+        let beforeScroll = scroll
+        let beforeCursor = cursor
+        let beforeValueSize = value.size
+        if (!handle(key)) { return None }
+        let dirty = DirtyRects()
+        let pageMove = match (key.code) {
+            case KeyCode.PageUp | KeyCode.PageDown => true
+            case _ => false
+        }
+        if (beforeScroll != scroll || value.size != beforeValueSize || pageMove) {
+            dirty.add(area)
+            return Some(dirty)
+        }
+        let row = visibleRowForOffset(beforeCursor)
+        if (row >= 0 && row < area.height) {
+            dirty.add(Rect(area.x, area.y + row, area.width, 1))
+        } else {
+            dirty.add(area)
+        }
+        Some(dirty)
     }
 
     public func handleVimNavigation(key: KeyEvent): Bool {
@@ -335,7 +382,7 @@ public class TextArea <: Widget {
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
-        let lines = splitLines(value)
+        let lines = linesForRender()
         let gutter = if (lineNumbers) { min(6, max(3, decimalDigits(lines.size) + 1)) } else { 0 }
         let textTarget = Rect(target.x + gutter, target.y, max(0, target.width - gutter), target.height)
         if (value.isEmpty() && !placeholder.isEmpty()) {
@@ -364,11 +411,11 @@ public class TextArea <: Widget {
         if (let Some(b) <- block) {
             target = b.inner(area)
         }
-        let gutter = if (lineNumbers) { min(6, max(3, decimalDigits(splitLines(value).size) + 1)) } else { 0 }
+        let gutter = if (lineNumbers) { min(6, max(3, decimalDigits(lineCount()) + 1)) } else { 0 }
         let textTarget = Rect(target.x + gutter, target.y, max(0, target.width - gutter), target.height)
         ensureCursorVisible(textTarget.height)
-        let row = visibleRowForLine(cursorLine(value, cursor))
-        let col = displayWidth(value[lineStart(value, cursor)..cursor])
+        let row = visibleRowForLine(lineForOffset(cursor))
+        let col = displayWidth(value[lineStartForOffset(cursor)..cursor])
         Position(textTarget.x + min(col, textTarget.width), textTarget.y + clamp(row - scroll, 0, max(0, textTarget.height - 1)))
     }
 
@@ -483,6 +530,7 @@ public class TextArea <: Widget {
         if (!hasSelection()) { return }
         pushUndoSnapshot()
         deleteSelectionRaw()
+        markEdited()
         clearRedo()
     }
 
@@ -503,6 +551,10 @@ public class TextArea <: Widget {
         clearExtraCarets()
         markEdited()
         clearHistory()
+    }
+
+    public func editRevision(): Int64 {
+        revision
     }
 
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
@@ -542,8 +594,8 @@ public class TextArea <: Widget {
 
     public func beginCompletion(requestId: String): TextCompletionRequest {
         let start = completionPrefixStart(value, cursor)
-        let line = cursorLine(value, cursor)
-        let column = displayWidth(value[lineStart(value, cursor)..cursor])
+        let line = lineForOffset(cursor)
+        let column = displayWidth(value[lineStartForOffset(cursor)..cursor])
         completionRequestId = requestId
         completionRevision = revision
         completionReplaceStart = start
@@ -566,6 +618,27 @@ public class TextArea <: Widget {
                 }
             case _ => false
         }
+    }
+
+    public func completionVisible(): Bool {
+        completionOpen
+    }
+
+    public func cancelCompletion(): Bool {
+        if (!completionOpen) { return false }
+        completionOpen = false
+        completionItems = []
+        completionIndex = 0
+        true
+    }
+
+    public func completionRows(maximum!: Int64 = 5): Int64 {
+        if (!completionOpen) { return 0 }
+        min(max(0, maximum), completionItems.size)
+    }
+
+    public func renderCompletionOverlay(area: Rect, buffer: Buffer): Unit {
+        renderCompletion(area, buffer)
     }
 
     public func clearHistory(): Unit {
@@ -677,6 +750,43 @@ public class TextArea <: Widget {
         clearRedo()
     }
 
+    private func deleteToLineStart(): Unit {
+        if (hasSelection()) {
+            deleteSelection()
+            return
+        }
+        deleteRange(lineStartForOffset(cursor), cursor)
+    }
+
+    private func deleteToLineEnd(): Unit {
+        if (hasSelection()) {
+            deleteSelection()
+            return
+        }
+        deleteRange(cursor, lineEnd(value, cursor))
+    }
+
+    private func deletePreviousWord(): Unit {
+        if (hasSelection()) {
+            deleteSelection()
+            return
+        }
+        deleteRange(previousWordOffset(value, cursor), cursor)
+    }
+
+    private func deleteRange(start: Int64, end: Int64): Unit {
+        let from = clampToRuneBoundary(value, min(start, end))
+        let to = clampToRuneBoundary(value, max(start, end))
+        if (from == to) { return }
+        pushUndoSnapshot()
+        value = value[..from] + value[to..]
+        cursor = from
+        clearSelection()
+        clearExtraCarets()
+        markEdited()
+        clearRedo()
+    }
+
     private func snapshot(): TextAreaSnapshot {
         TextAreaSnapshot(value, cursor, scroll, selectionStart, selectionEnd, extraCarets)
     }
@@ -692,6 +802,7 @@ public class TextArea <: Widget {
         selectionStart = item.selectionStart
         selectionEnd = item.selectionEnd
         extraCarets = item.extraCarets
+        invalidateLineCache()
     }
 
     private func clearRedo(): Unit {
@@ -699,8 +810,8 @@ public class TextArea <: Widget {
     }
 
     private func moveVertical(delta: Int64): Unit {
-        let line = cursorLine(value, cursor)
-        let col = displayWidth(value[lineStart(value, cursor)..cursor])
+        let line = lineForOffset(cursor)
+        let col = displayWidth(value[lineStartForOffset(cursor)..cursor])
         let visible = visibleLineIndexes()
         let row = visibleRowForLine(line)
         let targetVisible = clamp(row + delta, 0, max(0, visible.size - 1))
@@ -709,7 +820,7 @@ public class TextArea <: Widget {
     }
 
     private func ensureCursorVisible(height: Int64): Unit {
-        let line = visibleRowForLine(cursorLine(value, cursor))
+        let line = visibleRowForLine(lineForOffset(cursor))
         if (line < scroll) {
             scroll = line
         } else if (height > 0 && line >= scroll + height) {
@@ -766,6 +877,7 @@ public class TextArea <: Widget {
 
     private func markEdited(): Unit {
         revision++
+        invalidateLineCache()
         completionOpen = false
         completionItems = []
     }
@@ -913,15 +1025,78 @@ public class TextArea <: Widget {
         merged.toArray()
     }
 
+    private func invalidateLineCache(): Unit {
+        cachedLineRevision = -1
+        cachedVisibleLines = []
+    }
+
+    private func ensureLineCache(): Unit {
+        if (!lineCacheStale()) { return }
+        cachedLines = splitLines(value)
+        cachedLineOffsets = lineStartOffsets(value)
+        cachedVisibleLines = []
+        cachedLineRebuilds++
+        cachedLineRevision = revision
+        cachedLineTextSize = value.size
+        cachedLineFirstByte = if (value.size > 0) { value[0] } else { 0u8 }
+        cachedLineLastByte = if (value.size > 0) { value[value.size - 1] } else { 0u8 }
+    }
+
+    private func lineCacheStale(): Bool {
+        if (cachedLineRevision != revision || cachedLineTextSize != value.size || cachedLines.size == 0 || cachedLineOffsets.size == 0) {
+            return true
+        }
+        let first = if (value.size > 0) { value[0] } else { 0u8 }
+        let last = if (value.size > 0) { value[value.size - 1] } else { 0u8 }
+        first != cachedLineFirstByte || last != cachedLineLastByte
+    }
+
+    private func linesForRender(): Array<String> {
+        ensureLineCache()
+        cachedLines
+    }
+
+    private func lineOffsetsForRender(): Array<Int64> {
+        ensureLineCache()
+        cachedLineOffsets
+    }
+
+    private func lineCount(): Int64 {
+        linesForRender().size
+    }
+
+    private func lineForOffset(offset: Int64): Int64 {
+        let target = clampToRuneBoundary(value, offset)
+        let offsets = lineOffsetsForRender()
+        var line: Int64 = 0
+        for (i in 0..offsets.size) {
+            if (offsets[i] <= target) { line = i } else { return line }
+        }
+        line
+    }
+
+    private func lineStartForOffset(offset: Int64): Int64 {
+        let line = lineForOffset(offset)
+        let offsets = lineOffsetsForRender()
+        if (line >= 0 && line < offsets.size) { offsets[line] } else { 0 }
+    }
+
+    public func lineCacheRebuildCount(): Int64 {
+        cachedLineRebuilds
+    }
+
     private func visibleLineIndexes(): Array<Int64> {
-        let lines = splitLines(value)
-        let offsets = lineStartOffsets(value)
+        ensureLineCache()
+        if (cachedVisibleLines.size > 0) { return cachedVisibleLines }
+        let lines = cachedLines
+        let offsets = cachedLineOffsets
         let out = ArrayList<Int64>()
         for (i in 0..lines.size) {
             if (!lineOffsetHidden(offsets[i])) { out.add(i) }
         }
         if (out.size == 0) { out.add(0) }
-        out.toArray()
+        cachedVisibleLines = out.toArray()
+        cachedVisibleLines
     }
 
     private func lineOffsetHidden(offset: Int64): Bool {
@@ -936,7 +1111,7 @@ public class TextArea <: Widget {
     }
 
     private func lineHasFoldMarker(lineIndex: Int64): Bool {
-        let offsets = lineStartOffsets(value)
+        let offsets = lineOffsetsForRender()
         if (lineIndex < 0 || lineIndex >= offsets.size) { return false }
         let offset = offsets[lineIndex]
         match (foldState) {
@@ -959,11 +1134,20 @@ public class TextArea <: Widget {
         fallback
     }
 
+    private func visibleRowForOffset(offset: Int64): Int64 {
+        let offsets = lineOffsetsForRender()
+        var line: Int64 = 0
+        for (i in 0..offsets.size) {
+            if (offsets[i] <= offset) { line = i }
+        }
+        visibleRowForLine(line) - scroll
+    }
+
     private func offsetForMouse(mouse: MouseEvent, area: Rect): ?Int64 {
         var target = area
         if (let Some(b) <- block) { target = b.inner(area) }
         if (target.width <= 0 || target.height <= 0) { return None }
-        let lines = splitLines(value)
+        let lines = linesForRender()
         let gutter = if (lineNumbers) { min(6, max(3, decimalDigits(lines.size) + 1)) } else { 0 }
         if (mouse.y < target.y || mouse.y >= target.y + target.height) { return None }
         let visible = visibleLineIndexes()
@@ -1028,13 +1212,18 @@ public class TextArea <: Widget {
         let pos = cursorPosition(Rect(area.x, area.y, area.width, area.height))
         let startY = min(area.y + area.height - 1, pos.y + 1)
         let maxRows = min(5, area.y + area.height - startY)
-        for (i in 0..maxRows) {
-            if (i >= completionItems.size) { return }
-            let item = completionItems[i]
-            let prefix = if (i == completionIndex) { "> " } else { "  " }
+        let visibleRows = min(maxRows, completionItems.size)
+        var itemStart = max(0, completionIndex - visibleRows / 2)
+        if (itemStart + visibleRows > completionItems.size) {
+            itemStart = max(0, completionItems.size - visibleRows)
+        }
+        for (row in 0..visibleRows) {
+            let itemIndex = itemStart + row
+            let item = completionItems[itemIndex]
+            let prefix = if (itemIndex == completionIndex) { "> " } else { "  " }
             let text = if (item.detail.isEmpty()) { prefix + item.label } else { prefix + item.label + " " + item.detail }
-            let popupStyle = if (i == completionIndex) { selectedStyle } else { Style(fg: Color.Cyan) }
-            buffer.setString(pos.x, startY + i, truncate(text, max(0, area.x + area.width - pos.x)), style: popupStyle)
+            let popupStyle = if (itemIndex == completionIndex) { selectedStyle } else { Style(fg: Color.Cyan) }
+            buffer.setString(pos.x, startY + row, truncate(text, max(0, area.x + area.width - pos.x)), style: popupStyle)
         }
     }
 
@@ -1133,7 +1322,7 @@ public class TextArea <: Widget {
     }
 
     private func markdownEnterText(): String {
-        let start = lineStart(value, cursor)
+        let start = lineStartForOffset(cursor)
         let end = lineEnd(value, cursor)
         let line = value[start..end]
         let indent = line[..leadingSpacesLocal(line)]
@@ -1152,7 +1341,7 @@ public class TextArea <: Widget {
     }
 
     private func finishEmptyMarkdownListItem(): Bool {
-        let start = lineStart(value, cursor)
+        let start = lineStartForOffset(cursor)
         let end = lineEnd(value, cursor)
         let line = value[start..end]
         let markerEnd = markdownListMarkerEnd(line)
@@ -1167,14 +1356,14 @@ public class TextArea <: Widget {
     }
 
     private func indentCurrentLine(): Unit {
-        let start = lineStart(value, cursor)
+        let start = lineStartForOffset(cursor)
         cursor = start
         select(start, start)
         paste("  ")
     }
 
     private func outdentCurrentLine(): Unit {
-        let start = lineStart(value, cursor)
+        let start = lineStartForOffset(cursor)
         let remove = if (start + 2 <= value.size && value[start..start + 2] == "  ") { 2 } else if (start < value.size && value[start] == b' ') { 1 } else { 0 }
         if (remove <= 0) { return }
         cursor = start
@@ -1424,7 +1613,9 @@ func markdownDecorationsForLine(line: String, lineStartOffset: Int64): Array<Tex
     if (markerEnd > 0) {
         let markerStyle = Style(fg: Color.Cyan)
         out.add(TextDecoration(lineStartOffset + trimmedStart, lineStartOffset + markerEnd, markerStyle))
-        if (markerEnd + 3 <= line.size && (line[markerEnd..markerEnd + 3] == "[ ]" || line[markerEnd..markerEnd + 3] == "[x]" || line[markerEnd..markerEnd + 3] == "[X]")) {
+        if (matchesAsciiNeedleAt(line, "[ ]", markerEnd) ||
+            matchesAsciiNeedleAt(line, "[x]", markerEnd) ||
+            matchesAsciiNeedleAt(line, "[X]", markerEnd)) {
             out.add(TextDecoration(lineStartOffset + markerEnd, lineStartOffset + markerEnd + 3, Style(fg: Color.Yellow)))
         }
     }

@@ -3,6 +3,21 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+sdk_root=$("$ROOT/scripts/check_sdk.sh")
+export CANGJIE_SDK_ROOT="$sdk_root"
+export CJ_TUI_CANONICAL_TARGET_ROOT="${CJ_TUI_CANONICAL_TARGET_ROOT:-${TMPDIR:-/tmp}/cj-tui-canonical-target/20260817}"
+
+echo "==> canonical Cangjie SDK"
+"$ROOT/scripts/check_sdk.sh" --report
+printf 'CANONICAL_TARGET_ROOT=%s\n' "$CJ_TUI_CANONICAL_TARGET_ROOT"
+printf 'SOURCE_CANDIDATE_SHA256=%s\n' "$(
+  sha256sum \
+    "$ROOT/packages/core/src/content_widgets.cj" \
+    "$ROOT/packages/core/src/lib_test.cj" \
+    "$ROOT/packages/core/src/performance_test.cj" |
+    sha256sum | cut -d' ' -f1
+)"
+
 run_cjpm_test() {
     local dir="$1"
     local label="$2"
@@ -27,11 +42,26 @@ echo "==> golden snapshot files"
 echo "==> api index"
 "$ROOT/scripts/generate_api_index.sh" --check
 
+echo "==> versioned api contract"
+"$ROOT/scripts/generate_api_contract.sh" --check
+
+echo "==> api extractor fixtures"
+python3 "$ROOT/scripts/test_api_contract.py"
+
+echo "==> architecture classification and fitness contracts"
+python3 "$ROOT/scripts/validate_architecture.py"
+
+echo "==> unicode generated data"
+python3 "$ROOT/scripts/generate_unicode_tables.py" --check
+
 echo "==> examples"
 "$ROOT/scripts/build_examples.sh"
 
 echo "==> example smoke checks"
 "$ROOT/scripts/test_examples.sh"
+
+echo "==> scripted example workflows"
+"$ROOT/scripts/cangjie_cmd.sh" "$ROOT/packages/example_smoke" cjpm run
 
 echo "==> pressure gate"
 "$ROOT/scripts/run_pressure.sh"

@@ -816,6 +816,35 @@ class CjTuiExpandedContractTest {
     }
 
     @TestCase
+    func bufferMixedUnicodeAndAsciiRuns(): Unit {
+        let buffer = Buffer(Rect(0, 0, 32, 1))
+        buffer.setString(0, 0, "╭─ ✓ Run cargo test")
+        @Expect(buffer.getCell(0, 0).symbol, "╭")
+        @Expect(buffer.getCell(3, 0).symbol, "✓")
+        @Expect(buffer.getCell(5, 0).symbol, "R")
+        @Expect(buffer.getCell(18, 0).symbol, "t")
+    }
+
+    @TestCase
+    func bufferAsciiBaseKeepsCombiningMark(): Unit {
+        let buffer = Buffer(Rect(0, 0, 8, 1))
+        buffer.setString(0, 0, "abce\u{0301}x")
+        @Expect(buffer.getCell(2, 0).symbol, "c")
+        @Expect(buffer.getCell(3, 0).symbol, "e\u{0301}")
+        @Expect(buffer.getCell(4, 0).symbol, "x")
+    }
+
+    @TestCase
+    func bufferMixedWideAndAsciiRuns(): Unit {
+        let buffer = Buffer(Rect(0, 0, 16, 1))
+        buffer.setString(0, 0, "路径 src/main.cj")
+        @Expect(buffer.getCell(0, 0).symbol, "路")
+        @Expect(buffer.getCell(1, 0).symbol, "")
+        @Expect(buffer.getCell(4, 0).symbol, " ")
+        @Expect(buffer.getCell(5, 0).symbol, "s")
+    }
+
+    @TestCase
     func bufferIndexOutOfBoundsCase0(): Unit {
         let buffer = Buffer(Rect(2, 3, 4, 5))
         match (buffer.indexOf(0, 0)) {

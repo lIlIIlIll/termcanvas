@@ -1,0 +1,1 @@
+{"configured_cards": null, "content_preserved": null, "differential": "FAIL", "documents": null, "documents_actual": null, "documents_expected": null, "frames": null, "max_render_ms": null, "render_ms": null, "returncode": 1, "run_id": 1, "stdout": "tui selective/full differential failed\n", "transcript_actual": null, "transcript_expected": null, "wall_ms": 4657.42994}

@@ -1,6 +1,7 @@
 package core
 
 import std.collection.*
+import std.env.*
 
 public enum TranscriptItemKind {
     | Text
@@ -13,10 +14,74 @@ public enum TranscriptItemKind {
 
 public enum TranscriptItemStatus {
     | Pending
+    | Queued
     | Running
+    | Streaming
     | Done
+    | Awaiting
+    | Approved
     | Failed
     | Cancelled
+    | Rejected
+    | TimedOut
+    | Expired
+    | Conflict
+}
+
+public class TranscriptCardOption {
+    public let label: String
+    public let selected: Bool
+
+    public init(label: String, selected!: Bool = false) {
+        this.label = label
+        this.selected = selected
+    }
+}
+
+public class TranscriptCardTheme {
+    public let style: Style
+    public let titleStyle: Style
+    public let mutedStyle: Style
+    public let selectedStyle: Style
+    public let bodyIndent: Int64
+    public let bodyLimit: Int64
+    public let borderStyle: Style
+    public let borderBackground: Style
+    public let topTitleStyle: Style
+    // Transcript hosts can opt individual items into a complete terminal
+    // frame or a borderless, full-width background block.  Defaults retain
+    // the historical left-rail rendering for existing clients.
+    public let fullFrame: Bool
+    public let fillBackground: Bool
+    public let contentPadding: Spacing
+
+    public init(
+        style!: Style = Style.default(),
+        titleStyle!: Style = Style(modifier: Modifier.strong()),
+        mutedStyle!: Style = Style(fg: Color.Indexed(8)),
+        selectedStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()),
+        bodyIndent!: Int64 = 2,
+        bodyLimit!: Int64 = 12,
+        borderStyle!: Style = Style(fg: Color.Indexed(8)),
+        borderBackground!: Style = Style.default(),
+        topTitleStyle!: Style = Style(modifier: Modifier.strong()),
+        fullFrame!: Bool = false,
+        fillBackground!: Bool = false,
+        contentPadding!: Spacing = Spacing.zero()
+    ) {
+        this.style = style
+        this.titleStyle = titleStyle
+        this.mutedStyle = mutedStyle
+        this.selectedStyle = selectedStyle
+        this.bodyIndent = max(0, bodyIndent)
+        this.bodyLimit = max(0, bodyLimit)
+        this.borderStyle = borderStyle
+        this.borderBackground = borderBackground
+        this.topTitleStyle = topTitleStyle
+        this.fullFrame = fullFrame
+        this.fillBackground = fillBackground
+        this.contentPadding = contentPadding
+    }
 }
 
 public class TranscriptItem {
@@ -28,6 +93,10 @@ public class TranscriptItem {
     public var collapsed: Bool
     public let timestamp: String
     public let duration: String
+    public let stateLabel: String
+    public let activityFrame: Int64
+    public let options: Array<TranscriptCardOption>
+    public let footer: String
 
     public init(
         id: String,
@@ -37,7 +106,11 @@ public class TranscriptItem {
         status!: TranscriptItemStatus = TranscriptItemStatus.Done,
         collapsed!: Bool = false,
         timestamp!: String = "",
-        duration!: String = ""
+        duration!: String = "",
+        stateLabel!: String = "",
+        activityFrame!: Int64 = 0,
+        options!: Array<TranscriptCardOption> = [],
+        footer!: String = ""
     ) {
         this.id = id
         this.kind = kind
@@ -47,6 +120,10 @@ public class TranscriptItem {
         this.collapsed = collapsed
         this.timestamp = timestamp
         this.duration = duration
+        this.stateLabel = stateLabel
+        this.activityFrame = max(0, activityFrame)
+        this.options = options
+        this.footer = footer
     }
 }
 
@@ -91,6 +168,7 @@ public class TranscriptView <: Widget {
     private let block: ?Block
     private let style: Style
     private let selectedStyle: Style
+    private let cardTheme: TranscriptCardTheme
 
     public init(
         transcript: Transcript,
@@ -98,7 +176,8 @@ public class TranscriptView <: Widget {
         selected!: Int64 = 0,
         block!: ?Block = None,
         style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
+        cardTheme!: ?TranscriptCardTheme = None
     ) {
         this.transcript = transcript
         this.offset = max(0, offset)
@@ -106,6 +185,10 @@ public class TranscriptView <: Widget {
         this.block = block
         this.style = style
         this.selectedStyle = selectedStyle
+        this.cardTheme = match (cardTheme) {
+            case Some(value) => value
+            case None => TranscriptCardTheme(style: style)
+        }
     }
 
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
@@ -149,14 +232,26 @@ public class TranscriptView <: Widget {
         while (index < transcript.size() && y < target.bottom) {
             match (transcript.get(index)) {
                 case Some(item) =>
-                    let headerStyle = if (index == selected) { selectedStyle } else { transcriptStatusStyle(item.status, style) }
-                    buffer.setString(target.x, y, truncate(transcriptHeader(item), target.width), style: headerStyle)
-                    y++
-                    if (!item.collapsed && y < target.bottom) {
-                        let height = min(target.bottom - y, max(1, item.body.lines.size))
-                        DocumentView(item.body).render(Rect(target.x + 2, y, max(0, target.width - 2), height), buffer)
-                        y += height
+                    let theme = if (index == selected) {
+                        TranscriptCardTheme(
+                            style: cardTheme.style,
+                            titleStyle: selectedStyle,
+                            mutedStyle: cardTheme.mutedStyle,
+                            selectedStyle: cardTheme.selectedStyle,
+                            bodyIndent: cardTheme.bodyIndent,
+                            bodyLimit: cardTheme.bodyLimit
+                        )
+                    } else {
+                        cardTheme
                     }
+                    let document = transcriptCardDocument(item, theme: theme)
+                    let height = min(target.bottom - y, max(1, document.lines.size))
+                    DocumentView(document).render(
+                        Rect(target.x, y, target.width, height),
+                        buffer
+                    )
+                    y += height
+                    if (y < target.bottom) { y++ }
                 case None => ()
             }
             index++
@@ -179,61 +274,128 @@ public class ComposerSubmit {
     }
 }
 
+class ComposerRetainedPaste {
+    let marker: String
+    let payload: String
+
+    init(marker: String, payload: String) {
+        this.marker = marker
+        this.payload = payload
+    }
+}
+
+class ComposerHistoryEntry {
+    let text: String
+    let pastes: Array<ComposerRetainedPaste>
+
+    init(text: String, pastes: Array<ComposerRetainedPaste>) {
+        this.text = text
+        this.pastes = pastes
+    }
+}
+
 public class Composer <: Widget {
     public let area: TextArea
-    private let history = ArrayList<String>()
+    public var lastError: ?String = None
+    private let history = ArrayList<ComposerHistoryEntry>()
+    private let retainedPastes = ArrayList<ComposerRetainedPaste>()
     private let slashHints: Array<String>
     private var historyIndex: Int64 = -1
+    private var historyDraft = ComposerHistoryEntry("", [])
+    private var nextPasteId: Int64 = 1
+    private var trackedValue: String
+    private var visualScroll: Int64 = 0
     private let block: ?Block
+    private var cachedWrapRevision: Int64 = -1
+    private var cachedWrapWidth: Int64 = -1
+    private var cachedWrapLines: Array<String> = []
+    private var cachedCursorRevision: Int64 = -1
+    private var cachedCursorWidth: Int64 = -1
+    private var cachedCursorOffset: Int64 = -1
+    private var cachedCursorRow: Int64 = 0
+    private var cachedCursorColumn: Int64 = 0
 
     public init(value!: String = "", slashHints!: Array<String> = [], block!: ?Block = None) {
         this.area = TextArea(value: value, block: block, placeholder: "message")
         this.slashHints = slashHints
         this.block = block
+        this.trackedValue = value
     }
 
     public func handle(key: KeyEvent): ?ComposerSubmit {
+        synchronizeAreaValue()
         match (key.code) {
             case KeyCode.Enter =>
                 if (key.modifiers.shift || key.modifiers.alt) {
-                    _ = area.handle(key)
+                    handleAreaKey(key)
                     None
                 } else {
                     submit()
                 }
             case KeyCode.Up =>
-                if (area.value.isEmpty() && history.size > 0) {
-                    historyIndex = if (historyIndex < 0) { history.size - 1 } else { max(0, historyIndex - 1) }
-                    area.setValue(history[historyIndex])
-                    area.cursor = area.value.size
+                if (history.size > 0 &&
+                    (historyIndex >= 0 || area.value.isEmpty())) {
+                    if (historyIndex < 0) {
+                        historyDraft = currentHistoryEntry(area.value)
+                        historyIndex = history.size - 1
+                    } else {
+                        historyIndex = max(0, historyIndex - 1)
+                    }
+                    restoreHistoryEntry(history[historyIndex])
                     None
                 } else {
-                    _ = area.handle(key)
+                    handleAreaKey(key)
                     None
                 }
             case KeyCode.Down =>
                 if (historyIndex >= 0 && history.size > 0) {
-                    historyIndex = min(history.size - 1, historyIndex + 1)
-                    area.setValue(history[historyIndex])
-                    area.cursor = area.value.size
+                    if (historyIndex < history.size - 1) {
+                        historyIndex++
+                        restoreHistoryEntry(history[historyIndex])
+                    } else {
+                        historyIndex = -1
+                        restoreHistoryEntry(historyDraft)
+                    }
                     None
                 } else {
-                    _ = area.handle(key)
+                    handleAreaKey(key)
                     None
                 }
             case _ =>
-                _ = area.handle(key)
+                handleAreaKey(key)
                 None
         }
     }
 
     public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool {
+        synchronizeAreaValue()
+        let before = area.value
         if (text.size > collapseThreshold) {
-            area.paste("[pasted ${text.size} bytes]")
+            let marker = "[pasted ${text.size} bytes #${nextPasteId}]"
+            nextPasteId++
+            retainedPastes.add(ComposerRetainedPaste(marker, text))
+            area.paste(marker)
         } else {
             area.paste(text)
         }
+        recordAreaChange(before)
         true
+    }
+
+    public func draftText(): ?String {
+        synchronizeAreaValue()
+        expandedSubmissionText(area.value)
+    }
+
+    public func restoreDraft(text: String): Unit {
+        clearRetainedPastes()
+        lastError = None
+        _ = area.cancelCompletion()
+        historyIndex = -1
+        historyDraft = ComposerHistoryEntry("", [])
+        area.setValue("")
+        trackedValue = ""
+        _ = paste(text)
     }
 
     public func currentSlashHints(): Array<String> {
@@ -245,22 +407,263 @@ public class Composer <: Widget {
         out.toArray()
     }
 
-    public func render(areaRect: Rect, buffer: Buffer): Unit {
-        area.render(areaRect, buffer)
-        let hints = currentSlashHints()
-        if (hints.size > 0 && areaRect.height > 1) {
-            buffer.setString(areaRect.x + 1, areaRect.bottom - 1, truncate(join(hints, "  "), max(0, areaRect.width - 2)), style: Style(fg: Color.Indexed(8)))
+    public func completionVisible(): Bool {
+        area.completionVisible()
+    }
+
+    public func cancelCompletion(): Bool {
+        area.cancelCompletion()
+    }
+
+    public func visualHeight(width: Int64, maximum: Int64): Int64 {
+        if (width <= 0 || maximum <= 0) { return 1 }
+        let textRows = max(1, layoutLines(width).size)
+        min(maximum, textRows + area.completionRows(
+            maximum: max(0, maximum - textRows)
+        ))
+    }
+
+    public func cursorPosition(areaRect: Rect): Position {
+        var target = areaRect
+        match (block) {
+            case Some(value) => target = value.inner(areaRect)
+            case None => ()
         }
+        if (target.width <= 0 || target.height <= 0) {
+            return Position(target.x, target.y)
+        }
+        let (row, column) = cursorLayout(target.width)
+        visualScroll = max(0, row - target.height + 1)
+        Position(
+            target.x + min(column, target.width),
+            target.y + clamp(
+                row - visualScroll,
+                0,
+                max(0, target.height - 1)
+            )
+        )
+    }
+
+    public func render(areaRect: Rect, buffer: Buffer): Unit {
+        synchronizeAreaValue()
+        var target = areaRect
+        match (block) {
+            case Some(value) =>
+                value.render(areaRect, buffer)
+                target = value.inner(areaRect)
+            case None => ()
+        }
+        if (target.width <= 0 || target.height <= 0) { return }
+        if (area.value.isEmpty()) {
+            buffer.setString(
+                target.x,
+                target.y,
+                truncate("message", target.width),
+                style: Style(fg: Color.Indexed(8))
+            )
+        } else {
+            let lines = layoutLines(target.width)
+            _ = cursorPosition(areaRect)
+            for (row in 0..target.height) {
+                let index = row + visualScroll
+                if (index >= lines.size) { break }
+                buffer.setString(
+                    target.x,
+                    target.y + row,
+                    truncate(lines[index], target.width)
+                )
+            }
+        }
+        match (lastError) {
+            case Some(message) =>
+                if (areaRect.height > 1) {
+                    buffer.setString(
+                        areaRect.x + 1,
+                        areaRect.bottom - 1,
+                        truncate(message, max(0, areaRect.width - 2)),
+                        style: Style(fg: Color.Red)
+                    )
+                }
+            case None =>
+                let hints = currentSlashHints()
+                if (hints.size > 0 && areaRect.height > 1) {
+                    buffer.setString(areaRect.x + 1, areaRect.bottom - 1, truncate(join(hints, "  "), max(0, areaRect.width - 2)), style: Style(fg: Color.Indexed(8)))
+                }
+        }
+        area.renderCompletionOverlay(target, buffer)
+    }
+
+    private func layoutLines(width: Int64): Array<String> {
+        if (width <= 0) { return [] }
+        let revision = area.editRevision()
+        if (cachedWrapRevision != revision || cachedWrapWidth != width) {
+            cachedWrapRevision = revision
+            cachedWrapWidth = width
+            cachedWrapLines = wrapText(area.value, width, WrapMode.Character)
+        }
+        cachedWrapLines
+    }
+
+    private func cursorLayout(width: Int64): (Int64, Int64) {
+        let revision = area.editRevision()
+        if (cachedCursorRevision == revision && cachedCursorWidth == width && cachedCursorOffset == area.cursor) {
+            return (cachedCursorRow, cachedCursorColumn)
+        }
+        let lines = if (area.cursor == area.value.size) {
+            layoutLines(width)
+        } else {
+            wrapText(area.value[..area.cursor], width, WrapMode.Character)
+        }
+        cachedCursorRevision = revision
+        cachedCursorWidth = width
+        cachedCursorOffset = area.cursor
+        cachedCursorRow = max(0, lines.size - 1)
+        cachedCursorColumn = if (lines.isEmpty()) { 0 } else { displayWidth(lines[lines.size - 1]) }
+        (cachedCursorRow, cachedCursorColumn)
     }
 
     private func submit(): ?ComposerSubmit {
-        let text = trimAsciiSpacesLocal(area.value)
-        if (text.isEmpty()) { return None }
-        history.add(text)
+        synchronizeAreaValue()
+        let displayText = trimAsciiSpacesLocal(area.value)
+        if (displayText.isEmpty()) { return None }
+        let text = match (expandedSubmissionText(displayText)) {
+            case Some(value) => value
+            case None => return None
+        }
+        history.add(currentHistoryEntry(displayText))
         historyIndex = -1
+        historyDraft = ComposerHistoryEntry("", [])
+        clearRetainedPastes()
+        lastError = None
         area.setValue("")
+        trackedValue = ""
         Some(ComposerSubmit(text))
     }
+
+    private func handleAreaKey(key: KeyEvent): Unit {
+        let before = area.value
+        _ = area.handle(key)
+        recordAreaChange(before)
+    }
+
+    private func synchronizeAreaValue(): Unit {
+        if (trackedValue != area.value) {
+            reconcileRetainedPastes(trackedValue, area.value)
+            trackedValue = area.value
+        }
+        refreshPasteError()
+    }
+
+    private func recordAreaChange(before: String): Unit {
+        reconcileRetainedPastes(before, area.value)
+        trackedValue = area.value
+        refreshPasteError()
+    }
+
+    private func reconcileRetainedPastes(before: String, after: String): Unit {
+        if (before == after || retainedPastes.size == 0) { return }
+        let (removedStart, removedEnd) = composerChangedRange(before, after)
+        var index: Int64 = 0
+        while (index < retainedPastes.size) {
+            let item = retainedPastes[index]
+            let beforeStart = stringIndexOf(before, item.marker, 0)
+            let beforeCount = composerMarkerCount(before, item.marker)
+            let afterCount = composerMarkerCount(after, item.marker)
+            if (afterCount == 0 && beforeCount == 1 &&
+                removedStart <= beforeStart &&
+                removedEnd >= beforeStart + item.marker.size) {
+                retainedPastes.remove(at: index)
+            } else {
+                index++
+            }
+        }
+    }
+
+    private func refreshPasteError(): Unit {
+        lastError = retainedPasteError(area.value)
+    }
+
+    private func retainedPasteError(text: String): ?String {
+        for (item in retainedPastes) {
+            if (composerMarkerCount(text, item.marker) != 1) {
+                return Some("paste marker damaged; restore or delete the entire marker")
+            }
+        }
+        None
+    }
+
+    private func expandedSubmissionText(displayText: String): ?String {
+        match (retainedPasteError(displayText)) {
+            case Some(message) =>
+                lastError = Some(message)
+                return None
+            case None => ()
+        }
+        var offset: Int64 = 0
+        var result = ""
+        while (true) {
+            var nextOffset: Int64 = -1
+            var nextPaste: Int64 = -1
+            for (index in 0..retainedPastes.size) {
+                let candidate = stringIndexOf(displayText, retainedPastes[index].marker, offset)
+                if (candidate >= 0 && (nextOffset < 0 || candidate < nextOffset)) {
+                    nextOffset = candidate
+                    nextPaste = index
+                }
+            }
+            if (nextPaste < 0) { break }
+            let item = retainedPastes[nextPaste]
+            result += displayText[offset..nextOffset]
+            result += item.payload
+            offset = nextOffset + item.marker.size
+        }
+        result += displayText[offset..]
+        Some(result)
+    }
+
+    private func currentHistoryEntry(text: String): ComposerHistoryEntry {
+        let pastes = ArrayList<ComposerRetainedPaste>()
+        for (item in retainedPastes) { pastes.add(item) }
+        ComposerHistoryEntry(text, pastes.toArray())
+    }
+
+    private func restoreHistoryEntry(entry: ComposerHistoryEntry): Unit {
+        clearRetainedPastes()
+        for (item in entry.pastes) { retainedPastes.add(item) }
+        area.setValue(entry.text)
+        trackedValue = entry.text
+        refreshPasteError()
+    }
+
+    private func clearRetainedPastes(): Unit {
+        while (retainedPastes.size > 0) {
+            retainedPastes.remove(at: retainedPastes.size - 1)
+        }
+    }
+}
+
+func composerMarkerCount(text: String, marker: String): Int64 {
+    var count: Int64 = 0
+    var offset: Int64 = 0
+    while (true) {
+        let index = stringIndexOf(text, marker, offset)
+        if (index < 0) { break }
+        count++
+        offset = index + marker.size
+    }
+    count
+}
+
+func composerChangedRange(before: String, after: String): (Int64, Int64) {
+    var prefix: Int64 = 0
+    let prefixLimit = min(before.size, after.size)
+    while (prefix < prefixLimit && before[prefix] == after[prefix]) { prefix++ }
+    var suffix: Int64 = 0
+    while (suffix < before.size - prefix && suffix < after.size - prefix &&
+        before[before.size - suffix - 1] == after[after.size - suffix - 1]) {
+        suffix++
+    }
+    (prefix, before.size - suffix)
 }
 
 public class ActivityStep {
@@ -342,31 +745,178 @@ public class RequestDialog <: Widget {
 
 public type DecisionDialog = RequestDialog
 
-func transcriptHeader(item: TranscriptItem): String {
-    let collapse = if (item.collapsed) { "+ " } else { "- " }
-    let title = if (item.title.isEmpty()) { item.id } else { item.title }
-    let time = if (item.timestamp.isEmpty()) { "" } else { " " + item.timestamp }
-    collapse + statusMark(item.status) + " " + title + time
-}
-
-func statusMark(status: TranscriptItemStatus): String {
+public func statusMark(
+    status: TranscriptItemStatus,
+    activityFrame!: Int64 = 0
+): String {
     match (status) {
-        case TranscriptItemStatus.Pending => "?"
-        case TranscriptItemStatus.Running => ">"
-        case TranscriptItemStatus.Done => "*"
-        case TranscriptItemStatus.Failed => "!"
-        case TranscriptItemStatus.Cancelled => "x"
+        case TranscriptItemStatus.Pending => "○"
+        case TranscriptItemStatus.Queued => "✓"
+        case TranscriptItemStatus.Running => runningStatusMark(activityFrame)
+        case TranscriptItemStatus.Streaming => streamingStatusMark(activityFrame)
+        case TranscriptItemStatus.Done => "✓"
+        case TranscriptItemStatus.Awaiting => "?"
+        case TranscriptItemStatus.Approved => "✓"
+        case TranscriptItemStatus.Failed => "✗"
+        case TranscriptItemStatus.Cancelled => "–"
+        case TranscriptItemStatus.Rejected => "⊘"
+        case TranscriptItemStatus.TimedOut => "⌛"
+        case TranscriptItemStatus.Expired => "⌛"
+        case TranscriptItemStatus.Conflict => "!"
     }
 }
 
-func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style {
+func runningStatusMark(frame: Int64): String {
+    match (frame % 4) {
+        case 0 => "◐"
+        case 1 => "◓"
+        case 2 => "◑"
+        case _ => "◒"
+    }
+}
+
+func streamingStatusMark(frame: Int64): String {
+    match (frame % 4) {
+        case 0 => "⋮"
+        case 1 => "⋰"
+        case 2 => "⋯"
+        case _ => "⋱"
+    }
+}
+
+public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style {
+    match (getVariable("NO_COLOR")) {
+        case Some(_) => return base
+        case None => ()
+    }
     match (status) {
         case TranscriptItemStatus.Pending => base.patch(Style(fg: Color.Indexed(8)))
+        case TranscriptItemStatus.Queued => base.patch(Style(fg: Color.Green))
         case TranscriptItemStatus.Running => base.patch(Style(fg: Color.Cyan))
+        case TranscriptItemStatus.Streaming => base.patch(Style(fg: Color.Cyan))
         case TranscriptItemStatus.Done => base.patch(Style(fg: Color.Green))
+        case TranscriptItemStatus.Awaiting => base.patch(Style(fg: Color.Yellow))
+        case TranscriptItemStatus.Approved => base.patch(Style(fg: Color.Green))
         case TranscriptItemStatus.Failed => base.patch(Style(fg: Color.Red))
         case TranscriptItemStatus.Cancelled => base.patch(Style(fg: Color.Yellow))
+        case TranscriptItemStatus.Rejected => base.patch(Style(fg: Color.Red))
+        case TranscriptItemStatus.TimedOut => base.patch(Style(fg: Color.Red))
+        case TranscriptItemStatus.Expired => base.patch(Style(fg: Color.Yellow))
+        case TranscriptItemStatus.Conflict => base.patch(Style(fg: Color.Yellow))
     }
+}
+
+public func transcriptStatusLabel(status: TranscriptItemStatus): String {
+    match (status) {
+        case TranscriptItemStatus.Pending => "pending"
+        case TranscriptItemStatus.Queued => "queued"
+        case TranscriptItemStatus.Running => "running"
+        case TranscriptItemStatus.Streaming => "streaming"
+        case TranscriptItemStatus.Done => "completed"
+        case TranscriptItemStatus.Awaiting => "awaiting approval"
+        case TranscriptItemStatus.Approved => "approved"
+        case TranscriptItemStatus.Failed => "failed"
+        case TranscriptItemStatus.Cancelled => "cancelled"
+        case TranscriptItemStatus.Rejected => "rejected"
+        case TranscriptItemStatus.TimedOut => "timed out"
+        case TranscriptItemStatus.Expired => "expired"
+        case TranscriptItemStatus.Conflict => "conflict"
+    }
+}
+
+public func transcriptCardDocument(
+    item: TranscriptItem,
+    theme!: TranscriptCardTheme = TranscriptCardTheme()
+): Document {
+    let lines = ArrayList<DocumentLine>()
+    let title = if (item.title.isEmpty()) { item.id } else { item.title }
+    let state = if (item.stateLabel.isEmpty()) {
+        transcriptStatusLabel(item.status)
+    } else {
+        item.stateLabel
+    }
+    let header = ArrayList<RichSpan>()
+    header.add(RichSpan(
+        statusMark(item.status, activityFrame: item.activityFrame) + " ",
+        style: transcriptStatusStyle(item.status, theme.style)
+    ))
+    header.add(RichSpan(title, style: theme.titleStyle))
+    if (!state.isEmpty()) {
+        header.add(RichSpan(" · " + state, style: theme.mutedStyle))
+    }
+    if (!item.duration.isEmpty()) {
+        header.add(RichSpan(" · " + item.duration, style: theme.mutedStyle))
+    }
+    if (item.collapsed) {
+        header.add(RichSpan("  ▸", style: theme.mutedStyle))
+    }
+    lines.add(DocumentLine(DocumentLineKind.Paragraph, header.toArray()))
+    if (!item.collapsed) {
+        let limit = if (theme.bodyLimit == 0) {
+            item.body.lines.size
+        } else {
+            min(theme.bodyLimit, item.body.lines.size)
+        }
+        for (index in 0..limit) {
+            lines.add(indentTranscriptLine(
+                item.body.lines[index],
+                theme.bodyIndent,
+                theme.style
+            ))
+        }
+        if (limit < item.body.lines.size) {
+            lines.add(DocumentLine(
+                DocumentLineKind.Paragraph,
+                transcriptIndent(theme.bodyIndent) + "…",
+                style: theme.mutedStyle
+            ))
+        }
+        for (option in item.options) {
+            lines.add(DocumentLine(
+                DocumentLineKind.Paragraph,
+                transcriptIndent(theme.bodyIndent) +
+                    if (option.selected) { "› " } else { "  " } +
+                    option.label,
+                style: if (option.selected) {
+                    theme.selectedStyle
+                } else {
+                    theme.style
+                }
+            ))
+        }
+        if (!item.footer.isEmpty()) {
+            lines.add(DocumentLine(
+                DocumentLineKind.Paragraph,
+                transcriptIndent(theme.bodyIndent) + item.footer,
+                style: theme.mutedStyle
+            ))
+        }
+    }
+    Document(lines.toArray())
+}
+
+func indentTranscriptLine(
+    line: DocumentLine,
+    width: Int64,
+    style: Style
+): DocumentLine {
+    let spans = ArrayList<RichSpan>()
+    spans.add(RichSpan(transcriptIndent(width), style: style))
+    spans.add(all: line.spans)
+    DocumentLine(
+        line.kind,
+        spans.toArray(),
+        quoteDepth: line.quoteDepth,
+        media: line.media,
+        mediaFit: line.mediaFit,
+        mediaHeight: line.mediaHeight
+    )
+}
+
+func transcriptIndent(width: Int64): String {
+    var result = ""
+    for (_ in 0..max(0, width)) { result += " " }
+    result
 }
 
 func insertPair(area: TextArea, left: String, right: String): Bool {
@@ -433,263 +983,3 @@ func wrapSelectionOrWord(area: TextArea, left: String, right: String): Bool {
     area.select(start, end)
     wrapSelection(area, left, right)
 }
-
-public class SaveDiagnostic {
-    public let path: String
-    public let message: String
-
-    public init(path: String, message: String) {
-        this.path = path
-        this.message = message
-    }
-}
-
-public class EditorBuffer {
-    public var path: String
-    public var title: String
-    public let textArea: TextArea
-    public var dirty: Bool
-    public var readonly: Bool
-    public var lastError: ?SaveDiagnostic
-
-    public init(path!: String = "", title!: String = "Untitled", value!: String = "", readonly!: Bool = false, markdownEditing!: Bool = false) {
-        this.path = path
-        this.title = title
-        this.textArea = TextArea(value: value, readOnly: readonly, markdownEditing: markdownEditing)
-        this.dirty = false
-        this.readonly = readonly
-        this.lastError = None
-    }
-
-    public func setReadOnly(readonly: Bool): Unit {
-        this.readonly = readonly
-        textArea.readOnly = readonly
-    }
-
-    public func markSaved(path!: String = ""): Unit {
-        if (!path.isEmpty()) { this.path = path }
-        dirty = false
-        lastError = None
-        textArea.clearHistory()
-    }
-
-    public func markSaveFailed(message: String): Unit {
-        lastError = Some(SaveDiagnostic(path, message))
-    }
-}
-
-public class BufferSet {
-    private let buffers = ArrayList<EditorBuffer>()
-    private let recent = ArrayList<String>()
-    public var active: Int64 = 0
-
-    public init(buffers!: Array<EditorBuffer> = []) {
-        for (buffer in buffers) { this.buffers.add(buffer) }
-        active = clamp(active, 0, max(0, this.buffers.size - 1))
-    }
-
-    public func size(): Int64 { buffers.size }
-
-    public func activeBuffer(): ?EditorBuffer {
-        if (buffers.size == 0) { return None }
-        active = clamp(active, 0, buffers.size - 1)
-        Some(buffers[active])
-    }
-
-    public func add(buffer: EditorBuffer): Int64 {
-        buffers.add(buffer)
-        active = buffers.size - 1
-        remember(buffer.path)
-        active
-    }
-
-    public func openOrSelect(buffer: EditorBuffer): Int64 {
-        if (!buffer.path.isEmpty()) {
-            for (i in 0..buffers.size) {
-                if (buffers[i].path == buffer.path) {
-                    active = i
-                    remember(buffer.path)
-                    return active
-                }
-            }
-        }
-        add(buffer)
-    }
-
-    public func close(index: Int64): ?EditorBuffer {
-        if (index < 0 || index >= buffers.size) { return None }
-        let removed = buffers[index]
-        buffers.remove(at: index)
-        active = clamp(active, 0, max(0, buffers.size - 1))
-        Some(removed)
-    }
-
-    public func next(): ?EditorBuffer {
-        if (buffers.size == 0) { return None }
-        active = (active + 1) % buffers.size
-        activeBuffer()
-    }
-
-    public func previous(): ?EditorBuffer {
-        if (buffers.size == 0) { return None }
-        active = (active + buffers.size - 1) % buffers.size
-        activeBuffer()
-    }
-
-    public func select(index: Int64): ?EditorBuffer {
-        if (index < 0 || index >= buffers.size) { return None }
-        active = index
-        activeBuffer()
-    }
-
-    public func remember(path: String): Unit {
-        if (path.isEmpty()) { return }
-        for (i in 0..recent.size) {
-            if (recent[i] == path) {
-                recent.remove(at: i)
-                break
-            }
-        }
-        recent.add(path)
-        while (recent.size > 10) {
-            recent.remove(at: 0)
-        }
-    }
-
-    public func recentFiles(): Array<String> {
-        recent.toArray()
-    }
-
-    public func tabTitles(): Array<String> {
-        let titles = ArrayList<String>()
-        for (buffer in buffers) {
-            titles.add(if (buffer.dirty) { buffer.title + "*" } else { buffer.title })
-        }
-        titles.toArray()
-    }
-}
-
-public class SearchPanel <: Widget {
-    public var query: String
-    public var matches: Int64
-    private let style: Style
-
-    public init(query!: String = "", matches!: Int64 = 0, style!: Style = Style.default()) {
-        this.query = query
-        this.matches = max(0, matches)
-        this.style = style
-    }
-
-    public func updateFrom(buffer: TextBuffer): Unit {
-        matches = buffer.findAll(query).size
-    }
-
-    public func render(area: Rect, buffer: Buffer): Unit {
-        if (area.width <= 0 || area.height <= 0) { return }
-        buffer.setString(area.x, area.y, truncate("find: " + query + " (${matches})", area.width), style: style)
-    }
-}
-
-public class ReplacePanel <: Widget {
-    public var query: String
-    public var replacement: String
-    public var lastCount: Int64 = 0
-    private let style: Style
-
-    public init(query!: String = "", replacement!: String = "", style!: Style = Style.default()) {
-        this.query = query
-        this.replacement = replacement
-        this.style = style
-    }
-
-    public func apply(buffer: TextBuffer): Int64 {
-        lastCount = buffer.replaceAll(query, replacement)
-        lastCount
-    }
-
-    public func render(area: Rect, buffer: Buffer): Unit {
-        if (area.width <= 0 || area.height <= 0) { return }
-        buffer.setString(area.x, area.y, truncate("replace: " + query + " -> " + replacement + " (${lastCount})", area.width), style: style)
-    }
-}
-
-public class TextDocumentView <: Widget {
-    private let lineCount: Int64
-    private let lineAt: (Int64) -> String
-    public var offset: Int64
-    private let style: Style
-
-    public init(lineCount: Int64, lineAt: (Int64) -> String, offset!: Int64 = 0, style!: Style = Style.default()) {
-        this.lineCount = max(0, lineCount)
-        this.lineAt = lineAt
-        this.offset = max(0, offset)
-        this.style = style
-    }
-
-    public func render(area: Rect, buffer: Buffer): Unit {
-        if (area.width <= 0 || area.height <= 0) { return }
-        let start = clamp(offset, 0, max(0, lineCount - area.height))
-        for (row in 0..min(area.height, lineCount - start)) {
-            buffer.setString(area.x, area.y + row, truncate(lineAt(start + row), area.width), style: style)
-        }
-    }
-}
-
-public class SyntaxRule {
-    public let token: String
-    public let style: Style
-    public init(token: String, style: Style) {
-        this.token = token
-        this.style = style
-    }
-}
-
-public class SyntaxHighlighter {
-    private let rules = ArrayList<SyntaxRule>()
-    public init(rules!: Array<SyntaxRule> = []) {
-        for (rule in rules) { this.rules.add(rule) }
-    }
-    public func add(rule: SyntaxRule): Unit { rules.add(rule) }
-    public func styleFor(text: String): Style {
-        for (rule in rules) {
-            if (text.contains(rule.token)) { return rule.style }
-        }
-        Style.default()
-    }
-}
-
-public class SoftWrapView <: Widget {
-    private let text: String
-    private let style: Style
-    public init(text: String, style!: Style = Style.default()) {
-        this.text = text
-        this.style = style
-    }
-    public func render(area: Rect, buffer: Buffer): Unit {
-        Paragraph(text, wrap: WrapMode.Word, style: style).render(area, buffer)
-    }
-}
-
-public class TextEditor <: Widget {
-    public let area: TextArea
-    public let search: SearchPanel
-    public let replace: ReplacePanel
-
-    public init(value!: String = "") {
-        area = TextArea(value: value, lineNumbers: true)
-        search = SearchPanel()
-        replace = ReplacePanel()
-    }
-
-    public func handle(key: KeyEvent): Bool { area.handle(key) }
-
-    public func render(areaRect: Rect, buffer: Buffer): Unit {
-        let rows = Layout.vertical([Constraint.Min(3), Constraint.Length(1), Constraint.Length(1)]).split(areaRect)
-        if (rows.size >= 3) {
-            area.render(rows[0], buffer)
-            search.render(rows[1], buffer)
-            replace.render(rows[2], buffer)
-        }
-    }
-}
-

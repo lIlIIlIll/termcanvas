@@ -11,7 +11,9 @@ The stable boundary is:
 - `DocumentTheme`
 - `DocumentView`
 
-Extensions convert content formats into `Document`, then applications render the result with `DocumentView`.
+Extensions convert content formats into the canonical stable `core.Document`, then applications render the result with `core.DocumentView`. The former experimental `document` alias facade is retired; applications use the stable core document vocabulary directly.
+
+The former experimental `packages/editor` facade and advanced editor shell are retired. Stable text-buffer, text-area, completion, and Markdown-editing declarations are used directly from `core`. Format adapters remain separate from editor behavior and parsing policy.
 
 Game helpers follow the same boundary: core owns terminal events, timing, metrics, canvas, buffers, and layout, while game-specific entity/component storage, physics, tile maps, and sprite rendering live in `packages/game`.
 
@@ -76,7 +78,7 @@ Game and simulation extensions:
 
 Near-term priority:
 
-1. `RichText` / `Document` / `DocumentView`
+1. `editor`
 2. `markdown`
 3. `terminal`
 4. `diff`

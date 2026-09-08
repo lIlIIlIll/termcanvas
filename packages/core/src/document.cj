@@ -282,6 +282,9 @@ public class DocumentView <: Widget {
     private let highlights: Array<DocumentHighlight>
     private let state: ?DocumentViewState
     private let currentSourceStyle: Style
+    private let cacheLayout: Bool
+    private var cachedWidth: Int64 = -1
+    private var cachedRows: Array<StyledLine> = []
 
     public init(
         document: Document,
@@ -293,7 +296,8 @@ public class DocumentView <: Widget {
         wrap!: WrapMode = WrapMode.Word,
         highlights!: Array<DocumentHighlight> = [],
         state!: ?DocumentViewState = None,
-        currentSourceStyle!: Style = Style(bg: Color.Indexed(8))
+        currentSourceStyle!: Style = Style(bg: Color.Indexed(8)),
+        cacheLayout!: Bool = false
     ) {
         this.document = document
         this.block = block
@@ -306,6 +310,7 @@ public class DocumentView <: Widget {
         this.highlights = highlights
         this.state = state
         this.currentSourceStyle = currentSourceStyle
+        this.cacheLayout = cacheLayout
     }
 
     public func renderedLineCount(width: Int64): Int64 {
@@ -428,15 +433,31 @@ public class DocumentView <: Widget {
         }
     }
 
+    func layoutRows(width: Int64): Array<StyledLine> {
+        renderRows(document, width)
+    }
+
     private func renderRows(document: Document, width: Int64): Array<StyledLine> {
+        if (cacheLayout && cachedWidth == width) { return cachedRows }
         let rows = ArrayList<StyledLine>()
         for (line in document.lines) {
             appendLineRows(rows, line, width)
         }
-        rows.toArray()
+        let result = rows.toArray()
+        if (cacheLayout) {
+            cachedWidth = width
+            cachedRows = result
+        }
+        result
     }
 
     private func renderRowsWindow(document: Document, width: Int64, start: Int64, count: Int64): Array<StyledLine> {
+        if (cacheLayout) {
+            let all = renderRows(document, width)
+            let from = min(all.size, max(0, start))
+            let to = min(all.size, from + max(0, count))
+            return all[from..to]
+        }
         let rows = ArrayList<StyledLine>()
         if (count <= 0) { return rows.toArray() }
         let from = max(0, start)
@@ -474,7 +495,11 @@ public class DocumentView <: Widget {
             case DocumentLineKind.TableHeader =>
                 rows.add(StyledLine(quotePrefixedSpans(line, theme.quoteStyle, applyCurrentSourceHighlight(applyHighlights(themedSpans(line.spans, theme.tableHeader), highlights), currentCursorSource(), currentSourceStyle))))
             case DocumentLineKind.HorizontalRule =>
-                rows.add(StyledLine(quotePrefixedSpans(line, theme.quoteStyle, [RichSpan(repeat("-", width), style: theme.table)])))
+                rows.add(StyledLine(
+                    quotePrefixedSpans(line, theme.quoteStyle, [RichSpan(repeat("-", width), style: theme.table)]),
+                    horizontalRule: true,
+                    ruleLabel: themedSpans(line.spans, theme.table)
+                ))
             case DocumentLineKind.Image =>
                 match (line.media) {
                     case Some(source) =>
@@ -601,12 +626,23 @@ class StyledLine {
     let media: ?MediaSource
     let mediaFit: MediaFit
     let mediaHeight: Int64
+    let horizontalRule: Bool
+    let ruleLabel: Array<RichSpan>
 
-    init(spans: Array<RichSpan>, media!: ?MediaSource = None, mediaFit!: MediaFit = MediaFit.Contain, mediaHeight!: Int64 = 0) {
+    init(
+        spans: Array<RichSpan>,
+        media!: ?MediaSource = None,
+        mediaFit!: MediaFit = MediaFit.Contain,
+        mediaHeight!: Int64 = 0,
+        horizontalRule!: Bool = false,
+        ruleLabel!: Array<RichSpan> = []
+    ) {
         this.spans = spans
         this.media = media
         this.mediaFit = mediaFit
         this.mediaHeight = max(0, mediaHeight)
+        this.horizontalRule = horizontalRule
+        this.ruleLabel = ruleLabel
     }
 }
 
@@ -615,9 +651,13 @@ func renderStyledLine(buffer: Buffer, x: Int64, y: Int64, line: StyledLine, widt
     let right = x + width
     for (span in line.spans) {
         if (cx >= right) { return }
-        let part = truncate(span.text, right - cx)
-        buffer.setString(cx, y, part, style: span.style)
-        cx += displayWidth(part)
+        cx += buffer.writeStringClipped(
+            cx,
+            y,
+            span.text,
+            maxWidth: right - cx,
+            style: span.style
+        )
     }
     match (line.media) {
         case Some(source) =>

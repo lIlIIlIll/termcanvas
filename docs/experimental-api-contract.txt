@@ -1,0 +1,781 @@
+core|AppTraceSink|interface|public interface AppTraceSink {
+core|AppTraceSink.externalDequeued|func|func externalDequeued(_: Int64): Unit
+core|AppTraceSink.inputReceived|func|func inputReceived(event: Event, eventQueueLength: Int64): Unit
+core|AppTraceSink.eventDispatchCompleted|func|func eventDispatchCompleted(): Unit
+core|AppTraceSink.stateUpdateCompleted|func|func stateUpdateCompleted(): Unit
+core|AppTraceSink.renderStarted|func|func renderStarted(): Unit
+core|AppTraceSink.frameScheduling|func|func frameScheduling(_: FrameSchedulingSnapshot): Unit
+core|AppTraceSink.frameCompleted|func|func frameCompleted(_: RenderMetrics): Unit
+core|AppTraceSink.eventLoopStall|func|func eventLoopStall(task: String, durationNanos: Int64): Unit
+core|AppMetrics.runtime|func|public func runtime(): RuntimeMetricsSnapshot
+core|RuntimeMetricsSnapshot|struct|public struct RuntimeMetricsSnapshot {
+core|RuntimeMetricsSnapshot.queueEnqueued|let|public let queueEnqueued: Int64
+core|RuntimeMetricsSnapshot.queueProcessed|let|public let queueProcessed: Int64
+core|RuntimeMetricsSnapshot.maxQueueDepth|let|public let maxQueueDepth: Int64
+core|RuntimeMetricsSnapshot.maxUpdateDepth|let|public let maxUpdateDepth: Int64
+core|RuntimeMetricsSnapshot.scheduling|let|public let scheduling: FrameSchedulingSnapshot
+core|RuntimeMetricsSnapshot.init|init|public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )
+core|App.attachTraceSink|func|public func attachTraceSink(traceSink: AppTraceSink): Unit
+core|App.attachPtyRuntime|func|public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit
+core|FocusManager|class|public class FocusManager {
+core|FocusManager.init|init|public init()
+core|FocusManager.add|func|public func add(id: String, enabled!: Bool = true): Unit
+core|FocusManager.remove|func|public func remove(id: String): Unit
+core|FocusManager.focus|func|public func focus(id: String): Bool
+core|FocusManager.current|func|public func current(): ?String
+core|FocusManager.isFocused|func|public func isFocused(id: String): Bool
+core|FocusManager.next|func|public func next(): ?String
+core|FocusManager.previous|func|public func previous(): ?String
+core|FocusManager.handle|func|public func handle(key: KeyEvent): Bool
+core|ResizePolicy|enum|public enum ResizePolicy {
+core|ResizePolicy.Stretch|enum_constructor|Stretch
+core|ResizePolicy.Letterbox|enum_constructor|Letterbox
+core|ResizePolicy.Pillarbox|enum_constructor|Pillarbox
+core|ResizePolicy.Center|enum_constructor|Center
+core|ViewportFit|struct|public struct ViewportFit {
+core|ViewportFit.area|let|public let area: Rect
+core|ViewportFit.content|let|public let content: Rect
+core|ViewportFit.tooSmall|let|public let tooSmall: Bool
+core|ViewportFit.scaleX|let|public let scaleX: Float64
+core|ViewportFit.scaleY|let|public let scaleY: Float64
+core|ViewportFit.init|init|public init(area: Rect, content: Rect, tooSmall!: Bool = false, scaleX!: Float64 = 1.0, scaleY!: Float64 = 1.0)
+core|SizeGuard|class|public class SizeGuard {
+core|SizeGuard.minWidth|let|public let minWidth: Int64
+core|SizeGuard.minHeight|let|public let minHeight: Int64
+core|SizeGuard.init|init|public init(minWidth: Int64, minHeight: Int64)
+core|SizeGuard.fit|func|public func fit(area: Rect, policy!: ResizePolicy = ResizePolicy.Center): ViewportFit
+core|Surface|class|public class Surface {
+core|Surface.area|let|public let area: Rect
+core|Surface.zIndex|let|public let zIndex: Int64
+core|Surface.init|init|public init(area: Rect, zIndex!: Int64 = 0)
+core|Surface.canvas|func|public func canvas(): Canvas
+core|Surface.bufferView|func|public func bufferView(): Buffer
+core|Canvas.withClip|func|public func withClip(area: Rect): Canvas
+core|Canvas.translated|func|public func translated(x: Int64, y: Int64): Canvas
+core|Canvas.viewport|func|public func viewport(camera: Position): Canvas
+core|Canvas.hline|func|public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit
+core|Canvas.vline|func|public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit
+core|Canvas.strokeRect|func|public func strokeRect(area: Rect, style: Style, horizontal!: String = "-", vertical!: String = "|", corner!: String = "+"): Unit
+core|Canvas.drawLine|func|public func drawLine(x1: Int64, y1: Int64, x2: Int64, y2: Int64, symbol: String, style: Style): Unit
+core|Canvas.drawSprite|func|public func drawSprite(x: Int64, y: Int64, lines: Array<String>, style: Style): Unit
+core|Canvas.render|func|public func render(widget: Widget, area: Rect): Unit
+core|Canvas.composite|func|public func composite(surface: Surface): Unit
+core|centeredViewport|func|public func centeredViewport(area: Rect, width: Int64, height: Int64): Rect
+core|MenuItem|class|public class MenuItem {
+core|MenuItem.label|let|public let label: String
+core|MenuItem.action|let|public let action: String
+core|MenuItem.enabled|let|public let enabled: Bool
+core|MenuItem.init|init|public init(label: String, action!: String = "", enabled!: Bool = true)
+core|Menu|class|public class Menu <: Widget {
+core|Menu.selected|var|public var selected: Int64
+core|Menu.init|init|public init( title: String, items: Array<MenuItem>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)) )
+core|Menu.handle|func|public func handle(key: KeyEvent): ?String
+core|Menu.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|MenuBar|class|public class MenuBar <: Widget {
+core|MenuBar.selected|var|public var selected: Int64
+core|MenuBar.init|init|public init( menus: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|MenuBar.handle|func|public func handle(key: KeyEvent): Bool
+core|MenuBar.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|CommandPalette|class|public class CommandPalette <: Widget {
+core|CommandPalette.query|var|public var query: String
+core|CommandPalette.selected|var|public var selected: Int64
+core|CommandPalette.init|init|public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|CommandPalette.handle|func|public func handle(key: KeyEvent): ?String
+core|CommandPalette.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Toast|class|public class Toast {
+core|Toast.message|let|public let message: String
+core|Toast.ttl|let|public let ttl: Int64
+core|Toast.style|let|public let style: Style
+core|Toast.init|init|public init(message: String, ttl!: Int64 = 3, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+core|ToastManager|class|public class ToastManager <: Widget {
+core|ToastManager.init|init|public init(toasts!: Array<Toast> = [])
+core|ToastManager.push|func|public func push(toast: Toast): Unit
+core|ToastManager.count|func|public func count(): Int64
+core|ToastManager.tick|func|public func tick(): Unit
+core|ToastManager.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Spinner|class|public class Spinner <: Widget {
+core|Spinner.init|init|public init(label!: String = "", frame!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
+core|Spinner.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Dialog|class|public class Dialog <: Widget {
+core|Dialog.selected|var|public var selected: Int64
+core|Dialog.init|init|public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Dialog.handle|func|public func handle(key: KeyEvent): ?String
+core|Dialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|ConfirmDialog|class|public class ConfirmDialog <: Widget {
+core|ConfirmDialog.confirmed|var|public var confirmed: Bool = false
+core|ConfirmDialog.init|init|public init(message: String)
+core|ConfirmDialog.handle|func|public func handle(key: KeyEvent): ?Bool
+core|ConfirmDialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|TranscriptItemKind|enum|public enum TranscriptItemKind {
+core|TranscriptItemKind.Text|enum_constructor|Text
+core|TranscriptItemKind.Code|enum_constructor|Code
+core|TranscriptItemKind.Event|enum_constructor|Event
+core|TranscriptItemKind.Error|enum_constructor|Error
+core|TranscriptItemKind.Progress|enum_constructor|Progress
+core|TranscriptItemKind.Detail|enum_constructor|Detail
+core|TranscriptItemStatus|enum|public enum TranscriptItemStatus {
+core|TranscriptItemStatus.Pending|enum_constructor|Pending
+core|TranscriptItemStatus.Queued|enum_constructor|Queued
+core|TranscriptItemStatus.Running|enum_constructor|Running
+core|TranscriptItemStatus.Streaming|enum_constructor|Streaming
+core|TranscriptItemStatus.Done|enum_constructor|Done
+core|TranscriptItemStatus.Awaiting|enum_constructor|Awaiting
+core|TranscriptItemStatus.Approved|enum_constructor|Approved
+core|TranscriptItemStatus.Failed|enum_constructor|Failed
+core|TranscriptItemStatus.Cancelled|enum_constructor|Cancelled
+core|TranscriptItemStatus.Rejected|enum_constructor|Rejected
+core|TranscriptItemStatus.TimedOut|enum_constructor|TimedOut
+core|TranscriptItemStatus.Expired|enum_constructor|Expired
+core|TranscriptItemStatus.Conflict|enum_constructor|Conflict
+core|TranscriptCardOption|class|public class TranscriptCardOption {
+core|TranscriptCardOption.label|let|public let label: String
+core|TranscriptCardOption.selected|let|public let selected: Bool
+core|TranscriptCardOption.init|init|public init(label: String, selected!: Bool = false)
+core|TranscriptCardTheme|class|public class TranscriptCardTheme {
+core|TranscriptCardTheme.style|let|public let style: Style
+core|TranscriptCardTheme.titleStyle|let|public let titleStyle: Style
+core|TranscriptCardTheme.mutedStyle|let|public let mutedStyle: Style
+core|TranscriptCardTheme.selectedStyle|let|public let selectedStyle: Style
+core|TranscriptCardTheme.bodyIndent|let|public let bodyIndent: Int64
+core|TranscriptCardTheme.bodyLimit|let|public let bodyLimit: Int64
+core|TranscriptCardTheme.borderStyle|let|public let borderStyle: Style
+core|TranscriptCardTheme.borderBackground|let|public let borderBackground: Style
+core|TranscriptCardTheme.topTitleStyle|let|public let topTitleStyle: Style
+core|TranscriptCardTheme.fullFrame|let|public let fullFrame: Bool
+core|TranscriptCardTheme.fillBackground|let|public let fillBackground: Bool
+core|TranscriptCardTheme.contentPadding|let|public let contentPadding: Spacing
+core|TranscriptCardTheme.init|init|public init( style!: Style = Style.default(), titleStyle!: Style = Style(modifier: Modifier.strong()), mutedStyle!: Style = Style(fg: Color.Indexed(8)), selectedStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()), bodyIndent!: Int64 = 2, bodyLimit!: Int64 = 12, borderStyle!: Style = Style(fg: Color.Indexed(8)), borderBackground!: Style = Style.default(), topTitleStyle!: Style = Style(modifier: Modifier.strong()), fullFrame!: Bool = false, fillBackground!: Bool = false, contentPadding!: Spacing = Spacing.zero() )
+core|TranscriptItem|class|public class TranscriptItem {
+core|TranscriptItem.id|let|public let id: String
+core|TranscriptItem.kind|let|public let kind: TranscriptItemKind
+core|TranscriptItem.title|let|public let title: String
+core|TranscriptItem.body|let|public let body: Document
+core|TranscriptItem.status|let|public let status: TranscriptItemStatus
+core|TranscriptItem.collapsed|var|public var collapsed: Bool
+core|TranscriptItem.timestamp|let|public let timestamp: String
+core|TranscriptItem.duration|let|public let duration: String
+core|TranscriptItem.stateLabel|let|public let stateLabel: String
+core|TranscriptItem.activityFrame|let|public let activityFrame: Int64
+core|TranscriptItem.options|let|public let options: Array<TranscriptCardOption>
+core|TranscriptItem.footer|let|public let footer: String
+core|TranscriptItem.init|init|public init( id: String, kind!: TranscriptItemKind = TranscriptItemKind.Text, title!: String = "", body!: Document = Document([]), status!: TranscriptItemStatus = TranscriptItemStatus.Done, collapsed!: Bool = false, timestamp!: String = "", duration!: String = "", stateLabel!: String = "", activityFrame!: Int64 = 0, options!: Array<TranscriptCardOption> = [], footer!: String = "" )
+core|Transcript|class|public class Transcript {
+core|Transcript.init|init|public init(items!: Array<TranscriptItem> = [])
+core|Transcript.append|func|public func append(item: TranscriptItem): Unit
+core|Transcript.size|func|public func size(): Int64
+core|Transcript.get|func|public func get(index: Int64): ?TranscriptItem
+core|Transcript.toArray|func|public func toArray(): Array<TranscriptItem>
+core|Transcript.toggleCollapsed|func|public func toggleCollapsed(id: String): Bool
+core|TranscriptView|class|public class TranscriptView <: Widget {
+core|TranscriptView.offset|var|public var offset: Int64
+core|TranscriptView.selected|var|public var selected: Int64
+core|TranscriptView.init|init|public init( transcript: Transcript, offset!: Int64 = 0, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cardTheme!: ?TranscriptCardTheme = None )
+core|TranscriptView.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+core|TranscriptView.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|ActivityStep|class|public class ActivityStep {
+core|ActivityStep.title|let|public let title: String
+core|ActivityStep.status|let|public let status: TranscriptItemStatus
+core|ActivityStep.detail|let|public let detail: String
+core|ActivityStep.duration|let|public let duration: String
+core|ActivityStep.init|init|public init(title: String, status!: TranscriptItemStatus = TranscriptItemStatus.Pending, detail!: String = "", duration!: String = "")
+core|ActivityTimeline|class|public class ActivityTimeline <: Widget {
+core|ActivityTimeline.init|init|public init(steps: Array<ActivityStep>, block!: ?Block = None)
+core|ActivityTimeline.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|RequestDialog|class|public class RequestDialog <: Widget {
+core|RequestDialog.selected|var|public var selected: Int64
+core|RequestDialog.init|init|public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0)
+core|RequestDialog.handle|func|public func handle(key: KeyEvent): ?String
+core|RequestDialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|DecisionDialog|type|public type DecisionDialog = RequestDialog
+core|statusMark|func|public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
+core|transcriptStatusStyle|func|public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
+core|transcriptStatusLabel|func|public func transcriptStatusLabel(status: TranscriptItemStatus): String
+core|transcriptCardDocument|func|public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
+core|MetricCard|class|public class MetricCard <: Widget {
+core|MetricCard.init|init|public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: Style = Style.default(), valueStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()) )
+core|MetricCard.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Meter|class|public class Meter <: Widget {
+core|Meter.init|init|public init(label: String, value: Int64, total!: Int64 = 100, style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green))
+core|Meter.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|LegendItem|class|public class LegendItem {
+core|LegendItem.label|let|public let label: String
+core|LegendItem.symbol|let|public let symbol: String
+core|LegendItem.style|let|public let style: Style
+core|LegendItem.init|init|public init(label: String, symbol!: String = "#", style!: Style = Style(fg: Color.Cyan))
+core|Legend|class|public class Legend <: Widget {
+core|Legend.init|init|public init(items: Array<LegendItem>, gap!: String = " ")
+core|Legend.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|TimeSeriesChart|class|public class TimeSeriesChart <: Widget {
+core|TimeSeriesChart.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
+core|TimeSeriesChart.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|HeaderBar|class|public class HeaderBar <: Widget {
+core|HeaderBar.init|init|public init(title: String, left!: String = "", right!: String = "", style!: Style = Style(fg: Color.White, modifier: Modifier.strong()))
+core|HeaderBar.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|FooterBar|class|public class FooterBar <: Widget {
+core|FooterBar.init|init|public init(left!: String = "", center!: String = "", right!: String = "", style!: Style = Style(fg: Color.Indexed(8)))
+core|FooterBar.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|EmptyState|class|public class EmptyState <: Widget {
+core|EmptyState.init|init|public init(title!: String = "No data", detail!: String = "", style!: Style = Style(fg: Color.Indexed(8)))
+core|EmptyState.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|ErrorBox|class|public class ErrorBox <: Widget {
+core|ErrorBox.init|init|public init(message: String, detail!: String = "")
+core|ErrorBox.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|LoadingOverlay|class|public class LoadingOverlay <: Widget {
+core|LoadingOverlay.init|init|public init(label!: String = "Loading", frame!: Int64 = 0)
+core|LoadingOverlay.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Skeleton|class|public class Skeleton <: Widget {
+core|Skeleton.init|init|public init(rows!: Int64 = 3, style!: Style = Style(fg: Color.Indexed(8)))
+core|Skeleton.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|InlineAlert|class|public class InlineAlert <: Widget {
+core|InlineAlert.init|init|public init(message: String, state!: StyleState = StyleState.Accent)
+core|InlineAlert.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Paginator|class|public class Paginator {
+core|Paginator.page|var|public var page: Int64
+core|Paginator.pageSize|var|public var pageSize: Int64
+core|Paginator.total|var|public var total: Int64
+core|Paginator.init|init|public init(page!: Int64 = 0, pageSize!: Int64 = 10, total!: Int64 = 0)
+core|Paginator.pageCount|func|public func pageCount(): Int64
+core|Paginator.offset|func|public func offset(): Int64
+core|Paginator.next|func|public func next(): Unit
+core|Paginator.previous|func|public func previous(): Unit
+core|Paginator.handle|func|public func handle(key: KeyEvent): Bool
+core|TableColumn|class|public class TableColumn {
+core|TableColumn.title|let|public let title: String
+core|TableColumn.width|var|public var width: Int64
+core|TableColumn.align|let|public let align: TextAlign
+core|TableColumn.init|init|public init(title: String, width!: Int64 = 10, align!: TextAlign = TextAlign.Left)
+core|TableStatus|enum|public enum TableStatus {
+core|TableStatus.Ready|enum_constructor|Ready
+core|TableStatus.Empty|enum_constructor|Empty
+core|TableStatus.Loading|enum_constructor|Loading
+core|TableStatus.Error|enum_constructor|Error(String)
+core|VirtualTable|class|public class VirtualTable <: Widget {
+core|VirtualTable.offset|var|public var offset: Int64
+core|VirtualTable.selectedRow|var|public var selectedRow: ?Int64
+core|VirtualTable.selectedColumn|var|public var selectedColumn: Int64
+core|VirtualTable.columnOffset|var|public var columnOffset: Int64
+core|VirtualTable.frozenColumns|var|public var frozenColumns: Int64 = 0
+core|VirtualTable.sortColumn|var|public var sortColumn: ?Int64 = None
+core|VirtualTable.sortDescending|var|public var sortDescending: Bool = false
+core|VirtualTable.filterText|var|public var filterText: String = ""
+core|VirtualTable.stickyHeader|var|public var stickyHeader: Bool = true
+core|VirtualTable.status|var|public var status: TableStatus = TableStatus.Ready
+core|VirtualTable.emptyText|var|public var emptyText: String = "No rows"
+core|VirtualTable.loadingText|var|public var loadingText: String = "Loading"
+core|VirtualTable.init|init|public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan), statusStyle!: Style = Style(fg: Color.Indexed(8)), selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None )
+core|VirtualTable.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|VirtualTable.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+core|VirtualTable.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, viewportHeight: Int64, area: Rect): ?DirtyRects
+core|VirtualTable.dirtyHeader|func|public func dirtyHeader(area: Rect): DirtyRects
+core|VirtualTable.dirtyBody|func|public func dirtyBody(area: Rect): DirtyRects
+core|VirtualTable.dirtyRows|func|public func dirtyRows(area: Rect, rows: Array<Int64>): DirtyRects
+core|VirtualTable.dirtySelectionChange|func|public func dirtySelectionChange(area: Rect, before: ?Int64, after: ?Int64): DirtyRects
+core|VirtualTable.dirtyStatus|func|public func dirtyStatus(area: Rect): DirtyRects
+core|VirtualTable.clearCachedRows|func|public func clearCachedRows(): Unit
+core|VirtualTable.cachedRowCount|func|public func cachedRowCount(): Int64
+core|VirtualTable.sortBy|func|public func sortBy(column: Int64, descending!: Bool = false): Unit
+core|VirtualTable.clearSort|func|public func clearSort(): Unit
+core|VirtualTable.resizeColumn|func|public func resizeColumn(column: Int64, width: Int64): Bool
+core|VirtualTable.setFrozenColumns|func|public func setFrozenColumns(count: Int64): Unit
+core|VirtualTable.setFilter|func|public func setFilter(text: String): Unit
+core|VirtualTable.setStatus|func|public func setStatus(status: TableStatus): Unit
+core|VirtualTable.toggleSelectedRow|func|public func toggleSelectedRow(): Unit
+core|VirtualTable.isSelected|func|public func isSelected(row: Int64): Bool
+core|VirtualTable.selectedRowIndices|func|public func selectedRowIndices(): Array<Int64>
+core|TreeNode|class|public class TreeNode {
+core|TreeNode.id|let|public let id: String
+core|TreeNode.label|let|public let label: String
+core|TreeNode.expanded|var|public var expanded: Bool
+core|TreeNode.init|init|public init(id: String, label: String, expanded!: Bool = false, children!: Array<TreeNode> = [])
+core|TreeNode.add|func|public func add(child: TreeNode): Unit
+core|TreeNode.childNodes|func|public func childNodes(): Array<TreeNode>
+core|Tree|class|public class Tree <: Widget {
+core|Tree.selected|var|public var selected: Int64
+core|Tree.offset|var|public var offset: Int64
+core|Tree.init|init|public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Tree.toggleSelected|func|public func toggleSelected(): Unit
+core|Tree.selectedId|func|public func selectedId(): ?String
+core|Tree.selectById|func|public func selectById(id: String): Bool
+core|Tree.findById|func|public func findById(id: String): ?TreeNode
+core|Tree.expandAll|func|public func expandAll(): Unit
+core|Tree.collapseAll|func|public func collapseAll(): Unit
+core|Tree.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+core|Tree.expandSelected|func|public func expandSelected(): Unit
+core|Tree.collapseSelected|func|public func collapseSelected(): Unit
+core|Tree.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|ColorPicker|class|public class ColorPicker <: Widget {
+core|ColorPicker.selected|var|public var selected: Int64
+core|ColorPicker.init|init|public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)
+core|ColorPicker.selectedColor|func|public func selectedColor(): ?Color
+core|ColorPicker.handle|func|public func handle(key: KeyEvent): Bool
+core|ColorPicker.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|MultiSelect|class|public class MultiSelect <: Widget {
+core|MultiSelect.cursor|var|public var cursor: Int64
+core|MultiSelect.init|init|public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White))
+core|MultiSelect.selectedIndices|func|public func selectedIndices(): Array<Int64>
+core|MultiSelect.toggle|func|public func toggle(): Unit
+core|MultiSelect.handle|func|public func handle(key: KeyEvent): Bool
+core|MultiSelect.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|DatePicker|class|public class DatePicker <: Widget {
+core|DatePicker.year|var|public var year: Int64
+core|DatePicker.month|var|public var month: Int64
+core|DatePicker.day|var|public var day: Int64
+core|DatePicker.init|init|public init(year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1)
+core|DatePicker.value|func|public func value(): String
+core|DatePicker.handle|func|public func handle(key: KeyEvent): Bool
+core|DatePicker.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|PtyProcess|interface|public interface PtyProcess {
+core|PtyProcess.id|func|func id(): String
+core|PtyProcess.write|func|func write(bytes: Array<Byte>): Bool
+core|PtyProcess.writeText|func|func writeText(text: String): Bool
+core|PtyProcess.resize|func|func resize(size: PtySize): Bool
+core|PtyProcess.signal|func|func signal(signal: PtySignal): Bool
+core|PtyProcess.close|func|func close(): Unit
+core|PtyRuntime|interface|public interface PtyRuntime {
+core|PtyRuntime.start|func|func start(id: String, spec: PtySpec): Event
+core|PtyRuntime.process|func|func process(id: String): ?PtyProcess
+core|PtyRuntime.write|func|func write(id: String, bytes: Array<Byte>): Event
+core|PtyRuntime.resize|func|func resize(id: String, size: PtySize): Event
+core|PtyRuntime.signal|func|func signal(id: String, signal: PtySignal): Event
+core|PtyRuntime.close|func|func close(id: String): Event
+core|PtyRuntime.sources|func|func sources(): Array<EventSource>
+core|PtyRuntime.drain|func|func drain(): Array<Event>
+core|PtyRuntime.activeCount|func|func activeCount(): Int64
+core|EventSourceInterest|enum|public enum EventSourceInterest {
+core|EventSourceInterest.Read|enum_constructor|Read
+core|EventSourceInterest.Write|enum_constructor|Write
+core|EventSourceInterest.ReadWrite|enum_constructor|ReadWrite
+core|EventSource|interface|public interface EventSource {
+core|EventSource.id|func|func id(): String
+core|EventSource.fd|func|func fd(): ?Int32
+core|EventSource.waitHandle|func|func waitHandle(): ?CPointer<Unit>
+core|EventSource.interests|func|func interests(): EventSourceInterest
+core|EventSource.onReady|func|func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
+core|EventSource.drain|func|func drain(): Array<Event>
+core|EventSource.close|func|func close(): Unit
+core|FrameSchedulingSnapshot|struct|public struct FrameSchedulingSnapshot {
+core|FrameSchedulingSnapshot.reason|let|public let reason: String
+core|FrameSchedulingSnapshot.frameRequests|let|public let frameRequests: Int64
+core|FrameSchedulingSnapshot.framesPresented|let|public let framesPresented: Int64
+core|FrameSchedulingSnapshot.frameRequestsMerged|let|public let frameRequestsMerged: Int64
+core|FrameSchedulingSnapshot.frameDeadlineWakes|let|public let frameDeadlineWakes: Int64
+core|FrameSchedulingSnapshot.pendingFramePromotions|let|public let pendingFramePromotions: Int64
+core|FrameSchedulingSnapshot.backgroundFrameRequests|let|public let backgroundFrameRequests: Int64
+core|FrameSchedulingSnapshot.interactiveFrameRequests|let|public let interactiveFrameRequests: Int64
+core|FrameSchedulingSnapshot.resizeFrameRequests|let|public let resizeFrameRequests: Int64
+core|FrameSchedulingSnapshot.updatesPerFrame|let|public let updatesPerFrame: Int64
+core|FrameSchedulingSnapshot.dirtyRectsBeforeMerge|let|public let dirtyRectsBeforeMerge: Int64
+core|FrameSchedulingSnapshot.dirtyRectsAfterMerge|let|public let dirtyRectsAfterMerge: Int64
+core|FrameSchedulingSnapshot.firstInvalidationToFrameMillis|let|public let firstInvalidationToFrameMillis: Int64
+core|FrameSchedulingSnapshot.lastUpdateToFrameMillis|let|public let lastUpdateToFrameMillis: Int64
+core|FrameSchedulingSnapshot.frameDelayDueToCoalescingMillis|let|public let frameDelayDueToCoalescingMillis: Int64
+core|FrameSchedulingSnapshot.framesAvoided|let|public let framesAvoided: Int64
+core|FrameSchedulingSnapshot.init|init|public init( reason!: String = "none", frameRequests!: Int64 = 0, framesPresented!: Int64 = 0, frameRequestsMerged!: Int64 = 0, frameDeadlineWakes!: Int64 = 0, pendingFramePromotions!: Int64 = 0, backgroundFrameRequests!: Int64 = 0, interactiveFrameRequests!: Int64 = 0, resizeFrameRequests!: Int64 = 0, updatesPerFrame!: Int64 = 0, dirtyRectsBeforeMerge!: Int64 = 0, dirtyRectsAfterMerge!: Int64 = 0, firstInvalidationToFrameMillis!: Int64 = 0, lastUpdateToFrameMillis!: Int64 = 0, frameDelayDueToCoalescingMillis!: Int64 = 0, framesAvoided!: Int64 = 0 )
+core|ExternalPort.enableLatencyMeasurement|func|public func enableLatencyMeasurement(): Unit
+core|ExternalPort.size|func|public func size(): Int64
+core|ExternalPort.acceptedCount|func|public func acceptedCount(): Int64
+core|ExternalPort.fullCount|func|public func fullCount(): Int64
+core|ExternalPort.closedCount|func|public func closedCount(): Int64
+core|ExternalPort.wakeSignals|func|public func wakeSignals(): Int64
+core|ExternalPort.wakeCoalesced|func|public func wakeCoalesced(): Int64
+core|StyleState|enum|public enum StyleState {
+core|StyleState.Normal|enum_constructor|Normal
+core|StyleState.Focused|enum_constructor|Focused
+core|StyleState.Selected|enum_constructor|Selected
+core|StyleState.Disabled|enum_constructor|Disabled
+core|StyleState.Error|enum_constructor|Error
+core|StyleState.Accent|enum_constructor|Accent
+core|TerminalProbe|class|public class TerminalProbe {
+core|TerminalProbe.run|func|public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult
+core|LinuxTerminalDriver|class|public class LinuxTerminalDriver <: TerminalDriver {
+core|LinuxTerminalDriver.init|init|public init()
+core|LinuxTerminalDriver.name|func|public func name(): String
+core|LinuxTerminalDriver.enterRawMode|func|public func enterRawMode(): Bool
+core|LinuxTerminalDriver.restore|func|public func restore(): Unit
+core|LinuxTerminalDriver.size|func|public func size(): ?Rect
+core|LinuxTerminalDriver.capabilities|func|public func capabilities(backend: Backend): TerminalCapabilities
+core|FallbackTerminalDriver|class|public class FallbackTerminalDriver <: TerminalDriver {
+core|FallbackTerminalDriver.init|init|public init(area!: Rect = Rect(0, 0, 80, 24))
+core|FallbackTerminalDriver.name|func|public func name(): String
+core|FallbackTerminalDriver.enterRawMode|func|public func enterRawMode(): Bool
+core|FallbackTerminalDriver.restore|func|public func restore(): Unit
+core|FallbackTerminalDriver.size|func|public func size(): ?Rect
+core|FallbackTerminalDriver.capabilities|func|public func capabilities(backend: Backend): TerminalCapabilities
+core|MacOSTerminalDriver|class|public class MacOSTerminalDriver <: TerminalDriver {
+core|MacOSTerminalDriver.init|init|public init(area!: Rect = Rect(0, 0, 80, 24))
+core|MacOSTerminalDriver.name|func|public func name(): String
+core|MacOSTerminalDriver.enterRawMode|func|public func enterRawMode(): Bool
+core|MacOSTerminalDriver.restore|func|public func restore(): Unit
+core|MacOSTerminalDriver.size|func|public func size(): ?Rect
+core|MacOSTerminalDriver.capabilities|func|public func capabilities(backend: Backend): TerminalCapabilities
+core|MacOSTerminalDriver|class|public class MacOSTerminalDriver <: TerminalDriver {
+core|MacOSTerminalDriver.init|init|public init(area!: Rect = Rect(0, 0, 80, 24))
+core|MacOSTerminalDriver.name|func|public func name(): String
+core|MacOSTerminalDriver.enterRawMode|func|public func enterRawMode(): Bool
+core|MacOSTerminalDriver.restore|func|public func restore(): Unit
+core|MacOSTerminalDriver.size|func|public func size(): ?Rect
+core|MacOSTerminalDriver.capabilities|func|public func capabilities(backend: Backend): TerminalCapabilities
+core|WindowsTerminalDriver|class|public class WindowsTerminalDriver <: TerminalDriver {
+core|WindowsTerminalDriver.init|init|public init(area!: Rect = Rect(0, 0, 80, 24))
+core|WindowsTerminalDriver.name|func|public func name(): String
+core|WindowsTerminalDriver.enterRawMode|func|public func enterRawMode(): Bool
+core|WindowsTerminalDriver.restore|func|public func restore(): Unit
+core|WindowsTerminalDriver.size|func|public func size(): ?Rect
+core|WindowsTerminalDriver.capabilities|func|public func capabilities(backend: Backend): TerminalCapabilities
+core|WindowsTerminalDriver|class|public class WindowsTerminalDriver <: TerminalDriver {
+core|WindowsTerminalDriver.init|init|public init(area!: Rect = Rect(0, 0, 80, 24))
+core|WindowsTerminalDriver.name|func|public func name(): String
+core|WindowsTerminalDriver.enterRawMode|func|public func enterRawMode(): Bool
+core|WindowsTerminalDriver.restore|func|public func restore(): Unit
+core|WindowsTerminalDriver.size|func|public func size(): ?Rect
+core|WindowsTerminalDriver.capabilities|func|public func capabilities(backend: Backend): TerminalCapabilities
+core|DebugOverlay|class|public class DebugOverlay <: Widget {
+core|DebugOverlay.init|init|public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+core|DebugOverlay.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|VirtualTranscriptSource|interface|public interface VirtualTranscriptSource {
+core|VirtualTranscriptSource.size|func|func size(): Int64
+core|VirtualTranscriptSource.generation|func|func generation(): Int64
+core|VirtualTranscriptSource.itemId|func|func itemId(index: Int64): String
+core|VirtualTranscriptSource.itemTitle|func|func itemTitle(_: Int64): String
+core|VirtualTranscriptSource.itemUsesCardChrome|func|func itemUsesCardChrome(_: Int64): Bool
+core|VirtualTranscriptSource.itemTitleForWidth|func|func itemTitleForWidth(index: Int64, width: Int64): String
+core|VirtualTranscriptSource.itemFooter|func|func itemFooter(_: Int64): String
+core|VirtualTranscriptSource.itemUsesCompactCardChrome|func|func itemUsesCompactCardChrome(_: Int64): Bool
+core|VirtualTranscriptSource.revision|func|func revision(index: Int64): Int64
+core|VirtualTranscriptSource.itemAppendOnlyText|func|func itemAppendOnlyText( _: Int64, _: Int64, _: String ): ?VirtualTranscriptAppendOnlyText
+core|VirtualTranscriptSource.document|func|func document(index: Int64, width: Int64, themeKey: String): Document
+core|VirtualTranscriptSource.itemCardTheme|func|func itemCardTheme(_: Int64): ?TranscriptCardTheme
+core|VirtualTranscriptState|class|public class VirtualTranscriptState {
+core|VirtualTranscriptState.scrollTop|var|public var scrollTop: Int64
+core|VirtualTranscriptState.followBottom|var|public var followBottom: Bool
+core|VirtualTranscriptState.anchorId|var|public var anchorId: String
+core|VirtualTranscriptState.anchorRow|var|public var anchorRow: Int64
+core|VirtualTranscriptState.init|init|public init( scrollTop!: Int64 = 0, followBottom!: Bool = true, anchorId!: String = "", anchorRow!: Int64 = 0 )
+core|VirtualTranscriptState.scrollBy|func|public func scrollBy(delta: Int64, totalRows: Int64, viewportRows: Int64): Unit
+core|VirtualTranscriptState.home|func|public func home(): Unit
+core|VirtualTranscriptState.end|func|public func end(totalRows: Int64, viewportRows: Int64): Unit
+core|VirtualTranscriptMetrics|class|public class VirtualTranscriptMetrics {
+core|VirtualTranscriptMetrics.materialized|let|public let materialized: Int64
+core|VirtualTranscriptMetrics.cacheEntries|let|public let cacheEntries: Int64
+core|VirtualTranscriptMetrics.measuredEntries|let|public let measuredEntries: Int64
+core|VirtualTranscriptMetrics.cachedRows|let|public let cachedRows: Int64
+core|VirtualTranscriptMetrics.appendOnlyFullLayouts|let|public let appendOnlyFullLayouts: Int64
+core|VirtualTranscriptMetrics.appendOnlyIncrementalLayouts|let|public let appendOnlyIncrementalLayouts: Int64
+core|VirtualTranscriptMetrics.appendOnlyRewrappedBytes|let|public let appendOnlyRewrappedBytes: Int64
+core|VirtualTranscriptMetrics.syncCountCalls|let|public let syncCountCalls: Int64
+core|VirtualTranscriptMetrics.metadataTouches|let|public let metadataTouches: Int64
+core|VirtualTranscriptMetrics.heightIndexResetEntries|let|public let heightIndexResetEntries: Int64
+core|VirtualTranscriptMetrics.heightIndexUpdateCalls|let|public let heightIndexUpdateCalls: Int64
+core|VirtualTranscriptMetrics.heightIndexNodesTouched|let|public let heightIndexNodesTouched: Int64
+core|VirtualTranscriptMetrics.heightIndexGrowOperations|let|public let heightIndexGrowOperations: Int64
+core|VirtualTranscriptMetrics.heightMetadataEntries|let|public let heightMetadataEntries: Int64
+core|VirtualTranscriptMetrics.heightIndexNodes|let|public let heightIndexNodes: Int64
+core|VirtualTranscriptMetrics.cacheLookups|let|public let cacheLookups: Int64
+core|VirtualTranscriptMetrics.cacheHits|let|public let cacheHits: Int64
+core|VirtualTranscriptMetrics.cacheMisses|let|public let cacheMisses: Int64
+core|VirtualTranscriptMetrics.layoutCalls|let|public let layoutCalls: Int64
+core|VirtualTranscriptMetrics.documentRequests|let|public let documentRequests: Int64
+core|VirtualTranscriptMetrics.documentsMaterialized|let|public let documentsMaterialized: Int64
+core|VirtualTranscriptMetrics.wrapInputBytes|let|public let wrapInputBytes: Int64
+core|VirtualTranscriptMetrics.measurementInvalidations|let|public let measurementInvalidations: Int64
+core|VirtualTranscriptMetrics.measurementGenerationBumps|let|public let measurementGenerationBumps: Int64
+core|VirtualTranscriptMetrics.staleEntriesEncountered|let|public let staleEntriesEncountered: Int64
+core|VirtualTranscriptMetrics.entriesRemeasured|let|public let entriesRemeasured: Int64
+core|VirtualTranscriptMetrics.estimateCorrections|let|public let estimateCorrections: Int64
+core|VirtualTranscriptMetrics.anchorCorrections|let|public let anchorCorrections: Int64
+core|VirtualTranscriptMetrics.visibleItems|let|public let visibleItems: Int64
+core|VirtualTranscriptMetrics.itemsVisited|let|public let itemsVisited: Int64
+core|VirtualTranscriptMetrics.itemsPainted|let|public let itemsPainted: Int64
+core|VirtualTranscriptMetrics.rowsVisited|let|public let rowsVisited: Int64
+core|VirtualTranscriptMetrics.rowsPainted|let|public let rowsPainted: Int64
+core|VirtualTranscriptMetrics.changedItems|let|public let changedItems: Int64
+core|VirtualTranscriptMetrics.itemPaintCellAttempts|let|public let itemPaintCellAttempts: Int64
+core|VirtualTranscriptMetrics.rowPaintCellAttempts|let|public let rowPaintCellAttempts: Int64
+core|VirtualTranscriptMetrics.itemBackgroundCellAttempts|let|public let itemBackgroundCellAttempts: Int64
+core|VirtualTranscriptMetrics.contentCellAttempts|let|public let contentCellAttempts: Int64
+core|VirtualTranscriptMetrics.layoutRowsRequested|let|public let layoutRowsRequested: Int64
+core|VirtualTranscriptMetrics.cachedRowsUsed|let|public let cachedRowsUsed: Int64
+core|VirtualTranscriptMetrics.selectiveItemInvalidations|let|public let selectiveItemInvalidations: Int64
+core|VirtualTranscriptMetrics.selectiveOffscreenInvalidations|let|public let selectiveOffscreenInvalidations: Int64
+core|VirtualTranscriptMetrics.fallbackFullViewportPaints|let|public let fallbackFullViewportPaints: Int64
+core|VirtualTranscriptMetrics.init|init|public init( materialized: Int64, cacheEntries: Int64, measuredEntries: Int64, cachedRows: Int64, appendOnlyFullLayouts!: Int64 = 0, appendOnlyIncrementalLayouts!: Int64 = 0, appendOnlyRewrappedBytes!: Int64 = 0, syncCountCalls!: Int64 = 0, metadataTouches!: Int64 = 0, heightIndexResetEntries!: Int64 = 0, heightIndexUpdateCalls!: Int64 = 0, heightIndexNodesTouched!: Int64 = 0, heightIndexGrowOperations!: Int64 = 0, heightMetadataEntries!: Int64 = 0, heightIndexNodes!: Int64 = 0, cacheLookups!: Int64 = 0, cacheHits!: Int64 = 0, cacheMisses!: Int64 = 0, layoutCalls!: Int64 = 0, documentRequests!: Int64 = 0, documentsMaterialized!: Int64 = 0, wrapInputBytes!: Int64 = 0, measurementInvalidations!: Int64 = 0, measurementGenerationBumps!: Int64 = 0, staleEntriesEncountered!: Int64 = 0, entriesRemeasured!: Int64 = 0, estimateCorrections!: Int64 = 0, anchorCorrections!: Int64 = 0, visibleItems!: Int64 = 0, itemsVisited!: Int64 = 0, itemsPainted!: Int64 = 0, rowsVisited!: Int64 = 0, rowsPainted!: Int64 = 0, changedItems!: Int64 = 0, itemPaintCellAttempts!: Int64 = 0, rowPaintCellAttempts!: Int64 = 0, itemBackgroundCellAttempts!: Int64 = 0, contentCellAttempts!: Int64 = 0, layoutRowsRequested!: Int64 = 0, cachedRowsUsed!: Int64 = 0, selectiveItemInvalidations!: Int64 = 0, selectiveOffscreenInvalidations!: Int64 = 0, fallbackFullViewportPaints!: Int64 = 0 )
+core|VirtualTranscriptView|class|public class VirtualTranscriptView <: Widget {
+core|VirtualTranscriptView.state|let|public let state: VirtualTranscriptState
+core|VirtualTranscriptView.lastVisibleRanges|let|public let lastVisibleRanges = ArrayList<VisibleRange>()
+core|VirtualTranscriptView.init|init|public init( source: VirtualTranscriptSource, state!: VirtualTranscriptState = VirtualTranscriptState(), themeKey!: String = "default", overscanViewports!: Int64 = 2, backgroundBatch!: Int64 = 0, instrumentationEnabled!: Bool = false )
+core|VirtualTranscriptView.setThemeKey|func|public func setThemeKey(value: String): Unit
+core|VirtualTranscriptView.setCardChrome|func|public func setCardChrome(enabled: Bool): Unit
+core|VirtualTranscriptView.setUnicode|func|public func setUnicode(enabled: Bool): Unit
+core|VirtualTranscriptView.setCardTheme|func|public func setCardTheme(theme: TranscriptCardTheme): Unit
+core|VirtualTranscriptView.invalidateItem|func|public func invalidateItem(id: String): Bool
+core|VirtualTranscriptView.totalRows|func|public func totalRows(): Int64
+core|VirtualTranscriptView.materializedCount|func|public func materializedCount(): Int64
+core|VirtualTranscriptView.metrics|func|public func metrics(): VirtualTranscriptMetrics
+core|VirtualTranscriptView.dirtyRectForItemRevision|func|public func dirtyRectForItemRevision(id: String): ?Rect
+core|VirtualTranscriptView.handle|func|public func handle(key: KeyEvent): Bool
+core|VirtualTranscriptView.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Sparkline|class|public class Sparkline <: Widget {
+core|Sparkline.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
+core|Sparkline.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Gauge|class|public class Gauge <: Widget {
+core|Gauge.init|init|public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )
+core|Gauge.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Chart|class|public class Chart <: Widget {
+core|Chart.init|init|public init(values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan))
+core|Chart.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|LogView|class|public class LogView <: Widget {
+core|LogView.offset|var|public var offset: Int64
+core|LogView.init|init|public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
+core|LogView.render|func|public func render(area: Rect, buffer: Buffer): Unit
+diff|DiffLineKind|enum|public enum DiffLineKind {
+diff|DiffLineKind.Context|enum_constructor|Context
+diff|DiffLineKind.Add|enum_constructor|Add
+diff|DiffLineKind.Delete|enum_constructor|Delete
+diff|DiffLineKind.Header|enum_constructor|Header
+diff|DiffLine|class|public class DiffLine {
+diff|DiffLine.kind|let|public let kind: DiffLineKind
+diff|DiffLine.text|let|public let text: String
+diff|DiffLine.oldLine|let|public let oldLine: ?Int64
+diff|DiffLine.newLine|let|public let newLine: ?Int64
+diff|DiffLine.init|init|public init(kind: DiffLineKind, text: String, oldLine!: ?Int64 = None, newLine!: ?Int64 = None)
+diff|DiffHunk|class|public class DiffHunk {
+diff|DiffHunk.header|let|public let header: String
+diff|DiffHunk.lines|let|public let lines: Array<DiffLine>
+diff|DiffHunk.collapsed|var|public var collapsed: Bool
+diff|DiffHunk.init|init|public init(header: String, lines!: Array<DiffLine> = [], collapsed!: Bool = false)
+diff|DiffFile|class|public class DiffFile {
+diff|DiffFile.oldPath|let|public let oldPath: String
+diff|DiffFile.newPath|let|public let newPath: String
+diff|DiffFile.hunks|let|public let hunks: Array<DiffHunk>
+diff|DiffFile.init|init|public init(oldPath: String, newPath: String, hunks!: Array<DiffHunk> = [])
+diff|DiffFile.addedLines|func|public func addedLines(): Int64
+diff|DiffFile.deletedLines|func|public func deletedLines(): Int64
+diff|DiffDocument|class|public class DiffDocument {
+diff|DiffDocument.files|let|public let files: Array<DiffFile>
+diff|DiffDocument.init|init|public init(files: Array<DiffFile>)
+diff|DiffDocument.addedLines|func|public func addedLines(): Int64
+diff|DiffDocument.deletedLines|func|public func deletedLines(): Int64
+diff|parseUnifiedDiff|func|public func parseUnifiedDiff(text: String): DiffDocument
+diff|DiffView|class|public class DiffView <: Widget {
+diff|DiffView.selectedFile|var|public var selectedFile: Int64
+diff|DiffView.selectedLine|var|public var selectedLine: Int64
+diff|DiffView.offset|var|public var offset: Int64
+diff|DiffView.init|init|public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, sideBySide!: Bool = false)
+diff|DiffView.render|func|public func render(area: Rect, buffer: Buffer): Unit
+game|EntityId|struct|public struct EntityId <: Equatable<EntityId> {
+game|EntityId.value|let|public let value: Int64
+game|EntityId.init|init|public init(value: Int64)
+game|EntityId.operator_==|operator|public operator func ==(other: EntityId): Bool
+game|EntityWorld|class|public class EntityWorld {
+game|EntityWorld.init|init|public init()
+game|EntityWorld.create|func|public func create(): EntityId
+game|EntityWorld.destroy|func|public func destroy(id: EntityId): Bool
+game|EntityWorld.isAlive|func|public func isAlive(id: EntityId): Bool
+game|EntityWorld.entities|func|public func entities(): Array<EntityId>
+game|EntityWorld.frame|func|public func frame(): Int64
+game|EntityWorld.advanceFrame|func|public func advanceFrame(): Int64
+game|ComponentStore|class|public class ComponentStore<T> {
+game|ComponentStore.init|init|public init()
+game|ComponentStore.insert|func|public func insert(id: EntityId, value: T): Unit
+game|ComponentStore.remove|func|public func remove(id: EntityId): Bool
+game|ComponentStore.has|func|public func has(id: EntityId): Bool
+game|ComponentStore.get|func|public func get(id: EntityId): ?T
+game|ComponentStore.set|func|public func set(id: EntityId, value: T): Bool
+game|ComponentStore.entities|func|public func entities(): Array<EntityId>
+game|ComponentStore.size|func|public func size(): Int64
+game|ComponentStore.clearDead|func|public func clearDead(world: EntityWorld): Unit
+game|Vec2|struct|public struct Vec2 <: Equatable<Vec2> {
+game|Vec2.x|var|public var x: Float64
+game|Vec2.y|var|public var y: Float64
+game|Vec2.init|init|public init(x!: Float64 = 0.0, y!: Float64 = 0.0)
+game|Vec2.operator_==|operator|public operator func ==(other: Vec2): Bool
+game|Vec2.plus|func|public func plus(other: Vec2): Vec2
+game|Vec2.minus|func|public func minus(other: Vec2): Vec2
+game|Vec2.scale|func|public func scale(value: Float64): Vec2
+game|Aabb|struct|public struct Aabb <: Equatable<Aabb> {
+game|Aabb.x|var|public var x: Float64
+game|Aabb.y|var|public var y: Float64
+game|Aabb.width|var|public var width: Float64
+game|Aabb.height|var|public var height: Float64
+game|Aabb.init|init|public init(x!: Float64 = 0.0, y!: Float64 = 0.0, width!: Float64 = 0.0, height!: Float64 = 0.0)
+game|Aabb.operator_==|operator|public operator func ==(other: Aabb): Bool
+game|Aabb.right|prop|public prop right: Float64 { get() { x + width } }
+game|Aabb.bottom|prop|public prop bottom: Float64 { get() { y + height } }
+game|Aabb.moved|func|public func moved(delta: Vec2): Aabb
+game|Aabb.overlaps|func|public func overlaps(other: Aabb): Bool
+game|Transform2D|struct|public struct Transform2D {
+game|Transform2D.position|var|public var position: Vec2
+game|Transform2D.size|var|public var size: Vec2
+game|Transform2D.init|init|public init(position!: Vec2 = Vec2(), size!: Vec2 = Vec2(x: 1.0, y: 1.0))
+game|Transform2D.bounds|func|public func bounds(): Aabb
+game|Velocity2D|struct|public struct Velocity2D {
+game|Velocity2D.value|var|public var value: Vec2
+game|Velocity2D.init|init|public init(value!: Vec2 = Vec2())
+game|Sprite2D|struct|public struct Sprite2D {
+game|Sprite2D.rows|let|public let rows: Array<String>
+game|Sprite2D.style|let|public let style: Style
+game|Sprite2D.transparent|let|public let transparent: String
+game|Sprite2D.init|init|public init(rows: Array<String>, style!: Style = Style.default(), transparent!: String = " ")
+game|SpriteFrame|struct|public struct SpriteFrame {
+game|SpriteFrame.sprite|let|public let sprite: Sprite2D
+game|SpriteFrame.durationMillis|let|public let durationMillis: Int64
+game|SpriteFrame.init|init|public init(sprite: Sprite2D, durationMillis!: Int64 = 120)
+game|SpriteAnimation|class|public class SpriteAnimation {
+game|SpriteAnimation.init|init|public init(frames: Array<SpriteFrame>, loop!: Bool = true)
+game|SpriteAnimation.reset|func|public func reset(): Unit
+game|SpriteAnimation.advance|func|public func advance(deltaMillis: Int64): Sprite2D
+game|SpriteAnimation.current|func|public func current(): Sprite2D
+game|Camera2D|struct|public struct Camera2D {
+game|Camera2D.origin|var|public var origin: Vec2
+game|Camera2D.viewport|var|public var viewport: Rect
+game|Camera2D.init|init|public init(origin!: Vec2 = Vec2(), viewport!: Rect = Rect(0, 0, 80, 24))
+game|ColliderKind|enum|public enum ColliderKind {
+game|ColliderKind.Solid|enum_constructor|Solid
+game|ColliderKind.Sensor|enum_constructor|Sensor
+game|Collider2D|struct|public struct Collider2D {
+game|Collider2D.kind|let|public let kind: ColliderKind
+game|Collider2D.bounds|let|public let bounds: Aabb
+game|Collider2D.layer|let|public let layer: Int64
+game|Collider2D.mask|let|public let mask: Int64
+game|Collider2D.init|init|public init(kind!: ColliderKind = ColliderKind.Solid, bounds!: Aabb = Aabb(width: 1.0, height: 1.0), layer!: Int64 = 1, mask!: Int64 = Int64.Max)
+game|BodyType|enum|public enum BodyType {
+game|BodyType.Static|enum_constructor|Static
+game|BodyType.Kinematic|enum_constructor|Kinematic
+game|BodyType.Dynamic|enum_constructor|Dynamic
+game|RigidBody2D|struct|public struct RigidBody2D {
+game|RigidBody2D.bodyType|let|public let bodyType: BodyType
+game|RigidBody2D.mass|let|public let mass: Float64
+game|RigidBody2D.gravityScale|let|public let gravityScale: Float64
+game|RigidBody2D.damping|let|public let damping: Float64
+game|RigidBody2D.init|init|public init(bodyType!: BodyType = BodyType.Dynamic, mass!: Float64 = 1.0, gravityScale!: Float64 = 1.0, damping!: Float64 = 0.0)
+game|CollisionEvent|struct|public struct CollisionEvent {
+game|CollisionEvent.entity|let|public let entity: EntityId
+game|CollisionEvent.other|let|public let other: EntityId
+game|CollisionEvent.normal|let|public let normal: Vec2
+game|CollisionEvent.time|let|public let time: Float64
+game|CollisionEvent.hitX|let|public let hitX: Float64
+game|CollisionEvent.hitY|let|public let hitY: Float64
+game|CollisionEvent.init|init|public init(entity: EntityId, other: EntityId, normal: Vec2, time: Float64, hitX: Float64, hitY: Float64)
+game|TileMarker|struct|public struct TileMarker <: Equatable<TileMarker> {
+game|TileMarker.x|let|public let x: Int64
+game|TileMarker.y|let|public let y: Int64
+game|TileMarker.symbol|let|public let symbol: String
+game|TileMarker.init|init|public init(x: Int64, y: Int64, symbol: String)
+game|TileMarker.operator_==|operator|public operator func ==(other: TileMarker): Bool
+game|PhysicsWorld|class|public class PhysicsWorld {
+game|PhysicsWorld.gravity|var|public var gravity: Vec2
+game|PhysicsWorld.maxSubSteps|var|public var maxSubSteps: Int64
+game|PhysicsWorld.skin|var|public var skin: Float64
+game|PhysicsWorld.init|init|public init(gravity!: Vec2 = Vec2(x: 0.0, y: 30.0), maxSubSteps!: Int64 = 4, skin!: Float64 = 0.001)
+game|PhysicsWorld.step|func|public func step( world: EntityWorld, transforms: ComponentStore<Transform2D>, velocities: ComponentStore<Velocity2D>, colliders: ComponentStore<Collider2D>, bodies: ComponentStore<RigidBody2D>, deltaMillis: Int64 ): Array<CollisionEvent>
+game|PhysicsWorld.overlaps|func|public func overlaps( world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>, id: EntityId ): Array<CollisionEvent>
+game|GameInputState|class|public class GameInputState {
+game|GameInputState.init|init|public init()
+game|GameInputState.beginFrame|func|public func beginFrame(): Unit
+game|GameInputState.handle|func|public func handle(event: Event): Unit
+game|GameInputState.pressed|func|public func pressed(code: KeyCode): Bool
+game|GameInputState.justPressed|func|public func justPressed(code: KeyCode): Bool
+game|GameInputState.axis|func|public func axis(negative: KeyCode, positive: KeyCode): Int64
+game|SpriteRenderer|class|public class SpriteRenderer {
+game|SpriteRenderer.init|init|public init()
+game|SpriteRenderer.render|func|public func render( area: Rect, buffer: Buffer, transforms: ComponentStore<Transform2D>, sprites: ComponentStore<Sprite2D>, camera!: Camera2D = Camera2D() ): Unit
+game|SpriteRenderer.drawSprite|func|public func drawSprite(canvas: Canvas, transform: Transform2D, sprite: Sprite2D, camera: Camera2D): Unit
+game|TileMap|class|public class TileMap {
+game|TileMap.width|let|public let width: Int64
+game|TileMap.height|let|public let height: Int64
+game|TileMap.init|init|public init(rows: Array<String>, solidSymbol!: String = "#")
+game|TileMap.isSolid|func|public func isSolid(x: Int64, y: Int64): Bool
+game|TileMap.tileAt|func|public func tileAt(x: Int64, y: Int64): String
+game|TileMap.find|func|public func find(symbol: String): Array<TileMarker>
+game|TileMap.findAny|func|public func findAny(symbols: Array<String>): Array<TileMarker>
+game|TileMap.addStaticColliders|func|public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
+game|TileMap.render|func|public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style = Style(fg: Color.White)): Unit
+media|MediaDecodeRequest|class|public class MediaDecodeRequest {
+media|MediaDecodeRequest.source|let|public let source: MediaSource
+media|MediaDecodeRequest.area|let|public let area: Rect
+media|MediaDecodeRequest.protocol|let|public let protocol: MediaProtocol
+media|MediaDecodeRequest.frameIndex|let|public let frameIndex: Int64
+media|MediaDecodeRequest.init|init|public init(source: MediaSource, area: Rect, protocol: MediaProtocol, frameIndex!: Int64 = 0)
+media|MediaAdapter|interface|public interface MediaAdapter {
+media|MediaAdapter.decode|func|func decode(request: MediaDecodeRequest): MediaFrameData
+media|FallbackMediaAdapter|class|public class FallbackMediaAdapter <: MediaAdapter {
+media|FallbackMediaAdapter.init|init|public init()
+media|FallbackMediaAdapter.decode|func|public func decode(request: MediaDecodeRequest): MediaFrameData
+media|ExternalMediaAdapter|class|public class ExternalMediaAdapter <: MediaAdapter {
+media|ExternalMediaAdapter.init|init|public init(magick!: String = "magick", ffmpeg!: String = "ffmpeg", sixelEncoder!: String = "img2sixel")
+media|ExternalMediaAdapter.decode|func|public func decode(request: MediaDecodeRequest): MediaFrameData
+media|ExternalMediaAdapter.commandFor|func|public func commandFor(request: MediaDecodeRequest): String
+media|AsciiRenderMode|enum|public enum AsciiRenderMode {
+media|AsciiRenderMode.Ascii|enum_constructor|Ascii
+media|AsciiRenderMode.HalfBlock|enum_constructor|HalfBlock
+media|AsciiRenderMode.Braille|enum_constructor|Braille
+media|AsciiRenderOptions|struct|public struct AsciiRenderOptions {
+media|AsciiRenderOptions.width|let|public let width: Int64
+media|AsciiRenderOptions.height|let|public let height: Int64
+media|AsciiRenderOptions.fps|let|public let fps: Int64
+media|AsciiRenderOptions.ramp|let|public let ramp: String
+media|AsciiRenderOptions.invert|let|public let invert: Bool
+media|AsciiRenderOptions.alphaThreshold|let|public let alphaThreshold: Int64
+media|AsciiRenderOptions.mode|let|public let mode: AsciiRenderMode
+media|AsciiRenderOptions.color|let|public let color: Bool
+media|AsciiRenderOptions.binaryThreshold|let|public let binaryThreshold: Int64
+media|AsciiRenderOptions.init|init|public init( width!: Int64 = 80, height!: Int64 = 32, fps!: Int64 = 12, ramp!: String = " .:-=+*#%@", invert!: Bool = false, alphaThreshold!: Int64 = 16, mode!: AsciiRenderMode = AsciiRenderMode.Ascii, color!: Bool = false, binaryThreshold!: Int64 = 128 )
+media|AsciiRenderOptions.frameMillis|func|public func frameMillis(): Int64
+media|AsciiRenderOptions.sampleWidth|func|public func sampleWidth(): Int64
+media|AsciiRenderOptions.sampleHeight|func|public func sampleHeight(): Int64
+media|AsciiFrame|struct|public struct AsciiFrame {
+media|AsciiFrame.lines|let|public let lines: Array<String>
+media|AsciiFrame.colors|let|public let colors: Array<Array<Color>>
+media|AsciiFrame.durationMillis|let|public let durationMillis: Int64
+media|AsciiFrame.init|init|public init(lines: Array<String>, durationMillis!: Int64 = 83, colors!: Array<Array<Color>> = [])
+media|AsciiFrame.text|func|public func text(): String
+media|AsciiFrame.hasColors|func|public func hasColors(): Bool
+media|AsciiFrame.colorAt|func|public func colorAt(row: Int64, column: Int64): Color
+media|AsciiAnimation|class|public class AsciiAnimation {
+media|AsciiAnimation.init|init|public init(frames: Array<AsciiFrame>)
+media|AsciiAnimation.frameCount|func|public func frameCount(): Int64
+media|AsciiAnimation.isEmpty|func|public func isEmpty(): Bool
+media|AsciiAnimation.totalDurationMillis|func|public func totalDurationMillis(): Int64
+media|AsciiAnimation.frameAtIndex|func|public func frameAtIndex(index: Int64): AsciiFrame
+media|AsciiAnimation.frameAtElapsed|func|public func frameAtElapsed(elapsedMillis: Int64): AsciiFrame
+media|AsciiAnimationDecoder|interface|public interface AsciiAnimationDecoder {
+media|AsciiAnimationDecoder.decode|func|func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
+media|FfmpegAsciiAnimationDecoder|class|public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {
+media|FfmpegAsciiAnimationDecoder.init|init|public init(ffmpeg!: String = "ffmpeg")
+media|FfmpegAsciiAnimationDecoder.decode|func|public func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
+media|FfmpegAsciiAnimationDecoder.commandFor|func|public func commandFor(source: MediaSource, options: AsciiRenderOptions): String
+media|AsciiAnimationView|class|public class AsciiAnimationView <: Widget {
+media|AsciiAnimationView.init|init|public init( animation: AsciiAnimation, elapsedMillis!: Int64 = 0, zoom!: Int64 = 1, paused!: Bool = false, block!: ?Block = None, style!: Style = Style(fg: Color.White), pausedStyle!: Style = Style(fg: Color.Yellow) )
+media|AsciiAnimationView.render|func|public func render(area: Rect, buffer: Buffer): Unit
+media|rgbaToAsciiFrame|func|public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame
+media|preferredMediaProtocol|func|public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol
+media|mediaPlacementWithAdapter|func|public func mediaPlacementWithAdapter( id: String, source: MediaSource, area: Rect, caps: TerminalCapabilities, adapter!: MediaAdapter = FallbackMediaAdapter(), fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0 ): MediaPlacement
+terminal|AnsiTokenKind|enum|public enum AnsiTokenKind {
+terminal|AnsiTokenKind.Text|enum_constructor|Text
+terminal|AnsiTokenKind.Sgr|enum_constructor|Sgr
+terminal|AnsiTokenKind.Cursor|enum_constructor|Cursor
+terminal|AnsiTokenKind.Erase|enum_constructor|Erase
+terminal|AnsiTokenKind.Control|enum_constructor|Control
+terminal|AnsiToken|class|public class AnsiToken {
+terminal|AnsiToken.kind|let|public let kind: AnsiTokenKind
+terminal|AnsiToken.text|let|public let text: String
+terminal|AnsiToken.init|init|public init(kind: AnsiTokenKind, text!: String = "")
+terminal|parseAnsi|func|public func parseAnsi(text: String): Array<AnsiToken>
+terminal|TerminalScreen|class|public class TerminalScreen {
+terminal|TerminalScreen.cols|let|public let cols: Int64
+terminal|TerminalScreen.rows|let|public let rows: Int64
+terminal|TerminalScreen.init|init|public init(cols!: Int64 = 80, rows!: Int64 = 24)
+terminal|TerminalScreen.cell|func|public func cell(x: Int64, y: Int64): Cell
+terminal|TerminalScreen.lineText|func|public func lineText(y: Int64): String
+terminal|TerminalScreen.feed|func|public func feed(text: String): Unit
+terminal|TerminalScreen.render|func|public func render(area: Rect, target: Buffer): Unit
+terminal|TerminalTranscript|class|public class TerminalTranscript {
+terminal|TerminalTranscript.screen|let|public let screen: TerminalScreen
+terminal|TerminalTranscript.maxChunks|let|public let maxChunks: Int64
+terminal|TerminalTranscript.followTail|var|public var followTail: Bool
+terminal|TerminalTranscript.init|init|public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true)
+terminal|TerminalTranscript.append|func|public func append(text: String): Unit
+terminal|TerminalTranscript.chunkCount|func|public func chunkCount(): Int64
+terminal|TerminalView|class|public class TerminalView <: Widget {
+terminal|TerminalView.init|init|public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "")
+terminal|TerminalView.render|func|public func render(area: Rect, buffer: Buffer): Unit

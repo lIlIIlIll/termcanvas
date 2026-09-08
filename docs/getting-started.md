@@ -2,20 +2,52 @@
 
 ## Hello TUI
 
-Create an app with a render function and an update function:
+Keep canonical state in an application object. Its update function is the only
+owner that applies events and command completions; its render function paints the
+current state with immediate widgets:
 
 ```cj
-let app = App(rawMode: false, alternateScreen: false, hideCursor: false)
-app.run(
-    { frame => frame.renderWidget(Paragraph("hello", block: Block(title: "cjtui")), frame.area) },
-    { event =>
+package hello_cjtui
+
+import core.*
+
+class HelloApp {
+    var count: Int64 = 0
+
+    func update(event: Event): UpdateResult {
         match (event) {
-            case Event.KeyDown(KeyEvent(KeyCode.CtrlC, _)) => ControlFlow.Exit
-            case _ => ControlFlow.Continue
+            case Event.KeyDown(key) => match (key.code) {
+                case KeyCode.CtrlC | KeyCode.Char(r'q') => UpdateResult.exit()
+                case KeyCode.Char(r'+') => UpdateResult.withCommand(Command.Message("inc"))
+                case _ => UpdateResult.next()
+            }
+            case Event.Message("inc") =>
+                count++
+                UpdateResult.next()
+            case _ => UpdateResult.next()
         }
     }
-)
+
+    func render(frame: Frame): Unit {
+        frame.renderWidget(
+            Paragraph("count: ${count}\n+: increment\nq/Ctrl-C: quit", block: Block(title: "cjtui")),
+            frame.area
+        )
+    }
+}
+
+main(): Int64 {
+    let app = HelloApp()
+    App(targetFps: 10).runWithCommands(
+        { frame => app.render(frame) },
+        { event => app.update(event) }
+    )
+    0
+}
 ```
+
+The repository's `templates/basic_app` contains this same stable API shape as a
+runnable project and is built by the official template check.
 
 ## Widgets And Layout
 
@@ -30,10 +62,13 @@ Common first widgets:
 
 ## Runtime Commands
 
-Use `App.runWithCommands()` when updates need side effects. Return `UpdateResult.withCommand(...)` from the update function.
+Use `App.runWithCommands()` when updates need side effects. Return
+`UpdateResult.withCommand(...)` from the update function; the runtime executes
+accepted work in order and delivers results back through update.
 
 - Use `Command.Message` for internal actions.
-- Use `Command.AsyncTask` for background work.
+- Use `Command.AsyncTask` for background work. Workers return immutable results;
+  apply them to state only from update.
 - Use `Command.AsyncExec` for background process execution.
 - Use `Command.StartTimer(TimerSpec(...))` for one-shot or repeating real-time timers.
 - Keep `Command.Exec` for short synchronous commands only.

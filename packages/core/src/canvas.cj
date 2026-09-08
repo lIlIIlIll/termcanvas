@@ -95,9 +95,25 @@ public class Canvas {
     public func fillRect(area: Rect, style: Style): Unit {
         let target = intersect(clip, Rect(area.x + dx, area.y + dy, area.width, area.height))
         if (target.width <= 0 || target.height <= 0) { return }
-        for (y in target.y..target.bottom) {
-            buffer.setString(target.x, y, repeat(" ", target.width), style: style)
-        }
+        buffer.fillRect(target, style: style)
+    }
+
+    public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit {
+        fillRect(Rect(x, y, width, height), style)
+    }
+
+    public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit {
+        if (width <= 0) { return }
+        let target = intersect(clip, Rect(x + dx, y + dy, width, 1))
+        if (target.width <= 0) { return }
+        buffer.hline(target.x, target.y, target.width, symbol, style)
+    }
+
+    public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit {
+        if (height <= 0) { return }
+        let target = intersect(clip, Rect(x + dx, y + dy, 1, height))
+        if (target.height <= 0) { return }
+        buffer.vline(target.x, target.y, target.height, symbol, style)
     }
 
     public func strokeRect(area: Rect, style: Style, horizontal!: String = "-", vertical!: String = "|", corner!: String = "+"): Unit {
@@ -139,28 +155,70 @@ public class Canvas {
         let tx = x + dx
         let ty = y + dy
         if (ty < clip.y || ty >= clip.bottom || tx >= clip.right) { return }
+        let bytes = unsafe { text.rawData() }
+        if (isPrintableAscii(bytes)) {
+            drawAsciiText(tx, ty, text, bytes, style)
+            return
+        }
         if (tx >= clip.x) {
             buffer.setString(tx, ty, truncate(text, clip.right - tx), style: style)
         } else {
-            var dropped: Int64 = 0
+            let hiddenWidth = clip.x - tx
+            var droppedWidth: Int64 = 0
             var byteOffset: Int64 = 0
-            for (r in text.runes()) {
-                let w = displayWidth(r)
-                if (dropped + w <= clip.x - tx) {
-                    dropped += w
-                    byteOffset += r.toString().size
+            for (cluster in graphemeClusters(text)) {
+                if (droppedWidth + cluster.width <= hiddenWidth) {
+                    droppedWidth += cluster.width
+                    byteOffset = cluster.endOffset
+                } else {
+                    // A terminal grapheme is atomic. If it crosses the left
+                    // clip edge, omit it without shifting following text.
+                    if (droppedWidth < hiddenWidth) {
+                        droppedWidth += cluster.width
+                        byteOffset = cluster.endOffset
+                    }
+                    break
                 }
             }
-            if (byteOffset < text.size) {
-                buffer.setString(clip.x, ty, truncate(text[byteOffset..], clip.width), style: style)
+            let drawX = tx + droppedWidth
+            if (byteOffset < text.size && drawX < clip.right) {
+                buffer.setString(drawX, ty, truncate(text[byteOffset..], clip.right - drawX), style: style)
             }
         }
+    }
+
+    private func drawAsciiText(tx: Int64, ty: Int64, text: String, bytes: Array<UInt8>, style: Style): Unit {
+        if (bytes.size == 0) { return }
+        var startOffset: Int64 = 0
+        var drawX = tx
+        if (drawX < clip.x) {
+            startOffset = clip.x - drawX
+            drawX = clip.x
+        }
+        if (startOffset >= bytes.size || drawX >= clip.right) { return }
+        let maxBytes = min(bytes.size - startOffset, clip.right - drawX)
+        if (maxBytes <= 0) { return }
+        let out = if (startOffset == 0 && maxBytes == bytes.size) {
+            text
+        } else {
+            text[startOffset..startOffset + maxBytes]
+        }
+        buffer.writeAsciiSpanUnchecked(drawX, ty, out, style: style)
     }
 
     public func drawSprite(x: Int64, y: Int64, lines: Array<String>, style: Style): Unit {
         for (row in 0..lines.size) {
             drawText(x, y + row, lines[row], style)
         }
+    }
+
+    public func render(widget: Widget, area: Rect): Unit {
+        let target = intersect(
+            clip,
+            Rect(area.x + dx, area.y + dy, area.width, area.height)
+        )
+        if (target.width <= 0 || target.height <= 0) { return }
+        widget.render(target, buffer)
     }
 
     public func composite(surface: Surface): Unit {
