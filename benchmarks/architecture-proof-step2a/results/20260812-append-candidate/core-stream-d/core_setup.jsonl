@@ -1,8 +1,0 @@
-{"benchmark": "stream_d_new_item", "build_identifier": "848ef9fc7b181b5c2210def9eeb88ca67e7f5d35+bin:7fa47bd1e4b418dd", "history_count": 100, "kind": "setup", "metrics_mode": "off", "setup_nanos": 10354780}
-{"benchmark": "stream_d_new_item", "build_identifier": "848ef9fc7b181b5c2210def9eeb88ca67e7f5d35+bin:7fa47bd1e4b418dd", "history_count": 100, "kind": "setup", "metrics_mode": "on", "setup_nanos": 4897290}
-{"benchmark": "stream_d_new_item", "build_identifier": "848ef9fc7b181b5c2210def9eeb88ca67e7f5d35+bin:7fa47bd1e4b418dd", "history_count": 1000, "kind": "setup", "metrics_mode": "off", "setup_nanos": 9931397}
-{"benchmark": "stream_d_new_item", "build_identifier": "848ef9fc7b181b5c2210def9eeb88ca67e7f5d35+bin:7fa47bd1e4b418dd", "history_count": 1000, "kind": "setup", "metrics_mode": "on", "setup_nanos": 5178221}
-{"benchmark": "stream_d_new_item", "build_identifier": "848ef9fc7b181b5c2210def9eeb88ca67e7f5d35+bin:7fa47bd1e4b418dd", "history_count": 10000, "kind": "setup", "metrics_mode": "off", "setup_nanos": 30589496}
-{"benchmark": "stream_d_new_item", "build_identifier": "848ef9fc7b181b5c2210def9eeb88ca67e7f5d35+bin:7fa47bd1e4b418dd", "history_count": 10000, "kind": "setup", "metrics_mode": "on", "setup_nanos": 54438105}
-{"benchmark": "stream_d_new_item", "build_identifier": "848ef9fc7b181b5c2210def9eeb88ca67e7f5d35+bin:7fa47bd1e4b418dd", "history_count": 100000, "kind": "setup", "metrics_mode": "off", "setup_nanos": 219975140}
-{"benchmark": "stream_d_new_item", "build_identifier": "848ef9fc7b181b5c2210def9eeb88ca67e7f5d35+bin:7fa47bd1e4b418dd", "history_count": 100000, "kind": "setup", "metrics_mode": "on", "setup_nanos": 1062375897}
