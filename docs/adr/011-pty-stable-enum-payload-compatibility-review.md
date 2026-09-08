@@ -2,16 +2,37 @@
 
 ## Status
 
-Accepted and implemented by Phase 5A-I.
+Accepted and implemented by Phase 5A-I. The exact five-value PTY data cohort
+is STABLE, while PTY runtime integration remains EXPERIMENTAL and concrete
+platform implementations remain INTERNAL. Known stable-to-nonstable debt is
+zero.
 
 ## Frozen scope
 
-Phase 4 consolidation remains complete. This review does not change production
-PTY, `Command`, `Event`, `App`, runtime, consumer, or API classification source.
-The stable and experimental contracts and the exact five known dependency debts
-remain active until a separately authorized implementation.
+Phase 4 consolidation remains complete, and Phase 5A-I is complete. The exact
+five-value cohort (`PtySpec`, `PtySize`, `PtySignal`, `PtyOutputStream`, and
+`PtyExitStatus`) and the existing stable `Command`/`Event` constructors are
+the frozen data-protocol scope. This review does not stabilize PTY runtime,
+attachment, process ownership, readiness, or platform implementation
+contracts. `PtyRuntime`, `PtyProcess`, `EventSource`, and
+`App.attachPtyRuntime` remain EXPERIMENTAL, and concrete platform
+implementations remain INTERNAL.
 
-## Current contradiction
+## Pre-decision review record (Phase 5A)
+
+The following sections preserve the Phase 5A review record from before the
+owner compatibility decision. Their conflicts, payload shapes, risks, and
+uncertainty are historical evidence, not the current implementation state.
+## Frozen scope at pre-decision (Phase 5A)
+
+Phase 4 consolidation remained complete. At that point, this review did not
+change production PTY, `Command`, `Event`, `App`, runtime, consumer, or API
+classification source. The stable and experimental contracts and the exact
+five known dependency debts remained active until a separately authorized
+implementation.
+
+
+## Contradiction (pre-decision)
 
 `Command` and `Event` are STABLE, so their constructors inherit STABLE tier.
 Five constructors expose EXPERIMENTAL payload types:
@@ -28,9 +49,10 @@ Five constructors expose EXPERIMENTAL payload types:
 `Event.PtyFailed` expose only builtin or already-stable payloads and therefore
 do not add debt.
 
-## Surface and ownership
+## Surface and ownership (pre-decision)
 
-The current public PTY family separates into three responsibilities:
+The public PTY family under review at that time separated into three
+responsibilities:
 
 - Protocol values: `PtySpec`, `PtySize`, `PtySignal`, `PtyOutputStream`, and
   `PtyExitStatus`.
@@ -46,7 +68,7 @@ descriptor, callback, mutable lifecycle state, or resource-ownership handle.
 Consequently, stabilizing the value protocol without stabilizing the runtime is
 technically coherent and does not create a promotion explosion.
 
-## Exact value contracts
+## Exact value contracts (pre-decision)
 
 - `PtySpec` is a public class with non-reassignable `command`, `args`, `cwd`,
   `env`, and `size` fields. Defaults are empty args/cwd/env and `PtySize()`.
@@ -58,7 +80,7 @@ technically coherent and does not create a promotion explosion.
   geometry or runtime state.
 - `PtySignal` is a public enum with `Interrupt`, `Terminate`, `Kill`, and
   `User(Int32)`. The named cases map to POSIX signals and `User` forwards a raw
-  native number, so the current contract includes a platform-shaped escape
+  native number, so the pre-decision contract included a platform-shaped escape
   hatch.
 - `PtyOutputStream` is a public identity enum with `Stdout` and `Stderr`. It is
   not an IO stream and owns no handle or resource.
@@ -67,7 +89,7 @@ technically coherent and does not create a promotion explosion.
   permits both fields to be absent or both to be present; it does not encode
   core-dump or another explicit status kind.
 
-## Adoption and test evidence
+## Adoption and test evidence (pre-decision)
 
 `terminal_lab` is the only example adopter and is machine-classified as a
 feature demo. It constructs `PtySpec`, emits `Command.PtyStart`, matches all PTY
@@ -87,38 +109,39 @@ states, raw signal semantics, or future enum evolution. The official
 `terminal_lab` smoke is a source-token check; it does not execute the real PTY
 path.
 
-## Documentation and compatibility authority
+## Documentation and compatibility authority (pre-decision)
 
-Current README, API, versioning, platform, and limitation documents describe PTY
-as optional or experimental integration. The stable `Command`/`Event`
-constructors already expose the exact data concepts, so product narrative and
-machine contract do not currently answer whether the data model itself is a
-long-term stable promise.
+At that time, the README, API, versioning, platform, and limitation documents
+described PTY as optional or experimental integration. The stable
+`Command`/`Event` constructors already exposed the exact data concepts, so the
+product narrative and machine contract did not then answer whether the data
+model itself was a long-term stable promise.
 
 Repository policy permits intentional documented pre-1.0 breaks, but the Phase
 4E authorization was explicitly narrow and consumed by `Event.ComponentTick`.
-It does not authorize removing these constructors or replacing their payload
+It did not authorize removing these constructors or replacing their payload
 types. Either operation is a stable source-contract change, breaks explicit
 construction/pattern-match callers, affects exhaustive matches, and carries
 enum layout/ABI risk that the source-level contract does not prove safe.
 External stable `Command`/`Event` and PTY consumers are unknown.
 
-## Review disposition before owner decision
+## Review disposition before owner decision (pre-decision)
 
-The repository evidence does not yet answer:
+The pre-decision repository evidence did not yet answer:
 
 > Does cj_tui intend to guarantee the exact current PTY command/event data model
 > as STABLE?
 
-The answer is therefore `NOT YET DECIDABLE`, and the Phase 5A disposition is:
+The answer was therefore `NOT YET DECIDABLE`, and the Phase 5A disposition was:
 
 ```text
 OWNER COMPATIBILITY DECISION REQUIRED
 ```
 
-No tier changes or stable enum contraction are authorized by this review. The
-exact five debts remain active, new debt remains forbidden, and there is no
-Phase 5A-I implementation until the owner chooses one of these boundaries:
+At that pre-decision point, no tier changes or stable enum contraction were
+authorized by this review. The exact five debts remained active, new debt
+remained forbidden, and there was no Phase 5A-I implementation until the owner
+chose one of these boundaries:
 
 1. `YES`: freeze the current five-value cohort as the stable request/result data
    model while leaving PTY runtime, attachment, process ownership, readiness,
@@ -131,11 +154,11 @@ Extracting duplicate stable types, splitting the cohort merely to reduce the
 debt count, reclassifying `Command`/`Event`, stabilizing the entire runtime,
 adding a generic message/event bus, or hiding the validator debt are rejected.
 
-## Phase 5A-I owner decision and implementation
+## Current implementation (Phase 5A-I owner decision and implementation)
 
-The owner chose the stable PTY data-protocol boundary without stabilizing PTY
-runtime integration. Before promotion, Phase 5A-I hardened the experimental
-payload shapes:
+Phase 5A-I closed the owner decision. The owner chose the stable PTY
+data-protocol boundary without stabilizing PTY runtime integration. Before
+promotion, Phase 5A-I hardened the experimental payload shapes:
 
 - `PtySpec` snapshots caller-provided `args` and `env` arrays. It retains raw
   string command/cwd/environment representation and does not move runtime
@@ -153,9 +176,9 @@ PTY `Command`/`Event` constructors were neither removed nor rehomed. Runtime,
 process, attachment, and readiness contracts remain EXPERIMENTAL; concrete
 platform implementations remain INTERNAL.
 
-## Final machine-state invariant
+## Final machine-state invariant (current)
 
-Until that owner decision is implemented:
+Phase 5A-I is complete. The current machine-state invariant is:
 
 ```text
 known PTY debt = 0

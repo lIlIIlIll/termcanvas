@@ -1,37 +1,30 @@
 # Extensions
 
-Core `cjtui` owns rich document rendering, not format parsing.
+## Reader task
 
-The stable boundary is:
+Use an extension when content or behavior is outside the cjtui core rendering
+loop. An extension may parse or model a format, but the application still owns
+state and routes events and effects through `App` / update before immediate
+widgets render. Core provides the stable document vocabulary; extensions adapt
+into it.
 
-- `RichSpan`
-- `DocumentLineKind`
-- `DocumentLine`
-- `Document`
-- `DocumentTheme`
-- `DocumentView`
+## Boundary and stable document model
 
-Extensions convert content formats into the canonical stable `core.Document`, then applications render the result with `core.DocumentView`. The former experimental `document` alias facade is retired; applications use the stable core document vocabulary directly.
+Core owns rich document rendering, not format parsing. The stable hand-off is:
 
-The former experimental `packages/editor` facade and advanced editor shell are retired. Stable text-buffer, text-area, completion, and Markdown-editing declarations are used directly from `core`. Format adapters remain separate from editor behavior and parsing policy.
+- `RichSpan`: styled text with optional source range.
+- `DocumentLineKind`: paragraph, heading, list/task item, quote, code, table,
+  HTML, diagnostic, and related row kinds.
+- `DocumentLine`: one renderable document row.
+- `Document`: ordered document lines.
+- `DocumentTheme`: document-specific styles.
+- `DocumentView`: immediate renderer with scrolling, links, highlights, folds,
+  and source-offset lookup.
 
-Game helpers follow the same boundary: core owns terminal events, timing, metrics, canvas, buffers, and layout, while game-specific entity/component storage, physics, tile maps, and sprite rendering live in `packages/game`.
+An adapter converts a source format into `core.Document`; application-owned
+state then supplies the document and view state to `core.DocumentView`:
 
-## Current Extensions
-
-`packages/markdown` provides the `markdown` package. It depends on the in-repository `cj_markdown` parser and only adapts `MarkdownDocument` into `core.Document`.
-
-The parser package handles source ranges, diagnostics, ATX/setext headings, merged paragraphs with soft-break source mapping, nested lists, task list items, indented block quotes, fenced code blocks with language info, pipe tables with alignment and escaped pipes, horizontal rules, HTML blocks/inline HTML, reference links/images, shortcut reference links, multi-backtick inline code, strong/emphasis/strikethrough, autolinks, and common escapes.
-
-The adapter maps the AST into `Document`, exposes `markdownOutline()` for heading trees, and exposes `markdownPreviewIndex()` for source-offset to preview-row synchronization.
-
-`packages/terminal` provides the `terminal` package. It parses ANSI terminal output into a `TerminalScreen` / bounded `TerminalTranscript` model and renders it with `TerminalView`. It targets a practical xterm subset for command output and logs, including common SGR colors, erase/cursor controls, carriage-return progress output, transcript trimming, and search highlighting; process execution stays in core PTY APIs.
-
-`packages/diff` provides the `diff` package. It parses unified diff text into `DiffDocument` / `DiffFile` / `DiffHunk` / `DiffLine` and renders it with `DiffView`. It includes added/deleted line summaries, inline line-number rendering, and a side-by-side view mode. It displays diffs only; apply/reject policy belongs to applications.
-
-`packages/game` provides the `game` package. It includes `EntityWorld`, generic `ComponentStore<T>`, `GameInputState`, `PhysicsWorld` with continuous swept AABB collision and sensor-overlap queries, `TileMap` with symbol lookup and marker discovery, `Sprite2D`, `SpriteFrame`, `SpriteAnimation`, `Camera2D`, and `SpriteRenderer`. It is intentionally engine-shaped but small: applications own gameplay rules, assets, levels, and persistence.
-
-```cangjie
+```cj
 import core.*
 import markdown.*
 
@@ -39,27 +32,101 @@ let doc = Markdown.parse("# Title\n\n- item")
 DocumentView(doc).render(area, buffer)
 ```
 
-## Extension Roadmap
+The former experimental `document` / `packages/document` alias facade is retired.
+Applications use the stable core document vocabulary directly. The former
+`packages/editor` facade and advanced editor shell are also retired; stable
+text-buffer, text-area, completion, and Markdown-editing declarations are used
+directly from `core`. Format adapters remain separate from editor behavior and
+parsing policy.
 
-Format parsing extensions:
+## Current packages
 
-- Markdown
-- ANSI logs
+### Markdown
+
+`packages/cj_markdown` provides the parser package and has no dependency on
+cjtui. `packages/markdown` provides the `markdown` adapter; it depends on
+`cj_markdown` and only maps `MarkdownDocument` into `core.Document`.
+
+The parser covers source ranges and diagnostics; ATX headings (including an
+optional closing `#`); setext headings; merged paragraphs with soft-break source
+mapping; grouped unordered and ordered lists with nested child items; task list
+items; block quotes with parsed child blocks, including indented quote markers;
+fenced code blocks with language info; indented code blocks; list continuation
+lines; pipe tables with headers, alignment, body rows, and escaped pipes;
+horizontal rules; HTML blocks and inline HTML; reference definitions and
+reference-style links/images; shortcut reference links; inline links with an
+optional title; inline images; inline code and multi-backtick inline code
+spans; strong, emphasis, and strikethrough; autolinks; common backslash
+escapes; and parser diagnostics such as unclosed fenced code blocks.
+
+The adapter exposes `Markdown.parse`, `markdownDocument`, and
+`markdownAstToDocument`. It also exposes `markdownOutline()` for heading trees
+and `markdownPreviewIndex()` for source-offset ↔ preview-row synchronization.
+Markdown parsing remains outside `core.DocumentView`.
+
+### Terminal output
+
+`packages/terminal` provides `terminal`. It parses ANSI terminal output into a
+`TerminalScreen` / bounded `TerminalTranscript` model and renders it with
+`TerminalView`. Its practical xterm subset includes common SGR colors,
+erase/cursor controls, carriage-return progress output, transcript trimming,
+and search highlighting. Process execution stays in core PTY APIs; terminal
+parsing does not own application state.
+
+### Unified diffs
+
+`packages/diff` provides `diff`. It parses unified diff text into
+`DiffDocument`, `DiffFile`, `DiffHunk`, and `DiffLine`, then renders with
+`DiffView`. It includes added/deleted line summaries, inline line-number
+rendering, and a side-by-side view mode. It displays diffs only; apply/reject
+policy belongs to applications.
+
+### Media
+
+`packages/media` provides `media` and depends on `core`. It is a current
+extension, not a future route. `MediaAdapter` has a text fallback and an
+`ExternalMediaAdapter` for Kitty and Sixel output backed by ImageMagick,
+ffmpeg, and `img2sixel` tools when available. `MediaDecodeRequest` carries a
+`MediaSource`, target area, protocol, and frame index.
+
+The package also provides `AsciiRenderOptions` with ASCII, half-block, and
+Braille modes; `AsciiFrame` and `AsciiAnimation`; `FfmpegAsciiAnimationDecoder`;
+and `AsciiAnimationView`. GIF/video-to-ASCII animation and media gallery
+examples use these extension APIs. Applications decide when to decode, how to
+handle tool failure, and where the resulting widget is rendered; media does
+not own application state.
+
+### Game and simulation helpers
+
+`packages/game` provides `game`. It includes `EntityWorld`, generic
+`ComponentStore<T>`, `GameInputState`, `PhysicsWorld` with continuous swept AABB
+collision and sensor-overlap queries, `TileMap` with symbol lookup and marker
+discovery, `Sprite2D`, `SpriteFrame`, `SpriteAnimation`, `Camera2D`, and
+`SpriteRenderer`. It is intentionally engine-shaped but small: applications
+own gameplay rules, assets, levels, and persistence. Core continues to own
+terminal events, timing, metrics, canvas, buffers, and layout.
+
+## Candidate and experimental families
+
+These are candidate capabilities rather than the stable quick-start path. A
+candidate becomes current only when its package and API contract exist; do not
+import a package merely because a roadmap entry is listed here.
+
+### Format parsing candidates
+
 - HTML subset
 - man/help documents
 - JSON/YAML/TOML viewers
 - CSV/table viewers
-- diff viewers
 
-Media rendering extensions:
+### Media and document candidates
 
-- `media` image/video adapters with Kitty graphics, Sixel, text fallback, and ffmpeg-backed media-to-ASCII animation helpers
 - charts and dashboard document blocks
 - Mermaid/Graphviz fallback diagrams
 - OSC8 links
 - LaTeX/math text fallback
 
-Interactive content extensions:
+### Interactive content candidates
 
 - folding trees
 - sortable and searchable tables
@@ -68,23 +135,25 @@ Interactive content extensions:
 - chat transcripts
 - archive/file previews
 
-Game and simulation extensions:
+### Game and simulation candidates
 
-- `game` ECS, input, continuous collision physics, tile maps, and sprite rendering
 - pathfinding and steering helpers
 - animation timelines
 - particle systems
 - replay/record helpers for deterministic testing
 
-Near-term priority:
+No current package is claimed for the candidate list above. The former editor
+facade and advanced editor shell are retired and are not a route for new
+applications.
 
-1. `editor`
-2. `markdown`
-3. `terminal`
-4. `diff`
-5. `cjtui_syntax`
-6. `cjtui_json`
-7. `media`
-8. `game`
-9. `cjtui_html`
-10. `cjtui_diagnostics`
+## Related documents
+
+- [`architecture.md`](architecture.md): application-owned state and immediate
+  rendering boundaries.
+- [`widgets.md`](widgets.md): `DocumentView`, editor primitives, and widget
+  composition.
+- [`events.md`](events.md): input and completion events entering update.
+- [`packages/cj_markdown/README.md`](../packages/cj_markdown/README.md): parser
+  API and coverage.
+- [`api.md`](api.md) and generated [`api-inventory.json`](api-inventory.json):
+  current ownership and stability tiers.

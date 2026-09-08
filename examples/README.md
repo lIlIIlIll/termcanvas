@@ -1,49 +1,68 @@
 # Examples
 
-Run an example from its directory:
+This index sits beside the 17 example directories. Use
+[`docs/examples.md`](../docs/examples.md) to choose an example by learning goal;
+use this page when you are already working in `examples/`.
+
+## Run and build
+
+From this directory, run the selected package directly:
 
 ```bash
+cd taskpad
 cjpm run
 ```
 
-Build every example:
+If the Cangjie SDK is not already configured in your shell, use the repository
+wrapper instead (still from `examples/`):
 
 ```bash
-../scripts/build_examples.sh
+CANGJIE_SDK_ROOT=/path/to/cangjie \
+  ../scripts/cangjie_cmd.sh taskpad cjpm run
 ```
 
-The machine-owned inventory classifies the 17 current examples as follows.
+Build every example from this directory:
 
-## Recommended applications
+```bash
+CANGJIE_SDK_ROOT=/path/to/cangjie ../scripts/build_examples.sh
+```
 
-- `taskpad`: task-board app with `Input`, `ListState`, `KeyMap`, `CommandPalette`, `ToastManager`, and command-driven updates.
-- `form_studio`: profile form app with focus routing, paste handling, `Input`, `TextArea`, `Checkbox`, `RadioGroup`, `Select`, `Dropdown`, `MultiSelect`, `DatePicker`, and `Button`.
-- `ops_dashboard`: real-time operations dashboard using `targetFps`, `TimerSpec`, `TickEvent`, `ProgressBar`, `Sparkline`, `Gauge`, `Chart`, `LogView`, and `StatusBar`.
-- `data_browser`: data/file browser using `VirtualTable`, `Tree`, `FilePicker`, `FileDialog`, and `Paginator`.
-- `markdown_studio`: Markdown authoring app using `TextArea`, multi-caret editing, completion events, `MarkdownEditorBehavior`, `DocumentView`, `markdown`, preview, and outline.
-- `oh_my_pi_skin`: terminal-native oh-my-pi visual skin using `Canvas`, an interactive animated todo tree, true-color styles, `TerminalCapabilities`, `Composer`, `CommandPalette`, and independent region timers.
-- `command_center`: command runtime app using `Command.Batch`-style command routing, async tasks, timers, menus, dialogs, spinner, and toasts.
-- `assistant_console`: transcript console using `TranscriptView`, `Composer`, `ActivityTimeline`, `RequestDialog`, `DecisionDialog`, and rich `Document` content.
+The runnable starter application is also available at
+[`templates/basic_app`](../templates/basic_app/).
 
-## Experimental applications
+## Recommended applications (8)
 
-- `btm_clone`: primary App/update system monitor with application-owned state,
-  core timers and async completions, regional dirty rendering, process interaction,
-  and deterministic headless isolation proof.
-- `media_gallery`: terminal capability/fallback demo with direct media placements
-  and `DocumentLine.image`.
+- [`taskpad`](taskpad/): task board with input, `KeyMap`, command palette, and toasts.
+- [`form_studio`](form_studio/): forms, focus routing, paste, and common controls.
+- [`ops_dashboard`](ops_dashboard/): ticks, timers, progress, charts, logs, and status bars.
+- [`data_browser`](data_browser/): virtual table, tree, file picker/dialog, and paginator.
+- [`markdown_studio`](markdown_studio/): Markdown editing, completion, preview, and outline.
+- [`command_center`](command_center/): async tasks, timers, dialogs, spinner, and toasts.
+- [`assistant_console`](assistant_console/): transcript, composer, activity timeline, and dialogs.
+- [`oh_my_pi_skin`](oh_my_pi_skin/): terminal-native canvas skin with timed regions.
 
-## Feature demonstrations
+## Experimental applications (2)
 
-- `arcade`: playable Canvas app with held-key input, ticks, and resize fallback.
-- `crystal_caves`: platform game with tile markers, sensors, physics, animation, and camera scrolling.
-- `debug_lab`: terminal capabilities, keyboard options, mouse/focus events, metrics, and debug overlay.
-- `game_demo`: farm-sim game with Canvas, stores, physics, tiles, sprites, saves, and headless smoke.
-- `gif_ascii`: ffmpeg-decodable ASCII/half-block/braille animation with playback and display controls.
-- `terminal_lab`: PTY, terminal transcript, and diff integration lab.
+- [`btm_clone`](btm_clone/): primary-model system monitor with timers, async
+  completions, focus/layout, dirty rendering, process interaction, and headless proof.
+- [`media_gallery`](media_gallery/): direct media placement, `DocumentLine.image`,
+  protocol fallback, and terminal capability reporting.
 
-## Proof workload
+## Feature demonstrations (6)
 
-- `game_pressure_suite`: six-category deterministic tick/input/render pressure workload.
+- [`arcade`](arcade/): held-key/tick-driven `Canvas` app with resize fallback and metrics.
+- [`crystal_caves`](crystal_caves/): side-scrolling game with tiles, sensors, physics, and animation.
+- [`debug_lab`](debug_lab/): terminal capabilities, keyboard options, mouse/focus events, and metrics.
+- [`game_demo`](game_demo/): farm-sim game with `Canvas`, stores, physics, tiles, sprites, saves, and headless smoke.
+- [`gif_ascii`](gif_ascii/): ffmpeg-backed ASCII, half-block, or braille animation.
+- [`terminal_lab`](terminal_lab/): PTY, terminal transcript, and diff integration.
 
-The example suite is intentionally application-shaped: each example should be useful to run directly while still demonstrating a clear slice of the public API.
+## Proof workload (1)
+
+- [`game_pressure_suite`](game_pressure_suite/): deterministic tick, input, and
+  render pressure workload across six categories.
+
+All entries are application-shaped: each can be run directly and demonstrates a
+focused slice of the public API. Check the API tier in
+[`docs/versioning.md`](../docs/versioning.md) before using an experimental
+capability in a production application.

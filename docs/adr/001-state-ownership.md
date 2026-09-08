@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Consolidation migration remains pending.
+Accepted. The consolidation migration is complete; application-owned state and explicit control models are the current architecture.
 
 ## Context
 
