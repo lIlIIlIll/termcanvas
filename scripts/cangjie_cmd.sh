@@ -13,7 +13,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if [[ -n "${CANGJIE_SDK_ROOT:-}" ]]; then
   sdk_root=$("$ROOT/scripts/check_sdk.sh")
-  stdx_root="$sdk_root/linux_x86_64_cjnative/dynamic/stdx"
+  stdx_root="${CANGJIE_STDX_PATH:-$sdk_root/linux_x86_64_cjnative/dynamic/stdx}"
   if [[ ! -d "$stdx_root" ]]; then
     stdx_root="$(dirname -- "$sdk_root")/linux_x86_64_cjnative/dynamic/stdx"
   fi
@@ -22,9 +22,14 @@ if [[ -n "${CANGJIE_SDK_ROOT:-}" ]]; then
   export CANGJIE_HOME="$sdk_root"
   export CANGJIE_ROOT="$sdk_root"
   export CANGJIE_PATH="$sdk_root"
-  export CANGJIE_STDX_PATH="$(readlink -f -- "$stdx_root")"
   export PATH="$sdk_root/bin:$sdk_root/tools/bin:$PATH"
-  export LD_LIBRARY_PATH="$runtime_root:$CANGJIE_STDX_PATH:$sdk_root/tools/lib"
+  if [[ -d "$stdx_root" ]]; then
+    export CANGJIE_STDX_PATH="$(readlink -f -- "$stdx_root")"
+    export LD_LIBRARY_PATH="$runtime_root:$CANGJIE_STDX_PATH:$sdk_root/tools/lib"
+  else
+    unset CANGJIE_STDX_PATH
+    export LD_LIBRARY_PATH="$runtime_root:$sdk_root/tools/lib"
+  fi
 
   command=("$@")
   if [[ -n "${TERMCANVAS_CANONICAL_TARGET_ROOT:-}" && ${command[0]##*/} == cjpm && ${#command[@]} -ge 2 && ${command[1]} =~ ^(bench|build|run|test)$ ]]; then
