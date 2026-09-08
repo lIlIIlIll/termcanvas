@@ -40,12 +40,20 @@ cjpm_version=$(env \
   LD_LIBRARY_PATH="$sdk_ld" \
   "$cjpm" --version 2>&1 || true)
 
-if [[ "$cjc_version" != *"$expected_version"* ]]; then
+actual_cjc_version=
+if [[ "$cjc_version" =~ ^Cangjie[[:space:]]Compiler:[[:space:]]([^[:space:]]+) ]]; then
+  actual_cjc_version="${BASH_REMATCH[1]}"
+fi
+if [[ "$actual_cjc_version" != "$expected_version" ]]; then
   printf 'termcanvas: unsupported cjc; expected %s, got: %s\n' \
     "$expected_version" "${cjc_version//$'\n'/; }" >&2
   exit 2
 fi
-if [[ "$cjpm_version" != *"$expected_cjpm_version"* ]]; then
+actual_cjpm_version=
+if [[ "$cjpm_version" =~ ^Cangjie[[:space:]]Project[[:space:]]Manager:[[:space:]]([^[:space:]]+) ]]; then
+  actual_cjpm_version="${BASH_REMATCH[1]}"
+fi
+if [[ "$actual_cjpm_version" != "$expected_cjpm_version" ]]; then
   printf 'termcanvas: unsupported cjpm; expected %s, got: %s\n' \
     "$expected_cjpm_version" "${cjpm_version//$'\n'/; }" >&2
   exit 2
