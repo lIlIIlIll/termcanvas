@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-expected_version='1.1.0-alpha.20260817040003'
-expected_cjpm_version='1.1.3'
+expected_version=${CANGJIE_SDK_VERSION:-1.1.3}
+expected_cjpm_version=${CANGJIE_CJPM_VERSION:-1.1.3}
 sdk_root=${CANGJIE_SDK_ROOT:-}
 
 if [[ -z "$sdk_root" ]]; then
   printf '%s\n' \
-    'cj_tui: set CANGJIE_SDK_ROOT to the canonical Cangjie SDK' >&2
+    'termcanvas: set CANGJIE_SDK_ROOT to the canonical Cangjie SDK' >&2
   exit 2
 fi
 
@@ -19,17 +19,20 @@ fi
 cjc="$sdk_root/bin/cjc"
 cjpm="$sdk_root/tools/bin/cjpm"
 runtime="$sdk_root/runtime/lib/linux_x86_64_cjnative/libcangjie-runtime.so"
-stdx="$sdk_root/linux_x86_64_cjnative/dynamic/stdx"
+stdx=${CANGJIE_STDX_PATH:-"$sdk_root/linux_x86_64_cjnative/dynamic/stdx"}
 if [[ ! -d "$stdx" ]]; then
   stdx="$(dirname -- "$sdk_root")/linux_x86_64_cjnative/dynamic/stdx"
 fi
 
-if [[ ! -x "$cjc" || ! -x "$cjpm" || ! -f "$runtime" || ! -d "$stdx" ]]; then
-  printf 'cj_tui: incomplete Cangjie SDK at %s\n' "$sdk_root" >&2
+if [[ ! -x "$cjc" || ! -x "$cjpm" || ! -f "$runtime" ]]; then
+  printf 'termcanvas: incomplete Cangjie SDK at %s\n' "$sdk_root" >&2
   exit 2
 fi
 
-sdk_ld="$stdx:$(dirname -- "$runtime"):$sdk_root/tools/lib"
+sdk_ld="$(dirname -- "$runtime"):$sdk_root/tools/lib"
+if [[ -d "$stdx" ]]; then
+  sdk_ld="$stdx:$sdk_ld"
+fi
 cjc_version=$(env LD_LIBRARY_PATH="$sdk_ld" \
   "$cjc" -v 2>&1 || true)
 cjpm_version=$(env \
@@ -37,13 +40,21 @@ cjpm_version=$(env \
   LD_LIBRARY_PATH="$sdk_ld" \
   "$cjpm" --version 2>&1 || true)
 
-if [[ "$cjc_version" != *"$expected_version"* ]]; then
-  printf 'cj_tui: unsupported cjc; expected %s, got: %s\n' \
+actual_cjc_version=
+if [[ "$cjc_version" =~ ^Cangjie[[:space:]]Compiler:[[:space:]]([^[:space:]]+) ]]; then
+  actual_cjc_version="${BASH_REMATCH[1]}"
+fi
+if [[ "$actual_cjc_version" != "$expected_version" ]]; then
+  printf 'termcanvas: unsupported cjc; expected %s, got: %s\n' \
     "$expected_version" "${cjc_version//$'\n'/; }" >&2
   exit 2
 fi
-if [[ "$cjpm_version" != *"$expected_cjpm_version"* ]]; then
-  printf 'cj_tui: unsupported cjpm; expected %s, got: %s\n' \
+actual_cjpm_version=
+if [[ "$cjpm_version" =~ ^Cangjie[[:space:]]Project[[:space:]]Manager:[[:space:]]([^[:space:]]+) ]]; then
+  actual_cjpm_version="${BASH_REMATCH[1]}"
+fi
+if [[ "$actual_cjpm_version" != "$expected_cjpm_version" ]]; then
+  printf 'termcanvas: unsupported cjpm; expected %s, got: %s\n' \
     "$expected_cjpm_version" "${cjpm_version//$'\n'/; }" >&2
   exit 2
 fi
@@ -55,7 +66,11 @@ if [[ ${1:-} == --report ]]; then
   printf 'CJPM_VERSION=%s\n' "${cjpm_version//$'\n'/; }"
   printf 'RUNTIME=%s\n' "$runtime"
   printf 'RUNTIME_SHA256=%s\n' "$(sha256sum "$runtime" | cut -d' ' -f1)"
-  printf 'STDX=%s\n' "$(readlink -f -- "$stdx")"
+  if [[ -d "$stdx" ]]; then
+    printf 'STDX=%s\n' "$(readlink -f -- "$stdx")"
+  else
+    printf 'STDX=embedded\n'
+  fi
 else
   printf '%s\n' "$sdk_root"
 fi

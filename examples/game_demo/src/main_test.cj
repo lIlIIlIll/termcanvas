@@ -110,6 +110,89 @@ class FarmGameRegressionTest {
             remove(directory, recursive: true)
         }
     }
+
+    @TestCase
+    func interactiveCommandsDecodeEdgesAndFrameModesStayCovered(): Unit {
+        let directory = Directory.createTemp(getTempDirectory())
+        let path = directory.toString() + "/farm.save"
+        try {
+            let malformed = "version=1\nday=bad\nminute=bad\nmoney=bad\nenergy=bad\nplayer=x\nfacing=99\ntool=99\nseed=-1\nseeds=1\ninventory=2,3\nshipping=4,5\nlastEarned=bad\nplots=bad|4,6,1,2,99,1|99,99,1,1,1,1\nignored=value\n"
+            File.writeTo(path, malformed.toArray())
+            let game = FarmGame(path, false)
+            @Expect(game.day, 1)
+            @Expect(game.minute, DAY_START)
+            @Expect(game.facing, DIR_LEFT)
+            @Expect(game.selectedTool, TOOL_HARVEST)
+            @Expect(game.selectedCrop, CROP_COUNT - 1)
+            @Expect(game.seeds[0], 1)
+            @Expect(game.inventory[1], 3)
+            @Expect(game.shipping[1], 5)
+            @Expect(game.plots[0].crop, CROP_BERRY)
+            @Expect(game.plots[0].growth, cropDays(CROP_BERRY))
+            @Expect(game.plots[0].watered)
+
+            @Expect(game.tileAt(-1, 0), "#")
+            @Expect(game.tileAt(1, 1), ".")
+            game.playerX = 1
+            game.playerY = 1
+            game.facing = DIR_LEFT
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Left)))
+            @Expect(game.status, "blocked")
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'1'))))
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'2'))))
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'3'))))
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'4'))))
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'['))))
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Char(r']'))))
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))))
+            _ = game.update(Event.KeyUp(KeyEvent(KeyCode.Char(r'x'))))
+            _ = game.update(Event.FocusIn)
+            game.energy = 0
+            game.playerX = 4
+            game.playerY = 6
+            game.facing = DIR_RIGHT
+            game.selectedTool = TOOL_HOE
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+            @Expect(game.status, "too tired: save or sleep")
+
+            game.energy = MAX_ENERGY
+            game.plots[0].tilled = true
+            game.plots[0].crop = CROP_TURNIP
+            game.plots[0].growth = cropDays(CROP_TURNIP)
+            game.plots[0].watered = true
+            game.inventory[CROP_TURNIP] = 0
+            game.playerX = 3
+            game.playerY = 6
+            game.facing = DIR_RIGHT
+            game.selectedTool = TOOL_HARVEST
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+            @Expect(game.inventory[CROP_TURNIP], 1)
+            game.playerX = 24
+            game.playerY = 3
+            game.facing = DIR_RIGHT
+            game.money = 0
+            _ = game.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+            @Assert(game.status.contains("need"))
+            _ = game.update(Event.Tick(TickEvent(frameIndex: 24, deltaMillis: -1)))
+            game.minute = DAY_END - 1
+            _ = game.update(Event.Tick(TickEvent(frameIndex: 32, deltaMillis: 1000)))
+
+            let smallBuffer = Buffer(Rect(0, 0, 80, 20))
+            FarmScene(game).render(smallBuffer.area, smallBuffer)
+            @Expect(smallBuffer.getCell(0, 0).symbol, "t")
+            let fullBackend = TestBackend(area: Rect(0, 0, VIEW_W, VIEW_H))
+            let terminal = Terminal(fullBackend, renderMode: RenderMode.Full)
+            let scene = FarmScene(game)
+            _ = terminal.draw { frame => scene.renderFrame(frame, frame.area) }
+            @Assert(fullBackend.snapshot().contains("MEADOW"))
+            let tinyBackend = TestBackend(area: Rect(0, 0, 80, 20))
+            let tinyTerminal = Terminal(tinyBackend, renderMode: RenderMode.Full)
+            _ = tinyTerminal.draw { frame => scene.renderFrame(frame, frame.area) }
+            @Assert(tinyBackend.snapshot().contains("terminal too small"))
+        } finally {
+            remove(directory, recursive: true)
+        }
+    }
 }
 
 func renderedFarmText(game: FarmGame): String {

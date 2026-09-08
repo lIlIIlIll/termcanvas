@@ -49,9 +49,9 @@ def frame_value(frame: dict[str, Any], field: str, scale: float = 1.0) -> float:
 def run_same_height(
     harness, args, cadence_ms: int, run_id: int, inject_input: bool, inject_resize: bool = False
 ):
-    os.environ["OMP_CJ_TUI_CORE_METRICS"] = "1" if args.mode == "on" else "0"
-    os.environ["CJ_TUI_FRAME_COALESCE_MS"] = str(args.frame_budget_ms)
-    os.environ["OMP_CJ_TUI_SAME_HEIGHT_BURST_INTERVAL_MS"] = str(cadence_ms)
+    os.environ["OMP_TERMCANVAS_CORE_METRICS"] = "1" if args.mode == "on" else "0"
+    os.environ["TERMCANVAS_FRAME_COALESCE_MS"] = str(args.frame_budget_ms)
+    os.environ["OMP_TERMCANVAS_SAME_HEIGHT_BURST_INTERVAL_MS"] = str(cadence_ms)
     session = harness.PtyRun(
         [str(args.binary), "--fixture"], args.consumer_root, args.width, args.height,
         args.history, args.tokens, args.timeout,
@@ -188,8 +188,8 @@ def run_same_height(
 
 
 def run_geometry_control(harness, args, run_id: int):
-    os.environ["OMP_CJ_TUI_CORE_METRICS"] = "1" if args.mode == "on" else "0"
-    os.environ["CJ_TUI_FRAME_COALESCE_MS"] = str(args.frame_budget_ms)
+    os.environ["OMP_TERMCANVAS_CORE_METRICS"] = "1" if args.mode == "on" else "0"
+    os.environ["TERMCANVAS_FRAME_COALESCE_MS"] = str(args.frame_budget_ms)
     session = harness.PtyRun(
         [str(args.binary), "--fixture"], args.consumer_root, 120, 40,
         args.history, args.tokens, args.timeout,

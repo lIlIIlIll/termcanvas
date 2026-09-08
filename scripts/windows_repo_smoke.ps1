@@ -6,9 +6,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$RepoName = "cj_tui" # CJ_TUI_STAGE_NAME_PLACEHOLDER
+$RepoName = "termcanvas" # TERMCANVAS_STAGE_NAME_PLACEHOLDER
 $Repo = Join-Path $Cases $RepoName
-$Log = Join-Path $Out "cj_tui-smoke.log"
+$Log = Join-Path $Out "termcanvas-smoke.log"
 $Utf8 = New-Object System.Text.UTF8Encoding($false)
 
 function Add-Log {

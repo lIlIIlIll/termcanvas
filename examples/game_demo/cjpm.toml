@@ -2,7 +2,7 @@
   cjc-version = "1.1.0"
   name = "game_demo"
   organization = ""
-  description = "Original farm-sim example for cjtui"
+  description = "Original farm-sim example for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

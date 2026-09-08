@@ -4,7 +4,7 @@ import std.unittest.*
 import std.unittest.testmacro.*
 
 @Test
-class CjTuiExpandedContractTest {
+class TermCanvasExpandedContractTest {
     @TestCase
     func displayWidthAsciiA(): Unit {
         @Expect(displayWidth("a"), 1)

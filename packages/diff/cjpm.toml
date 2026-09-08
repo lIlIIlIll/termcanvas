@@ -2,7 +2,7 @@
   cjc-version = "1.1.0"
   name = "diff"
   organization = ""
-  description = "Unified diff parser and viewer for cjtui"
+  description = "Unified diff parser and viewer for termcanvas"
   version = "0.1.0"
   target-dir = ""
   script-dir = ""

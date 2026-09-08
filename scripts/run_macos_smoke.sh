@@ -9,7 +9,7 @@ MACOS_SDKROOT="${MACOS_SDKROOT:-}"
 
 if [[ -z "$REPO" ]]; then
     cat >&2 <<'EOF'
-usage: MACOS_REPO=/path/to/cj_tui [MACOS_CANGJIE_ROOT=/path/to/cangjie] [MACOS_SDKROOT=/path/to/MacOSX.sdk] [MACOS_HOST=user@host] scripts/run_macos_smoke.sh
+usage: MACOS_REPO=/path/to/termcanvas [MACOS_CANGJIE_ROOT=/path/to/cangjie] [MACOS_SDKROOT=/path/to/MacOSX.sdk] [MACOS_HOST=user@host] scripts/run_macos_smoke.sh
 
 Runs packages/example_smoke and builds examples/game_pressure_suite from a
 checkout that already exists on the
@@ -24,7 +24,7 @@ set -euo pipefail
 repo="$1"
 cangjie_root="$2"
 sdkroot="$3"
-expected_cjc_version='1.1.0-alpha.20260817040003'
+expected_cjc_version='1.1.3'
 expected_cjpm_version='1.1.3'
 if [[ ! -d "$repo" ]]; then
     echo "macOS checkout not found: $repo" >&2

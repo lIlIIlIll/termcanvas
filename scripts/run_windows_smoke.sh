@@ -50,12 +50,12 @@ cleanup() {
 }
 
 generate_runner() {
-    local marker='$RepoName = "cj_tui" # CJ_TUI_STAGE_NAME_PLACEHOLDER'
+    local marker='$RepoName = "termcanvas" # TERMCANVAS_STAGE_NAME_PLACEHOLDER'
     local line
     local replacements=0
     while IFS= read -r line || [[ -n "$line" ]]; do
         if [[ "$line" == "$marker" ]]; then
-            printf '$RepoName = "%s" # CJ_TUI_STAGE_NAME_PLACEHOLDER\n' "$STAGE_NAME" || return 1
+            printf '$RepoName = "%s" # TERMCANVAS_STAGE_NAME_PLACEHOLDER\n' "$STAGE_NAME" || return 1
             replacements=$((replacements + 1))
         else
             printf '%s\n' "$line" || return 1
@@ -87,15 +87,15 @@ command -v flock >/dev/null 2>&1 || {
 }
 
 mkdir -p "$CASES"
-exec {LOCK_FD}>"$CASES/.cj_tui_windows_smoke.lock"
+exec {LOCK_FD}>"$CASES/.termcanvas_windows_smoke.lock"
 flock "$LOCK_FD"
 
-STAGE=$(mktemp -d "$CASES/cj_tui.XXXXXXXX")
+STAGE=$(mktemp -d "$CASES/termcanvas.XXXXXXXX")
 STAGE_NAME=${STAGE##*/}
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
-BACKUP=$(mktemp "$CASES/run-tests.ps1.cj_tui_backup.XXXXXXXX")
+BACKUP=$(mktemp "$CASES/run-tests.ps1.termcanvas_backup.XXXXXXXX")
 
 if [[ -f "$CUSTOM_RUNNER" ]]; then
     cp -f "$CUSTOM_RUNNER" "$BACKUP"
@@ -110,7 +110,7 @@ rsync -a --delete \
     --exclude '/examples/*/target' \
     "$ROOT/" "$STAGE/"
 
-OWNED_RUNNER=$(mktemp "$CASES/run-tests.ps1.cj_tui_new.XXXXXXXX")
+OWNED_RUNNER=$(mktemp "$CASES/run-tests.ps1.termcanvas_new.XXXXXXXX")
 if ! generate_runner < "$ROOT/scripts/windows_repo_smoke.ps1" > "$OWNED_RUNNER"; then
     echo "Windows smoke runner template has no unique staging placeholder" >&2
     exit 2

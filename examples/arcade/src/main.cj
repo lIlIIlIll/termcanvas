@@ -1,4 +1,4 @@
-package cjtui_arcade
+package termcanvas_arcade
 
 import core.*
 

@@ -2,7 +2,7 @@
 
 ## Reader task
 
-Use an extension when content or behavior is outside the cjtui core rendering
+Use an extension when content or behavior is outside the termcanvas core rendering
 loop. An extension may parse or model a format, but the application still owns
 state and routes events and effects through `App` / update before immediate
 widgets render. Core provides the stable document vocabulary; extensions adapt
@@ -44,7 +44,7 @@ parsing policy.
 ### Markdown
 
 `packages/cj_markdown` provides the parser package and has no dependency on
-cjtui. `packages/markdown` provides the `markdown` adapter; it depends on
+termcanvas. `packages/markdown` provides the `markdown` adapter; it depends on
 `cj_markdown` and only maps `MarkdownDocument` into `core.Document`.
 
 The parser covers source ranges and diagnostics; ATX headings (including an

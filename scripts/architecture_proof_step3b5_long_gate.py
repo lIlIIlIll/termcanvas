@@ -65,9 +65,9 @@ def main() -> int:
         env.update({
             "AGENT_TUI_HEADLESS": "1",
             "AGENT_TUI_HEADLESS_LONG_PERF": "1",
-            "OMP_CJ_TUI_PERF_DATA_COUNT": str(args.history),
-            "OMP_CJ_TUI_METRICS": "1" if args.metrics == "on" else "0",
-            "CJ_TUI_FRAME_COALESCE_MS": str(args.frame_budget_ms),
+            "OMP_TERMCANVAS_PERF_DATA_COUNT": str(args.history),
+            "OMP_TERMCANVAS_METRICS": "1" if args.metrics == "on" else "0",
+            "TERMCANVAS_FRAME_COALESCE_MS": str(args.frame_budget_ms),
         })
         started = time.monotonic_ns()
         completed = subprocess.run(

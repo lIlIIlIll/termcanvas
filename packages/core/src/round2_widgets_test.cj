@@ -42,7 +42,7 @@ class Round2PaddingSource <: VirtualTranscriptSource {
 }
 
 @Test
-class CjTuiRound2WidgetsTest {
+class TermCanvasRound2WidgetsTest {
     @TestCase
     func rw01ChartScalesLargeIntegersExactly(): Unit {
         let cases: Array<(Int64, Int64, Int64)> = [

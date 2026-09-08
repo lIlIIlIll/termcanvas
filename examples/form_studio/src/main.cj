@@ -1,4 +1,4 @@
-package cjtui_form_studio
+package termcanvas_form_studio
 
 import core.*
 

@@ -1,6 +1,7 @@
 package core
 
 import std.collection.*
+import std.time.*
 import std.sync.*
 import std.unittest.*
 import std.unittest.testmacro.*
@@ -662,4 +663,94 @@ class RuntimeFoundationTest {
     func asyncCompletionWakesRuntimeWithoutPollingDeadline(): Unit {
         @Expect(runtimeAsyncWakeProof())
     }
+    @TestCase
+    func metricsAndTimerPoliciesCoverEmptyMissedAndShutdownBoundaries(): Unit {
+        let metrics = AppMetrics()
+        match (metrics.lastFrame()) {
+            case None => ()
+            case Some(_) => @Expect(false)
+        }
+        @Expect(metrics.averageFps(), 0)
+        @Expect(metrics.droppedTicks(), 0)
+        metrics.record(FrameMetrics(fps: 0, droppedTicks: 2))
+        @Expect(metrics.averageFps(), 0)
+        @Expect(metrics.droppedTicks(), 2)
+        metrics.record(RenderMetrics(size: Rect(0, 0, 4, 2)), tickDeltaMillis: 20, droppedTicks: 3)
+        @Expect(metrics.averageFps(), 50)
+        @Expect(metrics.frames().size, 2)
+        metrics.reset()
+        @Expect(metrics.frames().size, 0)
+        @Expect(metrics.droppedTicks(), 0)
+
+        @Expect(durationMillis(Duration.Zero), 0)
+        @Expect(durationMillis(Duration.millisecond * 4), 4)
+        @Expect(droppedFrameMillis(0, 5, FrameMissPolicy.Drop), 0)
+        @Expect(droppedFrameMillis(11, 0, FrameMissPolicy.Drop), 0)
+        @Expect(droppedFrameMillis(11, 5, FrameMissPolicy.Drop), 2)
+        @Expect(droppedFrameMillis(11, 5, FrameMissPolicy.CatchUp(1)), 1)
+        @Expect(droppedFrames(Duration.Zero, Duration.millisecond * 5, FrameMissPolicy.Drop), 0)
+        @Expect(droppedFrames(Duration.millisecond * 11, Duration.Zero, FrameMissPolicy.Drop), 0)
+        @Expect(droppedFrames(Duration.millisecond * 11, Duration.millisecond * 5, FrameMissPolicy.CatchUp(1)), 1)
+        let now = MonoTime.now()
+        @Expect(nextDue(now, now, Duration.millisecond, FrameMissPolicy.Drop) > now)
+        @Expect(nextDue(now, now - Duration.second, Duration.millisecond, FrameMissPolicy.CatchUp(1)) < now)
+
+        let clock = TestClock()
+        let drop = TimerRuntime(clock: clock)
+        drop.start(TimerSpec("drop", Duration.millisecond * 5))
+        drop.start(TimerSpec("drop", Duration.millisecond * 5))
+        @Expect(drop.stop("missing"), false)
+        @Expect(drop.nextTimeoutMillis(), Some(5))
+        clock.advanceMillis(16)
+        match (drop.drain()[0]) {
+            case Event.Timer(timer) =>
+                @Expect(timer.droppedFrames, 2)
+                @Expect(timer.firedCount, 1)
+            case _ => @Expect(false)
+        }
+        @Expect(drop.nextTimeoutMillis(), Some(5))
+        @Expect(drop.stop("drop"), true)
+
+        let catchUp = TimerRuntime(clock: clock)
+        catchUp.start(TimerSpec("catch", Duration.millisecond * 5, missPolicy: FrameMissPolicy.CatchUp(1)))
+        clock.advanceMillis(16)
+        match (catchUp.drain()[0]) {
+            case Event.Timer(timer) => @Expect(timer.droppedFrames, 1)
+            case _ => @Expect(false)
+        }
+        @Expect(catchUp.nextTimeoutMillis(), Some(0))
+        catchUp.clear()
+        @Expect(catchUp.nextTimeoutMillis().isNone())
+        catchUp.start(TimerSpec("zero", Duration.Zero, mode: TimerMode.OneShot))
+        @Expect(catchUp.nextTimeoutMillis(), Some(1))
+        clock.advanceMillis(1)
+        @Expect(catchUp.drain().size, 1)
+        @Expect(catchUp.nextTimeoutMillis().isNone())
+
+        let async = AsyncRuntime()
+        async.cancelAll()
+        async.cancelAll()
+        match (async.start("closed", { => Event.Message("ignored") })) {
+            case Event.AsyncFailed(_, message) => @Expect(message, "async runtime is closed")
+            case _ => @Expect(false)
+        }
+        @Expect(async.drain().size, 0)
+        async.eventSource().close()
+    }
+
+    @TestCase
+    func terminalLifecycleTracksDeduplicatesReleasesAndClosesOwnedPtys(): Unit {
+        let lifecycle = TerminalLifecycleRequests()
+        lifecycle.trackPty("one")
+        lifecycle.trackPty("one")
+        lifecycle.trackPty("two")
+        lifecycle.releasePty("missing")
+        lifecycle.releasePty("one")
+        let runtime = FakePtyRuntime()
+        runtime.start("two", PtySpec("fake"))
+        lifecycle.closeOwnedPtys(runtime)
+        @Expect(runtime.activeCount(), 0)
+        lifecycle.closeOwnedPtys(runtime)
+    }
+
 }

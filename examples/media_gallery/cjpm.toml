@@ -2,7 +2,7 @@
   cjc-version = "1.1.0"
   name = "media_gallery"
   organization = ""
-  description = "Media capability gallery example for cjtui"
+  description = "Media capability gallery example for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

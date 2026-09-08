@@ -35,7 +35,7 @@ public interface VirtualTranscriptSource {
     func itemTitle(_: Int64): String { "" }
     // Hosts may keep ordinary conversation rows as plain transcript text
     // while giving structured events the left event rail.  The default keeps
-    // the historical card behaviour for existing cjtui clients.
+    // the historical card behaviour for existing termcanvas clients.
     func itemUsesCardChrome(_: Int64): Bool { true }
     // The title is measured/rendered with the live terminal width so a host
     // can preserve the useful tail of a path or command before truncation.

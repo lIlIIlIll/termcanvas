@@ -231,4 +231,102 @@ class GameExtensionTest {
         once.reset()
         @Expect(once.current().rows[0], "A")
     }
+    @TestCase
+    func worldStoresAndKeyVariantsCoverBoundaryModes(): Unit {
+        let world = EntityWorld()
+        let first = world.create()
+        let second = world.create()
+        @Expect(world.frame(), 0)
+        @Expect(world.advanceFrame(), 1)
+        @Expect(world.advanceFrame(), 2)
+        @Expect(!world.destroy(EntityId(999)))
+        @Expect(world.destroy(second))
+        @Expect(!world.isAlive(second))
+
+        let transforms = ComponentStore<Transform2D>()
+        transforms.insert(first, Transform2D())
+        transforms.insert(first, Transform2D(position: Vec2(x: 2.0, y: 3.0)))
+        transforms.insert(second, Transform2D())
+        @Expect(transforms.size(), 2)
+        @Expect(transforms.get(EntityId(999)).isNone())
+        @Expect(!transforms.set(EntityId(999), Transform2D()))
+        @Expect(transforms.set(first, Transform2D(position: Vec2(x: 4.0, y: 5.0))))
+        @Expect(!transforms.remove(EntityId(999)))
+        transforms.clearDead(world)
+        @Expect(transforms.size(), 1)
+        @Expect(transforms.remove(first))
+        @Expect(transforms.size(), 0)
+
+        let keys = [
+            KeyCode.Char(r'a'), KeyCode.F(1), KeyCode.CtrlC, KeyCode.Enter,
+            KeyCode.Esc, KeyCode.Tab, KeyCode.BackTab, KeyCode.Backspace,
+            KeyCode.Up, KeyCode.Down, KeyCode.Left, KeyCode.Right, KeyCode.Home,
+            KeyCode.End, KeyCode.PageUp, KeyCode.PageDown, KeyCode.Insert,
+            KeyCode.Delete
+        ]
+        for (key in keys) {
+            @Expect(sameKeyCode(key, key))
+            @Expect(!sameKeyCode(key, KeyCode.Char(r'~')))
+        }
+        @Expect(!sameKeyCode(KeyCode.Char(r'a'), KeyCode.Char(r'b')))
+        @Expect(!sameKeyCode(KeyCode.F(1), KeyCode.F(2)))
+        let input = GameInputState()
+        input.handle(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))))
+        input.handle(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))))
+        input.handle(Event.KeyHeld(KeyEvent(KeyCode.Char(r'y'))))
+        input.handle(Event.KeyRepeat(KeyEvent(KeyCode.Char(r'z'))))
+        @Expect(input.pressed(KeyCode.Char(r'x')))
+        @Expect(input.pressed(KeyCode.Char(r'y')))
+        @Expect(input.pressed(KeyCode.Char(r'z')))
+        input.handle(Event.FocusOut)
+        @Expect(!input.pressed(KeyCode.Char(r'x')))
+    }
+
+    @TestCase
+    func geometryAnimationAndRenderingBoundaryModesStayStable(): Unit {
+        let clamped = Aabb(x: 1.0, y: 2.0, width: -3.0, height: -4.0)
+        @Expect(clamped.width, 0.0)
+        @Expect(clamped.height, 0.0)
+        @Expect(clamped.moved(Vec2(x: 2.0, y: -1.0)), Aabb(x: 3.0, y: 1.0))
+        @Expect(Aabb(width: 2.0, height: 2.0).overlaps(Aabb(x: 1.0, y: 1.0, width: 2.0, height: 2.0)))
+        @Expect(!Aabb(width: 1.0, height: 1.0).overlaps(Aabb(x: 1.0, width: 1.0, height: 1.0)))
+        let body = RigidBody2D(mass: -1.0, damping: 2.0)
+        @Expect(body.mass, 0.001)
+        @Expect(body.damping, 1.0)
+        @Expect(CollisionEvent(EntityId(1), EntityId(2), Vec2(), -1.0, 0.0, 0.0).time, 0.0)
+        @Expect(CollisionEvent(EntityId(1), EntityId(2), Vec2(), 2.0, 0.0, 0.0).time, 1.0)
+
+        let emptyAnimation = SpriteAnimation([])
+        @Assert(emptyAnimation.current().rows.size, 0)
+        @Assert(emptyAnimation.advance(-10).rows.size, 0)
+        let map = TileMap([" #", "A "])
+        @Expect(map.tileAt(-1, 0), "")
+        @Expect(map.tileAt(99, 0), "")
+        @Expect(map.isSolid(1, 0))
+        @Expect(!map.isSolid(0, 0))
+        let mapBuffer = Buffer(Rect(0, 0, 2, 2))
+        map.render(mapBuffer.area, mapBuffer)
+        @Expect(mapBuffer.getCell(1, 0).symbol, "#")
+        @Expect(mapBuffer.getCell(0, 1).symbol, "A")
+
+        let world = EntityWorld()
+        let missing = world.create()
+        let transforms = ComponentStore<Transform2D>()
+        let velocities = ComponentStore<Velocity2D>()
+        let colliders = ComponentStore<Collider2D>()
+        let bodies = ComponentStore<RigidBody2D>()
+        let physics = PhysicsWorld(gravity: Vec2(), maxSubSteps: 0)
+        @Expect(physics.step(world, transforms, velocities, colliders, bodies, 0).size, 0)
+        transforms.insert(missing, Transform2D())
+        colliders.insert(missing, Collider2D())
+        bodies.insert(missing, RigidBody2D(bodyType: BodyType.Kinematic, damping: 1.0))
+        @Expect(physics.step(world, transforms, velocities, colliders, bodies, 16).size, 0)
+        @Expect(physics.overlaps(world, transforms, colliders, EntityId(999)).size, 0)
+
+        let sprites = ComponentStore<Sprite2D>()
+        let spriteOnly = world.create()
+        sprites.insert(spriteOnly, Sprite2D(["x"]))
+        SpriteRenderer().render(Rect(0, 0, 2, 1), Buffer(Rect(0, 0, 2, 1)), transforms, sprites)
+    }
+
 }

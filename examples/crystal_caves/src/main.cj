@@ -1,4 +1,4 @@
-package cjtui_crystal_caves
+package termcanvas_crystal_caves
 
 import core.*
 import game.*

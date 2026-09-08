@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_ops_dashboard"
+  name = "termcanvas_ops_dashboard"
   organization = ""
-  description = "Real-time operations dashboard example for cjtui"
+  description = "Real-time operations dashboard example for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

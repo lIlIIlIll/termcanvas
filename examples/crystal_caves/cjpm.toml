@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_crystal_caves"
+  name = "termcanvas_crystal_caves"
   organization = ""
-  description = "Playable multi-level side-scrolling crystal cave game for cjtui"
+  description = "Playable multi-level side-scrolling crystal cave game for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

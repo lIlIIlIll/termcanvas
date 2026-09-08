@@ -1,4 +1,4 @@
-package cjtui_example_smoke
+package termcanvas_example_smoke
 
 import core.*
 import std.collection.ArrayList

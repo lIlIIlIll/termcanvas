@@ -364,4 +364,45 @@ class AuditInputRound2Test {
         @Expect(editor.cursor, 3)
         @Expect(editor.scroll, 0)
     }
+    @TestCase
+    func readOnlyAndControlKeyBoundariesRemainNonMutating(): Unit {
+        let readOnly = TextArea(value: "one two", cursor: 3, readOnly: true, placeholder: "hint", lineNumbers: true)
+        for (key in [
+            KeyEvent(KeyCode.Char(r'k'), modifiers: KeyModifier(ctrl: true)),
+            KeyEvent(KeyCode.Char(r'u'), modifiers: KeyModifier(ctrl: true)),
+            KeyEvent(KeyCode.Char(r'w'), modifiers: KeyModifier(ctrl: true)),
+            KeyEvent(KeyCode.Char(r'y'), modifiers: KeyModifier(ctrl: true)),
+            KeyEvent(KeyCode.Char(r'x')),
+            KeyEvent(KeyCode.Enter),
+            KeyEvent(KeyCode.Backspace),
+            KeyEvent(KeyCode.Delete),
+            KeyEvent(KeyCode.Tab),
+            KeyEvent(KeyCode.BackTab)
+        ]) {
+            @Expect(!readOnly.handle(key))
+        }
+        @Expect(readOnly.value, "one two")
+        @Expect(readOnly.handleWithDirty(KeyEvent(KeyCode.Char(r'x')), Rect(0, 0, 12, 2)).isNone())
+
+        let blank = TextArea(value: "", placeholder: "hint", lineNumbers: true)
+        let buffer = Buffer(Rect(0, 0, 12, 2))
+        blank.render(buffer.area, buffer)
+        @Expect(buffer.getCell(3, 0).symbol, "h")
+
+        let editable = TextArea(value: "abc", cursor: 1)
+        @Expect(editable.handle(KeyEvent(KeyCode.Delete)))
+        @Expect(editable.value, "ac")
+        @Expect(editable.handle(KeyEvent(KeyCode.Right, modifiers: KeyModifier(ctrl: true))))
+        @Expect(editable.handle(KeyEvent(KeyCode.Left, modifiers: KeyModifier(ctrl: true))))
+        @Expect(editable.handle(KeyEvent(KeyCode.End)))
+        @Expect(editable.cursor, editable.value.size)
+        @Expect(editable.handleWithDirty(KeyEvent(KeyCode.Char(r'?')), Rect(0, 0, 8, 2)).isSome())
+        @Expect(!editable.handle(KeyEvent(KeyCode.F(1))))
+
+        let defaultItem = TextCompletionItem("label")
+        let replacementItem = TextCompletionItem("label", insertText: "x")
+        @Expect(defaultItem.insertText, "label")
+        @Expect(replacementItem.insertText, "x")
+    }
+
 }

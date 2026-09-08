@@ -2405,7 +2405,7 @@ public class App {
     // measured default is an immediate-first 32 ms continuation budget; zero
     // preserves exact legacy presentation behavior for proof and diagnostics.
     private static func frameCoalescingBudgetMillis(): Int64 {
-        match (getVariable("CJ_TUI_FRAME_COALESCE_MS")) {
+        match (getVariable("TERMCANVAS_FRAME_COALESCE_MS")) {
             case Some(value) => max(0, min(100, parseIntOrZero(value)))
             case None => 32
         }

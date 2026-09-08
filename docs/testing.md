@@ -95,8 +95,8 @@ they must not become release pass/fail thresholds. The core benchmark entrypoint
 is:
 
 ```bash
-CANGJIE_SDK_ROOT=/path/to/20260817/cangjie \
-  scripts/cangjie_cmd.sh packages/core cjpm bench --filter=CjTuiPerformanceBench
+CANGJIE_SDK_ROOT=/path/to/1.1.3/cangjie \
+  scripts/cangjie_cmd.sh packages/core cjpm bench --filter=TermCanvasPerformanceBench
 ```
 
 The benchmark is a diagnostic, not a gate. If a performance change needs a
@@ -105,10 +105,9 @@ invariant instead of adding a wall-clock threshold.
 
 ## Use the accepted compiler and scripts
 
-Canonical verification uses Cangjie
-`1.1.0-alpha.20260817040003` with cjpm `1.1.3`. Package manifests retain
-`cjc-version = "1.1.0"` as their language compatibility declaration; the exact
-compiler identity is enforced by `scripts/check_sdk.sh`.
+Canonical verification uses Cangjie `1.1.3` STS with cjpm `1.1.3`. Package
+manifests retain `cjc-version = "1.1.0"` as their language compatibility
+declaration; the exact compiler identity is enforced by `scripts/check_sdk.sh`.
 
 A mutable `daily` SDK may be used for local exploratory commands only and is not
 acceptance authority. `scripts/release_gate.sh` requires `CANGJIE_SDK_ROOT`,
@@ -135,6 +134,7 @@ The repository's additional workflow commands are:
 - `scripts/run_macos_smoke.sh` provides macOS package smoke and game pressure build coverage from an already-present remote checkout.
 - `scripts/run_regression_matrix.sh`
 - `scripts/run_pressure.sh`
+- `scripts/coverage.sh [output-dir]` runs Cangjie package/example tests with coverage instrumentation and writes a `coverage.xml` report for Codecov. The enforced 90% line / 80% branch scope contains production package sources; test files, demo applications, and the OS-specific terminal lifecycle files (`packages/core/src/{app,event,pty,terminal}.cj`) are excluded from the aggregate. Example tests still run in the same command as regression coverage.
 
 Full unittest execution may need permission to create the local test runner TCP
 socket.

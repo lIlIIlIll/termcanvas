@@ -2,7 +2,7 @@
 
 ## Explanation: support level and selection
 
-`cjtui` is Linux/glibc-first today. Linux/glibc is the fully validated terminal target. macOS and Windows have native experimental terminal paths; until a platform is included in the tested regression matrix, document it as experimental.
+`termcanvas` is Linux/glibc-first today. Linux/glibc is the fully validated terminal target. macOS and Windows have native experimental terminal paths; until a platform is included in the tested regression matrix, document it as experimental.
 
 Platform defaults are isolated behind `@When[os == ...]` factories, so non-Linux targets do not have to use Linux terminal defaults. The default selectors are:
 
@@ -61,13 +61,13 @@ scripts/run_windows_smoke.sh
 For macOS, run the same smoke package on the macOS host:
 
 ```bash
-MACOS_REPO=/path/to/cj_tui scripts/run_macos_smoke.sh
+MACOS_REPO=/path/to/termcanvas scripts/run_macos_smoke.sh
 ```
 
 If the macOS host does not expose `cjpm` through its default shell or the linker cannot infer the macOS SDK, pass explicit paths:
 
 ```bash
-MACOS_REPO=/path/to/cj_tui \
+MACOS_REPO=/path/to/termcanvas \
 MACOS_CANGJIE_ROOT=/path/to/cangjie \
 MACOS_SDKROOT=/path/to/MacOSX.sdk \
 scripts/run_macos_smoke.sh

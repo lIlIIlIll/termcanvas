@@ -1,4 +1,4 @@
-package cjtui_gif_ascii
+package termcanvas_gif_ascii
 
 import core.*
 import media.*

@@ -253,6 +253,41 @@ class VirtualTranscriptTests {
     }
 
     @TestCase
+    func heightIndexHandlesEmptyClampsNoopsAndTruncation(): Unit {
+        let empty = TranscriptHeightIndex()
+        @Expect(empty.count(), 0)
+        @Expect(empty.value(-1), 0)
+        @Expect(empty.value(0), 0)
+        @Expect(empty.prefix(-5), 0)
+        @Expect(empty.prefix(5), 0)
+        @Expect(empty.itemAt(0), -1)
+        @Expect(empty.update(-1, 5), 0)
+        @Expect(empty.truncate(4), 0)
+
+        @Expect(empty.append(height: 0) > 0)
+        @Expect(empty.append(height: 2) > 0)
+        @Expect(empty.total(), 3)
+        @Expect(empty.update(0, 1), 0)
+        @Expect(empty.update(99, 4), 0)
+        @Expect(empty.update(1, 5) > 0)
+        @Expect(empty.total(), 6)
+        @Expect(empty.prefix(99), 6)
+        @Expect(empty.itemAt(-1), 0)
+        @Expect(empty.itemAt(99), 1)
+        @Expect(empty.truncate(1), 1)
+        @Expect(empty.total(), 1)
+
+        empty.reset(3)
+        @Expect(empty.count(), 3)
+        @Expect(empty.nodeCount(), 3)
+        @Expect(empty.value(0), 1)
+        @Expect(empty.value(3), 0)
+        @Expect(empty.truncate(99), 3)
+        @Expect(empty.truncate(-1), 0)
+        @Expect(empty.total(), 0)
+    }
+
+    @TestCase
     func appendGrowthDoesNotResetOrScanHistoricalMetadata(): Unit {
         for (history in [0, 1, 63, 64, 65, 999, 9999, 99999, 100000]) {
             let source = GrowingTranscriptSource(history)
