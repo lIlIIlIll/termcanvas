@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-expected_version=${CANGJIE_SDK_VERSION:-1.1.0-alpha.20260817040003}
+expected_version=${CANGJIE_SDK_VERSION:-1.1.3}
 expected_cjpm_version=${CANGJIE_CJPM_VERSION:-1.1.3}
 sdk_root=${CANGJIE_SDK_ROOT:-}
 

@@ -757,12 +757,14 @@
   "canonical_toolchain_update": {
     "phase": "5O-T-I",
     "status": "IMPLEMENTED",
-    "previous_canonical": {"date": "20260803", "version": "1.1.0-alpha.20260803040049", "disposition": "REJECTED_FOR_CANONICAL_VERIFICATION", "defect": "PROVEN std.unittest.testmacro @Bench code-generation SIGSEGV during generated suite enumeration"},
-    "current_canonical": {"date": "20260817", "version": "1.1.0-alpha.20260817040003", "cjpm": "1.1.3"},
-    "authority": "Canonical verification requires an explicit CANGJIE_SDK_ROOT whose cjc version exactly matches 1.1.0-alpha.20260817040003. Manifest cjc-version 1.1.0 remains the package/language compatibility declaration; mutable daily remains only a noncanonical local convenience.",
-    "provenance": "Canonical gates validate compiler, cjpm, runtime, and stdx from one complete SDK root, replace inherited SDK paths, and use a version- plus workspace-specific isolated target namespace so artifacts produced by another compiler cannot satisfy verification.",
-    "qualification": "The frozen @Bench reproducer, core 528/528, API fixtures 14/14, architecture, fitness, all release packages, 17 example builds and smokes, six scripted workflows, pressure, agent_tui 65/65, agent_app 15/15, and the current official release gate passed. The old 20260803 SDK is rejected before compilation.",
-    "compatibility": "Forward canonical verification-toolchain update with zero termcanvas production migration, zero consumer production migration, zero API delta, and no ABI claim. External build systems using the repository's canonical verification path must supply the new exact SDK."
+    "qualification_phase": "STS-QUALIFICATION-20260908",
+    "previous_canonical": {"date": "20260817", "version": "1.1.0-alpha.20260817040003", "cjpm": "1.1.3", "disposition": "RETIRED_AFTER_STS_QUALIFICATION"},
+    "historical_rejected": {"date": "20260803", "version": "1.1.0-alpha.20260803040049", "disposition": "REJECTED_FOR_CANONICAL_VERIFICATION", "defect": "PROVEN std.unittest.testmacro @Bench code-generation SIGSEGV during generated suite enumeration"},
+    "current_canonical": {"release_date": "20260529", "qualified_on": "20260908", "channel": "sts", "version": "1.1.3", "cjpm": "1.1.3"},
+    "authority": "Canonical verification requires an explicit CANGJIE_SDK_ROOT whose cjc version exactly matches the public 1.1.3 STS SDK. Manifest cjc-version 1.1.0 remains the package/language compatibility declaration; a mutable daily SDK and the retired 20260817 nightly are noncanonical.",
+    "provenance": "Canonical gates validate compiler, cjpm, and runtime from one complete STS SDK root, replace inherited SDK paths, and use a 1.1.3- plus workspace-specific isolated target namespace so artifacts produced by another compiler cannot satisfy verification.",
+    "qualification": "The public Linux x64 1.1.3 STS archive was checksum-verified; the core suite passed 648/648, the full release gate passed locally, and GitHub Actions passed Setup Cangjie STS, SDK verification, release gate, coverage generation, and Codecov upload on the qualified commit.",
+    "compatibility": "Forward canonical verification-toolchain update with zero termcanvas production migration, zero consumer production migration, zero API delta, and no ABI claim. External build systems using the repository's canonical verification path must supply the exact 1.1.3 STS SDK."
   },
   "external_delivery_stability_review": {
     "phase": "5C-I",
