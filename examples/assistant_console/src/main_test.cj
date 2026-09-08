@@ -29,4 +29,35 @@ class AssistantConsoleTest {
         @Expect(app.composer.area.value, before)
         @Expect(app.showRequest, true)
     }
+
+    @TestCase
+    func approvalKeyboardAndRenderingCoverBothApplicationSurfaces(): Unit {
+        let app = AssistantConsole()
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'a'))))
+        @Expect(app.showRequest)
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Right)))
+        let accepted = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        @Expect(app.showRequest, false)
+        @Expect(app.status, "approval: Confirm")
+        match (accepted) {
+            case ControlFlow.Continue => ()
+            case _ => @Expect(false)
+        }
+
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.End)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))))
+        @Expect(app.composer.area.value.endsWith("x"))
+        let backend = TestBackend(area: Rect(0, 0, 80, 24))
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        _ = terminal.draw { frame => app.render(frame) }
+        @Assert(backend.snapshot().contains("Transcript"))
+        app.showRequest = true
+        _ = terminal.draw { frame => app.render(frame) }
+        @Assert(backend.snapshot().contains("Approval"))
+        let quit = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'q'))))
+        match (quit) {
+            case ControlFlow.Exit => ()
+            case _ => @Expect(false)
+        }
+    }
 }
