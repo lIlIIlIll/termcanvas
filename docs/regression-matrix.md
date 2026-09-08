@@ -81,7 +81,7 @@ generated index; use the script as the matrix lane's source of truth.
 ## Dependencies and CI SDK resolution
 
 - `packages/markdown` depends on the in-repository `packages/cj_markdown` package.
-- The GitHub Actions workflow installs the public pinned Cangjie `1.1.3` STS SDK with `Zxilly/setup-cangjie`; it no longer depends on `CANGJIE_SDK_URL` or `DEVREPO_TOKEN` secrets. `scripts/check_sdk.sh` keeps the local nightly defaults and accepts the CI pin through environment variables; the STS SDK's standard libraries are embedded in its runtime layout, so an external `stdx` archive is not required.
+- The GitHub Actions workflow installs the public pinned Cangjie `1.1.3` STS SDK with `Zxilly/setup-cangjie`; it no longer depends on `CANGJIE_SDK_URL` or `DEVREPO_TOKEN` secrets. `scripts/check_sdk.sh` defaults to the qualified STS pin and accepts an explicit compiler pin for local/nightly fixtures; the STS SDK's standard libraries are embedded in its runtime layout, so an external `stdx` archive is not required.
 - `scripts/resolve_nightly_sdk.py` remains the offline/local resolver for manifest and DevRepo fixtures; it is not on the CI installation path.
 - If the release gate fails on a non-PR CI run, `scripts/archive_nightly_failure.sh` creates and pushes `archive/nightly-fail/<sdk-version>/<short-sha>` pointing at the tested commit. The script skips an existing remote archive branch for the same commit; local invocations remain non-pushing unless `TERMCANVAS_PUSH_NIGHTLY_ARCHIVE=1` is set.
 - Full CI coverage runs from a single checkout; no sibling Markdown parser repository is required.

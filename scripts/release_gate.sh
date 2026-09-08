@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 sdk_root=$("$ROOT/scripts/check_sdk.sh")
 export CANGJIE_SDK_ROOT="$sdk_root"
-export TERMCANVAS_CANONICAL_TARGET_ROOT="${TERMCANVAS_CANONICAL_TARGET_ROOT:-${TMPDIR:-/tmp}/termcanvas-canonical-target/20260817}"
+export TERMCANVAS_CANONICAL_TARGET_ROOT="${TERMCANVAS_CANONICAL_TARGET_ROOT:-${TMPDIR:-/tmp}/termcanvas-canonical-target/1.1.3}"
 
 echo "==> canonical Cangjie SDK"
 "$ROOT/scripts/check_sdk.sh" --report
