@@ -32,8 +32,15 @@ jobs:
         working-directory: termcanvas
         run: |
           set -euo pipefail
-          sdk_root="$(dirname "$(dirname "$(command -v cjc)")")"
+          sdk_root="${CANGJIE_HOME:-}"
+          if [[ -z "$sdk_root" || ! -x "$sdk_root/bin/cjc" ]]; then
+            cjc_path="$(readlink -f -- "$(command -v cjc)")"
+            sdk_root="$(dirname -- "$(dirname -- "$cjc_path")")"
+          fi
+          sdk_root="$(readlink -f -- "$sdk_root")"
           echo "CANGJIE_SDK_ROOT=$sdk_root" >> "$GITHUB_ENV"
+          printf 'CANGJIE_HOME=%s\n' "${CANGJIE_HOME:-}"
+          printf 'CJC_PATH=%s\n' "$(command -v cjc)"
           printf 'CANGJIE_SDK_ROOT=%s\n' "$sdk_root"
           scripts/check_sdk.sh --report
 
