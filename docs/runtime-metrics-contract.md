@@ -1,11 +1,13 @@
 # Reduced Runtime Metrics Contract Candidate
 
+## Status and reader goal
+
 Status: **EXPERIMENTAL contract freeze; not promoted**.
 
-This document defines the smallest Runtime Observability surface that may be
-considered for a future stable contract. It does not change the current API
-classification. `AppTraceSink`, `FrameSchedulingSnapshot`, `maxUpdateDepth`,
-and `ExternalPort` diagnostics are outside this candidate.
+Use this page to understand the smallest Runtime Observability surface proposed
+for a future stable contract, and to keep implementation, ownership, reset, and
+overflow assumptions explicit while evaluating it. This document does not change
+the current API classification and does not promote any member to stable.
 
 The candidate surface is:
 
@@ -18,9 +20,11 @@ RuntimeMetricsSnapshot
 AppMetrics.runtime()
 ```
 
-`RuntimeMetricsSnapshot.scheduling`, `RuntimeMetricsSnapshot.maxUpdateDepth`,
-and public construction of arbitrary snapshots remain experimental and are not
-part of the candidate contract.
+`RuntimeMetricsSnapshot.scheduling`,
+`RuntimeMetricsSnapshot.maxUpdateDepth`, and public construction of arbitrary
+snapshots remain experimental and are not part of the candidate contract.
+`AppTraceSink`, `FrameSchedulingSnapshot`, `maxUpdateDepth`, and `ExternalPort`
+diagnostics are outside this candidate.
 
 ## Ownership and snapshot consistency
 
@@ -31,32 +35,34 @@ creation safe.
 
 Within that ownership rule, `AppMetrics.runtime()` returns a coherent
 point-in-time value, not a best-effort mixture of epochs. The returned struct is
-an independent immutable value. Reading it does not mutate or reset
-`AppMetrics`, and later runtime updates or resets do not change an already
-returned snapshot. After it has been safely published using ordinary Cangjie
-happens-before synchronization, unrelated consumers may read the immutable
-snapshot concurrently.
+an independent immutable value. Reading it does not mutate or reset `AppMetrics`,
+and later runtime updates or resets do not change an already returned snapshot.
+After it has been safely published using ordinary Cangjie happens-before
+synchronization, unrelated consumers may read the immutable snapshot
+concurrently.
 
 This contract does not expose `RuntimeQueue`, a physical queue count, a
 scheduler, or a synchronization primitive.
 
 ## Reset epoch
 
-`AppMetrics.reset()` remains the single public epoch boundary. Immediately
-after an owner-thread reset, the three candidate fields are zero. Resetting does
-not mutate snapshots that were already returned.
+`AppMetrics.reset()` remains the single public epoch boundary. Immediately after
+an owner-thread reset, the three candidate fields are zero. Resetting does not
+mutate snapshots that were already returned.
 
-The stable-intended promise is limited to those three fields. The current
-method may also clear frame history or experimental scheduling diagnostics, but
-those additional effects are not part of this reduced contract and must not be
-used to pull those diagnostics into a future stable closure.
+The stable-intended promise is limited to those three fields. The current method
+may also clear frame history or experimental scheduling diagnostics, but those
+additional effects are not part of this reduced contract and must not be used to
+pull those diagnostics into a future stable closure.
 
 Reset may occur while work admitted during the previous epoch is still pending.
 Consequently, no contract is made that `queueProcessed <= queueEnqueued` within
 an arbitrary epoch. Consumers must treat the counters independently rather than
 derive a durable backlog by subtraction across reset.
 
-## `queueEnqueued`
+## Candidate metric semantics
+
+### `queueEnqueued`
 
 | Property | Contract |
 | --- | --- |
@@ -69,7 +75,7 @@ derive a durable backlog by subtraction across reset.
 | Unit | Logical work items. |
 | Compatibility risk | Changing which admitted items can invoke application update changes the count. Physical queue count, priority, and ordering do not. |
 
-## `queueProcessed`
+### `queueProcessed`
 
 | Property | Contract |
 | --- | --- |
@@ -82,7 +88,7 @@ derive a durable backlog by subtraction across reset.
 | Unit | Update dispatch attempts. |
 | Compatibility risk | Moving the observation point to successful completion would be a semantic break. Callback, render, and frame completion are not included. |
 
-## `maxQueueDepth`
+### `maxQueueDepth`
 
 | Property | Contract |
 | --- | --- |
@@ -95,37 +101,38 @@ derive a durable backlog by subtraction across reset.
 | Unit | Simultaneously pending logical work items. |
 | Compatibility risk | Exact physical queue topology is free to change, but changing the logical pending-update boundary or sampling at another point changes the metric. |
 
-## Runtime implementation freedom
+## Implementation freedom and non-goals
 
 A future runtime may replace the current single FIFO with multiple queues, a
 priority queue, or an external scheduler without breaking this contract if it
 preserves these logical observations:
 
-1. each successfully admitted application-update work item increments
-   `queueEnqueued` once;
-2. each application-update dispatch attempt increments `queueProcessed` once;
+1. Each successfully admitted application-update work item increments
+   `queueEnqueued` once.
+2. Each application-update dispatch attempt increments `queueProcessed` once.
 3. `maxQueueDepth` observes the aggregate pending-update population after
-   admission; and
-4. all observations remain coherent within the owner-thread epoch.
+   admission.
+4. All observations remain coherent within the owner-thread epoch.
 
 The contract does not promise FIFO order, physical queue identity, scheduler
-reason strings, frame coalescing behavior, or a relationship between work-item
-counts and rendered frames.
+reason strings, frame coalescing behavior, or a relationship between
+work-item counts and rendered frames. It also does not expose a runtime queue,
+scheduler, or synchronization primitive.
 
 ## Consumer-neutral use
 
 The candidate can support unrelated consumers without exposing runtime
 internals:
 
-- a diagnostics UI may take a snapshot on the App owner thread and render
-  counts from that immutable value; and
-- a telemetry exporter may receive an already-created snapshot over a
+- A diagnostics UI may take a snapshot on the App owner thread and render counts
+  from that immutable value.
+- A telemetry exporter may receive an already-created snapshot over a
   synchronized application-owned channel and export it off-thread.
 
 Neither consumer needs `AppTraceSink`, frame-scheduling taxonomy, wake counters,
 or access to a mutable runtime queue.
 
-## Promotion prerequisites
+## Promotion gate and failure boundaries
 
 Promotion is not authorized by this document. It additionally requires:
 
@@ -134,3 +141,10 @@ Promotion is not authorized by this document. It additionally requires:
 - a clean stable dependency closure that excludes scheduling and diagnostics;
 - stable-to-nonstable debt remaining zero; and
 - an explicit promotion gate with no accidental promotion of excluded members.
+
+When reviewing an implementation or consumer, reject it as outside this
+candidate if it relies on a physical queue count, scheduler taxonomy, mutable
+snapshot sharing, concurrent unsynchronized `AppMetrics` access, durable
+backlog subtraction across reset, wall-clock frame completion, or any excluded
+member. An overflow must fail according to the stated Cangjie behavior rather
+than wrap to a negative value.

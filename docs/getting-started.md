@@ -1,17 +1,33 @@
 # Getting Started
 
-## Hello TUI
+## Goal
 
-Keep canonical state in an application object. Its update function is the only
-owner that applies events and command completions; its render function paints the
-current state with immediate widgets:
+Build and run the repository's basic application, then verify the complete path:
+application-owned state → `App`/`update` → immediate `Widget` rendering. The
+application exits from a key event and changes its state through a `Command`.
 
-```cj
-package hello_cjtui
+## Prerequisites
+
+- A checkout of this repository, with commands run from its root unless noted.
+- The Cangjie SDK available locally. Set `CANGJIE_SDK_ROOT` to its location;
+  the repository wrapper configures the compiler and runtime paths.
+- A terminal that can run an interactive application. The template manifest
+  declares `cjc-version = "1.1.0"`; the exact canonical verification pin is
+  recorded in [Versioning and Compatibility](versioning.md).
+
+## Run the basic application
+
+The complete first application is already in
+[`templates/basic_app/src/main.cj`](../templates/basic_app/src/main.cj), with its
+package manifest in [`templates/basic_app/cjpm.toml`](../templates/basic_app/cjpm.toml).
+Open the source first so the state, event, command, and render paths are visible:
+
+```cangjie
+package cjtui_basic_app
 
 import core.*
 
-class HelloApp {
+class DemoApp {
     var count: Int64 = 0
 
     func update(event: Event): UpdateResult {
@@ -37,7 +53,7 @@ class HelloApp {
 }
 
 main(): Int64 {
-    let app = HelloApp()
+    let app = DemoApp()
     App(targetFps: 10).runWithCommands(
         { frame => app.render(frame) },
         { event => app.update(event) }
@@ -46,61 +62,80 @@ main(): Int64 {
 }
 ```
 
-The repository's `templates/basic_app` contains this same stable API shape as a
-runnable project and is built by the official template check.
+From the repository root, build the template with the wrapper:
 
-## Widgets And Layout
+```bash
+CANGJIE_SDK_ROOT=/path/to/cangjie \
+  scripts/cangjie_cmd.sh templates/basic_app cjpm build
+```
 
-Use `Layout.horizontal()` and `Layout.vertical()` to split the frame. Render widgets with `frame.renderWidget(widget, area)`.
+Run it with the same command shape:
 
-Common first widgets:
+```bash
+CANGJIE_SDK_ROOT=/path/to/cangjie \
+  scripts/cangjie_cmd.sh templates/basic_app cjpm run
+```
 
-- `Block` and `Paragraph` for framed text.
-- `List` and `Table` for structured rows.
-- `Input` and `TextArea` for editing.
-- `DocumentView` for rich documents and previews.
+### Verify the first success
 
-## Runtime Commands
+The running application renders `count` and the `+`/quit key hints. Press `+`
+and verify that `count` increases. Press `q` or `Ctrl-C` and verify that the
+application exits. This exercises the application-owned state update, the
+`Command.Message("inc")` message action, and the immediate `Paragraph` render.
 
-Use `App.runWithCommands()` when updates need side effects. Return
-`UpdateResult.withCommand(...)` from the update function; the runtime executes
-accepted work in order and delivers results back through update.
+## Add layout and widgets
+
+Keep rendering immediate: compute layout from `frame.area`, then pass each area
+to `frame.renderWidget(widget, area)`. Start with:
+
+- `Block` and `Paragraph` for framed text;
+- `List` and `Table` for structured rows; and
+- `Input`, `TextArea`, or `DocumentView` for editing and rich content.
+
+When selection or scrolling must persist across frames, keep the corresponding
+state in the application-owned state and pass `ListState` or `TableState` rather
+than relying on transient constructor values.
+
+## Add effects through `Command`
+
+Use `App.runWithCommands()` when an update needs an effect. Return
+`UpdateResult.withCommand(...)` from `update`; the runtime executes accepted work
+in order and delivers results back through `Event` and the same update path.
 
 - Use `Command.Message` for internal actions.
 - Use `Command.AsyncTask` for background work. Workers return immutable results;
-  apply them to state only from update.
+  apply them to application-owned state only from `update`.
 - Use `Command.AsyncExec` for background process execution.
-- Use `Command.StartTimer(TimerSpec(...))` for one-shot or repeating real-time timers.
-- Keep `Command.Exec` for short synchronous commands only.
-- `App` redraws after input, resize, real-time ticks, timers, and command-produced events. On Linux it waits for stdin readiness with `epoll_wait`; tune `tickEvery`, `targetFps`, and `idleSleep` for periodic refresh without busy polling.
+- Use `Command.StartTimer(TimerSpec(...))` for one-shot or repeating real-time
+  timers.
+- Keep `Command.Exec` for short synchronous commands.
 
-## Testing
+## Verify event workflows
 
-Use `TestBackend` for render snapshots and `EventScenario` for workflow tests. Scenarios can drive keys, paste text, resize events, and expected cells or snapshots.
-
-```text
-scenario:save
-key:ctrl-s
-expect:flow:continue
-```
-
-Run:
+For deterministic event-script checks, run this command from the repository root:
 
 ```bash
-scripts/run_event_script.sh packages/core/tests/events/basic.events packages/core/tests/events/scenario.events
+scripts/run_event_script.sh \
+  packages/core/tests/events/basic.events \
+  packages/core/tests/events/scenario.events
 ```
 
-## Next Examples
+The script validates the repository's event scenario syntax. For render
+assertions and captured frames, use `TestBackend` and the snapshot helpers
+covered by [Testing](testing.md).
 
-Start with `examples/taskpad`, then read `examples/command_center` for runtime effects, `examples/form_studio` for focus and forms, `examples/markdown_studio` for text editing, and `examples/debug_lab` for diagnostics.
+## Next steps
 
-## Release Checks
+- Browse the [17-example catalog](examples.md), starting with
+  [`taskpad`](../examples/taskpad/) and then choosing a focused application.
+- Read [App runtime](app-runtime.md) for event, command, timer, and redraw
+  behavior.
+- Read [Widgets](widgets.md), [Layout](layout.md), and [Events](events.md) as
+  the application grows.
+- Check [API Overview](api.md) and [Versioning and Compatibility](versioning.md)
+  before adopting experimental or extension-package declarations.
+- Before sharing a build, run the repository [release gate](../scripts/release_gate.sh):
 
-Before sharing a build, run:
-
-```bash
-scripts/run_regression_matrix.sh
-scripts/run_pressure.sh
-```
-
-Platform support and API stability are documented in `docs/platforms.md` and `docs/versioning.md`.
+  ```bash
+  scripts/release_gate.sh
+  ```

@@ -1,11 +1,27 @@
 # cjtui
 
-`cjtui` is a Linux/glibc-first terminal UI library for Cangjie. Applications own
-their canonical state and update it from `Event`s in an `App` loop. Effects are
-returned as `Command`s, and immediate `Widget`s render the resulting state through
-`Frame` and `Buffer` to a `Backend`.
+`cjtui` is a Linux/glibc-first terminal UI library for Cangjie. An application owns
+its canonical state, applies `Event`s in an `App` update loop, returns effects as
+`Command`s, and renders the resulting state with immediate `Widget`s. The
+rendering path ends at a `Backend` through `Frame` and `Buffer`.
 
-The primary model is one path:
+## Start here
+
+1. Follow [Getting Started](docs/getting-started.md) for the first runnable
+   application and its verification commands.
+2. Use the [example catalog](docs/examples.md) to choose a complete application
+   or a focused feature demonstration.
+3. Read the [API overview](docs/api.md) and
+   [Versioning and Compatibility](docs/versioning.md) before depending on a
+   less familiar declaration.
+
+## Core model
+
+Keep the application's data and policy in application-owned state. `App` calls
+`update` for input, timers, and command results; `update` changes that state and
+returns an `UpdateResult`. Immediate widgets render a snapshot of the current
+state. Background work returns immutable completion events to the same update
+path instead of mutating widgets or application state directly.
 
 ```text
 application-owned state
@@ -14,28 +30,26 @@ App / update / Event / Command
         ↓
 ordered, run-to-completion runtime
         ↓
-DirtyRects / frame coalescing
+dirty-region coalescing
         ↓
 immediate Widget rendering
         ↓
 Frame / Buffer / Backend
 ```
 
-Key capabilities include:
+`Backend`, `Terminal`, and `TerminalSession` handle terminal I/O and restoration.
+`Frame` and `Buffer` provide presentation storage; `Layout`, styles, themes,
+text, and widgets operate on the current frame. `core` owns the stable editor
+primitives and rich document model. The former advanced editor shell and the
+`packages/editor` and `packages/document` alias facades are retired; use the
+same-named canonical `core` types instead. `packages/markdown` converts Markdown
+into the core document model, while PTY, media, transcript, diff, and game
+facilities extend this model without introducing a second application lifecycle.
 
-- application runtime, ordered commands, timers, async completions, and regional redraws;
-- immediate widgets, layout, styles/themes, text editing, rich documents, and Unicode-aware buffers;
-- keyboard, mouse, paste, focus, terminal capability, and resize events;
-- terminal/session restoration plus real and headless backends;
-- optional PTY, media, transcript, diff, editor, document, and game facilities; and
-- deterministic event, snapshot, headless-example, pressure, and release-gate testing.
+## Minimal use
 
-Not every exported declaration has the same support promise. Start with the stable
-primary path above; current experimental facilities are labelled in
-[`docs/api.md`](docs/api.md) and governed by
-[`docs/versioning.md`](docs/versioning.md).
-
-## Minimal Use
+This is the smallest stable rendering path. It renders one immediate widget and
+leaves event handling on the normal `App` update path:
 
 ```cangjie
 import core.*
@@ -54,73 +68,62 @@ main(): Int64 {
 }
 ```
 
-Use `Terminal`, `Backend`, and `TerminalSession` directly when writing a custom backend, low-level terminal test, or advanced session wrapper.
+For a stateful application, use `App(targetFps: 10).runWithCommands(...)` as in
+the runnable [basic application template](templates/basic_app/). The template
+keeps application-owned state in an object, handles `Event`s in `update`, and
+renders immediate widgets from that state.
 
 ## Examples
 
-From the repository root, point `CANGJIE_SDK_ROOT` at the canonical SDK and run
-an example through the repository wrapper:
+Run commands from the repository root. Set `CANGJIE_SDK_ROOT` to the canonical
+Cangjie SDK before using the repository wrapper:
 
 ```bash
 CANGJIE_SDK_ROOT=/path/to/cangjie \
   scripts/cangjie_cmd.sh examples/taskpad cjpm run
 ```
 
-The authoritative taxonomy is in
-[`docs/examples.md`](docs/examples.md): eight recommended applications, two
-experimental applications, six feature demonstrations, and one pressure/proof
-workload. Start with `taskpad`; use `btm_clone` for a nontrivial experimental
-App/update example with timers, async completion, focus, and regional dirty
-rendering; use `media_gallery` for direct terminal-media and `DocumentLine.image`
-integration.
+`taskpad` is the recommended first example. The [example catalog](docs/examples.md)
+links all 17 current examples by purpose: eight recommended applications, two
+experimental applications, six feature demonstrations, and one deterministic
+pressure/proof workload. The [examples directory index](examples/README.md)
+provides the same taxonomy next to the source directories.
 
-## Architecture
+## Release gate
 
-`App` is the single top-level event owner. Its update function mutates
-application-owned state and returns effects; background work returns immutable
-completion events to that same update path rather than mutating widgets. The
-runtime drains accepted work in order and runs each update to completion before
-coalescing dirty regions into a frame. Widgets are immediate renderers over the
-current state and layout.
-
-`Backend`, `Terminal`, `TerminalSession`, `Frame`, and `Buffer` own terminal I/O,
-restoration, and presentation. Focus, media, PTY, transcripts, documents, and
-other facilities are shared or specialized capabilities attached to this model,
-not alternative UI architectures. See [`docs/architecture.md`](docs/architecture.md)
-for the current topology and ADR-008 for historical architecture decisions.
-
-## Release Gate
+Run the repository's release gate from the root before sharing a build:
 
 ```bash
 scripts/release_gate.sh
 ```
 
-The gate runs parser tests, extension tests, core tests, event script validation, golden snapshot validation, API baseline checks, Unicode generated-data drift checks, example builds, smoke checks, and pressure-oriented scenarios.
+The gate checks package tests, event scripts, golden snapshots, generated API
+contracts and Unicode data, example builds and smoke checks, scripted workflows,
+and pressure scenarios. `packages/markdown` uses the in-repository
+`packages/cj_markdown` parser package, so the gate does not require a sibling
+parser checkout.
 
-`packages/markdown` depends on the in-repository `packages/cj_markdown` parser package, so a clean checkout can run the full gate without a sibling parser checkout.
+## Limits and support boundaries
 
-## Notes
+- Current packages use `0.1.x` and the API has four support tiers. The generated
+  inventory is exhaustive; use [Versioning and Compatibility](docs/versioning.md)
+  and [API Overview](docs/api.md) to distinguish `STABLE`, `EXPERIMENTAL`,
+  `INTERNAL`, and `TEST_ONLY` declarations.
+- The stable entry path is application-owned state → `App`/`update` → immediate
+  widget rendering. Do not make background workers mutate widgets or state
+  directly.
+- Linux/glibc is the primary terminal target. macOS and Windows drivers exist.
+  Windows external `EventSource` readiness remains experimental. The default
+  waiter accepts sources that provide a native `waitHandle()`; sources that
+  expose only a POSIX file descriptor require a custom waiter.
+- Raw mode can fail on non-tty input or a `termios` error. Check
+  `TerminalSession.rawModeEnabled` and `TerminalMode.lastError()` when
+  `TerminalSession.start()` returns `false`; modes enabled by the session are
+  rolled back on failure.
+- `TerminalSession` restores terminal state, cursor visibility, and enabled input
+  modes. Use it for interactive applications rather than managing restoration
+  ad hoc.
 
-- `TerminalSession.rawModeEnabled` reports whether raw mode was actually enabled.
-- `TerminalMode.lastError()` returns the last raw-mode setup failure reason, such as non-tty stdin or `termios` failure. If raw mode fails during `TerminalSession.start()`, modes already enabled by the session are rolled back before `false` is returned.
-- `List` and `Table` still accept direct `selected`/`offset` style arguments where supported; pass `ListState` or `TableState` when selection and scrolling should persist across frames.
-- `Input` supports placeholder text, helper methods such as `setValue()`/`clear()`, and horizontal viewport adjustment so the cursor remains visible in narrow areas.
-- `TextArea` supports multiline editing, multi-caret and mouse selection, paste insertion, find next/previous, word movement, cursor movement, PageUp/PageDown, Ctrl+A/Ctrl+E, optional line numbers with click navigation, fold ranges, async completion results, and vertical scrolling.
-- `displayWidth`, `graphemeClusters`, `nextGraphemeOffset`, and `previousGraphemeOffset` use Unicode 17.0.0 grapheme-break data for cursor movement, truncation, wrapping, and `TextBuffer` deletion. The release gate checks the generated tables and the full official `GraphemeBreakTest.txt` fixture.
-- `Paragraph` supports `WrapMode.NoWrap`, `WrapMode.Word`, `WrapMode.Character`, and `TextAlign.Left`/`Center`/`Right`.
-- `Color.Rgb(r, g, b)` renders true color SGR sequences.
-- `Theme.default()` provides normal/focused/selected/disabled/error/accent styles for newer form widgets.
-- `TestBackend.snapshot()`, `TestBackend.assertCell()`, `AppTestRunner`, and `SnapshotDiff` support render assertions, captured frame workflows, synthetic tick replay, and useful snapshot mismatch messages.
-- `VirtualTable`, `Tree`, `FilePicker`, and `Paginator` expose keyboard navigation helpers for app-level event handlers. `VirtualTable` also supports sorting, filtering, selected cells, horizontal column viewport adjustment, frozen columns, column resizing, sort indicators, and multi-selection row tracking.
-- `Tree` supports selected ids, id lookup, expand-all, and collapse-all. `FilePicker` supports parent navigation, entering selected directories, choosing selected paths, hidden-file toggling, search filtering, directory-first sorting, selected metadata, and keeps directories visible when filtering by extension.
-- `Menu`, `MenuBar`, `CommandPalette`, `ToastManager`, `Spinner`, and `Dialog` cover common command surfaces.
-- `Sparkline`, `Gauge`, `Chart`, `DocumentView`, `MarkdownView`, `LogView`, and `ColorPicker` cover common visualization and workflow surfaces.
-- `ProgressBar` supports determinate, indeterminate, horizontal, vertical, segmented, custom-symbol, and label-mode rendering while keeping the simple `ProgressBar(value, total, label)` constructor form.
-- `MultiSelect`, `DatePicker`, `FileDialog`, and `ConfirmDialog` cover additional application controls.
-- `scripts/run_event_script.sh`, `scripts/check_golden_snapshots.sh`, and `scripts/generate_api_index.sh` provide basic engineering workflow checks.
-- `Layout` supports `Constraint.Length`, `Percent`, `Min`, `Max`, and `Ratio`, plus `withGap`, `withMargin`, and `withFlex`.
-- See `docs/` for API overview, architecture, layout, app runtime, widgets, content extensions, events, testing, examples, widget gallery, and limitations.
-
-## Platform Notes
-
-Default terminal setup is selected through `defaultTerminalDriver()` and `defaultEventWaiter()`. Linux/glibc selects `LinuxTerminalDriver` plus `LinuxEpollEventWaiter`; macOS selects `MacOSTerminalDriver` plus `MacOSPollEventWaiter`; Windows selects `WindowsTerminalDriver` plus `WindowsConsoleEventWaiter` for console input/deadline waiting. Windows external event-source readiness remains experimental because `EventSource` exposes POSIX-style file descriptors. `TerminalMode` is the Linux/glibc raw-mode implementation; `MacOSTerminalMode` uses Darwin termios with `cfmakeraw()` and `poll()`; `WindowsConsoleMode` preserves Win32 console modes while enabling virtual terminal input/output. Use `TerminalSession` to restore raw mode, cursor visibility, mouse mode, paste mode, and the alternate screen on normal exit or exceptions.
+See `docs/` for the [application runtime](docs/app-runtime.md),
+[widgets](docs/widgets.md), [events](docs/events.md), [testing](docs/testing.md),
+[platform notes](docs/platforms.md), and [limitations](docs/limitations.md).
