@@ -1,9 +1,13 @@
 # Architecture Proof Step 0
 
-This document freezes the meaning of the Step-0 measurements. It is a
-measurement contract, not a runtime or rendering design change.
+## Status and applicability
 
-## Semantics and state/side effects
+This document freezes the meaning of the Step-0 measurements. It is a
+measurement contract: measurement and proof do not change product behavior or
+rendering design.
+
+The contract applies to the currently observable draw, transcript, diff, PTY,
+and resize paths. Its boundaries are:
 
 - Production behavior is unchanged when instrumentation is disabled.
 - Counters are monotonic within one observed draw or one
@@ -15,20 +19,7 @@ measurement contract, not a runtime or rendering design change.
 - Real PTY measurements stop at terminal flush; they are not keyboard-to-photon
   latency.
 
-## Control-flow paths
-
-| Path ID | Path | Observable boundary |
-| --- | --- | --- |
-| P001 | input -> application update -> render -> diff -> write | existing `AppTraceSink` timestamps and PTY trace |
-| P002 | widget paint -> Buffer writes | attempted and accepted cell assignments |
-| P003 | previous Buffer + next Buffer -> diff plan | diff scan time, changed cells, spans |
-| P004 | VirtualTranscript sync -> height index | sync calls, metadata touches, reset/update touches |
-| P005 | VirtualTranscript cache lookup -> materialization -> Document layout | requests, hits/misses, documents, wrap input bytes |
-| P006 | full render and incremental render from the same state | cell-for-cell Buffer comparison |
-| P007 | process spawn -> first terminal frame | independent PTY process sample |
-| P008 | resize -> invalidation -> transcript reflow | invalidations, metadata, materialization and wrap counters |
-
-## Input-domain equivalence and boundaries
+## Input-domain boundaries
 
 Text classes are ASCII, CJK, emoji, combining sequences, and wide cells.
 History boundaries are 100, 1,000, 10,000, and 100,000 items. Terminal
@@ -70,6 +61,54 @@ visual height, wrap crossing, complete-line append, and new-item append.
 | T011 | S011 | P001 | overlay fixture expects open/close/switch final-state assertions and raw timings |
 | T012 | S012 | P002 P003 P005 | overhead report expects matched off/on sample counts and distribution statistics |
 
+## Reproduction commands
+
+The pinned SDK and harness paths below are host-specific inputs copied from the
+original measurement environment. They are not repository prerequisites; replace
+them with paths available on the machine that runs the proof. The source-bearing
+microbenchmark fixture lives beside its manifest and results, outside the
+user-facing example inventory. Build that deterministic driver, then run the
+manifest's complete core matrix:
+
+```bash
+cd benchmarks/architecture-proof-step0/fixture
+OMP_CJ_SDK_ROOT=/home/elliot/cangjie_sdk/daily \
+  /home/elliot/playground/learn_agent_cj/scripts/pinned_cangjie cjpm build
+cd ../../..
+
+python3 scripts/architecture_proof_step0.py \
+  --output benchmarks/architecture-proof-step0/results/<run-id>
+```
+
+Run real PTY samples against an explicitly identified omp-cj candidate:
+
+```bash
+python3 scripts/architecture_proof_step0_pty.py \
+  --harness /home/elliot/playground/learn_agent_cj/scripts/tui_pty_bench.py \
+  --candidate '/absolute/path/to/agent_app --fixture' \
+  --candidate-root /absolute/path/to/learn_agent_cj \
+  --output benchmarks/architecture-proof-step0/results/<run-id>/pty
+```
+
+`architecture_proof_step0_cold.py` handles minimal applications that do not
+emit application trace records. `architecture_proof_step0_report.py` merges
+raw runs without discarding the individual JSONL artifacts. Result directories
+are ignored by Git but remain stable on disk; `/tmp` is never their sole
+location.
+
+## Observable control-flow paths
+
+| Path ID | Path | Observable boundary |
+| --- | --- | --- |
+| P001 | input -> application update -> render -> diff -> write | existing `AppTraceSink` timestamps and PTY trace |
+| P002 | widget paint -> Buffer writes | attempted and accepted cell assignments |
+| P003 | previous Buffer + next Buffer -> diff plan | diff scan time, changed cells, spans |
+| P004 | VirtualTranscript sync -> height index | sync calls, metadata touches, reset/update touches |
+| P005 | VirtualTranscript cache lookup -> materialization -> Document layout | requests, hits/misses, documents, wrap input bytes |
+| P006 | full render and incremental render from the same state | cell-for-cell Buffer comparison |
+| P007 | process spawn -> first terminal frame | independent PTY process sample |
+| P008 | resize -> invalidation -> transcript reflow | invalidations, metadata, materialization and wrap counters |
+
 ## Metric definitions
 
 | Metric | Definition |
@@ -101,36 +140,3 @@ visual height, wrap crossing, complete-line append, and new-item append.
 - The raw artifact path and build identity are emitted by the runner; reports
   must retain the raw JSON/JSONL files used for any coverage or performance
   claim.
-
-## Reproduction commands
-
-The pinned SDK path is an environment input, not part of the workload. The
-source-bearing microbenchmark fixture lives beside its manifest and results,
-outside the user-facing example inventory. Build that deterministic driver,
-then run the manifest's complete core matrix:
-
-```bash
-cd benchmarks/architecture-proof-step0/fixture
-OMP_CJ_SDK_ROOT=/home/elliot/cangjie_sdk/daily \
-  /home/elliot/playground/learn_agent_cj/scripts/pinned_cangjie cjpm build
-cd ../../..
-
-python3 scripts/architecture_proof_step0.py \
-  --output benchmarks/architecture-proof-step0/results/<run-id>
-```
-
-Run real PTY samples against an explicitly identified omp-cj candidate:
-
-```bash
-python3 scripts/architecture_proof_step0_pty.py \
-  --harness /home/elliot/playground/learn_agent_cj/scripts/tui_pty_bench.py \
-  --candidate '/absolute/path/to/agent_app --fixture' \
-  --candidate-root /absolute/path/to/learn_agent_cj \
-  --output benchmarks/architecture-proof-step0/results/<run-id>/pty
-```
-
-`architecture_proof_step0_cold.py` handles minimal applications that do not
-emit application trace records. `architecture_proof_step0_report.py` merges
-raw runs without discarding the individual JSONL artifacts. Result directories
-are ignored by Git but remain stable on disk; `/tmp` is never their sole
-location.

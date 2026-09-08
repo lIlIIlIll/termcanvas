@@ -1,31 +1,16 @@
 # Architecture Proof Step 1A: Runtime Correctness Foundation
 
-Step 1A is a correctness and lifecycle proof. It does not change frame cadence,
-render invalidation, layout, or transcript virtualization.
+## Status and applicability
 
-## Runtime contracts
+Step 1A is a correctness and lifecycle proof. Measurement and proof do not
+change product behavior: this step does not change frame cadence, render
+invalidation, layout, or transcript virtualization.
 
-- Every accepted runtime item receives a monotonically increasing sequence.
-- The runtime consumes accepted items FIFO and invokes one application update
-  at most once for each item.
-- Commands produced by an update append work to the queue. They never invoke
-  the application update synchronously.
-- Update is run-to-completion: events accepted during update, render, or wake
-  handling append to the queue and cannot re-enter update.
-- `ExternalPort<A>` is bounded and non-blocking. Enqueue returns `Accepted`,
-  `Full`, or `Closed`; no accepted action is silently lost.
-- Wake is level-visible: while a port is non-empty, clearing one notification
-  cannot make the runtime sleep indefinitely.
-- Runtime lifetime is `Running -> Closing -> Closed`. Closing rejects new
-  external actions, timers, and operations. Late completions are discarded.
-- Async owner identity is `(slot, generation)`. Reusing a slot increments the
-  generation; operation identity is independent from owner identity.
-- Cancellation is a request, not settlement. Generation validation remains
-  mandatory for late completions.
-- A background loader publishes an immutable completion. Only the UI/runtime
-  boundary applies that completion to retained `DataSource` state.
+The applicable input equivalence classes and control-flow paths are listed
+first below. Runtime contract details, scenario assertions, and known gaps
+remain evidence requirements for this step.
 
-## Control-flow paths and input domains
+## Input domains and control-flow paths
 
 | Path ID | Semantics / input domain | State and side effects |
 | --- | --- | --- |
@@ -73,6 +58,28 @@ render, wake handling, or shutdown.
 | T7 | S11 | P1 | TestClock test asserts 24 ms not due and 25 ms exactly due |
 | T8 | S13 | P1 | existing differential tests assert metrics do not alter final Buffer |
 | T9 | S14 | P1 P3 | Step-0.5 workload rerun asserts metrics-OFF distributions have no stable regression |
+
+## Runtime contracts
+
+- Every accepted runtime item receives a monotonically increasing sequence.
+- The runtime consumes accepted items FIFO and invokes one application update
+  at most once for each item.
+- Commands produced by an update append work to the queue. They never invoke the
+  application update synchronously.
+- Update is run-to-completion: events accepted during update, render, or wake
+  handling append to the queue and cannot re-enter update.
+- `ExternalPort<A>` is bounded and non-blocking. Enqueue returns `Accepted`,
+  `Full`, or `Closed`; no accepted action is silently lost.
+- Wake is level-visible: while a port is non-empty, clearing one notification
+  cannot make the runtime sleep indefinitely.
+- Runtime lifetime is `Running -> Closing -> Closed`. Closing rejects new
+  external actions, timers, and operations. Late completions are discarded.
+- Async owner identity is `(slot, generation)`. Reusing a slot increments the
+  generation; operation identity is independent from owner identity.
+- Cancellation is a request, not settlement. Generation validation remains
+  mandatory for late completions.
+- A background loader publishes an immutable completion. Only the UI/runtime
+  boundary applies that completion to retained `DataSource` state.
 
 ## Reverse-review gaps
 
