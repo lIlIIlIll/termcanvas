@@ -38,6 +38,7 @@ jobs:
             sdk_root="$(dirname -- "$(dirname -- "$cjc_path")")"
           fi
           sdk_root="$(readlink -f -- "$sdk_root")"
+          export CANGJIE_SDK_ROOT="$sdk_root"
           echo "CANGJIE_SDK_ROOT=$sdk_root" >> "$GITHUB_ENV"
           printf 'CANGJIE_HOME=%s\n' "${CANGJIE_HOME:-}"
           printf 'CJC_PATH=%s\n' "$(command -v cjc)"
