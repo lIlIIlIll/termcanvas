@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "suite": "cj_tui-architecture-proof-step0",
+  "build_mode": "release",
+  "environment": {
+    "TERM": "xterm-256color",
+    "NO_COLOR": "1",
+    "OMP_CJ_TUI_PERF_TRACE": "1"
+  },
+  "sample_policy": {
+    "operation_iterations": 120,
+    "process_iterations": 20,
+    "warmup_operations": 10,
+    "p99_min_samples": 100,
+    "sample_unit": "one completed frame or one independent process"
+  },
+  "terminal_sizes": {
+    "default": [100, 28],
+    "small": [60, 18],
+    "large": [120, 36]
+  },
+  "history_counts": [100, 1000, 10000, 100000],
+  "metrics_modes": ["off", "on"],
+  "workloads": [
+    {"name":"cold_start_minimal","kind":"process","fixture":"templates/basic_app","terminal_size":"default","iterations":20,"warmup":0},
+    {"name":"cold_start_omp_normal","kind":"process","fixture":"omp-cj --fixture","terminal_size":"default","history_count":100,"iterations":20,"warmup":0},
+    {"name":"cold_start_omp_10k","kind":"process","fixture":"omp-cj --fixture","terminal_size":"default","history_count":10000,"iterations":20,"warmup":0},
+    {"name":"typing_ascii","kind":"input","fixture":"deterministic PTY ASCII","terminal_size":"default","iterations":120,"warmup":10},
+    {"name":"typing_cjk","kind":"input","fixture":"deterministic PTY CJK when supported","terminal_size":"default","iterations":120,"warmup":10},
+    {"name":"backspace","kind":"input","fixture":"deterministic PTY","terminal_size":"default","iterations":120,"warmup":10},
+    {"name":"cursor_left_right","kind":"input","fixture":"deterministic PTY","terminal_size":"default","iterations":120,"warmup":10},
+    {"name":"key_repeat_up_down","kind":"input","fixture":"deterministic PTY","terminal_size":"default","iterations":120,"warmup":10},
+    {"name":"scroll_line","kind":"transcript","fixture":"generated transcript","terminal_size":"default","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"scroll_page","kind":"transcript","fixture":"generated transcript","terminal_size":"default","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"scroll_continuous","kind":"transcript","fixture":"generated transcript","terminal_size":"default","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"stream_a_no_wrap","kind":"transcript","fixture":"append token without visual-height change","terminal_size":"default","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"stream_b_wrap_cross","kind":"transcript","fixture":"append token crossing wrap boundary","terminal_size":"default","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"stream_c_complete_line","kind":"transcript","fixture":"append complete line","terminal_size":"default","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"stream_d_new_item","kind":"transcript","fixture":"append transcript item","terminal_size":"default","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"resize_small_width_oscillation","kind":"resize","fixture":"100x28 <-> 99x28","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"resize_large_width_jump","kind":"resize","fixture":"60x18 <-> 120x36","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"resize_huge_width_extremes","kind":"resize","fixture":"20x28 <-> 160x28 follow-bottom","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"resize_manual_width_extremes","kind":"resize","fixture":"20x28 <-> 160x28 manual anchor","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"resize_continuous_width","kind":"resize","fixture":"width 60..120 sequence","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"resize_height_only","kind":"resize","fixture":"100x18 <-> 100x36","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"resize_width_height","kind":"resize","fixture":"60x18 <-> 120x36","history_counts":[100,1000,10000,100000],"iterations":120,"warmup":10},
+    {"name":"overlay_open","kind":"overlay","fixture":"omp deterministic modal","terminal_size":"default","iterations":120,"warmup":10},
+    {"name":"overlay_close","kind":"overlay","fixture":"omp deterministic modal","terminal_size":"default","iterations":120,"warmup":10},
+    {"name":"overlay_switch","kind":"overlay","fixture":"omp deterministic modal switch","terminal_size":"default","iterations":120,"warmup":10}
+  ],
+  "raw_record_required_fields": [
+    "benchmark", "sample_id", "sample_order", "build_identifier",
+    "history_count", "terminal_width", "terminal_height", "metrics_mode",
+    "stage_timings", "counters"
+  ]
+}

@@ -1,0 +1,18 @@
+[package]
+cjc-version = "1.1.0"
+name = "markdown_studio"
+organization = ""
+description = "Markdown authoring studio built with cjtui"
+version = "1.0.0"
+target-dir = ""
+script-dir = ""
+output-type = "executable"
+compile-option = "--static"
+override-compile-option = ""
+link-option = ""
+package-configuration = {}
+
+[dependencies]
+"core" = { path = "../../packages/core", output-type = "static" }
+"markdown" = { path = "../../packages/markdown", output-type = "static" }
+"cj_markdown" = { path = "../../packages/cj_markdown", output-type = "static" }

@@ -1,0 +1,43 @@
+{
+  "format_version": 1,
+  "policy": {
+    "latency_source": "metrics off",
+    "attribution_source": "metrics on",
+    "performance_evidence": ["correctness differential", "structural counters", "latency distribution"],
+    "fixed_frame_deadline_is_public_contract": false
+  },
+  "gates": [
+    {"id": "runtime_run_to_completion", "tier": "fast", "contract": "maxUpdateDepth == 1 and accepted queue order is FIFO", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/runtime_foundation_test.cj"], "permanent": true},
+    {"id": "external_idle_wake", "tier": "fast", "contract": "an accepted ExternalPort action wakes an idle runtime without timer or input", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/runtime_foundation_test.cj"], "permanent": true},
+    {"id": "terminal_restore_once", "tier": "fast", "contract": "each enabled TerminalSession restore action occurs exactly once across failure/shutdown paths", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/runtime_foundation_test.cj", "packages/core/src/lib_test.cj"], "permanent": true},
+    {"id": "partial_full_buffer_equality", "tier": "fast", "contract": "partial dirty final Buffer equals forced full final Buffer including symbol, style, and CellKind", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/boundary_extreme_test.cj"], "permanent": true},
+    {"id": "wide_cell_atomicity", "tier": "fast", "contract": "wide lead and continuation are redrawn and committed atomically at dirty boundaries", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/boundary_extreme_test.cj"], "permanent": true},
+    {"id": "scheduler_preserves_updates", "tier": "fast", "contract": "frame coalescing preserves application update count/order and does not coalesce state transitions", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/runtime_foundation_test.cj"], "permanent": true},
+    {"id": "scheduler_promotion_resize_shutdown", "tier": "fast", "contract": "input promotes pending presentation, resize cannot present stale surface, shutdown discards pending frame, and deadline is non-sliding", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/runtime_foundation_test.cj"], "permanent": true},
+    {"id": "virtual_transcript_append_scaling", "tier": "architecture", "contract": "append metadata work is bounded and does not scale with total history", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/virtual_transcript_test.cj"], "permanent": true},
+    {"id": "virtual_transcript_width_scaling", "tier": "architecture", "contract": "normal width invalidation is an O(1) generation bump followed by viewport-dependent remeasurement", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/virtual_transcript_test.cj"], "permanent": true},
+    {"id": "virtual_transcript_precise_item", "tier": "architecture", "contract": "same-height visible-item fixture paints exactly the changed item", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/virtual_transcript_test.cj"], "permanent": true},
+    {"id": "virtual_transcript_offscreen_tail", "tier": "architecture", "contract": "offscreen tail update paints zero transcript items when visible mapping is unchanged", "command": "scripts/cangjie_cmd.sh packages/core cjpm test --no-color", "evidence_paths": ["packages/core/src/virtual_transcript_test.cj"], "permanent": true},
+    {"id": "composer_narrow_dirty", "tier": "release", "contract": "single-row normal edit does not repaint Composer header/chrome; geometry-changing edit uses the correct full-layout fallback", "command": "scripts/architecture_proof_step3c_composer.py --help", "evidence_paths": ["scripts/architecture_proof_step3c_composer.py"], "permanent": true, "repository": "learn_agent_cj consumer binary required"},
+    {"id": "long_transcript_materialization", "tier": "release", "contract": "long transcript preserves content and materialized documents remain bounded by viewport/overscan", "command": "scripts/architecture_proof_step3b5_long_gate.py --help", "evidence_paths": ["scripts/architecture_proof_step3b5_long_gate.py"], "permanent": true, "repository": "learn_agent_cj consumer binary required"},
+    {"id": "core_release_gate", "tier": "release", "contract": "all core and package public behavior suites pass", "command": "scripts/release_gate.sh", "evidence_paths": ["scripts/release_gate.sh"], "permanent": true},
+    {"id": "real_consumer_agent_tui", "tier": "release", "contract": "principal agent_tui consumer compiles and its relevant tests pass", "command": "scripts/pinned_cangjie cjpm test -m agent_tui", "evidence_paths": [], "permanent": true, "repository": "learn_agent_cj"},
+    {"id": "real_consumer_agent_app", "tier": "release", "contract": "principal agent_app consumer compiles and its relevant tests pass", "command": "scripts/pinned_cangjie cjpm test -m agent_app", "evidence_paths": [], "permanent": true, "repository": "learn_agent_cj"},
+    {"id": "buffer_document_microbench", "tier": "microbenchmark", "contract": "Buffer, Document, wrap, diff, and ANSI counters remain attributable", "command": "python3 scripts/architecture_proof_step0.py --help", "evidence_paths": ["scripts/architecture_proof_step0.py", "benchmarks/architecture-proof-step0/manifest.json", "benchmarks/architecture-proof-step0/fixture/cjpm.toml"], "permanent": false},
+    {"id": "real_consumer_attribution_microbench", "tier": "microbenchmark", "contract": "metrics-off latency and metrics-on attribution remain separately reproducible", "command": "python3 scripts/architecture_proof_step05_pty.py --help", "evidence_paths": ["scripts/architecture_proof_step05_pty.py", "benchmarks/architecture-proof-step05/manifest.json"], "permanent": false}
+  ],
+  "proof_only_archive": [
+    {"phase": "0", "disposition": "archive_summary_keep_manifest"},
+    {"phase": "0.5", "disposition": "archive_summary_keep_provenance_procedure"},
+    {"phase": "1A", "disposition": "promote_runtime_correctness_tests"},
+    {"phase": "1B", "disposition": "promote_scheduling_semantics_archive_policy_sweep"},
+    {"phase": "2A", "disposition": "promote_scaling_assertions"},
+    {"phase": "2B", "disposition": "promote_scaling_and_anchor_assertions"},
+    {"phase": "2C", "disposition": "promote_fixed_and_randomized_differential"},
+    {"phase": "3A", "disposition": "archive_STOP_summary_remove_prototype_later"},
+    {"phase": "3B", "disposition": "promote_item_dirty_and_offscreen_assertions"},
+    {"phase": "3B.5", "disposition": "archive_scheduler_decision_workload"},
+    {"phase": "3C", "disposition": "promote_consumer_composer_gate"},
+    {"phase": "3D", "disposition": "archive_STOP_summary_remove_prototype_later"}
+  ]
+}

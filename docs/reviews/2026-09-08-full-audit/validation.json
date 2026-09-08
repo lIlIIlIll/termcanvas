@@ -1,0 +1,71 @@
+{
+  "source_sha": "ab76bc1b39ed3a9261487beb71b4d1967accc2a2",
+  "sdk": "/home/elliot/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
+  "cjc_version": "1.1.0-alpha.20260817040003",
+  "cjpm_version": "1.1.3",
+  "cjc_sha256": "02c01c8b90f5228c380306cd661d33a2d1c05262be34019128d2a37946e57d3e",
+  "runtime_sha256": "2a79bfb4685ee820b7aec4852df84e81700e0bf8b7ebb94e1a79d585dcb415b8",
+  "release_gate": {
+    "command": [
+      "bash",
+      "scripts/release_gate.sh"
+    ],
+    "returncode": 0,
+    "elapsed_seconds": 437.26,
+    "source_sha": "ab76bc1b39ed3a9261487beb71b4d1967accc2a2",
+    "log": "/tmp/cjtui-audit-20260908-3klxuhqr/logs/release-gate.log"
+  },
+  "distinct_package_tests": {
+    "core": 528,
+    "cj_markdown": 15,
+    "markdown": 18,
+    "terminal": 5,
+    "diff": 3,
+    "media": 9,
+    "game": 8
+  },
+  "examples_built": 17,
+  "compiled_probe_sources": 11,
+  "executed_probe_cases": 75,
+  "supplemental": [
+    {
+      "name": "template-build",
+      "command": [
+        "bash",
+        "scripts/cangjie_cmd.sh",
+        "templates/basic_app",
+        "cjpm",
+        "build"
+      ],
+      "cwd": "/home/elliot/playground/cj_tui",
+      "returncode": 0,
+      "elapsed_seconds": 14.187,
+      "log": "/tmp/cjtui-audit-20260908-3klxuhqr/logs/template-build.log"
+    },
+    {
+      "name": "clean-archive-control",
+      "command": [
+        "python3",
+        "scripts/validate_architecture.py"
+      ],
+      "cwd": "/tmp/cjtui-clean-audit-BuYVOGz5/tree",
+      "returncode": 0,
+      "elapsed_seconds": 2.953,
+      "log": "/tmp/cjtui-audit-20260908-3klxuhqr/logs/clean-archive-control.log"
+    }
+  ],
+  "clean_archive_architecture_returncode": 1,
+  "report_runner_smoke": {
+    "case": "render-probe-cut",
+    "output_directory": "/tmp/cjtui-review-replay-tupu1cmu",
+    "compiled_sources": 11,
+    "case_returncode": 0
+  },
+  "not_executed": [
+    "native macOS",
+    "native Windows",
+    "remote CI",
+    "real terminal visual acceptance",
+    "long duration benchmark matrix"
+  ]
+}
