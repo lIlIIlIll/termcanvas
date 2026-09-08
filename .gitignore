@@ -3,12 +3,17 @@ target/
 __pycache__/
 *.py[cod]
 *.cjo
-benchmarks/architecture-proof-step0/results/
-benchmarks/architecture-proof-step05/results/
-benchmarks/**/results/**/bin/
-benchmarks/**/results/**/build.log
-results/**/bin/
-results/**/build.log
+
+# Generated benchmark/experiment output (not source)
+benchmarks/**/results/
+results/
+
+# Review evidence artifacts: keep conclusions/reviews, drop logs/probes/artifacts
+docs/reviews/*/evidence/
+docs/reviews/*/artifact-manifest.sha256
+docs/reviews/*/coverage.csv
+docs/reviews/*/findings.json
+*.host.log
 
 !docs/api-index.txt
 !docs/api-contract-v1.txt
