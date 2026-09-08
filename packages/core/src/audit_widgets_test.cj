@@ -65,7 +65,7 @@ func auditWidgetDocument(): Document {
 }
 
 @Test
-class CjTuiAuditWidgetsTest {
+class TermCanvasAuditWidgetsTest {
     @TestCase
     func inputUsesAssociatedTextFromParsedKeyEvents(): Unit {
         let frames = ["\u{1B}[97;2;65u", "\u{1B}[0;;229u", "\u{1B}[0;;65:769u"]
@@ -249,7 +249,7 @@ class CjTuiAuditWidgetsTest {
 
     @TestCase
     func wd08FilePickerReturnsToTheAbsoluteRoot(): Unit {
-        for (path in ["/cjtui-audit-placeholder", "/cjtui-audit-placeholder/"]) {
+        for (path in ["/termcanvas-audit-placeholder", "/termcanvas-audit-placeholder/"]) {
             let picker = FilePicker(path: path)
             @Expect(picker.parent())
             @Expect(picker.path, "/")

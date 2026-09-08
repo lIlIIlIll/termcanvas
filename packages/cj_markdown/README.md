@@ -2,11 +2,11 @@
 
 ## Purpose and boundary
 
-`cj_markdown` is the standalone Markdown parser used by cjtui. It intentionally
-has no dependency on cjtui or `core`: non-TUI consumers can inspect the same AST,
+`cj_markdown` is the standalone Markdown parser used by termcanvas. It intentionally
+has no dependency on termcanvas or `core`: non-TUI consumers can inspect the same AST,
 and UI packages can map it into their own render model, such as `core.Document`.
 Parsing is separate from application-owned state, `App` update, and immediate
-widget rendering. The `packages/markdown` adapter is the cjtui integration;
+widget rendering. The `packages/markdown` adapter is the termcanvas integration;
 [`docs/extensions.md`](../../docs/extensions.md) describes the package boundary.
 
 ## Parse a document
@@ -88,13 +88,13 @@ Current coverage includes:
 - parser diagnostics, including unclosed fenced code blocks
 
 Unsupported or unrecognized source is represented by the available text/HTML
-nodes and diagnostics rather than by a cjtui-specific widget. Rendering policy
+nodes and diagnostics rather than by a termcanvas-specific widget. Rendering policy
 belongs to the consumer.
 
-## cjtui adapter path
+## termcanvas adapter path
 
-The cjtui integration lives in the separate `markdown` extension package, not in
-cjtui core or this parser:
+The termcanvas integration lives in the separate `markdown` extension package, not in
+termcanvas core or this parser:
 
 ```text
 cj_markdown MarkdownDocument

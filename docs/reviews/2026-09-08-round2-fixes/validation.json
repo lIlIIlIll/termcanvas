@@ -8,7 +8,7 @@
     "elapsed_seconds": 601.55,
     "source_manifest_sha256": "89816a6d23e7d39a4dc730c8d49f3d68b9392537ee8bb6e09fc72a3150173d65",
     "changed_during_gate": [],
-    "log": "/tmp/cjtui-round2/logs/release-gate.log"
+    "log": "/tmp/termcanvas-round2/logs/release-gate.log"
   },
   "package_tests": {
     "cj_markdown": 19,

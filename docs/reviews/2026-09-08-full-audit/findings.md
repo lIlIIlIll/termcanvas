@@ -2,7 +2,7 @@
 
 [返回总览](README.md)。原始候选与合并关系见 [去向记录](evidence/synthesis/rejected_or_merged.json)。
 
-## CJTUI-001
+## TERMCANVAS-001
 
 **P1 · 已复现 · PTY 未建立子进程组，启动失败与信号转发会命中错误目标**
 
@@ -22,7 +22,7 @@
 
 原始条目：`RT-01`, `RT-02`。
 
-## CJTUI-002
+## TERMCANVAS-002
 
 **P2 · 已复现 · PTY 退出回收由多个路径竞争，产生虚构终态或残留 active 记录**
 
@@ -44,7 +44,7 @@
 
 原始条目：`RT-03`, `RT-04`。
 
-## CJTUI-003
+## TERMCANVAS-003
 
 **P2 · 已复现 · PTY 非阻塞写入把短写当作整批成功**
 
@@ -64,7 +64,7 @@
 
 原始条目：`RT-05`。
 
-## CJTUI-004
+## TERMCANVAS-004
 
 **P2 · 已复现 · PTY 启动忽略无效 cwd 并在宿主目录继续执行**
 
@@ -84,7 +84,7 @@
 
 原始条目：`RT-06`。
 
-## CJTUI-005
+## TERMCANVAS-005
 
 **P2 · 已复现 · 单次异步任务取消发布两次 AsyncCancelled**
 
@@ -104,7 +104,7 @@
 
 原始条目：`RT-07`。
 
-## CJTUI-006
+## TERMCANVAS-006
 
 **P2 · 已复现 · AsyncRuntime 清理仅位于正常 App 回调，helper 与启动失败路径会遗留唤醒资源**
 
@@ -124,7 +124,7 @@
 
 原始条目：`RT-09`, `RT-10`。
 
-## CJTUI-007
+## TERMCANVAS-007
 
 **P2 · 已复现 · 待定裸 ESC 未进入事件等待截止时间**
 
@@ -144,7 +144,7 @@
 
 原始条目：`RT-11`。
 
-## CJTUI-008
+## TERMCANVAS-008
 
 **P2 · 已复现 · Linux epoll 事件按错误步长解码并漏派同批 source**
 
@@ -164,7 +164,7 @@
 
 原始条目：`RT-12`。
 
-## CJTUI-009
+## TERMCANVAS-009
 
 **P1 · 已复现 · FD 数值复用后 epoll 注册缓存把新 source 当作旧注册**
 
@@ -184,7 +184,7 @@
 
 原始条目：`RT-13`。
 
-## CJTUI-010
+## TERMCANVAS-010
 
 **P2 · 已复现 · AppTestRunner 不持久化 StartTimer 创建的运行时状态**
 
@@ -204,7 +204,7 @@
 
 原始条目：`RT-14`。
 
-## CJTUI-011
+## TERMCANVAS-011
 
 **P2 · 已复现 · TerminalProbe 首次空读即放弃剩余预算**
 
@@ -224,7 +224,7 @@
 
 原始条目：`RT-15`。
 
-## CJTUI-012
+## TERMCANVAS-012
 
 **P2 · 已复现 · 会话恢复后光标物理状态与 Terminal 缓存不同步**
 
@@ -244,7 +244,7 @@
 
 原始条目：`RT-16`。
 
-## CJTUI-013
+## TERMCANVAS-013
 
 **P1 · 静态确认 · macOS 分支复用 Linux 非阻塞与窗口 ioctl 常量**
 
@@ -266,7 +266,7 @@
 
 原始条目：`RT-17`。
 
-## CJTUI-014
+## TERMCANVAS-014
 
 **P2 · 已复现 · Alt+UTF-8 字符跨输入帧时丢失 Alt 修饰位**
 
@@ -286,7 +286,7 @@
 
 原始条目：`IN-01`。
 
-## CJTUI-015
+## TERMCANVAS-015
 
 **P2 · 已复现 · Kitty 键盘协议的冒号子字段被拼成整数**
 
@@ -306,7 +306,7 @@
 
 原始条目：`IN-02`。
 
-## CJTUI-016
+## TERMCANVAS-016
 
 **P2 · 已复现 · Canvas 左侧裁剪可写入孤立宽字符 continuation**
 
@@ -326,7 +326,7 @@
 
 原始条目：`IN-04`。
 
-## CJTUI-017
+## TERMCANVAS-017
 
 **P3 · 改进建议 · Buffer.resize 与 blitFrom 未定义宽字符对被切开时的约束**
 
@@ -346,7 +346,7 @@
 
 原始条目：`IN-05`, `IN-06`。
 
-## CJTUI-018
+## TERMCANVAS-018
 
 **P3 · 已复现 · cut 在宽度预算 1 或 2 时仍返回三列省略号**
 
@@ -366,7 +366,7 @@
 
 原始条目：`IN-08`。
 
-## CJTUI-019
+## TERMCANVAS-019
 
 **P2 · 已复现 · TextArea 多选区替换后 caret 停在插入文本之前**
 
@@ -386,7 +386,7 @@
 
 原始条目：`IN-09`。
 
-## CJTUI-020
+## TERMCANVAS-020
 
 **P2 · 已复现 · TextArea 主选区、selectedTexts 与绘制高亮读取不同状态**
 
@@ -406,7 +406,7 @@
 
 原始条目：`IN-11`。
 
-## CJTUI-021
+## TERMCANVAS-021
 
 **P2 · 已复现 · TextArea 文本变更未统一推进 revision，Composer 因此复用旧布局**
 
@@ -428,7 +428,7 @@
 
 原始条目：`IN-12`, `IN-14`, `WD-11`。
 
-## CJTUI-022
+## TERMCANVAS-022
 
 **P2 · 已复现 · TextArea 首次渲染后更新 foldState 不重建可见行**
 
@@ -448,7 +448,7 @@
 
 原始条目：`IN-13`。
 
-## CJTUI-023
+## TERMCANVAS-023
 
 **P2 · 已复现 · TextArea readOnly 可被 undo/redo 与补全确认绕过**
 
@@ -470,7 +470,7 @@
 
 原始条目：`IN-15`。
 
-## CJTUI-024
+## TERMCANVAS-024
 
 **P2 · 已复现 · TextArea.handleWithDirty 未包含光标移动引起的新视口**
 
@@ -490,7 +490,7 @@
 
 原始条目：`IN-16`。
 
-## CJTUI-025
+## TERMCANVAS-025
 
 **P2 · 已复现 · 短文档提前返回导致已打开的补全菜单不可见**
 
@@ -510,7 +510,7 @@
 
 原始条目：`IN-17`。
 
-## CJTUI-026
+## TERMCANVAS-026
 
 **P3 · 改进建议 · cursorPositions 会把 scroll 留在最后一个额外 caret 的视口**
 
@@ -530,7 +530,7 @@
 
 原始条目：`IN-18`。
 
-## CJTUI-027
+## TERMCANVAS-027
 
 **P3 · 已复现 · TaskPad 的全局单字符快捷键优先于 New task 输入**
 
@@ -550,7 +550,7 @@
 
 原始条目：`IN-19`。
 
-## CJTUI-028
+## TERMCANVAS-028
 
 **P2 · 已复现 · EventParser 对 CSI 数值与 Unicode scalar 缺少边界校验**
 
@@ -570,7 +570,7 @@
 
 原始条目：`IN-22`。
 
-## CJTUI-029
+## TERMCANVAS-029
 
 **P2 · 已复现 · DocumentView 布局缓存不观察折叠和当前源位置变化**
 
@@ -590,7 +590,7 @@
 
 原始条目：`WD-01`。
 
-## CJTUI-030
+## TERMCANVAS-030
 
 **P2 · 已复现 · VirtualTranscriptView.setCardTheme 不失效已测量几何**
 
@@ -610,7 +610,7 @@
 
 原始条目：`WD-02`。
 
-## CJTUI-031
+## TERMCANVAS-031
 
 **P2 · 已复现 · List、Table 和 VirtualTable 未限制在传入 area 内**
 
@@ -630,7 +630,7 @@
 
 原始条目：`WD-03`。
 
-## CJTUI-032
+## TERMCANVAS-032
 
 **P2 · 已复现 · DocumentView.handleMouse 使用外框坐标且接受区域外点击**
 
@@ -650,7 +650,7 @@
 
 原始条目：`WD-05`。
 
-## CJTUI-033
+## TERMCANVAS-033
 
 **P2 · 已复现 · VirtualTable 的外部滚动与选择绑定存在双重状态真相**
 
@@ -670,7 +670,7 @@
 
 原始条目：`WD-06`, `WD-18`。
 
-## CJTUI-034
+## TERMCANVAS-034
 
 **P1 · 已复现 · ConfirmDialog 显示默认 No，Enter 却返回 true**
 
@@ -690,7 +690,7 @@
 
 原始条目：`WD-07`。
 
-## CJTUI-035
+## TERMCANVAS-035
 
 **P2 · 已复现 · FilePicker 从绝对一级目录返回父目录时跳到当前目录**
 
@@ -710,7 +710,7 @@
 
 原始条目：`WD-08`。
 
-## CJTUI-036
+## TERMCANVAS-036
 
 **P2 · 已复现 · 带框 Input 返回的 dirty 行不是实际文本行**
 
@@ -730,7 +730,7 @@
 
 原始条目：`WD-09`。
 
-## CJTUI-037
+## TERMCANVAS-037
 
 **P2 · 已复现 · Document 富文本换行按 Rune 拆分并破坏字素**
 
@@ -750,7 +750,7 @@
 
 原始条目：`WD-10`。
 
-## CJTUI-038
+## TERMCANVAS-038
 
 **P2 · 已复现 · 空 MultiSelect 可以选中不存在的索引 0**
 
@@ -770,7 +770,7 @@
 
 原始条目：`WD-12`。
 
-## CJTUI-039
+## TERMCANVAS-039
 
 **P2 · 已复现 · DatePicker 可通过正常按键产生不存在的日期**
 
@@ -790,7 +790,7 @@
 
 原始条目：`WD-13`。
 
-## CJTUI-040
+## TERMCANVAS-040
 
 **P2 · 已复现 · VirtualTranscript ASCII 侧栏的测量宽度比绘制宽度多一列**
 
@@ -810,7 +810,7 @@
 
 原始条目：`WD-14`。
 
-## CJTUI-041
+## TERMCANVAS-041
 
 **P3 · 已复现 · BlockOptions.border 接受自定义边框但 Block 从不读取**
 
@@ -830,7 +830,7 @@
 
 原始条目：`WD-16`。
 
-## CJTUI-042
+## TERMCANVAS-042
 
 **P2 · 已复现 · TranscriptView 用逻辑项目数代替视觉行高**
 
@@ -850,7 +850,7 @@
 
 原始条目：`WD-17`。
 
-## CJTUI-043
+## TERMCANVAS-043
 
 **P3 · 已复现 · assistant_console 开启 Paste 模式却丢弃 Paste 事件**
 
@@ -870,7 +870,7 @@
 
 原始条目：`WD-19`。
 
-## CJTUI-044
+## TERMCANVAS-044
 
 **P3 · 已复现 · form_studio 在 Notes 焦点粘贴时覆盖 Name**
 
@@ -890,7 +890,7 @@
 
 原始条目：`WD-20`。
 
-## CJTUI-045
+## TERMCANVAS-045
 
 **P3 · 已复现 · oh_my_pi_skin 未把查询字符和返回动作接入 CommandPalette**
 
@@ -910,7 +910,7 @@
 
 原始条目：`WD-21`。
 
-## CJTUI-046
+## TERMCANVAS-046
 
 **P3 · 已复现 · btm_clone 搜索 Backspace 按 UTF-8 字节删除**
 
@@ -930,7 +930,7 @@
 
 原始条目：`WD-22`。
 
-## CJTUI-047
+## TERMCANVAS-047
 
 **P3 · 改进建议 · btm_clone 前台与后台采样共享可变基线**
 
@@ -950,7 +950,7 @@
 
 原始条目：`WD-23`。
 
-## CJTUI-048
+## TERMCANVAS-048
 
 **P3 · 已复现 · example_smoke 重写事件状态，不能证明真实示例流程**
 
@@ -972,7 +972,7 @@
 
 原始条目：`WD-24`。
 
-## CJTUI-049
+## TERMCANVAS-049
 
 **P1 · 已复现 · ANSI 解析遇到裸 ESC 或非 CSI 序列时循环不前进**
 
@@ -992,7 +992,7 @@
 
 原始条目：`EX-01`。
 
-## CJTUI-050
+## TERMCANVAS-050
 
 **P2 · 已复现 · Terminal 搜索按任意 UTF-8 字节切片并把字节下标当显示列**
 
@@ -1014,7 +1014,7 @@
 
 原始条目：`EX-03`。
 
-## CJTUI-051
+## TERMCANVAS-051
 
 **P2 · 已复现 · TerminalScreen 满行后立即换行，使随后的 LF 再前进一行**
 
@@ -1034,7 +1034,7 @@
 
 原始条目：`EX-04`。
 
-## CJTUI-052
+## TERMCANVAS-052
 
 **P2 · 已复现 · Diff 解析器未按状态区分文件头、hunk 正文和 no-newline 元信息**
 
@@ -1054,7 +1054,7 @@
 
 原始条目：`EX-05`, `EX-07`。
 
-## CJTUI-053
+## TERMCANVAS-053
 
 **P3 · 改进建议 · DiffView 对负选择值缺少明确契约和范围处理**
 
@@ -1074,7 +1074,7 @@
 
 原始条目：`EX-08`。
 
-## CJTUI-054
+## TERMCANVAS-054
 
 **P1 · 已复现 · Markdown 任务标记解析对空项和紧邻多字节文本越界**
 
@@ -1094,7 +1094,7 @@
 
 原始条目：`EX-09`。
 
-## CJTUI-055
+## TERMCANVAS-055
 
 **P2 · 已复现 · 列表与标题树以首节点层级为根并丢弃后续浅层节点**
 
@@ -1114,7 +1114,7 @@
 
 原始条目：`EX-10`。
 
-## CJTUI-056
+## TERMCANVAS-056
 
 **P2 · 已复现 · 代码围栏内的参考定义污染围栏外链接解析**
 
@@ -1134,7 +1134,7 @@
 
 原始条目：`EX-11`。
 
-## CJTUI-057
+## TERMCANVAS-057
 
 **P2 · 已复现 · 表格单元格与列表续行的 SourceRange 从错误偏移重建**
 
@@ -1156,7 +1156,7 @@
 
 原始条目：`EX-12`。
 
-## CJTUI-058
+## TERMCANVAS-058
 
 **P2 · 已复现 · 碰撞计算在静止轴上不检查空间分离**
 
@@ -1176,7 +1176,7 @@
 
 原始条目：`EX-13`。
 
-## CJTUI-059
+## TERMCANVAS-059
 
 **P2 · 已复现 · 移动 Sensor 被 Solid 碰撞响应截停**
 
@@ -1196,7 +1196,7 @@
 
 原始条目：`EX-14`。
 
-## CJTUI-060
+## TERMCANVAS-060
 
 **P3 · 改进建议 · 媒体预解码和示例同步加载缺少显式预算与取消**
 
@@ -1216,7 +1216,7 @@
 
 原始条目：`EX-15`。
 
-## CJTUI-061
+## TERMCANVAS-061
 
 **P2 · 已复现 · ExternalMediaAdapter 忽略公开 frameIndex**
 
@@ -1238,7 +1238,7 @@
 
 原始条目：`EX-16`。
 
-## CJTUI-062
+## TERMCANVAS-062
 
 **P2 · 已复现 · Kitty 媒体帧只检查非空输出，不验证 RGBA 长度**
 
@@ -1258,7 +1258,7 @@
 
 原始条目：`EX-17`。
 
-## CJTUI-063
+## TERMCANVAS-063
 
 **P3 · 静态确认 · Markdown Studio 预览导航没有持久状态也未实际处理事件**
 
@@ -1278,7 +1278,7 @@
 
 原始条目：`EX-19`。
 
-## CJTUI-064
+## TERMCANVAS-064
 
 **P2 · 静态确认 · FarmGame 把任意读档失败当作新档并覆盖原路径**
 
@@ -1298,7 +1298,7 @@
 
 原始条目：`EX-20`。
 
-## CJTUI-065
+## TERMCANVAS-065
 
 **P3 · 静态确认 · FarmGame tick 改变动画相位却不标记农场区域**
 
@@ -1318,7 +1318,7 @@
 
 原始条目：`EX-21`。
 
-## CJTUI-066
+## TERMCANVAS-066
 
 **P3 · 静态确认 · FarmGame 存档计数未限制在结算算术可表示范围**
 
@@ -1338,7 +1338,7 @@
 
 原始条目：`EX-22`。
 
-## CJTUI-067
+## TERMCANVAS-067
 
 **P2 · 静态确认 · 示例首跑命令依赖作者机器的绝对路径**
 
@@ -1358,7 +1358,7 @@
 
 原始条目：`DOC-01`。
 
-## CJTUI-068
+## TERMCANVAS-068
 
 **P2 · 静态确认 · versioning 文档与生成契约对四个公开入口分级相反**
 
@@ -1378,7 +1378,7 @@
 
 原始条目：`DOC-03`。
 
-## CJTUI-069
+## TERMCANVAS-069
 
 **P3 · 静态确认 · API Overview 数量仍包含已退役接口**
 
@@ -1398,7 +1398,7 @@
 
 原始条目：`DOC-04`。
 
-## CJTUI-070
+## TERMCANVAS-070
 
 **P2 · 已复现 · summarize-only 用当前构建身份覆盖历史 benchmark provenance**
 
@@ -1418,7 +1418,7 @@
 
 原始条目：`DOC-05`。
 
-## CJTUI-071
+## TERMCANVAS-071
 
 **P2 · 已复现 · append benchmark 改写旧末项内容却保持相同 revision**
 
@@ -1438,7 +1438,7 @@
 
 原始条目：`DOC-06`。
 
-## CJTUI-072
+## TERMCANVAS-072
 
 **P1 · 静态确认 · 两个 benchmark manifest 未被跟踪，干净 checkout 的正式 gate 必然失败**
 
@@ -1458,7 +1458,7 @@
 
 原始条目：`DOC-08`。
 
-## CJTUI-073
+## TERMCANVAS-073
 
 **P1 · 已复现 · Windows smoke 前置检查失败会删除已有共享 runner 和 staging**
 
@@ -1478,7 +1478,7 @@
 
 原始条目：`TOOL-01`。
 
-## CJTUI-074
+## TERMCANVAS-074
 
 **P2 · 已复现 · API inventory 把块注释中的 public 声明当成真实接口**
 
@@ -1498,7 +1498,7 @@
 
 原始条目：`TOOL-02`。
 
-## CJTUI-075
+## TERMCANVAS-075
 
 **P2 · 已复现 · 动态 latest nightly 与固定日期 SDK gate 不兼容**
 
@@ -1520,7 +1520,7 @@
 
 原始条目：`TOOL-03`。
 
-## CJTUI-076
+## TERMCANVAS-076
 
 **P2 · 已复现 · macOS smoke 的远端 helper 进入 Linux 专用 SDK 检查**
 
@@ -1540,7 +1540,7 @@
 
 原始条目：`TOOL-05`。
 
-## CJTUI-077
+## TERMCANVAS-077
 
 **P3 · 已复现 · event syntax validator 忽略无结尾换行的最后一行**
 
@@ -1560,7 +1560,7 @@
 
 原始条目：`TOOL-06`。
 
-## CJTUI-078
+## TERMCANVAS-078
 
 **P2 · 已复现 · 相同异步任务 ID 重启后 cancel 命中旧代次**
 
@@ -1580,7 +1580,7 @@
 
 原始条目：`RT-08`。
 
-## CJTUI-079
+## TERMCANVAS-079
 
 **P2 · 已复现 · Kitty 功能键代码映射偏移**
 
@@ -1600,7 +1600,7 @@
 
 原始条目：`IN-03`。
 
-## CJTUI-080
+## TERMCANVAS-080
 
 **P3 · 已复现 · Canvas.hline/vline 忽略零宽或零高裁剪交集**
 
@@ -1620,7 +1620,7 @@
 
 原始条目：`IN-07`。
 
-## CJTUI-081
+## TERMCANVAS-081
 
 **P2 · 已复现 · 主光标有选区时 Backspace/Delete 跳过额外选区**
 
@@ -1640,7 +1640,7 @@
 
 原始条目：`IN-10`。
 
-## CJTUI-082
+## TERMCANVAS-082
 
 **P3 · 已复现 · TaskPad 命令菜单打开后 Esc 无法取消**
 
@@ -1660,7 +1660,7 @@
 
 原始条目：`IN-20`。
 
-## CJTUI-083
+## TERMCANVAS-083
 
 **P3 · 已复现 · TaskPad 把 Paste 重新解释为按键并写入隐藏输入**
 
@@ -1680,7 +1680,7 @@
 
 原始条目：`IN-21`。
 
-## CJTUI-084
+## TERMCANVAS-084
 
 **P3 · 已复现 · Bracketed Paste 以未校验 UTF-8 构造 String**
 
@@ -1700,7 +1700,7 @@
 
 原始条目：`IN-23`。
 
-## CJTUI-085
+## TERMCANVAS-085
 
 **P3 · 已复现 · ColorPicker 在只剩一列时仍绘制两个字符**
 
@@ -1720,7 +1720,7 @@
 
 原始条目：`WD-04`。
 
-## CJTUI-086
+## TERMCANVAS-086
 
 **P2 · 已复现 · TimeSeriesChart 对超量程值绘制到图表上边界之外**
 
@@ -1740,7 +1740,7 @@
 
 原始条目：`WD-15`。
 
-## CJTUI-087
+## TERMCANVAS-087
 
 **P3 · 静态确认 · Markdown Studio 开启编辑模式却丢弃 Paste 事件**
 
@@ -1762,7 +1762,7 @@
 
 原始条目：`EX-18`。
 
-## CJTUI-088
+## TERMCANVAS-088
 
 **P2 · 已复现 · TerminalScreen.feed 不保留跨 chunk 的未结束 CSI**
 
@@ -1782,7 +1782,7 @@
 
 原始条目：`EX-02`。
 
-## CJTUI-089
+## TERMCANVAS-089
 
 **P2 · 已复现 · DiffView 用显示宽度作为 UTF-8 字节切片终点**
 
@@ -1802,7 +1802,7 @@
 
 原始条目：`EX-06`。
 
-## CJTUI-090
+## TERMCANVAS-090
 
 **P2 · 静态确认 · 入门和测试文档引用不存在的事件脚本路径**
 
@@ -1822,7 +1822,7 @@
 
 原始条目：`DOC-02`。
 
-## CJTUI-091
+## TERMCANVAS-091
 
 **P2 · 静态确认 · Step 0.5 记录哈希的二进制与实际采样 candidate 未绑定**
 
@@ -1842,7 +1842,7 @@
 
 原始条目：`DOC-07`。
 
-## CJTUI-092
+## TERMCANVAS-092
 
 **P2 · 已复现 · CI SDK PATH 未包含仓库要求的 tools/bin/cjpm**
 

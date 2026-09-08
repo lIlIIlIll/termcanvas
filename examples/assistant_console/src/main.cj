@@ -1,4 +1,4 @@
-package cjtui_assistant_console
+package termcanvas_assistant_console
 
 import core.*
 

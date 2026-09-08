@@ -32,7 +32,7 @@ scripts/run_regression_matrix.sh
 | Example package tests | Every `examples/*/src/*_test.cj` package discovered by `scripts/release_gate.sh` |
 | Pressure gate | `scripts/run_pressure.sh` |
 | Windows VM smoke | `scripts/run_windows_smoke.sh` |
-| macOS smoke | `MACOS_REPO=/path/to/cj_tui scripts/run_macos_smoke.sh` |
+| macOS smoke | `MACOS_REPO=/path/to/termcanvas scripts/run_macos_smoke.sh` |
 
 Application behavior is checked by each discovered
 `examples/*/src/*_test.cj` package. The component-composition package does not
@@ -82,8 +82,8 @@ generated index; use the script as the matrix lane's source of truth.
 
 - `packages/markdown` depends on the in-repository `packages/cj_markdown` package.
 - The GitHub Actions workflow pins `CANGJIE_SDK_VERSION` to the same canonical compiler accepted by `scripts/check_sdk.sh`, then installs it through `scripts/resolve_nightly_sdk.py`. Resolution order is explicit `CANGJIE_SDK_URL`, `CANGJIE_SDK_MANIFEST`, then DevRepo lookup with `DEVREPO_TOKEN`/`TOKEN`.
-- `scripts/resolve_nightly_sdk.py --install --emit-github-env` writes both SDK command directories to `GITHUB_PATH`, plus `CANGJIE_HOME`, `CANGJIE_SDK_ROOT`, `CJ_TUI_NIGHTLY_SDK_VERSION`, and SDK library paths for subsequent CI steps.
-- If the release gate fails under a nightly SDK on a non-PR CI run, `scripts/archive_nightly_failure.sh` creates and pushes `archive/nightly-fail/<sdk-version>/<short-sha>` pointing at the tested commit. The script skips an existing remote archive branch for the same commit; local invocations remain non-pushing unless `CJ_TUI_PUSH_NIGHTLY_ARCHIVE=1` is set.
+- `scripts/resolve_nightly_sdk.py --install --emit-github-env` writes both SDK command directories to `GITHUB_PATH`, plus `CANGJIE_HOME`, `CANGJIE_SDK_ROOT`, `TERMCANVAS_NIGHTLY_SDK_VERSION`, and SDK library paths for subsequent CI steps.
+- If the release gate fails under a nightly SDK on a non-PR CI run, `scripts/archive_nightly_failure.sh` creates and pushes `archive/nightly-fail/<sdk-version>/<short-sha>` pointing at the tested commit. The script skips an existing remote archive branch for the same commit; local invocations remain non-pushing unless `TERMCANVAS_PUSH_NIGHTLY_ARCHIVE=1` is set.
 - Full CI coverage runs from a single checkout; no sibling Markdown parser repository is required.
 
 ## Run platform smoke and find platform boundaries
@@ -102,7 +102,7 @@ SDK under `$SHARE/sdk`. Override `BACKEND`, `SHARE`, or `RUN_VBOX_CJ_TESTS` when
 needed.
 
 After its prechecks pass, the wrapper takes a share-local lock, stages the
-current checkout in a unique `$SHARE/cases/cj_tui.*` directory, installs
+current checkout in a unique `$SHARE/cases/termcanvas.*` directory, installs
 `scripts/windows_repo_smoke.ps1` as a temporary custom runner, restores any
 previous shared runner on exit, and removes only its own staging directory.
 
@@ -113,7 +113,7 @@ checkout already present on the macOS host or from an explicitly approved source
 transfer to that host:
 
 ```bash
-MACOS_REPO=/path/to/cj_tui scripts/run_macos_smoke.sh
+MACOS_REPO=/path/to/termcanvas scripts/run_macos_smoke.sh
 ```
 
 `MACOS_HOST` defaults to `cjlibs@10.0.0.10`. Set `MACOS_CANGJIE_ROOT` when the

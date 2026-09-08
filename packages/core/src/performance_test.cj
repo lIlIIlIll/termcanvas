@@ -124,7 +124,7 @@ func runTextAreaBench(lineCount: Int64): RenderMetrics {
 }
 
 @Test
-class CjTuiPerformanceRegressionTest {
+class TermCanvasPerformanceRegressionTest {
     @TestCase
     func terminalDiffKeepsSmallAsciiUpdateLocal(): Unit {
         let viewport = Rect(0, 0, 20, 4)
@@ -317,7 +317,7 @@ class CjTuiPerformanceRegressionTest {
 }
 
 @Test
-class CjTuiPerformanceBench {
+class TermCanvasPerformanceBench {
     var sink: Int64 = 0
 
     @Bench[variant in [0, 1, 2, 3]]

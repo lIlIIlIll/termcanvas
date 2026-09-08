@@ -9,7 +9,7 @@ MACOS_SDKROOT="${MACOS_SDKROOT:-}"
 
 if [[ -z "$REPO" ]]; then
     cat >&2 <<'EOF'
-usage: MACOS_REPO=/path/to/cj_tui [MACOS_CANGJIE_ROOT=/path/to/cangjie] [MACOS_SDKROOT=/path/to/MacOSX.sdk] [MACOS_HOST=user@host] scripts/run_macos_smoke.sh
+usage: MACOS_REPO=/path/to/termcanvas [MACOS_CANGJIE_ROOT=/path/to/cangjie] [MACOS_SDKROOT=/path/to/MacOSX.sdk] [MACOS_HOST=user@host] scripts/run_macos_smoke.sh
 
 Runs packages/example_smoke and builds examples/game_pressure_suite from a
 checkout that already exists on the

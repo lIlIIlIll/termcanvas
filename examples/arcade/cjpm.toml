@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_arcade"
+  name = "termcanvas_arcade"
   organization = ""
-  description = "Canvas and input-state arcade example for cjtui"
+  description = "Canvas and input-state arcade example for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

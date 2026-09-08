@@ -7,7 +7,7 @@ sdk_root=${CANGJIE_SDK_ROOT:-}
 
 if [[ -z "$sdk_root" ]]; then
   printf '%s\n' \
-    'cj_tui: set CANGJIE_SDK_ROOT to the canonical Cangjie SDK' >&2
+    'termcanvas: set CANGJIE_SDK_ROOT to the canonical Cangjie SDK' >&2
   exit 2
 fi
 
@@ -25,7 +25,7 @@ if [[ ! -d "$stdx" ]]; then
 fi
 
 if [[ ! -x "$cjc" || ! -x "$cjpm" || ! -f "$runtime" || ! -d "$stdx" ]]; then
-  printf 'cj_tui: incomplete Cangjie SDK at %s\n' "$sdk_root" >&2
+  printf 'termcanvas: incomplete Cangjie SDK at %s\n' "$sdk_root" >&2
   exit 2
 fi
 
@@ -38,12 +38,12 @@ cjpm_version=$(env \
   "$cjpm" --version 2>&1 || true)
 
 if [[ "$cjc_version" != *"$expected_version"* ]]; then
-  printf 'cj_tui: unsupported cjc; expected %s, got: %s\n' \
+  printf 'termcanvas: unsupported cjc; expected %s, got: %s\n' \
     "$expected_version" "${cjc_version//$'\n'/; }" >&2
   exit 2
 fi
 if [[ "$cjpm_version" != *"$expected_cjpm_version"* ]]; then
-  printf 'cj_tui: unsupported cjpm; expected %s, got: %s\n' \
+  printf 'termcanvas: unsupported cjpm; expected %s, got: %s\n' \
     "$expected_cjpm_version" "${cjpm_version//$'\n'/; }" >&2
   exit 2
 fi

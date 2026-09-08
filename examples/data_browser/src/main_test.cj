@@ -1,4 +1,4 @@
-package cjtui_data_browser
+package termcanvas_data_browser
 
 import core.*
 import std.unittest.*

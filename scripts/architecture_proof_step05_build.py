@@ -2,7 +2,7 @@
 """Build a provenance-locked real omp-cj consumer for Step 0.5.
 
 The consumer is copied to an isolated /tmp tree with no target directory. Its
-`../../cj_tui` sibling is a symlink to the live workspace, so cjpm must compile
+`../../termcanvas` sibling is a symlink to the live workspace, so cjpm must compile
 the exact instrumented core while leaving both source workspaces untouched.
 """
 
@@ -93,27 +93,27 @@ def ignored(_: str, names: list[str]) -> set[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cj-tui-root", type=Path, required=True)
+    parser.add_argument("--termcanvas-root", type=Path, required=True)
     parser.add_argument("--consumer-root", type=Path, required=True)
     parser.add_argument("--sdk-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    cj_tui = args.cj_tui_root.resolve()
+    termcanvas = args.termcanvas_root.resolve()
     consumer = args.consumer_root.resolve()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
 
-    cj_state = repo_state(cj_tui)
+    cj_state = repo_state(termcanvas)
     consumer_state = repo_state(consumer)
-    build_root = Path(tempfile.mkdtemp(prefix="cj-tui-step05-build-", dir="/tmp"))
+    build_root = Path(tempfile.mkdtemp(prefix="termcanvas-step05-build-", dir="/tmp"))
     snapshot_consumer = build_root / "learn_agent_cj"
     shutil.copytree(consumer, snapshot_consumer, ignore=ignored, symlinks=True)
-    snapshot_cj_tui = build_root / "cj_tui"
-    snapshot_cj_tui.symlink_to(cj_tui, target_is_directory=True)
+    snapshot_termcanvas = build_root / "termcanvas"
+    snapshot_termcanvas.symlink_to(termcanvas, target_is_directory=True)
 
-    core_dependency = (snapshot_consumer / "agent_tui" / "../../cj_tui/packages/core").resolve()
-    markdown_dependency = (snapshot_consumer / "agent_tui" / "../../cj_tui/packages/markdown").resolve()
-    expected_core = (cj_tui / "packages/core").resolve()
+    core_dependency = (snapshot_consumer / "agent_tui" / "../../termcanvas/packages/core").resolve()
+    markdown_dependency = (snapshot_consumer / "agent_tui" / "../../termcanvas/packages/markdown").resolve()
+    expected_core = (termcanvas / "packages/core").resolve()
     if core_dependency != expected_core:
         raise SystemExit(f"resolved core dependency {core_dependency} != {expected_core}")
     if (snapshot_consumer / "target").exists():
@@ -153,17 +153,17 @@ def main() -> int:
         "isolated_target_preexisted": False,
         "build_root": str(build_root),
         "consumer_snapshot": str(snapshot_consumer),
-        "cj_tui": cj_state,
+        "termcanvas": cj_state,
         "consumer": consumer_state,
         "declared_dependency": {
             "manifest": str((consumer / "agent_tui/cjpm.toml").resolve()),
-            "core": "../../cj_tui/packages/core",
-            "markdown": "../../cj_tui/packages/markdown",
+            "core": "../../termcanvas/packages/core",
+            "markdown": "../../termcanvas/packages/markdown",
         },
         "resolved_dependency": {
             "core": str(core_dependency),
             "markdown": str(markdown_dependency),
-            "uses_live_cj_tui_workspace": core_dependency == expected_core,
+            "uses_live_termcanvas_workspace": core_dependency == expected_core,
         },
         "sdk_root": str(args.sdk_root.resolve()),
         "compiler_version": compiler.stdout.strip(),

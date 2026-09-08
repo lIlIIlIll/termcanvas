@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OUTPUT_DIR="${1:-${RUNNER_TEMP:-${TMPDIR:-/tmp}}/cjtui-codecov}"
+OUTPUT_DIR="${1:-${RUNNER_TEMP:-${TMPDIR:-/tmp}}/termcanvas-codecov}"
 
 if [[ "$OUTPUT_DIR" != /* ]]; then
     OUTPUT_DIR="$ROOT/$OUTPUT_DIR"
@@ -11,10 +11,10 @@ fi
 sdk_root=$("$ROOT/scripts/check_sdk.sh")
 export CANGJIE_SDK_ROOT="$sdk_root"
 # Use a clean target root so dependencies are rebuilt with coverage enabled.
-export CJ_TUI_CANONICAL_TARGET_ROOT="$ROOT/.coverage-target"
+export TERMCANVAS_CANONICAL_TARGET_ROOT="$ROOT/.coverage-target"
 
-rm -rf -- "$OUTPUT_DIR" "$CJ_TUI_CANONICAL_TARGET_ROOT"
-mkdir -p -- "$OUTPUT_DIR" "$CJ_TUI_CANONICAL_TARGET_ROOT"
+rm -rf -- "$OUTPUT_DIR" "$TERMCANVAS_CANONICAL_TARGET_ROOT"
+mkdir -p -- "$OUTPUT_DIR" "$TERMCANVAS_CANONICAL_TARGET_ROOT"
 
 # Do not accumulate counters from an earlier local run.
 while IFS= read -r -d '' artifact; do

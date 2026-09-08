@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_debug_lab"
+  name = "termcanvas_debug_lab"
   organization = ""
-  description = "Terminal capability and metrics lab example for cjtui"
+  description = "Terminal capability and metrics lab example for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

@@ -14,7 +14,7 @@
 
 ## 汇总说明更正
 
-CJTUI-047 的旧汇总与此前答复误写“完整事务锁”。实际代码在 `examples/btm_clone/src/main.cj:633` 分别创建前台和后台 `ProcFsSampler`，各自持有采样基线；`completionLock` 保护完成结果槽。原 Agent 的证据对此描述正确。需要修正文档表述，不能把这处汇总错误当作代码未分离采样状态。
+TERMCANVAS-047 的旧汇总与此前答复误写“完整事务锁”。实际代码在 `examples/btm_clone/src/main.cj:633` 分别创建前台和后台 `ProcFsSampler`，各自持有采样基线；`completionLock` 保护完成结果槽。原 Agent 的证据对此描述正确。需要修正文档表述，不能把这处汇总错误当作代码未分离采样状态。
 
 ## 结果与证据
 
@@ -22,10 +22,10 @@ CJTUI-047 的旧汇总与此前答复误写“完整事务锁”。实际代码�
 
 - [输入文件与映射核验](evidence/root/validation.json)。
 - [最终 core 库独立回放](evidence/root/replay.json)。
-- [runtime 完整复核范围与原编号映射](evidence/cjtui-rereview-runtime.json)。
-- [input 完整复核范围与原编号映射](evidence/cjtui-rereview-input.json)。
-- [widgets 完整复核范围与原编号映射](evidence/cjtui-rereview-widgets.json)。
-- [tooling 完整复核范围与原编号映射](evidence/cjtui-rereview-tooling.json)。
-- [extensions 完整复核范围与原编号映射](evidence/cjtui-rereview-extensions.json)。
+- [runtime 完整复核范围与原编号映射](evidence/termcanvas-rereview-runtime.json)。
+- [input 完整复核范围与原编号映射](evidence/termcanvas-rereview-input.json)。
+- [widgets 完整复核范围与原编号映射](evidence/termcanvas-rereview-widgets.json)。
+- [tooling 完整复核范围与原编号映射](evidence/termcanvas-rereview-tooling.json)。
+- [extensions 完整复核范围与原编号映射](evidence/termcanvas-rereview-extensions.json)。
 
 Windows 脚本问题核对了实际生成文本及 [PowerShell 官方参数规则](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_scripts#parameters-in-scripts)，未声称本机运行过 PowerShell。原日志的 `/tmp` 路径保留来源；源码、脚本和文本证据随附，编译库与可执行文件不打包。

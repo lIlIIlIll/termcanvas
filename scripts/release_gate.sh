@@ -5,11 +5,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 sdk_root=$("$ROOT/scripts/check_sdk.sh")
 export CANGJIE_SDK_ROOT="$sdk_root"
-export CJ_TUI_CANONICAL_TARGET_ROOT="${CJ_TUI_CANONICAL_TARGET_ROOT:-${TMPDIR:-/tmp}/cj-tui-canonical-target/20260817}"
+export TERMCANVAS_CANONICAL_TARGET_ROOT="${TERMCANVAS_CANONICAL_TARGET_ROOT:-${TMPDIR:-/tmp}/termcanvas-canonical-target/20260817}"
 
 echo "==> canonical Cangjie SDK"
 "$ROOT/scripts/check_sdk.sh" --report
-printf 'CANONICAL_TARGET_ROOT=%s\n' "$CJ_TUI_CANONICAL_TARGET_ROOT"
+printf 'CANONICAL_TARGET_ROOT=%s\n' "$TERMCANVAS_CANONICAL_TARGET_ROOT"
 printf 'SOURCE_CANDIDATE_SHA256=%s\n' "$(
   sha256sum \
     "$ROOT/packages/core/src/content_widgets.cj" \

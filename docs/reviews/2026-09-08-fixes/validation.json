@@ -8,7 +8,7 @@
     "elapsed_seconds": 874.42,
     "source_manifest_sha256": "eef433066092a257a8abf0b752a9ed8ed9d17b50c5730729e46ce53131c1f8f1",
     "changed_during_gate": [],
-    "log": "/tmp/cjtui-fix-20260908/logs/release-gate.log"
+    "log": "/tmp/termcanvas-fix-20260908/logs/release-gate.log"
   },
   "package_tests": {
     "cj_markdown": 19,
@@ -38,7 +38,7 @@
   "diagnostic_cases": 72,
   "diagnostic_sources": 8,
   "candidate_export": {
-    "directory": "/tmp/cjtui-final-export-ezjna3pb",
+    "directory": "/tmp/termcanvas-final-export-ezjna3pb",
     "source": "current tracked and nonignored untracked files; not a new commit",
     "file_count": 659,
     "manifest_included": true,
@@ -48,7 +48,7 @@
     ],
     "returncode": 0,
     "elapsed_seconds": 5.168,
-    "log": "/tmp/cjtui-fix-20260908/logs/candidate-export-architecture.log"
+    "log": "/tmp/termcanvas-fix-20260908/logs/candidate-export-architecture.log"
   },
   "media_real_frame": "PASS",
   "finding_status_counts": {

@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_gif_ascii"
+  name = "termcanvas_gif_ascii"
   organization = ""
-  description = "ffmpeg-decodable media to ASCII animation viewer example for cjtui"
+  description = "ffmpeg-decodable media to ASCII animation viewer example for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

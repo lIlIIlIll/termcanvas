@@ -2,7 +2,7 @@
   cjc-version = "1.1.0"
   name = "terminal_lab"
   organization = ""
-  description = "Terminal, PTY, and diff lab example for cjtui"
+  description = "Terminal, PTY, and diff lab example for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_assistant_console"
+  name = "termcanvas_assistant_console"
   organization = ""
-  description = "Transcript and request console example for cjtui"
+  description = "Transcript and request console example for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

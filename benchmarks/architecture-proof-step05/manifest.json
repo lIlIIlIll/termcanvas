@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "name": "cj_tui-architecture-proof-step05-real-consumer",
+  "name": "termcanvas-architecture-proof-step05-real-consumer",
   "consumer": "learn_agent_cj/agent_app --fixture",
   "measurement_boundary": "PTY input receipt through completed Terminal.draw and terminal flush; not photon latency",
   "build": {
     "mode": "release",
-    "procedure": "isolated consumer source snapshot with live cj_tui path dependency and empty target directory",
+    "procedure": "isolated consumer source snapshot with live termcanvas path dependency and empty target directory",
     "sdk_root": "/home/elliot/cangjie_sdk/daily"
   },
   "terminal": {"width": 100, "height": 28, "term": "xterm-256color"},
@@ -15,8 +15,8 @@
   "warmup_operations": 0,
   "statistics": ["n", "p50", "p95", "p99_when_n_at_least_100", "max"],
   "metrics_modes": {
-    "off": "product trace and stage timing enabled; cj_tui hot counters disabled; latency source of truth",
-    "on": "same product trace with cj_tui Buffer and VirtualTranscript counters enabled; attribution source",
+    "off": "product trace and stage timing enabled; termcanvas hot counters disabled; latency source of truth",
+    "on": "same product trace with termcanvas Buffer and VirtualTranscript counters enabled; attribution source",
     "off_repeat": "selected OFF/ON/OFF perturbation leg"
   },
   "workloads": [

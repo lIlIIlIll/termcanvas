@@ -13,7 +13,7 @@ class PrimitiveCountingRows {
 }
 
 @Test
-class CjTuiComponentPrimitivesTest {
+class TermCanvasComponentPrimitivesTest {
     @TestCase
     func transcriptCardsShareStatusBodyAndChoiceChrome(): Unit {
         let item = TranscriptItem(

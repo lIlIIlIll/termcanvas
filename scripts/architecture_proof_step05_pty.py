@@ -296,8 +296,8 @@ def main() -> int:
     samples: list[dict[str, Any]] = []
     runs: list[dict[str, Any]] = []
     sample_id = 0
-    previous_env = os.environ.get("OMP_CJ_TUI_CORE_METRICS")
-    os.environ["OMP_CJ_TUI_CORE_METRICS"] = "1" if args.mode == "on" else "0"
+    previous_env = os.environ.get("OMP_TERMCANVAS_CORE_METRICS")
+    os.environ["OMP_TERMCANVAS_CORE_METRICS"] = "1" if args.mode == "on" else "0"
     try:
         with raw_path.open("w", encoding="utf-8") as raw, runs_path.open("w", encoding="utf-8") as raw_runs:
             for workload in workloads:
@@ -329,8 +329,8 @@ def main() -> int:
                     raw.flush(); raw_runs.flush()
                     print(f"{args.mode} {workload}/{history} n={len(records)}", flush=True)
     finally:
-        if previous_env is None: os.environ.pop("OMP_CJ_TUI_CORE_METRICS", None)
-        else: os.environ["OMP_CJ_TUI_CORE_METRICS"] = previous_env
+        if previous_env is None: os.environ.pop("OMP_TERMCANVAS_CORE_METRICS", None)
+        else: os.environ["OMP_TERMCANVAS_CORE_METRICS"] = previous_env
 
     summary: dict[str, Any] = {"mode": args.mode, "groups": {}}
     for workload, history in sorted({(row["benchmark"], row["history_count"]) for row in samples}):

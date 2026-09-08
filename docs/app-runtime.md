@@ -6,7 +6,7 @@ Use this page to choose an `App` entry point, connect application-owned state to
 updates and immediate widgets, and understand where runtime behavior stops being
 public API.
 
-The main cjtui path is:
+The main termcanvas path is:
 
 ```text
 application-owned state → App/update → immediate Widget rendering

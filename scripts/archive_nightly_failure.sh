@@ -2,12 +2,12 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SDK_VERSION="${1:-${CJ_TUI_NIGHTLY_SDK_VERSION:-unknown-sdk}}"
+SDK_VERSION="${1:-${TERMCANVAS_NIGHTLY_SDK_VERSION:-unknown-sdk}}"
 COMMIT="${2:-$(git -C "$ROOT" rev-parse HEAD)}"
 SHORT_SHA="$(git -C "$ROOT" rev-parse --short "$COMMIT")"
 SAFE_VERSION="$(printf '%s' "$SDK_VERSION" | tr -c 'A-Za-z0-9._-' '-')"
 BRANCH="archive/nightly-fail/${SAFE_VERSION}/${SHORT_SHA}"
-PUSH_ARCHIVE="${CJ_TUI_PUSH_NIGHTLY_ARCHIVE:-}"
+PUSH_ARCHIVE="${TERMCANVAS_PUSH_NIGHTLY_ARCHIVE:-}"
 
 if [[ -z "$PUSH_ARCHIVE" ]]; then
     if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
@@ -32,5 +32,5 @@ fi
 if [[ "$PUSH_ARCHIVE" == "1" ]]; then
     git -C "$ROOT" push origin "refs/heads/$BRANCH:refs/heads/$BRANCH"
 else
-    echo "nightly failure archive push disabled; set CJ_TUI_PUSH_NIGHTLY_ARCHIVE=1 to push $BRANCH"
+    echo "nightly failure archive push disabled; set TERMCANVAS_PUSH_NIGHTLY_ARCHIVE=1 to push $BRANCH"
 fi

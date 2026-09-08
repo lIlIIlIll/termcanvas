@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extract and classify cj_tui's source-level public API.
+"""Extract and classify termcanvas's source-level public API.
 
 This is intentionally a source contract, not an ABI parser. It extracts
 production declarations using explicit source roots, assigns architecture

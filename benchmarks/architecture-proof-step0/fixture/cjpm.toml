@@ -1,6 +1,6 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_architecture_proof_step0"
+  name = "termcanvas_architecture_proof_step0"
   organization = ""
   description = "Deterministic Step-0 architecture proof workload driver"
   version = "1.0.0"

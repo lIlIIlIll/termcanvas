@@ -289,7 +289,7 @@
   },
   {
     "id": "RR-REPORT-01",
-    "title": "CJTUI-047 汇总误述采样器修复方式",
+    "title": "TERMCANVAS-047 汇总误述采样器修复方式",
     "status": "addressed_and_reviewed",
     "verification_mode": "documentation_checked",
     "group": "tooling",
