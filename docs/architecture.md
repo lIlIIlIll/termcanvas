@@ -2,7 +2,7 @@
 
 ## Reader task
 
-Use this page to choose the ownership boundary for a new cjtui application. The
+Use this page to choose the ownership boundary for a new termcanvas application. The
 stable path is deliberately small:
 
 > application-owned state → `App` / update → immediate Widget rendering

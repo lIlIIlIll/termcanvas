@@ -27,9 +27,9 @@ if [[ -n "${CANGJIE_SDK_ROOT:-}" ]]; then
   export LD_LIBRARY_PATH="$runtime_root:$CANGJIE_STDX_PATH:$sdk_root/tools/lib"
 
   command=("$@")
-  if [[ -n "${CJ_TUI_CANONICAL_TARGET_ROOT:-}" && ${command[0]##*/} == cjpm && ${#command[@]} -ge 2 && ${command[1]} =~ ^(bench|build|run|test)$ ]]; then
+  if [[ -n "${TERMCANVAS_CANONICAL_TARGET_ROOT:-}" && ${command[0]##*/} == cjpm && ${#command[@]} -ge 2 && ${command[1]} =~ ^(bench|build|run|test)$ ]]; then
     workdir_key=$(printf '%s' "$(readlink -f -- "$WORKDIR")" | sha256sum | cut -c1-16)
-    target_dir="$CJ_TUI_CANONICAL_TARGET_ROOT/$workdir_key"
+    target_dir="$TERMCANVAS_CANONICAL_TARGET_ROOT/$workdir_key"
     mkdir -p -- "$target_dir"
     command+=(--target-dir "$target_dir")
   fi

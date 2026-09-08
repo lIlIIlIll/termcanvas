@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_basic_app"
+  name = "termcanvas_basic_app"
   organization = ""
-  description = "cjtui app template"
+  description = "termcanvas app template"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

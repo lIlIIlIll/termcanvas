@@ -2,7 +2,7 @@
 
 ## Explanation: read this policy
 
-`cjtui` is pre-1.0. Current packages use `0.1.x` while APIs are tightened by real applications. Choose declarations marked `STABLE` for application code; treat `EXPERIMENTAL` declarations as evaluation or extension points whose shape and behavior may change; do not construct `INTERNAL` declarations or infer an application promise from `TEST_ONLY` exports.
+`termcanvas` is pre-1.0. Current packages use `0.1.x` while APIs are tightened by real applications. Choose declarations marked `STABLE` for application code; treat `EXPERIMENTAL` declarations as evaluation or extension points whose shape and behavior may change; do not construct `INTERNAL` declarations or infer an application promise from `TEST_ONLY` exports.
 
 The exact tier of every declaration comes from the generated [`api-inventory.json`](api-inventory.json). The generated [`stable-api-contract.txt`](stable-api-contract.txt) and [`experimental-api-contract.txt`](experimental-api-contract.txt) are the source-level contracts, including enum constructors and exact signatures. [`api-index.txt`](api-index.txt) is an exported-symbol baseline, not a stability contract. These outputs are maintained by scripts and must not be edited manually. Package location, `core` ownership, or language `public` visibility does not determine a tier. ADR-009 (`adr/009-api-and-package-stability.md`) records the governing decision; [`api.md`](api.md) is the human map.
 

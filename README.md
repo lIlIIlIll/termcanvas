@@ -1,10 +1,10 @@
-# cjtui
+# termcanvas
 
 > 用 Cangjie 构建终端应用的即时模式 TUI 库。
 [![CI](https://github.com/lIlIIlIll/termcanvas/actions/workflows/ci.yml/badge.svg)](https://github.com/lIlIIlIll/termcanvas/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/lIlIIlIll/termcanvas)](LICENSE) [![codecov](https://codecov.io/gh/lIlIIlIll/termcanvas/branch/main/graph/badge.svg)](https://codecov.io/gh/lIlIIlIll/termcanvas)
 
-`cjtui` 以 Linux/glibc 为首要验证平台。应用持有自己的状态，在一个
+`termcanvas` 以 Linux/glibc 为首要验证平台。应用持有自己的状态，在一个
 `App` 更新循环中处理 `Event`，通过 `Command` 返回副作用，再由即时模式
 `Widget` 把状态渲染到终端。
 
@@ -86,7 +86,7 @@ main(): Int64 {
     runAppWithCommands(
         { frame =>
             frame.renderWidget(
-                Paragraph("Hello, cjtui", block: Block(title: "Demo")),
+                Paragraph("Hello, termcanvas", block: Block(title: "Demo")),
                 frame.area
             )
         },
@@ -137,7 +137,7 @@ CANGJIE_SDK_ROOT=/path/to/cangjie \
 | 包 | 用途 |
 | --- | --- |
 | `packages/core` | 运行时、事件、终端会话、布局、Widget、富文档和编辑原语 |
-| `packages/cj_markdown` | 独立 Markdown 解析器，不依赖 `cjtui` |
+| `packages/cj_markdown` | 独立 Markdown 解析器，不依赖 `termcanvas` |
 | `packages/markdown` | 把 Markdown AST 转换为 `core.Document` |
 | `packages/terminal` | ANSI 输出解析、终端转录和 `TerminalView` |
 | `packages/diff` | 统一 diff 解析和 `DiffView` |

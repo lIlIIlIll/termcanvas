@@ -370,7 +370,7 @@ def validate_fitness(errors: list[str]) -> None:
         if not gate.get("contract") or not gate.get("command"):
             errors.append(f"{gate_id}: missing contract or command")
         command = shlex.split(gate.get("command", ""))
-        if gate.get("repository", "cj_tui") == "cj_tui" and command:
+        if gate.get("repository", "termcanvas") == "termcanvas" and command:
             executable = ROOT / command[0]
             if "/" in command[0] and not executable.exists():
                 errors.append(f"{gate_id}: command path does not exist: {command[0]}")

@@ -8,7 +8,7 @@ import re
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 EVIDENCE = HERE / 'evidence'
-ORIGINAL = '/tmp/cjtui-audit-20260908-3klxuhqr/'
+ORIGINAL = '/tmp/termcanvas-audit-20260908-3klxuhqr/'
 
 
 def main():

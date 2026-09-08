@@ -97,9 +97,9 @@ events and both output-stream cases, attaches `LinuxPtyRuntime`, and can execute
 a real `/bin/sh` command. No recommended example uses the PTY API.
 
 The principal `agent_tui`, `agent_app`, and omp-cj source and manifests depend on
-cj_tui `core`/`markdown` but do not reference this PTY family. Their performance
+termcanvas `core`/`markdown` but do not reference this PTY family. Their performance
 scripts use an operating-system PTY to drive the application; that is not API
-adoption of cj_tui `PtyRuntime` or its payload values.
+adoption of termcanvas `PtyRuntime` or its payload values.
 
 Four focused core test cases cover fake-runtime command/event routing, a bounded
 Linux process, App-owned PTY cleanup and pre-run attachment, and the unsupported
@@ -129,7 +129,7 @@ External stable `Command`/`Event` and PTY consumers are unknown.
 
 The pre-decision repository evidence did not yet answer:
 
-> Does cj_tui intend to guarantee the exact current PTY command/event data model
+> Does termcanvas intend to guarantee the exact current PTY command/event data model
 > as STABLE?
 
 The answer was therefore `NOT YET DECIDABLE`, and the Phase 5A disposition was:

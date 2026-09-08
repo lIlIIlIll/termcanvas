@@ -449,7 +449,7 @@ func ptyExitEventText(event: Event): String {
 }
 
 @Test
-class CjTuiCoreTest {
+class TermCanvasCoreTest {
     @TestCase
     func ptySpecSnapshotsCallerArraysAndKeepsDefaults(): Unit {
         let args = ["-lc", "printf ok"]

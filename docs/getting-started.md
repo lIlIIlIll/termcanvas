@@ -23,7 +23,7 @@ package manifest in [`templates/basic_app/cjpm.toml`](../templates/basic_app/cjp
 Open the source first so the state, event, command, and render paths are visible:
 
 ```cangjie
-package cjtui_basic_app
+package termcanvas_basic_app
 
 import core.*
 
@@ -46,7 +46,7 @@ class DemoApp {
 
     func render(frame: Frame): Unit {
         frame.renderWidget(
-            Paragraph("count: ${count}\n+: increment\nq/Ctrl-C: quit", block: Block(title: "cjtui")),
+            Paragraph("count: ${count}\n+: increment\nq/Ctrl-C: quit", block: Block(title: "termcanvas")),
             frame.area
         )
     }

@@ -73,7 +73,7 @@ class WindowsSmokeWrapperTest(unittest.TestCase):
             fake_mv.write_text(
                 "#!/usr/bin/env bash\n"
                 "set -euo pipefail\n"
-                "if [[ \"${1:-}\" == '-f' && \"${2:-}\" == *run-tests.ps1.cj_tui_new.* "
+                "if [[ \"${1:-}\" == '-f' && \"${2:-}\" == *run-tests.ps1.termcanvas_new.* "
                 "&& \"${3:-}\" == */run-tests.ps1 ]]; then\n"
                 "  printf 'partial runner\\n' > \"$3\"\n"
                 "  exit 23\n"
@@ -103,7 +103,7 @@ class WindowsSmokeWrapperTest(unittest.TestCase):
 
         generated = capture.read_text(encoding="utf-8") if capture.exists() else ""
         self.assertEqual(custom_runner.read_text(encoding="utf-8"), previous_runner)
-        self.assertEqual(list(cases.glob("cj_tui.*")), [])
+        self.assertEqual(list(cases.glob("termcanvas.*")), [])
         return result, generated
 
     def assert_runner_shape(self, generated: str) -> None:
@@ -115,9 +115,9 @@ class WindowsSmokeWrapperTest(unittest.TestCase):
         self.assertEqual(significant[0], "param(")
         self.assertRegex(
             generated,
-            r'(?m)^\$RepoName = "cj_tui\.[A-Za-z0-9]{8}" # CJ_TUI_STAGE_NAME_PLACEHOLDER$',
+            r'(?m)^\$RepoName = "termcanvas\.[A-Za-z0-9]{8}" # TERMCANVAS_STAGE_NAME_PLACEHOLDER$',
         )
-        self.assertNotIn('$env:CJ_TUI_STAGE_NAME', generated)
+        self.assertNotIn('$env:TERMCANVAS_STAGE_NAME', generated)
         self.assertLess(generated.index("param("), generated.index("$RepoName = "))
 
     def test_generated_runner_keeps_param_first_and_uses_unique_stage(self):

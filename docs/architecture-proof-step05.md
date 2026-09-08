@@ -2,7 +2,7 @@
 
 ## Status and applicability
 
-Step 0.5 is measurement-only. It connects the existing `cj_tui` metrics to
+Step 0.5 is measurement-only. It connects the existing `termcanvas` metrics to
 the real `learn_agent_cj/agent_tui` consumer without changing event ordering,
 rendering, layout, invalidation, virtualization, or scheduling semantics.
 Measurement and proof do not change product behavior. This contract covers the
@@ -25,7 +25,7 @@ boundary below; it does not turn an unavailable oracle into a product claim.
 
 | Scenario ID | Input | Pre-state | Path IDs | Expected behavior | Required assertions | Type | Priority |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| S001 | isolated release build | current dirty workspaces | P001 | binary uses the live sibling `cj_tui` source | resolved path, dirty hashes, compiler/build mode, binary hash and trace schema recorded | regression | P0 |
+| S001 | isolated release build | current dirty workspaces | P001 | binary uses the live sibling `termcanvas` source | resolved path, dirty hashes, compiler/build mode, binary hash and trace schema recorded | regression | P0 |
 | S002 | startup/input with core metrics OFF | trace enabled | P003,P005 | timing trace works without hot counters | core-metrics flag false; counter fields unavailable; frame timing ordered | normal | P0 |
 | S003 | same workload with core metrics ON | trace enabled | P004,P005 | same visible behavior with counters | final snapshot/hash matches OFF; counters are non-negative and frame scoped | regression | P0 |
 | S004 | ASCII/CJK/backspace/cursor/Up-Down at 100k | fixture ready | P003,P004,P005 | input reaches a completed frame | 120 samples per workload; update/render/diff/write distributions present | normal,boundary | P0 |

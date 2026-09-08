@@ -19,12 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: cj_tui
+          path: termcanvas
           fetch-depth: 0
 
       - name: Install canonical Cangjie SDK
         shell: bash
-        working-directory: cj_tui
+        working-directory: termcanvas
         run: |
           set -euo pipefail
           scripts/resolve_nightly_sdk.py --install --emit-github-env
@@ -40,18 +40,18 @@ jobs:
       - name: Run release gate
         id: release_gate
         shell: bash
-        working-directory: cj_tui
+        working-directory: termcanvas
         run: scripts/ci_gate.sh
 
       - name: Generate Codecov coverage report
         shell: bash
-        working-directory: cj_tui
-        run: scripts/coverage.sh "$RUNNER_TEMP/cjtui-codecov"
+        working-directory: termcanvas
+        run: scripts/coverage.sh "$RUNNER_TEMP/termcanvas-codecov"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: ${{ runner.temp }}/cjtui-codecov/coverage.xml
+          files: ${{ runner.temp }}/termcanvas-codecov/coverage.xml
           flags: cangjie
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -59,7 +59,7 @@ jobs:
       - name: Archive nightly failure
         if: failure() && steps.release_gate.outcome == 'failure' && github.event_name != 'pull_request'
         shell: bash
-        working-directory: cj_tui
+        working-directory: termcanvas
         env:
-          CJ_TUI_PUSH_NIGHTLY_ARCHIVE: "1"
-        run: scripts/archive_nightly_failure.sh "${CJ_TUI_NIGHTLY_SDK_VERSION:-unknown-sdk}" "$GITHUB_SHA"
+          TERMCANVAS_PUSH_NIGHTLY_ARCHIVE: "1"
+        run: scripts/archive_nightly_failure.sh "${TERMCANVAS_NIGHTLY_SDK_VERSION:-unknown-sdk}" "$GITHUB_SHA"

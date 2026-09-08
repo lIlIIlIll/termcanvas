@@ -1,4 +1,4 @@
-package cjtui_ops_dashboard
+package termcanvas_ops_dashboard
 
 import core.*
 import std.unittest.*

@@ -1,4 +1,4 @@
-package cjtui_oh_my_pi_skin
+package termcanvas_oh_my_pi_skin
 
 import core.*
 import std.unittest.*

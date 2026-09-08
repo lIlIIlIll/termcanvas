@@ -1,4 +1,4 @@
-package cjtui_btm_clone
+package termcanvas_btm_clone
 
 import core.*
 import std.collection.*

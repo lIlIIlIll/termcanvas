@@ -1,4 +1,4 @@
-package cjtui_debug_lab
+package termcanvas_debug_lab
 
 import core.*
 

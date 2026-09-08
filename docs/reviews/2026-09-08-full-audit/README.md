@@ -1,4 +1,4 @@
-# cj_tui 全仓检视结果
+# termcanvas 全仓检视结果
 
 本轮完成源码检视、候选问题交叉复核及本地验证，未修改产品源码。
 
@@ -12,14 +12,14 @@
 
 | 编号 | 等级 | 结论 | 证据 |
 | --- | --- | --- | --- |
-| [CJTUI-001](findings.md#cjtui-001) | P1 | PTY 未建立子进程组，启动失败与信号转发会命中错误目标 | 已复现 |
-| [CJTUI-009](findings.md#cjtui-009) | P1 | FD 数值复用后 epoll 注册缓存把新 source 当作旧注册 | 已复现 |
-| [CJTUI-013](findings.md#cjtui-013) | P1 | macOS 分支复用 Linux 非阻塞与窗口 ioctl 常量 | 静态确认 |
-| [CJTUI-034](findings.md#cjtui-034) | P1 | ConfirmDialog 显示默认 No，Enter 却返回 true | 已复现 |
-| [CJTUI-049](findings.md#cjtui-049) | P1 | ANSI 解析遇到裸 ESC 或非 CSI 序列时循环不前进 | 已复现 |
-| [CJTUI-054](findings.md#cjtui-054) | P1 | Markdown 任务标记解析对空项和紧邻多字节文本越界 | 已复现 |
-| [CJTUI-072](findings.md#cjtui-072) | P1 | 两个 benchmark manifest 未被跟踪，干净 checkout 的正式 gate 必然失败 | 静态确认 |
-| [CJTUI-073](findings.md#cjtui-073) | P1 | Windows smoke 前置检查失败会删除已有共享 runner 和 staging | 已复现 |
+| [TERMCANVAS-001](findings.md#termcanvas-001) | P1 | PTY 未建立子进程组，启动失败与信号转发会命中错误目标 | 已复现 |
+| [TERMCANVAS-009](findings.md#termcanvas-009) | P1 | FD 数值复用后 epoll 注册缓存把新 source 当作旧注册 | 已复现 |
+| [TERMCANVAS-013](findings.md#termcanvas-013) | P1 | macOS 分支复用 Linux 非阻塞与窗口 ioctl 常量 | 静态确认 |
+| [TERMCANVAS-034](findings.md#termcanvas-034) | P1 | ConfirmDialog 显示默认 No，Enter 却返回 true | 已复现 |
+| [TERMCANVAS-049](findings.md#termcanvas-049) | P1 | ANSI 解析遇到裸 ESC 或非 CSI 序列时循环不前进 | 已复现 |
+| [TERMCANVAS-054](findings.md#termcanvas-054) | P1 | Markdown 任务标记解析对空项和紧邻多字节文本越界 | 已复现 |
+| [TERMCANVAS-072](findings.md#termcanvas-072) | P1 | 两个 benchmark manifest 未被跟踪，干净 checkout 的正式 gate 必然失败 | 静态确认 |
+| [TERMCANVAS-073](findings.md#termcanvas-073) | P1 | Windows smoke 前置检查失败会删除已有共享 runner 和 staging | 已复现 |
 
 ## 交付文件
 

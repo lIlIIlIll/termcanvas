@@ -96,7 +96,7 @@ is:
 
 ```bash
 CANGJIE_SDK_ROOT=/path/to/20260817/cangjie \
-  scripts/cangjie_cmd.sh packages/core cjpm bench --filter=CjTuiPerformanceBench
+  scripts/cangjie_cmd.sh packages/core cjpm bench --filter=TermCanvasPerformanceBench
 ```
 
 The benchmark is a diagnostic, not a gate. If a performance change needs a

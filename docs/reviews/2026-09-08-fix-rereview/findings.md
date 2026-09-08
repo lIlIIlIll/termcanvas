@@ -10,14 +10,14 @@
 
 预期：生成脚本保留最前面的 param(Cases, Out, Cjc)，随后选择本次唯一 staging 目录。
 
-实际：实际 shell 包装器生成的首行是 $env:CJ_TUI_STAGE_NAME = "cj_tui...."，第二行才是 param(。PowerShell 要求脚本 param 为首条非注释语句；该内容不能按预期绑定 Cases/Out/Cjc。
+实际：实际 shell 包装器生成的首行是 $env:TERMCANVAS_STAGE_NAME = "termcanvas...."，第二行才是 param(。PowerShell 要求脚本 param 为首条非注释语句；该内容不能按预期绑定 Cases/Out/Cjc。
 
 建议：保留模板 param 为首条语句，将 staging 常量放在 param 块之后，或通过显式参数/模板占位符传入；对最终生成文本补 PowerShell 参数解析或本地执行检查。
 
 - [scripts/run_windows_smoke.sh:98](../../../scripts/run_windows_smoke.sh)
 - [scripts/windows_repo_smoke.ps1:1](../../../scripts/windows_repo_smoke.ps1)
 
-[原始复核记录](evidence/cjtui-rereview-tooling.json)
+[原始复核记录](evidence/termcanvas-rereview-tooling.json)
 
 ## EXT-RR-01 · P2 · TerminalScreen 窄区域复制可留下孤立 WideLead
 
@@ -35,7 +35,7 @@
 - [packages/terminal/src/terminal.cj:135](../../../packages/terminal/src/terminal.cj)
 - [packages/core/src/buffer.cj:115](../../../packages/core/src/buffer.cj)
 
-[原始复核记录](evidence/cjtui-rereview-extensions.json)
+[原始复核记录](evidence/termcanvas-rereview-extensions.json)
 
 ## RIN-01 · P2 · 宽字符错位覆盖旧宽字符时留下孤立 continuation
 
@@ -53,7 +53,7 @@
 - [packages/core/src/buffer.cj:115](../../../packages/core/src/buffer.cj)
 - [packages/core/src/canvas.cj:172](../../../packages/core/src/canvas.cj)
 
-[原始复核记录](evidence/cjtui-rereview-input.json)
+[原始复核记录](evidence/termcanvas-rereview-input.json)
 
 ## RIN-02 · P2 · 重叠选区删除会跳过较左选区并留下已选文字
 
@@ -71,7 +71,7 @@
 - [packages/core/src/text_area.cj:946](../../../packages/core/src/text_area.cj)
 - [packages/core/src/text_area.cj:988](../../../packages/core/src/text_area.cj)
 
-[原始复核记录](evidence/cjtui-rereview-input.json)
+[原始复核记录](evidence/termcanvas-rereview-input.json)
 
 ## RIN-03 · P2 · 相邻选区删除合到同一点后重复插入后续文本
 
@@ -89,7 +89,7 @@
 - [packages/core/src/text_area.cj:929](../../../packages/core/src/text_area.cj)
 - [packages/core/src/text_area.cj:988](../../../packages/core/src/text_area.cj)
 
-[原始复核记录](evidence/cjtui-rereview-input.json)
+[原始复核记录](evidence/termcanvas-rereview-input.json)
 
 ## RR-RT-01 · P2 · 显式 PTY 关闭先交付退出，再交付尾部输出；同 ID 重启会把旧尾部放到新启动之后
 
@@ -109,7 +109,7 @@
 - [packages/core/src/app.cj:2297](../../../packages/core/src/app.cj)
 - [packages/core/src/app.cj:2351](../../../packages/core/src/app.cj)
 
-[原始复核记录](evidence/cjtui-rereview-runtime.json)
+[原始复核记录](evidence/termcanvas-rereview-runtime.json)
 
 ## RR-RT-03 · P2 · 主动探测新增空读重试后，会丢掉探测期间到达的普通按键
 
@@ -127,7 +127,7 @@
 - [packages/core/src/terminal.cj:826](../../../packages/core/src/terminal.cj)
 - [packages/core/src/app.cj:1642](../../../packages/core/src/app.cj)
 
-[原始复核记录](evidence/cjtui-rereview-runtime.json)
+[原始复核记录](evidence/termcanvas-rereview-runtime.json)
 
 ## RR-TOOL-02 · P2 · 注释中的合法 Unicode 分行符使 API 提取新增索引越界
 
@@ -144,7 +144,7 @@
 - [scripts/api_contract.py:359](../../../scripts/api_contract.py)
 - [scripts/api_contract.py:226](../../../scripts/api_contract.py)
 
-[原始复核记录](evidence/cjtui-rereview-tooling.json)
+[原始复核记录](evidence/termcanvas-rereview-tooling.json)
 
 ## RR-TOOL-03 · P2 · 显式 SDK 版本请求仍按子串筛选清单和 DevRepo 结果
 
@@ -162,7 +162,7 @@
 - [scripts/resolve_nightly_sdk.py:143](../../../scripts/resolve_nightly_sdk.py)
 - [.github/workflows/ci.yml:18](../../../.github/workflows/ci.yml)
 
-[原始复核记录](evidence/cjtui-rereview-tooling.json)
+[原始复核记录](evidence/termcanvas-rereview-tooling.json)
 
 ## RW-01 · P2 · 图表未超量程的大数值仍在高度换算中溢出
 
@@ -178,7 +178,7 @@
 
 - [packages/core/src/dashboard_widgets.cj:119](../../../packages/core/src/dashboard_widgets.cj)
 
-[原始复核记录](evidence/cjtui-rereview-widgets.json)
+[原始复核记录](evidence/termcanvas-rereview-widgets.json)
 
 ## RW-02 · P2 · 直接 Widget.render 仍可通过宽字符配对修复改动传入区域外单元
 
@@ -199,7 +199,7 @@
 - [packages/core/src/form_widgets.cj:324](../../../packages/core/src/form_widgets.cj)
 - [packages/core/src/buffer.cj:115](../../../packages/core/src/buffer.cj)
 
-[原始复核记录](evidence/cjtui-rereview-widgets.json)
+[原始复核记录](evidence/termcanvas-rereview-widgets.json)
 
 ## RW-03 · P2 · 普通 DocumentHighlight 会再次拆开单个字素并丢掉组合符
 
@@ -217,7 +217,7 @@
 - [packages/core/src/document.cj:780](../../../packages/core/src/document.cj)
 - [packages/core/src/document.cj:838](../../../packages/core/src/document.cj)
 
-[原始复核记录](evidence/cjtui-rereview-widgets.json)
+[原始复核记录](evidence/termcanvas-rereview-widgets.json)
 
 ## RW-04 · P2 · CommandPalette 尚未采用已经解析出的关联文本
 
@@ -233,7 +233,7 @@
 
 - [packages/core/src/command_widgets.cj:164](../../../packages/core/src/command_widgets.cj)
 
-[原始复核记录](evidence/cjtui-rereview-widgets.json)
+[原始复核记录](evidence/termcanvas-rereview-widgets.json)
 
 ## EXT-RR-02 · P3 · side-by-side 总宽度为 1 时写到传入区域之外
 
@@ -251,7 +251,7 @@
 - [packages/diff/src/diff.cj:211](../../../packages/diff/src/diff.cj)
 - [packages/diff/src/diff.cj:219](../../../packages/diff/src/diff.cj)
 
-[原始复核记录](evidence/cjtui-rereview-extensions.json)
+[原始复核记录](evidence/termcanvas-rereview-extensions.json)
 
 ## EXT-RR-03 · P3 · 装箱容量已满且库存非空时状态仍显示 shipping box is empty
 
@@ -269,7 +269,7 @@
 - [examples/game_demo/src/main.cj:418](../../../examples/game_demo/src/main.cj)
 - [examples/game_demo/src/main.cj:423](../../../examples/game_demo/src/main.cj)
 
-[原始复核记录](evidence/cjtui-rereview-extensions.json)
+[原始复核记录](evidence/termcanvas-rereview-extensions.json)
 
 ## RIN-04 · P3 · 折叠隐藏的额外 caret 仍返回折叠头可见坐标
 
@@ -287,9 +287,9 @@
 - [packages/core/src/text_area.cj:1172](../../../packages/core/src/text_area.cj)
 - [docs/reviews/2026-09-08-fixes/evidence/input-results.json:484](../../../docs/reviews/2026-09-08-fixes/evidence/input-results.json)
 
-[原始复核记录](evidence/cjtui-rereview-input.json)
+[原始复核记录](evidence/termcanvas-rereview-input.json)
 
-## RR-REPORT-01 · P3 · CJTUI-047 汇总误述采样器修复方式
+## RR-REPORT-01 · P3 · TERMCANVAS-047 汇总误述采样器修复方式
 
 来源：配套说明问题。
 
@@ -314,7 +314,7 @@
 - [packages/core/src/app.cj:1243](../../../packages/core/src/app.cj)
 - [packages/core/src/app.cj:269](../../../packages/core/src/app.cj)
 
-[原始复核记录](evidence/cjtui-rereview-runtime.json)
+[原始复核记录](evidence/termcanvas-rereview-runtime.json)
 
 ## RR-RT-04 · P3 · App 启动能力事件仍使用探测前的 driver 能力
 
@@ -331,7 +331,7 @@
 - [packages/core/src/terminal.cj:826](../../../packages/core/src/terminal.cj)
 - [packages/core/src/app.cj:1683](../../../packages/core/src/app.cj)
 
-[原始复核记录](evidence/cjtui-rereview-runtime.json)
+[原始复核记录](evidence/termcanvas-rereview-runtime.json)
 
 ## RR-TOOL-04 · P3 · 示例 smoke 的旧工作流说明没有随组件组合重定位更新
 
@@ -349,7 +349,7 @@
 - [docs/regression-matrix.md:34](../../../docs/regression-matrix.md)
 - [packages/example_smoke/src/main.cj:172](../../../packages/example_smoke/src/main.cj)
 
-[原始复核记录](evidence/cjtui-rereview-tooling.json)
+[原始复核记录](evidence/termcanvas-rereview-tooling.json)
 
 ## RW-05 · P3 · VirtualTranscriptView 的左 padding 大于可用宽度时仍把正文画到区域外
 
@@ -366,5 +366,5 @@
 - [packages/core/src/virtual_transcript.cj:875](../../../packages/core/src/virtual_transcript.cj)
 - [packages/core/src/virtual_transcript.cj:1092](../../../packages/core/src/virtual_transcript.cj)
 
-[原始复核记录](evidence/cjtui-rereview-widgets.json)
+[原始复核记录](evidence/termcanvas-rereview-widgets.json)
 

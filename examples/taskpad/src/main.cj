@@ -1,4 +1,4 @@
-package cjtui_taskpad
+package termcanvas_taskpad
 
 import core.*
 import std.collection.ArrayList

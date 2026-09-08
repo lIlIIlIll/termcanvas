@@ -24,4 +24,4 @@
 | EXT-RR-01 | TerminalScreen 窄区域复制可留下孤立 WideLead | 公共行为测试及主审 | [组内证据](evidence/extensions-results.json) |
 | EXT-RR-02 | side-by-side 总宽度为 1 时写到传入区域之外 | 公共行为测试及主审 | [组内证据](evidence/extensions-results.json) |
 | EXT-RR-03 | 装箱容量已满且库存非空时状态仍显示 shipping box is empty | 公共行为测试及主审 | [组内证据](evidence/extensions-results.json) |
-| RR-REPORT-01 | CJTUI-047 汇总误述采样器修复方式 | 文档与实现核对 | [组内证据](evidence/tooling-results.json) |
+| RR-REPORT-01 | TERMCANVAS-047 汇总误述采样器修复方式 | 文档与实现核对 | [组内证据](evidence/tooling-results.json) |

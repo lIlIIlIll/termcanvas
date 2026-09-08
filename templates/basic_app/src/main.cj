@@ -1,4 +1,4 @@
-package cjtui_basic_app
+package termcanvas_basic_app
 
 import core.*
 
@@ -21,7 +21,7 @@ class DemoApp {
 
     func render(frame: Frame): Unit {
         frame.renderWidget(
-            Paragraph("count: ${count}\n+: increment\nq/Ctrl-C: quit", block: Block(title: "cjtui")),
+            Paragraph("count: ${count}\n+: increment\nq/Ctrl-C: quit", block: Block(title: "termcanvas")),
             frame.area
         )
     }

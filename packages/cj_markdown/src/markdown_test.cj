@@ -425,7 +425,7 @@ class MarkdownParserTest {
 
     @TestCase
     func parsesUtf8BoundarySamples(): Unit {
-        // Shared UTF-8 boundary corpus (mirrored in cj_tui core lib_test.cj
+        // Shared UTF-8 boundary corpus (mirrored in termcanvas core lib_test.cj
         // and agent_tui tui.cj headless): every parse must succeed (no
         // split-rune exceptions) and keep the sample's marker text.
         let samples = [

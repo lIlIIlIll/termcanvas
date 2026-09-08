@@ -1,6 +1,6 @@
 # Examples
 
-Use this page to choose an example by the part of `cjtui` you want to learn. All
+Use this page to choose an example by the part of `termcanvas` you want to learn. All
 17 current examples are grouped by support and purpose; the links open their
 source directories. For the directory-local index and commands, see
 [`examples/README.md`](../examples/README.md).
