@@ -43,6 +43,19 @@ jobs:
         working-directory: cj_tui
         run: scripts/ci_gate.sh
 
+      - name: Generate Codecov coverage report
+        shell: bash
+        working-directory: cj_tui
+        run: scripts/coverage.sh "$RUNNER_TEMP/cjtui-codecov"
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ runner.temp }}/cjtui-codecov/coverage.xml
+          flags: cangjie
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Archive nightly failure
         if: failure() && steps.release_gate.outcome == 'failure' && github.event_name != 'pull_request'
         shell: bash

@@ -181,8 +181,127 @@ public class MediaExtensionTest {
         @Expect(buffer.getCell(3, 1).symbol, "d")
         @Expect(buffer.getCell(4, 1).symbol, "d")
     }
-}
+    @TestCase
+    func fallbackCommandsAndAsciiBoundaryContractsStayCovered(): Unit {
+        let source = MediaSource("still", "image.png")
+        let request = MediaDecodeRequest(source, Rect(0, 0, 2, 3), MediaProtocol.Kitty, frameIndex: -4)
+        @Expect(request.frameIndex, 0)
+        @Expect(isText(FallbackMediaAdapter().decode(request).protocol))
+        let adapter = ExternalMediaAdapter(magick: "/bin/false", ffmpeg: "/bin/false", sixelEncoder: "/bin/false")
+        @Expect(adapter.commandFor(MediaDecodeRequest(source, Rect(0, 0, 5000, 1), MediaProtocol.Kitty)), "")
+        @Expect(adapter.commandFor(MediaDecodeRequest(source, Rect(0, 0, 1, 1), MediaProtocol.Text)), "")
+        @Expect(adapter.commandFor(MediaDecodeRequest(source, Rect(0, 0, 1, 1), MediaProtocol.Sixel)), "/bin/false -w 8 -h 16 image.png")
+        @Expect(adapter.commandFor(MediaDecodeRequest(source, Rect(0, 0, 1, 1), MediaProtocol.Sixel, frameIndex: 1)), "")
+        let video = MediaSource("video", "movie.mp4", kind: MediaKind.Video)
+        let animation = MediaSource("animation", "movie.gif", kind: MediaKind.Animation)
+        @Assert(adapter.commandFor(MediaDecodeRequest(video, Rect(0, 0, 1, 1), MediaProtocol.Kitty)).contains("movie.mp4"))
+        @Assert(adapter.commandFor(MediaDecodeRequest(animation, Rect(0, 0, 1, 1), MediaProtocol.Kitty)).contains("movie.gif"))
+        let options = AsciiRenderOptions(width: 0, height: 0, fps: 0, ramp: "", alphaThreshold: 999, binaryThreshold: -1)
+        @Expect(options.width, 1)
+        @Expect(options.height, 1)
+        @Expect(options.fps, 1)
+        @Expect(options.frameMillis(), 1000)
+        @Expect(options.sampleWidth(), 1)
+        @Expect(options.sampleHeight(), 1)
+        let brailleOptions = AsciiRenderOptions(width: 2, height: 3, mode: AsciiRenderMode.Braille)
+        @Expect(brailleOptions.sampleWidth(), 4)
+        @Expect(brailleOptions.sampleHeight(), 12)
+        let empty = AsciiAnimation([])
+        @Expect(empty.isEmpty())
+        @Expect(empty.frameAtIndex(-1).lines[0], "")
+        @Expect(empty.frameAtElapsed(-1).lines[0], "")
+        @Expect(empty.totalDurationMillis(), 1)
+        let frame = AsciiFrame(["x"])
+        @Expect(isReset(frame.colorAt(-1, 0)))
+        @Expect(isReset(frame.colorAt(0, 0)))
+        @Expect(rgbaToAsciiFrame([], 0, 0, options).lines.size, 0)
+        @Expect(stripSixelEnvelope("\u{1B}PqABC\u{1B}\\"), "ABC")
+        @Expect(stripSixelEnvelope("\u{1B}P0;0;0qABC\u{1B}\\"), "ABC")
+        @Expect(stripSixelEnvelope("\u{1B}P1;2qABC"), "ABC")
+        let buffer = Buffer(Rect(0, 0, 4, 2))
+        AsciiAnimationView(empty, paused: false).render(buffer.area, buffer)
+        AsciiAnimationView(AsciiAnimation([AsciiFrame(["abc"])]), block: Some(Block(title: "X"))).render(buffer.area, buffer)
+        let placement = mediaPlacementWithAdapter("id", source, Rect(0, 0, 1, 1), TerminalCapabilities(), adapter: FallbackMediaAdapter())
+        @Expect(placement.id, "id")
+        @Expect(isText(placement.frame.protocol))
+    }
+    @TestCase
+    func asciiConversionHelpersCoverAllPackingAndColorBoundaries(): Unit {
+        @Expect(halfBlockRune(false, false), r' ')
+        @Expect(halfBlockRune(true, false), r'▀')
+        @Expect(halfBlockRune(false, true), r'▄')
+        @Expect(halfBlockRune(true, true), r'█')
+        for ((x, y) in [(0, 0), (0, 1), (0, 2), (0, 3), (1, 0), (1, 1), (1, 2), (1, 3)]) {
+            @Expect(brailleMask(x, y) > 0)
+        }
+        @Expect(brailleMask(2, 4), 0)
 
+        @Expect(colorEqualsLocal(Color.Reset, Color.Reset))
+        @Expect(colorEqualsLocal(Color.Black, Color.Black))
+        @Expect(colorEqualsLocal(Color.Red, Color.Red))
+        @Expect(colorEqualsLocal(Color.Green, Color.Green))
+        @Expect(colorEqualsLocal(Color.Yellow, Color.Yellow))
+        @Expect(colorEqualsLocal(Color.Blue, Color.Blue))
+        @Expect(colorEqualsLocal(Color.Magenta, Color.Magenta))
+        @Expect(colorEqualsLocal(Color.Cyan, Color.Cyan))
+        @Expect(colorEqualsLocal(Color.White, Color.White))
+        @Expect(colorEqualsLocal(Color.Indexed(3), Color.Indexed(3)))
+        @Expect(colorEqualsLocal(Color.Rgb(1, 2, 3), Color.Rgb(1, 2, 3)))
+        @Expect(!colorEqualsLocal(Color.Red, Color.Blue))
+        @Expect(!colorEqualsLocal(Color.Indexed(3), Color.Indexed(4)))
+        @Expect(!colorEqualsLocal(Color.Rgb(1, 2, 3), Color.Rgb(1, 2, 4)))
+
+        let options = AsciiRenderOptions(
+            width: 1,
+            height: 1,
+            ramp: "@.",
+            color: true,
+            alphaThreshold: 10,
+            binaryThreshold: 50
+        )
+        let bytes: Array<Byte> = [255, 0, 0, 255]
+        @Expect(visiblePixel(bytes, 1, 1, 0, 0, options))
+        @Expect(!visiblePixel(bytes, 1, 1, -1, 0, options))
+        @Expect(!visiblePixel([255, 0, 0, 1], 1, 1, 0, 0, options))
+        @Expect(isRgb(pixelColor(255, 0, 0, 255, options), 255, 0, 0))
+        @Expect(isReset(pixelColor(255, 0, 0, 0, options)))
+        @Expect(isReset(averagePixelColor([0, 0, 0, 0], 1, 1, 0, 0, 1, 2, options)))
+
+        @Expect(zoomAsciiLine("abc", 1, 2), "ab")
+        @Expect(zoomAsciiLine("ab", 2, 3), "aab")
+        @Expect(zoomAsciiLine("abc", 2, 0), "")
+        @Expect(truncateAscii("abc", 0), "")
+        @Expect(truncateAscii("abc", 2), "ab")
+        @Expect(modPositive(-1, 3), 2)
+        @Expect(modPositive(4, 3), 1)
+        @Expect(modPositive(4, 0), 0)
+        @Expect(runeCount("é🙂"), 2)
+        @Expect(runeAt("ab", 9).toString(), " ")
+        @Expect(joinLocal([], ","), "")
+        @Expect(joinLocal(["a", "b"], ","), "a,b")
+        @Expect(frameFilter(2, 8, 16), "select=eq(n\\,2),scale=8:16")
+
+        let twoFrames: Array<Byte> = [255, 0, 0, 255, 255, 0, 0, 255]
+        match (asciiAnimationFromRgba(twoFrames, options)) {
+            case Some(animation) => @Expect(animation.frameCount(), 2)
+            case None => @Expect(false)
+        }
+        @Expect(asciiAnimationFromRgba([1, 2, 3], options).isNone())
+        match (mediaDimensions(Rect(0, 0, 0, 0))) {
+            case Some((width, height)) =>
+                @Expect(width, 1)
+                @Expect(height, 1)
+            case None => @Expect(false)
+        }
+        @Expect(mediaDimensions(Rect(0, 0, 5000, 1)).isNone())
+
+        let colored = AsciiAnimation([AsciiFrame(["a"], colors: [[Color.Reset]])])
+        let buffer = Buffer(Rect(0, 0, 1, 1))
+        AsciiAnimationView(colored, style: Style(fg: Color.Red)).render(buffer.area, buffer)
+        @Expect(buffer.getCell(0, 0).style, Style(fg: Color.Red))
+    }
+
+}
 func setPixel(bytes: Array<Byte>, width: Int64, x: Int64, y: Int64): Unit {
     setPixelColor(bytes, width, x, y, 255, 255, 255)
 }
@@ -219,6 +338,12 @@ func isText(protocol: MediaProtocol): Bool {
 func isRgb(color: Color, r: UInt8, g: UInt8, b: UInt8): Bool {
     match (color) {
         case Color.Rgb(cr, cg, cb) => cr == r && cg == g && cb == b
+        case _ => false
+    }
+}
+func isReset(color: Color): Bool {
+    match (color) {
+        case Color.Reset => true
         case _ => false
     }
 }

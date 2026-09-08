@@ -51,4 +51,39 @@ class TaskPadInputTest {
         @Expect(app.palette.selected, 0)
         @Expect(app.input.value, "前ab 中")
     }
+
+    @TestCase
+    func taskActionsClearDoneDeleteMoveRenderAndSanitizeInput(): Unit {
+        @Expect(Task("open").label(), "[ ] open")
+        @Expect(Task("done", done: true).label(), "[x] done")
+        let app = TaskPad()
+        app.input.setValue(" \t\n")
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        @Expect(app.status, "Type a task before adding.")
+        app.input.setValue("")
+
+        _ = app.update(Event.Paste("new\r\ntask"))
+        @Expect(app.input.value, "new  task")
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        @Expect(app.tasks[app.tasks.size - 1].title, "new  task")
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Up)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'd'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(app.status.startsWith("deleted:"))
+
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'p'), modifiers: KeyModifier(ctrl: true))))
+        app.palette.selected = 3
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        @Expect(app.commandMode, false)
+        @Expect(app.status, "cleared done tasks")
+        _ = app.update(Event.Tick(TickEvent()))
+
+        let backend = TestBackend(area: Rect(0, 0, 80, 24))
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        _ = terminal.draw { frame => app.render(frame) }
+        @Assert(backend.snapshot().contains("Tasks"))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'p'), modifiers: KeyModifier(ctrl: true))))
+        _ = terminal.draw { frame => app.render(frame) }
+        @Assert(backend.snapshot().contains("Add task"))
+    }
 }
