@@ -2,7 +2,7 @@
   cjc-version = "1.1.0"
   name = "game_pressure_suite"
   organization = ""
-  description = "Six-category game pressure suite for cj_tui"
+  description = "Six-category game pressure suite for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

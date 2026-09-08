@@ -425,7 +425,7 @@ class MarkdownParserTest {
 
     @TestCase
     func parsesUtf8BoundarySamples(): Unit {
-        // Shared UTF-8 boundary corpus (mirrored in cj_tui core lib_test.cj
+        // Shared UTF-8 boundary corpus (mirrored in termcanvas core lib_test.cj
         // and agent_tui tui.cj headless): every parse must succeed (no
         // split-rune exceptions) and keep the sample's marker text.
         let samples = [
@@ -493,5 +493,64 @@ class MarkdownParserTest {
                 @Expect(false)
             }
         }
+    }
+
+    @TestCase
+    func optionMatrixAndMalformedInlineBoundariesStayStable(): Unit {
+        let blank = parseMarkdown("\n")
+        @Expect(blank.blocks.size, 2)
+        match (blank.blocks[0].kind) {
+            case MarkdownBlockKind.Blank => ()
+            case _ => @Expect(false)
+        }
+        let separate = parseMarkdownWithOptions("first\nsecond", MarkdownParserOptions(mergeParagraphs: false))
+        @Expect(separate.blocks.size, 2)
+        let htmlDisabled = parseMarkdownWithOptions("<section>x</section>", MarkdownParserOptions(enableHtml: false))
+        match (htmlDisabled.blocks[0].kind) {
+            case MarkdownBlockKind.Paragraph => ()
+            case _ => @Expect(false)
+        }
+        let strikeDisabled = parseMarkdownWithOptions("~~plain~~", MarkdownParserOptions(enableStrikethrough: false))
+        match (strikeDisabled.blocks[0].inlines[0].kind) {
+            case MarkdownInlineKind.Text => ()
+            case _ => @Expect(false)
+        }
+        let fenced = parseMarkdown("~~~cj\nmain()\n~~~\n\n~~~\nopen")
+        var sawTildeFence = false
+        var sawUnclosedFence = false
+        for (block in fenced.blocks) {
+            match (block.kind) {
+                case MarkdownBlockKind.CodeBlock(language) =>
+                    if (language == "cj") { sawTildeFence = true }
+                    if (block.text == "open") { sawUnclosedFence = true }
+                case _ => ()
+            }
+        }
+        @Expect(sawTildeFence)
+        @Expect(sawUnclosedFence)
+        let refs = parseMarkdown("[id]: https://example.test \"title\"\n[id]\n| a | b | c | d |\n| :---: | --- | ---: | --- |")
+        @Expect(refs.blocks.size > 0)
+        let inlineSamples = ["<tag>", "`code`", "~~gone~~", "***both***"]
+        var sawHtml = false
+        var sawCode = false
+        var sawStrike = false
+        var sawStrong = false
+        for (sample in inlineSamples) {
+            let inline = parseInline(sample)
+            match (inline[0].kind) {
+                case MarkdownInlineKind.HtmlInline => sawHtml = true
+                case MarkdownInlineKind.Code => sawCode = true
+                case MarkdownInlineKind.Strikethrough => sawStrike = true
+                case MarkdownInlineKind.Strong => sawStrong = true
+                case _ => ()
+            }
+        }
+        @Expect(parseInline("\\*escaped*").size > 0)
+        @Expect(sawHtml)
+        @Expect(sawCode)
+        @Expect(sawStrike)
+        @Expect(sawStrong)
+        let malformed = parseInline("[broken ![image <unclosed `code ~~strike")
+        @Expect(malformed.size > 0)
     }
 }

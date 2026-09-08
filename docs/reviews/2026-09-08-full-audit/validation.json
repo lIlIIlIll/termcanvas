@@ -13,7 +13,7 @@
     "returncode": 0,
     "elapsed_seconds": 437.26,
     "source_sha": "ab76bc1b39ed3a9261487beb71b4d1967accc2a2",
-    "log": "/tmp/cjtui-audit-20260908-3klxuhqr/logs/release-gate.log"
+    "log": "/tmp/termcanvas-audit-20260908-3klxuhqr/logs/release-gate.log"
   },
   "distinct_package_tests": {
     "core": 528,
@@ -37,10 +37,10 @@
         "cjpm",
         "build"
       ],
-      "cwd": "/home/elliot/playground/cj_tui",
+      "cwd": "/home/elliot/playground/termcanvas",
       "returncode": 0,
       "elapsed_seconds": 14.187,
-      "log": "/tmp/cjtui-audit-20260908-3klxuhqr/logs/template-build.log"
+      "log": "/tmp/termcanvas-audit-20260908-3klxuhqr/logs/template-build.log"
     },
     {
       "name": "clean-archive-control",
@@ -48,16 +48,16 @@
         "python3",
         "scripts/validate_architecture.py"
       ],
-      "cwd": "/tmp/cjtui-clean-audit-BuYVOGz5/tree",
+      "cwd": "/tmp/termcanvas-clean-audit-BuYVOGz5/tree",
       "returncode": 0,
       "elapsed_seconds": 2.953,
-      "log": "/tmp/cjtui-audit-20260908-3klxuhqr/logs/clean-archive-control.log"
+      "log": "/tmp/termcanvas-audit-20260908-3klxuhqr/logs/clean-archive-control.log"
     }
   ],
   "clean_archive_architecture_returncode": 1,
   "report_runner_smoke": {
     "case": "render-probe-cut",
-    "output_directory": "/tmp/cjtui-review-replay-tupu1cmu",
+    "output_directory": "/tmp/termcanvas-review-replay-tupu1cmu",
     "compiled_sources": 11,
     "case_returncode": 0
   },

@@ -1,4 +1,4 @@
-package cjtui_architecture_proof_step0
+package termcanvas_architecture_proof_step0
 
 import core.*
 import std.collection.*

@@ -11,8 +11,8 @@ import tempfile
 
 HERE = Path(__file__).resolve().parent
 EVIDENCE = HERE / 'evidence'
-ORIGINAL = '/tmp/cjtui-audit-20260908-3klxuhqr'
-ORIGINAL_ROOT = '/home/elliot/playground/cj_tui'
+ORIGINAL = '/tmp/termcanvas-audit-20260908-3klxuhqr'
+ORIGINAL_ROOT = '/home/elliot/playground/termcanvas'
 ORIGINAL_SDK = '/home/elliot/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie'
 
 
@@ -46,7 +46,7 @@ def main():
                or hashlib.sha256((root / x['path']).read_bytes()).hexdigest() != x['sha256']]
     if changed:
         parser.error('Source differs from recorded baseline: ' + ', '.join(changed[:8]))
-    out = Path(tempfile.mkdtemp(prefix='cjtui-review-replay-'))
+    out = Path(tempfile.mkdtemp(prefix='termcanvas-review-replay-'))
     targets = args.targets.resolve() if args.targets else out / 'targets'
     print(f'Output: {out}', flush=True)
     for directory in ['logs', 'probes']:
@@ -57,7 +57,7 @@ def main():
             if source.suffix == '.cj' or source.name.startswith('fake_'):
                 shutil.copy2(source, out / group / source.name)
     env = {**os.environ, 'CANGJIE_SDK_ROOT': str(sdk),
-           'CJ_TUI_CANONICAL_TARGET_ROOT': str(targets), 'DISABLE_ZOXIDE': '1'}
+           'TERMCANVAS_CANONICAL_TARGET_ROOT': str(targets), 'DISABLE_ZOXIDE': '1'}
     if not args.skip_build:
         for package in ['core', 'cj_markdown', 'markdown', 'terminal', 'diff', 'media', 'game']:
             subprocess.run(['bash', 'scripts/cangjie_cmd.sh', 'packages/' + package,

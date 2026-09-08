@@ -2,14 +2,14 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OUT_DIR="${1:-/tmp/cj_tui-macos-smoke-bundle}"
+OUT_DIR="${1:-/tmp/termcanvas-macos-smoke-bundle}"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 
 mkdir -p "$OUT_DIR"
 
 MANIFEST="$OUT_DIR/manifest-$STAMP.txt"
 MANIFEST0="$OUT_DIR/manifest-$STAMP.nul"
-ARCHIVE="$OUT_DIR/cj_tui-macos-smoke-$STAMP.tar.gz"
+ARCHIVE="$OUT_DIR/termcanvas-macos-smoke-$STAMP.tar.gz"
 SHA256="$ARCHIVE.sha256"
 
 git -C "$ROOT" ls-files -z --cached --modified --others --exclude-standard |

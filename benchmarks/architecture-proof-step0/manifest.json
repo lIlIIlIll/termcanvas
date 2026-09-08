@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "suite": "cj_tui-architecture-proof-step0",
+  "suite": "termcanvas-architecture-proof-step0",
   "build_mode": "release",
   "environment": {
     "TERM": "xterm-256color",
     "NO_COLOR": "1",
-    "OMP_CJ_TUI_PERF_TRACE": "1"
+    "OMP_TERMCANVAS_PERF_TRACE": "1"
   },
   "sample_policy": {
     "operation_iterations": 120,

@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_data_browser"
+  name = "termcanvas_data_browser"
   organization = ""
-  description = "Data widgets example for cjtui"
+  description = "Data widgets example for termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

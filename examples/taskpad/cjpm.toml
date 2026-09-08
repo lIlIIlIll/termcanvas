@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_taskpad"
+  name = "termcanvas_taskpad"
   organization = ""
-  description = "A small interactive task manager built with cjtui"
+  description = "A small interactive task manager built with termcanvas"
   version = "1.0.0"
   target-dir = ""
   script-dir = ""

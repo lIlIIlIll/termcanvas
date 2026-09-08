@@ -1,4 +1,4 @@
-package cjtui_oh_my_pi_skin
+package termcanvas_oh_my_pi_skin
 
 import core.*
 import std.collection.ArrayList
@@ -561,7 +561,7 @@ class OhMyPiSkin {
         y += 4
         drawMessage(canvas, Rect(area.x + 2, y, area.width - 4, 4), "Assistant", "I will build a terminal-native skin with welcome card, transcript, composer, and status segments.", Color.Rgb(42, 37, 48))
         y += 5
-        drawMessage(canvas, Rect(area.x + 2, y, area.width - 4, 4), "Tool", "cjtui: Canvas + Style + Composer + CommandPalette + Tick animation", Color.Rgb(22, 26, 32))
+        drawMessage(canvas, Rect(area.x + 2, y, area.width - 4, 4), "Tool", "termcanvas: Canvas + Style + Composer + CommandPalette + Tick animation", Color.Rgb(22, 26, 32))
         canvas.drawText(area.x + 4, min(area.bottom - 2, y + 3), "approval gate: ready", Style(fg: RED, bg: Color.Rgb(22, 26, 32)))
     }
 

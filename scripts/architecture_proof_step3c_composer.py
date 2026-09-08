@@ -98,8 +98,8 @@ def main() -> int:
     unknown = [name for name in selected if name not in SCENARIOS]
     if unknown:
         raise SystemExit(f"unknown scenarios: {','.join(unknown)}")
-    os.environ["OMP_CJ_TUI_CORE_METRICS"] = "1" if args.mode == "on" else "0"
-    os.environ["OMP_CJ_TUI_SAME_HEIGHT_BURST_INTERVAL_MS"] = "10"
+    os.environ["OMP_TERMCANVAS_CORE_METRICS"] = "1" if args.mode == "on" else "0"
+    os.environ["OMP_TERMCANVAS_SAME_HEIGHT_BURST_INTERVAL_MS"] = "10"
     raw_path = args.output / f"samples-{args.mode}.jsonl"
     with raw_path.open("w", encoding="utf-8") as raw:
         for scenario in selected:

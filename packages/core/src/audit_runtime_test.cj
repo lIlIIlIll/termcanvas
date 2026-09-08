@@ -539,9 +539,9 @@ class AuditRuntimeLinuxTest {
         let before = auditOpenFdCount()
         for (_ in 0..8) {
             @Expect(auditPtyFailed(runtime.start("missing-exec",
-                PtySpec("/cjtui-definitely-missing-executable"))))
+                PtySpec("/termcanvas-definitely-missing-executable"))))
             @Expect(auditPtyFailed(runtime.start("missing-cwd",
-                PtySpec("/bin/pwd", cwd: "/cjtui-definitely-missing-directory"))))
+                PtySpec("/bin/pwd", cwd: "/termcanvas-definitely-missing-directory"))))
         }
         @Expect(runtime.activeCount(), 0)
         @Expect(runtime.sources().size, 0)

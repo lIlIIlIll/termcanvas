@@ -30,7 +30,7 @@ func documentStyledSpanCellsMatchLegacy(spans: Array<RichSpan>, width: Int64): B
 }
 
 @Test
-class CjTuiBoundaryExtremeTest {
+class TermCanvasBoundaryExtremeTest {
     @TestCase
     func zeroSizedBuffersIgnoreWritesAndHaveEmptyDiff(): Unit {
         let empty = Buffer(Rect(0, 0, 0, 0))

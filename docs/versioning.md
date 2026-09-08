@@ -2,7 +2,7 @@
 
 ## Explanation: read this policy
 
-`cjtui` is pre-1.0. Current packages use `0.1.x` while APIs are tightened by real applications. Choose declarations marked `STABLE` for application code; treat `EXPERIMENTAL` declarations as evaluation or extension points whose shape and behavior may change; do not construct `INTERNAL` declarations or infer an application promise from `TEST_ONLY` exports.
+`termcanvas` is pre-1.0. Current packages use `0.1.x` while APIs are tightened by real applications. Choose declarations marked `STABLE` for application code; treat `EXPERIMENTAL` declarations as evaluation or extension points whose shape and behavior may change; do not construct `INTERNAL` declarations or infer an application promise from `TEST_ONLY` exports.
 
 The exact tier of every declaration comes from the generated [`api-inventory.json`](api-inventory.json). The generated [`stable-api-contract.txt`](stable-api-contract.txt) and [`experimental-api-contract.txt`](experimental-api-contract.txt) are the source-level contracts, including enum constructors and exact signatures. [`api-index.txt`](api-index.txt) is an exported-symbol baseline, not a stability contract. These outputs are maintained by scripts and must not be edited manually. Package location, `core` ownership, or language `public` visibility does not determine a tier. ADR-009 (`adr/009-api-and-package-stability.md`) records the governing decision; [`api.md`](api.md) is the human map.
 
@@ -96,6 +96,6 @@ scripts/release_gate.sh
 
 `scripts/run_regression_matrix.sh` delegates to the same release gate for compatibility with older local workflows. The gate also checks that generated Unicode 17.0.0 tables are current; a release is not ready if it fails.
 
-The canonical verification toolchain is Cangjie `1.1.0-alpha.20260817040003` with cjpm `1.1.3`. This exact verification pin is separate from manifests' `cjc-version = "1.1.0"` language compatibility declaration and does not claim ABI compatibility with other compilers. The prior 20260803 compiler is rejected because its test-macro code generation crashes on the repository's legal `@Bench` suite. Official verification uses a toolchain-specific target namespace; moving a local `daily` symlink cannot change the accepted compiler or reuse objects from another SDK.
+The canonical verification toolchain is Cangjie `1.1.3` STS with cjpm `1.1.3`. This exact verification pin is separate from manifests' `cjc-version = "1.1.0"` language compatibility declaration and does not claim ABI compatibility with other compilers. The prior 20260817 nightly compiler is retained only as historical evidence; official verification uses the public STS archive and a version-specific target namespace, so moving a local `daily` symlink cannot change the accepted compiler or reuse objects from another SDK.
 
 Revisit a tier only through reviewed evidence and an explicit contract diff. Actual removals require a separate compatibility census and migration phase. The fitness requirements are zero unclassified production public declarations, excluded test sources, inventoried enum constructors, deterministic generated outputs, and no new stable-to-nonstable edges beyond the exact lifecycle-owned baseline.

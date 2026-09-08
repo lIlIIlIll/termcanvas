@@ -241,7 +241,7 @@ def emit_github_env(install_dir: Path, version: str) -> None:
         with open(github_env, "a", encoding="utf-8") as fh:
             fh.write(f"CANGJIE_HOME={install_dir}\n")
             fh.write(f"CANGJIE_SDK_ROOT={install_dir}\n")
-            fh.write(f"CJ_TUI_NIGHTLY_SDK_VERSION={version}\n")
+            fh.write(f"TERMCANVAS_NIGHTLY_SDK_VERSION={version}\n")
             fh.write(
                 f"LD_LIBRARY_PATH={install_dir / 'lib'}:{install_dir / 'runtime/lib'}:{old_library_path}\n"
             )

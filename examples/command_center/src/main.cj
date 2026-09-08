@@ -1,4 +1,4 @@
-package cjtui_command_center
+package termcanvas_command_center
 
 import core.*
 

@@ -1,8 +1,8 @@
 [package]
   cjc-version = "1.1.0"
-  name = "cjtui_example_smoke"
+  name = "termcanvas_example_smoke"
   organization = ""
-  description = "Headless component composition checks for cj_tui examples"
+  description = "Headless component composition checks for termcanvas examples"
   version = "0.1.0"
   target-dir = ""
   script-dir = ""
