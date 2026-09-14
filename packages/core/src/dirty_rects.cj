@@ -2,8 +2,13 @@ package core
 
 import std.collection.*
 
+// Bound the rectangle-list multiplier in clipping, snapshots, and diff scans.
+// A fragmented batch conservatively coalesces until clear() starts a new batch.
+const MAX_DIRTY_RECTS: Int64 = 64
+
 public class DirtyRects {
     private let items = ArrayList<Rect>()
+    private var coalesced: Bool = false
 
     public init() {}
 
@@ -19,6 +24,10 @@ public class DirtyRects {
 
     public func add(rect: Rect): Unit {
         if (rect.width <= 0 || rect.height <= 0) { return }
+        if (coalesced) {
+            items[0] = unionRect(items[0], rect)
+            return
+        }
         var merged = rect
         var i: Int64 = 0
         while (i < items.size) {
@@ -26,9 +35,17 @@ public class DirtyRects {
             if (canMerge(current, merged)) {
                 merged = unionRect(current, merged)
                 items.remove(at: i)
+                // The expanded union can now overlap an earlier rectangle.
+                // Revisit it so stored rectangles remain pairwise disjoint.
+                i = 0
             } else {
                 i++
             }
+        }
+        if (items.size >= MAX_DIRTY_RECTS) {
+            for (current in items) { merged = unionRect(current, merged) }
+            clear()
+            coalesced = true
         }
         items.add(merged)
     }
@@ -43,8 +60,9 @@ public class DirtyRects {
 
     public func clear(): Unit {
         while (items.size > 0) {
-            items.remove(at: 0)
+            items.remove(at: items.size - 1)
         }
+        coalesced = false
     }
 
     public func isEmpty(): Bool {
@@ -56,7 +74,10 @@ public class DirtyRects {
     }
 
     public func copy(): DirtyRects {
-        DirtyRects(rects())
+        let result = DirtyRects()
+        for (rect in items) { result.items.add(rect) }
+        result.coalesced = coalesced
+        result
     }
 
     public func covers(area: Rect): Bool {

@@ -13307,7 +13307,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 5,
+      "line": 9,
       "level": "top_level",
       "kind": "class",
       "symbol": "DirtyRects",
@@ -13325,7 +13325,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 8,
+      "line": 13,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -13343,7 +13343,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 10,
+      "line": 15,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -13361,7 +13361,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 14,
+      "line": 19,
       "level": "member",
       "kind": "func",
       "symbol": "full",
@@ -13379,7 +13379,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 20,
+      "line": 25,
       "level": "member",
       "kind": "func",
       "symbol": "add",
@@ -13397,7 +13397,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 36,
+      "line": 53,
       "level": "member",
       "kind": "func",
       "symbol": "addAll",
@@ -13415,7 +13415,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 40,
+      "line": 57,
       "level": "member",
       "kind": "func",
       "symbol": "addAll",
@@ -13433,7 +13433,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 44,
+      "line": 61,
       "level": "member",
       "kind": "func",
       "symbol": "clear",
@@ -13451,7 +13451,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 50,
+      "line": 68,
       "level": "member",
       "kind": "func",
       "symbol": "isEmpty",
@@ -13469,7 +13469,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 54,
+      "line": 72,
       "level": "member",
       "kind": "func",
       "symbol": "rects",
@@ -13487,7 +13487,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 58,
+      "line": 76,
       "level": "member",
       "kind": "func",
       "symbol": "copy",
@@ -13505,7 +13505,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 62,
+      "line": 83,
       "level": "member",
       "kind": "func",
       "symbol": "covers",
@@ -13523,7 +13523,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 72,
+      "line": 93,
       "level": "member",
       "kind": "func",
       "symbol": "intersects",
@@ -13541,7 +13541,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 80,
+      "line": 101,
       "level": "member",
       "kind": "func",
       "symbol": "intersectsRect",
@@ -13559,7 +13559,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 92,
+      "line": 113,
       "level": "member",
       "kind": "func",
       "symbol": "intersectsCell",
@@ -13577,7 +13577,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 101,
+      "line": 122,
       "level": "member",
       "kind": "func",
       "symbol": "cellCount",
@@ -32256,7 +32256,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 96,
+      "line": 103,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemeClusters",
@@ -32274,7 +32274,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 108,
+      "line": 115,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemeDisplayWidth",
@@ -32292,7 +32292,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 115,
+      "line": 122,
       "level": "top_level",
       "kind": "func",
       "symbol": "cut",
@@ -32310,7 +32310,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 128,
+      "line": 135,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemePrefix",
@@ -32328,7 +32328,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 144,
+      "line": 151,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemeDisplayWidth",
@@ -32346,7 +32346,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 168,
+      "line": 175,
       "level": "top_level",
       "kind": "func",
       "symbol": "wrapText",
@@ -32364,7 +32364,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 362,
+      "line": 369,
       "level": "top_level",
       "kind": "func",
       "symbol": "clampToRuneBoundary",
@@ -32382,7 +32382,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 379,
+      "line": 386,
       "level": "top_level",
       "kind": "func",
       "symbol": "previousGraphemeOffset",
@@ -32400,7 +32400,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 395,
+      "line": 402,
       "level": "top_level",
       "kind": "func",
       "symbol": "nextGraphemeOffset",
