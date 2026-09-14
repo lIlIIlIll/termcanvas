@@ -1,91 +1,84 @@
-name: temporary-api-inventory-refresh-pr3
+name: ci
 
 on:
   push:
-    branches: [automation/pr3-api-inventory-20260914]
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  generate:
-    if: github.ref == 'refs/heads/automation/pr3-api-inventory-20260914'
+  linux:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     env:
-      BASE: e8ec0b166b2012512edb83199670cb80133e1a7e
+      CANGJIE_SDK_VERSION: 1.1.3
+      CANGJIE_CJPM_VERSION: 1.1.3
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
-      - name: Reproduce stale artifacts and regenerate
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD^)" = "$BASE"
-          set +e
-          scripts/generate_api_index.sh --check > "$RUNNER_TEMP/api-check-before.log" 2>&1
-          before_status=$?
-          set -e
-          cat "$RUNNER_TEMP/api-check-before.log"
-          test "$before_status" -eq 1
-          diff -u <(printf '%s\n' 'stale generated API output: docs/api-index.txt' 'stale generated API output: docs/api-inventory.json') <(sort "$RUNNER_TEMP/api-check-before.log")
-          scripts/generate_api_index.sh
-          scripts/generate_api_index.sh --check
-      - name: Validate API generator and coverage regression tests
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 scripts/test_api_contract.py
-          python3 scripts/test_coverage_report.py
-          git diff --check
-      - name: Verify that only source line locations changed
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import json
-          import os
-          import re
-          import subprocess
-          from pathlib import Path
+          path: termcanvas
+          fetch-depth: 0
 
-          base = os.environ['BASE']
-          expected = {'docs/api-inventory.json', 'docs/api-index.txt'}
-          changed = set(subprocess.check_output(['git', 'diff', '--name-only'], text=True).splitlines())
-          assert changed == expected, changed
-          old = json.loads(subprocess.check_output(['git', 'show', f'{base}:docs/api-inventory.json'], text=True))
-          new = json.loads(Path('docs/api-inventory.json').read_text(encoding='utf-8'))
-          old_symbols = old.pop('symbols')
-          new_symbols = new.pop('symbols')
-          assert old == new, 'inventory metadata changed'
-          assert len(old_symbols) == len(new_symbols)
-          moved = 0
-          for previous, current in zip(old_symbols, new_symbols):
-              previous_line = previous.pop('line')
-              current_line = current.pop('line')
-              assert previous == current, (previous, current)
-              moved += previous_line != current_line
-          assert moved > 0
-          old_index = subprocess.check_output(['git', 'show', f'{base}:docs/api-index.txt'], text=True)
-          new_index = Path('docs/api-index.txt').read_text(encoding='utf-8')
-          without_lines = lambda text: re.sub(r'^(packages/[^:\n]+):[0-9]+:', r'\1:', text, flags=re.MULTILINE)
-          assert without_lines(old_index) == without_lines(new_index), 'API index signatures changed'
-          print(f'VALIDATED: {len(new_symbols)} declarations; {moved} source line locations refreshed; no API signatures or classifications changed')
-          PY
-      - name: Export clean result tree on the temporary branch
+      - name: Setup Cangjie STS
+        uses: Zxilly/setup-cangjie@f959b3d1078c92173ea67d398f293727639000f7
+        with:
+          channel: sts
+          version: ${{ env.CANGJIE_SDK_VERSION }}
+          archive-path: ${{ runner.temp }}/cangjie-sts.tar.gz
+
+      - name: Configure canonical SDK
         shell: bash
+        working-directory: termcanvas
         run: |
           set -euo pipefail
-          git restore --source="$BASE" -- .github/workflows/ci.yml
-          git add -- .github/workflows/ci.yml docs/api-inventory.json docs/api-index.txt
-          diff -u <(printf '%s\n' docs/api-index.txt docs/api-inventory.json) <(git diff --cached "$BASE" --name-only | sort)
-          git diff --cached "$BASE" --check
-          git diff --cached "$BASE" --stat
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'chore(docs): export regenerated PR 3 API artifacts'
-          git push origin HEAD:refs/heads/automation/pr3-api-inventory-20260914
-          printf 'RESULT_COMMIT=%s\n' "$(git rev-parse HEAD)"
-          printf 'RESULT_TREE=%s\n' "$(git rev-parse HEAD^{tree})"
+          sdk_root="${CANGJIE_HOME:-}"
+          if [[ -z "$sdk_root" || ! -x "$sdk_root/bin/cjc" ]]; then
+            cjc_path="$(readlink -f -- "$(command -v cjc)")"
+            sdk_root="$(dirname -- "$(dirname -- "$cjc_path")")"
+          fi
+          sdk_root="$(readlink -f -- "$sdk_root")"
+          export CANGJIE_SDK_ROOT="$sdk_root"
+          echo "CANGJIE_SDK_ROOT=$sdk_root" >> "$GITHUB_ENV"
+          printf 'CANGJIE_HOME=%s\n' "${CANGJIE_HOME:-}"
+          printf 'CJC_PATH=%s\n' "$(command -v cjc)"
+          printf 'CANGJIE_SDK_ROOT=%s\n' "$sdk_root"
+          scripts/check_sdk.sh --report
+
+      - name: Verify Cangjie SDK
+        shell: bash
+        working-directory: termcanvas
+        run: |
+          set -euo pipefail
+          command -v cjc
+          cjc -v
+          command -v cjpm
+          cjpm --version
+          scripts/check_sdk.sh --report
+
+      - name: Run release gate
+        id: release_gate
+        shell: bash
+        working-directory: termcanvas
+        run: scripts/ci_gate.sh
+
+      - name: Generate Codecov coverage report
+        shell: bash
+        working-directory: termcanvas
+        run: scripts/coverage.sh "$RUNNER_TEMP/termcanvas-codecov"
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ runner.temp }}/termcanvas-codecov/coverage.xml
+          flags: cangjie
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Archive SDK failure
+        if: failure() && steps.release_gate.outcome == 'failure' && github.event_name != 'pull_request'
+        shell: bash
+        working-directory: termcanvas
+        env:
+          TERMCANVAS_PUSH_NIGHTLY_ARCHIVE: "1"
+        run: scripts/archive_nightly_failure.sh "${CANGJIE_SDK_VERSION:-unknown-sdk}" "$GITHUB_SHA"

@@ -729,22 +729,22 @@ packages/core/src/data_widgets.cj:953:public let name: String
 packages/core/src/data_widgets.cj:954:public let path: String
 packages/core/src/data_widgets.cj:955:public let isDir: Bool
 packages/core/src/data_widgets.cj:957:public init(name: String, path: String, isDir: Bool)
-packages/core/src/dirty_rects.cj:5:public class DirtyRects {
-packages/core/src/dirty_rects.cj:8:public init()
-packages/core/src/dirty_rects.cj:10:public init(rects: Array<Rect>)
-packages/core/src/dirty_rects.cj:14:public static func full(area: Rect): DirtyRects
-packages/core/src/dirty_rects.cj:20:public func add(rect: Rect): Unit
-packages/core/src/dirty_rects.cj:36:public func addAll(rects: Array<Rect>): Unit
-packages/core/src/dirty_rects.cj:40:public func addAll(other: DirtyRects): Unit
-packages/core/src/dirty_rects.cj:44:public func clear(): Unit
-packages/core/src/dirty_rects.cj:50:public func isEmpty(): Bool
-packages/core/src/dirty_rects.cj:54:public func rects(): Array<Rect>
-packages/core/src/dirty_rects.cj:58:public func copy(): DirtyRects
-packages/core/src/dirty_rects.cj:62:public func covers(area: Rect): Bool
-packages/core/src/dirty_rects.cj:72:public func intersects(area: Rect): Bool
-packages/core/src/dirty_rects.cj:80:public func intersectsRect(x: Int64, y: Int64, width: Int64, height: Int64): Bool
-packages/core/src/dirty_rects.cj:92:public func intersectsCell(x: Int64, y: Int64): Bool
-packages/core/src/dirty_rects.cj:101:public func cellCount(): Int64
+packages/core/src/dirty_rects.cj:9:public class DirtyRects {
+packages/core/src/dirty_rects.cj:13:public init()
+packages/core/src/dirty_rects.cj:15:public init(rects: Array<Rect>)
+packages/core/src/dirty_rects.cj:19:public static func full(area: Rect): DirtyRects
+packages/core/src/dirty_rects.cj:25:public func add(rect: Rect): Unit
+packages/core/src/dirty_rects.cj:53:public func addAll(rects: Array<Rect>): Unit
+packages/core/src/dirty_rects.cj:57:public func addAll(other: DirtyRects): Unit
+packages/core/src/dirty_rects.cj:61:public func clear(): Unit
+packages/core/src/dirty_rects.cj:68:public func isEmpty(): Bool
+packages/core/src/dirty_rects.cj:72:public func rects(): Array<Rect>
+packages/core/src/dirty_rects.cj:76:public func copy(): DirtyRects
+packages/core/src/dirty_rects.cj:83:public func covers(area: Rect): Bool
+packages/core/src/dirty_rects.cj:93:public func intersects(area: Rect): Bool
+packages/core/src/dirty_rects.cj:101:public func intersectsRect(x: Int64, y: Int64, width: Int64, height: Int64): Bool
+packages/core/src/dirty_rects.cj:113:public func intersectsCell(x: Int64, y: Int64): Bool
+packages/core/src/dirty_rects.cj:122:public func cellCount(): Int64
 packages/core/src/document.cj:5:public class RichSpan {
 packages/core/src/document.cj:6:public let text: String
 packages/core/src/document.cj:7:public let style: Style
@@ -1770,15 +1770,15 @@ packages/core/src/text.cj:34:public func displayWidth(text: String): Int64
 packages/core/src/text.cj:38:public func displayWidth(text: String, options!: TextWidthOptions): Int64
 packages/core/src/text.cj:57:public func displayWidth(r: Rune): Int64
 packages/core/src/text.cj:61:public func displayWidth(r: Rune, options!: TextWidthOptions): Int64
-packages/core/src/text.cj:96:public func graphemeClusters(text: String): Array<GraphemeCluster>
-packages/core/src/text.cj:108:public func graphemeDisplayWidth(text: String): Int64
-packages/core/src/text.cj:115:public func cut(text: String, width: Int64): String
-packages/core/src/text.cj:128:public func graphemePrefix(text: String, maxWidth: Int64): String
-packages/core/src/text.cj:144:public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64
-packages/core/src/text.cj:168:public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String>
-packages/core/src/text.cj:362:public func clampToRuneBoundary(text: String, offset: Int64): Int64
-packages/core/src/text.cj:379:public func previousGraphemeOffset(text: String, offset: Int64): Int64
-packages/core/src/text.cj:395:public func nextGraphemeOffset(text: String, offset: Int64): Int64
+packages/core/src/text.cj:103:public func graphemeClusters(text: String): Array<GraphemeCluster>
+packages/core/src/text.cj:115:public func graphemeDisplayWidth(text: String): Int64
+packages/core/src/text.cj:122:public func cut(text: String, width: Int64): String
+packages/core/src/text.cj:135:public func graphemePrefix(text: String, maxWidth: Int64): String
+packages/core/src/text.cj:151:public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64
+packages/core/src/text.cj:175:public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String>
+packages/core/src/text.cj:369:public func clampToRuneBoundary(text: String, offset: Int64): Int64
+packages/core/src/text.cj:386:public func previousGraphemeOffset(text: String, offset: Int64): Int64
+packages/core/src/text.cj:402:public func nextGraphemeOffset(text: String, offset: Int64): Int64
 packages/core/src/text_area.cj:35:public class TextAreaCaret {
 packages/core/src/text_area.cj:36:public let offset: Int64
 packages/core/src/text_area.cj:37:public let anchor: ?Int64
