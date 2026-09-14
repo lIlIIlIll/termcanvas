@@ -78,6 +78,13 @@ public func displayWidth(r: Rune, options!: TextWidthOptions): Int64 {
             case AmbiguousWidth.Narrow => ()
         }
     }
+    // Unicode 17 EastAsianWidth assigns W to planes 2 and 3, including
+    // unassigned positions, except each plane's final two noncharacters.
+    // Keep this independent of the configurable ambiguous-width policy.
+    if ((code >= 0x20000u32 && code <= 0x2FFFDu32) ||
+        (code >= 0x30000u32 && code <= 0x3FFFDu32)) {
+        return 2
+    }
     if ((code >= 0x1100u32 && code <= 0x115Fu32) ||
         (code >= 0x2329u32 && code <= 0x232Au32) ||
         (code >= 0x2E80u32 && code <= 0xA4CFu32) ||
