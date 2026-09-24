@@ -140,7 +140,7 @@ core|FrameMetrics.writeNanos|let|public let writeNanos: Int64
 core|FrameMetrics.ansiBytes|let|public let ansiBytes: Int64
 core|FrameMetrics.init|init|public init( frameIndex!: Int64 = 0, fps!: Int64 = 0, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, eventQueueLength!: Int64 = 0, dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, terminalSize!: Rect = Rect(0, 0, 0, 0), droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
 core|AppMetrics|class|public class AppMetrics {
-core|AppMetrics.init|init|public init()
+core|AppMetrics.init|init|public init(maxFrames!: ?Int64 = Some(600))
 core|AppMetrics.record|func|public func record(frame: FrameMetrics): Unit
 core|AppMetrics.record|func|public func record( render: RenderMetrics, frameIndex!: Int64 = 0, eventQueueLength!: Int64 = 0, droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0 ): Unit
 core|AppMetrics.lastFrame|func|public func lastFrame(): ?FrameMetrics

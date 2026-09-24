@@ -255,6 +255,25 @@ class CjTuiBoundaryExtremeTest {
     }
 
     @TestCase
+    func textBufferMultilineInsertPreservesTailPositionAndUndo(): Unit {
+        let buffer = TextBuffer(text: "keep\nmiddle\ntail")
+        let position = buffer.insert(TextPosition(1, 3), "🙂\nnew\n")
+        @Expect(buffer.text(), "keep\nmid🙂\nnew\ndle\ntail")
+        @Expect(position, TextPosition(3, 0))
+        @Expect(buffer.undo())
+        @Expect(buffer.text(), "keep\nmiddle\ntail")
+    }
+
+    @TestCase
+    func textBufferReplaceAllPreservesUnicodeAndUndo(): Unit {
+        let buffer = TextBuffer(text: "aba\naba")
+        @Expect(buffer.replaceAll("a", "🙂"), 4)
+        @Expect(buffer.text(), "🙂b🙂\n🙂b🙂")
+        @Expect(buffer.undo())
+        @Expect(buffer.text(), "aba\naba")
+    }
+
+    @TestCase
     func paragraphZeroAreaAndHugeTextDoNotMutateBuffer(): Unit {
         let buffer = Buffer(Rect(0, 0, 4, 1))
         buffer.setString(0, 0, "keep")
@@ -438,6 +457,16 @@ class CjTuiBoundaryExtremeTest {
         @Expect(escape.getCell(6, 0).symbol, "d")
         @Expect(escape.getCell(7, 0).symbol, "Z")
         @Expect(escape.getCell(7, 0).style, green)
+    }
+
+    @TestCase
+    func runeBoundaryClampUsesLocalUtf8Starts(): Unit {
+        let text = "A中e\u{0301}🙂Z"
+        let offsets: Array<Int64> = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+        let expected: Array<Int64> = [0, 0, 1, 1, 1, 4, 5, 5, 7, 7, 7, 7, 11, 12, 12]
+        for (index in 0..offsets.size) {
+            @Expect(clampToRuneBoundary(text, offsets[index]), expected[index])
+        }
     }
 
     @TestCase

@@ -463,4 +463,177 @@ class CjTuiAuditWidgetsTest {
             @Expect(source.calls, before)
         }
     }
+    @TestCase
+    func virtualTableBoundStateSettersPersistAndExternalChangesApply(): Unit {
+        let rows = [["b", "b0"], ["a", "a1"], ["a", "a2"]]
+        let sort = SortState()
+        let filter = FilterState()
+        let scroll = ScrollState(offset: 2)
+        let table = VirtualTable(
+            [TableColumn("Key"), TableColumn("ID")],
+            rows.size,
+            { index => rows[index] },
+            sortState: Some(sort),
+            filterState: Some(filter),
+            scrollState: Some(scroll)
+        )
+        let area = Rect(0, 0, 30, 6)
+        table.render(area, Buffer(area))
+        table.sortBy(0)
+        @Expect(scroll.offset, 0)
+        let sorted = Buffer(area)
+        table.render(area, sorted)
+        table.render(area, sorted)
+        @Expect(sort.column, Some(0))
+        @Expect(table.offset, 0)
+        @Expect(auditWidgetRow(sorted, 1).contains("a1"))
+        @Expect(auditWidgetRow(sorted, 2).contains("a2"))
+
+        table.setFilter("a")
+        let filtered = Buffer(area)
+        table.render(area, filtered)
+        table.render(area, filtered)
+        @Expect(filter.query, "a")
+        @Expect(auditWidgetRow(filtered, 1).contains("a1"))
+        @Expect(auditWidgetRow(filtered, 2).contains("a2"))
+        @Expect(!auditWidgetRow(filtered, 1).contains("b0"))
+
+        sort.set(0, descending: true)
+        filter.set("b")
+        scroll.offset = 0
+        let external = Buffer(area)
+        table.render(area, external)
+        @Expect(auditWidgetRow(external, 1).contains("b0"))
+        rows[0] = ["z", "z0"]
+        filter.set("")
+        table.clearCachedRows()
+        let refreshed = Buffer(area)
+        table.render(area, refreshed)
+        @Expect(auditWidgetRow(refreshed, 1).contains("z0"))
+        table.clearSort()
+        @Expect(sort.column.isNone())
+        @Expect(!sort.descending)
+    }
+
+    @TestCase
+    func virtualTableDirtyRectsUseBlockedContentCoordinates(): Unit {
+        let screen = Rect(0, 0, 32, 16)
+        let outer = Rect(4, 3, 20, 7)
+        let block = Block(title: "T")
+        let content = block.inner(outer)
+        let table = VirtualTable(
+            [TableColumn("Name", width: 12)],
+            10,
+            { index => ["row-${index}"] },
+            selectedRow: Some(0),
+            block: Some(block)
+        )
+
+        let header = table.dirtyHeader(outer).rects()
+        @Expect(header.size, 1)
+        @Expect(header[0].x, content.x)
+        @Expect(header[0].y, content.y)
+        @Expect(header[0].width, content.width)
+        let body = table.dirtyBody(outer).rects()
+        @Expect(body.size, 1)
+        @Expect(body[0].x, content.x)
+        @Expect(body[0].y, content.y + 1)
+        @Expect(body[0].height, content.height - 1)
+        let selected = table.dirtyRows(outer, [0]).rects()
+        @Expect(selected.size, 1)
+        @Expect(selected[0].x, content.x)
+        @Expect(selected[0].y, content.y + 1)
+        let fallback = table.dirtyRows(outer, [100]).copy()
+        @Expect(fallback.covers(content))
+        @Expect(!fallback.covers(outer))
+
+        let backend = TestBackend(area: screen)
+        let terminal = Terminal(backend, renderMode: RenderMode.Diff)
+        _ = terminal.draw { frame => frame.renderWidget(table, outer) }
+        let dirty = table.handleWithDirty(KeyEvent(KeyCode.Down), outer)
+        @Expect(dirty.isSome())
+        for (rect in dirty.getOrThrow().rects()) {
+            @Expect(rect.x >= content.x && rect.right <= content.right)
+            @Expect(rect.y >= content.y && rect.bottom <= content.bottom)
+        }
+        _ = terminal.draw({ frame => frame.renderWidget(table, outer) }, dirtyRects: dirty)
+        let expected = Buffer(screen)
+        table.render(outer, expected)
+        @Expect(backend.lastBuffer().getOrThrow().diff(expected).size, 0)
+
+        let noRows = VirtualTable(
+            [TableColumn("Name")],
+            1,
+            { _ => ["row"] },
+            selectedRow: Some(0),
+            block: Some(Block(title: "T"))
+        )
+        @Expect(noRows.handleWithDirty(KeyEvent(KeyCode.Down), Rect(4, 3, 10, 3)).isNone())
+        @Expect(noRows.selectedRow, Some(0))
+        @Expect(noRows.handleWithDirty(KeyEvent(KeyCode.Down), Rect(4, 3, 2, 7)).isNone())
+    }
+
+    @TestCase
+    func virtualTableSortIsStableAndMissingCellsSortAsEmpty(): Unit {
+        let rows = [["b", "b0"], ["a", "a1"], ["a", "a2"]]
+        let table = VirtualTable(
+            [TableColumn("Key"), TableColumn("ID")],
+            rows.size,
+            { index => rows[index] }
+        )
+        let area = Rect(0, 0, 30, 6)
+        table.sortBy(0)
+        let ascending = Buffer(area)
+        table.render(area, ascending)
+        @Expect(auditWidgetRow(ascending, 1).contains("a1"))
+        @Expect(auditWidgetRow(ascending, 2).contains("a2"))
+        @Expect(auditWidgetRow(ascending, 3).contains("b0"))
+        table.sortBy(0, descending: true)
+        let descending = Buffer(area)
+        table.render(area, descending)
+        @Expect(auditWidgetRow(descending, 1).contains("b0"))
+        @Expect(auditWidgetRow(descending, 2).contains("a1"))
+        @Expect(auditWidgetRow(descending, 3).contains("a2"))
+
+        let missing = VirtualTable(
+            [TableColumn("Key"), TableColumn("ID")],
+            3,
+            { index => [["a", "a1"], ["b"], ["c", "b2"]][index] }
+        )
+        missing.sortBy(1)
+        let missingCell = Buffer(area)
+        missing.render(area, missingCell)
+        @Expect(auditWidgetRow(missingCell, 1).contains("b"))
+        @Expect(auditWidgetRow(missingCell, 2).contains("a1"))
+        @Expect(auditWidgetRow(missingCell, 3).contains("b2"))
+        missing.setFilter("not-present")
+        let empty = Buffer(area)
+        missing.render(area, empty)
+        @Expect(auditWidgetRow(empty, 1).contains(missing.emptyText))
+    }
+
+    @TestCase
+    func virtualTableHorizontalScrollRedrawsContentHeader(): Unit {
+        let screen = Rect(0, 0, 32, 16)
+        let outer = Rect(4, 3, 20, 7)
+        let block = Block(title: "T")
+        let content = block.inner(outer)
+        let table = VirtualTable(
+            [TableColumn("first", width: 10), TableColumn("second", width: 10), TableColumn("third", width: 10)],
+            2,
+            { index => ["a-${index}", "b-${index}", "c-${index}"] },
+            block: Some(block)
+        )
+        let backend = TestBackend(area: screen)
+        let terminal = Terminal(backend, renderMode: RenderMode.Diff)
+        _ = terminal.draw { frame => frame.renderWidget(table, outer) }
+        let dirty = table.handleWithDirty(KeyEvent(KeyCode.Right), outer)
+        @Expect(dirty.isSome())
+        @Expect(dirty.getOrThrow().covers(content))
+        _ = terminal.draw({ frame => frame.renderWidget(table, outer) }, dirtyRects: dirty)
+        let expected = Buffer(screen)
+        table.render(outer, expected)
+        @Expect(backend.lastBuffer().getOrThrow().diff(expected).size, 0)
+    }
+
 }

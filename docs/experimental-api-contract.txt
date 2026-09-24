@@ -265,7 +265,7 @@ core|VirtualTable.loadingText|var|public var loadingText: String = "Loading"
 core|VirtualTable.init|init|public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan), statusStyle!: Style = Style(fg: Color.Indexed(8)), selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None )
 core|VirtualTable.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|VirtualTable.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-core|VirtualTable.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, viewportHeight: Int64, area: Rect): ?DirtyRects
+core|VirtualTable.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
 core|VirtualTable.dirtyHeader|func|public func dirtyHeader(area: Rect): DirtyRects
 core|VirtualTable.dirtyBody|func|public func dirtyBody(area: Rect): DirtyRects
 core|VirtualTable.dirtyRows|func|public func dirtyRows(area: Rect, rows: Array<Int64>): DirtyRects

@@ -2,6 +2,7 @@ package core
 
 import std.collection.*
 import std.fs.*
+import std.sort.*
 
 public class Paginator {
     public var page: Int64
@@ -87,8 +88,11 @@ public class VirtualTable <: Widget {
     public var emptyText: String = "No rows"
     public var loadingText: String = "Loading"
     private let selectedRows = ArrayList<Int64>()
-    private let rowCacheIndices = ArrayList<Int64>()
-    private let rowCacheValues = ArrayList<Array<String>>()
+    private let rowCache = HashMap<Int64, Array<String>>()
+    private var cachedVisibleIndices: ?Array<Int64> = None
+    private var cachedVisibleFilterText: String = ""
+    private var cachedVisibleSortColumn: ?Int64 = None
+    private var cachedVisibleSortDescending: Bool = false
     private let block: ?Block
     private let style: Style
     private let selectedStyle: Style
@@ -141,14 +145,17 @@ public class VirtualTable <: Widget {
 
     private func renderClipped(area: Rect, buffer: Buffer): Unit {
         syncExternalState()
-        var target = area
-        if (let Some(b) <- block) {
-            b.render(area, buffer)
-            target = b.inner(area)
-        }
+        if (let Some(b) <- block) { b.render(area, buffer) }
+        let target = contentArea(area)
         if (target.width <= 0 || target.height <= 0) { return }
-        let content = target
-        buffer.withCanvasClip(content) { => renderRows(content, buffer) }
+        buffer.withCanvasClip(target) { => renderRows(target, buffer) }
+    }
+
+    private func contentArea(area: Rect): Rect {
+        match (block) {
+            case Some(value) => value.inner(area)
+            case None => area
+        }
     }
 
     private func renderRows(target: Rect, buffer: Buffer): Unit {
@@ -235,39 +242,55 @@ public class VirtualTable <: Widget {
         handled
     }
 
-    public func handleWithDirty(key: KeyEvent, viewportHeight: Int64, area: Rect): ?DirtyRects {
+    public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects {
+        let content = contentArea(area)
+        if (content.width <= 0 || content.height <= 0) { return None }
+        let headerRows = if (stickyHeader) { Int64(1) } else { Int64(0) }
+        let dataRows = max(0, content.height - headerRows)
+        if (dataRows <= 0) { return None }
+
+        syncExternalState()
         let beforeOffset = offset
         let beforeSelected = selectedRow
-        let beforeColumn = selectedColumn
-        if (!handle(key, viewportHeight)) { return None }
-        if (beforeOffset != offset || beforeColumn != selectedColumn) {
-            return Some(dirtyBody(area))
+        let beforeColumnOffset = columnOffset
+        if (!handle(key, dataRows)) { return None }
+        ensureColumnVisible(content.width)
+        if (beforeColumnOffset != columnOffset) {
+            let dirty = DirtyRects()
+            dirty.add(content)
+            return Some(dirty)
         }
+        if (beforeOffset != offset) { return Some(dirtyBody(area)) }
         Some(dirtySelectionChange(area, beforeSelected, selectedRow))
     }
 
     public func dirtyHeader(area: Rect): DirtyRects {
         let dirty = DirtyRects()
-        if (stickyHeader && area.height > 0) {
-            dirty.add(Rect(area.x, area.y, area.width, 1))
+        let content = contentArea(area)
+        if (content.width > 0 && content.height > 0 && stickyHeader) {
+            dirty.add(Rect(content.x, content.y, content.width, 1))
         }
         dirty
     }
 
     public func dirtyBody(area: Rect): DirtyRects {
         let dirty = DirtyRects()
+        let content = contentArea(area)
+        if (content.width <= 0 || content.height <= 0) { return dirty }
         let headerRows = if (stickyHeader) { Int64(1) } else { Int64(0) }
-        dirty.add(Rect(area.x, area.y + headerRows, area.width, max(0, area.height - headerRows)))
+        dirty.add(Rect(content.x, content.y + headerRows, content.width, max(0, content.height - headerRows)))
         dirty
     }
 
     public func dirtyRows(area: Rect, rows: Array<Int64>): DirtyRects {
         let dirty = DirtyRects()
+        let content = contentArea(area)
+        if (content.width <= 0 || content.height <= 0) { return dirty }
         let headerRows = if (stickyHeader) { Int64(1) } else { Int64(0) }
         for (row in rows) {
-            addVirtualTableRowDirty(dirty, area, Some(row), offset, headerRows)
+            addVirtualTableRowDirty(dirty, content, Some(row), offset, headerRows)
         }
-        if (dirty.isEmpty()) { dirty.add(area) }
+        if (dirty.isEmpty()) { dirty.add(content) }
         dirty
     }
 
@@ -293,19 +316,32 @@ public class VirtualTable <: Widget {
     }
 
     public func cachedRowCount(): Int64 {
-        rowCacheIndices.size
+        rowCache.size
     }
 
     public func sortBy(column: Int64, descending!: Bool = false): Unit {
-        sortColumn = Some(clamp(column, 0, max(0, columns.size - 1)))
+        let sortedColumn = clamp(column, 0, max(0, columns.size - 1))
+        sortColumn = Some(sortedColumn)
         sortDescending = descending
         offset = 0
+        match (scrollState) {
+            case Some(state) => state.offset = 0
+            case None => ()
+        }
+        match (sortState) {
+            case Some(state) => state.set(sortedColumn, descending: descending)
+            case None => ()
+        }
         clearRowCache()
     }
 
     public func clearSort(): Unit {
         sortColumn = None
         sortDescending = false
+        match (sortState) {
+            case Some(state) => state.clear()
+            case None => ()
+        }
         clearRowCache()
     }
 
@@ -323,6 +359,14 @@ public class VirtualTable <: Widget {
         filterText = text
         offset = 0
         selectedRow = None
+        match (filterState) {
+            case Some(state) => state.set(text)
+            case None => ()
+        }
+        match (scrollState) {
+            case Some(state) => state.offset = 0
+            case None => ()
+        }
         clearRowCache()
     }
 
@@ -453,17 +497,42 @@ public class VirtualTable <: Widget {
     }
 
     private func visibleIndices(): Array<Int64> {
-        let rows = ArrayList<Int64>()
-        for (i in 0..rowCount) {
-            if (matchesFilter(i)) {
-                rows.add(i)
-            }
-        }
-        match (sortColumn) {
-            case Some(column) => sortRows(rows, column)
+        let filterKey = filterText
+        let sortColumnKey = sortColumn
+        let descendingKey = sortDescending
+        match (cachedVisibleIndices) {
+            case Some(indices) =>
+                if (cachedVisibleFilterText == filterKey &&
+                    cachedVisibleSortColumn == sortColumnKey &&
+                    cachedVisibleSortDescending == descendingKey) {
+                    return indices
+                }
             case None => ()
         }
-        rows.toArray()
+
+        let rows = ArrayList<Int64>()
+        for (i in 0..rowCount) {
+            if (filterKey.isEmpty() || matchesFilter(i)) { rows.add(i) }
+        }
+        match (sortColumnKey) {
+            case Some(column) =>
+                sort(
+                    rows,
+                    lessThan: { left, right =>
+                        compareStrings(valueAt(left, column), valueAt(right, column)) < 0
+                    },
+                    stable: true,
+                    descending: descendingKey
+                )
+            case None => ()
+        }
+
+        let indices = rows.toArray()
+        cachedVisibleFilterText = filterKey
+        cachedVisibleSortColumn = sortColumnKey
+        cachedVisibleSortDescending = descendingKey
+        cachedVisibleIndices = Some(indices)
+        indices
     }
 
     private func usesDerivedRows(): Bool {
@@ -498,49 +567,24 @@ public class VirtualTable <: Widget {
         false
     }
 
-    private func sortRows(rows: ArrayList<Int64>, column: Int64): Unit {
-        var i: Int64 = 1
-        while (i < rows.size) {
-            let key = rows[i]
-            var j = i - 1
-            while (j >= 0 && rowComesAfter(rows[j], key, column)) {
-                rows[j + 1] = rows[j]
-                j--
-            }
-            rows[j + 1] = key
-            i++
-        }
-    }
-
-    private func rowComesAfter(left: Int64, right: Int64, column: Int64): Bool {
-        let leftValue = valueAt(left, column)
-        let rightValue = valueAt(right, column)
-        let cmp = compareStrings(leftValue, rightValue)
-        if (sortDescending) { cmp < 0 } else { cmp > 0 }
-    }
-
     private func valueAt(row: Int64, column: Int64): String {
         let values = cachedRow(row)
         if (column >= 0 && column < values.size) { values[column] } else { "" }
     }
 
     private func cachedRow(index: Int64): Array<String> {
-        for (i in 0..rowCacheIndices.size) {
-            if (rowCacheIndices[i] == index) {
-                return rowCacheValues[i]
-            }
+        match (rowCache.get(index)) {
+            case Some(row) => return row
+            case None => ()
         }
         let row = rowAt(index)
-        rowCacheIndices.add(index)
-        rowCacheValues.add(row)
+        rowCache.add(index, row)
         row
     }
 
     private func clearRowCache(): Unit {
-        while (rowCacheIndices.size > 0) {
-            rowCacheIndices.remove(at: 0)
-            rowCacheValues.remove(at: 0)
-        }
+        rowCache.clear()
+        cachedVisibleIndices = None
     }
 
     private func renderStatus(area: Rect, buffer: Buffer, headerRows: Int64): Bool {

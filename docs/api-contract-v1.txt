@@ -149,7 +149,7 @@ packages/core/src/app.cj:public let writeNanos: Int64
 packages/core/src/app.cj:public let ansiBytes: Int64
 packages/core/src/app.cj:public init( frameIndex!: Int64 = 0, fps!: Int64 = 0, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, eventQueueLength!: Int64 = 0, dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, terminalSize!: Rect = Rect(0, 0, 0, 0), droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
 packages/core/src/app.cj:public class AppMetrics {
-packages/core/src/app.cj:public init()
+packages/core/src/app.cj:public init(maxFrames!: ?Int64 = Some(600))
 packages/core/src/app.cj:public func record(frame: FrameMetrics): Unit
 packages/core/src/app.cj:public func record( render: RenderMetrics, frameIndex!: Int64 = 0, eventQueueLength!: Int64 = 0, droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0 ): Unit
 packages/core/src/app.cj:public func lastFrame(): ?FrameMetrics
@@ -670,7 +670,7 @@ packages/core/src/data_widgets.cj:public var loadingText: String = "Loading"
 packages/core/src/data_widgets.cj:public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan), statusStyle!: Style = Style(fg: Color.Indexed(8)), selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None )
 packages/core/src/data_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/data_widgets.cj:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/data_widgets.cj:public func handleWithDirty(key: KeyEvent, viewportHeight: Int64, area: Rect): ?DirtyRects
+packages/core/src/data_widgets.cj:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
 packages/core/src/data_widgets.cj:public func dirtyHeader(area: Rect): DirtyRects
 packages/core/src/data_widgets.cj:public func dirtyBody(area: Rect): DirtyRects
 packages/core/src/data_widgets.cj:public func dirtyRows(area: Rect, rows: Array<Int64>): DirtyRects

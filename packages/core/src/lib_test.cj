@@ -3162,6 +3162,25 @@ class CjTuiCoreTest {
     }
 
     @TestCase
+    func headlessRunnerRetainsAllHistoryBeyondDefaultWindow(): Unit {
+        let result = AppTestRunner.run(
+            HeadlessScript().tick(count: 600),
+            { _ => },
+            { _ => UpdateResult.unchanged() },
+            options: HeadlessRunOptions(
+                area: Rect(0, 0, 1, 1),
+                captureSnapshots: false
+            )
+        )
+        @Expect(result.frames.size, 601)
+        @Expect(result.metrics.frames().size, 601)
+        match (result.metrics.lastFrame()) {
+            case Some(frame) => @Expect(frame.frameIndex, 600)
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
     func appUsesInjectedEventWaiterAndClosesItOnExit(): Unit {
         let waiter = CountingEventWaiter()
         let backend = TestBackend(area: Rect(0, 0, 8, 2))

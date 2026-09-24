@@ -68,7 +68,7 @@ public class TextBuffer {
     }
 
     public func setText(text: String): Unit {
-        while (lines.size > 0) { lines.remove(at: 0) }
+        lines.clear()
         for (line in splitLines(text)) {
             lines.add(line)
         }
@@ -165,22 +165,20 @@ public class TextBuffer {
         let source = text()
         var offset: Int64 = 0
         var count: Int64 = 0
-        var out = ""
-        while (offset <= source.size) {
-            let idx = stringIndexOf(source, needle, offset)
-            if (idx < 0) {
-                out += source[offset..]
-                break
-            }
-            out += source[offset..idx] + replacement
+        var idx = stringIndexOf(source, needle, offset)
+        if (idx < 0) { return 0 }
+        let out = StringBuilder()
+        while (idx >= 0) {
+            out.append(source[offset..idx])
+            out.append(replacement)
             offset = idx + needle.size
             count++
+            idx = stringIndexOf(source, needle, offset)
         }
-        if (count > 0) {
-            snapshot()
-            setText(out)
-            clearRedo()
-        }
+        out.append(source[offset..])
+        snapshot()
+        setText(out.toString())
+        clearRedo()
         count
     }
 
@@ -214,24 +212,27 @@ public class TextBuffer {
     }
 
     private func insertRaw(position: TextPosition, text: String): TextPosition {
-        var pos = position
-        for (r in unsafe { text.rawData() }) {
-            _ = r
+        if (text.isEmpty()) { return position }
+        let parts = splitLines(text)
+        let current = lines[position.line]
+        let prefix = current[..position.column]
+        let suffix = current[position.column..]
+        if (parts.size == 1) {
+            lines[position.line] = prefix + text + suffix
+            return TextPosition(position.line, position.column + text.size)
         }
-        let bytes = unsafe { text.rawData() }
-        var offset: Int64 = 0
-        while (offset < bytes.size) {
-            let (r, len) = Rune.fromUtf8(bytes, offset)
-            if (r == r'\n') {
-                pos = newline(pos)
-            } else {
-                let current = lines[pos.line]
-                lines[pos.line] = current[..pos.column] + runeToString(r) + current[pos.column..]
-                pos = TextPosition(pos.line, pos.column + len)
-            }
-            offset += len
+        let last = parts.size - 1
+        let replacement = ArrayList<String>()
+        replacement.add(prefix + parts[0])
+        var index: Int64 = 1
+        while (index < last) {
+            replacement.add(parts[index])
+            index++
         }
-        pos
+        replacement.add(parts[last] + suffix)
+        lines.remove(at: position.line)
+        lines.add(all: replacement, at: position.line)
+        TextPosition(position.line + last, parts[last].size)
     }
 
     public func deleteBackward(position: TextPosition): TextPosition {

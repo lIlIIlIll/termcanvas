@@ -361,15 +361,11 @@ func truncate(text: String, maxWidth: Int64): String {
 
 public func clampToRuneBoundary(text: String, offset: Int64): Int64 {
     let target = clamp(offset, 0, text.size)
+    if (target <= 0 || target >= text.size) { return target }
     let bytes = unsafe { text.rawData() }
-    var pos: Int64 = 0
-    var last: Int64 = 0
-    while (pos < bytes.size && pos <= target) {
-        last = pos
-        let (_, len) = Rune.fromUtf8(bytes, pos)
-        pos += len
-    }
-    if (target == text.size) { text.size } else { last }
+    var boundary = target
+    while (boundary > 0 && (bytes[boundary] & 0xC0u8) == 0x80u8) { boundary-- }
+    boundary
 }
 
 func previousRuneOffset(text: String, offset: Int64): Int64 {

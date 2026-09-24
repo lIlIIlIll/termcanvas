@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-expected_version='1.1.0-alpha.20260817040003'
+expected_version='1.1.3'
 expected_cjpm_version='1.1.3'
 sdk_root=${CANGJIE_SDK_ROOT:-}
 
 if [[ -z "$sdk_root" ]]; then
   printf '%s\n' \
-    'cj_tui: set CANGJIE_SDK_ROOT to the canonical Cangjie SDK' >&2
+    'cj_tui: set CANGJIE_SDK_ROOT to the pinned Cangjie STS SDK' >&2
   exit 2
 fi
 
@@ -19,17 +19,12 @@ fi
 cjc="$sdk_root/bin/cjc"
 cjpm="$sdk_root/tools/bin/cjpm"
 runtime="$sdk_root/runtime/lib/linux_x86_64_cjnative/libcangjie-runtime.so"
-stdx="$sdk_root/linux_x86_64_cjnative/dynamic/stdx"
-if [[ ! -d "$stdx" ]]; then
-  stdx="$(dirname -- "$sdk_root")/linux_x86_64_cjnative/dynamic/stdx"
-fi
-
-if [[ ! -x "$cjc" || ! -x "$cjpm" || ! -f "$runtime" || ! -d "$stdx" ]]; then
+if [[ ! -x "$cjc" || ! -x "$cjpm" || ! -f "$runtime" ]]; then
   printf 'cj_tui: incomplete Cangjie SDK at %s\n' "$sdk_root" >&2
   exit 2
 fi
 
-sdk_ld="$stdx:$(dirname -- "$runtime"):$sdk_root/tools/lib"
+sdk_ld="$(dirname -- "$runtime"):$sdk_root/tools/lib"
 cjc_version=$(env LD_LIBRARY_PATH="$sdk_ld" \
   "$cjc" -v 2>&1 || true)
 cjpm_version=$(env \
@@ -55,7 +50,6 @@ if [[ ${1:-} == --report ]]; then
   printf 'CJPM_VERSION=%s\n' "${cjpm_version//$'\n'/; }"
   printf 'RUNTIME=%s\n' "$runtime"
   printf 'RUNTIME_SHA256=%s\n' "$(sha256sum "$runtime" | cut -d' ' -f1)"
-  printf 'STDX=%s\n' "$(readlink -f -- "$stdx")"
 else
   printf '%s\n' "$sdk_root"
 fi
