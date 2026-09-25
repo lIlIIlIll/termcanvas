@@ -249,16 +249,33 @@ public struct FrameMetrics {
 
 public class AppMetrics {
     private let values = ArrayList<FrameMetrics>()
+    private let maxFramesValue: ?Int64
+    private var nextFrameIndex: Int64 = 0
+
     private var queueEnqueuedValue: Int64 = 0
     private var queueProcessedValue: Int64 = 0
     private var maxQueueDepthValue: Int64 = 0
     private var maxUpdateDepthValue: Int64 = 0
     private var schedulingValue = FrameSchedulingSnapshot()
 
-    public init() {}
+    public init(maxFrames!: ?Int64 = Some(600)) {
+        this.maxFramesValue = match (maxFrames) {
+            case Some(limit) => Some(max(1, limit))
+            case None => None
+        }
+    }
 
     public func record(frame: FrameMetrics): Unit {
-        values.add(frame)
+        match (maxFramesValue) {
+            case None => values.add(frame)
+            case Some(maxFrames) =>
+                if (values.size < maxFrames) {
+                    values.add(frame)
+                    return
+                }
+                values[nextFrameIndex] = frame
+                nextFrameIndex = (nextFrameIndex + 1) % maxFrames
+        }
     }
 
     public func record(
@@ -293,11 +310,33 @@ public class AppMetrics {
 
     public func lastFrame(): ?FrameMetrics {
         if (values.size == 0) { return None }
-        Some(values[values.size - 1])
+        let lastIndex = match (maxFramesValue) {
+            case Some(maxFrames) =>
+                if (values.size >= maxFrames && nextFrameIndex != 0) { nextFrameIndex - 1 }
+                else { values.size - 1 }
+            case None => values.size - 1
+        }
+        Some(values[lastIndex])
     }
 
     public func frames(): Array<FrameMetrics> {
-        values.toArray()
+        match (maxFramesValue) {
+            case None => values.toArray()
+            case Some(maxFrames) =>
+                if (values.size < maxFrames || nextFrameIndex == 0) { return values.toArray() }
+                let ordered = ArrayList<FrameMetrics>()
+                var index = nextFrameIndex
+                while (index < values.size) {
+                    ordered.add(values[index])
+                    index++
+                }
+                index = 0
+                while (index < nextFrameIndex) {
+                    ordered.add(values[index])
+                    index++
+                }
+                ordered.toArray()
+        }
     }
 
     public func averageFps(): Int64 {
@@ -321,9 +360,8 @@ public class AppMetrics {
     }
 
     public func reset(): Unit {
-        while (values.size > 0) {
-            values.remove(at: 0)
-        }
+        values.clear()
+        nextFrameIndex = 0
         queueEnqueuedValue = 0
         queueProcessedValue = 0
         maxQueueDepthValue = 0
@@ -1218,7 +1256,7 @@ public class AppTestRunner {
         try {
             let frames = ArrayList<Buffer>()
             let snapshots = ArrayList<String>()
-            let metrics = AppMetrics()
+            let metrics = AppMetrics(maxFrames: None)
             let failures = ArrayList<String>()
             var flow = ControlFlow.Continue
             var frameIndex: Int64 = 0

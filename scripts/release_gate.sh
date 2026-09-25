@@ -50,6 +50,8 @@ python3 "$ROOT/scripts/test_api_contract.py"
 
 echo "==> SDK resolver local fixtures"
 python3 "$ROOT/scripts/test_resolve_nightly_sdk.py"
+echo "==> example generator local fixtures"
+python3 "$ROOT/scripts/test_new_example.py"
 
 echo "==> Windows smoke wrapper local fixtures"
 python3 "$ROOT/scripts/test_windows_smoke.py"

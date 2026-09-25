@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve and optionally install the Cangjie nightly SDK for CI.
+"""Resolve and optionally install a Cangjie SDK for CI.
 
 The local developer helper at ``~/.local/bin/get_sdk.py`` contains the richer
 interactive DevRepo downloader. This repository script keeps the CI subset
@@ -33,6 +33,7 @@ DEFAULT_CHANNEL = "main"
 DYNAMIC_LATEST_CHANNELS = {"main"}
 DYNAMIC_CHANNEL_PACKAGE_PREFIXES = {"main": "1.1.0-alpha"}
 CHANNEL_PACKAGE_VERSIONS = {
+    "sts": "1.1.3",
     "main": "1.1.0-alpha",
     "dev": "1.1.0-alpha.20260527010056",
     "release-1.0": "1.0.5",
@@ -110,6 +111,8 @@ def explicit_candidate(url: str) -> SdkCandidate:
 def version_matches(candidate_version: str, channel: str, requested_version: str) -> bool:
     if requested_version:
         return candidate_version == requested_version
+    if channel == "sts":
+        return candidate_version == version_prefix(channel)
     return candidate_version.startswith(version_prefix(channel))
 
 

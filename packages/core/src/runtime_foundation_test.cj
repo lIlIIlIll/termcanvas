@@ -739,6 +739,53 @@ class RuntimeFoundationTest {
     }
 
     @TestCase
+    func appMetricsRetainBoundedFramesInChronologicalOrder(): Unit {
+        let metrics = AppMetrics(maxFrames: Some(3))
+        for (index in 0..5) {
+            metrics.record(FrameMetrics(frameIndex: index, fps: (index + 1) * 10, droppedTicks: index))
+        }
+        let frames = metrics.frames()
+        @Expect(frames.size, 3)
+        @Expect(frames[0].frameIndex, 2)
+        @Expect(frames[1].frameIndex, 3)
+        @Expect(frames[2].frameIndex, 4)
+        @Expect(metrics.averageFps(), 40)
+        @Expect(metrics.droppedTicks(), 4)
+        metrics.reset()
+        @Expect(metrics.frames().size, 0)
+        @Expect(metrics.averageFps(), 0)
+        @Expect(metrics.droppedTicks(), 0)
+
+        let singleSlot = AppMetrics(maxFrames: Some(0))
+        singleSlot.record(FrameMetrics(frameIndex: 10, fps: 50))
+        singleSlot.record(FrameMetrics(frameIndex: 11, fps: 60))
+        @Expect(singleSlot.frames().size, 1)
+        match (singleSlot.lastFrame()) {
+            case Some(frame) => @Expect(frame.frameIndex, 11)
+            case None => @Expect(false)
+        }
+    }
+
+    @TestCase
+    func appMetricsDefaultWindowAndUnboundedHistory(): Unit {
+        let bounded = AppMetrics()
+        let unbounded = AppMetrics(maxFrames: Option<Int64>.None)
+        for (index in 0..601) {
+            let frame = FrameMetrics(frameIndex: index, fps: index + 1)
+            bounded.record(frame)
+            unbounded.record(frame)
+        }
+        let boundedFrames = bounded.frames()
+        let unboundedFrames = unbounded.frames()
+        @Expect(boundedFrames.size, 600)
+        @Expect(boundedFrames[0].frameIndex, 1)
+        @Expect(boundedFrames[599].frameIndex, 600)
+        @Expect(unboundedFrames.size, 601)
+        @Expect(unboundedFrames[0].frameIndex, 0)
+        @Expect(unboundedFrames[600].frameIndex, 600)
+    }
+
+    @TestCase
     func terminalLifecycleTracksDeduplicatesReleasesAndClosesOwnedPtys(): Unit {
         let lifecycle = TerminalLifecycleRequests()
         lifecycle.trackPty("one")

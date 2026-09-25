@@ -15,6 +15,7 @@ import resolve_nightly_sdk as resolver
 
 REQUESTED = "1.1.0-alpha.20260817040003"
 NEWER_PREFIX_MATCH = REQUESTED + ".1"
+STS_VERSION = "1.1.3"
 
 
 def candidate(name_version: str) -> dict[str, str]:
@@ -56,6 +57,11 @@ class ResolverVersionSelectionTest(unittest.TestCase):
         path = self.manifest([REQUESTED, NEWER_PREFIX_MATCH])
         selected = resolver.load_manifest(path, "linux", "x64", "main")
         self.assertEqual(selected.version, NEWER_PREFIX_MATCH)
+
+    def test_sts_channel_selects_only_the_pinned_release(self):
+        path = self.manifest([STS_VERSION, STS_VERSION + ".1"])
+        selected = resolver.load_manifest(path, "linux", "x64", "sts")
+        self.assertEqual(selected.version, STS_VERSION)
 
     def test_explicit_manifest_version_rejects_prefix_only_candidate(self):
         path = self.manifest([NEWER_PREFIX_MATCH])

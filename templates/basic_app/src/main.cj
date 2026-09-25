@@ -7,15 +7,17 @@ class DemoApp {
 
     func update(event: Event): UpdateResult {
         match (event) {
-            case Event.KeyDown(key) => match (key.code) {
-                case KeyCode.CtrlC | KeyCode.Char(r'q') => UpdateResult.exit()
-                case KeyCode.Char(r'+') => UpdateResult.withCommand(Command.Message("inc"))
-                case _ => UpdateResult.next()
-            }
+            case Event.KeyDown(key) =>
+                match (key.code) {
+                    case KeyCode.CtrlC | KeyCode.Char(r'q') => UpdateResult.exit()
+                    case KeyCode.Char(r'+') => UpdateResult.withCommand(Command.Message("inc"))
+                    case _ => UpdateResult.unchanged()
+                }
+            case Event.Resize(_) => UpdateResult.next()
             case Event.Message("inc") =>
                 count++
                 UpdateResult.next()
-            case _ => UpdateResult.next()
+            case _ => UpdateResult.unchanged()
         }
     }
 
@@ -29,7 +31,7 @@ class DemoApp {
 
 main(): Int64 {
     let app = DemoApp()
-    App(targetFps: 10).runWithCommands(
+    App().runWithCommands(
         { frame => app.render(frame) },
         { event => app.update(event) }
     )

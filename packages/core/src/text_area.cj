@@ -845,7 +845,7 @@ public class TextArea <: Widget {
         let row = visibleRowForLine(line)
         let targetVisible = clamp(row + delta, 0, max(0, visible.size - 1))
         let targetLine = if (visible.size == 0) { 0 } else { visible[targetVisible] }
-        cursor = offsetAtLineColumn(value, targetLine, col)
+        cursor = offsetAtCachedLineColumn(targetLine, col)
     }
 
     private func ensureCursorVisible(height: Int64): Unit {
@@ -1146,11 +1146,20 @@ public class TextArea <: Widget {
     private func lineForOffset(offset: Int64): Int64 {
         let target = clampToRuneBoundary(value, offset)
         let offsets = lineOffsetsForRender()
-        var line: Int64 = 0
-        for (i in 0..offsets.size) {
-            if (offsets[i] <= target) { line = i } else { return line }
+        var low: Int64 = 0
+        var high = offsets.size
+        while (low < high) {
+            let middle = low + (high - low) / 2
+            if (offsets[middle] <= target) { low = middle + 1 } else { high = middle }
         }
-        line
+        max(0, low - 1)
+    }
+
+    private func offsetAtCachedLineColumn(line: Int64, column: Int64): Int64 {
+        ensureLineCache()
+        let lineIndex = clamp(line, 0, max(0, cachedLines.size - 1))
+        let localLine = cachedLines[lineIndex]
+        cachedLineOffsets[lineIndex] + offsetAtLineColumn(localLine, 0, column)
     }
 
     private func lineStartForOffset(offset: Int64): Int64 {
@@ -1209,12 +1218,13 @@ public class TextArea <: Widget {
 
     private func visibleRowForLine(line: Int64): Int64 {
         let visible = visibleLineIndexes()
-        var fallback: Int64 = 0
-        for (i in 0..visible.size) {
-            if (visible[i] <= line) { fallback = i }
-            if (visible[i] == line) { return i }
+        var low: Int64 = 0
+        var high = visible.size
+        while (low < high) {
+            let middle = low + (high - low) / 2
+            if (visible[middle] <= line) { low = middle + 1 } else { high = middle }
         }
-        fallback
+        max(0, low - 1)
     }
 
     private func offsetForMouse(mouse: MouseEvent, area: Rect): ?Int64 {
@@ -1229,11 +1239,11 @@ public class TextArea <: Widget {
         if (visibleIndex < 0 || visibleIndex >= visible.size) { return None }
         let lineIndex = visible[visibleIndex]
         if (lineNumbers && mouse.x < target.x + gutter) {
-            return Some(offsetAtLineColumn(value, lineIndex, 0))
+            return Some(offsetAtCachedLineColumn(lineIndex, 0))
         }
         let textX = target.x + gutter
         let column = max(0, mouse.x - textX)
-        Some(offsetAtLineColumn(value, lineIndex, column))
+        Some(offsetAtCachedLineColumn(lineIndex, column))
     }
 
     private func applyCompletionResult(result: TextCompletionResult): Bool {
@@ -1301,7 +1311,8 @@ public class TextArea <: Widget {
     }
 
     private func renderLine(x: Int64, y: Int64, width: Int64, lineIndex: Int64, line: String, buffer: Buffer): Unit {
-        let lineStartOffset = offsetAtLineColumn(value, lineIndex, 0)
+        let offsets = lineOffsetsForRender()
+        let lineStartOffset = offsets[lineIndex]
         let styled = lineDecorations(line, lineStartOffset)
         let ranges = selectionRangesForLine(lineStartOffset, line.size)
         if (ranges.size == 0) {
@@ -1348,7 +1359,7 @@ public class TextArea <: Widget {
         let markers = if (markdownEditing && decorations.size == 0) { markdownLineDecorations(line, lineStartOffset) } else { lineMarkers }
         let spans = ArrayList<RichSpan>()
         var offset: Int64 = 0
-        var currentText = ""
+        var runStart: Int64 = 0
         var currentStyle = style
         var hasCurrent = false
         while (offset < line.size) {
@@ -1361,21 +1372,18 @@ public class TextArea <: Widget {
                     nextStyle = nextStyle.patch(decoration.style)
                 }
             }
-            let text = line[offset..next]
             if (!hasCurrent) {
-                currentText = text
+                runStart = offset
                 currentStyle = nextStyle
                 hasCurrent = true
-            } else if (nextStyle == currentStyle) {
-                currentText += text
-            } else {
-                spans.add(RichSpan(currentText, style: currentStyle))
-                currentText = text
+            } else if (nextStyle != currentStyle) {
+                spans.add(RichSpan(line[runStart..offset], style: currentStyle))
+                runStart = offset
                 currentStyle = nextStyle
             }
             offset = next
         }
-        if (hasCurrent) { spans.add(RichSpan(currentText, style: currentStyle)) }
+        if (hasCurrent) { spans.add(RichSpan(line[runStart..line.size], style: currentStyle)) }
         spans.toArray()
     }
 
