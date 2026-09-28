@@ -385,6 +385,11 @@ core|StyleState.Selected|enum_constructor|Selected
 core|StyleState.Disabled|enum_constructor|Disabled
 core|StyleState.Error|enum_constructor|Error
 core|StyleState.Accent|enum_constructor|Accent
+core|CursorShape|enum|public enum CursorShape {
+core|CursorShape.Block|enum_constructor|Block
+core|CursorShape.Bar|enum_constructor|Bar
+core|Backend.setCursorShape|func|func setCursorShape(_: ?CursorShape): Unit
+core|Frame.setCursorShape|func|public func setCursorShape(shape: CursorShape): Unit
 core|TerminalProbe|class|public class TerminalProbe {
 core|TerminalProbe.run|func|public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult
 core|LinuxTerminalDriver|class|public class LinuxTerminalDriver <: TerminalDriver {
@@ -429,9 +434,18 @@ core|WindowsTerminalDriver.enterRawMode|func|public func enterRawMode(): Bool
 core|WindowsTerminalDriver.restore|func|public func restore(): Unit
 core|WindowsTerminalDriver.size|func|public func size(): ?Rect
 core|WindowsTerminalDriver.capabilities|func|public func capabilities(backend: Backend): TerminalCapabilities
+core|TestBackend.setCursorShape|func|public func setCursorShape(shape: ?CursorShape): Unit
 core|DebugOverlay|class|public class DebugOverlay <: Widget {
 core|DebugOverlay.init|init|public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
 core|DebugOverlay.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|VimMode|enum|public enum VimMode {
+core|VimMode.Normal|enum_constructor|Normal
+core|VimMode.Insert|enum_constructor|Insert
+core|VimEditorBehavior|class|public class VimEditorBehavior {
+core|VimEditorBehavior.init|init|public init(area: TextArea, insertHandler!: (TextArea, KeyEvent) -> Bool =
+core|VimEditorBehavior.mode|prop|public prop mode: VimMode {
+core|VimEditorBehavior.deactivate|func|public func deactivate(): Unit
+core|VimEditorBehavior.handle|func|public func handle(event: Event): Bool
 core|VirtualTranscriptSource|interface|public interface VirtualTranscriptSource {
 core|VirtualTranscriptSource.size|func|func size(): Int64
 core|VirtualTranscriptSource.generation|func|func generation(): Int64
@@ -690,6 +704,12 @@ game|TileMap.find|func|public func find(symbol: String): Array<TileMarker>
 game|TileMap.findAny|func|public func findAny(symbols: Array<String>): Array<TileMarker>
 game|TileMap.addStaticColliders|func|public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
 game|TileMap.render|func|public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style = Style(fg: Color.White)): Unit
+markdown_adapter|MarkdownPresentation|class|public class MarkdownPresentation {
+markdown_adapter|MarkdownPresentation.document|let|public let document: Document
+markdown_adapter|MarkdownPresentation.decorations|let|public let decorations: Array<TextDecoration>
+markdown_adapter|markdownAstToPresentation|func|public func markdownAstToPresentation( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None ): MarkdownPresentation
+markdown_adapter|SyntaxHighlightConfig|class|public class SyntaxHighlightConfig {
+markdown_adapter|parseSyntaxHighlightConfig|func|public func parseSyntaxHighlightConfig(text: String): SyntaxHighlightConfig
 media|MediaDecodeRequest|class|public class MediaDecodeRequest {
 media|MediaDecodeRequest.source|let|public let source: MediaSource
 media|MediaDecodeRequest.area|let|public let area: Rect

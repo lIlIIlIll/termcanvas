@@ -185,6 +185,8 @@ public class TextArea <: Widget {
     private var decorations: Array<TextDecoration>
     private let undoStack = ArrayList<TextAreaSnapshot>()
     private let redoStack = ArrayList<TextAreaSnapshot>()
+    private var undoGroupSnapshot: ?TextAreaSnapshot = None
+    internal var vimEditorAttached: Bool = false
     private var extraCarets: Array<TextAreaCaret> = []
     private var dragAnchor: ?Int64 = None
     private var revision: Int64 = 0
@@ -650,6 +652,12 @@ public class TextArea <: Widget {
         true
     }
 
+    internal func invalidateCompletionRequest(): Unit {
+        _ = cancelCompletion()
+        completionRequestId = ""
+        completionRevision = -1
+    }
+
     public func completionRows(maximum!: Int64 = 5): Int64 {
         synchronizeValue()
         if (!completionOpen) { return 0 }
@@ -666,11 +674,30 @@ public class TextArea <: Widget {
     }
 
     public func clearHistory(): Unit {
+        undoGroupSnapshot = None
         while (undoStack.size > 0) { undoStack.remove(at: 0) }
         clearRedo()
     }
 
+    internal func beginUndoGroup(): Unit {
+        synchronizeValue()
+        if (let None <- undoGroupSnapshot) { undoGroupSnapshot = Some(snapshot()) }
+    }
+
+    internal func endUndoGroup(): Unit {
+        synchronizeValue()
+        let initial = undoGroupSnapshot
+        undoGroupSnapshot = None
+        if (let Some(item) <- initial) {
+            if (value != item.value) {
+                undoStack.add(item)
+                clearRedo()
+            }
+        }
+    }
+
     public func undo(): Bool {
+        endUndoGroup()
         synchronizeValue()
         if (undoStack.size == 0) { return false }
         redoStack.add(snapshot())
@@ -681,6 +708,7 @@ public class TextArea <: Widget {
     }
 
     public func redo(): Bool {
+        endUndoGroup()
         synchronizeValue()
         if (redoStack.size == 0) { return false }
         undoStack.add(snapshot())
@@ -821,7 +849,7 @@ public class TextArea <: Widget {
 
     private func pushUndoSnapshot(): Unit {
         synchronizeValue()
-        undoStack.add(snapshot())
+        if (let None <- undoGroupSnapshot) { undoStack.add(snapshot()) }
     }
 
     private func restoreSnapshot(item: TextAreaSnapshot): Unit {
@@ -835,6 +863,7 @@ public class TextArea <: Widget {
     }
 
     private func clearRedo(): Unit {
+        if (let Some(_) <- undoGroupSnapshot) { return }
         while (redoStack.size > 0) { redoStack.remove(at: 0) }
     }
 
@@ -1248,7 +1277,7 @@ public class TextArea <: Widget {
 
     private func applyCompletionResult(result: TextCompletionResult): Bool {
         synchronizeValue()
-        if (result.requestId != completionRequestId || result.revision != revision) { return false }
+        if (completionRevision < 0 || result.requestId != completionRequestId || result.revision != revision) { return false }
         completionItems = result.items
         completionReplaceStart = clampToRuneBoundary(value, result.replaceStart)
         completionReplaceEnd = clampToRuneBoundary(value, result.replaceEnd)
@@ -1604,6 +1633,10 @@ func matchesAsciiNeedleAt(text: String, needle: String, offset: Int64): Bool {
     true
 }
 
+func isMarkdownFenceLine(line: String, start: Int64): Bool {
+    matchesAsciiNeedleAt(line, "```", start) || matchesAsciiNeedleAt(line, "~~~", start)
+}
+
 public func markdownDecorations(text: String): Array<TextDecoration> {
     let out = ArrayList<TextDecoration>()
     let lines = splitLines(text)
@@ -1612,7 +1645,7 @@ public func markdownDecorations(text: String): Array<TextDecoration> {
     for (lineIndex in 0..lines.size) {
         let line = lines[lineIndex]
         let trimmed = leadingSpacesLocal(line)
-        if (line[trimmed..].startsWith("```") || line[trimmed..].startsWith("~~~")) {
+        if (isMarkdownFenceLine(line, trimmed)) {
             out.add(TextDecoration(offset + trimmed, offset + line.size, Style(fg: Color.Magenta)))
             inFence = !inFence
         } else if (inFence) {
@@ -1635,7 +1668,7 @@ public func markdownLineHighlights(text: String): Array<LineHighlight> {
         let line = lines[lineIndex]
         let trimmed = leadingSpacesLocal(line)
         let spans = ArrayList<TextDecoration>()
-        if (line[trimmed..].startsWith("```") || line[trimmed..].startsWith("~~~")) {
+        if (isMarkdownFenceLine(line, trimmed)) {
             spans.add(TextDecoration(trimmed, line.size, Style(fg: Color.Magenta)))
             inFence = !inFence
         } else if (inFence) {
@@ -1681,6 +1714,10 @@ func isCompletionWordByte(ch: Byte): Bool {
 func markdownDecorationsForLine(line: String, lineStartOffset: Int64): Array<TextDecoration> {
     let out = ArrayList<TextDecoration>()
     let trimmedStart = leadingSpacesLocal(line)
+    if (isMarkdownFenceLine(line, trimmedStart)) {
+        out.add(TextDecoration(lineStartOffset + trimmedStart, lineStartOffset + line.size, Style(fg: Color.Magenta)))
+        return out.toArray()
+    }
     if (trimmedStart < line.size && line[trimmedStart] == b'#') {
         out.add(TextDecoration(lineStartOffset + trimmedStart, lineStartOffset + line.size, Style(fg: Color.Yellow, modifier: Modifier.strong())))
         return out.toArray()

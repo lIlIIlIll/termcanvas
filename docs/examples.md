@@ -87,12 +87,107 @@ Create a new example scaffold from the repository root:
 scripts/new_example.sh my_example
 ```
 
-Open a Markdown file directly with `markdown_studio`:
+Run Markdown Studio with its built-in Markdown sample. The editor and preview
+both color the `main`, `Int64`, and `0` tokens in its `cj` code block:
 
 ```bash
 CANGJIE_SDK_ROOT=/path/to/cangjie \
-  scripts/cangjie_cmd.sh examples/markdown_studio cjpm run -- README.md
+  scripts/cangjie_cmd.sh examples/markdown_studio cjpm run
 ```
+
+The example does not open a file argument. Paste or edit Markdown in its editor;
+source and preview colors update together. Fenced code recognizes these AST
+language names (case-insensitively, after ASCII whitespace trim):
+
+| Language | Fence names |
+| --- | --- |
+| Cangjie | `cj`, `cangjie` |
+| C | `c`, `h` |
+| C++ | `cpp`, `c++`, `cxx`, `cc`, `hpp`, `hxx` |
+| JavaScript | `js`, `javascript`, `mjs`, `cjs` |
+| TypeScript | `ts`, `typescript` |
+| Python | `py`, `python`, `python3` |
+| JSON | `json` |
+| Shell | `sh`, `bash`, `shell`, `zsh` |
+
+Names such as `go`, `jsonc`, `jsx`, and `tsx`, fences with no language, and
+indented code remain a single code color. Colors indicate lexical tokens
+(strings, comments, numbers, keywords, types), not semantic diagnostics or
+function definitions.
+
+To add an experimental lexer, save this UTF-8 file as `palette.syntax` in the
+repository root:
+
+```text
+syntax 1
+language workflow
+aliases flow
+keywords task stage
+types Pipeline
+numbers decimal
+line-comment "#"
+block-comment "/*" "*/" nested
+string "\"" "\"" "\\" single
+style keyword #12ab34 bold
+style type indexed:45
+end
+```
+
+Launch Studio with that file (or add `--vim` before the config option):
+
+```bash
+CANGJIE_SDK_ROOT=/path/to/cangjie \
+  scripts/cangjie_cmd.sh examples/markdown_studio cjpm run \
+    --run-args="--syntax-config=../../palette.syntax"
+```
+
+Paste a `workflow` fenced block containing `task Pipeline` into the editor.
+`task` appears bold green and `Pipeline` uses palette index 45 in both the
+source and preview. `flow` is an alias. The config is read once at startup:
+edit the file and restart Studio to apply changes. Without the option, only
+the built-in languages above are colored.
+
+The first non-comment line must be `syntax 1`. Each `language NAME` starts
+a new lexer; `end` closes it. To retain a built-in lexer and add words or
+styles, use `extend cj` instead. To discard its built-in token rules, use
+`language cj replace`. Built-in aliases resolve to the same configured
+language. Each declaration must occur between a language header and `end`:
+
+| Declaration | Behavior |
+| --- | --- |
+| `aliases NAME...` | Additional fence names for this language. |
+| `keywords WORD...`, `types WORD...`, `literals WORD...` | Exact identifier matches; literals use the keyword token kind. |
+| `line-comment OPEN` | Colors through the physical line ending. |
+| `block-comment OPEN CLOSE flat` or `nested` | Colors through the closer; `nested` permits matching openers inside. |
+| `string OPEN CLOSE ESCAPE single` or `multi` | `single` ends at the physical line ending; an empty quoted escape disables escaping. |
+| `numbers PROFILE` | `none`, `decimal`, `cj`, `c`, `cpp`, `js`, `ts`, `py`, or `json`. |
+| `style KIND COLOR [MODIFIER...]` | Override `keyword`, `type`, `string`, `number`, `comment`, `directive`, `variable`, or `property`. |
+
+Colors are `inherit`, `black`, `red`, `green`, `yellow`, `blue`,
+`magenta`, `cyan`, `white`, `#RRGGBB`, or `indexed:0` through
+`indexed:255`. Modifiers are `bold`, `italic`, `underline`, and
+`reversed`; each may appear once. Quoted arguments permit `\`, `\"`,
+`\n`, `\r`, and `\t` escapes. Lines may use LF, CRLF, or CR;
+leading `#` comments and a UTF-8 BOM are accepted. Invalid input prints a
+line-numbered error and exits before the UI starts. Configuration is limited
+to 256 KiB, 64 languages, 64 aliases and delimiters per language, and 4096
+words per language. `extend` retains the built-in delimiter and number
+rules, so use `replace` when those need to change.
+
+To opt into the limited Vim editor policy, pass `--vim` as a run argument:
+
+```bash
+CANGJIE_SDK_ROOT=/path/to/cangjie scripts/cangjie_cmd.sh examples/markdown_studio cjpm run --run-args=--vim
+```
+
+The status bar starts in `NORMAL`. Press `i` to edit, `Esc` to return to Normal,
+`F2` to switch between editor and preview, and `Ctrl-C` to quit. In Insert,
+`F3` requests completion. Normal supports motion (`h/j/k/l`, `w/b`, `0/$`,
+`gg/G`), insert entry (`i/a/I/A/o/O`), `x`, `dd`, `u`, and `Ctrl-r`.
+On terminals that support DECSCUSR cursor styling, Normal uses a steady block
+and Insert a steady bar. Preview and exit restore the terminal default; terminals
+that ignore cursor styling still show the mode in the status bar.
+Without `--vim`, the original two-caret editing and shortcuts remain active.
 
 Play an ffmpeg-decodable image, GIF, or video with `gif_ascii`:
 

@@ -1,92 +1,3 @@
-packages/cj_markdown/src/markdown.cj:public struct SourcePos <: Equatable<SourcePos> {
-packages/cj_markdown/src/markdown.cj:public let line: Int64
-packages/cj_markdown/src/markdown.cj:public let column: Int64
-packages/cj_markdown/src/markdown.cj:public let offset: Int64
-packages/cj_markdown/src/markdown.cj:public init(line: Int64, column: Int64, offset: Int64)
-packages/cj_markdown/src/markdown.cj:public operator func ==(other: SourcePos): Bool
-packages/cj_markdown/src/markdown.cj:public struct SourceRange <: Equatable<SourceRange> {
-packages/cj_markdown/src/markdown.cj:public let start: SourcePos
-packages/cj_markdown/src/markdown.cj:public let end: SourcePos
-packages/cj_markdown/src/markdown.cj:public init(start: SourcePos, end: SourcePos)
-packages/cj_markdown/src/markdown.cj:public operator func ==(other: SourceRange): Bool
-packages/cj_markdown/src/markdown.cj:public enum MarkdownDiagnosticSeverity {
-packages/cj_markdown/src/markdown.cj:Warning
-packages/cj_markdown/src/markdown.cj:Error
-packages/cj_markdown/src/markdown.cj:public class MarkdownDiagnostic {
-packages/cj_markdown/src/markdown.cj:public let severity: MarkdownDiagnosticSeverity
-packages/cj_markdown/src/markdown.cj:public let message: String
-packages/cj_markdown/src/markdown.cj:public let range: SourceRange
-packages/cj_markdown/src/markdown.cj:public init(severity: MarkdownDiagnosticSeverity, message: String, range: SourceRange)
-packages/cj_markdown/src/markdown.cj:public enum MarkdownBlockKind {
-packages/cj_markdown/src/markdown.cj:Paragraph
-packages/cj_markdown/src/markdown.cj:Heading(Int64)
-packages/cj_markdown/src/markdown.cj:List
-packages/cj_markdown/src/markdown.cj:ListItem(Bool, Int64)
-packages/cj_markdown/src/markdown.cj:TaskListItem(Bool, Int64)
-packages/cj_markdown/src/markdown.cj:Quote
-packages/cj_markdown/src/markdown.cj:CodeBlock(String)
-packages/cj_markdown/src/markdown.cj:Table
-packages/cj_markdown/src/markdown.cj:HorizontalRule
-packages/cj_markdown/src/markdown.cj:HtmlBlock
-packages/cj_markdown/src/markdown.cj:ReferenceDefinition(String, String, String)
-packages/cj_markdown/src/markdown.cj:Blank
-packages/cj_markdown/src/markdown.cj:public enum MarkdownInlineKind {
-packages/cj_markdown/src/markdown.cj:Text
-packages/cj_markdown/src/markdown.cj:Emphasis
-packages/cj_markdown/src/markdown.cj:Strong
-packages/cj_markdown/src/markdown.cj:Strikethrough
-packages/cj_markdown/src/markdown.cj:Code
-packages/cj_markdown/src/markdown.cj:Link(String, String)
-packages/cj_markdown/src/markdown.cj:Image(String)
-packages/cj_markdown/src/markdown.cj:HtmlInline
-packages/cj_markdown/src/markdown.cj:SoftBreak
-packages/cj_markdown/src/markdown.cj:HardBreak
-packages/cj_markdown/src/markdown.cj:public enum MarkdownTableAlign {
-packages/cj_markdown/src/markdown.cj:Left
-packages/cj_markdown/src/markdown.cj:Center
-packages/cj_markdown/src/markdown.cj:Right
-packages/cj_markdown/src/markdown.cj:None
-packages/cj_markdown/src/markdown.cj:public class MarkdownInline {
-packages/cj_markdown/src/markdown.cj:public let kind: MarkdownInlineKind
-packages/cj_markdown/src/markdown.cj:public let text: String
-packages/cj_markdown/src/markdown.cj:public let children: Array<MarkdownInline>
-packages/cj_markdown/src/markdown.cj:public let range: ?SourceRange
-packages/cj_markdown/src/markdown.cj:public init(kind: MarkdownInlineKind, text: String, children!: Array<MarkdownInline> = [], range!: ?SourceRange = None)
-packages/cj_markdown/src/markdown.cj:public class MarkdownTableCell {
-packages/cj_markdown/src/markdown.cj:public let text: String
-packages/cj_markdown/src/markdown.cj:public let inlines: Array<MarkdownInline>
-packages/cj_markdown/src/markdown.cj:public init(text: String, inlines!: Array<MarkdownInline> = [])
-packages/cj_markdown/src/markdown.cj:public class MarkdownTableRow {
-packages/cj_markdown/src/markdown.cj:public let cells: Array<MarkdownTableCell>
-packages/cj_markdown/src/markdown.cj:public init(cells: Array<MarkdownTableCell>)
-packages/cj_markdown/src/markdown.cj:public class MarkdownTable {
-packages/cj_markdown/src/markdown.cj:public let header: MarkdownTableRow
-packages/cj_markdown/src/markdown.cj:public let alignments: Array<MarkdownTableAlign>
-packages/cj_markdown/src/markdown.cj:public let rows: Array<MarkdownTableRow>
-packages/cj_markdown/src/markdown.cj:public init(header: MarkdownTableRow, alignments: Array<MarkdownTableAlign>, rows!: Array<MarkdownTableRow> = [])
-packages/cj_markdown/src/markdown.cj:public class MarkdownBlock {
-packages/cj_markdown/src/markdown.cj:public let kind: MarkdownBlockKind
-packages/cj_markdown/src/markdown.cj:public let text: String
-packages/cj_markdown/src/markdown.cj:public let inlines: Array<MarkdownInline>
-packages/cj_markdown/src/markdown.cj:public let table: ?MarkdownTable
-packages/cj_markdown/src/markdown.cj:public let children: Array<MarkdownBlock>
-packages/cj_markdown/src/markdown.cj:public let range: ?SourceRange
-packages/cj_markdown/src/markdown.cj:public init( kind: MarkdownBlockKind, text: String, inlines!: Array<MarkdownInline> = [], table!: ?MarkdownTable = None, children!: Array<MarkdownBlock> = [], range!: ?SourceRange = None )
-packages/cj_markdown/src/markdown.cj:public class MarkdownDocument {
-packages/cj_markdown/src/markdown.cj:public let blocks: Array<MarkdownBlock>
-packages/cj_markdown/src/markdown.cj:public let diagnostics: Array<MarkdownDiagnostic>
-packages/cj_markdown/src/markdown.cj:public init(blocks: Array<MarkdownBlock>, diagnostics!: Array<MarkdownDiagnostic> = [])
-packages/cj_markdown/src/markdown.cj:public struct MarkdownParserOptions {
-packages/cj_markdown/src/markdown.cj:public let mergeParagraphs: Bool
-packages/cj_markdown/src/markdown.cj:public let enableHtml: Bool
-packages/cj_markdown/src/markdown.cj:public let enableStrikethrough: Bool
-packages/cj_markdown/src/markdown.cj:public init(mergeParagraphs!: Bool = true, enableHtml!: Bool = true, enableStrikethrough!: Bool = true)
-packages/cj_markdown/src/markdown.cj:public class MarkdownParser {
-packages/cj_markdown/src/markdown.cj:public init(options!: MarkdownParserOptions = MarkdownParserOptions())
-packages/cj_markdown/src/markdown.cj:public func parse(text: String): MarkdownDocument
-packages/cj_markdown/src/markdown.cj:public func parseMarkdown(text: String): MarkdownDocument
-packages/cj_markdown/src/markdown.cj:public func parseMarkdownWithOptions(text: String, options: MarkdownParserOptions): MarkdownDocument
-packages/cj_markdown/src/markdown.cj:public func parseInline(text: String): Array<MarkdownInline>
 packages/core/src/app.cj:public enum ControlFlow {
 packages/core/src/app.cj:Continue
 packages/core/src/app.cj:Exit
@@ -1507,6 +1418,9 @@ packages/core/src/style.cj:Selected
 packages/core/src/style.cj:Disabled
 packages/core/src/style.cj:Error
 packages/core/src/style.cj:Accent
+packages/core/src/terminal.cj:public enum CursorShape {
+packages/core/src/terminal.cj:Block
+packages/core/src/terminal.cj:Bar
 packages/core/src/terminal.cj:public interface Backend {
 packages/core/src/terminal.cj:func clear(): Unit
 packages/core/src/terminal.cj:func moveTo(x: Int64, y: Int64): Unit
@@ -1514,6 +1428,7 @@ packages/core/src/terminal.cj:func enterAlternateScreen(): Unit
 packages/core/src/terminal.cj:func leaveAlternateScreen(): Unit
 packages/core/src/terminal.cj:func hideCursor(): Unit
 packages/core/src/terminal.cj:func showCursor(): Unit
+packages/core/src/terminal.cj:func setCursorShape(_: ?CursorShape): Unit
 packages/core/src/terminal.cj:func enableMouse(): Unit
 packages/core/src/terminal.cj:func disableMouse(): Unit
 packages/core/src/terminal.cj:func enableBracketedPaste(): Unit
@@ -1548,6 +1463,7 @@ packages/core/src/terminal.cj:public func isDirtyCell(x: Int64, y: Int64): Bool
 packages/core/src/terminal.cj:public func dirtyRects(): Array<Rect>
 packages/core/src/terminal.cj:public func addMedia(placement: MediaPlacement): Unit
 packages/core/src/terminal.cj:public func setCursor(position: Position): Unit
+packages/core/src/terminal.cj:public func setCursorShape(shape: CursorShape): Unit
 packages/core/src/terminal.cj:public func getCursor(): ?Position
 packages/core/src/terminal.cj:public enum RenderMode {
 packages/core/src/terminal.cj:Diff
@@ -1647,6 +1563,7 @@ packages/core/src/terminal.cj:public func enterAlternateScreen(): Unit
 packages/core/src/terminal.cj:public func leaveAlternateScreen(): Unit
 packages/core/src/terminal.cj:public func hideCursor(): Unit
 packages/core/src/terminal.cj:public func showCursor(): Unit
+packages/core/src/terminal.cj:public func setCursorShape(shape: ?CursorShape): Unit
 packages/core/src/terminal.cj:public func enableMouse(): Unit
 packages/core/src/terminal.cj:public func disableMouse(): Unit
 packages/core/src/terminal.cj:public func enableBracketedPaste(): Unit
@@ -1667,6 +1584,7 @@ packages/core/src/terminal.cj:public func enterAlternateScreen(): Unit
 packages/core/src/terminal.cj:public func leaveAlternateScreen(): Unit
 packages/core/src/terminal.cj:public func hideCursor(): Unit
 packages/core/src/terminal.cj:public func showCursor(): Unit
+packages/core/src/terminal.cj:public func setCursorShape(shape: ?CursorShape): Unit
 packages/core/src/terminal.cj:public func enableMouse(): Unit
 packages/core/src/terminal.cj:public func disableMouse(): Unit
 packages/core/src/terminal.cj:public func enableBracketedPaste(): Unit
@@ -1937,6 +1855,14 @@ packages/core/src/text_buffer.cj:public func undo(): Bool
 packages/core/src/text_buffer.cj:public func redo(): Bool
 packages/core/src/text_buffer.cj:public func find(needle: String, start!: TextPosition = TextPosition(0, 0)): ?TextPosition
 packages/core/src/text_buffer.cj:public func clampPosition(position: TextPosition): TextPosition
+packages/core/src/vim_editor.cj:public enum VimMode {
+packages/core/src/vim_editor.cj:Normal
+packages/core/src/vim_editor.cj:Insert
+packages/core/src/vim_editor.cj:public class VimEditorBehavior {
+packages/core/src/vim_editor.cj:public init(area: TextArea, insertHandler!: (TextArea, KeyEvent) -> Bool =
+packages/core/src/vim_editor.cj:public prop mode: VimMode {
+packages/core/src/vim_editor.cj:public func deactivate(): Unit
+packages/core/src/vim_editor.cj:public func handle(event: Event): Bool
 packages/core/src/virtual_transcript.cj:public struct VirtualTranscriptAppendOnlyText {
 packages/core/src/virtual_transcript.cj:public let text: String
 packages/core/src/virtual_transcript.cj:public let style: Style
@@ -2341,23 +2267,27 @@ packages/game/src/game.cj:public func find(symbol: String): Array<TileMarker>
 packages/game/src/game.cj:public func findAny(symbols: Array<String>): Array<TileMarker>
 packages/game/src/game.cj:public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
 packages/game/src/game.cj:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style = Style(fg: Color.White)): Unit
-packages/markdown/src/markdown.cj:public class Markdown {
-packages/markdown/src/markdown.cj:public static func parse( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-packages/markdown/src/markdown.cj:public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-packages/markdown/src/markdown.cj:public func markdownAstToDocument( ast: MarkdownDocument, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-packages/markdown/src/markdown.cj:public class OutlineNode {
-packages/markdown/src/markdown.cj:public let level: Int64
-packages/markdown/src/markdown.cj:public let title: String
-packages/markdown/src/markdown.cj:public let sourceOffset: Int64
-packages/markdown/src/markdown.cj:public let children: Array<OutlineNode>
-packages/markdown/src/markdown.cj:public init(level: Int64, title: String, sourceOffset: Int64, children!: Array<OutlineNode> = [])
-packages/markdown/src/markdown.cj:public class MarkdownPreviewIndex {
-packages/markdown/src/markdown.cj:public init(sourceOffsets: Array<Int64>)
-packages/markdown/src/markdown.cj:public func renderedLineCount(): Int64
-packages/markdown/src/markdown.cj:public func sourceOffsetForRenderedLine(line: Int64): ?Int64
-packages/markdown/src/markdown.cj:public func renderedLineForSourceOffset(offset: Int64): Int64
-packages/markdown/src/markdown.cj:public func markdownOutline(ast: MarkdownDocument): Array<OutlineNode>
-packages/markdown/src/markdown.cj:public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex
+packages/markdown_adapter/src/markdown.cj:public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
+packages/markdown_adapter/src/markdown.cj:public func markdownAstToDocument( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
+packages/markdown_adapter/src/markdown.cj:public class MarkdownPresentation {
+packages/markdown_adapter/src/markdown.cj:public let document: Document
+packages/markdown_adapter/src/markdown.cj:public let decorations: Array<TextDecoration>
+packages/markdown_adapter/src/markdown.cj:public func markdownAstToPresentation( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None ): MarkdownPresentation
+packages/markdown_adapter/src/markdown.cj:public class OutlineNode {
+packages/markdown_adapter/src/markdown.cj:public let level: Int64
+packages/markdown_adapter/src/markdown.cj:public let title: String
+packages/markdown_adapter/src/markdown.cj:public let sourceOffset: Int64
+packages/markdown_adapter/src/markdown.cj:public let children: Array<OutlineNode>
+packages/markdown_adapter/src/markdown.cj:public init(level: Int64, title: String, sourceOffset: Int64, children!: Array<OutlineNode> = [])
+packages/markdown_adapter/src/markdown.cj:public class MarkdownPreviewIndex {
+packages/markdown_adapter/src/markdown.cj:public init(sourceOffsets: Array<Int64>)
+packages/markdown_adapter/src/markdown.cj:public func renderedLineCount(): Int64
+packages/markdown_adapter/src/markdown.cj:public func sourceOffsetForRenderedLine(line: Int64): ?Int64
+packages/markdown_adapter/src/markdown.cj:public func renderedLineForSourceOffset(offset: Int64): Int64
+packages/markdown_adapter/src/markdown.cj:public func markdownOutline(result: ParseResult): Array<OutlineNode>
+packages/markdown_adapter/src/markdown.cj:public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex
+packages/markdown_adapter/src/syntax_config.cj:public class SyntaxHighlightConfig {
+packages/markdown_adapter/src/syntax_config.cj:public func parseSyntaxHighlightConfig(text: String): SyntaxHighlightConfig
 packages/media/src/media.cj:public class MediaDecodeRequest {
 packages/media/src/media.cj:public let source: MediaSource
 packages/media/src/media.cj:public let area: Rect

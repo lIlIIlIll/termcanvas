@@ -557,6 +557,20 @@ class AuditInputTest {
             @Expect(integrated.getCell(x, position.y + 1), overlay.getCell(x, position.y + 1))
         }
     }
+    @TestCase
+    func markdownFenceMarkersRenderUniformlyWithoutExplicitHighlights(): Unit {
+        let area = Rect(0, 0, 20, 5)
+        let editor = TextArea(value: "```cj\nbody\n```\n  ~~~\n`code`", markdownEditing: true)
+        let buffer = Buffer(area)
+        editor.render(area, buffer)
+        let fence = Style(fg: Color.Magenta)
+        for (x in 0..5) { @Expect(buffer.getCell(x, 0).style, fence) }
+        for (x in 0..3) { @Expect(buffer.getCell(x, 2).style, fence) }
+        for (x in 2..5) { @Expect(buffer.getCell(x, 3).style, fence) }
+        @Expect(buffer.getCell(0, 4).style, fence)
+        @Expect(buffer.getCell(5, 4).style, fence)
+    }
+
 
     @TestCase
     func cursorPositionsShareThePrimaryViewportAndOmitOffscreenCarets(): Unit {

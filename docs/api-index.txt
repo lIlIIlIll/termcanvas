@@ -1,92 +1,3 @@
-packages/cj_markdown/src/markdown.cj:5:public struct SourcePos <: Equatable<SourcePos> {
-packages/cj_markdown/src/markdown.cj:6:public let line: Int64
-packages/cj_markdown/src/markdown.cj:7:public let column: Int64
-packages/cj_markdown/src/markdown.cj:8:public let offset: Int64
-packages/cj_markdown/src/markdown.cj:9:public init(line: Int64, column: Int64, offset: Int64)
-packages/cj_markdown/src/markdown.cj:14:public operator func ==(other: SourcePos): Bool
-packages/cj_markdown/src/markdown.cj:19:public struct SourceRange <: Equatable<SourceRange> {
-packages/cj_markdown/src/markdown.cj:20:public let start: SourcePos
-packages/cj_markdown/src/markdown.cj:21:public let end: SourcePos
-packages/cj_markdown/src/markdown.cj:22:public init(start: SourcePos, end: SourcePos)
-packages/cj_markdown/src/markdown.cj:26:public operator func ==(other: SourceRange): Bool
-packages/cj_markdown/src/markdown.cj:31:public enum MarkdownDiagnosticSeverity {
-packages/cj_markdown/src/markdown.cj:32:Warning
-packages/cj_markdown/src/markdown.cj:33:Error
-packages/cj_markdown/src/markdown.cj:36:public class MarkdownDiagnostic {
-packages/cj_markdown/src/markdown.cj:37:public let severity: MarkdownDiagnosticSeverity
-packages/cj_markdown/src/markdown.cj:38:public let message: String
-packages/cj_markdown/src/markdown.cj:39:public let range: SourceRange
-packages/cj_markdown/src/markdown.cj:41:public init(severity: MarkdownDiagnosticSeverity, message: String, range: SourceRange)
-packages/cj_markdown/src/markdown.cj:48:public enum MarkdownBlockKind {
-packages/cj_markdown/src/markdown.cj:49:Paragraph
-packages/cj_markdown/src/markdown.cj:50:Heading(Int64)
-packages/cj_markdown/src/markdown.cj:51:List
-packages/cj_markdown/src/markdown.cj:52:ListItem(Bool, Int64)
-packages/cj_markdown/src/markdown.cj:53:TaskListItem(Bool, Int64)
-packages/cj_markdown/src/markdown.cj:54:Quote
-packages/cj_markdown/src/markdown.cj:55:CodeBlock(String)
-packages/cj_markdown/src/markdown.cj:56:Table
-packages/cj_markdown/src/markdown.cj:57:HorizontalRule
-packages/cj_markdown/src/markdown.cj:58:HtmlBlock
-packages/cj_markdown/src/markdown.cj:59:ReferenceDefinition(String, String, String)
-packages/cj_markdown/src/markdown.cj:60:Blank
-packages/cj_markdown/src/markdown.cj:63:public enum MarkdownInlineKind {
-packages/cj_markdown/src/markdown.cj:64:Text
-packages/cj_markdown/src/markdown.cj:65:Emphasis
-packages/cj_markdown/src/markdown.cj:66:Strong
-packages/cj_markdown/src/markdown.cj:67:Strikethrough
-packages/cj_markdown/src/markdown.cj:68:Code
-packages/cj_markdown/src/markdown.cj:69:Link(String, String)
-packages/cj_markdown/src/markdown.cj:70:Image(String)
-packages/cj_markdown/src/markdown.cj:71:HtmlInline
-packages/cj_markdown/src/markdown.cj:72:SoftBreak
-packages/cj_markdown/src/markdown.cj:73:HardBreak
-packages/cj_markdown/src/markdown.cj:76:public enum MarkdownTableAlign {
-packages/cj_markdown/src/markdown.cj:77:Left
-packages/cj_markdown/src/markdown.cj:78:Center
-packages/cj_markdown/src/markdown.cj:79:Right
-packages/cj_markdown/src/markdown.cj:80:None
-packages/cj_markdown/src/markdown.cj:83:public class MarkdownInline {
-packages/cj_markdown/src/markdown.cj:84:public let kind: MarkdownInlineKind
-packages/cj_markdown/src/markdown.cj:85:public let text: String
-packages/cj_markdown/src/markdown.cj:86:public let children: Array<MarkdownInline>
-packages/cj_markdown/src/markdown.cj:87:public let range: ?SourceRange
-packages/cj_markdown/src/markdown.cj:89:public init(kind: MarkdownInlineKind, text: String, children!: Array<MarkdownInline> = [], range!: ?SourceRange = None)
-packages/cj_markdown/src/markdown.cj:98:public class MarkdownTableCell {
-packages/cj_markdown/src/markdown.cj:99:public let text: String
-packages/cj_markdown/src/markdown.cj:100:public let inlines: Array<MarkdownInline>
-packages/cj_markdown/src/markdown.cj:102:public init(text: String, inlines!: Array<MarkdownInline> = [])
-packages/cj_markdown/src/markdown.cj:112:public class MarkdownTableRow {
-packages/cj_markdown/src/markdown.cj:113:public let cells: Array<MarkdownTableCell>
-packages/cj_markdown/src/markdown.cj:115:public init(cells: Array<MarkdownTableCell>)
-packages/cj_markdown/src/markdown.cj:120:public class MarkdownTable {
-packages/cj_markdown/src/markdown.cj:121:public let header: MarkdownTableRow
-packages/cj_markdown/src/markdown.cj:122:public let alignments: Array<MarkdownTableAlign>
-packages/cj_markdown/src/markdown.cj:123:public let rows: Array<MarkdownTableRow>
-packages/cj_markdown/src/markdown.cj:125:public init(header: MarkdownTableRow, alignments: Array<MarkdownTableAlign>, rows!: Array<MarkdownTableRow> = [])
-packages/cj_markdown/src/markdown.cj:132:public class MarkdownBlock {
-packages/cj_markdown/src/markdown.cj:133:public let kind: MarkdownBlockKind
-packages/cj_markdown/src/markdown.cj:134:public let text: String
-packages/cj_markdown/src/markdown.cj:135:public let inlines: Array<MarkdownInline>
-packages/cj_markdown/src/markdown.cj:136:public let table: ?MarkdownTable
-packages/cj_markdown/src/markdown.cj:137:public let children: Array<MarkdownBlock>
-packages/cj_markdown/src/markdown.cj:138:public let range: ?SourceRange
-packages/cj_markdown/src/markdown.cj:140:public init( kind: MarkdownBlockKind, text: String, inlines!: Array<MarkdownInline> = [], table!: ?MarkdownTable = None, children!: Array<MarkdownBlock> = [], range!: ?SourceRange = None )
-packages/cj_markdown/src/markdown.cj:157:public class MarkdownDocument {
-packages/cj_markdown/src/markdown.cj:158:public let blocks: Array<MarkdownBlock>
-packages/cj_markdown/src/markdown.cj:159:public let diagnostics: Array<MarkdownDiagnostic>
-packages/cj_markdown/src/markdown.cj:161:public init(blocks: Array<MarkdownBlock>, diagnostics!: Array<MarkdownDiagnostic> = [])
-packages/cj_markdown/src/markdown.cj:167:public struct MarkdownParserOptions {
-packages/cj_markdown/src/markdown.cj:168:public let mergeParagraphs: Bool
-packages/cj_markdown/src/markdown.cj:169:public let enableHtml: Bool
-packages/cj_markdown/src/markdown.cj:170:public let enableStrikethrough: Bool
-packages/cj_markdown/src/markdown.cj:172:public init(mergeParagraphs!: Bool = true, enableHtml!: Bool = true, enableStrikethrough!: Bool = true)
-packages/cj_markdown/src/markdown.cj:214:public class MarkdownParser {
-packages/cj_markdown/src/markdown.cj:219:public init(options!: MarkdownParserOptions = MarkdownParserOptions())
-packages/cj_markdown/src/markdown.cj:223:public func parse(text: String): MarkdownDocument
-packages/cj_markdown/src/markdown.cj:636:public func parseMarkdown(text: String): MarkdownDocument
-packages/cj_markdown/src/markdown.cj:640:public func parseMarkdownWithOptions(text: String, options: MarkdownParserOptions): MarkdownDocument
-packages/cj_markdown/src/markdown.cj:644:public func parseInline(text: String): Array<MarkdownInline>
 packages/core/src/app.cj:85:public enum ControlFlow {
 packages/core/src/app.cj:86:Continue
 packages/core/src/app.cj:87:Exit
@@ -1507,253 +1418,260 @@ packages/core/src/style.cj:134:Selected
 packages/core/src/style.cj:135:Disabled
 packages/core/src/style.cj:136:Error
 packages/core/src/style.cj:137:Accent
-packages/core/src/terminal.cj:120:public interface Backend {
-packages/core/src/terminal.cj:121:func clear(): Unit
-packages/core/src/terminal.cj:122:func moveTo(x: Int64, y: Int64): Unit
-packages/core/src/terminal.cj:123:func enterAlternateScreen(): Unit
-packages/core/src/terminal.cj:124:func leaveAlternateScreen(): Unit
-packages/core/src/terminal.cj:125:func hideCursor(): Unit
-packages/core/src/terminal.cj:126:func showCursor(): Unit
-packages/core/src/terminal.cj:127:func enableMouse(): Unit
-packages/core/src/terminal.cj:128:func disableMouse(): Unit
-packages/core/src/terminal.cj:129:func enableBracketedPaste(): Unit
-packages/core/src/terminal.cj:130:func disableBracketedPaste(): Unit
-packages/core/src/terminal.cj:131:func size(): Rect
-packages/core/src/terminal.cj:132:func draw(buffer: Buffer): Unit
-packages/core/src/terminal.cj:133:func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
-packages/core/src/terminal.cj:134:func drawMedia(ops: Array<MediaOp>): Unit
-packages/core/src/terminal.cj:135:func write(text: String): Unit
-packages/core/src/terminal.cj:136:func flush(): Unit
-packages/core/src/terminal.cj:139:func setInstrumentationEnabled(_: Bool): Unit
-packages/core/src/terminal.cj:140:func diagnosticByteCount(): Int64
-packages/core/src/terminal.cj:143:public struct RenderDiffSpan {
-packages/core/src/terminal.cj:144:public let x: Int64
-packages/core/src/terminal.cj:145:public let y: Int64
-packages/core/src/terminal.cj:146:public let text: String
-packages/core/src/terminal.cj:147:public let style: Style
-packages/core/src/terminal.cj:149:public init(x: Int64, y: Int64, text: String, style: Style)
-packages/core/src/terminal.cj:157:public struct RenderDiffPlan {
-packages/core/src/terminal.cj:158:public let dirtyCells: Int64
-packages/core/src/terminal.cj:159:public let spans: Array<RenderDiffSpan>
-packages/core/src/terminal.cj:161:public init(dirtyCells: Int64, spans: Array<RenderDiffSpan>)
-packages/core/src/terminal.cj:167:public class Frame {
-packages/core/src/terminal.cj:168:public let area: Rect
-packages/core/src/terminal.cj:173:public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None)
-packages/core/src/terminal.cj:179:public func renderWidget(widget: Widget, area: Rect): Unit
-packages/core/src/terminal.cj:184:public func canvas(area!: Rect = this.area): Canvas
-packages/core/src/terminal.cj:188:public func fill(area: Rect, style: Style): Unit
-packages/core/src/terminal.cj:193:public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit
-packages/core/src/terminal.cj:198:public func isDirty(area: Rect): Bool
-packages/core/src/terminal.cj:205:public func isDirtyCell(x: Int64, y: Int64): Bool
-packages/core/src/terminal.cj:212:public func dirtyRects(): Array<Rect>
-packages/core/src/terminal.cj:219:public func addMedia(placement: MediaPlacement): Unit
-packages/core/src/terminal.cj:223:public func setCursor(position: Position): Unit
-packages/core/src/terminal.cj:227:public func getCursor(): ?Position
-packages/core/src/terminal.cj:232:public enum RenderMode {
-packages/core/src/terminal.cj:233:Diff
-packages/core/src/terminal.cj:234:Full
-packages/core/src/terminal.cj:237:public class Terminal {
-packages/core/src/terminal.cj:247:public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )
-packages/core/src/terminal.cj:258:public func draw(render: (Frame) -> Unit): RenderMetrics
-packages/core/src/terminal.cj:262:public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
-packages/core/src/terminal.cj:411:public func clear(): Unit
-packages/core/src/terminal.cj:572:public enum KeyboardProtocolMode {
-packages/core/src/terminal.cj:573:Basic
-packages/core/src/terminal.cj:574:ModifyOtherKeys
-packages/core/src/terminal.cj:575:Kitty
-packages/core/src/terminal.cj:576:Auto
-packages/core/src/terminal.cj:579:public enum TerminalProbeMode {
-packages/core/src/terminal.cj:580:Disabled
-packages/core/src/terminal.cj:581:EnvOnly
-packages/core/src/terminal.cj:582:Active
-packages/core/src/terminal.cj:585:public struct KeyboardOptions {
-packages/core/src/terminal.cj:586:public let mode: KeyboardProtocolMode
-packages/core/src/terminal.cj:587:public let probe: TerminalProbeMode
-packages/core/src/terminal.cj:588:public let probeBudgetMillis: Int64
-packages/core/src/terminal.cj:589:public let escDelayMillis: Int64
-packages/core/src/terminal.cj:590:public let repeatHeldMillis: Int64
-packages/core/src/terminal.cj:592:public init( mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic, probe!: TerminalProbeMode = TerminalProbeMode.Disabled, probeBudgetMillis!: Int64 = 100, escDelayMillis!: Int64 = 25, repeatHeldMillis!: Int64 = 120 )
-packages/core/src/terminal.cj:607:public struct TerminalProbeResult {
-packages/core/src/terminal.cj:608:public let capabilities: TerminalCapabilities
-packages/core/src/terminal.cj:611:public let consumedBytes: Array<Byte>
-packages/core/src/terminal.cj:612:public let budgetMillis: Int64
-packages/core/src/terminal.cj:613:public let elapsedMillis: Int64
-packages/core/src/terminal.cj:615:public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64)
-packages/core/src/terminal.cj:623:public class TerminalProbe {
-packages/core/src/terminal.cj:624:public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult
-packages/core/src/terminal.cj:673:public class TerminalSession {
-packages/core/src/terminal.cj:698:public prop rawModeEnabled: Bool { get() { rawActive } }
-packages/core/src/terminal.cj:700:public init( backend: Backend, driver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions() )
-packages/core/src/terminal.cj:726:public func probeResult(): ?TerminalProbeResult
-packages/core/src/terminal.cj:741:public func start(): Bool
-packages/core/src/terminal.cj:784:public func stop(): Unit
-packages/core/src/terminal.cj:792:public func run(action: () -> Unit): Unit
-packages/core/src/terminal.cj:1061:public interface TerminalDriver {
-packages/core/src/terminal.cj:1062:func name(): String
-packages/core/src/terminal.cj:1063:func enterRawMode(): Bool
-packages/core/src/terminal.cj:1064:func restore(): Unit
-packages/core/src/terminal.cj:1065:func size(): ?Rect
-packages/core/src/terminal.cj:1066:func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1070:public class LinuxTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1071:public init()
-packages/core/src/terminal.cj:1073:public func name(): String
-packages/core/src/terminal.cj:1074:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1075:public func restore(): Unit
-packages/core/src/terminal.cj:1076:public func size(): ?Rect
-packages/core/src/terminal.cj:1077:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1082:public class FallbackTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1084:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1088:public func name(): String
-packages/core/src/terminal.cj:1089:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1090:public func restore(): Unit
-packages/core/src/terminal.cj:1091:public func size(): ?Rect
-packages/core/src/terminal.cj:1092:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1106:public class MacOSTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1109:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1113:public func name(): String
-packages/core/src/terminal.cj:1114:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1115:public func restore(): Unit
-packages/core/src/terminal.cj:1116:public func size(): ?Rect
-packages/core/src/terminal.cj:1117:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1131:public class MacOSTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1132:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1136:public func name(): String
-packages/core/src/terminal.cj:1137:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1138:public func restore(): Unit
-packages/core/src/terminal.cj:1139:public func size(): ?Rect
-packages/core/src/terminal.cj:1140:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1146:public class WindowsTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1149:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1153:public func name(): String
-packages/core/src/terminal.cj:1154:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1155:public func restore(): Unit
-packages/core/src/terminal.cj:1156:public func size(): ?Rect
-packages/core/src/terminal.cj:1157:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1171:public class WindowsTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1172:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1176:public func name(): String
-packages/core/src/terminal.cj:1177:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1178:public func restore(): Unit
-packages/core/src/terminal.cj:1179:public func size(): ?Rect
-packages/core/src/terminal.cj:1180:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1186:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1191:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1196:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1200:public class AnsiBackend <: Backend {
-packages/core/src/terminal.cj:1207:public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1213:public func clear(): Unit
-packages/core/src/terminal.cj:1217:public func moveTo(x: Int64, y: Int64): Unit
-packages/core/src/terminal.cj:1221:public func enterAlternateScreen(): Unit
-packages/core/src/terminal.cj:1222:public func leaveAlternateScreen(): Unit
-packages/core/src/terminal.cj:1223:public func hideCursor(): Unit
-packages/core/src/terminal.cj:1224:public func showCursor(): Unit
-packages/core/src/terminal.cj:1225:public func enableMouse(): Unit
-packages/core/src/terminal.cj:1226:public func disableMouse(): Unit
-packages/core/src/terminal.cj:1227:public func enableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1228:public func disableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1230:public func size(): Rect
-packages/core/src/terminal.cj:1237:public func draw(buffer: Buffer): Unit
-packages/core/src/terminal.cj:1256:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
-packages/core/src/terminal.cj:1277:public func drawMedia(ops: Array<MediaOp>): Unit
-packages/core/src/terminal.cj:1287:public func write(text: String): Unit
-packages/core/src/terminal.cj:1293:public func setInstrumentationEnabled(enabled: Bool): Unit
-packages/core/src/terminal.cj:1297:public func diagnosticByteCount(): Int64
-packages/core/src/terminal.cj:1301:public func flush(): Unit
-packages/core/src/terminal.cj:1329:public class TestBackend <: Backend {
-packages/core/src/terminal.cj:1342:public init( area!: Rect = Rect(0, 0, 80, 24), captureSnapshots!: Bool = true )
-packages/core/src/terminal.cj:1350:public func clear(): Unit
-packages/core/src/terminal.cj:1354:public func moveTo(x: Int64, y: Int64): Unit
-packages/core/src/terminal.cj:1358:public func enterAlternateScreen(): Unit
-packages/core/src/terminal.cj:1359:public func leaveAlternateScreen(): Unit
-packages/core/src/terminal.cj:1360:public func hideCursor(): Unit
-packages/core/src/terminal.cj:1361:public func showCursor(): Unit
-packages/core/src/terminal.cj:1362:public func enableMouse(): Unit
-packages/core/src/terminal.cj:1363:public func disableMouse(): Unit
-packages/core/src/terminal.cj:1364:public func enableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1365:public func disableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1367:public func size(): Rect
-packages/core/src/terminal.cj:1371:public func setSize(area: Rect): Unit
-packages/core/src/terminal.cj:1375:public func draw(buffer: Buffer): Unit
-packages/core/src/terminal.cj:1385:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
-packages/core/src/terminal.cj:1395:public func drawMedia(ops: Array<MediaOp>): Unit
-packages/core/src/terminal.cj:1402:public func write(text: String): Unit
-packages/core/src/terminal.cj:1408:public func flush(): Unit
-packages/core/src/terminal.cj:1410:public func output(): String
-packages/core/src/terminal.cj:1414:public func clearOutput(): Unit
-packages/core/src/terminal.cj:1420:public func lastBuffer(): ?Buffer
-packages/core/src/terminal.cj:1424:public func lastDiffOps(): Int64
-packages/core/src/terminal.cj:1428:public func lastDiffWrites(): Int64
-packages/core/src/terminal.cj:1432:public func lastMediaOps(): Array<MediaOp>
-packages/core/src/terminal.cj:1437:public func mediaFrameCount(): Int64
-packages/core/src/terminal.cj:1441:public func snapshot(): String
-packages/core/src/terminal.cj:1448:public func snapshots(): Array<String>
-packages/core/src/terminal.cj:1452:public func snapshotAt(index: Int64): String
-packages/core/src/terminal.cj:1457:public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool
-packages/core/src/terminal.cj:1466:public func assertSnapshot(expected: String): Bool
-packages/core/src/terminal.cj:1470:public func assertSnapshotAt(index: Int64, expected: String): Bool
-packages/core/src/terminal.cj:1474:public func assertLastMediaOpCount(expected: Int64): Bool
-packages/core/src/terminal.cj:1487:public struct TerminalCapabilities {
-packages/core/src/terminal.cj:1488:public let size: Rect
-packages/core/src/terminal.cj:1489:public let trueColor: Bool
-packages/core/src/terminal.cj:1490:public let colorLevel: Int64
-packages/core/src/terminal.cj:1491:public let mouse: Bool
-packages/core/src/terminal.cj:1492:public let mouseMove: Bool
-packages/core/src/terminal.cj:1493:public let focusEvents: Bool
-packages/core/src/terminal.cj:1494:public let bracketedPaste: Bool
-packages/core/src/terminal.cj:1495:public let alternateScreen: Bool
-packages/core/src/terminal.cj:1496:public let unicode: Bool
-packages/core/src/terminal.cj:1497:public let kittyGraphics: Bool
-packages/core/src/terminal.cj:1498:public let sixel: Bool
-packages/core/src/terminal.cj:1499:public let osc8: Bool
-packages/core/src/terminal.cj:1500:public let keyboardProtocol: KeyProtocol
-packages/core/src/terminal.cj:1501:public let keyUp: Bool
-packages/core/src/terminal.cj:1502:public let keyRepeat: Bool
-packages/core/src/terminal.cj:1503:public let recommendedFps: Int64
-packages/core/src/terminal.cj:1504:public let cellWidthPixels: Int64
-packages/core/src/terminal.cj:1505:public let cellHeightPixels: Int64
-packages/core/src/terminal.cj:1506:public let driverName: String
-packages/core/src/terminal.cj:1508:public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = "linux-glibc" )
-packages/core/src/terminal.cj:1550:public static func detect(backend!: Backend = AnsiBackend(), driverName!: String = "linux-glibc"): TerminalCapabilities
-packages/core/src/terminal.cj:1660:public struct RenderMetrics {
-packages/core/src/terminal.cj:1661:public let size: Rect
-packages/core/src/terminal.cj:1662:public let dirtyCells: Int64
-packages/core/src/terminal.cj:1663:public let diffWrites: Int64
-packages/core/src/terminal.cj:1664:public let mediaOps: Int64
-packages/core/src/terminal.cj:1665:public let fullRedraw: Bool
-packages/core/src/terminal.cj:1666:public let renderMillis: Int64
-packages/core/src/terminal.cj:1667:public let drawMillis: Int64
-packages/core/src/terminal.cj:1668:public let totalMillis: Int64
-packages/core/src/terminal.cj:1669:public let renderedCells: Int64
-packages/core/src/terminal.cj:1670:public let dirtyRects: Int64
-packages/core/src/terminal.cj:1671:public let copiedCells: Int64
-packages/core/src/terminal.cj:1672:public let bufferCellAttempts: Int64
-packages/core/src/terminal.cj:1673:public let bufferCellWrites: Int64
-packages/core/src/terminal.cj:1674:public let diffCells: Int64
-packages/core/src/terminal.cj:1675:public let diffSpans: Int64
-packages/core/src/terminal.cj:1676:public let renderNanos: Int64
-packages/core/src/terminal.cj:1677:public let diffNanos: Int64
-packages/core/src/terminal.cj:1678:public let writeNanos: Int64
-packages/core/src/terminal.cj:1679:public let totalNanos: Int64
-packages/core/src/terminal.cj:1680:public let ansiBytes: Int64
-packages/core/src/terminal.cj:1682:public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
-packages/core/src/terminal.cj:1725:public class DebugOverlay <: Widget {
-packages/core/src/terminal.cj:1729:public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
-packages/core/src/terminal.cj:1734:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/terminal.cj:1759:public class TerminalMode {
-packages/core/src/terminal.cj:1765:public static func lastError(): ?String
-packages/core/src/terminal.cj:1769:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:1809:public static func restore(): Unit
-packages/core/src/terminal.cj:1827:public static func size(): ?Rect
-packages/core/src/terminal.cj:1865:public class MacOSTerminalMode {
-packages/core/src/terminal.cj:1872:public static func lastError(): ?String
-packages/core/src/terminal.cj:1876:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:1916:public static func restore(): Unit
-packages/core/src/terminal.cj:1934:public static func size(): ?Rect
-packages/core/src/terminal.cj:1955:public class WindowsConsoleMode {
-packages/core/src/terminal.cj:1962:public static func lastError(): ?String
-packages/core/src/terminal.cj:1966:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:2006:public static func restore(): Unit
-packages/core/src/terminal.cj:2024:public static func size(): ?Rect
+packages/core/src/terminal.cj:120:public enum CursorShape {
+packages/core/src/terminal.cj:121:Block
+packages/core/src/terminal.cj:122:Bar
+packages/core/src/terminal.cj:133:public interface Backend {
+packages/core/src/terminal.cj:134:func clear(): Unit
+packages/core/src/terminal.cj:135:func moveTo(x: Int64, y: Int64): Unit
+packages/core/src/terminal.cj:136:func enterAlternateScreen(): Unit
+packages/core/src/terminal.cj:137:func leaveAlternateScreen(): Unit
+packages/core/src/terminal.cj:138:func hideCursor(): Unit
+packages/core/src/terminal.cj:139:func showCursor(): Unit
+packages/core/src/terminal.cj:140:func setCursorShape(_: ?CursorShape): Unit
+packages/core/src/terminal.cj:141:func enableMouse(): Unit
+packages/core/src/terminal.cj:142:func disableMouse(): Unit
+packages/core/src/terminal.cj:143:func enableBracketedPaste(): Unit
+packages/core/src/terminal.cj:144:func disableBracketedPaste(): Unit
+packages/core/src/terminal.cj:145:func size(): Rect
+packages/core/src/terminal.cj:146:func draw(buffer: Buffer): Unit
+packages/core/src/terminal.cj:147:func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+packages/core/src/terminal.cj:148:func drawMedia(ops: Array<MediaOp>): Unit
+packages/core/src/terminal.cj:149:func write(text: String): Unit
+packages/core/src/terminal.cj:150:func flush(): Unit
+packages/core/src/terminal.cj:153:func setInstrumentationEnabled(_: Bool): Unit
+packages/core/src/terminal.cj:154:func diagnosticByteCount(): Int64
+packages/core/src/terminal.cj:157:public struct RenderDiffSpan {
+packages/core/src/terminal.cj:158:public let x: Int64
+packages/core/src/terminal.cj:159:public let y: Int64
+packages/core/src/terminal.cj:160:public let text: String
+packages/core/src/terminal.cj:161:public let style: Style
+packages/core/src/terminal.cj:163:public init(x: Int64, y: Int64, text: String, style: Style)
+packages/core/src/terminal.cj:171:public struct RenderDiffPlan {
+packages/core/src/terminal.cj:172:public let dirtyCells: Int64
+packages/core/src/terminal.cj:173:public let spans: Array<RenderDiffSpan>
+packages/core/src/terminal.cj:175:public init(dirtyCells: Int64, spans: Array<RenderDiffSpan>)
+packages/core/src/terminal.cj:181:public class Frame {
+packages/core/src/terminal.cj:182:public let area: Rect
+packages/core/src/terminal.cj:188:public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None)
+packages/core/src/terminal.cj:194:public func renderWidget(widget: Widget, area: Rect): Unit
+packages/core/src/terminal.cj:199:public func canvas(area!: Rect = this.area): Canvas
+packages/core/src/terminal.cj:203:public func fill(area: Rect, style: Style): Unit
+packages/core/src/terminal.cj:208:public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit
+packages/core/src/terminal.cj:213:public func isDirty(area: Rect): Bool
+packages/core/src/terminal.cj:220:public func isDirtyCell(x: Int64, y: Int64): Bool
+packages/core/src/terminal.cj:227:public func dirtyRects(): Array<Rect>
+packages/core/src/terminal.cj:234:public func addMedia(placement: MediaPlacement): Unit
+packages/core/src/terminal.cj:238:public func setCursor(position: Position): Unit
+packages/core/src/terminal.cj:242:public func setCursorShape(shape: CursorShape): Unit
+packages/core/src/terminal.cj:250:public func getCursor(): ?Position
+packages/core/src/terminal.cj:255:public enum RenderMode {
+packages/core/src/terminal.cj:256:Diff
+packages/core/src/terminal.cj:257:Full
+packages/core/src/terminal.cj:260:public class Terminal {
+packages/core/src/terminal.cj:270:public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )
+packages/core/src/terminal.cj:281:public func draw(render: (Frame) -> Unit): RenderMetrics
+packages/core/src/terminal.cj:285:public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
+packages/core/src/terminal.cj:436:public func clear(): Unit
+packages/core/src/terminal.cj:597:public enum KeyboardProtocolMode {
+packages/core/src/terminal.cj:598:Basic
+packages/core/src/terminal.cj:599:ModifyOtherKeys
+packages/core/src/terminal.cj:600:Kitty
+packages/core/src/terminal.cj:601:Auto
+packages/core/src/terminal.cj:604:public enum TerminalProbeMode {
+packages/core/src/terminal.cj:605:Disabled
+packages/core/src/terminal.cj:606:EnvOnly
+packages/core/src/terminal.cj:607:Active
+packages/core/src/terminal.cj:610:public struct KeyboardOptions {
+packages/core/src/terminal.cj:611:public let mode: KeyboardProtocolMode
+packages/core/src/terminal.cj:612:public let probe: TerminalProbeMode
+packages/core/src/terminal.cj:613:public let probeBudgetMillis: Int64
+packages/core/src/terminal.cj:614:public let escDelayMillis: Int64
+packages/core/src/terminal.cj:615:public let repeatHeldMillis: Int64
+packages/core/src/terminal.cj:617:public init( mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic, probe!: TerminalProbeMode = TerminalProbeMode.Disabled, probeBudgetMillis!: Int64 = 100, escDelayMillis!: Int64 = 25, repeatHeldMillis!: Int64 = 120 )
+packages/core/src/terminal.cj:632:public struct TerminalProbeResult {
+packages/core/src/terminal.cj:633:public let capabilities: TerminalCapabilities
+packages/core/src/terminal.cj:636:public let consumedBytes: Array<Byte>
+packages/core/src/terminal.cj:637:public let budgetMillis: Int64
+packages/core/src/terminal.cj:638:public let elapsedMillis: Int64
+packages/core/src/terminal.cj:640:public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64)
+packages/core/src/terminal.cj:648:public class TerminalProbe {
+packages/core/src/terminal.cj:649:public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult
+packages/core/src/terminal.cj:698:public class TerminalSession {
+packages/core/src/terminal.cj:723:public prop rawModeEnabled: Bool { get() { rawActive } }
+packages/core/src/terminal.cj:725:public init( backend: Backend, driver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions() )
+packages/core/src/terminal.cj:751:public func probeResult(): ?TerminalProbeResult
+packages/core/src/terminal.cj:766:public func start(): Bool
+packages/core/src/terminal.cj:809:public func stop(): Unit
+packages/core/src/terminal.cj:817:public func run(action: () -> Unit): Unit
+packages/core/src/terminal.cj:1088:public interface TerminalDriver {
+packages/core/src/terminal.cj:1089:func name(): String
+packages/core/src/terminal.cj:1090:func enterRawMode(): Bool
+packages/core/src/terminal.cj:1091:func restore(): Unit
+packages/core/src/terminal.cj:1092:func size(): ?Rect
+packages/core/src/terminal.cj:1093:func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1097:public class LinuxTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1098:public init()
+packages/core/src/terminal.cj:1100:public func name(): String
+packages/core/src/terminal.cj:1101:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1102:public func restore(): Unit
+packages/core/src/terminal.cj:1103:public func size(): ?Rect
+packages/core/src/terminal.cj:1104:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1109:public class FallbackTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1111:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1115:public func name(): String
+packages/core/src/terminal.cj:1116:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1117:public func restore(): Unit
+packages/core/src/terminal.cj:1118:public func size(): ?Rect
+packages/core/src/terminal.cj:1119:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1133:public class MacOSTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1136:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1140:public func name(): String
+packages/core/src/terminal.cj:1141:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1142:public func restore(): Unit
+packages/core/src/terminal.cj:1143:public func size(): ?Rect
+packages/core/src/terminal.cj:1144:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1158:public class MacOSTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1159:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1163:public func name(): String
+packages/core/src/terminal.cj:1164:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1165:public func restore(): Unit
+packages/core/src/terminal.cj:1166:public func size(): ?Rect
+packages/core/src/terminal.cj:1167:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1173:public class WindowsTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1176:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1180:public func name(): String
+packages/core/src/terminal.cj:1181:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1182:public func restore(): Unit
+packages/core/src/terminal.cj:1183:public func size(): ?Rect
+packages/core/src/terminal.cj:1184:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1198:public class WindowsTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1199:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1203:public func name(): String
+packages/core/src/terminal.cj:1204:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1205:public func restore(): Unit
+packages/core/src/terminal.cj:1206:public func size(): ?Rect
+packages/core/src/terminal.cj:1207:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1213:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1218:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1223:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1227:public class AnsiBackend <: Backend {
+packages/core/src/terminal.cj:1235:public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1241:public func clear(): Unit
+packages/core/src/terminal.cj:1245:public func moveTo(x: Int64, y: Int64): Unit
+packages/core/src/terminal.cj:1249:public func enterAlternateScreen(): Unit
+packages/core/src/terminal.cj:1250:public func leaveAlternateScreen(): Unit
+packages/core/src/terminal.cj:1251:public func hideCursor(): Unit
+packages/core/src/terminal.cj:1252:public func showCursor(): Unit
+packages/core/src/terminal.cj:1253:public func setCursorShape(shape: ?CursorShape): Unit
+packages/core/src/terminal.cj:1259:public func enableMouse(): Unit
+packages/core/src/terminal.cj:1260:public func disableMouse(): Unit
+packages/core/src/terminal.cj:1261:public func enableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1262:public func disableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1264:public func size(): Rect
+packages/core/src/terminal.cj:1271:public func draw(buffer: Buffer): Unit
+packages/core/src/terminal.cj:1290:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+packages/core/src/terminal.cj:1311:public func drawMedia(ops: Array<MediaOp>): Unit
+packages/core/src/terminal.cj:1321:public func write(text: String): Unit
+packages/core/src/terminal.cj:1327:public func setInstrumentationEnabled(enabled: Bool): Unit
+packages/core/src/terminal.cj:1331:public func diagnosticByteCount(): Int64
+packages/core/src/terminal.cj:1335:public func flush(): Unit
+packages/core/src/terminal.cj:1363:public class TestBackend <: Backend {
+packages/core/src/terminal.cj:1377:public init( area!: Rect = Rect(0, 0, 80, 24), captureSnapshots!: Bool = true )
+packages/core/src/terminal.cj:1385:public func clear(): Unit
+packages/core/src/terminal.cj:1389:public func moveTo(x: Int64, y: Int64): Unit
+packages/core/src/terminal.cj:1393:public func enterAlternateScreen(): Unit
+packages/core/src/terminal.cj:1394:public func leaveAlternateScreen(): Unit
+packages/core/src/terminal.cj:1395:public func hideCursor(): Unit
+packages/core/src/terminal.cj:1396:public func showCursor(): Unit
+packages/core/src/terminal.cj:1397:public func setCursorShape(shape: ?CursorShape): Unit
+packages/core/src/terminal.cj:1403:public func enableMouse(): Unit
+packages/core/src/terminal.cj:1404:public func disableMouse(): Unit
+packages/core/src/terminal.cj:1405:public func enableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1406:public func disableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1408:public func size(): Rect
+packages/core/src/terminal.cj:1412:public func setSize(area: Rect): Unit
+packages/core/src/terminal.cj:1416:public func draw(buffer: Buffer): Unit
+packages/core/src/terminal.cj:1426:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+packages/core/src/terminal.cj:1436:public func drawMedia(ops: Array<MediaOp>): Unit
+packages/core/src/terminal.cj:1443:public func write(text: String): Unit
+packages/core/src/terminal.cj:1449:public func flush(): Unit
+packages/core/src/terminal.cj:1451:public func output(): String
+packages/core/src/terminal.cj:1455:public func clearOutput(): Unit
+packages/core/src/terminal.cj:1461:public func lastBuffer(): ?Buffer
+packages/core/src/terminal.cj:1465:public func lastDiffOps(): Int64
+packages/core/src/terminal.cj:1469:public func lastDiffWrites(): Int64
+packages/core/src/terminal.cj:1473:public func lastMediaOps(): Array<MediaOp>
+packages/core/src/terminal.cj:1478:public func mediaFrameCount(): Int64
+packages/core/src/terminal.cj:1482:public func snapshot(): String
+packages/core/src/terminal.cj:1489:public func snapshots(): Array<String>
+packages/core/src/terminal.cj:1493:public func snapshotAt(index: Int64): String
+packages/core/src/terminal.cj:1498:public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool
+packages/core/src/terminal.cj:1507:public func assertSnapshot(expected: String): Bool
+packages/core/src/terminal.cj:1511:public func assertSnapshotAt(index: Int64, expected: String): Bool
+packages/core/src/terminal.cj:1515:public func assertLastMediaOpCount(expected: Int64): Bool
+packages/core/src/terminal.cj:1528:public struct TerminalCapabilities {
+packages/core/src/terminal.cj:1529:public let size: Rect
+packages/core/src/terminal.cj:1530:public let trueColor: Bool
+packages/core/src/terminal.cj:1531:public let colorLevel: Int64
+packages/core/src/terminal.cj:1532:public let mouse: Bool
+packages/core/src/terminal.cj:1533:public let mouseMove: Bool
+packages/core/src/terminal.cj:1534:public let focusEvents: Bool
+packages/core/src/terminal.cj:1535:public let bracketedPaste: Bool
+packages/core/src/terminal.cj:1536:public let alternateScreen: Bool
+packages/core/src/terminal.cj:1537:public let unicode: Bool
+packages/core/src/terminal.cj:1538:public let kittyGraphics: Bool
+packages/core/src/terminal.cj:1539:public let sixel: Bool
+packages/core/src/terminal.cj:1540:public let osc8: Bool
+packages/core/src/terminal.cj:1541:public let keyboardProtocol: KeyProtocol
+packages/core/src/terminal.cj:1542:public let keyUp: Bool
+packages/core/src/terminal.cj:1543:public let keyRepeat: Bool
+packages/core/src/terminal.cj:1544:public let recommendedFps: Int64
+packages/core/src/terminal.cj:1545:public let cellWidthPixels: Int64
+packages/core/src/terminal.cj:1546:public let cellHeightPixels: Int64
+packages/core/src/terminal.cj:1547:public let driverName: String
+packages/core/src/terminal.cj:1549:public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = "linux-glibc" )
+packages/core/src/terminal.cj:1591:public static func detect(backend!: Backend = AnsiBackend(), driverName!: String = "linux-glibc"): TerminalCapabilities
+packages/core/src/terminal.cj:1701:public struct RenderMetrics {
+packages/core/src/terminal.cj:1702:public let size: Rect
+packages/core/src/terminal.cj:1703:public let dirtyCells: Int64
+packages/core/src/terminal.cj:1704:public let diffWrites: Int64
+packages/core/src/terminal.cj:1705:public let mediaOps: Int64
+packages/core/src/terminal.cj:1706:public let fullRedraw: Bool
+packages/core/src/terminal.cj:1707:public let renderMillis: Int64
+packages/core/src/terminal.cj:1708:public let drawMillis: Int64
+packages/core/src/terminal.cj:1709:public let totalMillis: Int64
+packages/core/src/terminal.cj:1710:public let renderedCells: Int64
+packages/core/src/terminal.cj:1711:public let dirtyRects: Int64
+packages/core/src/terminal.cj:1712:public let copiedCells: Int64
+packages/core/src/terminal.cj:1713:public let bufferCellAttempts: Int64
+packages/core/src/terminal.cj:1714:public let bufferCellWrites: Int64
+packages/core/src/terminal.cj:1715:public let diffCells: Int64
+packages/core/src/terminal.cj:1716:public let diffSpans: Int64
+packages/core/src/terminal.cj:1717:public let renderNanos: Int64
+packages/core/src/terminal.cj:1718:public let diffNanos: Int64
+packages/core/src/terminal.cj:1719:public let writeNanos: Int64
+packages/core/src/terminal.cj:1720:public let totalNanos: Int64
+packages/core/src/terminal.cj:1721:public let ansiBytes: Int64
+packages/core/src/terminal.cj:1723:public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
+packages/core/src/terminal.cj:1766:public class DebugOverlay <: Widget {
+packages/core/src/terminal.cj:1770:public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+packages/core/src/terminal.cj:1775:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/terminal.cj:1800:public class TerminalMode {
+packages/core/src/terminal.cj:1806:public static func lastError(): ?String
+packages/core/src/terminal.cj:1810:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:1850:public static func restore(): Unit
+packages/core/src/terminal.cj:1868:public static func size(): ?Rect
+packages/core/src/terminal.cj:1906:public class MacOSTerminalMode {
+packages/core/src/terminal.cj:1913:public static func lastError(): ?String
+packages/core/src/terminal.cj:1917:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:1957:public static func restore(): Unit
+packages/core/src/terminal.cj:1975:public static func size(): ?Rect
+packages/core/src/terminal.cj:1996:public class WindowsConsoleMode {
+packages/core/src/terminal.cj:2003:public static func lastError(): ?String
+packages/core/src/terminal.cj:2007:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:2047:public static func restore(): Unit
+packages/core/src/terminal.cj:2065:public static func size(): ?Rect
 packages/core/src/text.cj:7:public enum AmbiguousWidth {
 packages/core/src/text.cj:8:Narrow
 packages/core/src/text.cj:9:Wide
@@ -1831,70 +1749,70 @@ packages/core/src/text_area.cj:173:public var selectionStart: ?Int64 = None
 packages/core/src/text_area.cj:174:public var selectionEnd: ?Int64 = None
 packages/core/src/text_area.cj:183:public var readOnly: Bool
 packages/core/src/text_area.cj:184:public var markdownEditing: Bool
-packages/core/src/text_area.cj:206:public init( value!: String = "", cursor!: Int64 = 0, scroll!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), lineNumbers!: Bool = false, lineNumberStyle!: Style = Style(fg: Color.Indexed(8)), foldState!: ?DocumentViewState = None, readOnly!: Bool = false, markdownEditing!: Bool = false, decorations!: Array<TextDecoration> = [] )
-packages/core/src/text_area.cj:239:public func handle(key: KeyEvent): Bool
-packages/core/src/text_area.cj:340:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
-packages/core/src/text_area.cj:363:public func handleVimNavigation(key: KeyEvent): Bool
-packages/core/src/text_area.cj:382:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/text_area.cj:415:public func cursorPosition(area: Rect): Position
-packages/core/src/text_area.cj:429:public func cursorPositions(area: Rect): Array<Position>
-packages/core/src/text_area.cj:450:public func select(start: Int64, end: Int64): Unit
-packages/core/src/text_area.cj:455:public func clearSelection(): Unit
-packages/core/src/text_area.cj:460:public func hasSelection(): Bool
-packages/core/src/text_area.cj:467:public func selectedText(): String
-packages/core/src/text_area.cj:475:public func selectedRange(): ?(Int64, Int64)
-packages/core/src/text_area.cj:480:public func carets(): Array<TextAreaCaret>
-packages/core/src/text_area.cj:487:public func setCarets(carets: Array<TextAreaCaret>): Unit
-packages/core/src/text_area.cj:502:public func addCaret(caret: TextAreaCaret): Unit
-packages/core/src/text_area.cj:509:public func clearExtraCarets(): Unit
-packages/core/src/text_area.cj:513:public func selectedTexts(): Array<String>
-packages/core/src/text_area.cj:525:public func copySelectionTo(clipboard: Clipboard): Bool
-packages/core/src/text_area.cj:531:public func cutSelectionTo(clipboard: Clipboard): Bool
-packages/core/src/text_area.cj:537:public func pasteFrom(clipboard: Clipboard): Unit
-packages/core/src/text_area.cj:541:public func deleteSelection(): Unit
-packages/core/src/text_area.cj:550:public func paste(text: String): Unit
-packages/core/src/text_area.cj:556:public func setDecorations(decorations: Array<TextDecoration>): Unit
-packages/core/src/text_area.cj:560:public func setValue(value: String, cursor!: Int64 = -1): Unit
-packages/core/src/text_area.cj:570:public func editRevision(): Int64
-packages/core/src/text_area.cj:575:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/text_area.cj:611:public func beginCompletion(requestId: String): TextCompletionRequest
-packages/core/src/text_area.cj:623:public func completionCommand(requestId: String, provider: (TextCompletionRequest) -> TextCompletionResult): Command
-packages/core/src/text_area.cj:628:public func handleCompletionEvent(event: Event): Bool
-packages/core/src/text_area.cj:640:public func completionVisible(): Bool
-packages/core/src/text_area.cj:645:public func cancelCompletion(): Bool
-packages/core/src/text_area.cj:653:public func completionRows(maximum!: Int64 = 5): Int64
-packages/core/src/text_area.cj:659:public func renderCompletionOverlay(area: Rect, buffer: Buffer): Unit
-packages/core/src/text_area.cj:668:public func clearHistory(): Unit
-packages/core/src/text_area.cj:673:public func undo(): Bool
-packages/core/src/text_area.cj:683:public func redo(): Bool
-packages/core/src/text_area.cj:703:public func findNext(needle: String): ?Int64
-packages/core/src/text_area.cj:714:public func findPrevious(needle: String): ?Int64
-packages/core/src/text_area.cj:725:public func moveWordLeft(): Unit
-packages/core/src/text_area.cj:730:public func moveWordRight(): Unit
-packages/core/src/text_area.cj:1171:public func lineCacheRebuildCount(): Int64
-packages/core/src/text_area.cj:1607:public func markdownDecorations(text: String): Array<TextDecoration>
-packages/core/src/text_area.cj:1630:public func markdownLineHighlights(text: String): Array<LineHighlight>
-packages/core/src/text_area.cj:1737:public class MarkdownEditorBehavior {
-packages/core/src/text_area.cj:1740:public init()
-packages/core/src/text_area.cj:1742:public func applyHighlights(area: TextArea): Unit
-packages/core/src/text_area.cj:1746:public func invalidate(): Unit
-packages/core/src/text_area.cj:1750:public func handle(area: TextArea, key: KeyEvent): Bool
-packages/core/src/text_area.cj:1782:public func toggleBold(area: TextArea): Bool
-packages/core/src/text_area.cj:1786:public func toggleItalic(area: TextArea): Bool
-packages/core/src/text_area.cj:1790:public func toggleCode(area: TextArea): Bool
-packages/core/src/text_area.cj:1794:public func insertLink(area: TextArea, url!: String = "https://example.com"): Bool
-packages/core/src/text_area.cj:1803:public func insertImage(area: TextArea, url!: String = "image.png", alt!: String = "alt"): Bool
-packages/core/src/text_area.cj:1820:public func insertReferenceLink(area: TextArea, id!: String = "ref"): Bool
-packages/core/src/text_area.cj:1829:public func insertReferenceDefinition(area: TextArea, id!: String = "ref", url!: String = "https://example.com", title!: String = ""): Bool
-packages/core/src/text_area.cj:1835:public func insertFrontmatter(area: TextArea, title!: String = "Untitled"): Bool
-packages/core/src/text_area.cj:1845:public func insertTable(area: TextArea): Bool
-packages/core/src/text_area.cj:1850:public func insertCodeFence(area: TextArea, language!: String = ""): Bool
-packages/core/src/text_area.cj:1856:public class MarkdownTextEditor <: Widget {
-packages/core/src/text_area.cj:1857:public let area: TextArea
-packages/core/src/text_area.cj:1858:public let behavior: MarkdownEditorBehavior
-packages/core/src/text_area.cj:1860:public init(value!: String = "", block!: ?Block = None, lineNumbers!: Bool = true)
-packages/core/src/text_area.cj:1865:public func handle(key: KeyEvent): Bool
-packages/core/src/text_area.cj:1869:public func render(areaRect: Rect, buffer: Buffer): Unit
+packages/core/src/text_area.cj:208:public init( value!: String = "", cursor!: Int64 = 0, scroll!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), lineNumbers!: Bool = false, lineNumberStyle!: Style = Style(fg: Color.Indexed(8)), foldState!: ?DocumentViewState = None, readOnly!: Bool = false, markdownEditing!: Bool = false, decorations!: Array<TextDecoration> = [] )
+packages/core/src/text_area.cj:241:public func handle(key: KeyEvent): Bool
+packages/core/src/text_area.cj:342:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+packages/core/src/text_area.cj:365:public func handleVimNavigation(key: KeyEvent): Bool
+packages/core/src/text_area.cj:384:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/text_area.cj:417:public func cursorPosition(area: Rect): Position
+packages/core/src/text_area.cj:431:public func cursorPositions(area: Rect): Array<Position>
+packages/core/src/text_area.cj:452:public func select(start: Int64, end: Int64): Unit
+packages/core/src/text_area.cj:457:public func clearSelection(): Unit
+packages/core/src/text_area.cj:462:public func hasSelection(): Bool
+packages/core/src/text_area.cj:469:public func selectedText(): String
+packages/core/src/text_area.cj:477:public func selectedRange(): ?(Int64, Int64)
+packages/core/src/text_area.cj:482:public func carets(): Array<TextAreaCaret>
+packages/core/src/text_area.cj:489:public func setCarets(carets: Array<TextAreaCaret>): Unit
+packages/core/src/text_area.cj:504:public func addCaret(caret: TextAreaCaret): Unit
+packages/core/src/text_area.cj:511:public func clearExtraCarets(): Unit
+packages/core/src/text_area.cj:515:public func selectedTexts(): Array<String>
+packages/core/src/text_area.cj:527:public func copySelectionTo(clipboard: Clipboard): Bool
+packages/core/src/text_area.cj:533:public func cutSelectionTo(clipboard: Clipboard): Bool
+packages/core/src/text_area.cj:539:public func pasteFrom(clipboard: Clipboard): Unit
+packages/core/src/text_area.cj:543:public func deleteSelection(): Unit
+packages/core/src/text_area.cj:552:public func paste(text: String): Unit
+packages/core/src/text_area.cj:558:public func setDecorations(decorations: Array<TextDecoration>): Unit
+packages/core/src/text_area.cj:562:public func setValue(value: String, cursor!: Int64 = -1): Unit
+packages/core/src/text_area.cj:572:public func editRevision(): Int64
+packages/core/src/text_area.cj:577:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/text_area.cj:613:public func beginCompletion(requestId: String): TextCompletionRequest
+packages/core/src/text_area.cj:625:public func completionCommand(requestId: String, provider: (TextCompletionRequest) -> TextCompletionResult): Command
+packages/core/src/text_area.cj:630:public func handleCompletionEvent(event: Event): Bool
+packages/core/src/text_area.cj:642:public func completionVisible(): Bool
+packages/core/src/text_area.cj:647:public func cancelCompletion(): Bool
+packages/core/src/text_area.cj:661:public func completionRows(maximum!: Int64 = 5): Int64
+packages/core/src/text_area.cj:667:public func renderCompletionOverlay(area: Rect, buffer: Buffer): Unit
+packages/core/src/text_area.cj:676:public func clearHistory(): Unit
+packages/core/src/text_area.cj:699:public func undo(): Bool
+packages/core/src/text_area.cj:710:public func redo(): Bool
+packages/core/src/text_area.cj:731:public func findNext(needle: String): ?Int64
+packages/core/src/text_area.cj:742:public func findPrevious(needle: String): ?Int64
+packages/core/src/text_area.cj:753:public func moveWordLeft(): Unit
+packages/core/src/text_area.cj:758:public func moveWordRight(): Unit
+packages/core/src/text_area.cj:1200:public func lineCacheRebuildCount(): Int64
+packages/core/src/text_area.cj:1640:public func markdownDecorations(text: String): Array<TextDecoration>
+packages/core/src/text_area.cj:1663:public func markdownLineHighlights(text: String): Array<LineHighlight>
+packages/core/src/text_area.cj:1774:public class MarkdownEditorBehavior {
+packages/core/src/text_area.cj:1777:public init()
+packages/core/src/text_area.cj:1779:public func applyHighlights(area: TextArea): Unit
+packages/core/src/text_area.cj:1783:public func invalidate(): Unit
+packages/core/src/text_area.cj:1787:public func handle(area: TextArea, key: KeyEvent): Bool
+packages/core/src/text_area.cj:1819:public func toggleBold(area: TextArea): Bool
+packages/core/src/text_area.cj:1823:public func toggleItalic(area: TextArea): Bool
+packages/core/src/text_area.cj:1827:public func toggleCode(area: TextArea): Bool
+packages/core/src/text_area.cj:1831:public func insertLink(area: TextArea, url!: String = "https://example.com"): Bool
+packages/core/src/text_area.cj:1840:public func insertImage(area: TextArea, url!: String = "image.png", alt!: String = "alt"): Bool
+packages/core/src/text_area.cj:1857:public func insertReferenceLink(area: TextArea, id!: String = "ref"): Bool
+packages/core/src/text_area.cj:1866:public func insertReferenceDefinition(area: TextArea, id!: String = "ref", url!: String = "https://example.com", title!: String = ""): Bool
+packages/core/src/text_area.cj:1872:public func insertFrontmatter(area: TextArea, title!: String = "Untitled"): Bool
+packages/core/src/text_area.cj:1882:public func insertTable(area: TextArea): Bool
+packages/core/src/text_area.cj:1887:public func insertCodeFence(area: TextArea, language!: String = ""): Bool
+packages/core/src/text_area.cj:1893:public class MarkdownTextEditor <: Widget {
+packages/core/src/text_area.cj:1894:public let area: TextArea
+packages/core/src/text_area.cj:1895:public let behavior: MarkdownEditorBehavior
+packages/core/src/text_area.cj:1897:public init(value!: String = "", block!: ?Block = None, lineNumbers!: Bool = true)
+packages/core/src/text_area.cj:1902:public func handle(key: KeyEvent): Bool
+packages/core/src/text_area.cj:1906:public func render(areaRect: Rect, buffer: Buffer): Unit
 packages/core/src/text_buffer.cj:5:public interface Clipboard {
 packages/core/src/text_buffer.cj:6:func getText(): String
 packages/core/src/text_buffer.cj:7:func setText(text: String): Unit
@@ -1937,6 +1855,14 @@ packages/core/src/text_buffer.cj:272:public func undo(): Bool
 packages/core/src/text_buffer.cj:281:public func redo(): Bool
 packages/core/src/text_buffer.cj:290:public func find(needle: String, start!: TextPosition = TextPosition(0, 0)): ?TextPosition
 packages/core/src/text_buffer.cj:302:public func clampPosition(position: TextPosition): TextPosition
+packages/core/src/vim_editor.cj:5:public enum VimMode {
+packages/core/src/vim_editor.cj:6:Normal
+packages/core/src/vim_editor.cj:7:Insert
+packages/core/src/vim_editor.cj:10:public class VimEditorBehavior {
+packages/core/src/vim_editor.cj:17:public init(area: TextArea, insertHandler!: (TextArea, KeyEvent) -> Bool =
+packages/core/src/vim_editor.cj:27:public prop mode: VimMode {
+packages/core/src/vim_editor.cj:31:public func deactivate(): Unit
+packages/core/src/vim_editor.cj:45:public func handle(event: Event): Bool
 packages/core/src/virtual_transcript.cj:8:public struct VirtualTranscriptAppendOnlyText {
 packages/core/src/virtual_transcript.cj:9:public let text: String
 packages/core/src/virtual_transcript.cj:10:public let style: Style
@@ -2341,23 +2267,27 @@ packages/game/src/game.cj:638:public func find(symbol: String): Array<TileMarker
 packages/game/src/game.cj:650:public func findAny(symbols: Array<String>): Array<TileMarker>
 packages/game/src/game.cj:663:public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
 packages/game/src/game.cj:678:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style = Style(fg: Color.White)): Unit
-packages/markdown/src/markdown.cj:9:public class Markdown {
-packages/markdown/src/markdown.cj:10:public static func parse( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-packages/markdown/src/markdown.cj:19:public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-packages/markdown/src/markdown.cj:27:public func markdownAstToDocument( ast: MarkdownDocument, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-packages/markdown/src/markdown.cj:48:public class OutlineNode {
-packages/markdown/src/markdown.cj:49:public let level: Int64
-packages/markdown/src/markdown.cj:50:public let title: String
-packages/markdown/src/markdown.cj:51:public let sourceOffset: Int64
-packages/markdown/src/markdown.cj:52:public let children: Array<OutlineNode>
-packages/markdown/src/markdown.cj:54:public init(level: Int64, title: String, sourceOffset: Int64, children!: Array<OutlineNode> = [])
-packages/markdown/src/markdown.cj:62:public class MarkdownPreviewIndex {
-packages/markdown/src/markdown.cj:65:public init(sourceOffsets: Array<Int64>)
-packages/markdown/src/markdown.cj:69:public func renderedLineCount(): Int64
-packages/markdown/src/markdown.cj:73:public func sourceOffsetForRenderedLine(line: Int64): ?Int64
-packages/markdown/src/markdown.cj:80:public func renderedLineForSourceOffset(offset: Int64): Int64
-packages/markdown/src/markdown.cj:91:public func markdownOutline(ast: MarkdownDocument): Array<OutlineNode>
-packages/markdown/src/markdown.cj:97:public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex
+packages/markdown_adapter/src/markdown.cj:7:public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
+packages/markdown_adapter/src/markdown.cj:16:public func markdownAstToDocument( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
+packages/markdown_adapter/src/markdown.cj:25:public class MarkdownPresentation {
+packages/markdown_adapter/src/markdown.cj:26:public let document: Document
+packages/markdown_adapter/src/markdown.cj:27:public let decorations: Array<TextDecoration>
+packages/markdown_adapter/src/markdown.cj:35:public func markdownAstToPresentation( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None ): MarkdownPresentation
+packages/markdown_adapter/src/markdown.cj:72:public class OutlineNode {
+packages/markdown_adapter/src/markdown.cj:73:public let level: Int64
+packages/markdown_adapter/src/markdown.cj:74:public let title: String
+packages/markdown_adapter/src/markdown.cj:75:public let sourceOffset: Int64
+packages/markdown_adapter/src/markdown.cj:76:public let children: Array<OutlineNode>
+packages/markdown_adapter/src/markdown.cj:78:public init(level: Int64, title: String, sourceOffset: Int64, children!: Array<OutlineNode> = [])
+packages/markdown_adapter/src/markdown.cj:86:public class MarkdownPreviewIndex {
+packages/markdown_adapter/src/markdown.cj:89:public init(sourceOffsets: Array<Int64>)
+packages/markdown_adapter/src/markdown.cj:93:public func renderedLineCount(): Int64
+packages/markdown_adapter/src/markdown.cj:97:public func sourceOffsetForRenderedLine(line: Int64): ?Int64
+packages/markdown_adapter/src/markdown.cj:104:public func renderedLineForSourceOffset(offset: Int64): Int64
+packages/markdown_adapter/src/markdown.cj:115:public func markdownOutline(result: ParseResult): Array<OutlineNode>
+packages/markdown_adapter/src/markdown.cj:121:public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex
+packages/markdown_adapter/src/syntax_config.cj:64:public class SyntaxHighlightConfig {
+packages/markdown_adapter/src/syntax_config.cj:198:public func parseSyntaxHighlightConfig(text: String): SyntaxHighlightConfig
 packages/media/src/media.cj:8:public class MediaDecodeRequest {
 packages/media/src/media.cj:9:public let source: MediaSource
 packages/media/src/media.cj:10:public let area: Rect

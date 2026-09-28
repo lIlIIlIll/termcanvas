@@ -112,7 +112,7 @@ def main() -> int:
     snapshot_cj_tui.symlink_to(cj_tui, target_is_directory=True)
 
     core_dependency = (snapshot_consumer / "agent_tui" / "../../cj_tui/packages/core").resolve()
-    markdown_dependency = (snapshot_consumer / "agent_tui" / "../../cj_tui/packages/markdown").resolve()
+    markdown_dependency = (snapshot_consumer / "agent_tui" / "../../cj_tui/packages/markdown_adapter").resolve()
     expected_core = (cj_tui / "packages/core").resolve()
     if core_dependency != expected_core:
         raise SystemExit(f"resolved core dependency {core_dependency} != {expected_core}")
@@ -158,7 +158,7 @@ def main() -> int:
         "declared_dependency": {
             "manifest": str((consumer / "agent_tui/cjpm.toml").resolve()),
             "core": "../../cj_tui/packages/core",
-            "markdown": "../../cj_tui/packages/markdown",
+            "markdown": "../../cj_tui/packages/markdown_adapter",
         },
         "resolved_dependency": {
             "core": str(core_dependency),

@@ -117,6 +117,19 @@ let DISABLE_NEWLINE_AUTO_RETURN: UInt32 = 0x0008u32
 @When[os == "Windows"]
 let CONSOLE_SCREEN_BUFFER_INFO_BYTES: Int64 = 22
 
+public enum CursorShape {
+    | Block
+    | Bar
+}
+
+private func cursorShapeCode(shape: ?CursorShape): Int64 {
+    match (shape) {
+        case Some(CursorShape.Block) => 2
+        case Some(CursorShape.Bar) => 6
+        case None => 0
+    }
+}
+
 public interface Backend {
     func clear(): Unit
     func moveTo(x: Int64, y: Int64): Unit
@@ -124,6 +137,7 @@ public interface Backend {
     func leaveAlternateScreen(): Unit
     func hideCursor(): Unit
     func showCursor(): Unit
+    func setCursorShape(_: ?CursorShape): Unit {}
     func enableMouse(): Unit
     func disableMouse(): Unit
     func enableBracketedPaste(): Unit
@@ -169,6 +183,7 @@ public class Frame {
     private let buffer: Buffer
     private let dirty: ?DirtyRects
     private var cursor: ?Position = None
+    private var cursorShape: ?CursorShape = None
 
     public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None) {
         this.area = area
@@ -222,6 +237,14 @@ public class Frame {
 
     public func setCursor(position: Position): Unit {
         cursor = Some(position)
+    }
+
+    public func setCursorShape(shape: CursorShape): Unit {
+        cursorShape = Some(shape)
+    }
+
+    internal func getCursorShape(): ?CursorShape {
+        cursorShape
     }
 
     public func getCursor(): ?Position {
@@ -354,6 +377,7 @@ public class Terminal {
         backend.drawMedia(mediaOps)
         match (frame.getCursor()) {
             case Some(cursor) =>
+                backend.setCursorShape(frame.getCursorShape())
                 if (!cursorStateKnown || !cursorVisible) {
                     backend.showCursor()
                 }
@@ -362,6 +386,7 @@ public class Terminal {
                 backend.moveTo(cursor.x, cursor.y)
                 backend.flush()
             case None =>
+                backend.setCursorShape(None)
                 if (!cursorStateKnown || cursorVisible) {
                     backend.hideCursor()
                     backend.flush()
@@ -830,6 +855,7 @@ public class TerminalSession {
             try { backend.disableMouse() } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
             mouseActive = false
         }
+        try { backend.setCursorShape(None) } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
         if (cursorHidden) {
             try { backend.showCursor() } catch (error: Exception) { failures = appendCleanupFailure(failures, error) }
             cursorHidden = false
@@ -1031,6 +1057,7 @@ class TerminalSignalGuard {
 
     private static func restoreAnsiModes(): Unit {
         writeAnsi(disableKeyboardProtocolSequence())
+        writeAnsi("${ESC}[0 q")
         if (bracketedPaste) { writeAnsi("${ESC}[?2004l") }
         if (focusEvents) { writeAnsi("${ESC}[?1004l") }
         if (mouseMove) { writeAnsi("${ESC}[?1003l${ESC}[?1006l") }
@@ -1203,6 +1230,7 @@ public class AnsiBackend <: Backend {
     private let fallbackArea: Rect
     private var instrumentationEnabled: Bool = false
     private var diagnosticBytesValue: Int64 = 0
+    private var selectedCursorShapeCode: Int64 = 0
 
     public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24)) {
         this.output = output
@@ -1222,6 +1250,12 @@ public class AnsiBackend <: Backend {
     public func leaveAlternateScreen(): Unit { write("${ESC}[?1049l") }
     public func hideCursor(): Unit { write("${ESC}[?25l") }
     public func showCursor(): Unit { write("${ESC}[?25h") }
+    public func setCursorShape(shape: ?CursorShape): Unit {
+        let code = cursorShapeCode(shape)
+        if (code == selectedCursorShapeCode) { return }
+        write("${ESC}[${code} q")
+        selectedCursorShapeCode = code
+    }
     public func enableMouse(): Unit { write("${ESC}[?1000h${ESC}[?1006h") }
     public func disableMouse(): Unit { write("${ESC}[?1006l${ESC}[?1000l") }
     public func enableBracketedPaste(): Unit { write("${ESC}[?2004h") }
@@ -1338,6 +1372,7 @@ public class TestBackend <: Backend {
     private let captureSnapshots: Bool
     private var latestDiffOps: Int64 = 0
     private var latestDiffWrites: Int64 = 0
+    private var selectedCursorShapeCode: Int64 = 0
 
     public init(
         area!: Rect = Rect(0, 0, 80, 24),
@@ -1359,6 +1394,12 @@ public class TestBackend <: Backend {
     public func leaveAlternateScreen(): Unit { write("${ESC}[?1049l") }
     public func hideCursor(): Unit { write("${ESC}[?25l") }
     public func showCursor(): Unit { write("${ESC}[?25h") }
+    public func setCursorShape(shape: ?CursorShape): Unit {
+        let code = cursorShapeCode(shape)
+        if (code == selectedCursorShapeCode) { return }
+        write("${ESC}[${code} q")
+        selectedCursorShapeCode = code
+    }
     public func enableMouse(): Unit { write("${ESC}[?1000h${ESC}[?1006h") }
     public func disableMouse(): Unit { write("${ESC}[?1006l${ESC}[?1000l") }
     public func enableBracketedPaste(): Unit { write("${ESC}[?2004h") }
