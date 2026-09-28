@@ -8,11 +8,10 @@
     "external_compatibility_census": "required before removal; not yet performed"
   },
   "source_roots": [
-    "packages/cj_markdown/src",
     "packages/core/src",
     "packages/diff/src",
     "packages/game/src",
-    "packages/markdown/src",
+    "packages/markdown_adapter/src",
     "packages/media/src",
     "packages/terminal/src"
   ],
@@ -171,6 +170,24 @@
       "consumer_evidence": "Core, examples, and principal consumer."
     },
     {
+      "id": "core-terminal-cursor-shape-experimental",
+      "match": {"package": "core", "symbols": ["CursorShape"]},
+      "stability": "EXPERIMENTAL", "subsystem": "terminal", "owner": "core/terminal",
+      "reason": "Opt-in block and bar terminal cursor shapes are not part of the existing default rendering contract.",
+      "consumer_evidence": "markdown_studio --vim and terminal renderer tests.",
+      "promotion_condition": "An independent consumer validates cursor shape transitions and terminal restoration.",
+      "sunset_condition": "Review alongside optional terminal presentation policies."
+    },
+    {
+      "id": "core-terminal-cursor-shape-members",
+      "match": {"package": "core", "qualified_symbols": ["Backend.setCursorShape", "Frame.setCursorShape", "TestBackend.setCursorShape"]},
+      "stability": "EXPERIMENTAL", "subsystem": "terminal", "owner": "core/terminal",
+      "reason": "Optional cursor presentation hints must not change default Frame and Backend behavior.",
+      "consumer_evidence": "markdown_studio --vim and terminal renderer tests.",
+      "promotion_condition": "An independent consumer validates cursor shape transitions and terminal restoration.",
+      "sunset_condition": "Review alongside optional terminal presentation policies."
+    },
+    {
       "id": "core-terminal-experimental",
       "match": {"package": "core", "symbols": ["TerminalProbe", "LinuxTerminalDriver", "FallbackTerminalDriver", "MacOSTerminalDriver", "WindowsTerminalDriver"]},
       "stability": "EXPERIMENTAL", "subsystem": "terminal", "owner": "core/terminal",
@@ -282,6 +299,15 @@
       "stability": "STABLE", "subsystem": "document_editor", "owner": "core/editor",
       "reason": "Document, TextArea, and Composer control models are mature and used by the principal consumer.",
       "consumer_evidence": "Core tests, recommended examples, and omp-cj."
+    },
+    {
+      "id": "core-vim-editor-experimental",
+      "match": {"package": "core", "symbols": ["VimMode", "VimEditorBehavior"]},
+      "stability": "EXPERIMENTAL", "subsystem": "document_editor", "owner": "core/editor",
+      "reason": "Optional limited modal editing policy, not a default TextArea keymap or full Vim compatibility layer.",
+      "consumer_evidence": "markdown_studio --vim is the first opt-in application consumer.",
+      "promotion_condition": "A second independent consumer validates the same mode and history contract.",
+      "sunset_condition": "Review with the editor behavior family; never make it the implicit default."
     },
     {
       "id": "core-editor-experimental",
@@ -419,18 +445,29 @@
       "consumer_evidence": "agent_tui production rendering, oh_my_pi_skin, direct Frame.canvas contract tests, and permanent rendering fitness."
     },
     {
-      "id": "cj-markdown-stable",
-      "match": {"package": "cj_markdown", "symbols": ["SourcePos", "SourceRange", "MarkdownDiagnosticSeverity", "MarkdownDiagnostic", "MarkdownBlockKind", "MarkdownInlineKind", "MarkdownTableAlign", "MarkdownInline", "MarkdownTableCell", "MarkdownTableRow", "MarkdownTable", "MarkdownBlock", "MarkdownDocument", "MarkdownParserOptions", "MarkdownParser", "parseMarkdown", "parseMarkdownWithOptions", "parseInline"]},
-      "stability": "STABLE", "subsystem": "markdown_parser", "owner": "packages/cj_markdown",
-      "reason": "The parser has a clear package boundary and supports the real markdown adapter consumer.",
-      "consumer_evidence": "markdown package, examples, and omp-cj transitive use."
+      "id": "markdown-adapter-stable",
+      "match": {"package": "markdown_adapter", "symbols": ["OutlineNode", "MarkdownPreviewIndex", "markdownDocument", "markdownAstToDocument", "markdownOutline", "markdownPreviewIndex"]},
+      "stability": "STABLE", "subsystem": "markdown_adapter", "owner": "packages/markdown_adapter",
+      "reason": "Markdown-to-Document conversion is an optional package with a real consumer.",
+      "consumer_evidence": "markdown_studio uses markdown 0.9.0; external consumers must migrate to markdown_adapter."
     },
     {
-      "id": "markdown-adapter-stable",
-      "match": {"package": "markdown", "symbols": ["Markdown", "OutlineNode", "MarkdownPreviewIndex", "markdownDocument", "markdownAstToDocument", "markdownOutline", "markdownPreviewIndex"]},
-      "stability": "STABLE", "subsystem": "markdown_adapter", "owner": "packages/markdown",
-      "reason": "Markdown-to-Document conversion is an optional package with a real consumer.",
-      "consumer_evidence": "markdown_studio and omp-cj."
+      "id": "markdown-adapter-presentation-experimental",
+      "match": {"package": "markdown_adapter", "symbols": ["MarkdownPresentation", "markdownAstToPresentation", "SyntaxHighlightConfig", "parseSyntaxHighlightConfig"]},
+      "stability": "EXPERIMENTAL", "subsystem": "markdown_adapter", "owner": "packages/markdown_adapter",
+      "reason": "Paired preview/source decorations and declarative syntax configuration share one evolving presentation contract and one application consumer.",
+      "consumer_evidence": "markdown_studio loads a syntax configuration at startup and renders the same parsed source into editor and preview; adapter and Studio rendering regressions.",
+      "promotion_condition": "Two independent consumers validate the byte-offset and lifecycle contract.",
+      "sunset_condition": "Review paired presentation ownership if editor or parser boundaries change."
+    },
+    {
+      "id": "markdown-adapter-presentation-fields-experimental",
+      "match": {"package": "markdown_adapter", "qualified_symbols": ["MarkdownPresentation.document", "MarkdownPresentation.decorations"]},
+      "stability": "EXPERIMENTAL", "subsystem": "markdown_adapter", "owner": "packages/markdown_adapter",
+      "reason": "Document and full source decorations form one revision-bound presentation result.",
+      "consumer_evidence": "markdown_studio consumes both fields together; adapter rendering tests.",
+      "promotion_condition": "Two independent consumers validate the same paired result fields.",
+      "sunset_condition": "Review the field contract with the presentation entry point."
     },
     {
       "id": "diff-package-experimental",

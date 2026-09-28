@@ -1,92 +1,3 @@
-cj_markdown|SourcePos|struct|public struct SourcePos <: Equatable<SourcePos> {
-cj_markdown|SourcePos.line|let|public let line: Int64
-cj_markdown|SourcePos.column|let|public let column: Int64
-cj_markdown|SourcePos.offset|let|public let offset: Int64
-cj_markdown|SourcePos.init|init|public init(line: Int64, column: Int64, offset: Int64)
-cj_markdown|SourcePos.operator_==|operator|public operator func ==(other: SourcePos): Bool
-cj_markdown|SourceRange|struct|public struct SourceRange <: Equatable<SourceRange> {
-cj_markdown|SourceRange.start|let|public let start: SourcePos
-cj_markdown|SourceRange.end|let|public let end: SourcePos
-cj_markdown|SourceRange.init|init|public init(start: SourcePos, end: SourcePos)
-cj_markdown|SourceRange.operator_==|operator|public operator func ==(other: SourceRange): Bool
-cj_markdown|MarkdownDiagnosticSeverity|enum|public enum MarkdownDiagnosticSeverity {
-cj_markdown|MarkdownDiagnosticSeverity.Warning|enum_constructor|Warning
-cj_markdown|MarkdownDiagnosticSeverity.Error|enum_constructor|Error
-cj_markdown|MarkdownDiagnostic|class|public class MarkdownDiagnostic {
-cj_markdown|MarkdownDiagnostic.severity|let|public let severity: MarkdownDiagnosticSeverity
-cj_markdown|MarkdownDiagnostic.message|let|public let message: String
-cj_markdown|MarkdownDiagnostic.range|let|public let range: SourceRange
-cj_markdown|MarkdownDiagnostic.init|init|public init(severity: MarkdownDiagnosticSeverity, message: String, range: SourceRange)
-cj_markdown|MarkdownBlockKind|enum|public enum MarkdownBlockKind {
-cj_markdown|MarkdownBlockKind.Paragraph|enum_constructor|Paragraph
-cj_markdown|MarkdownBlockKind.Heading|enum_constructor|Heading(Int64)
-cj_markdown|MarkdownBlockKind.List|enum_constructor|List
-cj_markdown|MarkdownBlockKind.ListItem|enum_constructor|ListItem(Bool, Int64)
-cj_markdown|MarkdownBlockKind.TaskListItem|enum_constructor|TaskListItem(Bool, Int64)
-cj_markdown|MarkdownBlockKind.Quote|enum_constructor|Quote
-cj_markdown|MarkdownBlockKind.CodeBlock|enum_constructor|CodeBlock(String)
-cj_markdown|MarkdownBlockKind.Table|enum_constructor|Table
-cj_markdown|MarkdownBlockKind.HorizontalRule|enum_constructor|HorizontalRule
-cj_markdown|MarkdownBlockKind.HtmlBlock|enum_constructor|HtmlBlock
-cj_markdown|MarkdownBlockKind.ReferenceDefinition|enum_constructor|ReferenceDefinition(String, String, String)
-cj_markdown|MarkdownBlockKind.Blank|enum_constructor|Blank
-cj_markdown|MarkdownInlineKind|enum|public enum MarkdownInlineKind {
-cj_markdown|MarkdownInlineKind.Text|enum_constructor|Text
-cj_markdown|MarkdownInlineKind.Emphasis|enum_constructor|Emphasis
-cj_markdown|MarkdownInlineKind.Strong|enum_constructor|Strong
-cj_markdown|MarkdownInlineKind.Strikethrough|enum_constructor|Strikethrough
-cj_markdown|MarkdownInlineKind.Code|enum_constructor|Code
-cj_markdown|MarkdownInlineKind.Link|enum_constructor|Link(String, String)
-cj_markdown|MarkdownInlineKind.Image|enum_constructor|Image(String)
-cj_markdown|MarkdownInlineKind.HtmlInline|enum_constructor|HtmlInline
-cj_markdown|MarkdownInlineKind.SoftBreak|enum_constructor|SoftBreak
-cj_markdown|MarkdownInlineKind.HardBreak|enum_constructor|HardBreak
-cj_markdown|MarkdownTableAlign|enum|public enum MarkdownTableAlign {
-cj_markdown|MarkdownTableAlign.Left|enum_constructor|Left
-cj_markdown|MarkdownTableAlign.Center|enum_constructor|Center
-cj_markdown|MarkdownTableAlign.Right|enum_constructor|Right
-cj_markdown|MarkdownTableAlign.None|enum_constructor|None
-cj_markdown|MarkdownInline|class|public class MarkdownInline {
-cj_markdown|MarkdownInline.kind|let|public let kind: MarkdownInlineKind
-cj_markdown|MarkdownInline.text|let|public let text: String
-cj_markdown|MarkdownInline.children|let|public let children: Array<MarkdownInline>
-cj_markdown|MarkdownInline.range|let|public let range: ?SourceRange
-cj_markdown|MarkdownInline.init|init|public init(kind: MarkdownInlineKind, text: String, children!: Array<MarkdownInline> = [], range!: ?SourceRange = None)
-cj_markdown|MarkdownTableCell|class|public class MarkdownTableCell {
-cj_markdown|MarkdownTableCell.text|let|public let text: String
-cj_markdown|MarkdownTableCell.inlines|let|public let inlines: Array<MarkdownInline>
-cj_markdown|MarkdownTableCell.init|init|public init(text: String, inlines!: Array<MarkdownInline> = [])
-cj_markdown|MarkdownTableRow|class|public class MarkdownTableRow {
-cj_markdown|MarkdownTableRow.cells|let|public let cells: Array<MarkdownTableCell>
-cj_markdown|MarkdownTableRow.init|init|public init(cells: Array<MarkdownTableCell>)
-cj_markdown|MarkdownTable|class|public class MarkdownTable {
-cj_markdown|MarkdownTable.header|let|public let header: MarkdownTableRow
-cj_markdown|MarkdownTable.alignments|let|public let alignments: Array<MarkdownTableAlign>
-cj_markdown|MarkdownTable.rows|let|public let rows: Array<MarkdownTableRow>
-cj_markdown|MarkdownTable.init|init|public init(header: MarkdownTableRow, alignments: Array<MarkdownTableAlign>, rows!: Array<MarkdownTableRow> = [])
-cj_markdown|MarkdownBlock|class|public class MarkdownBlock {
-cj_markdown|MarkdownBlock.kind|let|public let kind: MarkdownBlockKind
-cj_markdown|MarkdownBlock.text|let|public let text: String
-cj_markdown|MarkdownBlock.inlines|let|public let inlines: Array<MarkdownInline>
-cj_markdown|MarkdownBlock.table|let|public let table: ?MarkdownTable
-cj_markdown|MarkdownBlock.children|let|public let children: Array<MarkdownBlock>
-cj_markdown|MarkdownBlock.range|let|public let range: ?SourceRange
-cj_markdown|MarkdownBlock.init|init|public init( kind: MarkdownBlockKind, text: String, inlines!: Array<MarkdownInline> = [], table!: ?MarkdownTable = None, children!: Array<MarkdownBlock> = [], range!: ?SourceRange = None )
-cj_markdown|MarkdownDocument|class|public class MarkdownDocument {
-cj_markdown|MarkdownDocument.blocks|let|public let blocks: Array<MarkdownBlock>
-cj_markdown|MarkdownDocument.diagnostics|let|public let diagnostics: Array<MarkdownDiagnostic>
-cj_markdown|MarkdownDocument.init|init|public init(blocks: Array<MarkdownBlock>, diagnostics!: Array<MarkdownDiagnostic> = [])
-cj_markdown|MarkdownParserOptions|struct|public struct MarkdownParserOptions {
-cj_markdown|MarkdownParserOptions.mergeParagraphs|let|public let mergeParagraphs: Bool
-cj_markdown|MarkdownParserOptions.enableHtml|let|public let enableHtml: Bool
-cj_markdown|MarkdownParserOptions.enableStrikethrough|let|public let enableStrikethrough: Bool
-cj_markdown|MarkdownParserOptions.init|init|public init(mergeParagraphs!: Bool = true, enableHtml!: Bool = true, enableStrikethrough!: Bool = true)
-cj_markdown|MarkdownParser|class|public class MarkdownParser {
-cj_markdown|MarkdownParser.init|init|public init(options!: MarkdownParserOptions = MarkdownParserOptions())
-cj_markdown|MarkdownParser.parse|func|public func parse(text: String): MarkdownDocument
-cj_markdown|parseMarkdown|func|public func parseMarkdown(text: String): MarkdownDocument
-cj_markdown|parseMarkdownWithOptions|func|public func parseMarkdownWithOptions(text: String, options: MarkdownParserOptions): MarkdownDocument
-cj_markdown|parseInline|func|public func parseInline(text: String): Array<MarkdownInline>
 core|ControlFlow|enum|public enum ControlFlow {
 core|ControlFlow.Continue|enum_constructor|Continue
 core|ControlFlow.Exit|enum_constructor|Exit
@@ -1325,20 +1236,18 @@ core|FileDialog.init|init|public init(path!: String = ".", extension!: String = 
 core|FileDialog.selectedPath|func|public func selectedPath(): ?String
 core|FileDialog.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 core|FileDialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
-markdown|Markdown|class|public class Markdown {
-markdown|Markdown.parse|func|public static func parse( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-markdown|markdownDocument|func|public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-markdown|markdownAstToDocument|func|public func markdownAstToDocument( ast: MarkdownDocument, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-markdown|OutlineNode|class|public class OutlineNode {
-markdown|OutlineNode.level|let|public let level: Int64
-markdown|OutlineNode.title|let|public let title: String
-markdown|OutlineNode.sourceOffset|let|public let sourceOffset: Int64
-markdown|OutlineNode.children|let|public let children: Array<OutlineNode>
-markdown|OutlineNode.init|init|public init(level: Int64, title: String, sourceOffset: Int64, children!: Array<OutlineNode> = [])
-markdown|MarkdownPreviewIndex|class|public class MarkdownPreviewIndex {
-markdown|MarkdownPreviewIndex.init|init|public init(sourceOffsets: Array<Int64>)
-markdown|MarkdownPreviewIndex.renderedLineCount|func|public func renderedLineCount(): Int64
-markdown|MarkdownPreviewIndex.sourceOffsetForRenderedLine|func|public func sourceOffsetForRenderedLine(line: Int64): ?Int64
-markdown|MarkdownPreviewIndex.renderedLineForSourceOffset|func|public func renderedLineForSourceOffset(offset: Int64): Int64
-markdown|markdownOutline|func|public func markdownOutline(ast: MarkdownDocument): Array<OutlineNode>
-markdown|markdownPreviewIndex|func|public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex
+markdown_adapter|markdownDocument|func|public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
+markdown_adapter|markdownAstToDocument|func|public func markdownAstToDocument( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
+markdown_adapter|OutlineNode|class|public class OutlineNode {
+markdown_adapter|OutlineNode.level|let|public let level: Int64
+markdown_adapter|OutlineNode.title|let|public let title: String
+markdown_adapter|OutlineNode.sourceOffset|let|public let sourceOffset: Int64
+markdown_adapter|OutlineNode.children|let|public let children: Array<OutlineNode>
+markdown_adapter|OutlineNode.init|init|public init(level: Int64, title: String, sourceOffset: Int64, children!: Array<OutlineNode> = [])
+markdown_adapter|MarkdownPreviewIndex|class|public class MarkdownPreviewIndex {
+markdown_adapter|MarkdownPreviewIndex.init|init|public init(sourceOffsets: Array<Int64>)
+markdown_adapter|MarkdownPreviewIndex.renderedLineCount|func|public func renderedLineCount(): Int64
+markdown_adapter|MarkdownPreviewIndex.sourceOffsetForRenderedLine|func|public func sourceOffsetForRenderedLine(line: Int64): ?Int64
+markdown_adapter|MarkdownPreviewIndex.renderedLineForSourceOffset|func|public func renderedLineForSourceOffset(offset: Int64): Int64
+markdown_adapter|markdownOutline|func|public func markdownOutline(result: ParseResult): Array<OutlineNode>
+markdown_adapter|markdownPreviewIndex|func|public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex

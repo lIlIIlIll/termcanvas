@@ -26,10 +26,11 @@ state then supplies the document and view state to `core.DocumentView`:
 
 ```cj
 import core.*
-import markdown.*
+import markdown_adapter.*
 
-let doc = Markdown.parse("# Title\n\n- item")
-DocumentView(doc).render(area, buffer)
+let doc = markdownDocument("# Title\n\n- item")
+let buffer = Buffer(Rect(0, 0, 40, 10))
+DocumentView(doc).render(buffer.area, buffer)
 ```
 
 The former experimental `document` / `packages/document` alias facade is retired.
@@ -43,26 +44,48 @@ parsing policy.
 
 ### Markdown
 
-`packages/cj_markdown` provides the parser package and has no dependency on
-cjtui. `packages/markdown` provides the `markdown` adapter; it depends on
-`cj_markdown` and only maps `MarkdownDocument` into `core.Document`.
+The `markdown_adapter` package maps the AST from
+[markdown v0.9.0](https://github.com/lIlIIlIll/markdown/releases/tag/v0.9.0)
+into `core.Document`. This upstream release is a pre-GA preview; the adapter
+pins its Git tag and `cjpm.lock` records the resolved commit.
+The parser remains independent of cjtui. Import `markdown.core.Markdown`
+to parse directly, or call `markdownDocument(text)` to parse with the GFM
+profile and convert for `DocumentView`.
 
-The parser covers source ranges and diagnostics; ATX headings (including an
-optional closing `#`); setext headings; merged paragraphs with soft-break source
-mapping; grouped unordered and ordered lists with nested child items; task list
-items; block quotes with parsed child blocks, including indented quote markers;
-fenced code blocks with language info; indented code blocks; list continuation
-lines; pipe tables with headers, alignment, body rows, and escaped pipes;
-horizontal rules; HTML blocks and inline HTML; reference definitions and
-reference-style links/images; shortcut reference links; inline links with an
-optional title; inline images; inline code and multi-backtick inline code
-spans; strong, emphasis, and strikethrough; autolinks; common backslash
-escapes; and parser diagnostics such as unclosed fenced code blocks.
-
-The adapter exposes `Markdown.parse`, `markdownDocument`, and
-`markdownAstToDocument`. It also exposes `markdownOutline()` for heading trees
-and `markdownPreviewIndex()` for source-offset ↔ preview-row synchronization.
+`markdownAstToDocument(result)` accepts the upstream `ParseResult`;
+`markdownOutline(result)` derives heading trees from that same result.
+`markdownPreviewIndex()` maps source byte offsets to rendered rows.
+Diagnostics appear only when the upstream parser emits them; an unclosed
+code fence is valid Markdown and does not imply a warning.
 Markdown parsing remains outside `core.DocumentView`.
+
+`markdownAstToPresentation(result, syntax: Some(config))` (experimental)
+produces both a preview `document` and a complete `decorations` array for a
+`TextArea` containing the **same** `result.source.text()` revision.
+`config` is a `SyntaxHighlightConfig` returned by
+`parseSyntaxHighlightConfig(text)`; omit the named argument to use only
+the built-in lexers. Parse the editor value once, pass the result to this
+function, assign `presentation.document` to the preview, and call
+`editor.setDecorations(presentation.decorations)`. Replace both on
+every text revision; the decorations include ordinary Markdown, not just
+code tokens. Keep the configuration instance across revisions rather than
+reloading the file on each edit. `markdownDocument` and
+`markdownAstToDocument` remain preview-only and use the built-in
+code-block colors without constructing editor decorations.
+
+Fenced code language and literal come directly from the Markdown AST; the
+adapter does not render HTML to recover an info string. Supported languages
+are Cangjie, C/C++, JavaScript/TypeScript, Python, JSON, and Shell (aliases and
+usage are listed in [the Studio example](examples.md#focused-commands)).
+Highlighting is lexical, not compiler or semantic analysis. Unknown or absent
+languages and indented code retain the plain code style. Preview source ranges
+and editor styles use AST-anchored UTF-8 byte offsets; virtual indentation
+cannot claim source bytes. Only parse results whose source bytes match the
+editor String can supply editor decorations.
+
+For a runnable dependency declaration, see
+[`examples/markdown_studio/cjpm.toml`](../examples/markdown_studio/cjpm.toml).
+It declares both the local `markdown_adapter` and upstream `markdown` v0.9.0.
 
 ### Terminal output
 
@@ -153,7 +176,7 @@ applications.
 - [`widgets.md`](widgets.md): `DocumentView`, editor primitives, and widget
   composition.
 - [`events.md`](events.md): input and completion events entering update.
-- [`packages/cj_markdown/README.md`](../packages/cj_markdown/README.md): parser
-  API and coverage.
+- [Upstream markdown v0.9.0](https://github.com/lIlIIlIll/markdown/releases/tag/v0.9.0):
+  parser API, source ranges, profiles, and release artifacts.
 - [`api.md`](api.md) and generated [`api-inventory.json`](api-inventory.json):
   current ownership and stability tiers.

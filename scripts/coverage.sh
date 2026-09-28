@@ -32,9 +32,8 @@ run_coverage_test() {
     "$ROOT/scripts/cangjie_cmd.sh" "$package_dir" cjpm test --no-color --coverage
 }
 
-run_coverage_test "$ROOT/packages/cj_markdown" "cj_markdown coverage"
 run_coverage_test "$ROOT/packages/core" "core coverage"
-run_coverage_test "$ROOT/packages/markdown" "markdown adapter coverage"
+run_coverage_test "$ROOT/packages/markdown_adapter" "markdown adapter coverage"
 run_coverage_test "$ROOT/packages/terminal" "terminal coverage"
 run_coverage_test "$ROOT/packages/diff" "diff coverage"
 run_coverage_test "$ROOT/packages/media" "media coverage"

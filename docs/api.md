@@ -72,7 +72,7 @@ Current families include:
 
 - `packages/core` owns the primary runtime, immediate rendering, common widgets, rich document model, and stable compatibility surfaces.
 - `packages/core` owns the stable editor primitives. The former advanced editor shell and the `packages/editor` and `packages/document` alias facades are retired.
-- `packages/markdown` converts Markdown into the core document model; `packages/cj_markdown` owns parsing and source diagnostics.
+- `packages/markdown_adapter` converts [markdown v0.9.0](https://github.com/lIlIIlIll/markdown/releases/tag/v0.9.0) parse results into the core document model; the external parser owns diagnostics and source positions.
 - `packages/terminal`, `packages/diff`, `packages/media`, and `packages/game` provide specialized extension capabilities without owning application state.
 
 The former Component lifecycle package and retained ViewNode/CSS package are not current modules or API choices. Their history is recorded in ADR-008 (`adr/008-component-and-viewnode-disposition.md`).

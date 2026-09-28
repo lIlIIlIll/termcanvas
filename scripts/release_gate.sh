@@ -25,9 +25,8 @@ run_cjpm_test() {
     "$ROOT/scripts/cangjie_cmd.sh" "$dir" cjpm test --no-color
 }
 
-run_cjpm_test "$ROOT/packages/cj_markdown" "cj_markdown tests"
 run_cjpm_test "$ROOT/packages/core" "core tests"
-run_cjpm_test "$ROOT/packages/markdown" "markdown adapter tests"
+run_cjpm_test "$ROOT/packages/markdown_adapter" "markdown adapter tests"
 run_cjpm_test "$ROOT/packages/terminal" "terminal tests"
 run_cjpm_test "$ROOT/packages/diff" "diff tests"
 run_cjpm_test "$ROOT/packages/media" "media tests"

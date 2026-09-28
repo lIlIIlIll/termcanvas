@@ -18,8 +18,8 @@ scripts/run_regression_matrix.sh
 
 | Lane | What it exercises |
 | --- | --- |
-| Markdown parser tests | `packages/cj_markdown` |
-| Markdown adapter tests | `packages/markdown` |
+| Markdown parser conformance | [upstream markdown v0.9.0](https://github.com/lIlIIlIll/markdown/releases/tag/v0.9.0) |
+| Markdown adapter tests | `packages/markdown_adapter` |
 | Terminal output adapter tests | `packages/terminal` |
 | Diff adapter tests | `packages/diff` |
 | Core unit and workflow tests | `(cd packages/core && cjpm test --no-color)` |
@@ -80,7 +80,7 @@ generated index; use the script as the matrix lane's source of truth.
 
 ## Dependencies and CI SDK resolution
 
-- `packages/markdown` depends on the in-repository `packages/cj_markdown` package.
+- `packages/markdown_adapter` depends on the Git-tagged upstream markdown v0.9.0 release; `cjpm.lock` records its commit.
 - The GitHub Actions workflow pins `CANGJIE_SDK_VERSION` to the same canonical compiler accepted by `scripts/check_sdk.sh`, then installs it through `scripts/resolve_nightly_sdk.py`. Resolution order is explicit `CANGJIE_SDK_URL`, `CANGJIE_SDK_MANIFEST`, then DevRepo lookup with `DEVREPO_TOKEN`/`TOKEN`.
 - `scripts/resolve_nightly_sdk.py --install --emit-github-env` writes both SDK command directories to `GITHUB_PATH`, plus `CANGJIE_HOME`, `CANGJIE_SDK_ROOT`, `CJ_TUI_NIGHTLY_SDK_VERSION`, and SDK library paths for subsequent CI steps.
 - If the release gate fails under a nightly SDK on a non-PR CI run, `scripts/archive_nightly_failure.sh` creates and pushes `archive/nightly-fail/<sdk-version>/<short-sha>` pointing at the tested commit. The script skips an existing remote archive branch for the same commit; local invocations remain non-pushing unless `CJ_TUI_PUSH_NIGHTLY_ARCHIVE=1` is set.

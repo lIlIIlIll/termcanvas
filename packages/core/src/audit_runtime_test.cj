@@ -329,20 +329,34 @@ class AuditRuntimeTest {
         let terminal = Terminal(backend)
         session.start()
         try {
-            terminal.draw { frame => frame.setCursor(Position(1, 0)) }
+            terminal.draw { frame =>
+                frame.setCursor(Position(1, 0))
+                frame.setCursorShape(CursorShape.Block)
+            }
+            @Expect(backend.output().contains("\u{1B}[2 q"))
             session.stop()
+            @Expect(backend.output().contains("\u{1B}[0 q"))
             session.start()
             backend.clearOutput()
             terminal.clear()
-            terminal.draw { frame => frame.setCursor(Position(1, 0)) }
+            terminal.draw { frame =>
+                frame.setCursor(Position(1, 0))
+                frame.setCursorShape(CursorShape.Block)
+            }
+            @Expect(backend.output().contains("\u{1B}[2 q"))
             @Expect(backend.output().contains("\u{1B}[?25h"))
             backend.clearOutput()
-            terminal.draw { frame => frame.setCursor(Position(1, 0)) }
+            terminal.draw { frame =>
+                frame.setCursor(Position(1, 0))
+                frame.setCursorShape(CursorShape.Block)
+            }
             @Expect(!backend.output().contains("\u{1B}[?25h"))
+            @Expect(!backend.output().contains("\u{1B}[2 q"))
             terminal.clear()
             backend.clearOutput()
             terminal.draw { _ => }
             @Expect(backend.output().contains("\u{1B}[?25l"))
+            @Expect(backend.output().contains("\u{1B}[0 q"))
         } finally { session.stop() }
     }
 }
