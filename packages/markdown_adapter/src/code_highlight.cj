@@ -753,13 +753,17 @@ class CodeHighlightContext {
     func decorations(): Array<TextDecoration> {
         if (!collect) { return [] }
         let all = ArrayList<TextDecoration>()
+        var ownedIndex: Int64 = 0
         for (line in physical) {
+            // Code ranges are recorded in source order; each physical line can skip all earlier ranges once.
+            while (ownedIndex < owned.size && owned[ownedIndex].end <= line.start) { ownedIndex++ }
             if (line.end <= line.start) { continue }
             let raw = source[line.start..line.end]
             for (dec in markdownDecorations(raw)) {
                 var from = line.start + dec.start
                 let end = min(line.end, line.start + dec.end)
-                for (region in owned) {
+                for (regionIndex in ownedIndex..owned.size) {
+                    let region = owned[regionIndex]
                     if (region.end <= from) { continue }
                     if (region.start >= end) { break }
                     if (region.start > from) { all.add(TextDecoration(from, min(end, region.start), dec.style)) }

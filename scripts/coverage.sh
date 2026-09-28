@@ -56,6 +56,7 @@ echo "==> cjcov report"
 cjcov_args=(
     --root="$ROOT"
     --source="$ROOT/packages $ROOT/examples"
+    --include="$ROOT"
     --xml
     --branches
     --html-details

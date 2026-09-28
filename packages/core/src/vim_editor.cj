@@ -310,7 +310,10 @@ public class VimEditorBehavior {
         var from = start
         var to = end
         if (end < area.value.size) { to++ }
-        else if (start > 0) { from-- }
+        else if (start > 0) {
+            from--
+            if (from > 0 && area.value[from] == b'\n' && area.value[from - 1] == b'\r') { from-- }
+        }
         area.beginUndoGroup()
         area.select(from, to)
         area.deleteSelection()

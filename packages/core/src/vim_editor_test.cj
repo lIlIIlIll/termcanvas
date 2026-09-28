@@ -77,6 +77,20 @@ class VimEditorTests {
     }
 
     @TestCase
+    func deletingLastCrLfLineKeepsEarlierTextAndUndoHistory(): Unit {
+        let area = TextArea(value: "a\r\nb", cursor: 3)
+        let editor = VimEditorBehavior(area)
+        _ = vimKey(editor, r'd')
+        _ = vimKey(editor, r'd')
+        @Expect(area.value, "a")
+        @Expect(area.cursor, 0)
+        _ = vimKey(editor, r'u')
+        @Expect(area.value, "a\r\nb")
+        _ = editor.handle(Event.KeyDown(KeyEvent(KeyCode.Char(r'r'), modifiers: KeyModifier(ctrl: true))))
+        @Expect(area.value, "a")
+    }
+
+    @TestCase
     func prefixesRepeatsFocusAndIndependentAreas(): Unit {
         let first = TextArea(value: "one\ntwo", cursor: 4)
         let second = TextArea(value: "abc")

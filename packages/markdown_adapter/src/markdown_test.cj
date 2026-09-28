@@ -440,6 +440,138 @@ class MarkdownExtensionTest {
         }
     }
     @TestCase
+    func literalDelimitersAndNumericSuffixesStopAtTheirActualBoundaries(): Unit {
+        let green = Style(fg: Color.Green)
+        let yellow = Style(fg: Color.Yellow)
+        let cyan = Style(fg: Color.Cyan)
+        let cases: Array<(String, String, String, Style, String, String, Style)> = [
+            ("cj", "let n = 0b1010u64; let s = r##\"a\"#b\"##", "0b1010u64", yellow, ";", "r##\"a\"#b\"##", green),
+            ("c", "char *s = u8\"hi\"; double x = 0x1.8p+2F;", "0x1.8p+2F", yellow, ";", "u8\"hi\"", green),
+            ("cpp", "auto s = u8R\"tag(a)not-end)tag\"; auto n = 0xff'eeULL;", "u8R\"tag(a)not-end)tag\"", green, ";", "0xff'eeULL", yellow),
+            ("js", "return /a\\/[b/]+/gi; const n = 42n / 2;", "/a\\/[b/]+/gi", green, "/ 2", "42n", yellow),
+            ("ts", "const s = `a$" + "{{x: \"b\"}.x}c`;", "`a$" + "{{x: \"b\"}.x}c`", green, ";", "const", Style(fg: Color.Yellow, modifier: Modifier.strong())),
+            ("py", "value = fr'''a{{b}}{obj[\"x\"]}z''' ; z = 2j", "fr'''a{{b}}{obj[\"x\"]}z'''", green, ";", "2j", yellow),
+            ("json", "{\"key\" : -0.35e-2, \"value\": \"literal\"}", "\"key\"", cyan, ",", "-0.35e-2", yellow),
+            ("sh", "echo $'a\\n' $" + "{name} $# ;", "$" + "{name}", cyan, ";", "$'a\\n'", green)
+        ]
+        for ((lang, body, colored, style, plain, secondary, secondaryStyle) in cases) {
+            let text = "```" + lang + "\n" + body + "\n```"
+            let presentation = markdownAstToPresentation(Markdown.parse(text))
+            let source = TextArea(value: text)
+            source.setDecorations(presentation.decorations)
+            let sourceCells = Buffer(Rect(0, 0, 100, 3))
+            source.render(sourceCells.area, sourceCells)
+            let previewCells = Buffer(Rect(0, 0, 100, 1))
+            DocumentView(presentation.document).render(previewCells.area, previewCells)
+            let coloredAt = byteIndex(body, colored)
+            let plainAt = byteIndex(body, plain)
+            let secondaryAt = byteIndex(body, secondary)
+            @Expect(sourceCells.getCell(coloredAt, 1).style, style)
+            @Expect(sourceCells.getCell(coloredAt + colored.size - 1, 1).style, style)
+            @Expect(sourceCells.getCell(plainAt, 1).style, DocumentTheme().code)
+            @Expect(sourceCells.getCell(secondaryAt, 1).style, secondaryStyle)
+            @Expect(sourceCells.getCell(secondaryAt + secondary.size - 1, 1).style, secondaryStyle)
+            @Expect(previewCells.getCell(coloredAt, 0).style, style)
+            @Expect(previewCells.getCell(plainAt, 0).style, DocumentTheme().code)
+            @Expect(previewCells.getCell(secondaryAt, 0).style, secondaryStyle)
+        }
+    }
+    @TestCase
+    func quotedAndTabStrippedHereDocumentsStopAtTheirOwnDelimiters(): Unit {
+        let text = "```sh\ncat <<-'A' <<B\n$x # literal\n\tA\nif false\nB\nif true; then echo done; fi\n```"
+        let presentation = markdownAstToPresentation(Markdown.parse(text))
+        let editor = TextArea(value: text)
+        editor.setDecorations(presentation.decorations)
+        let source = Buffer(Rect(0, 0, 50, 8))
+        editor.render(source.area, source)
+        let preview = Buffer(Rect(0, 0, 50, 6))
+        DocumentView(presentation.document).render(preview.area, preview)
+        let stringStyle = Style(fg: Color.Green)
+        let keyword = Style(fg: Color.Yellow, modifier: Modifier.strong())
+        @Expect(source.getCell(0, 2).style, stringStyle)
+        @Expect(source.getCell(0, 4).style, stringStyle)
+        @Expect(source.getCell(0, 6).style, keyword)
+        @Expect(preview.getCell(0, 1).style, stringStyle)
+        @Expect(preview.getCell(0, 3).style, stringStyle)
+        @Expect(preview.getCell(0, 5).style, keyword)
+    }
+    @TestCase
+    func shellSpecialParametersAndEscapedHashKeepWordBoundaries(): Unit {
+        let body = "echo $? $# $$ $@ $* $!\necho \\#plain # comment\necho \\\nif true"
+        let text = "```sh\n" + body + "\n```"
+        let presentation = markdownAstToPresentation(Markdown.parse(text))
+        let editor = TextArea(value: text)
+        editor.setDecorations(presentation.decorations)
+        let source = Buffer(Rect(0, 0, 80, 6))
+        editor.render(source.area, source)
+        let preview = Buffer(Rect(0, 0, 80, 4))
+        DocumentView(presentation.document).render(preview.area, preview)
+        let first = "echo $? $# $$ $@ $* $!"
+        for (variable in ["$?", "$#", "$$", "$@", "$*", "$!"]) {
+            let at = byteIndex(first, variable)
+            @Expect(source.getCell(at, 1).style, Style(fg: Color.Cyan))
+            @Expect(source.getCell(at + 1, 1).style, Style(fg: Color.Cyan))
+            @Expect(preview.getCell(at, 0).style, Style(fg: Color.Cyan))
+        }
+        let second = "echo \\#plain # comment"
+        let plain = byteIndex(second, "#plain")
+        let comment = byteIndex(second, "# comment")
+        @Expect(source.getCell(plain, 2).style, DocumentTheme().code)
+        @Expect(source.getCell(comment, 2).style, Style(fg: Color.Indexed(8)))
+        @Expect(preview.getCell(plain, 1).style, DocumentTheme().code)
+        @Expect(preview.getCell(comment, 1).style, Style(fg: Color.Indexed(8)))
+        let keyword = Style(fg: Color.Yellow, modifier: Modifier.strong())
+        @Expect(source.getCell(0, 4).style, keyword)
+        @Expect(preview.getCell(0, 3).style, keyword)
+    }
+    @TestCase
+    func pythonPrefixPairsColorOnlySupportedStringCombinations(): Unit {
+        let body = "Rb\"raw\" Br'bytes' fR\"{x}\" rF'''a{{b}}{x}''' bf\"bad\""
+        let text = "```python\n" + body + "\n```"
+        let presentation = markdownAstToPresentation(Markdown.parse(text))
+        let editor = TextArea(value: text)
+        editor.setDecorations(presentation.decorations)
+        let source = Buffer(Rect(0, 0, 80, 3))
+        editor.render(source.area, source)
+        let preview = Buffer(Rect(0, 0, 80, 1))
+        DocumentView(presentation.document).render(preview.area, preview)
+        let stringStyle = Style(fg: Color.Green)
+        for (valid in ["Rb\"raw\"", "Br'bytes'", "fR\"{x}\"", "rF'''a{{b}}{x}'''"]) {
+            let at = byteIndex(body, valid)
+            @Expect(source.getCell(at, 1).style, stringStyle)
+            @Expect(source.getCell(at + valid.size - 1, 1).style, stringStyle)
+            @Expect(preview.getCell(at, 0).style, stringStyle)
+        }
+        let invalid = byteIndex(body, "bf\"bad\"")
+        @Expect(source.getCell(invalid, 1).style, DocumentTheme().code)
+        @Expect(source.getCell(invalid + 2, 1).style, stringStyle)
+        @Expect(preview.getCell(invalid, 0).style, DocumentTheme().code)
+        @Expect(preview.getCell(invalid + 2, 0).style, stringStyle)
+    }
+    @TestCase
+    func basedAndFractionalNumbersKeepOnlyValidSeparators(): Unit {
+        let body = "0b10_01 0o7_5 0xA_F 1_000.2_5e+1_0 0x_1"
+        let text = "```cj\n" + body + "\n```"
+        let presentation = markdownAstToPresentation(Markdown.parse(text))
+        let editor = TextArea(value: text)
+        editor.setDecorations(presentation.decorations)
+        let source = Buffer(Rect(0, 0, 80, 3))
+        editor.render(source.area, source)
+        let preview = Buffer(Rect(0, 0, 80, 1))
+        DocumentView(presentation.document).render(preview.area, preview)
+        let number = Style(fg: Color.Yellow)
+        for (valid in ["0b10_01", "0o7_5", "0xA_F", "1_000.2_5e+1_0"]) {
+            let at = byteIndex(body, valid)
+            @Expect(source.getCell(at, 1).style, number)
+            @Expect(source.getCell(at + valid.size - 1, 1).style, number)
+            @Expect(preview.getCell(at + valid.size - 1, 0).style, number)
+        }
+        let invalid = byteIndex(body, "0x_1")
+        @Expect(source.getCell(invalid, 1).style, number)
+        @Expect(source.getCell(invalid + 1, 1).style, DocumentTheme().code)
+        @Expect(preview.getCell(invalid + 1, 0).style, DocumentTheme().code)
+    }
+    @TestCase
     func astFenceOwnershipPreventsInnerMarkersFromLeakingStyles(): Unit {
         let text = "# Before\n````cj\n```\nlet x = 1\n````\n# After\n\n~~~go\n# title\n*x* [a](b)\n~~~"
         let presentation = markdownAstToPresentation(Markdown.parse(text))
@@ -579,6 +711,8 @@ class MarkdownExtensionTest {
             ("syntax 1\nlanguage workflow\nblock-comment x x nested\nend", 3),
             ("syntax 1\n# ignored\nlanguage cj\nend", 3),
             ("syntax 1\nlanguage workflow\nkeywords task", 4),
+            ("syntax 1\nlanguage first\nline-comment \"#\"\nlanguage second\nend", 4),
+            ("syntax 1\nextend cj\nkeywords task\nextend js\nend", 4),
             ("syntax 1\nlanguage workflow\nline-comment \"\"\nend", 3),
             ("syntax 1\nlanguage workflow\nstring q q q single\nend", 3),
             ("syntax 1\nlanguage workflow\nnumbers unsupported\nend", 3),

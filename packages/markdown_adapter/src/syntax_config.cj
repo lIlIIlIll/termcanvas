@@ -224,6 +224,7 @@ public func parseSyntaxHighlightConfig(text: String): SyntaxHighlightConfig {
                 if (let Some(rule) <- active) { rule.compileOpeners(); active = None }
                 else { syntaxError(line, "end outside language") }
             } else if (command == "language" || command == "extend") {
+                if (active.isSome()) { syntaxError(line, "missing end") }
                 syntaxArity(args, 2, if (command == "language") { 3 } else { 2 }, line)
                 let replacing = args.size == 3
                 if (replacing && args[2] != "replace") { syntaxError(line, "expected replace") }
