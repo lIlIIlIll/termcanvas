@@ -26,6 +26,8 @@ packages/core/src/app.cj:AsyncTask(String, () -> Event)
 packages/core/src/app.cj:AsyncExec(String, String)
 packages/core/src/app.cj:AsyncExecArgs(String, String, Array<String>)
 packages/core/src/app.cj:CancelAsync(String)
+packages/core/src/app.cj:ProcessStart(String, ProcessSpec)
+packages/core/src/app.cj:ProcessCancel(String)
 packages/core/src/app.cj:PtyStart(String, PtySpec)
 packages/core/src/app.cj:PtyWrite(String, Array<Byte>)
 packages/core/src/app.cj:PtyResize(String, PtySize)
@@ -74,12 +76,14 @@ packages/core/src/app.cj:public let queueEnqueued: Int64
 packages/core/src/app.cj:public let queueProcessed: Int64
 packages/core/src/app.cj:public let maxQueueDepth: Int64
 packages/core/src/app.cj:public let maxUpdateDepth: Int64
+packages/core/src/app.cj:public let yieldedTurns: Int64
+packages/core/src/app.cj:public let queueOverflows: Int64
 packages/core/src/app.cj:public let scheduling: FrameSchedulingSnapshot
-packages/core/src/app.cj:public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )
+packages/core/src/app.cj:public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, yieldedTurns!: Int64 = 0, queueOverflows!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )
 packages/core/src/app.cj:public class TimerRuntime {
 packages/core/src/app.cj:public init(clock!: RuntimeClock = MonotonicRuntimeClock())
 packages/core/src/app.cj:public class AsyncRuntime {
-packages/core/src/app.cj:public init()
+packages/core/src/app.cj:public init(maxPendingTasks!: Int64 = 256)
 packages/core/src/app.cj:public func start(id: String, task: () -> Event): Event
 packages/core/src/app.cj:public func startExec(id: String, commandLine: String): Event
 packages/core/src/app.cj:public func startExecArgs(id: String, program: String, args: Array<String>): Event
@@ -221,13 +225,14 @@ packages/core/src/app.cj:public class App {
 packages/core/src/app.cj:public init( inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
 packages/core/src/app.cj:public init( backend!: Backend, inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
 packages/core/src/app.cj:public func attachTraceSink(traceSink: AppTraceSink): Unit
+packages/core/src/app.cj:public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit
 packages/core/src/app.cj:public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit
 packages/core/src/app.cj:public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
 packages/core/src/app.cj:public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit
 packages/core/src/app.cj:public func runWithExternalPort( port: ExternalPort<Event>, render: (Frame) -> Unit, update: (Event) -> UpdateResult ): Unit
 packages/core/src/app.cj:public static func applyUpdateResult(result: UpdateResult, commandQueue: ArrayList<Command>, dirtySink!: ?DirtyRects = None): Bool
-packages/core/src/app.cj:public static func processCommands( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), timerRuntime!: TimerRuntime = TimerRuntime() ): Bool
-packages/core/src/app.cj:public static func processCommandsWithEvents( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), timerRuntime!: TimerRuntime = TimerRuntime(), dirtySink!: ?DirtyRects = None ): (Bool, Bool)
+packages/core/src/app.cj:public static func processCommands( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(), timerRuntime!: TimerRuntime = TimerRuntime() ): Bool
+packages/core/src/app.cj:public static func processCommandsWithEvents( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(), timerRuntime!: TimerRuntime = TimerRuntime(), dirtySink!: ?DirtyRects = None ): (Bool, Bool)
 packages/core/src/app.cj:public static func executeCommand(commandLine: String): Event
 packages/core/src/app.cj:public static func executeCommandArgs(id: String, program: String, args: Array<String>): Event
 packages/core/src/app.cj:public func defaultApp(): App
@@ -332,6 +337,69 @@ packages/core/src/canvas.cj:public func drawSprite(x: Int64, y: Int64, lines: Ar
 packages/core/src/canvas.cj:public func render(widget: Widget, area: Rect): Unit
 packages/core/src/canvas.cj:public func composite(surface: Surface): Unit
 packages/core/src/canvas.cj:public func centeredViewport(area: Rect, width: Int64, height: Int64): Rect
+packages/core/src/clipboard.cj:public enum ClipboardStatus {
+packages/core/src/clipboard.cj:Success
+packages/core/src/clipboard.cj:Unavailable
+packages/core/src/clipboard.cj:Unsupported
+packages/core/src/clipboard.cj:Timeout
+packages/core/src/clipboard.cj:TooLarge
+packages/core/src/clipboard.cj:Failed
+packages/core/src/clipboard.cj:public class ClipboardResult {
+packages/core/src/clipboard.cj:public let status: ClipboardStatus
+packages/core/src/clipboard.cj:public let text: String
+packages/core/src/clipboard.cj:public let message: String
+packages/core/src/clipboard.cj:public let backend: String
+packages/core/src/clipboard.cj:public init(status: ClipboardStatus, text!: String = "", message!: String = "", backend!: String = "")
+packages/core/src/clipboard.cj:public func isSuccess(): Bool
+packages/core/src/clipboard.cj:public class ClipboardCapabilities {
+packages/core/src/clipboard.cj:public let canRead: Bool
+packages/core/src/clipboard.cj:public let canWrite: Bool
+packages/core/src/clipboard.cj:public let backend: String
+packages/core/src/clipboard.cj:public let description: String
+packages/core/src/clipboard.cj:public init(canRead: Bool, canWrite: Bool, backend: String, description!: String = "")
+packages/core/src/clipboard.cj:public interface Clipboard {
+packages/core/src/clipboard.cj:func getText(): String
+packages/core/src/clipboard.cj:func setText(text: String): Unit
+packages/core/src/clipboard.cj:func capabilities(): ClipboardCapabilities
+packages/core/src/clipboard.cj:func readText(): ClipboardResult
+packages/core/src/clipboard.cj:func writeText(text: String): ClipboardResult
+packages/core/src/clipboard.cj:public class MemoryClipboard <: Clipboard {
+packages/core/src/clipboard.cj:public init(text!: String = "")
+packages/core/src/clipboard.cj:public func getText(): String
+packages/core/src/clipboard.cj:public func setText(text: String): Unit
+packages/core/src/clipboard.cj:public func capabilities(): ClipboardCapabilities
+packages/core/src/clipboard.cj:public class ClipboardCommandResult {
+packages/core/src/clipboard.cj:public let status: ClipboardStatus
+packages/core/src/clipboard.cj:public let output: String
+packages/core/src/clipboard.cj:public let exitCode: Int64
+packages/core/src/clipboard.cj:public let message: String
+packages/core/src/clipboard.cj:public init(status: ClipboardStatus, output!: String = "", exitCode!: Int64 = -1, message!: String = "")
+packages/core/src/clipboard.cj:public interface ClipboardCommandRunner {
+packages/core/src/clipboard.cj:func platform(): String
+packages/core/src/clipboard.cj:func environment(name: String): String
+packages/core/src/clipboard.cj:func available(command: String): Bool
+packages/core/src/clipboard.cj:func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult
+packages/core/src/clipboard.cj:public class NativeClipboardCommandRunner <: ClipboardCommandRunner {
+packages/core/src/clipboard.cj:public init()
+packages/core/src/clipboard.cj:public func platform(): String
+packages/core/src/clipboard.cj:public func environment(name: String): String
+packages/core/src/clipboard.cj:public func available(command: String): Bool
+packages/core/src/clipboard.cj:public func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult
+packages/core/src/clipboard.cj:public class SystemClipboard <: Clipboard {
+packages/core/src/clipboard.cj:public init(runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024)
+packages/core/src/clipboard.cj:public func capabilities(): ClipboardCapabilities
+packages/core/src/clipboard.cj:public func readText(): ClipboardResult
+packages/core/src/clipboard.cj:public func writeText(text: String): ClipboardResult
+packages/core/src/clipboard.cj:public func getText(): String
+packages/core/src/clipboard.cj:public func setText(text: String): Unit
+packages/core/src/clipboard.cj:public class Osc52Clipboard <: Clipboard {
+packages/core/src/clipboard.cj:public init(emit: (String) -> Unit, enabled!: Bool = true, maxBytes!: Int64 = 100000, tmuxPassthrough!: Bool = false)
+packages/core/src/clipboard.cj:public func capabilities(): ClipboardCapabilities
+packages/core/src/clipboard.cj:public func readText(): ClipboardResult
+packages/core/src/clipboard.cj:public func writeText(text: String): ClipboardResult
+packages/core/src/clipboard.cj:public func getText(): String
+packages/core/src/clipboard.cj:public func setText(text: String): Unit
+packages/core/src/clipboard.cj:public func detectClipboard( runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), osc52Emitter!: ?(String) -> Unit = None, timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024 ): Clipboard
 packages/core/src/command_widgets.cj:public class MenuItem {
 packages/core/src/command_widgets.cj:public let label: String
 packages/core/src/command_widgets.cj:public let action: String
@@ -339,19 +407,24 @@ packages/core/src/command_widgets.cj:public let enabled: Bool
 packages/core/src/command_widgets.cj:public init(label: String, action!: String = "", enabled!: Bool = true)
 packages/core/src/command_widgets.cj:public class Menu <: Widget {
 packages/core/src/command_widgets.cj:public var selected: Int64
+packages/core/src/command_widgets.cj:public var offset: Int64 = 0
 packages/core/src/command_widgets.cj:public init( title: String, items: Array<MenuItem>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)) )
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?String
+packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class MenuBar <: Widget {
 packages/core/src/command_widgets.cj:public var selected: Int64
 packages/core/src/command_widgets.cj:public init( menus: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): Bool
+packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class CommandPalette <: Widget {
 packages/core/src/command_widgets.cj:public var query: String
 packages/core/src/command_widgets.cj:public var selected: Int64
+packages/core/src/command_widgets.cj:public var offset: Int64 = 0
 packages/core/src/command_widgets.cj:public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?String
+packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class Toast {
 packages/core/src/command_widgets.cj:public let message: String
@@ -371,6 +444,7 @@ packages/core/src/command_widgets.cj:public class Dialog <: Widget {
 packages/core/src/command_widgets.cj:public var selected: Int64
 packages/core/src/command_widgets.cj:public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?String
+packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class ConfirmDialog <: Widget {
 packages/core/src/command_widgets.cj:public var confirmed: Bool = false
@@ -404,6 +478,7 @@ packages/core/src/container_widgets.cj:public func render(area: Rect, buffer: Bu
 packages/core/src/container_widgets.cj:public class Scrollable <: Widget {
 packages/core/src/container_widgets.cj:public init(lines: Array<String>, state!: ScrollState = ScrollState(), style!: Style = Style.default(), scrollbarStyle!: Style = Style(fg: Color.Indexed(8)))
 packages/core/src/container_widgets.cj:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/container_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect, capture: PointerCapture, owner: String): Bool
 packages/core/src/container_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/content_widgets.cj:public enum TranscriptItemKind {
 packages/core/src/content_widgets.cj:Text
@@ -578,7 +653,9 @@ packages/core/src/data_widgets.cj:public var stickyHeader: Bool = true
 packages/core/src/data_widgets.cj:public var status: TableStatus = TableStatus.Ready
 packages/core/src/data_widgets.cj:public var emptyText: String = "No rows"
 packages/core/src/data_widgets.cj:public var loadingText: String = "Loading"
-packages/core/src/data_widgets.cj:public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan), statusStyle!: Style = Style(fg: Color.Indexed(8)), selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None )
+packages/core/src/data_widgets.cj:public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan), statusStyle!: Style = Style(fg: Color.Indexed(8)), selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None, dataModel!: ?PagedTableModel = None, cacheCapacity!: Int64 = 1024 )
+packages/core/src/data_widgets.cj:public init(columns: Array<TableColumn>, model: PagedTableModel, block!: ?Block = None)
+packages/core/src/data_widgets.cj:public func handle(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/data_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/data_widgets.cj:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 packages/core/src/data_widgets.cj:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
@@ -608,7 +685,9 @@ packages/core/src/data_widgets.cj:public func childNodes(): Array<TreeNode>
 packages/core/src/data_widgets.cj:public class Tree <: Widget {
 packages/core/src/data_widgets.cj:public var selected: Int64
 packages/core/src/data_widgets.cj:public var offset: Int64
-packages/core/src/data_widgets.cj:public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/data_widgets.cj:public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), dataModel!: ?LazyTreeModel = None )
+packages/core/src/data_widgets.cj:public init(model: LazyTreeModel, block!: ?Block = None)
+packages/core/src/data_widgets.cj:public func handle(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/data_widgets.cj:public func toggleSelected(): Unit
 packages/core/src/data_widgets.cj:public func selectedId(): ?String
 packages/core/src/data_widgets.cj:public func selectById(id: String): Bool
@@ -857,6 +936,11 @@ packages/core/src/event.cj:Paste(String)
 packages/core/src/event.cj:Message(String)
 packages/core/src/event.cj:ExecResult(String, Int64, String)
 packages/core/src/event.cj:TextCompletion(String, TextCompletionResult)
+packages/core/src/event.cj:ProcessStarted(String)
+packages/core/src/event.cj:ProcessOutput(String, ProcessOutputStream, Array<Byte>)
+packages/core/src/event.cj:ProcessFinished(String, ProcessResult)
+packages/core/src/event.cj:ProcessFailed(String, String)
+packages/core/src/event.cj:ProcessCancelRequested(String)
 packages/core/src/event.cj:PtyStarted(String)
 packages/core/src/event.cj:PtyOutput(String, PtyOutputStream, Array<Byte>)
 packages/core/src/event.cj:PtyExited(String, PtyExitStatus)
@@ -895,42 +979,54 @@ packages/core/src/event.cj:public func flushEsc(): Array<Event>
 packages/core/src/event.cj:public func flushEscAfterPolls(polls: Int64): Array<Event>
 packages/core/src/form_widgets.cj:public class Button <: Widget {
 packages/core/src/form_widgets.cj:public init( label: String, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class Checkbox <: Widget {
 packages/core/src/form_widgets.cj:public var checked: Bool
 packages/core/src/form_widgets.cj:public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class RadioGroup <: Widget {
 packages/core/src/form_widgets.cj:public var selected: Int64
+packages/core/src/form_widgets.cj:public var offset: Int64 = 0
 packages/core/src/form_widgets.cj:public init( items: Array<String>, selected!: Int64 = 0, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Cyan), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class Select <: Widget {
 packages/core/src/form_widgets.cj:public var selected: Int64
+packages/core/src/form_widgets.cj:public var offset: Int64 = 0
 packages/core/src/form_widgets.cj:public init( items: Array<String>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 packages/core/src/form_widgets.cj:public func selectedValue(): ?String
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): ?String
+packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class Dropdown <: Widget {
 packages/core/src/form_widgets.cj:public var selected: Int64
+packages/core/src/form_widgets.cj:public var offset: Int64 = 0
 packages/core/src/form_widgets.cj:public var open: Bool
 packages/core/src/form_widgets.cj:public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 packages/core/src/form_widgets.cj:public func selectedValue(): ?String
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): ?String
+packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class ColorPicker <: Widget {
 packages/core/src/form_widgets.cj:public var selected: Int64
 packages/core/src/form_widgets.cj:public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)
 packages/core/src/form_widgets.cj:public func selectedColor(): ?Color
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class MultiSelect <: Widget {
 packages/core/src/form_widgets.cj:public var cursor: Int64
+packages/core/src/form_widgets.cj:public var offset: Int64 = 0
 packages/core/src/form_widgets.cj:public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White))
 packages/core/src/form_widgets.cj:public func selectedIndices(): Array<Int64>
 packages/core/src/form_widgets.cj:public func toggle(): Unit
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class DatePicker <: Widget {
 packages/core/src/form_widgets.cj:public var year: Int64
@@ -1002,10 +1098,19 @@ packages/core/src/geometry.cj:public struct FlexItem {
 packages/core/src/geometry.cj:public let basis: Int64
 packages/core/src/geometry.cj:public let grow: Int64
 packages/core/src/geometry.cj:public let shrink: Int64
-packages/core/src/geometry.cj:public init(basis!: Int64 = 0, grow!: Int64 = 1, shrink!: Int64 = 1)
+packages/core/src/geometry.cj:public let minSize: Int64
+packages/core/src/geometry.cj:public let maxSize: Int64
+packages/core/src/geometry.cj:public init( basis!: Int64 = 0, grow!: Int64 = 1, shrink!: Int64 = 1, minSize!: Int64 = 0, maxSize!: Int64 = Int64.Max )
+packages/core/src/geometry.cj:public static func fromSizeHint( hint: SizeHint, direction: Direction, grow!: Int64 = 1, shrink!: Int64 = 1 ): FlexItem
+packages/core/src/geometry.cj:public class FlexLayoutResult {
+packages/core/src/geometry.cj:public let rects: Array<Rect>
+packages/core/src/geometry.cj:public let constraintsSatisfied: Bool
+packages/core/src/geometry.cj:public let effectiveGap: Int64
+packages/core/src/geometry.cj:public init(rects: Array<Rect>, constraintsSatisfied: Bool, effectiveGap: Int64)
 packages/core/src/geometry.cj:public class FlexLayout {
 packages/core/src/geometry.cj:public init(direction: Direction, items: Array<FlexItem>, gap!: Int64 = 0)
 packages/core/src/geometry.cj:public func split(area: Rect): Array<Rect>
+packages/core/src/geometry.cj:public func resolve(area: Rect): FlexLayoutResult
 packages/core/src/geometry.cj:public class LayoutCache {
 packages/core/src/geometry.cj:public init()
 packages/core/src/geometry.cj:public func get(area: Rect, compute: (Rect) -> Array<Rect>): Array<Rect>
@@ -1024,6 +1129,34 @@ packages/core/src/keymap.cj:public func all(): Array<KeyBinding>
 packages/core/src/keymap.cj:public class HelpView <: Widget {
 packages/core/src/keymap.cj:public init(keymap: KeyMap, style!: Style = Style(fg: Color.Indexed(8)), separator!: String = " ")
 packages/core/src/keymap.cj:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/lazy_tree.cj:public class LazyTreeNode {
+packages/core/src/lazy_tree.cj:public let id: String
+packages/core/src/lazy_tree.cj:public let label: String
+packages/core/src/lazy_tree.cj:public let childCount: Int64
+packages/core/src/lazy_tree.cj:public init(id: String, label: String, childCount!: Int64 = 0)
+packages/core/src/lazy_tree.cj:public interface TreeDataSource {
+packages/core/src/lazy_tree.cj:func rootCount(): Int64
+packages/core/src/lazy_tree.cj:func nodeAt(path: Array<Int64>): ?LazyTreeNode
+packages/core/src/lazy_tree.cj:func pathForId(id: String): ?Array<Int64>
+packages/core/src/lazy_tree.cj:public class LazyTreeRow {
+packages/core/src/lazy_tree.cj:public let node: LazyTreeNode
+packages/core/src/lazy_tree.cj:public let depth: Int64
+packages/core/src/lazy_tree.cj:public let expanded: Bool
+packages/core/src/lazy_tree.cj:public let index: Int64
+packages/core/src/lazy_tree.cj:public class LazyTreeModel {
+packages/core/src/lazy_tree.cj:public init(source: TreeDataSource)
+packages/core/src/lazy_tree.cj:public func visibleCount(): Int64
+packages/core/src/lazy_tree.cj:public func selectedId(): ?String
+packages/core/src/lazy_tree.cj:public func findById(id: String): ?LazyTreeNode
+packages/core/src/lazy_tree.cj:public func selectedIndex(): ?Int64
+packages/core/src/lazy_tree.cj:public func selectById(id: String): Bool
+packages/core/src/lazy_tree.cj:public func selectIndex(index: Int64): Bool
+packages/core/src/lazy_tree.cj:public func rowAt(index: Int64): ?LazyTreeRow
+packages/core/src/lazy_tree.cj:public func rows(offset: Int64, height: Int64): Array<LazyTreeRow>
+packages/core/src/lazy_tree.cj:public func setExpanded(id: String, expanded: Bool): Bool
+packages/core/src/lazy_tree.cj:public func toggleSelected(): Bool
+packages/core/src/lazy_tree.cj:public func collapseAll(): Unit
+packages/core/src/lazy_tree.cj:public func refresh(): Unit
 packages/core/src/media.cj:public enum MediaKind {
 packages/core/src/media.cj:Image
 packages/core/src/media.cj:Animation
@@ -1079,6 +1212,7 @@ packages/core/src/navigation.cj:public class Tabs <: Widget {
 packages/core/src/navigation.cj:public var selected: Int64
 packages/core/src/navigation.cj:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 packages/core/src/navigation.cj:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/navigation.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/navigation.cj:public class StatusBarProgress {
 packages/core/src/navigation.cj:public let value: Int64
@@ -1100,6 +1234,138 @@ packages/core/src/navigation.cj:public init(lines: Array<String>, offset!: Int64
 packages/core/src/navigation.cj:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 packages/core/src/navigation.cj:public func scroll(delta: Int64, viewportHeight: Int64): Unit
 packages/core/src/navigation.cj:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64
+packages/core/src/navigation.cj:public func mouseScrollDelta(mouse: MouseEvent): Int64
+packages/core/src/navigation.cj:public class PointerCapture {
+packages/core/src/navigation.cj:public init()
+packages/core/src/navigation.cj:public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool
+packages/core/src/navigation.cj:public func owns(owner: String): Bool
+packages/core/src/navigation.cj:public func activeOwner(): ?String
+packages/core/src/navigation.cj:public func origin(): Position
+packages/core/src/navigation.cj:public func initialValue(): Int64
+packages/core/src/navigation.cj:public func release(owner: String, mouse: MouseEvent): Bool
+packages/core/src/navigation.cj:public func cancel(): Unit
+packages/core/src/navigation.cj:public class ModalFocusState {
+packages/core/src/navigation.cj:public init(base: FocusManager, keymap!: KeyMap = KeyMap())
+packages/core/src/navigation.cj:public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
+packages/core/src/navigation.cj:public func active(): ?String
+packages/core/src/navigation.cj:public func focus(): FocusManager
+packages/core/src/navigation.cj:public func close(): ?String
+packages/core/src/navigation.cj:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:public func actionFor(key: KeyEvent): ?String
+packages/core/src/paged_table.cj:public class TableDataRow {
+packages/core/src/paged_table.cj:public let id: String
+packages/core/src/paged_table.cj:public let cells: Array<String>
+packages/core/src/paged_table.cj:public init(id: String, cells: Array<String>)
+packages/core/src/paged_table.cj:public struct TableQuery {
+packages/core/src/paged_table.cj:public let filter: String
+packages/core/src/paged_table.cj:public let sortColumn: ?Int64
+packages/core/src/paged_table.cj:public let descending: Bool
+packages/core/src/paged_table.cj:public init(filter!: String = "", sortColumn!: ?Int64 = None, descending!: Bool = false)
+packages/core/src/paged_table.cj:public class TablePageRequest {
+packages/core/src/paged_table.cj:public let revision: Int64
+packages/core/src/paged_table.cj:public let requestId: Int64
+packages/core/src/paged_table.cj:public let offset: Int64
+packages/core/src/paged_table.cj:public let limit: Int64
+packages/core/src/paged_table.cj:public let query: TableQuery
+packages/core/src/paged_table.cj:public class TablePage {
+packages/core/src/paged_table.cj:public let rows: Array<TableDataRow>
+packages/core/src/paged_table.cj:public let totalRows: Int64
+packages/core/src/paged_table.cj:public init(rows: Array<TableDataRow>, totalRows: Int64)
+packages/core/src/paged_table.cj:public interface TableDataSource {
+packages/core/src/paged_table.cj:func load(request: TablePageRequest): TablePage
+packages/core/src/paged_table.cj:public class PagedTableModel {
+packages/core/src/paged_table.cj:public let pageSize: Int64
+packages/core/src/paged_table.cj:public let maxPages: Int64
+packages/core/src/paged_table.cj:public init(pageSize!: Int64 = 128, maxPages!: Int64 = 8)
+packages/core/src/paged_table.cj:public func query(): TableQuery
+packages/core/src/paged_table.cj:public func revision(): Int64
+packages/core/src/paged_table.cj:public func totalRows(): Int64
+packages/core/src/paged_table.cj:public func hasTotal(): Bool
+packages/core/src/paged_table.cj:public func cachedPageCount(): Int64
+packages/core/src/paged_table.cj:public func pendingPageCount(): Int64
+packages/core/src/paged_table.cj:public func cachedRowCount(): Int64
+packages/core/src/paged_table.cj:public func selectedId(): ?String
+packages/core/src/paged_table.cj:public func selectedIndex(): ?Int64
+packages/core/src/paged_table.cj:public func selectedIds(): Array<String>
+packages/core/src/paged_table.cj:public func isSelected(id: String): Bool
+packages/core/src/paged_table.cj:public func toggle(id: String): Unit
+packages/core/src/paged_table.cj:public func selectIndex(index: Int64): Unit
+packages/core/src/paged_table.cj:public func selectId(id: String): Unit
+packages/core/src/paged_table.cj:public func setQuery(query: TableQuery): Bool
+packages/core/src/paged_table.cj:public func invalidate(): Unit
+packages/core/src/paged_table.cj:public func row(index: Int64): ?TableDataRow
+packages/core/src/paged_table.cj:public func statusAt(index: Int64): TableStatus
+packages/core/src/paged_table.cj:public func requestViewport(offset: Int64, height: Int64, retry!: Bool = false): Array<TablePageRequest>
+packages/core/src/paged_table.cj:public func accept(request: TablePageRequest, page: TablePage): Bool
+packages/core/src/paged_table.cj:public func fail(request: TablePageRequest, message: String): Bool
+packages/core/src/paged_table.cj:public func isPending(request: TablePageRequest): Bool
+packages/core/src/process_runtime.cj:public enum ProcessOutputStream { | Stdout | Stderr }
+packages/core/src/process_runtime.cj:Stdout
+packages/core/src/process_runtime.cj:Stderr
+packages/core/src/process_runtime.cj:public enum ProcessEndReason { | Exited | Cancelled | TimedOut | OutputLimit | DrainTimeout }
+packages/core/src/process_runtime.cj:Exited
+packages/core/src/process_runtime.cj:Cancelled
+packages/core/src/process_runtime.cj:TimedOut
+packages/core/src/process_runtime.cj:OutputLimit
+packages/core/src/process_runtime.cj:DrainTimeout
+packages/core/src/process_runtime.cj:public class ProcessSpec {
+packages/core/src/process_runtime.cj:public let command: String
+packages/core/src/process_runtime.cj:public let args: Array<String>
+packages/core/src/process_runtime.cj:public let cwd: String
+packages/core/src/process_runtime.cj:public let env: Array<String>
+packages/core/src/process_runtime.cj:public let timeoutMillis: Int64
+packages/core/src/process_runtime.cj:public let maxOutputBytes: Int64
+packages/core/src/process_runtime.cj:public let drainTimeoutMillis: Int64
+packages/core/src/process_runtime.cj:public init(command: String, args!: Array<String> = [], cwd!: String = "", env!: Array<String> = [], timeoutMillis!: Int64 = 0, maxOutputBytes!: Int64 = 16 * 1024 * 1024, drainTimeoutMillis!: Int64 = 1000)
+packages/core/src/process_runtime.cj:public struct ProcessResult {
+packages/core/src/process_runtime.cj:public let reason: ProcessEndReason
+packages/core/src/process_runtime.cj:public let status: PtyExitStatus
+packages/core/src/process_runtime.cj:public let outputBytes: Int64
+packages/core/src/process_runtime.cj:public let outputComplete: Bool
+packages/core/src/process_runtime.cj:public init(reason: ProcessEndReason, status: PtyExitStatus, outputBytes: Int64, outputComplete!: Bool = true)
+packages/core/src/process_runtime.cj:public struct ProcessMetrics {
+packages/core/src/process_runtime.cj:public let queuedBytes: Int64
+packages/core/src/process_runtime.cj:public let peakQueuedBytes: Int64
+packages/core/src/process_runtime.cj:public let outputBytes: Int64
+packages/core/src/process_runtime.cj:public let backpressureCount: Int64
+packages/core/src/process_runtime.cj:public init(queuedBytes!: Int64 = 0, peakQueuedBytes!: Int64 = 0, outputBytes!: Int64 = 0, backpressureCount!: Int64 = 0)
+packages/core/src/process_runtime.cj:public interface ProcessRuntime {
+packages/core/src/process_runtime.cj:func start(id: String, spec: ProcessSpec): Event
+packages/core/src/process_runtime.cj:func cancel(id: String): Event
+packages/core/src/process_runtime.cj:func sources(): Array<EventSource>
+packages/core/src/process_runtime.cj:func drain(): Array<Event>
+packages/core/src/process_runtime.cj:func activeCount(): Int64
+packages/core/src/process_runtime.cj:func nextTimeoutMillis(): ?Int64
+packages/core/src/process_runtime.cj:func metrics(): ProcessMetrics
+packages/core/src/process_runtime.cj:func closeAll(): Unit
+packages/core/src/process_runtime.cj:public class UnsupportedProcessRuntime <: ProcessRuntime {
+packages/core/src/process_runtime.cj:public init()
+packages/core/src/process_runtime.cj:public func start(id: String, spec: ProcessSpec): Event
+packages/core/src/process_runtime.cj:public func cancel(id: String): Event
+packages/core/src/process_runtime.cj:public func sources(): Array<EventSource>
+packages/core/src/process_runtime.cj:public func drain(): Array<Event>
+packages/core/src/process_runtime.cj:public func activeCount(): Int64
+packages/core/src/process_runtime.cj:public func nextTimeoutMillis(): ?Int64
+packages/core/src/process_runtime.cj:public func metrics(): ProcessMetrics
+packages/core/src/process_runtime.cj:public func closeAll(): Unit
+packages/core/src/process_runtime.cj:public func defaultProcessRuntime(): ProcessRuntime
+packages/core/src/process_runtime.cj:public func defaultProcessRuntime(): ProcessRuntime
+packages/core/src/process_runtime.cj:public class PosixProcessRuntime <: ProcessRuntime {
+packages/core/src/process_runtime.cj:public init(maxProcesses!: Int64 = 32, readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 64 * 1024)
+packages/core/src/process_runtime.cj:public func start(id: String, spec: ProcessSpec): Event
+packages/core/src/process_runtime.cj:public func cancel(id: String): Event
+packages/core/src/process_runtime.cj:public func sources(): Array<EventSource>
+packages/core/src/process_runtime.cj:public func drain(): Array<Event>
+packages/core/src/process_runtime.cj:public func activeCount(): Int64
+packages/core/src/process_runtime.cj:public func nextTimeoutMillis(): ?Int64
+packages/core/src/process_runtime.cj:public func metrics(): ProcessMetrics
+packages/core/src/process_runtime.cj:public func closeAll(): Unit
+packages/core/src/process_runtime.cj:public class Utf8StreamDecoder {
+packages/core/src/process_runtime.cj:public init()
+packages/core/src/process_runtime.cj:public func feed(bytes: Array<Byte>): String
+packages/core/src/process_runtime.cj:public func finish(): String
 packages/core/src/pty.cj:public enum PtyOutputStream {
 packages/core/src/pty.cj:Stdout
 packages/core/src/pty.cj:Stderr
@@ -1189,8 +1455,14 @@ packages/core/src/pty.cj:public func close(id: String): Event
 packages/core/src/pty.cj:public func sources(): Array<EventSource>
 packages/core/src/pty.cj:public func drain(): Array<Event>
 packages/core/src/pty.cj:public func activeCount(): Int64
+packages/core/src/pty.cj:public struct PtyFlowMetrics {
+packages/core/src/pty.cj:public let queuedBytes: Int64
+packages/core/src/pty.cj:public let peakQueuedBytes: Int64
+packages/core/src/pty.cj:public let backpressureCount: Int64
+packages/core/src/pty.cj:public init(queuedBytes: Int64, peakQueuedBytes: Int64, backpressureCount: Int64)
 packages/core/src/pty.cj:public class LinuxPtyRuntime <: PtyRuntime {
-packages/core/src/pty.cj:public init()
+packages/core/src/pty.cj:public init(readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 2 * 1024 * 1024, maxProcesses!: Int64 = 32)
+packages/core/src/pty.cj:public func flowMetrics(): PtyFlowMetrics
 packages/core/src/pty.cj:public func start(id: String, spec: PtySpec): Event
 packages/core/src/pty.cj:public func process(id: String): ?PtyProcess
 packages/core/src/pty.cj:public func write(id: String, bytes: Array<Byte>): Event
@@ -1277,7 +1549,10 @@ packages/core/src/runtime_foundation.cj:public let envelope: RuntimeEnvelope<A>
 packages/core/src/runtime_foundation.cj:public let enqueuedAtMillis: Int64
 packages/core/src/runtime_foundation.cj:public init(sequence: Int64, envelope: RuntimeEnvelope<A>, enqueuedAtMillis!: Int64 = 0)
 packages/core/src/runtime_foundation.cj:public class RuntimeQueue<A> {
-packages/core/src/runtime_foundation.cj:public init(metrics!: ?AppMetrics = None)
+packages/core/src/runtime_foundation.cj:public init(metrics!: ?AppMetrics = None, capacity!: Int64 = 4096)
+packages/core/src/runtime_foundation.cj:public func capacity(): Int64
+packages/core/src/runtime_foundation.cj:public func yieldedTurns(): Int64
+packages/core/src/runtime_foundation.cj:public func overflowCount(): Int64
 packages/core/src/runtime_foundation.cj:public func state(): RuntimeState
 packages/core/src/runtime_foundation.cj:public func size(): Int64
 packages/core/src/runtime_foundation.cj:public func maxQueueDepth(): Int64
@@ -1742,14 +2017,16 @@ packages/core/src/text_area.cj:public func visibleHighlights(text: String, first
 packages/core/src/text_area.cj:public func recomputeCount(): Int64
 packages/core/src/text_area.cj:public func invalidate(): Unit
 packages/core/src/text_area.cj:public class TextArea <: Widget {
-packages/core/src/text_area.cj:public var value: String
+packages/core/src/text_area.cj:public mut prop value: String {
+packages/core/src/text_area.cj:public prop textModel: EditableTextModel { get() { textModelValue } }
+packages/core/src/text_area.cj:public var horizontalScroll: Int64 = 0
 packages/core/src/text_area.cj:public var cursor: Int64
 packages/core/src/text_area.cj:public var scroll: Int64
 packages/core/src/text_area.cj:public var selectionStart: ?Int64 = None
 packages/core/src/text_area.cj:public var selectionEnd: ?Int64 = None
 packages/core/src/text_area.cj:public var readOnly: Bool
 packages/core/src/text_area.cj:public var markdownEditing: Bool
-packages/core/src/text_area.cj:public init( value!: String = "", cursor!: Int64 = 0, scroll!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), lineNumbers!: Bool = false, lineNumberStyle!: Style = Style(fg: Color.Indexed(8)), foldState!: ?DocumentViewState = None, readOnly!: Bool = false, markdownEditing!: Bool = false, decorations!: Array<TextDecoration> = [] )
+packages/core/src/text_area.cj:public init( value!: String = "", model!: ?EditableTextModel = None, cursor!: Int64 = 0, scroll!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), lineNumbers!: Bool = false, lineNumberStyle!: Style = Style(fg: Color.Indexed(8)), foldState!: ?DocumentViewState = None, readOnly!: Bool = false, markdownEditing!: Bool = false, decorations!: Array<TextDecoration> = [] )
 packages/core/src/text_area.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/text_area.cj:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
 packages/core/src/text_area.cj:public func handleVimNavigation(key: KeyEvent): Bool
@@ -1772,6 +2049,9 @@ packages/core/src/text_area.cj:public func pasteFrom(clipboard: Clipboard): Unit
 packages/core/src/text_area.cj:public func deleteSelection(): Unit
 packages/core/src/text_area.cj:public func paste(text: String): Unit
 packages/core/src/text_area.cj:public func setDecorations(decorations: Array<TextDecoration>): Unit
+packages/core/src/text_area.cj:public func setDecorationProviders(providers: Array<TextDecorationProvider>): Unit
+packages/core/src/text_area.cj:public func applyDecorationUpdate(layer: String, update: TextDecorationUpdate): Bool
+packages/core/src/text_area.cj:public func clearDecorationLayer(layer: String): Bool
 packages/core/src/text_area.cj:public func setValue(value: String, cursor!: Int64 = -1): Unit
 packages/core/src/text_area.cj:public func editRevision(): Int64
 packages/core/src/text_area.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
@@ -1813,13 +2093,6 @@ packages/core/src/text_area.cj:public let behavior: MarkdownEditorBehavior
 packages/core/src/text_area.cj:public init(value!: String = "", block!: ?Block = None, lineNumbers!: Bool = true)
 packages/core/src/text_area.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/text_area.cj:public func render(areaRect: Rect, buffer: Buffer): Unit
-packages/core/src/text_buffer.cj:public interface Clipboard {
-packages/core/src/text_buffer.cj:func getText(): String
-packages/core/src/text_buffer.cj:func setText(text: String): Unit
-packages/core/src/text_buffer.cj:public class MemoryClipboard <: Clipboard {
-packages/core/src/text_buffer.cj:public init(text!: String = "")
-packages/core/src/text_buffer.cj:public func getText(): String
-packages/core/src/text_buffer.cj:public func setText(text: String): Unit
 packages/core/src/text_buffer.cj:public struct TextPosition <: Equatable<TextPosition> {
 packages/core/src/text_buffer.cj:public let line: Int64
 packages/core/src/text_buffer.cj:public let column: Int64
@@ -1831,7 +2104,8 @@ packages/core/src/text_buffer.cj:public let end: TextPosition
 packages/core/src/text_buffer.cj:public init(start: TextPosition, end: TextPosition)
 packages/core/src/text_buffer.cj:public func isEmpty(): Bool
 packages/core/src/text_buffer.cj:public class TextBuffer {
-packages/core/src/text_buffer.cj:public init(text!: String = "")
+packages/core/src/text_buffer.cj:public init(text!: String = "", model!: ?EditableTextModel = None)
+packages/core/src/text_buffer.cj:public prop textModel: EditableTextModel { get() { modelValue } }
 packages/core/src/text_buffer.cj:public func setText(text: String): Unit
 packages/core/src/text_buffer.cj:public func text(): String
 packages/core/src/text_buffer.cj:public func lineCount(): Int64
@@ -1840,21 +2114,92 @@ packages/core/src/text_buffer.cj:public func insert(position: TextPosition, text
 packages/core/src/text_buffer.cj:public func replace(range: TextRange, text: String): TextPosition
 packages/core/src/text_buffer.cj:public func deleteRange(range: TextRange): TextPosition
 packages/core/src/text_buffer.cj:public func slice(range: TextRange): String
-packages/core/src/text_buffer.cj:public func wordLeft(position: TextPosition): TextPosition
-packages/core/src/text_buffer.cj:public func wordRight(position: TextPosition): TextPosition
-packages/core/src/text_buffer.cj:public func findPrevious(needle: String, start!: TextPosition = TextPosition(Int64.Max, Int64.Max)): ?TextPosition
-packages/core/src/text_buffer.cj:public func findAll(needle: String): Array<TextRange>
-packages/core/src/text_buffer.cj:public func replaceAll(needle: String, replacement: String): Int64
-packages/core/src/text_buffer.cj:public func beginUndoGroup(): Unit
-packages/core/src/text_buffer.cj:public func endUndoGroup(): Unit
+packages/core/src/text_buffer.cj:public func clampPosition(position: TextPosition): TextPosition
 packages/core/src/text_buffer.cj:public func positionToOffset(position: TextPosition): Int64
 packages/core/src/text_buffer.cj:public func offsetToPosition(offset: Int64): TextPosition
 packages/core/src/text_buffer.cj:public func deleteBackward(position: TextPosition): TextPosition
 packages/core/src/text_buffer.cj:public func deleteForward(position: TextPosition): TextPosition
+packages/core/src/text_buffer.cj:public func beginUndoGroup(): Unit
+packages/core/src/text_buffer.cj:public func endUndoGroup(): Unit
 packages/core/src/text_buffer.cj:public func undo(): Bool
 packages/core/src/text_buffer.cj:public func redo(): Bool
+packages/core/src/text_buffer.cj:public func wordLeft(position: TextPosition): TextPosition
+packages/core/src/text_buffer.cj:public func wordRight(position: TextPosition): TextPosition
 packages/core/src/text_buffer.cj:public func find(needle: String, start!: TextPosition = TextPosition(0, 0)): ?TextPosition
-packages/core/src/text_buffer.cj:public func clampPosition(position: TextPosition): TextPosition
+packages/core/src/text_buffer.cj:public func findPrevious(needle: String, start!: TextPosition = TextPosition(Int64.Max, Int64.Max)): ?TextPosition
+packages/core/src/text_buffer.cj:public func findAll(needle: String): Array<TextRange>
+packages/core/src/text_buffer.cj:public func replaceAll(needle: String, replacement: String): Int64
+packages/core/src/text_decorations.cj:public struct TextEditDelta {
+packages/core/src/text_decorations.cj:public let start: Int64
+packages/core/src/text_decorations.cj:public let end: Int64
+packages/core/src/text_decorations.cj:public let insertedBytes: Int64
+packages/core/src/text_decorations.cj:public let beforeRevision: Int64
+packages/core/src/text_decorations.cj:public let afterRevision: Int64
+packages/core/src/text_decorations.cj:public init(start: Int64, end: Int64, insertedBytes: Int64, beforeRevision: Int64, afterRevision: Int64)
+packages/core/src/text_decorations.cj:public interface TextDecorationProvider {
+packages/core/src/text_decorations.cj:func revision(): Int64
+packages/core/src/text_decorations.cj:func query(start: Int64, end: Int64): Array<TextDecoration>
+packages/core/src/text_decorations.cj:func onEdit(edit: TextEditDelta): Unit
+packages/core/src/text_decorations.cj:public class TextDecorationUpdate {
+packages/core/src/text_decorations.cj:public let revision: Int64
+packages/core/src/text_decorations.cj:public let start: Int64
+packages/core/src/text_decorations.cj:public let end: Int64
+packages/core/src/text_decorations.cj:public let spans: Array<TextDecoration>
+packages/core/src/text_decorations.cj:public init(revision: Int64, start: Int64, end: Int64, spans: Array<TextDecoration>)
+packages/core/src/text_decorations.cj:public class TextDecorationStore <: TextDecorationProvider {
+packages/core/src/text_decorations.cj:public init(revision!: Int64 = 0)
+packages/core/src/text_decorations.cj:public func revision(): Int64
+packages/core/src/text_decorations.cj:public func cachedRanges(): Int64
+packages/core/src/text_decorations.cj:public func invalidatedRanges(): Int64
+packages/core/src/text_decorations.cj:public func queryCount(): Int64
+packages/core/src/text_decorations.cj:public func apply(update: TextDecorationUpdate): Bool
+packages/core/src/text_decorations.cj:public func query(start: Int64, end: Int64): Array<TextDecoration>
+packages/core/src/text_decorations.cj:public func onEdit(edit: TextEditDelta): Unit
+packages/core/src/text_decorations.cj:public func reset(revision: Int64): Unit
+packages/core/src/text_model.cj:public interface TextModel {
+packages/core/src/text_model.cj:func byteLength(): Int64
+packages/core/src/text_model.cj:func lineCount(): Int64
+packages/core/src/text_model.cj:func line(index: Int64): String
+packages/core/src/text_model.cj:func lineStart(index: Int64): Int64
+packages/core/src/text_model.cj:func lineForOffset(offset: Int64): Int64
+packages/core/src/text_model.cj:func slice(start: Int64, end: Int64): String
+packages/core/src/text_model.cj:func replace(start: Int64, end: Int64, text: String): Unit
+packages/core/src/text_model.cj:func text(): String
+packages/core/src/text_model.cj:func revision(): Int64
+packages/core/src/text_model.cj:func metrics(): TextModelMetrics
+packages/core/src/text_model.cj:func clampOffset(offset: Int64): Int64
+packages/core/src/text_model.cj:public interface EditableTextModel <: TextModel {
+packages/core/src/text_model.cj:func beginUndoGroup(): Unit
+packages/core/src/text_model.cj:func endUndoGroup(): Unit
+packages/core/src/text_model.cj:func undo(): Bool
+packages/core/src/text_model.cj:func redo(): Bool
+packages/core/src/text_model.cj:func clearHistory(): Unit
+packages/core/src/text_model.cj:public struct TextModelMetrics {
+packages/core/src/text_model.cj:public let nodeVisits: Int64
+packages/core/src/text_model.cj:public let bytesScanned: Int64
+packages/core/src/text_model.cj:public let bytesCopied: Int64
+packages/core/src/text_model.cj:public let materializations: Int64
+packages/core/src/text_model.cj:public let pieceCount: Int64
+packages/core/src/text_model.cj:public let treeHeight: Int64
+packages/core/src/text_model.cj:public init(nodeVisits!: Int64 = 0, bytesScanned!: Int64 = 0, bytesCopied!: Int64 = 0, materializations!: Int64 = 0, pieceCount!: Int64 = 0, treeHeight!: Int64 = 0)
+packages/core/src/text_model.cj:public class PieceTableTextModel <: EditableTextModel {
+packages/core/src/text_model.cj:public init(text!: String = "")
+packages/core/src/text_model.cj:public func byteLength(): Int64
+packages/core/src/text_model.cj:public func lineCount(): Int64
+packages/core/src/text_model.cj:public func line(index: Int64): String
+packages/core/src/text_model.cj:public func lineStart(index: Int64): Int64
+packages/core/src/text_model.cj:public func lineForOffset(offset: Int64): Int64
+packages/core/src/text_model.cj:public func clampOffset(offset: Int64): Int64
+packages/core/src/text_model.cj:public func slice(start: Int64, end: Int64): String
+packages/core/src/text_model.cj:public func replace(start: Int64, end: Int64, text: String): Unit
+packages/core/src/text_model.cj:public func text(): String
+packages/core/src/text_model.cj:public func revision(): Int64
+packages/core/src/text_model.cj:public func metrics(): TextModelMetrics
+packages/core/src/text_model.cj:public func beginUndoGroup(): Unit
+packages/core/src/text_model.cj:public func endUndoGroup(): Unit
+packages/core/src/text_model.cj:public func undo(): Bool
+packages/core/src/text_model.cj:public func redo(): Bool
+packages/core/src/text_model.cj:public func clearHistory(): Unit
 packages/core/src/vim_editor.cj:public enum VimMode {
 packages/core/src/vim_editor.cj:Normal
 packages/core/src/vim_editor.cj:Insert
@@ -2060,6 +2405,7 @@ packages/core/src/widgets.cj:public init( text: String, block!: ?Block = None, s
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class List <: Widget {
 packages/core/src/widgets.cj:public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class ListState {
 packages/core/src/widgets.cj:public var selected: ?Int64
@@ -2073,6 +2419,7 @@ packages/core/src/widgets.cj:public func previous(total: Int64): Unit
 packages/core/src/widgets.cj:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
 packages/core/src/widgets.cj:public class Table <: Widget {
 packages/core/src/widgets.cj:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: Style = Style.default(), headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class TableState {
 packages/core/src/widgets.cj:public var selectedRow: ?Int64
@@ -2085,6 +2432,7 @@ packages/core/src/widgets.cj:public func previous(total: Int64): Unit
 packages/core/src/widgets.cj:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
 packages/core/src/widgets.cj:public class Scrollbar <: Widget {
 packages/core/src/widgets.cj:public init( total: Int64, offset!: Int64 = 0, viewport!: Int64 = 0, style!: Style = Style(fg: Color.Indexed(8)), thumbStyle!: Style = Style(fg: Color.White) )
+packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class Input <: Widget {
 packages/core/src/widgets.cj:public var value: String
@@ -2092,6 +2440,7 @@ packages/core/src/widgets.cj:public var cursor: Int64
 packages/core/src/widgets.cj:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)) )
 packages/core/src/widgets.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/widgets.cj:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public func cursorPosition(area: Rect): Position
 packages/core/src/widgets.cj:public func setValue(value: String, cursor!: Int64 = -1): Unit
@@ -2377,3 +2726,23 @@ packages/terminal/src/terminal.cj:public func chunkCount(): Int64
 packages/terminal/src/terminal.cj:public class TerminalView <: Widget {
 packages/terminal/src/terminal.cj:public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "")
 packages/terminal/src/terminal.cj:public func render(area: Rect, buffer: Buffer): Unit
+packages/testing/src/testing.cj:public class TestReport {
+packages/testing/src/testing.cj:public let passed: Bool
+packages/testing/src/testing.cj:public let exited: Bool
+packages/testing/src/testing.cj:public let frames: Array<Buffer>
+packages/testing/src/testing.cj:public let snapshots: Array<String>
+packages/testing/src/testing.cj:public let failures: Array<String>
+packages/testing/src/testing.cj:public init(passed: Bool, exited: Bool, frames: Array<Buffer>, snapshots: Array<String>, failures: Array<String>)
+packages/testing/src/testing.cj:public func lastSnapshot(): String
+packages/testing/src/testing.cj:public class TestScenario {
+packages/testing/src/testing.cj:public init()
+packages/testing/src/testing.cj:public func event(value: Event): TestScenario
+packages/testing/src/testing.cj:public func key(value: KeyEvent): TestScenario
+packages/testing/src/testing.cj:public func paste(text: String): TestScenario
+packages/testing/src/testing.cj:public func message(text: String): TestScenario
+packages/testing/src/testing.cj:public func render(): TestScenario
+packages/testing/src/testing.cj:public func resize(width: Int64, height: Int64): TestScenario
+packages/testing/src/testing.cj:public func tick(count!: Int64 = 1): TestScenario
+packages/testing/src/testing.cj:public func expectSnapshot(text: String): TestScenario
+packages/testing/src/testing.cj:public func expectCell(x: Int64, y: Int64, symbol: String): TestScenario
+packages/testing/src/testing.cj:public func run( render: (Frame) -> Unit, update: (Event) -> UpdateResult, width!: Int64 = 80, height!: Int64 = 24, tickDeltaMillis!: Int64 = 16 ): TestReport

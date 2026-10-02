@@ -3,7 +3,7 @@
   name = "cjtui_arcade"
   organization = ""
   description = "Canvas and input-state arcade example for cjtui"
-  version = "1.0.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "executable"

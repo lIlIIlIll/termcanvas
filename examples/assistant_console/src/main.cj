@@ -3,6 +3,8 @@ package cjtui_assistant_console
 import core.*
 
 class AssistantConsole {
+    let focus = FocusManager()
+    let interaction: ModalFocusState
     let transcript = Transcript(items: [
         TranscriptItem("u1", title: "User", body: Document.plain("Run the release checks")),
         TranscriptItem("a1", title: "Assistant", body: Document.plain("I will prepare a plan and ask for approval."), status: TranscriptItemStatus.Done)
@@ -17,33 +19,47 @@ class AssistantConsole {
     var showRequest = true
     var status = "ready"
 
+    init() {
+        focus.add("composer")
+        interaction = ModalFocusState(focus, keymap: KeyMap(bindings: [KeyBinding([KeyEvent(KeyCode.F(2))], "approval")]))
+        _ = interaction.open("approval", ["cancel", "confirm"])
+    }
+
+    private func synchronizeRequest(): Unit {
+        if (showRequest && interaction.active().isNone()) { _ = interaction.open("approval", ["cancel", "confirm"]) }
+        if (!showRequest && interaction.active().isSome()) { _ = interaction.close() }
+    }
+
     func update(event: Event): ControlFlow {
+        synchronizeRequest()
         match (event) {
             case Event.KeyDown(key) =>
-                match (key.code) {
-                    case KeyCode.CtrlC => return ControlFlow.Exit
-                    case KeyCode.F(2) => showRequest = true
-                    case KeyCode.Esc => showRequest = false
-                    case _ =>
-                        if (showRequest) {
-                            match (request.handle(key)) {
-                                case Some(action) => status = "approval: " + action; showRequest = false
-                                case None => ()
-                            }
-                        } else {
-                            _ = composer.handle(key)
-                        }
+                match (key.code) { case KeyCode.CtrlC => return ControlFlow.Exit; case _ => () }
+                if (interaction.handle(key)) {
+                    showRequest = interaction.active().isSome()
+                    request.selected = if (interaction.focus().current() == Some("confirm")) { 1 } else { 0 }
+                    return ControlFlow.Continue
                 }
-            case Event.Paste(text) =>
-                if (!showRequest) {
-                    _ = composer.paste(text)
+                if (interaction.active().isSome()) {
+                    match (request.handle(key)) {
+                        case Some(action) => status = "approval: " + action; _ = interaction.close(); showRequest = false
+                        case None => _ = interaction.focus().focus(if (request.selected == 1) { "confirm" } else { "cancel" })
+                    }
+                    return ControlFlow.Continue
                 }
+                if (interaction.actionFor(key) == Some("approval")) {
+                    _ = interaction.open("approval", ["cancel", "confirm"])
+                    request.selected = 0
+                    showRequest = true
+                } else { _ = composer.handle(key) }
+            case Event.Paste(text) => if (interaction.active().isNone()) { _ = composer.paste(text) }
             case _ => ()
         }
         ControlFlow.Continue
     }
 
     func render(frame: Frame): Unit {
+        synchronizeRequest()
         let rows = Layout.vertical([Constraint.Min(8), Constraint.Length(5), Constraint.Length(1)]).withMargin(Spacing.all(1)).withGap(1).split(frame.area)
         let cols = Layout.horizontal([Constraint.Percent(62), Constraint.Min(20)]).withGap(1).split(rows[0])
         frame.renderWidget(TranscriptView(transcript, block: Block(title: "Transcript")), cols[0])

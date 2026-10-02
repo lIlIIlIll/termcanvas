@@ -2,7 +2,7 @@
 
 ## Explanation: read this policy
 
-`cjtui` is pre-1.0. Current packages use `0.1.x` while APIs are tightened by real applications. Choose declarations marked `STABLE` for application code; treat `EXPERIMENTAL` declarations as evaluation or extension points whose shape and behavior may change; do not construct `INTERNAL` declarations or infer an application promise from `TEST_ONLY` exports.
+`cjtui` is pre-1.0. Current first-party packages and templates use **`0.0.1`**. This is an explicitly authorized version reset and breaking API boundary, not a SemVer-compatible upgrade from `0.1.x`; consumers must select the new version/ref explicitly and follow [the migration guide](migration-0.0.1.md). Choose declarations marked `STABLE` for application code; treat `EXPERIMENTAL` declarations as evaluation or extension points whose shape and behavior may change; do not construct `INTERNAL` declarations or infer an application promise from `TEST_ONLY` exports.
 
 The exact tier of every declaration comes from the generated [`api-inventory.json`](api-inventory.json). The generated [`stable-api-contract.txt`](stable-api-contract.txt) and [`experimental-api-contract.txt`](experimental-api-contract.txt) are the source-level contracts, including enum constructors and exact signatures. [`api-index.txt`](api-index.txt) is an exported-symbol baseline, not a stability contract. These outputs are maintained by scripts and must not be edited manually. Package location, `core` ownership, or language `public` visibility does not determine a tier. ADR-009 (`adr/009-api-and-package-stability.md`) records the governing decision; [`api.md`](api.md) is the human map.
 
@@ -14,10 +14,12 @@ The stable application surface currently includes:
 
 - Core data types: `Buffer`, `Cell`, `Style`, `Color`, `Modifier`, `Rect`, and `Position`.
 - Runtime basics: `App`, `ControlFlow`, `UpdateResult`, `HandleResult`, `InputSource`, `TerminalDriver`, `Command.Message`, `Command.Batch`, `Command.Quit`, `Command.Exec`, `Command.ExecArgs`, `Command.AsyncExec`, and `Command.AsyncExecArgs`.
-- Testing basics: `TestBackend`.
+- Testing basics: `TestBackend`, and downstream `cjtui_testing.TestScenario` / `TestReport`.
 - Common widgets: `Block`, `Paragraph`, `Input`, `TextArea`, `DocumentView`, `List`, `Table`, and `FilePicker`.
 - Rich document model: `RichSpan`, `DocumentLine`, `Document`, `DocumentTheme`, and `DocumentViewState`.
 - PTY data protocol: `PtySpec`, `PtySize`, `PtySignal`, `PtyOutputStream`, `PtyExitStatus`, and the existing `Command.Pty*` / `Event.Pty*` constructors.
+- Indexed editing: `TextModel`, `EditableTextModel`, `PieceTableTextModel`, revisioned text edits and range-decoration contracts.
+- Ordinary process values: `ProcessSpec`, stream/end-reason/result values and `Utf8StreamDecoder`. Concrete process implementations and runtime attachment remain below the stable boundary.
 - External delivery: `ExternalPort<A>`, `ExternalEnqueueResult` with its exact `Accepted` / `Full` / `Closed` cases, and `App.runWithExternalPort`. The commitment covers positive capacity, non-blocking bounded enqueue, mutex-linearized successful ordering, level-visible wake, and idempotent close. `Accepted` does not promise eventual processing or shutdown durability.
 - Low-level drawing: `Canvas` construction, both `fillRect` overloads, `drawText`, and `Frame.canvas`. The commitment covers translated terminal-cell coordinates, Canvas/Buffer clipping, styled blank fills, grapheme-atomic text clipping, and wide-cell-valid output.
 
@@ -30,6 +32,7 @@ Experimental declarations are exported for exploration and extension work, not a
 - Async task runtime details beyond `Command.AsyncTask`, `Command.AsyncExecArgs`, and async completion events.
 - Platform drivers other than Linux/glibc.
 - PTY runtime/process attachment, readiness, and lifecycle details.
+- Ordinary process runtime attachment/metrics, optional system/OSC 52 clipboard adapters, paged/lazy data models and application-owned modal focus policy.
 - `ExternalPort` instantaneous size, counters, wake counters, and latency measurement; `EventSource` readiness remains a separate runtime experiment.
 - Advanced Canvas transforms and drawing conveniences, Widget bridging, `Surface`/composition, and `ResizePolicy`/`ViewportFit`/`SizeGuard` helpers.
 - Terminal media protocol adapters.
@@ -49,7 +52,7 @@ Runtime implementation details such as queue ownership, concrete default waiters
 1. Prefer additive changes for public APIs.
 2. Keep legacy constructors and enum variants when practical.
 3. Breaking cleanup is allowed before 1.0, but the change must be intentional, documented, and covered by public behavior tests where practical.
-4. The current Phase 4E pre-1.0 consolidation window is an authorized breaking boundary. Phase 4E-4B-I used it to remove `Event.ComponentTick` and its experimental payload after migrating component timers to host-localized `Event.Timer`; this authorization does not extend to other stable enum constructors.
+4. The 0.0.1 release is a separately authorized breaking boundary, including the version reset. Its exact changes and call-site migrations are recorded in the migration guide and generated contracts. Earlier Phase 4E authorization was narrower: Phase 4E-4B-I removed `Event.ComponentTick` after migrating component timers, and did not authorize unrelated stable changes at that time.
 5. Enum constructors inherit the stability of their containing enum. The v1 source-contract extractor inventories them explicitly; removing or reordering a stable constructor is a stable contract change even when its payload type has a lower tier.
 6. New stable-to-nonstable dependencies are forbidden. Phase 5A-I resolved the five pre-existing PTY payload edges by hardening and stabilizing the exact runtime-free value cohort. It did not remove or rehome any stable `Command` or `Event` constructor and did not stabilize runtime integration.
 7. Treat `TerminalDriver` as the portability boundary for terminal mode, size, and capability behavior; widgets and application tests must not depend on Linux-only terminal internals.

@@ -394,15 +394,42 @@ public class UnsupportedPtyRuntime <: PtyRuntime {
     public func activeCount(): Int64 { 0 }
 }
 
+public struct PtyFlowMetrics {
+    public let queuedBytes: Int64
+    public let peakQueuedBytes: Int64
+    public let backpressureCount: Int64
+    public init(queuedBytes: Int64, peakQueuedBytes: Int64, backpressureCount: Int64) {
+        this.queuedBytes = queuedBytes; this.peakQueuedBytes = peakQueuedBytes; this.backpressureCount = backpressureCount
+    }
+}
+
+@When[os != "Windows"]
+class PtyReadBudget {
+    var queued: Int64 = 0
+    var peak: Int64 = 0
+    var blocked: Int64 = 0
+    let quantum: Int64
+    let capacity: Int64
+    init(quantum: Int64, capacity: Int64) { this.quantum = quantum; this.capacity = capacity }
+    func accepted(count: Int64): Unit { queued += count; peak = max(peak, queued) }
+}
+
 @When[os != "Windows"]
 public class LinuxPtyRuntime <: PtyRuntime {
     private let processes = ArrayList<LinuxPtyProcess>()
     private let events = ArrayList<Event>()
+    private let flow: PtyReadBudget
+    private let maxProcesses: Int64
 
-    public init() {}
+    public init(readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 2 * 1024 * 1024, maxProcesses!: Int64 = 32) {
+        if (readBudgetBytes <= 0 || maxQueuedBytes <= 0 || maxProcesses <= 0) { throw IllegalArgumentException("PTY budgets must be positive") }
+        flow = PtyReadBudget(readBudgetBytes, maxQueuedBytes); this.maxProcesses = maxProcesses
+    }
+    public func flowMetrics(): PtyFlowMetrics { PtyFlowMetrics(flow.queued, flow.peak, flow.blocked) }
 
     public func start(id: String, spec: PtySpec): Event {
         _ = close(id)
+        if (processes.size >= maxProcesses) { return Event.PtyFailed(id, "pty process capacity exhausted") }
         if (spec.command.isEmpty()) { return Event.PtyFailed(id, "pty command is empty") }
         let masterPtr = LibC.malloc<Int32>()
         let slavePtr = LibC.malloc<Int32>()
@@ -449,7 +476,7 @@ public class LinuxPtyRuntime <: PtyRuntime {
             if (startupError != 0) {
                 return Event.PtyFailed(id, "pty startup failed at stage ${startupError}")
             }
-            processes.add(LinuxPtyProcess(id, master, stderrPipe[0], child, spec.size, events))
+            processes.add(LinuxPtyProcess(id, master, stderrPipe[0], child, spec.size, events, flow: flow))
             transferred = true
             Event.PtyStarted(id)
         } finally {
@@ -533,18 +560,24 @@ public class LinuxPtyRuntime <: PtyRuntime {
     public func drain(): Array<Event> {
         let out = ArrayList<Event>()
         for (event in events) { out.add(event) }
-        while (events.size > 0) { events.remove(at: 0) }
+        events.clear()
+        flow.queued = 0
         var index: Int64 = 0
         while (index < processes.size) {
             let process = processes[index]
+            // A busy App may deliberately avoid blocking in its waiter. Read
+            // one quantum here too so command traffic cannot starve PTYs.
+            process.drainRemaining()
+            for (event in events) { out.add(event) }
+            events.clear()
+            flow.queued = 0
             match (process.pollExit()) {
                 case Some(status) =>
-                    process.drainRemaining()
-                    for (event in events) { out.add(event) }
-                    while (events.size > 0) { events.remove(at: 0) }
-                    out.add(Event.PtyExited(process.id(), status))
-                    process.closeFdOnly()
-                    processes.remove(at: index)
+                    if (process.outputEnded()) {
+                        out.add(Event.PtyExited(process.id(), status))
+                        process.closeFdOnly()
+                        processes.remove(at: index)
+                    } else { index++ }
                 case None => index++
             }
         }
@@ -579,20 +612,26 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
     private var exitStatus: ?PtyExitStatus = None
     private var pendingWrite: Array<Byte> = []
     private var writeOffset: Int64 = 0
+    private var stdoutEnded: Bool = false
+    private let flow: PtyReadBudget
 
     public init(id: String, fd: Int32, stderrFd: Int32, pid: Int32, size: PtySize, events: ArrayList<Event>) {
+        this(id, fd, stderrFd, pid, size, events, flow: PtyReadBudget(16 * 1024, 2 * 1024 * 1024))
+    }
+    init(id: String, fd: Int32, stderrFd: Int32, pid: Int32, size: PtySize, events: ArrayList<Event>, flow!: PtyReadBudget) {
         this.processId = id
         this.masterFd = fd
         this.stderrFd = stderrFd
         this.childPid = pid
         this.currentSize = size
         this.eventQueue = events
+        this.flow = flow
     }
 
     public func id(): String { processId }
 
     public func fd(): ?Int32 {
-        if (closed) { None } else { Some(masterFd) }
+        if (closed || stdoutEnded || flow.queued >= flow.capacity) { None } else { Some(masterFd) }
     }
 
     public func interests(): EventSourceInterest {
@@ -681,7 +720,17 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
                 if (pollExit().isNone()) { unsafe { _ = kill(-childPid, SIGKILL) } }
             }
             _ = reap()
-            drainRemaining()
+            // The process group is owned by this session, including any child
+            // that survived its leader. Stop it before the final finite drain.
+            unsafe { _ = kill(-childPid, SIGKILL) }
+            // Shutdown has a bounded reserve for bytes already in kernel
+            // buffers. Overflow is explicit rather than silently truncating.
+            while (!outputEnded()) {
+                let before = flow.queued
+                readAvailable(masterFd, PtyOutputStream.Stdout, closing: true)
+                readAvailable(stderrFd, PtyOutputStream.Stderr, closing: true)
+                if (flow.queued == before) { break }
+            }
         } finally {
             closeFdOnly()
         }
@@ -698,13 +747,12 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
     }
 
     func stderrFdValue(): ?Int32 {
-        if (stderrClosed || closed) { None } else { Some(stderrFd) }
+        if (stderrClosed || closed || flow.queued >= flow.capacity) { None } else { Some(stderrFd) }
     }
 
     func onStderrReady(readable: Bool, error: Bool, hangup: Bool): Unit {
         if (stderrClosed || closed) { return }
-        if (readable) { readAvailable(stderrFd, PtyOutputStream.Stderr) }
-        if (error || hangup) { closeStderrFdOnly() }
+        if (readable || error || hangup) { readAvailable(stderrFd, PtyOutputStream.Stderr) }
     }
 
     func closeStderrFdOnly(): Unit {
@@ -713,6 +761,8 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
             stderrClosed = true
         }
     }
+
+    func outputEnded(): Bool { stdoutEnded && stderrClosed }
 
     func drainRemaining(): Unit {
         if (!closed) { readAvailable(masterFd, PtyOutputStream.Stdout) }
@@ -745,15 +795,23 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
         } finally { unsafe { LibC.free(status) } }
     }
 
-    private func readAvailable(fd: Int32, stream: PtyOutputStream): Unit {
+    private func readAvailable(fd: Int32, stream: PtyOutputStream, closing!: Bool = false): Unit {
         match (stream) {
             case PtyOutputStream.Stdout =>
-                if (closed) { return }
+                if (closed || stdoutEnded) { return }
             case PtyOutputStream.Stderr =>
                 if (stderrClosed) { return }
         }
-        while (!closed) {
-            let bytes = Array<Byte>(PTY_READ_BYTES, repeat: 0)
+        var remaining = flow.quantum
+        while (!closed && remaining > 0) {
+            let limit = if (closing) { flow.capacity + 8 * 1024 * 1024 } else { flow.capacity }
+            let capacity = min(min(PTY_READ_BYTES, remaining), limit - flow.queued)
+            if (capacity <= 0) {
+                flow.blocked++
+                if (closing) { throw IllegalStateException("PTY final output capacity exhausted") }
+                return
+            }
+            let bytes = Array<Byte>(capacity, repeat: 0)
             var n: IntNative = 0
             unsafe {
                 let handle = acquireArrayRawData(bytes)
@@ -761,8 +819,17 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
                 releaseArrayRawData(handle)
             }
             if (n > 0) {
+                remaining -= Int64(n)
+                flow.accepted(Int64(n))
                 eventQueue.add(Event.PtyOutput(processId, stream, bytes[..Int64(n)]))
             } else {
+                if (n < 0 && ptyErrno() == 4) { continue }
+                if (n == 0 || (n < 0 && ptyErrno() != PTY_EAGAIN)) {
+                    match (stream) {
+                        case PtyOutputStream.Stdout => stdoutEnded = true
+                        case PtyOutputStream.Stderr => closeStderrFdOnly()
+                    }
+                }
                 return
             }
         }

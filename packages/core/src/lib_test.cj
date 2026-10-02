@@ -1576,56 +1576,7 @@ class CjTuiCoreTest {
         @Expect(counter.ptyExits, 1)
     }
 
-    @TestCase
-    func linuxPtyRuntimeRunsBoundedCommandWhenAvailable(): Unit {
-        let runtime = LinuxPtyRuntime()
-        match (runtime.start("printf", PtySpec("/bin/sh", args: ["-lc", "printf pty-ok; printf pty-err >&2"]))) {
-            case Event.PtyStarted(id) => @Expect(id, "printf")
-            case Event.PtyFailed(_, _) => return
-            case _ => @Expect(false)
-        }
-        var sawOutput = false
-        var sawStderr = false
-        var sawExit = false
-        for (_ in 0..10000) {
-            for (source in runtime.sources()) {
-                source.onReady(true, false, false, false)
-            }
-            for (event in runtime.drain()) {
-                match (event) {
-                    case Event.PtyOutput(_, stream, bytes) =>
-                        if (unsafe { String.fromUtf8Unchecked(bytes) }.contains("pty-ok")) {
-                            match (stream) {
-                                case PtyOutputStream.Stdout => ()
-                                case _ => @Expect(false)
-                            }
-                            sawOutput = true
-                        }
-                        if (unsafe { String.fromUtf8Unchecked(bytes) }.contains("pty-err")) {
-                            match (stream) {
-                                case PtyOutputStream.Stderr => ()
-                                case _ => @Expect(false)
-                            }
-                            sawStderr = true
-                        }
-                    case Event.PtyExited(_, status) =>
-                        match (status) {
-                            case PtyExitStatus.Exited(code) => @Expect(code, 0)
-                            case PtyExitStatus.Signaled(_) => @Expect(false)
-                        }
-                        sawExit = true
-                    case _ => ()
-                }
-            }
-            if (sawOutput && sawStderr && sawExit) { break }
-        }
-        if (runtime.activeCount() > 0) {
-            _ = runtime.close("printf")
-        }
-        @Expect(sawOutput)
-        @Expect(sawStderr)
-        @Expect(sawExit)
-    }
+
 
     @TestCase
     func asyncRuntimeStartsCompletesAndCancelsTasks(): Unit {
@@ -3758,5 +3709,60 @@ class CjTuiCoreTest {
             }
         }
         @Expect(completed, 16)
+    }
+}
+
+@When[os != "Windows"]
+@Test
+class NativePtyAvailabilityTest {
+    @TestCase
+    func linuxPtyRuntimeRunsBoundedCommandWhenAvailable(): Unit {
+        let runtime = LinuxPtyRuntime()
+        match (runtime.start("printf", PtySpec("/bin/sh", args: ["-lc", "printf pty-ok; printf pty-err >&2"]))) {
+            case Event.PtyStarted(id) => @Expect(id, "printf")
+            case Event.PtyFailed(_, _) => return
+            case _ => @Expect(false)
+        }
+        var sawOutput = false
+        var sawStderr = false
+        var sawExit = false
+        for (_ in 0..10000) {
+            for (source in runtime.sources()) {
+                source.onReady(true, false, false, false)
+            }
+            for (event in runtime.drain()) {
+                match (event) {
+                    case Event.PtyOutput(_, stream, bytes) =>
+                        if (unsafe { String.fromUtf8Unchecked(bytes) }.contains("pty-ok")) {
+                            match (stream) {
+                                case PtyOutputStream.Stdout => ()
+                                case _ => @Expect(false)
+                            }
+                            sawOutput = true
+                        }
+                        if (unsafe { String.fromUtf8Unchecked(bytes) }.contains("pty-err")) {
+                            match (stream) {
+                                case PtyOutputStream.Stderr => ()
+                                case _ => @Expect(false)
+                            }
+                            sawStderr = true
+                        }
+                    case Event.PtyExited(_, status) =>
+                        match (status) {
+                            case PtyExitStatus.Exited(code) => @Expect(code, 0)
+                            case PtyExitStatus.Signaled(_) => @Expect(false)
+                        }
+                        sawExit = true
+                    case _ => ()
+                }
+            }
+            if (sawOutput && sawStderr && sawExit) { break }
+        }
+        if (runtime.activeCount() > 0) {
+            _ = runtime.close("printf")
+        }
+        @Expect(sawOutput)
+        @Expect(sawStderr)
+        @Expect(sawExit)
     }
 }

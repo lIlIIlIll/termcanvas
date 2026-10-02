@@ -1,5 +1,7 @@
 package core
 
+import std.math.numeric.BigInt
+
 public struct Rect <: Equatable<Rect> {
     public var x: Int64
     public var y: Int64
@@ -290,11 +292,46 @@ public struct FlexItem {
     public let basis: Int64
     public let grow: Int64
     public let shrink: Int64
+    public let minSize: Int64
+    public let maxSize: Int64
 
-    public init(basis!: Int64 = 0, grow!: Int64 = 1, shrink!: Int64 = 1) {
-        this.basis = max(0, basis)
+    public init(
+        basis!: Int64 = 0,
+        grow!: Int64 = 1,
+        shrink!: Int64 = 1,
+        minSize!: Int64 = 0,
+        maxSize!: Int64 = Int64.Max
+    ) {
+        this.minSize = max(0, minSize)
+        this.maxSize = max(this.minSize, maxSize)
+        this.basis = clamp(basis, this.minSize, this.maxSize)
         this.grow = max(0, grow)
         this.shrink = max(0, shrink)
+    }
+
+    public static func fromSizeHint(
+        hint: SizeHint,
+        direction: Direction,
+        grow!: Int64 = 1,
+        shrink!: Int64 = 1
+    ): FlexItem {
+        match (direction) {
+            case Direction.Horizontal => FlexItem(basis: hint.preferredWidth, minSize: hint.minWidth, maxSize: hint.maxWidth, grow: grow, shrink: shrink)
+            case Direction.Vertical => FlexItem(basis: hint.preferredHeight, minSize: hint.minHeight, maxSize: hint.maxHeight, grow: grow, shrink: shrink)
+        }
+    }
+}
+
+public class FlexLayoutResult {
+    public let rects: Array<Rect>
+    // False when the viewport cannot preserve minima or zero-shrink bases.
+    public let constraintsSatisfied: Bool
+    public let effectiveGap: Int64
+
+    public init(rects: Array<Rect>, constraintsSatisfied: Bool, effectiveGap: Int64) {
+        this.rects = rects
+        this.constraintsSatisfied = constraintsSatisfied
+        this.effectiveGap = effectiveGap
     }
 }
 
@@ -305,30 +342,123 @@ public class FlexLayout {
 
     public init(direction: Direction, items: Array<FlexItem>, gap!: Int64 = 0) {
         this.direction = direction
-        this.items = items
+        this.items = items.clone()
         this.gap = max(0, gap)
     }
 
-    public func split(area: Rect): Array<Rect> {
-        if (items.size == 0) { return [] }
+    public func split(area: Rect): Array<Rect> { resolve(area).rects }
+
+    public func resolve(area: Rect): FlexLayoutResult {
+        if (items.size == 0) { return FlexLayoutResult([], true, 0) }
+        // Rect coordinates are Int64. Clip unrepresentable positive extents
+        // before adding offsets, including when callers mutate Rect fields.
+        let target = Rect(area.x, area.y, flexExtent(area.x, area.width), flexExtent(area.y, area.height))
         let total = match (direction) {
-            case Direction.Horizontal => area.width
-            case Direction.Vertical => area.height
+            case Direction.Horizontal => target.width
+            case Direction.Vertical => target.height
         }
-        let available = max(0, total - gap * max(0, items.size - 1))
-        var basisTotal: Int64 = 0
-        var growTotal: Int64 = 0
-        for (item in items) {
-            basisTotal += item.basis
-            growTotal += item.grow
+        let gaps = items.size - 1
+        let effectiveGap = if (gaps == 0) { 0 } else { min(gap, total / gaps) }
+        let available = total - effectiveGap * gaps
+        let budget = BigInt(available)
+        let zero = BigInt(0)
+        let sizes = Array<Int64>(items.size, { i => items[i].basis })
+        let minima = Array<Int64>(items.size, { i => items[i].minSize })
+        let maxima = Array<Int64>(items.size, { i => items[i].maxSize })
+        let minTotal = flexSum(minima)
+        var satisfied = effectiveGap == gap || gaps == 0
+        if (minTotal > budget) {
+            // No feasible allocation exists. Deterministically compress the
+            // minima instead of overflowing or returning offscreen children.
+            satisfied = false
+            var cumulative = zero
+            var assigned: Int64 = 0
+            for (i in 0..sizes.size) {
+                cumulative += BigInt(minima[i])
+                let next = (budget * cumulative / minTotal).toInt64()
+                sizes[i] = next - assigned
+                assigned = next
+            }
+        } else {
+            let basisTotal = flexSum(sizes)
+            if (basisTotal > budget) {
+                let weights = Array<BigInt>(items.size, { i => BigInt(items[i].basis) * BigInt(items[i].shrink) })
+                let remaining = flexDistribute(sizes, minima, weights, basisTotal - budget, false)
+                if (remaining > zero) {
+                    // Zero-shrink items cannot all keep their bases in this
+                    // viewport. Preserve feasible minima and expose the
+                    // degraded allocation to callers through the result.
+                    satisfied = false
+                    let fallback = Array<BigInt>(items.size, { i => BigInt(sizes[i] - minima[i]) })
+                    _ = flexDistribute(sizes, minima, fallback, remaining, false)
+                }
+            } else if (basisTotal < budget) {
+                let weights = Array<BigInt>(items.size, { i => BigInt(items[i].grow) })
+                _ = flexDistribute(sizes, maxima, weights, budget - basisTotal, true)
+            }
         }
-        let sizes = Array<Int64>(items.size, repeat: 0)
-        let extra = max(0, available - basisTotal)
+        var offset: Int64 = 0
+        let rects = Array<Rect>(items.size, repeat: Rect(target.x, target.y, 0, 0))
         for (i in 0..items.size) {
-            sizes[i] = items[i].basis + if (growTotal > 0) { extra * items[i].grow / growTotal } else { 0 }
+            rects[i] = match (direction) {
+                case Direction.Horizontal => Rect(target.x + offset, target.y, sizes[i], target.height)
+                case Direction.Vertical => Rect(target.x, target.y + offset, target.width, sizes[i])
+            }
+            offset += sizes[i]
+            if (i < gaps) { offset += effectiveGap }
         }
-        Layout(direction, sizesToConstraints(sizes)).withGap(gap).split(area)
+        FlexLayoutResult(rects, satisfied, effectiveGap)
     }
+}
+
+func flexExtent(origin: Int64, extent: Int64): Int64 {
+    let size = max(0, extent)
+    if (origin > 0) { min(size, Int64.Max - origin) } else { size }
+}
+
+func flexSum(values: Array<Int64>): BigInt {
+    var total = BigInt(0)
+    for (value in values) { total += BigInt(value) }
+    total
+}
+
+// Integer cumulative quotas allocate every remainder deterministically.
+// A saturated item is removed from the next round, so work is bounded by
+// the item count, not by the number of terminal cells or weight magnitude.
+func flexDistribute(
+    sizes: Array<Int64>,
+    limits: Array<Int64>,
+    weights: Array<BigInt>,
+    amount: BigInt,
+    growing: Bool
+): BigInt {
+    let zero = BigInt(0)
+    var remaining = amount
+    while (remaining > zero) {
+        var totalWeight = zero
+        for (i in 0..sizes.size) {
+            let capacity = if (growing) { limits[i] - sizes[i] } else { sizes[i] - limits[i] }
+            if (capacity > 0) { totalWeight += weights[i] }
+        }
+        if (totalWeight == zero) { break }
+        var cumulative = zero
+        var previousQuota = zero
+        var changed = zero
+        for (i in 0..sizes.size) {
+            let capacity = if (growing) { limits[i] - sizes[i] } else { sizes[i] - limits[i] }
+            if (capacity <= 0 || weights[i] == zero) { continue }
+            cumulative += weights[i]
+            let quota = remaining * cumulative / totalWeight
+            let share = quota - previousQuota
+            previousQuota = quota
+            let delta = if (share > BigInt(capacity)) { capacity } else { share.toInt64() }
+            if (growing) { sizes[i] += delta } else { sizes[i] -= delta }
+            changed += BigInt(delta)
+        }
+        if (changed == zero) { break }
+        remaining -= changed
+    }
+    remaining
 }
 
 public class LayoutCache {

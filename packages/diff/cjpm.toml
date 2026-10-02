@@ -3,7 +3,7 @@
   name = "diff"
   organization = ""
   description = "Unified diff parser and viewer for cjtui"
-  version = "0.1.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "static"

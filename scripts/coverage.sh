@@ -63,6 +63,7 @@ run_coverage_test "$ROOT/packages/terminal" "terminal coverage"
 run_coverage_test "$ROOT/packages/diff" "diff coverage"
 run_coverage_test "$ROOT/packages/media" "media coverage"
 run_coverage_test "$ROOT/packages/game" "game coverage"
+run_coverage_test "$ROOT/packages/testing" "downstream testing API coverage"
 
 declare -A tested_examples=()
 while IFS= read -r -d '' test_file; do

@@ -3,7 +3,7 @@
   name = "cjtui_oh_my_pi_skin"
   organization = ""
   description = "oh-my-pi inspired terminal skin example for cjtui"
-  version = "1.0.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "executable"

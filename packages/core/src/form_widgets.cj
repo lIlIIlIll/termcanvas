@@ -32,6 +32,16 @@ public class Button <: Widget {
         this.theme = theme
     }
 
+    public func handle(key: KeyEvent): Bool {
+        if (disabled) { return false }
+        match (key.code) { case KeyCode.Enter | KeyCode.Char(r' ') => true; case _ => false }
+    }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        if (disabled || !widgetHitTest(mouse, widgetInnerArea(area, block))) { return false }
+        match ((mouse.kind, mouse.button)) { case (MouseKind.Down, MouseButton.Left) => true; case _ => false }
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
@@ -86,6 +96,14 @@ public class Checkbox <: Widget {
         }
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        if (disabled || !widgetHitTest(mouse, area)) { return false }
+        match ((mouse.kind, mouse.button)) {
+            case (MouseKind.Down, MouseButton.Left) => checked = !checked; true
+            case _ => false
+        }
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let mark = if (checked) { "[x] " } else { "[ ] " }
@@ -96,6 +114,8 @@ public class Checkbox <: Widget {
 
 public class RadioGroup <: Widget {
     public var selected: Int64
+    public var offset: Int64 = 0
+    private var viewportHeight: Int64 = 1
     private let items: Array<String>
     private let focused: Bool
     private let disabled: Bool
@@ -132,6 +152,10 @@ public class RadioGroup <: Widget {
 
     public func handle(key: KeyEvent): Bool {
         if (disabled || items.size == 0) { return false }
+        if (let Some(index) <- selectionNavigation(key, selected, items.size, viewportHeight)) {
+            selected = index
+            return true
+        }
         match (key.code) {
             case KeyCode.Up =>
                 selected = max(0, selected - 1)
@@ -144,15 +168,30 @@ public class RadioGroup <: Widget {
         }
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        if (disabled) { return false }
+        let target = widgetInnerArea(area, block)
+        offset = selectionViewportOffset(offset, selected, items.size, target.height)
+        if (let Some(index) <- selectionMouse(mouse, target, offset, items.size, selected)) {
+            selected = index
+            return true
+        }
+        false
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)
             target = b.inner(area)
         }
-        let rows = min(target.height, items.size)
+        viewportHeight = max(1, target.height)
+        selected = clamp(selected, 0, max(0, items.size - 1))
+        offset = selectionViewportOffset(offset, selected, items.size, target.height)
+        let rows = min(target.height, items.size - offset)
         for (i in 0..rows) {
-            let active = i == selected
+            let index = offset + i
+            let active = index == selected
             let mark = if (active) { "(*) " } else { "( ) " }
             let rowStyle = if (disabled) {
                 themedDisabled(disabledStyle, theme)
@@ -163,7 +202,7 @@ public class RadioGroup <: Widget {
             } else {
                 themedNormal(style, theme)
             }
-            buffer.setString(target.x, target.y + i, truncate(mark + items[i], target.width), style: rowStyle)
+            buffer.setString(target.x, target.y + i, truncate(mark + items[index], target.width), style: rowStyle)
         }
     }
 }
@@ -171,6 +210,8 @@ public class RadioGroup <: Widget {
 public class Select <: Widget {
     private let items: Array<String>
     public var selected: Int64
+    public var offset: Int64 = 0
+    private var viewportHeight: Int64 = 1
     private let block: ?Block
     private let style: Style
     private let selectedStyle: Style
@@ -195,6 +236,10 @@ public class Select <: Widget {
 
     public func handle(key: KeyEvent): ?String {
         if (items.size == 0) { return None }
+        if (let Some(index) <- selectionNavigation(key, selected, items.size, viewportHeight)) {
+            selected = index
+            return None
+        }
         match (key.code) {
             case KeyCode.Up =>
                 selected = max(0, selected - 1)
@@ -213,18 +258,32 @@ public class Select <: Widget {
         }
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
+        let target = widgetInnerArea(area, block)
+        offset = selectionViewportOffset(offset, selected, items.size, target.height)
+        if (let Some(index) <- selectionMouse(mouse, target, offset, items.size, selected)) {
+            selected = index
+            if (mouseScrollDelta(mouse) == 0) { return selectedValue() }
+        }
+        None
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)
             target = b.inner(area)
         }
-        for (row in 0..min(target.height, items.size)) {
+        viewportHeight = max(1, target.height)
+        selected = clamp(selected, 0, max(0, items.size - 1))
+        offset = selectionViewportOffset(offset, selected, items.size, target.height)
+        for (row in 0..min(target.height, items.size - offset)) {
+            let index = offset + row
             buffer.setString(
                 target.x,
                 target.y + row,
-                truncate(items[row], target.width),
-                style: if (row == selected) { selectedStyle } else { style }
+                truncate(items[index], target.width),
+                style: if (index == selected) { selectedStyle } else { style }
             )
         }
     }
@@ -233,6 +292,8 @@ public class Select <: Widget {
 public class Dropdown <: Widget {
     private let items: Array<String>
     public var selected: Int64
+    public var offset: Int64 = 0
+    private var viewportHeight: Int64 = 1
     public var open: Bool
     private let placeholder: String
     private let style: Style
@@ -267,6 +328,10 @@ public class Dropdown <: Widget {
                 case _ => None
             }
         } else {
+            if (let Some(index) <- selectionNavigation(key, selected, items.size, viewportHeight)) {
+                selected = index
+                return None
+            }
             match (key.code) {
                 case KeyCode.Esc =>
                     open = false
@@ -285,6 +350,23 @@ public class Dropdown <: Widget {
         }
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
+        if (!widgetHitTest(mouse, area)) { return None }
+        match ((mouse.kind, mouse.button)) {
+            case (MouseKind.Down, MouseButton.Left) =>
+                if (mouse.y == area.y) { open = !open; return None }
+            case _ => ()
+        }
+        if (!open) { return None }
+        let target = Rect(area.x, area.y + 1, area.width, max(0, area.height - 1))
+        offset = selectionViewportOffset(offset, selected, items.size, target.height)
+        if (let Some(index) <- selectionMouse(mouse, target, offset, items.size, selected)) {
+            selected = index
+            if (mouseScrollDelta(mouse) == 0) { open = false; return selectedValue() }
+        }
+        None
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let current = match (selectedValue()) {
@@ -294,8 +376,12 @@ public class Dropdown <: Widget {
         let mark = if (open) { "v " } else { "> " }
         buffer.setString(area.x, area.y, truncate(mark + current, area.width), style: style)
         if (open && area.height > 1) {
+            viewportHeight = max(1, area.height - 1)
             let select = Select(items, selected: selected, style: style, selectedStyle: selectedStyle)
+            select.offset = offset
             select.render(Rect(area.x, area.y + 1, area.width, area.height - 1), buffer)
+            selected = select.selected
+            offset = select.offset
         }
     }
 }
@@ -321,6 +407,19 @@ public class ColorPicker <: Widget {
         }
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        if (!widgetHitTest(mouse, area) || mouse.y != area.y) { return false }
+        match ((mouse.kind, mouse.button)) {
+            case (MouseKind.Down, MouseButton.Left) =>
+                let column = mouse.x - area.x
+                let index = column / 3
+                if (column % 3 == 2 || index >= colors.size) { return false }
+                selected = index
+                true
+            case _ => false
+        }
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -341,6 +440,8 @@ public class MultiSelect <: Widget {
     private let items: Array<String>
     private let selectedItems = ArrayList<Int64>()
     public var cursor: Int64
+    public var offset: Int64 = 0
+    private var viewportHeight: Int64 = 1
     private let style: Style
     private let selectedStyle: Style
 
@@ -370,6 +471,10 @@ public class MultiSelect <: Widget {
     }
 
     public func handle(key: KeyEvent): Bool {
+        if (let Some(index) <- selectionNavigation(key, cursor, items.size, viewportHeight)) {
+            cursor = index
+            return true
+        }
         match (key.code) {
             case KeyCode.Up => cursor = max(0, cursor - 1); true
             case KeyCode.Down => cursor = min(max(0, items.size - 1), cursor + 1); true
@@ -378,11 +483,25 @@ public class MultiSelect <: Widget {
         }
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        offset = selectionViewportOffset(offset, cursor, items.size, area.height)
+        if (let Some(index) <- selectionMouse(mouse, area, offset, items.size, cursor)) {
+            cursor = index
+            if (mouseScrollDelta(mouse) == 0) { toggle() }
+            return true
+        }
+        false
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
-        for (row in 0..min(area.height, items.size)) {
-            let checked = containsIndex(selectedItems, row)
+        viewportHeight = max(1, area.height)
+        cursor = clamp(cursor, 0, max(0, items.size - 1))
+        offset = selectionViewportOffset(offset, cursor, items.size, area.height)
+        for (row in 0..min(area.height, items.size - offset)) {
+            let index = offset + row
+            let checked = containsIndex(selectedItems, index)
             let mark = if (checked) { "[x] " } else { "[ ] " }
-            buffer.setString(area.x, area.y + row, truncate(mark + items[row], area.width), style: if (row == cursor) { selectedStyle } else { style })
+            buffer.setString(area.x, area.y + row, truncate(mark + items[index], area.width), style: if (index == cursor) { selectedStyle } else { style })
         }
     }
 }

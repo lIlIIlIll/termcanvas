@@ -1939,6 +1939,12 @@ public class MacOSTerminalMode {
         unsafe {
             let handle = acquireArrayRawData(raw)
             cfmakeraw(CPointer<Unit>(handle.pointer))
+            // Darwin LP64 termios has four unsigned-long flags before c_cc;
+            // VMIN=16 and VTIME=17 (xnu bsd/sys/termios.h). cfmakeraw leaves
+            // VMIN=1, which blocks the input drain after its first ready byte.
+            // Match the event loop's nonblocking Linux input contract.
+            raw[32 + 16] = 0
+            raw[32 + 17] = 0
             let rc = tcsetattr(STDIN_FILENO, TCSAFLUSH, CPointer<Unit>(handle.pointer))
             releaseArrayRawData(handle)
             if (rc != 0) {

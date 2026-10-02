@@ -31,6 +31,10 @@ run_cjpm_test "$ROOT/packages/terminal" "terminal tests"
 run_cjpm_test "$ROOT/packages/diff" "diff tests"
 run_cjpm_test "$ROOT/packages/media" "media tests"
 run_cjpm_test "$ROOT/packages/game" "game tests"
+run_cjpm_test "$ROOT/packages/testing" "downstream testing API"
+
+echo "==> release version"
+python3 "$ROOT/scripts/check_version.py"
 
 echo "==> event script syntax"
 "$ROOT/scripts/run_event_script.sh" "$ROOT/packages/core/tests/events/basic.events" "$ROOT/packages/core/tests/events/scenario.events"
@@ -60,6 +64,16 @@ python3 "$ROOT/scripts/test_coverage_output.py"
 
 echo "==> long proof gate evidence fixtures"
 python3 "$ROOT/scripts/test_architecture_proof_audit_20261003.py"
+
+echo "==> native SDK wrapper fixtures"
+python3 "$ROOT/scripts/test_native_sdk.py"
+python3 "$ROOT/scripts/test_windows_terminal_harness.py"
+
+echo "==> independent downstream application"
+python3 "$ROOT/scripts/test_downstream_app.py"
+
+echo "==> native terminal lifecycle"
+python3 "$ROOT/scripts/native_terminal_harness.py"
 
 echo "==> architecture classification and fitness contracts"
 python3 "$ROOT/scripts/validate_architecture.py"

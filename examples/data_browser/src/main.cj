@@ -1,33 +1,35 @@
 package cjtui_data_browser
 
 import core.*
+import std.collection.*
 
 class DataBrowser {
-    let root = TreeNode("root", "workspace", expanded: true, children: [
-        TreeNode("src", "src", expanded: true, children: [TreeNode("widgets", "widgets.cj"), TreeNode("app", "app.cj")]),
-        TreeNode("examples", "examples", children: [TreeNode("taskpad", "taskpad"), TreeNode("arcade", "arcade")])
-    ])
-    let tree = Tree([root], block: Block(title: "Tree"))
+    let treeModel = LazyTreeModel(BrowserTreeSource())
+    let tree: Tree
     let focus = FocusManager()
     let menuBar = MenuBar(["Tree", "Rows", "Files"], selected: 1)
-    let table = VirtualTable(
-        [TableColumn("ID", width: 6), TableColumn("Name", width: 18), TableColumn("State", width: 10)],
-        120,
-        { row => ["${row}", "record-${row}", if (row % 3 == 0) { "ready" } else { "pending" }] },
-        selectedRow: Some(2),
-        selectedColumn: 1,
-        block: Block(title: "VirtualTable")
-    )
+    let model = PagedTableModel(pageSize: 64, maxPages: 4)
+    let source = BrowserRows()
+    let table: VirtualTable
+    private let completions = BrowserPageMailbox()
+    private let active = HashMap<String, TablePageRequest>()
+    private var retry = false
     let picker = FilePicker(path: ".", extension: ".cj")
     let dialog = FileDialog(path: ".", extension: ".cj", title: "Open file")
     var showDialog = false
-    var status = "Tab changes panel; arrows navigate; / filters; f opens dialog"
+    var status = "Tab panels; / filter; s sort; e error; r retry; f files"
     var treeArea = Rect(0, 0, 1, 1)
     var tableArea = Rect(0, 0, 1, 1)
     var pickerArea = Rect(0, 0, 1, 1)
     var dialogArea = Rect(0, 0, 1, 1)
 
     init() {
+        _ = treeModel.setExpanded("root", true)
+        tree = Tree(treeModel, block: Block(title: "Tree"))
+        table = VirtualTable([TableColumn("ID", width: 8), TableColumn("Name", width: 18), TableColumn("State", width: 10)], model,
+            block: Block(title: "VirtualTable"))
+        model.selectIndex(2)
+        table.selectedColumn = 1
         focus.add("tree")
         focus.add("rows")
         focus.add("files")
@@ -36,6 +38,26 @@ class DataBrowser {
 
     func update(event: Event): ControlFlow {
         match (event) {
+            case Event.AsyncCompleted(id, Event.DataReady(_, requestId)) =>
+                let result = completions.take(requestId)
+                if (let Some(request) <- active.get(id)) {
+                    if (request.requestId == requestId) {
+                        active.remove(id)
+                        if (let Some(value) <- result) {
+                            if (let Some(page) <- value.page) { _ = model.accept(request, page) }
+                            else { _ = model.fail(request, value.error) }
+                        } else { _ = model.fail(request, "Page completion queue was full; press r to retry") }
+                    }
+                }
+            case Event.AsyncFailed(id, message) =>
+                if (let Some(request) <- active.get(id)) { _ = model.fail(request, message); active.remove(id) }
+            case Event.AsyncCancelled(id) =>
+                if (let Some(request) <- active.get(id)) { _ = model.fail(request, "Request cancelled; r retries"); active.remove(id) }
+            case Event.Mouse(mouse) =>
+                if (!showDialog) {
+                    if (widgetHitTest(mouse, tableArea)) { _ = focus.focus("rows"); _ = table.handle(mouse, tableArea) }
+                    else if (widgetHitTest(mouse, treeArea)) { _ = focus.focus("tree"); _ = tree.handle(mouse, treeArea) }
+                }
             case Event.KeyDown(key) =>
                 match (key.code) {
                     case KeyCode.CtrlC | KeyCode.Char(r'q') => return ControlFlow.Exit
@@ -65,6 +87,11 @@ class DataBrowser {
                                 status = "filter: all"
                             }
                         }
+                    case KeyCode.Char(r's') =>
+                        if (focus.isFocused("rows")) { table.sortBy(0, descending: !table.sortDescending); status = "external sort" }
+                    case KeyCode.Char(r'e') =>
+                        if (focus.isFocused("rows")) { table.setFilter("!error"); status = "provider error demo; / clears filter" }
+                    case KeyCode.Char(r'r') => retry = true
                     case KeyCode.Char(r'h') =>
                         if (focus.isFocused("files")) { picker.toggleHidden() }
                     case _ => routeFocusedKey(key)
@@ -72,6 +99,31 @@ class DataBrowser {
             case _ => ()
         }
         ControlFlow.Continue
+    }
+
+    func updateWithCommands(event: Event): UpdateResult {
+        let flow = update(event)
+        match (flow) { case ControlFlow.Exit => return UpdateResult.exit(); case _ => () }
+        let requests = model.requestViewport(table.offset, tableViewportHeight(), retry: retry)
+        retry = false
+        let commands = ArrayList<Command>()
+        let obsolete = ArrayList<String>()
+        for ((id, request) in active) { if (!model.isPending(request)) { obsolete.add(id) } }
+        for (id in obsolete) { active.remove(id); commands.add(Command.CancelAsync(id)) }
+        for (request in requests) {
+            let id = "table-page-${request.requestId}"
+            active.add(id, request)
+            commands.add(Command.AsyncTask(id, { =>
+                let result = try { BrowserPageResult(request.requestId, Some(source.load(request)), "") }
+                    catch (error: Exception) { BrowserPageResult(request.requestId, Option<TablePage>.None, error.message) }
+                completions.put(result)
+                Event.DataReady("table", request.requestId)
+            }))
+        }
+        let allowed = ArrayList<Int64>()
+        for ((_, request) in active) { allowed.add(request.requestId) }
+        completions.retain(allowed.toArray())
+        UpdateResult(command: Command.Batch(commands.toArray()))
     }
 
     private func routeFocusedKey(key: KeyEvent): Unit {
@@ -124,15 +176,15 @@ class DataBrowser {
         frame.renderWidget(table, tableArea)
         frame.renderWidget(picker, pickerArea)
         if (showDialog) { frame.renderWidget(dialog, dialogArea) }
-        frame.renderWidget(StatusBar(left: "focus: ${focusedPanel} | ${status}", right: "offset ${table.offset}/120", style: Style(fg: Color.White, bg: Color.Black)), rows[2])
+        frame.renderWidget(StatusBar(left: "focus: ${focusedPanel} | ${status}", right: "offset ${table.offset}/${model.totalRows()} cache ${model.cachedPageCount()}", style: Style(fg: Color.White, bg: Color.Black)), rows[2])
     }
 }
 
 main(): Int64 {
     let app = DataBrowser()
-    App(rawMode: true, alternateScreen: true, hideCursor: true).run(
+    App(rawMode: true, alternateScreen: true, hideCursor: true, mouse: true, tickEvery: Some(100 * Duration.millisecond)).runWithCommands(
         { frame => app.render(frame) },
-        { event => app.update(event) }
+        { event => app.updateWithCommands(event) }
     )
     0
 }

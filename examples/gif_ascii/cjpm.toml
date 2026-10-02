@@ -3,7 +3,7 @@
   name = "cjtui_gif_ascii"
   organization = ""
   description = "ffmpeg-decodable media to ASCII animation viewer example for cjtui"
-  version = "1.0.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "executable"

@@ -333,54 +333,730 @@
     "phase": "5B",
     "review_status": "closed",
     "inventory_source": "docs/api-inventory.json plus architecture/api-classification.json",
-    "top_level_total": 130,
-    "contract_entry_total": 801,
-    "family_total": 21,
+    "top_level_total": 148,
+    "contract_entry_total": 941,
+    "family_total": 25,
     "coverage": "Every EXPERIMENTAL top-level declaration has exactly one primary family; classification-rule subsets below resolve mixed rules without changing API classification.",
     "selected_next_family": null,
     "selected_next_phase": null,
     "completed_families": [
-      {"id": "composite_navigation_widgets", "phase": "5Q-I", "result": "RETIRED", "top_level_removed": 5, "contract_entries_removed": 22, "evidence": "The authorized visual_widgets.cj EOF island was removed after the old inventory and fresh extractor differed by exactly SplitPane 4, Wizard 7, Accordion 5, Breadcrumb 3, and TreeTable 3 entries, with zero added or collateral stale entries. Only the five target execution hunks and current capability listings were retired; mixed-test assertions, stable primitives, the separate data family, examples, and consumers remained unchanged. Deterministic API generation/check, architecture validation, full core 528/528, the canonical 20260817 official release gate, 17 official example builds and pressure, agent_tui 65/65, and the isolated canonical agent_app test binary 15/15 passed. No replacement, shim, migration adapter, or new navigation abstraction was introduced."},
-      {"id": "external_delivery_runtime_seam", "phase": "5C-I", "result": "STABLE_PRODUCER_CONTRACT", "top_level_promoted": 2, "stable_member": "App.runWithExternalPort", "nonstable_diagnostics_owner": "runtime_observability", "evidence": "Existing ExternalPort was hardened without a parallel facade; runtime methods left the public surface, diagnostics remained EXPERIMENTAL, three direct contract tests were added, and the producer cohort stabilized with debt remaining zero."},
-      {"id": "canvas_drawing_core", "phase": "5G-I", "result": "STABLE_DRAWING_CONTRACT", "top_level_promoted": 1, "stable_member": "Frame.canvas", "nonstable_groups": ["advanced Canvas conveniences", "Surface/composition", "viewport/resize policy"], "evidence": "Gate A fixed grapheme-atomic left clipping, added six direct coordinate/fill/text/wide-cell/Frame tests while Canvas remained EXPERIMENTAL, and Gate B promoted only the six approved machine entries with debt remaining zero."},
-      {"id": "core_media_runtime", "phase": "5K-I", "result": "RETIRED", "top_level_removed": 4, "contract_entries_removed": 22, "evidence": "The authorized declaration island was removed after the old inventory and current source differed by exactly the approved 22 entries. Stable media primitives and packages/media remained unchanged; no replacement or migration was required."},
-      {"id": "document_facade", "phase": "5L-I", "result": "RETIRED", "top_level_removed": 12, "contract_entries_removed": 12, "evidence": "The authorized package and twelve pure aliases were retired after the intermediate classifier reported exactly the approved twelve stale entries and no collateral surface. All twelve canonical STABLE core targets remained unchanged; no caller migration, shim, or behavior replacement was required."},
-      {"id": "modal_widget", "phase": "5M-I", "result": "RETIRED", "top_level_removed": 1, "contract_entries_removed": 3, "evidence": "The authorized immediate presentation convenience was removed after the old inventory and current extractor differed by exactly Modal, Modal.init, and Modal.render with no added or collateral declaration. Tabs, Viewport, StatusBar, shared rendering primitives, examples, and consumers required no behavior migration."},
-      {"id": "editor_facade", "phase": "5N-I", "result": "RETIRED", "top_level_removed": 28, "contract_entries_removed": 28, "evidence": "The dedicated facade package was retired after old metadata reported exactly the authorized 26 aliases and two pure forwarders stale with no collateral API. Sixteen STABLE type targets, two STABLE function targets, and ten EXPERIMENTAL advanced-shell targets remain unchanged; no caller migration or replacement facade was required."},
-      {"id": "advanced_core_editor_shell", "phase": "5O-I", "result": "RETIRED", "top_level_removed": 10, "contract_entries_removed": 64, "evidence": "The authorized behavior-bearing shell was removed after the intermediate stale proof matched exactly 64 entries with zero collateral. Stable editor APIs and all adopted behavior remained unchanged; final executable acceptance passed under the qualified and implemented 20260817 canonical toolchain."}
+      {
+        "id": "composite_navigation_widgets",
+        "phase": "5Q-I",
+        "result": "RETIRED",
+        "top_level_removed": 5,
+        "contract_entries_removed": 22,
+        "evidence": "The authorized visual_widgets.cj EOF island was removed after the old inventory and fresh extractor differed by exactly SplitPane 4, Wizard 7, Accordion 5, Breadcrumb 3, and TreeTable 3 entries, with zero added or collateral stale entries. Only the five target execution hunks and current capability listings were retired; mixed-test assertions, stable primitives, the separate data family, examples, and consumers remained unchanged. Deterministic API generation/check, architecture validation, full core 528/528, the canonical 20260817 official release gate, 17 official example builds and pressure, agent_tui 65/65, and the isolated canonical agent_app test binary 15/15 passed. No replacement, shim, migration adapter, or new navigation abstraction was introduced."
+      },
+      {
+        "id": "external_delivery_runtime_seam",
+        "phase": "5C-I",
+        "result": "STABLE_PRODUCER_CONTRACT",
+        "top_level_promoted": 2,
+        "stable_member": "App.runWithExternalPort",
+        "nonstable_diagnostics_owner": "runtime_observability",
+        "evidence": "Existing ExternalPort was hardened without a parallel facade; runtime methods left the public surface, diagnostics remained EXPERIMENTAL, three direct contract tests were added, and the producer cohort stabilized with debt remaining zero."
+      },
+      {
+        "id": "canvas_drawing_core",
+        "phase": "5G-I",
+        "result": "STABLE_DRAWING_CONTRACT",
+        "top_level_promoted": 1,
+        "stable_member": "Frame.canvas",
+        "nonstable_groups": [
+          "advanced Canvas conveniences",
+          "Surface/composition",
+          "viewport/resize policy"
+        ],
+        "evidence": "Gate A fixed grapheme-atomic left clipping, added six direct coordinate/fill/text/wide-cell/Frame tests while Canvas remained EXPERIMENTAL, and Gate B promoted only the six approved machine entries with debt remaining zero."
+      },
+      {
+        "id": "core_media_runtime",
+        "phase": "5K-I",
+        "result": "RETIRED",
+        "top_level_removed": 4,
+        "contract_entries_removed": 22,
+        "evidence": "The authorized declaration island was removed after the old inventory and current source differed by exactly the approved 22 entries. Stable media primitives and packages/media remained unchanged; no replacement or migration was required."
+      },
+      {
+        "id": "document_facade",
+        "phase": "5L-I",
+        "result": "RETIRED",
+        "top_level_removed": 12,
+        "contract_entries_removed": 12,
+        "evidence": "The authorized package and twelve pure aliases were retired after the intermediate classifier reported exactly the approved twelve stale entries and no collateral surface. All twelve canonical STABLE core targets remained unchanged; no caller migration, shim, or behavior replacement was required."
+      },
+      {
+        "id": "modal_widget",
+        "phase": "5M-I",
+        "result": "RETIRED",
+        "top_level_removed": 1,
+        "contract_entries_removed": 3,
+        "evidence": "The authorized immediate presentation convenience was removed after the old inventory and current extractor differed by exactly Modal, Modal.init, and Modal.render with no added or collateral declaration. Tabs, Viewport, StatusBar, shared rendering primitives, examples, and consumers required no behavior migration."
+      },
+      {
+        "id": "editor_facade",
+        "phase": "5N-I",
+        "result": "RETIRED",
+        "top_level_removed": 28,
+        "contract_entries_removed": 28,
+        "evidence": "The dedicated facade package was retired after old metadata reported exactly the authorized 26 aliases and two pure forwarders stale with no collateral API. Sixteen STABLE type targets, two STABLE function targets, and ten EXPERIMENTAL advanced-shell targets remain unchanged; no caller migration or replacement facade was required."
+      },
+      {
+        "id": "advanced_core_editor_shell",
+        "phase": "5O-I",
+        "result": "RETIRED",
+        "top_level_removed": 10,
+        "contract_entries_removed": 64,
+        "evidence": "The authorized behavior-bearing shell was removed after the intermediate stale proof matched exactly 64 entries with zero collateral. Stable editor APIs and all adopted behavior remained unchanged; final executable acceptance passed under the qualified and implemented 20260817 canonical toolchain."
+      }
     ],
     "families": [
-      {"id": "runtime_observability", "rules": ["core-app-observability-experimental", "core-app-detailed-metric-member", "core-app-trace-attachment-member", "core-runtime-scheduling-metrics", "core-runtime-external-port-diagnostics"], "top_level": 3, "contract_entries": 43, "owner": "core/observability", "decision": "KEEP_EXPERIMENTAL", "review_phase": "5H", "review_status": "EXACT_COHORT_SPLIT_COMPLETE", "semantic_readiness": "READY_ONLY_FOR_REDUCED_RUNTIME_METRICS", "promotion_readiness": "DEFERRED", "lifecycle_subcohorts": [{"id": "coarse_pull_runtime_metrics", "symbols": ["RuntimeMetricsSnapshot", "AppMetrics.runtime"], "decision": "KEEP_EXPERIMENTAL", "semantic_readiness": "READY", "stable_intended_subset": ["RuntimeMetricsSnapshot", "RuntimeMetricsSnapshot.queueEnqueued", "RuntimeMetricsSnapshot.queueProcessed", "RuntimeMetricsSnapshot.maxQueueDepth", "AppMetrics.runtime"], "excluded": ["RuntimeMetricsSnapshot.init", "RuntimeMetricsSnapshot.maxUpdateDepth", "RuntimeMetricsSnapshot.scheduling"]}, {"id": "trace_lifecycle", "symbols": ["AppTraceSink", "App.attachTraceSink"], "decision": "KEEP_EXPERIMENTAL"}, {"id": "frame_scheduling_diagnostics", "symbols": ["FrameSchedulingSnapshot"], "decision": "KEEP_EXPERIMENTAL"}, {"id": "external_delivery_operational_diagnostics", "symbols": ["ExternalPort.size", "ExternalPort.acceptedCount", "ExternalPort.fullCount", "ExternalPort.closedCount"], "decision": "KEEP_EXPERIMENTAL"}, {"id": "proof_implementation_diagnostics", "symbols": ["RuntimeMetricsSnapshot.maxUpdateDepth", "ExternalPort.enableLatencyMeasurement", "ExternalPort.wakeSignals", "ExternalPort.wakeCoalesced"], "decision": "KEEP_EXPERIMENTAL", "future": "INTERNALIZATION_CANDIDATE"}], "adoption": "agent_tui production performance trace and Architecture Proof consume broad diagnostics; no second independent operational consumer adopts the exact reduced pull-snapshot contract", "reason": "Corrected language-public inventory contains 43 entries after implicit interface methods became visible and stale FrameSchedulingSnapshot ownership leakage was removed. Only queueEnqueued, queueProcessed, maxQueueDepth, and AppMetrics.runtime have a frozen consumer-neutral semantic contract; trace callbacks, scheduling taxonomy, ExternalPort diagnostics, maxUpdateDepth, and the broad snapshot constructor remain intentionally nonstable.", "revisit": "Reopen only after a second independent operational consumer organically adopts the exact reduced pull-snapshot semantics and cross-version compatibility evidence exists. Tests, proofs, benchmarks, duplicate agent_tui paths, documentation examples, wrappers, and synthetic adopters do not satisfy this condition."},
-      {"id": "pty_runtime_integration", "rules": ["core-pty-runtime-experimental", "core-app-pty-attachment-member"], "top_level": 4, "contract_entries": 30, "owner": "experimental/pty", "decision": "KEEP_EXPERIMENTAL", "adoption": "terminal_lab feature demo and core integration tests; no principal consumer", "reason": "The corrected language-public inventory includes inherited interface members. The data protocol is stable, but process ownership, readiness, attachment, lifecycle, and cross-platform behavior remain Linux-first.", "revisit": "Revisit after independent production adoption and cross-platform lifecycle/readiness proof."},
-      {"id": "focus_management", "rules": ["core-focus-manager-experimental"], "top_level": 1, "contract_entries": 10, "owner": "core/focus", "decision": "KEEP_EXPERIMENTAL", "review_phase": "5D", "adoption": "recommended form_studio plus one focused core test; no principal production adopter", "reason": "The application-owned flat String-ID responsibility and STABLE KeyEvent/builtin closure are coherent, but current behavior permits duplicate IDs, remove-current successor and empty/all-disabled key-consumption semantics are not contract-frozen, form_studio exercises only part of the surface, and the explicit two-independent-application promotion condition is unmet.", "revisit": "Intentionally harden and directly test duplicate registration, removal/current selection, empty/all-disabled traversal and Tab/BackTab consumption, then require a second independent application using the same flat focus contract; do not manufacture adoption or add a focus tree."},
-      {"id": "interactive_command_widgets", "rules": ["core-widget-experimental"], "symbols": ["MenuItem", "Menu", "MenuBar", "CommandPalette", "Toast", "ToastManager", "Spinner", "Dialog", "ConfirmDialog"], "top_level": 9, "contract_entries": 45, "owner": "core/widgets", "decision": "KEEP_EXPERIMENTAL", "adoption": "seven recommended examples, terminal_lab, and core tests", "reason": "The widgets are executable and useful but remain a heterogeneous opt-in interaction toolkit without production compatibility ownership.", "revisit": "Revisit per coherent widget subset after production adoption or repeated API-shape stability across recommended examples."},
-      {"id": "feedback_status_dashboard_widgets", "rules": ["core-widget-experimental", "core-style-state-experimental"], "symbols": ["StyleState", "MetricCard", "Meter", "LegendItem", "Legend", "TimeSeriesChart", "HeaderBar", "FooterBar", "EmptyState", "ErrorBox", "LoadingOverlay", "Skeleton", "InlineAlert"], "top_level": 13, "contract_entries": 45, "owner": "core/widgets", "decision": "KEEP_EXPERIMENTAL", "adoption": "experimental btm_clone uses Meter, HeaderBar, and FooterBar; core tests cover the broader family; no principal, production, or recommended-example adopter", "reason": "Dashboard/feedback presentation is useful but styling, data shape, and compatibility expectations remain example-led.", "revisit": "Revisit after an independent production dashboard adopter freezes a smaller coherent contract."},
-      {"id": "advanced_form_inputs", "rules": ["core-widget-experimental"], "symbols": ["ColorPicker", "MultiSelect", "DatePicker"], "top_level": 3, "contract_entries": 21, "owner": "core/widgets", "decision": "KEEP_EXPERIMENTAL", "adoption": "recommended form_studio and core tests", "reason": "The controls are usable but have only one example owner and no production accessibility/input contract evidence.", "revisit": "Revisit after a second real form consumer and focused keyboard/value semantics tests."},
-      {"id": "visualization_log_widgets", "rules": ["core-widget-experimental"], "symbols": ["Sparkline", "Gauge", "Chart", "LogView"], "top_level": 4, "contract_entries": 13, "owner": "core/widgets", "decision": "KEEP_EXPERIMENTAL", "adoption": "recommended ops_dashboard/markdown_studio plus core tests", "reason": "These specialized presentation widgets remain example-led and do not yet share one frozen data/scale contract.", "revisit": "Revisit when production consumers validate chart scaling, log bounds, and styling semantics."},
-      {"id": "data_virtual_data_widgets", "rules": ["core-data-experimental"], "top_level": 6, "contract_entries": 74, "owner": "core/widgets", "decision": "KEEP_EXPERIMENTAL", "review_phase": "5F", "lifecycle_subcohorts": [{"id": "pagination", "symbols": ["Paginator"], "semantic_maturity": "NOT_READY", "adoption_maturity": "INSUFFICIENT"}, {"id": "tree_model_view", "symbols": ["TreeNode", "Tree"], "semantic_maturity": "NOT_READY", "adoption_maturity": "INSUFFICIENT"}, {"id": "virtual_table", "symbols": ["TableColumn", "TableStatus", "VirtualTable"], "semantic_maturity": "PARTIAL", "adoption_maturity": "INSUFFICIENT"}], "adoption": "recommended data_browser uses Paginator plus static Tree/TreeNode and a broader VirtualTable path; experimental btm_clone uses only TableColumn plus ephemeral VirtualTable rendering; principal consumers use none", "reason": "The six declarations are not one compatibility cohort. Paginator is independent mutable pagination state; TreeNode/Tree own a mutable display hierarchy and visible-index navigation; TableColumn/TableStatus/VirtualTable own a callback-backed data grid. Constructor normalization can be bypassed through public mutable fields, Tree identity/mutation edges and VirtualTable callback/cache/source-index semantics are not contract-frozen, TableStatus has zero application/test adoption, and the two examples validate only a small shared VirtualTable render/provider subset rather than the same 74-entry contract.", "revisit": "Review each exact subcohort independently only after public mutable invariants and invalid-input semantics are hardened, direct tests cover its identity/mutation/callback contract, and two independent real consumers validate that same subcohort. Keep viewport-bounded provider work as fitness without freezing cache or dirty implementation details; do not manufacture adoption or add a generic data framework."},
-      {"id": "transcript_card_presentation", "rules": ["core-editor-experimental"], "symbols": ["TranscriptItemKind", "TranscriptItemStatus", "TranscriptCardOption", "TranscriptCardTheme", "TranscriptItem", "Transcript", "TranscriptView", "statusMark", "transcriptStatusStyle", "transcriptStatusLabel", "transcriptCardDocument"], "top_level": 11, "contract_entries": 70, "owner": "core/editor", "decision": "KEEP_EXPERIMENTAL", "review_phase": "5I", "review_status": "EXACT_LIFECYCLE_SPLIT_FROZEN_NO_CURRENT_PROMOTION_TARGET", "lifecycle_subcohorts": [{"id": "item_kind_taxonomy", "symbols": ["TranscriptItemKind"], "semantic_maturity": "PARTIAL", "adoption_maturity": "INSUFFICIENT"}, {"id": "status_taxonomy", "symbols": ["TranscriptItemStatus"], "semantic_maturity": "PARTIAL", "adoption_maturity": "INSUFFICIENT"}, {"id": "status_presentation_helpers", "symbols": ["statusMark", "transcriptStatusStyle", "transcriptStatusLabel"], "semantic_maturity": "NOT_READY", "adoption_maturity": "INSUFFICIENT"}, {"id": "card_theme_options", "symbols": ["TranscriptCardOption", "TranscriptCardTheme"], "semantic_maturity": "PARTIAL", "adoption_maturity": "INSUFFICIENT"}, {"id": "card_projection", "symbols": ["TranscriptItem", "transcriptCardDocument"], "semantic_maturity": "PARTIAL", "adoption_maturity": "INSUFFICIENT"}, {"id": "mutable_transcript_model", "symbols": ["Transcript"], "semantic_maturity": "NOT_READY", "adoption_maturity": "INSUFFICIENT"}, {"id": "interactive_transcript_view", "symbols": ["TranscriptView"], "semantic_maturity": "NOT_READY", "adoption_maturity": "INSUFFICIENT"}], "adoption": "agent_tui production owns canonical UiSnapshot/UiCard state and projects it through the item/theme/document helpers into VirtualTranscript; recommended assistant_console owns a separate Transcript and renders TranscriptView; oh_my_pi_skin has no direct symbol use from this family", "reason": "The eleven declarations are seven lifecycle subcohorts, not one presentation contract. agent_tui and assistant_console overlap only on a small basic TranscriptItem/card-rendering subset rather than the exact current constructors, enum cases, theme slots, mutable model, or view semantics. Exact glyphs, English labels, colors, NO_COLOR behavior, Document decomposition, card chrome defaults, public collapsed/offset/selected mutation, duplicate-id toggle behavior, and empty navigation consumption remain under-frozen.", "revisit": "Review one exact subcohort only after direct semantic tests freeze its enum/value/default/output or mutable interaction contract and two independent consumers validate that same exact responsibility. Theme/card promotion requires independent presentation justification and must not be used to launder VirtualTranscript closure; do not count custom Canvas transcript visuals or manufacture adoption."},
-      {"id": "activity_dialog_ui", "rules": ["core-editor-experimental"], "symbols": ["ActivityStep", "ActivityTimeline", "RequestDialog", "DecisionDialog"], "top_level": 4, "contract_entries": 15, "owner": "core/editor", "decision": "KEEP_EXPERIMENTAL", "adoption": "recommended assistant_console and one combined core test", "reason": "The request/activity widgets are usable but application-specific and have no production adopter or independent semantic tests.", "revisit": "Revisit after real workflow adoption freezes decision, selection, and activity-state semantics."},
-      {"id": "vim_editor_policy", "rules": ["core-vim-editor-experimental"], "top_level": 2, "contract_entries": 8, "owner": "core/editor", "decision": "KEEP_EXPERIMENTAL", "adoption": "markdown_studio --vim and core public behavior regressions", "reason": "An optional limited modal editing strategy has one application consumer; command, history, and focus semantics have not been validated independently.", "revisit": "Review with editor behavior policies after a second independent consumer validates mode and transaction semantics; never infer default TextArea adoption."},
-      {"id": "canvas_surfaces", "rules": ["core-canvas-advanced-experimental", "core-canvas-surface-policy-experimental"], "top_level": 5, "contract_entries": 34, "owner": "experimental/canvas", "decision": "KEEP_EXPERIMENTAL", "review_phase": "5G-I", "review_decision": "CANVAS_CORE_STABILIZED_REMAINDER_KEPT_EXPERIMENTAL", "lifecycle_subcohorts": [{"id": "advanced_canvas_convenience", "symbols": ["Canvas.withClip", "Canvas.translated", "Canvas.viewport", "Canvas.hline", "Canvas.vline", "Canvas.strokeRect", "Canvas.drawLine", "Canvas.drawSprite", "Canvas.render"], "next": "KEEP_EXPERIMENTAL"}, {"id": "surface_composition", "symbols": ["Surface", "Canvas.composite"], "next": "KEEP_EXPERIMENTAL"}, {"id": "viewport_resize_policy", "symbols": ["ResizePolicy", "ViewportFit", "SizeGuard", "centeredViewport"], "next": "KEEP_EXPERIMENTAL"}], "adoption": "agent_tui production uses centeredViewport; official examples exercise ResizePolicy/ViewportFit/SizeGuard and advanced Canvas conveniences; no caller uses Surface/composite", "reason": "The stable Canvas owner intentionally has qualified EXPERIMENTAL overrides. Convenience methods need method-specific semantic adoption/tests; Surface/composition needs independent adoption plus ownership/zIndex and wide-cell tests; viewport/resize policy needs distinct safe policy semantics and same-policy adoption.", "revisit": "Review each exact remaining group independently. Do not inherit Canvas owner stability, manufacture adoption, or add a graphics framework."},
-      {"id": "virtual_transcript", "rules": ["core-virtual-transcript-public", "core-virtual-transcript-metrics"], "top_level": 4, "contract_entries": 82, "owner": "specialized/virtual_transcript", "decision": "KEEP_EXPERIMENTAL", "review_phase": "5E", "adoption": "agent_tui production plus 29 focused tests, one proof-focused metrics test, and permanent append/width/precise-item/offscreen/long-transcript fitness", "reason": "The specialized capability is production-proven, but the consumer cohort is not a clean stable closure: the corrected machine inventory now includes all twelve language-public VirtualTranscriptSource methods, which expose INTERNAL VirtualTranscriptAppendOnlyText and EXPERIMENTAL TranscriptCardTheme; VirtualTranscriptView exposes INTERNAL VisibleRange, algorithm knobs, dirty/metrics helpers, and presentation configuration; VirtualTranscriptState exposes freely mutable scroll/anchor implementation state. VirtualTranscriptMetrics remains a 45-entry structural diagnostics object, and the explicit second-independent-real-consumer promotion condition is unmet.", "revisit": "Revisit only after a second independent real consumer validates source/state/identity and bounded-work semantics, the consumer API no longer exposes VirtualTranscriptAppendOnlyText or VisibleRange, TranscriptCardTheme/presentation ownership is resolved, mutable state and constructor algorithm knobs are narrowed into intentional consumer semantics, and metrics remain separately EXPERIMENTAL or are independently reviewed; do not manufacture adoption or create a generic VirtualList."},
-      {"id": "terminal_drivers_probe", "rules": ["core-terminal-experimental"], "symbols": ["TerminalProbe", "LinuxTerminalDriver", "FallbackTerminalDriver", "MacOSTerminalDriver", "WindowsTerminalDriver"], "top_level": 7, "contract_entries": 44, "owner": "core/terminal", "decision": "KEEP_EXPERIMENTAL", "review_phase": "5J", "review_status": "EXACT_LIFECYCLE_SPLIT_FROZEN_NO_CURRENT_PROMOTION_TARGET", "lifecycle_subcohorts": [{"id": "active_terminal_probe_executor", "symbols": ["TerminalProbe"], "physical_top_level": 1, "contract_entries": 2, "semantic_maturity": "NOT_READY", "adoption_maturity": "INSUFFICIENT"}, {"id": "portable_fallback_driver", "symbols": ["FallbackTerminalDriver"], "physical_top_level": 1, "contract_entries": 7, "semantic_maturity": "PARTIAL", "adoption_maturity": "INSUFFICIENT"}, {"id": "native_platform_driver_implementations", "symbols": ["LinuxTerminalDriver", "MacOSTerminalDriver", "WindowsTerminalDriver"], "physical_top_level": 5, "contract_entries": 35, "semantic_maturity": "PARTIAL", "adoption_maturity": "INSUFFICIENT", "future": "INTERNALIZATION_REVIEW_CANDIDATE_IF_NO_PUBLIC_OWNER"}], "adoption": "Stable App/TerminalSession exercise the implementations indirectly through stable TerminalDriver/defaultTerminalDriver; core tests directly cover TerminalProbe and FallbackTerminalDriver; agent_tui, agent_app, other omp-cj packages, and all official examples have zero direct construction or calls to the five logical family types.", "reason": "The seven physical declarations are three lifecycle cohorts, not one compatibility contract. Consumer-neutral TerminalDriver, TerminalCapabilities, TerminalProbeMode, TerminalProbeResult, TerminalSession, and defaultTerminalDriver are already STABLE. TerminalProbe is an active terminal-I/O policy with input consumption, timeout, fallback, malformed-response, and failure semantics still under-frozen; FallbackTerminalDriver is a fixed-size no-raw implementation; native drivers delegate to process-global platform mode machinery and have platform/resource/error/multi-session commitments unsupported by direct consumers or a real Linux/macOS/Windows matrix. MacOS and Windows each have mutually exclusive native/fallback physical declarations, accounting for fourteen legitimate platform-conditioned inventory rows rather than stale-owner duplicates.", "revisit": "Review the active probe only after its query, byte-consumption/non-replay, timeout, malformed/invalid input, failure, and cleanup semantics are frozen, its stable-intended signature no longer defaults through INTERNAL detect, and independent cross-platform consumers validate it. Review fallback/native drivers only if real users directly select them and explicit resource ownership, restore/error, thread/multi-session, and Linux/macOS/Windows behavior are proven; otherwise consider concrete-driver internalization. Do not count indirect stable Backend exercise as public adoption."},
-      {"id": "terminal_cursor_shapes", "rules": ["core-terminal-cursor-shape-experimental", "core-terminal-cursor-shape-members"], "top_level": 1, "contract_entries": 6, "owner": "core/terminal", "decision": "KEEP_EXPERIMENTAL", "adoption": "markdown_studio --vim and terminal renderer tests", "reason": "Opt-in cursor styling has one application consumer; unsupported backends retain their existing cursor, and the cross-terminal behavior is not a stable contract.", "revisit": "Review after independent consumers validate block/bar transitions and session restoration on supported terminals."},
-      {"id": "debug_overlay", "rules": ["core-observability-widget-experimental"], "symbols": ["DebugOverlay"], "top_level": 1, "contract_entries": 3, "owner": "core/observability", "decision": "KEEP_EXPERIMENTAL", "review_phase": "5R", "review_status": "EXACT_LIFECYCLE_REVIEW_CLOSED_KEEP", "semantic_readiness": "PARTIAL", "promotion_readiness": "DEFERRED", "adoption": "debug_lab and crystal_caves render the overlay directly; experimental btm_clone toggles it and asserts fps output in headless smoke; core snapshot/golden coverage validates metrics text and styling; agent_tui, agent_app, and other principal consumers have no direct adoption", "reason": "DebugOverlay is a coherent optional observability presentation over AppMetrics and has current value in three independent examples plus direct core behavior coverage. It remains EXPERIMENTAL because no principal production consumer owns its output contract, and field order, zero-frame fallback, truncation, style, and size behavior are not frozen. Its former terminal classification was an ownership mismatch: the platform driver/probe policy did not govern this metrics widget.", "revisit": "Revisit only after a principal application or two independent production applications adopt the widget and direct semantic tests freeze metrics field order, zero-frame output, truncation, style, and size handling; sunset review is appropriate if all current diagnostic/example adopters remove it and no shared observability owner remains."},
-      {"id": "markdown_code_presentation", "rules": ["markdown-adapter-presentation-experimental", "markdown-adapter-presentation-fields-experimental"], "top_level": 4, "contract_entries": 6, "owner": "packages/markdown_adapter", "decision": "KEEP_EXPERIMENTAL", "adoption": "markdown_studio loads declarative rules and consumes paired source and preview output; focused adapter and Studio rendering tests", "reason": "Configurable byte-accurate lexical presentation has one application consumer and is not a stable adapter contract yet.", "revisit": "Revisit after two independent consumers validate source-byte mapping, full decoration replacement, and language coverage."},
-      {"id": "diff_package", "rules": ["diff-package-experimental"], "top_level": 7, "contract_entries": 35, "owner": "packages/diff", "decision": "KEEP_EXPERIMENTAL", "adoption": "terminal_lab feature demo and three package tests", "reason": "The package has coherent independent value but only one feature-demo adopter and no production compatibility owner.", "revisit": "Revisit after a real consumer validates parse/render and side-by-side semantics."},
-      {"id": "media_package", "rules": ["media-package-experimental"], "top_level": 14, "contract_entries": 60, "owner": "packages/media", "decision": "KEEP_EXPERIMENTAL", "adoption": "media_gallery, gif_ascii, and nine package tests", "reason": "The corrected language-public inventory includes inherited interface members. The optional domain is active, but adapter/process/protocol portability and ffmpeg lifecycle remain experimental.", "revisit": "Revisit after independent production adoption and cross-terminal/platform evidence."},
-      {"id": "game_package", "rules": ["game-package-experimental"], "top_level": 21, "contract_entries": 128, "owner": "packages/game", "decision": "KEEP_EXPERIMENTAL", "adoption": "crystal_caves feature demo and eight package tests", "reason": "The optional domain is coherent but engine-shaped, broad, and supported by one feature demo rather than a stable compatibility commitment.", "revisit": "Revisit after independent game consumers validate ECS, physics, tile, animation, and rendering boundaries."},
-      {"id": "terminal_transcript_package", "rules": ["terminal-package-experimental"], "top_level": 6, "contract_entries": 29, "owner": "packages/terminal", "decision": "KEEP_EXPERIMENTAL", "adoption": "terminal_lab feature demo and five package tests", "reason": "The xterm-subset transcript capability is coherent but intentionally partial and lacks a production adopter.", "revisit": "Revisit after real log/terminal consumers freeze ANSI subset, trimming, cursor, and search semantics."}
+      {
+        "id": "runtime_observability",
+        "rules": [
+          "core-app-observability-experimental",
+          "core-app-detailed-metric-member",
+          "core-app-trace-attachment-member",
+          "core-runtime-scheduling-metrics",
+          "core-runtime-external-port-diagnostics"
+        ],
+        "top_level": 3,
+        "contract_entries": 45,
+        "owner": "core/observability",
+        "decision": "KEEP_EXPERIMENTAL",
+        "review_phase": "5H",
+        "review_status": "EXACT_COHORT_SPLIT_COMPLETE",
+        "semantic_readiness": "READY_ONLY_FOR_REDUCED_RUNTIME_METRICS",
+        "promotion_readiness": "DEFERRED",
+        "lifecycle_subcohorts": [
+          {
+            "id": "coarse_pull_runtime_metrics",
+            "symbols": [
+              "RuntimeMetricsSnapshot",
+              "AppMetrics.runtime"
+            ],
+            "decision": "KEEP_EXPERIMENTAL",
+            "semantic_readiness": "READY",
+            "stable_intended_subset": [
+              "RuntimeMetricsSnapshot",
+              "RuntimeMetricsSnapshot.queueEnqueued",
+              "RuntimeMetricsSnapshot.queueProcessed",
+              "RuntimeMetricsSnapshot.maxQueueDepth",
+              "AppMetrics.runtime"
+            ],
+            "excluded": [
+              "RuntimeMetricsSnapshot.init",
+              "RuntimeMetricsSnapshot.maxUpdateDepth",
+              "RuntimeMetricsSnapshot.scheduling"
+            ]
+          },
+          {
+            "id": "trace_lifecycle",
+            "symbols": [
+              "AppTraceSink",
+              "App.attachTraceSink"
+            ],
+            "decision": "KEEP_EXPERIMENTAL"
+          },
+          {
+            "id": "frame_scheduling_diagnostics",
+            "symbols": [
+              "FrameSchedulingSnapshot"
+            ],
+            "decision": "KEEP_EXPERIMENTAL"
+          },
+          {
+            "id": "external_delivery_operational_diagnostics",
+            "symbols": [
+              "ExternalPort.size",
+              "ExternalPort.acceptedCount",
+              "ExternalPort.fullCount",
+              "ExternalPort.closedCount"
+            ],
+            "decision": "KEEP_EXPERIMENTAL"
+          },
+          {
+            "id": "proof_implementation_diagnostics",
+            "symbols": [
+              "RuntimeMetricsSnapshot.maxUpdateDepth",
+              "ExternalPort.enableLatencyMeasurement",
+              "ExternalPort.wakeSignals",
+              "ExternalPort.wakeCoalesced"
+            ],
+            "decision": "KEEP_EXPERIMENTAL",
+            "future": "INTERNALIZATION_CANDIDATE"
+          }
+        ],
+        "adoption": "agent_tui production performance trace and Architecture Proof consume broad diagnostics; no second independent operational consumer adopts the exact reduced pull-snapshot contract",
+        "reason": "Corrected language-public inventory contains 43 entries after implicit interface methods became visible and stale FrameSchedulingSnapshot ownership leakage was removed. Only queueEnqueued, queueProcessed, maxQueueDepth, and AppMetrics.runtime have a frozen consumer-neutral semantic contract; trace callbacks, scheduling taxonomy, ExternalPort diagnostics, maxUpdateDepth, and the broad snapshot constructor remain intentionally nonstable.",
+        "revisit": "Reopen only after a second independent operational consumer organically adopts the exact reduced pull-snapshot semantics and cross-version compatibility evidence exists. Tests, proofs, benchmarks, duplicate agent_tui paths, documentation examples, wrappers, and synthetic adopters do not satisfy this condition."
+      },
+      {
+        "id": "pty_runtime_integration",
+        "rules": [
+          "core-pty-runtime-experimental",
+          "core-app-pty-attachment-member"
+        ],
+        "top_level": 4,
+        "contract_entries": 30,
+        "owner": "experimental/pty",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "terminal_lab feature demo and core integration tests; no principal consumer",
+        "reason": "The corrected language-public inventory includes inherited interface members. The data protocol is stable, but process ownership, readiness, attachment, lifecycle, and cross-platform behavior remain Linux-first.",
+        "revisit": "Revisit after independent production adoption and cross-platform lifecycle/readiness proof."
+      },
+      {
+        "id": "focus_management",
+        "rules": [
+          "core-focus-manager-experimental"
+        ],
+        "top_level": 1,
+        "contract_entries": 10,
+        "owner": "core/focus",
+        "decision": "KEEP_EXPERIMENTAL",
+        "review_phase": "5D",
+        "adoption": "recommended form_studio plus one focused core test; no principal production adopter",
+        "reason": "The application-owned flat String-ID responsibility and STABLE KeyEvent/builtin closure are coherent, but current behavior permits duplicate IDs, remove-current successor and empty/all-disabled key-consumption semantics are not contract-frozen, form_studio exercises only part of the surface, and the explicit two-independent-application promotion condition is unmet.",
+        "revisit": "Intentionally harden and directly test duplicate registration, removal/current selection, empty/all-disabled traversal and Tab/BackTab consumption, then require a second independent application using the same flat focus contract; do not manufacture adoption or add a focus tree."
+      },
+      {
+        "id": "interactive_command_widgets",
+        "rules": [
+          "core-widget-experimental"
+        ],
+        "symbols": [
+          "MenuItem",
+          "Menu",
+          "MenuBar",
+          "CommandPalette",
+          "Toast",
+          "ToastManager",
+          "Spinner",
+          "Dialog",
+          "ConfirmDialog"
+        ],
+        "top_level": 9,
+        "contract_entries": 51,
+        "owner": "core/widgets",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "seven recommended examples, terminal_lab, and core tests",
+        "reason": "The widgets are executable and useful but remain a heterogeneous opt-in interaction toolkit without production compatibility ownership.",
+        "revisit": "Revisit per coherent widget subset after production adoption or repeated API-shape stability across recommended examples."
+      },
+      {
+        "id": "feedback_status_dashboard_widgets",
+        "rules": [
+          "core-widget-experimental",
+          "core-style-state-experimental"
+        ],
+        "symbols": [
+          "StyleState",
+          "MetricCard",
+          "Meter",
+          "LegendItem",
+          "Legend",
+          "TimeSeriesChart",
+          "HeaderBar",
+          "FooterBar",
+          "EmptyState",
+          "ErrorBox",
+          "LoadingOverlay",
+          "Skeleton",
+          "InlineAlert"
+        ],
+        "top_level": 13,
+        "contract_entries": 45,
+        "owner": "core/widgets",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "experimental btm_clone uses Meter, HeaderBar, and FooterBar; core tests cover the broader family; no principal, production, or recommended-example adopter",
+        "reason": "Dashboard/feedback presentation is useful but styling, data shape, and compatibility expectations remain example-led.",
+        "revisit": "Revisit after an independent production dashboard adopter freezes a smaller coherent contract."
+      },
+      {
+        "id": "advanced_form_inputs",
+        "rules": [
+          "core-widget-experimental"
+        ],
+        "symbols": [
+          "ColorPicker",
+          "MultiSelect",
+          "DatePicker"
+        ],
+        "top_level": 3,
+        "contract_entries": 24,
+        "owner": "core/widgets",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "recommended form_studio and core tests",
+        "reason": "The controls are usable but have only one example owner and no production accessibility/input contract evidence.",
+        "revisit": "Revisit after a second real form consumer and focused keyboard/value semantics tests."
+      },
+      {
+        "id": "visualization_log_widgets",
+        "rules": [
+          "core-widget-experimental"
+        ],
+        "symbols": [
+          "Sparkline",
+          "Gauge",
+          "Chart",
+          "LogView"
+        ],
+        "top_level": 4,
+        "contract_entries": 13,
+        "owner": "core/widgets",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "recommended ops_dashboard/markdown_studio plus core tests",
+        "reason": "These specialized presentation widgets remain example-led and do not yet share one frozen data/scale contract.",
+        "revisit": "Revisit when production consumers validate chart scaling, log bounds, and styling semantics."
+      },
+      {
+        "id": "data_virtual_data_widgets",
+        "rules": [
+          "core-data-experimental"
+        ],
+        "top_level": 6,
+        "contract_entries": 78,
+        "owner": "core/widgets",
+        "decision": "KEEP_EXPERIMENTAL",
+        "review_phase": "5F",
+        "lifecycle_subcohorts": [
+          {
+            "id": "pagination",
+            "symbols": [
+              "Paginator"
+            ],
+            "semantic_maturity": "NOT_READY",
+            "adoption_maturity": "INSUFFICIENT"
+          },
+          {
+            "id": "tree_model_view",
+            "symbols": [
+              "TreeNode",
+              "Tree"
+            ],
+            "semantic_maturity": "NOT_READY",
+            "adoption_maturity": "INSUFFICIENT"
+          },
+          {
+            "id": "virtual_table",
+            "symbols": [
+              "TableColumn",
+              "TableStatus",
+              "VirtualTable"
+            ],
+            "semantic_maturity": "PARTIAL",
+            "adoption_maturity": "INSUFFICIENT"
+          }
+        ],
+        "adoption": "recommended data_browser uses Paginator plus static Tree/TreeNode and a broader VirtualTable path; experimental btm_clone uses only TableColumn plus ephemeral VirtualTable rendering; principal consumers use none",
+        "reason": "The six declarations are not one compatibility cohort. Paginator is independent mutable pagination state; TreeNode/Tree own a mutable display hierarchy and visible-index navigation; TableColumn/TableStatus/VirtualTable own a callback-backed data grid. Constructor normalization can be bypassed through public mutable fields, Tree identity/mutation edges and VirtualTable callback/cache/source-index semantics are not contract-frozen, TableStatus has zero application/test adoption, and the two examples validate only a small shared VirtualTable render/provider subset rather than the same 74-entry contract.",
+        "revisit": "Review each exact subcohort independently only after public mutable invariants and invalid-input semantics are hardened, direct tests cover its identity/mutation/callback contract, and two independent real consumers validate that same subcohort. Keep viewport-bounded provider work as fitness without freezing cache or dirty implementation details; do not manufacture adoption or add a generic data framework."
+      },
+      {
+        "id": "transcript_card_presentation",
+        "rules": [
+          "core-editor-experimental"
+        ],
+        "symbols": [
+          "TranscriptItemKind",
+          "TranscriptItemStatus",
+          "TranscriptCardOption",
+          "TranscriptCardTheme",
+          "TranscriptItem",
+          "Transcript",
+          "TranscriptView",
+          "statusMark",
+          "transcriptStatusStyle",
+          "transcriptStatusLabel",
+          "transcriptCardDocument"
+        ],
+        "top_level": 11,
+        "contract_entries": 70,
+        "owner": "core/editor",
+        "decision": "KEEP_EXPERIMENTAL",
+        "review_phase": "5I",
+        "review_status": "EXACT_LIFECYCLE_SPLIT_FROZEN_NO_CURRENT_PROMOTION_TARGET",
+        "lifecycle_subcohorts": [
+          {
+            "id": "item_kind_taxonomy",
+            "symbols": [
+              "TranscriptItemKind"
+            ],
+            "semantic_maturity": "PARTIAL",
+            "adoption_maturity": "INSUFFICIENT"
+          },
+          {
+            "id": "status_taxonomy",
+            "symbols": [
+              "TranscriptItemStatus"
+            ],
+            "semantic_maturity": "PARTIAL",
+            "adoption_maturity": "INSUFFICIENT"
+          },
+          {
+            "id": "status_presentation_helpers",
+            "symbols": [
+              "statusMark",
+              "transcriptStatusStyle",
+              "transcriptStatusLabel"
+            ],
+            "semantic_maturity": "NOT_READY",
+            "adoption_maturity": "INSUFFICIENT"
+          },
+          {
+            "id": "card_theme_options",
+            "symbols": [
+              "TranscriptCardOption",
+              "TranscriptCardTheme"
+            ],
+            "semantic_maturity": "PARTIAL",
+            "adoption_maturity": "INSUFFICIENT"
+          },
+          {
+            "id": "card_projection",
+            "symbols": [
+              "TranscriptItem",
+              "transcriptCardDocument"
+            ],
+            "semantic_maturity": "PARTIAL",
+            "adoption_maturity": "INSUFFICIENT"
+          },
+          {
+            "id": "mutable_transcript_model",
+            "symbols": [
+              "Transcript"
+            ],
+            "semantic_maturity": "NOT_READY",
+            "adoption_maturity": "INSUFFICIENT"
+          },
+          {
+            "id": "interactive_transcript_view",
+            "symbols": [
+              "TranscriptView"
+            ],
+            "semantic_maturity": "NOT_READY",
+            "adoption_maturity": "INSUFFICIENT"
+          }
+        ],
+        "adoption": "agent_tui production owns canonical UiSnapshot/UiCard state and projects it through the item/theme/document helpers into VirtualTranscript; recommended assistant_console owns a separate Transcript and renders TranscriptView; oh_my_pi_skin has no direct symbol use from this family",
+        "reason": "The eleven declarations are seven lifecycle subcohorts, not one presentation contract. agent_tui and assistant_console overlap only on a small basic TranscriptItem/card-rendering subset rather than the exact current constructors, enum cases, theme slots, mutable model, or view semantics. Exact glyphs, English labels, colors, NO_COLOR behavior, Document decomposition, card chrome defaults, public collapsed/offset/selected mutation, duplicate-id toggle behavior, and empty navigation consumption remain under-frozen.",
+        "revisit": "Review one exact subcohort only after direct semantic tests freeze its enum/value/default/output or mutable interaction contract and two independent consumers validate that same exact responsibility. Theme/card promotion requires independent presentation justification and must not be used to launder VirtualTranscript closure; do not count custom Canvas transcript visuals or manufacture adoption."
+      },
+      {
+        "id": "activity_dialog_ui",
+        "rules": [
+          "core-editor-experimental"
+        ],
+        "symbols": [
+          "ActivityStep",
+          "ActivityTimeline",
+          "RequestDialog",
+          "DecisionDialog"
+        ],
+        "top_level": 4,
+        "contract_entries": 15,
+        "owner": "core/editor",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "recommended assistant_console and one combined core test",
+        "reason": "The request/activity widgets are usable but application-specific and have no production adopter or independent semantic tests.",
+        "revisit": "Revisit after real workflow adoption freezes decision, selection, and activity-state semantics."
+      },
+      {
+        "id": "vim_editor_policy",
+        "rules": [
+          "core-vim-editor-experimental"
+        ],
+        "top_level": 2,
+        "contract_entries": 8,
+        "owner": "core/editor",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "markdown_studio --vim and core public behavior regressions",
+        "reason": "An optional limited modal editing strategy has one application consumer; command, history, and focus semantics have not been validated independently.",
+        "revisit": "Review with editor behavior policies after a second independent consumer validates mode and transaction semantics; never infer default TextArea adoption."
+      },
+      {
+        "id": "canvas_surfaces",
+        "rules": [
+          "core-canvas-advanced-experimental",
+          "core-canvas-surface-policy-experimental"
+        ],
+        "top_level": 5,
+        "contract_entries": 34,
+        "owner": "experimental/canvas",
+        "decision": "KEEP_EXPERIMENTAL",
+        "review_phase": "5G-I",
+        "review_decision": "CANVAS_CORE_STABILIZED_REMAINDER_KEPT_EXPERIMENTAL",
+        "lifecycle_subcohorts": [
+          {
+            "id": "advanced_canvas_convenience",
+            "symbols": [
+              "Canvas.withClip",
+              "Canvas.translated",
+              "Canvas.viewport",
+              "Canvas.hline",
+              "Canvas.vline",
+              "Canvas.strokeRect",
+              "Canvas.drawLine",
+              "Canvas.drawSprite",
+              "Canvas.render"
+            ],
+            "next": "KEEP_EXPERIMENTAL"
+          },
+          {
+            "id": "surface_composition",
+            "symbols": [
+              "Surface",
+              "Canvas.composite"
+            ],
+            "next": "KEEP_EXPERIMENTAL"
+          },
+          {
+            "id": "viewport_resize_policy",
+            "symbols": [
+              "ResizePolicy",
+              "ViewportFit",
+              "SizeGuard",
+              "centeredViewport"
+            ],
+            "next": "KEEP_EXPERIMENTAL"
+          }
+        ],
+        "adoption": "agent_tui production uses centeredViewport; official examples exercise ResizePolicy/ViewportFit/SizeGuard and advanced Canvas conveniences; no caller uses Surface/composite",
+        "reason": "The stable Canvas owner intentionally has qualified EXPERIMENTAL overrides. Convenience methods need method-specific semantic adoption/tests; Surface/composition needs independent adoption plus ownership/zIndex and wide-cell tests; viewport/resize policy needs distinct safe policy semantics and same-policy adoption.",
+        "revisit": "Review each exact remaining group independently. Do not inherit Canvas owner stability, manufacture adoption, or add a graphics framework."
+      },
+      {
+        "id": "virtual_transcript",
+        "rules": [
+          "core-virtual-transcript-public",
+          "core-virtual-transcript-metrics"
+        ],
+        "top_level": 4,
+        "contract_entries": 82,
+        "owner": "specialized/virtual_transcript",
+        "decision": "KEEP_EXPERIMENTAL",
+        "review_phase": "5E",
+        "adoption": "agent_tui production plus 29 focused tests, one proof-focused metrics test, and permanent append/width/precise-item/offscreen/long-transcript fitness",
+        "reason": "The specialized capability is production-proven, but the consumer cohort is not a clean stable closure: the corrected machine inventory now includes all twelve language-public VirtualTranscriptSource methods, which expose INTERNAL VirtualTranscriptAppendOnlyText and EXPERIMENTAL TranscriptCardTheme; VirtualTranscriptView exposes INTERNAL VisibleRange, algorithm knobs, dirty/metrics helpers, and presentation configuration; VirtualTranscriptState exposes freely mutable scroll/anchor implementation state. VirtualTranscriptMetrics remains a 45-entry structural diagnostics object, and the explicit second-independent-real-consumer promotion condition is unmet.",
+        "revisit": "Revisit only after a second independent real consumer validates source/state/identity and bounded-work semantics, the consumer API no longer exposes VirtualTranscriptAppendOnlyText or VisibleRange, TranscriptCardTheme/presentation ownership is resolved, mutable state and constructor algorithm knobs are narrowed into intentional consumer semantics, and metrics remain separately EXPERIMENTAL or are independently reviewed; do not manufacture adoption or create a generic VirtualList."
+      },
+      {
+        "id": "terminal_drivers_probe",
+        "rules": [
+          "core-terminal-experimental"
+        ],
+        "symbols": [
+          "TerminalProbe",
+          "LinuxTerminalDriver",
+          "FallbackTerminalDriver",
+          "MacOSTerminalDriver",
+          "WindowsTerminalDriver"
+        ],
+        "top_level": 7,
+        "contract_entries": 44,
+        "owner": "core/terminal",
+        "decision": "KEEP_EXPERIMENTAL",
+        "review_phase": "5J",
+        "review_status": "EXACT_LIFECYCLE_SPLIT_FROZEN_NO_CURRENT_PROMOTION_TARGET",
+        "lifecycle_subcohorts": [
+          {
+            "id": "active_terminal_probe_executor",
+            "symbols": [
+              "TerminalProbe"
+            ],
+            "physical_top_level": 1,
+            "contract_entries": 2,
+            "semantic_maturity": "NOT_READY",
+            "adoption_maturity": "INSUFFICIENT"
+          },
+          {
+            "id": "portable_fallback_driver",
+            "symbols": [
+              "FallbackTerminalDriver"
+            ],
+            "physical_top_level": 1,
+            "contract_entries": 7,
+            "semantic_maturity": "PARTIAL",
+            "adoption_maturity": "INSUFFICIENT"
+          },
+          {
+            "id": "native_platform_driver_implementations",
+            "symbols": [
+              "LinuxTerminalDriver",
+              "MacOSTerminalDriver",
+              "WindowsTerminalDriver"
+            ],
+            "physical_top_level": 5,
+            "contract_entries": 35,
+            "semantic_maturity": "PARTIAL",
+            "adoption_maturity": "INSUFFICIENT",
+            "future": "INTERNALIZATION_REVIEW_CANDIDATE_IF_NO_PUBLIC_OWNER"
+          }
+        ],
+        "adoption": "Stable App/TerminalSession exercise the implementations indirectly through stable TerminalDriver/defaultTerminalDriver; core tests directly cover TerminalProbe and FallbackTerminalDriver; agent_tui, agent_app, other omp-cj packages, and all official examples have zero direct construction or calls to the five logical family types.",
+        "reason": "The seven physical declarations are three lifecycle cohorts, not one compatibility contract. Consumer-neutral TerminalDriver, TerminalCapabilities, TerminalProbeMode, TerminalProbeResult, TerminalSession, and defaultTerminalDriver are already STABLE. TerminalProbe is an active terminal-I/O policy with input consumption, timeout, fallback, malformed-response, and failure semantics still under-frozen; FallbackTerminalDriver is a fixed-size no-raw implementation; native drivers delegate to process-global platform mode machinery and have platform/resource/error/multi-session commitments unsupported by direct consumers or a real Linux/macOS/Windows matrix. MacOS and Windows each have mutually exclusive native/fallback physical declarations, accounting for fourteen legitimate platform-conditioned inventory rows rather than stale-owner duplicates.",
+        "revisit": "Review the active probe only after its query, byte-consumption/non-replay, timeout, malformed/invalid input, failure, and cleanup semantics are frozen, its stable-intended signature no longer defaults through INTERNAL detect, and independent cross-platform consumers validate it. Review fallback/native drivers only if real users directly select them and explicit resource ownership, restore/error, thread/multi-session, and Linux/macOS/Windows behavior are proven; otherwise consider concrete-driver internalization. Do not count indirect stable Backend exercise as public adoption."
+      },
+      {
+        "id": "terminal_cursor_shapes",
+        "rules": [
+          "core-terminal-cursor-shape-experimental",
+          "core-terminal-cursor-shape-members"
+        ],
+        "top_level": 1,
+        "contract_entries": 6,
+        "owner": "core/terminal",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "markdown_studio --vim and terminal renderer tests",
+        "reason": "Opt-in cursor styling has one application consumer; unsupported backends retain their existing cursor, and the cross-terminal behavior is not a stable contract.",
+        "revisit": "Review after independent consumers validate block/bar transitions and session restoration on supported terminals."
+      },
+      {
+        "id": "debug_overlay",
+        "rules": [
+          "core-observability-widget-experimental"
+        ],
+        "symbols": [
+          "DebugOverlay"
+        ],
+        "top_level": 1,
+        "contract_entries": 3,
+        "owner": "core/observability",
+        "decision": "KEEP_EXPERIMENTAL",
+        "review_phase": "5R",
+        "review_status": "EXACT_LIFECYCLE_REVIEW_CLOSED_KEEP",
+        "semantic_readiness": "PARTIAL",
+        "promotion_readiness": "DEFERRED",
+        "adoption": "debug_lab and crystal_caves render the overlay directly; experimental btm_clone toggles it and asserts fps output in headless smoke; core snapshot/golden coverage validates metrics text and styling; agent_tui, agent_app, and other principal consumers have no direct adoption",
+        "reason": "DebugOverlay is a coherent optional observability presentation over AppMetrics and has current value in three independent examples plus direct core behavior coverage. It remains EXPERIMENTAL because no principal production consumer owns its output contract, and field order, zero-frame fallback, truncation, style, and size behavior are not frozen. Its former terminal classification was an ownership mismatch: the platform driver/probe policy did not govern this metrics widget.",
+        "revisit": "Revisit only after a principal application or two independent production applications adopt the widget and direct semantic tests freeze metrics field order, zero-frame output, truncation, style, and size handling; sunset review is appropriate if all current diagnostic/example adopters remove it and no shared observability owner remains."
+      },
+      {
+        "id": "markdown_code_presentation",
+        "rules": [
+          "markdown-adapter-presentation-experimental",
+          "markdown-adapter-presentation-fields-experimental"
+        ],
+        "top_level": 4,
+        "contract_entries": 6,
+        "owner": "packages/markdown_adapter",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "markdown_studio loads declarative rules and consumes paired source and preview output; focused adapter and Studio rendering tests",
+        "reason": "Configurable byte-accurate lexical presentation has one application consumer and is not a stable adapter contract yet.",
+        "revisit": "Revisit after two independent consumers validate source-byte mapping, full decoration replacement, and language coverage."
+      },
+      {
+        "id": "diff_package",
+        "rules": [
+          "diff-package-experimental"
+        ],
+        "top_level": 7,
+        "contract_entries": 35,
+        "owner": "packages/diff",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "terminal_lab feature demo and three package tests",
+        "reason": "The package has coherent independent value but only one feature-demo adopter and no production compatibility owner.",
+        "revisit": "Revisit after a real consumer validates parse/render and side-by-side semantics."
+      },
+      {
+        "id": "media_package",
+        "rules": [
+          "media-package-experimental"
+        ],
+        "top_level": 14,
+        "contract_entries": 60,
+        "owner": "packages/media",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "media_gallery, gif_ascii, and nine package tests",
+        "reason": "The corrected language-public inventory includes inherited interface members. The optional domain is active, but adapter/process/protocol portability and ffmpeg lifecycle remain experimental.",
+        "revisit": "Revisit after independent production adoption and cross-terminal/platform evidence."
+      },
+      {
+        "id": "game_package",
+        "rules": [
+          "game-package-experimental"
+        ],
+        "top_level": 21,
+        "contract_entries": 128,
+        "owner": "packages/game",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "crystal_caves feature demo and eight package tests",
+        "reason": "The optional domain is coherent but engine-shaped, broad, and supported by one feature demo rather than a stable compatibility commitment.",
+        "revisit": "Revisit after independent game consumers validate ECS, physics, tile, animation, and rendering boundaries."
+      },
+      {
+        "id": "terminal_transcript_package",
+        "rules": [
+          "terminal-package-experimental"
+        ],
+        "top_level": 6,
+        "contract_entries": 29,
+        "owner": "packages/terminal",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "terminal_lab feature demo and five package tests",
+        "reason": "The xterm-subset transcript capability is coherent but intentionally partial and lacks a production adopter.",
+        "revisit": "Revisit after real log/terminal consumers freeze ANSI subset, trimming, cursor, and search semantics."
+      },
+      {
+        "id": "v001_clipboard_adapters",
+        "rules": [
+          "v001-clipboard-adapters"
+        ],
+        "top_level": 4,
+        "contract_entries": 21,
+        "owner": "core/clipboard",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "0.0.1 real example and bounded integration tests; independent production adoption not claimed.",
+        "reason": "Explicit 0.0.1 optional integration. The primary application state/update/render model is unchanged.",
+        "revisit": "Review after independent production adoption and native-platform evidence; do not infer stabilization from example counts."
+      },
+      {
+        "id": "v001_process_runtime",
+        "rules": [
+          "v001-process-integration",
+          "v001-process-attachment"
+        ],
+        "top_level": 3,
+        "contract_entries": 21,
+        "owner": "core/process",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "0.0.1 real example and bounded integration tests; independent production adoption not claimed.",
+        "reason": "Explicit 0.0.1 optional integration. The primary application state/update/render model is unchanged.",
+        "revisit": "Review after independent production adoption and native-platform evidence; do not infer stabilization from example counts."
+      },
+      {
+        "id": "v001_paged_data",
+        "rules": [
+          "v001-paged-data"
+        ],
+        "top_level": 10,
+        "contract_entries": 75,
+        "owner": "core/data",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "0.0.1 real example and bounded integration tests; independent production adoption not claimed.",
+        "reason": "Explicit 0.0.1 optional integration. The primary application state/update/render model is unchanged.",
+        "revisit": "Review after independent production adoption and native-platform evidence; do not infer stabilization from example counts."
+      },
+      {
+        "id": "v001_modal_focus",
+        "rules": [
+          "v001-modal-focus"
+        ],
+        "top_level": 1,
+        "contract_entries": 8,
+        "owner": "core/focus",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "0.0.1 real example and bounded integration tests; independent production adoption not claimed.",
+        "reason": "Explicit 0.0.1 optional integration. The primary application state/update/render model is unchanged.",
+        "revisit": "Review after independent production adoption and native-platform evidence; do not infer stabilization from example counts."
+      }
     ],
     "distribution": {
-      "KEEP_EXPERIMENTAL": {"families": 21, "top_level": 130},
-      "LIFECYCLE_REVIEW_REQUIRED": {"families": 0, "top_level": 0},
-      "PROMOTION_REVIEW_CANDIDATE": {"families": 0, "top_level": 0},
-      "SUNSET_REVIEW_CANDIDATE": {"families": 0, "top_level": 0},
-      "SUNSET_AUTHORIZED": {"families": 0, "top_level": 0},
-      "INTERNALIZATION_REVIEW_CANDIDATE": {"families": 0, "top_level": 0},
-      "SPLIT_REQUIRED": {"families": 0, "top_level": 0},
-      "BLOCKED_BY_OWNER_DECISION": {"families": 0, "top_level": 0}
+      "KEEP_EXPERIMENTAL": {
+        "families": 25,
+        "top_level": 148
+      }
     },
     "priority": []
   },

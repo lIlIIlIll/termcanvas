@@ -22,7 +22,7 @@
    ↓
 App / update / Event / Command
    ↓
-有序、run-to-completion 的运行时
+有序、按轮预算推进的运行时
    ↓
 DirtyRects 与帧合并
    ↓
@@ -41,12 +41,13 @@ Frame / Buffer / Backend
 
 | 方向 | 能力 |
 | --- | --- |
-| 运行时 | 有序命令、消息、定时器、异步任务、PTY 数据事件、区域重绘 |
+| 运行时 | 有序命令、消息、定时器、有界异步任务、流式进程、PTY 数据事件、区域重绘 |
 | 渲染 | 即时 Widget、布局、样式、主题、`Frame`、`Buffer`、差分刷新 |
-| 输入 | 键盘、鼠标、粘贴、焦点、终端能力探测、窗口大小变化 |
-| 内容 | 富文档、Markdown 适配、文本编辑、Unicode 字素与终端单元格宽度 |
-| 扩展 | ANSI 终端输出、统一 diff、媒体、游戏和无头测试工具 |
-| 验证 | 事件脚本、快照、示例 smoke、API 契约、压力场景和发布闸门 |
+| 输入 | 键盘、鼠标、粘贴、弹窗焦点策略、系统/OSC 52 剪贴板、终端能力探测 |
+| 内容 | 富文档、Markdown 适配、索引文本模型、范围装饰、Unicode 字素与单元格宽度 |
+| 数据 | 异步分页、外部排序/过滤、稳定行 ID、有界缓存和惰性树 |
+| 扩展 | ANSI 终端输出、统一 diff、媒体、游戏和下游测试支持包 |
+| 验证 | 独立应用构建、真实终端夹具、快照、API 契约、压力场景和发布闸门 |
 
 ## 5 分钟运行第一个应用
 
@@ -143,6 +144,7 @@ CANGJIE_SDK_ROOT=/path/to/cangjie \
 | `packages/diff` | 统一 diff 解析和 `DiffView` |
 | `packages/media` | Kitty、Sixel、文本回退和 ffmpeg ASCII 动画 |
 | `packages/game` | 实体、组件存储、物理、TileMap、精灵和相机 |
+| `packages/testing` | 面向下游应用的稳定 `TestScenario` / `TestReport` 测试入口 |
 | `packages/example_smoke` | 核心组件组合的无头验证 |
 
 `packages/editor`、`packages/document` 以及旧的高级 editor shell 已退役。编辑
@@ -150,7 +152,7 @@ CANGJIE_SDK_ROOT=/path/to/cangjie \
 
 ## API 稳定性
 
-项目处于 `0.1.x`、pre-1.0 阶段。每个公开声明属于以下四个等级之一：
+下一版本为 `0.0.1`，这是经授权的破坏性 API 重整版本；迁移说明见 [0.0.1 migration](docs/migration-0.0.1.md)。项目仍处于 pre-1.0 阶段。每个公开声明属于以下四个等级之一：
 
 | 等级 | 含义 |
 | --- | --- |
@@ -166,7 +168,7 @@ CANGJIE_SDK_ROOT=/path/to/cangjie \
 ## 平台与限制
 
 - Linux/glibc 是当前完整验证的终端目标。
-- macOS 和 Windows 有原生代码路径，但在纳入对应回归矩阵前仍属于实验支持。
+- macOS 和 Windows 纳入原生 CI；适配器仍属实验支持，实测结果以对应运行记录为准。
 - Windows 默认 waiter 支持提供 `waitHandle()` 的 `EventSource`；只有 POSIX
   文件描述符的 source 需要自定义 waiter。
 - `TerminalSession` 负责恢复 raw mode、光标和终端输入模式。raw mode 失败时，

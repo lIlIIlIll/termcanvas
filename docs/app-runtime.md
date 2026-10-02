@@ -43,6 +43,8 @@ needs an effect. The available commands are:
 - `Command.AsyncExec(id, text)`: convenience helper that splits a simple command line, runs it in an async task, and returns an `ExecResult` through `AsyncCompleted`.
 - `Command.AsyncExecArgs(id, program, args)`: run `program` with explicit argv in an async task and return an `ExecResult` through `AsyncCompleted`.
 - `Command.CancelAsync(id)`: request cooperative cancellation for a pending async task.
+- `Command.ProcessStart(id, spec)`: start a pipe-based subprocess with independent stdout/stderr byte events, a deadline, and an output limit.
+- `Command.ProcessCancel(id)`: request termination of the subprocess group; completion follows child reaping and bounded output draining.
 - `Command.PtyStart(id, spec)`: start a PTY process through the configured `PtyRuntime`.
 - `Command.PtyWrite(id, bytes)`: write bytes to the PTY master stream.
 - `Command.PtyResize(id, size)`: update PTY window size.
@@ -59,6 +61,81 @@ Prefer the `*ExecArgs` variants when command names or arguments come from user
 input, file paths, or structured application state. The string-based `Exec` and
 `AsyncExec` variants are convenience APIs for short literal commands and use
 only the library's simple command-line splitter.
+
+## Stream ordinary subprocesses
+
+Use `ProcessStart` for build tools, searches, and other commands whose output
+should arrive before exit. `App` configures `PosixProcessRuntime` by default on
+Linux/macOS; the Windows default returns an explicit `ProcessFailed`. A PTY is
+not allocated. The child receives EOF on stdin, and arguments are passed as
+argv without shell interpretation:
+
+```cangjie
+UpdateResult.withCommand(Command.ProcessStart("build", ProcessSpec(
+    "make", args: ["all"], timeoutMillis: 30_000, maxOutputBytes: 8 * 1024 * 1024
+)))
+```
+
+`ProcessStarted(id)` acknowledges startup. `ProcessOutput(id, stream, bytes)`
+preserves byte order within each stdout/stderr stream; no ordering is promised
+between the two independent pipes. Use one `Utf8StreamDecoder` per stream when
+text is wanted, call `feed(bytes)` for each chunk, and `finish()` at completion.
+The raw-byte events remain suitable for binary data. Invalid UTF-8 uses
+replacement characters and an unfinished scalar is flushed once at EOF.
+
+`ProcessFinished(id, result)` is emitted once, after all retained output events
+and reaping the direct child. The result includes the actual exit status,
+delivered byte count, `outputComplete`, and a reason: `Exited`, `Cancelled`,
+`TimedOut`, `OutputLimit`, or `DrainTimeout`. The output cap counts stdout and
+stderr together and retains exactly the accepted prefix; exceeding it reports
+`OutputLimit` and `outputComplete = false`. Startup failures and duplicate
+active IDs return `ProcessFailed`; a duplicate leaves the original running.
+
+Cancellation/deadline sends SIGTERM to the owned process group, escalating to
+SIGKILL after 100 ms. After reaping, a cancelled process has a 250 ms total
+termination/drain window. A naturally exited leader has a configurable absolute
+`drainTimeoutMillis` (default 1000 ms), with an earlier 250 ms idle-drain limit.
+An incomplete drain is explicit. Descendants that create a new session escape
+process-group ownership; the runtime bounds its wait for inherited pipes but
+does not claim to terminate those escaped processes.
+
+`ProcessSpec.timeoutMillis = 0` disables the execution deadline; the default
+output limit is 16 MiB. `PosixProcessRuntime` defaults to 32 active children,
+16 KiB read quanta and 64 KiB queued bytes per child. Full output queues pause
+reads and apply kernel-pipe backpressure. `metrics()` exposes queued/peak bytes,
+delivered bytes and backpressure observations. `App.attachProcessRuntime` must
+run before `run`; attaching transfers session ownership of that runtime, and
+App shutdown calls `closeAll()`, including when update throws.
+
+The lower-level `App.processCommands*` helpers accept an explicit
+`processRuntime:`. Retain it, call the helper again to consume completions, and
+close it when finished. Those helpers remain run-to-completion for their queued
+commands; they do not wait for a running subprocess to finish.
+
+## Runtime work and admission budgets
+
+An App loop dispatches at most 256 command/event steps before returning to
+input, timers and presentation. Pending work resumes in FIFO order on later
+turns; command execution and event dispatch alternate. External-port imports
+take at most 64 entries at a time and leave remaining entries and their wake
+pending. Internal event and command queues each have a 4096-entry hard limit;
+overflow raises a descriptive exception and runs session cleanup rather than
+silently dropping accepted output. These are entry-count bounds, not bounds on
+arbitrary application-owned event payloads. User update callbacks still run to
+completion and must avoid blocking work.
+
+`AppMetrics.runtime()` reports `yieldedTurns` and `queueOverflows` alongside
+queue depth and dispatch counts. `AsyncRuntime` admits at most 256 unfinished
+tasks by default (`maxPendingTasks` is configurable); superseded tasks retain a
+slot until they actually complete. Capacity failure is an `AsyncFailed` event.
+Cancellation remains cooperative for arbitrary user task functions.
+
+`LinuxPtyRuntime` defaults to 32 children, 16 KiB reads per source and a 2 MiB
+queued-output budget. Readiness and nonblocking polling both respect read
+quanta, including trailing output after child exit. Full queues pause reads;
+`flowMetrics()` reports queued/peak bytes and backpressure. PTY close allows an
+additional bounded 8 MiB reserve to drain bytes already in kernel buffers;
+reserve exhaustion is an explicit `PtyFailed`, never silent truncation.
 
 ## Schedule ticks and timers
 

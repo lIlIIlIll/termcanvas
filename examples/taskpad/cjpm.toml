@@ -3,7 +3,7 @@
   name = "cjtui_taskpad"
   organization = ""
   description = "A small interactive task manager built with cjtui"
-  version = "1.0.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "executable"

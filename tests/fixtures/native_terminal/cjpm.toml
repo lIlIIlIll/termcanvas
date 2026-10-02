@@ -1,0 +1,10 @@
+[package]
+  cjc-version = "1.1.0"
+  name = "cjtui_native_terminal_probe"
+  organization = ""
+  description = "Native terminal lifecycle probe for the repository-owned PTY harness"
+  version = "0.0.1"
+  output-type = "executable"
+
+[dependencies]
+  "core" = { path = "../../../packages/core", output-type = "static" }

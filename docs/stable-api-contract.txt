@@ -17,6 +17,8 @@ core|Command.AsyncTask|enum_constructor|AsyncTask(String, () -> Event)
 core|Command.AsyncExec|enum_constructor|AsyncExec(String, String)
 core|Command.AsyncExecArgs|enum_constructor|AsyncExecArgs(String, String, Array<String>)
 core|Command.CancelAsync|enum_constructor|CancelAsync(String)
+core|Command.ProcessStart|enum_constructor|ProcessStart(String, ProcessSpec)
+core|Command.ProcessCancel|enum_constructor|ProcessCancel(String)
 core|Command.PtyStart|enum_constructor|PtyStart(String, PtySpec)
 core|Command.PtyWrite|enum_constructor|PtyWrite(String, Array<Byte>)
 core|Command.PtyResize|enum_constructor|PtyResize(String, PtySize)
@@ -140,6 +142,48 @@ core|Canvas.init|init|public init(buffer: Buffer, clip: Rect, translateX!: Int64
 core|Canvas.fillRect|func|public func fillRect(area: Rect, style: Style): Unit
 core|Canvas.fillRect|func|public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit
 core|Canvas.drawText|func|public func drawText(x: Int64, y: Int64, text: String, style: Style): Unit
+core|ClipboardStatus|enum|public enum ClipboardStatus {
+core|ClipboardStatus.Success|enum_constructor|Success
+core|ClipboardStatus.Unavailable|enum_constructor|Unavailable
+core|ClipboardStatus.Unsupported|enum_constructor|Unsupported
+core|ClipboardStatus.Timeout|enum_constructor|Timeout
+core|ClipboardStatus.TooLarge|enum_constructor|TooLarge
+core|ClipboardStatus.Failed|enum_constructor|Failed
+core|ClipboardResult|class|public class ClipboardResult {
+core|ClipboardResult.status|let|public let status: ClipboardStatus
+core|ClipboardResult.text|let|public let text: String
+core|ClipboardResult.message|let|public let message: String
+core|ClipboardResult.backend|let|public let backend: String
+core|ClipboardResult.init|init|public init(status: ClipboardStatus, text!: String = "", message!: String = "", backend!: String = "")
+core|ClipboardResult.isSuccess|func|public func isSuccess(): Bool
+core|ClipboardCapabilities|class|public class ClipboardCapabilities {
+core|ClipboardCapabilities.canRead|let|public let canRead: Bool
+core|ClipboardCapabilities.canWrite|let|public let canWrite: Bool
+core|ClipboardCapabilities.backend|let|public let backend: String
+core|ClipboardCapabilities.description|let|public let description: String
+core|ClipboardCapabilities.init|init|public init(canRead: Bool, canWrite: Bool, backend: String, description!: String = "")
+core|Clipboard|interface|public interface Clipboard {
+core|Clipboard.getText|func|func getText(): String
+core|Clipboard.setText|func|func setText(text: String): Unit
+core|Clipboard.capabilities|func|func capabilities(): ClipboardCapabilities
+core|Clipboard.readText|func|func readText(): ClipboardResult
+core|Clipboard.writeText|func|func writeText(text: String): ClipboardResult
+core|MemoryClipboard|class|public class MemoryClipboard <: Clipboard {
+core|MemoryClipboard.init|init|public init(text!: String = "")
+core|MemoryClipboard.getText|func|public func getText(): String
+core|MemoryClipboard.setText|func|public func setText(text: String): Unit
+core|MemoryClipboard.capabilities|func|public func capabilities(): ClipboardCapabilities
+core|ClipboardCommandResult|class|public class ClipboardCommandResult {
+core|ClipboardCommandResult.status|let|public let status: ClipboardStatus
+core|ClipboardCommandResult.output|let|public let output: String
+core|ClipboardCommandResult.exitCode|let|public let exitCode: Int64
+core|ClipboardCommandResult.message|let|public let message: String
+core|ClipboardCommandResult.init|init|public init(status: ClipboardStatus, output!: String = "", exitCode!: Int64 = -1, message!: String = "")
+core|ClipboardCommandRunner|interface|public interface ClipboardCommandRunner {
+core|ClipboardCommandRunner.platform|func|func platform(): String
+core|ClipboardCommandRunner.environment|func|func environment(name: String): String
+core|ClipboardCommandRunner.available|func|func available(command: String): Bool
+core|ClipboardCommandRunner.run|func|func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult
 core|VBox|class|public class VBox <: Widget {
 core|VBox.init|init|public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())
 core|VBox.render|func|public func render(area: Rect, buffer: Buffer): Unit
@@ -167,6 +211,7 @@ core|Dock.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Scrollable|class|public class Scrollable <: Widget {
 core|Scrollable.init|init|public init(lines: Array<String>, state!: ScrollState = ScrollState(), style!: Style = Style.default(), scrollbarStyle!: Style = Style(fg: Color.Indexed(8)))
 core|Scrollable.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+core|Scrollable.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect, capture: PointerCapture, owner: String): Bool
 core|Scrollable.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ComposerSubmit|class|public class ComposerSubmit {
 core|ComposerSubmit.text|let|public let text: String
@@ -419,6 +464,11 @@ core|Event.Paste|enum_constructor|Paste(String)
 core|Event.Message|enum_constructor|Message(String)
 core|Event.ExecResult|enum_constructor|ExecResult(String, Int64, String)
 core|Event.TextCompletion|enum_constructor|TextCompletion(String, TextCompletionResult)
+core|Event.ProcessStarted|enum_constructor|ProcessStarted(String)
+core|Event.ProcessOutput|enum_constructor|ProcessOutput(String, ProcessOutputStream, Array<Byte>)
+core|Event.ProcessFinished|enum_constructor|ProcessFinished(String, ProcessResult)
+core|Event.ProcessFailed|enum_constructor|ProcessFailed(String, String)
+core|Event.ProcessCancelRequested|enum_constructor|ProcessCancelRequested(String)
 core|Event.PtyStarted|enum_constructor|PtyStarted(String)
 core|Event.PtyOutput|enum_constructor|PtyOutput(String, PtyOutputStream, Array<Byte>)
 core|Event.PtyExited|enum_constructor|PtyExited(String, PtyExitStatus)
@@ -457,29 +507,38 @@ core|EventParser.flushEsc|func|public func flushEsc(): Array<Event>
 core|EventParser.flushEscAfterPolls|func|public func flushEscAfterPolls(polls: Int64): Array<Event>
 core|Button|class|public class Button <: Widget {
 core|Button.init|init|public init( label: String, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+core|Button.handle|func|public func handle(key: KeyEvent): Bool
+core|Button.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|Button.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Checkbox|class|public class Checkbox <: Widget {
 core|Checkbox.checked|var|public var checked: Bool
 core|Checkbox.init|init|public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
 core|Checkbox.handle|func|public func handle(key: KeyEvent): Bool
+core|Checkbox.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|Checkbox.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|RadioGroup|class|public class RadioGroup <: Widget {
 core|RadioGroup.selected|var|public var selected: Int64
+core|RadioGroup.offset|var|public var offset: Int64 = 0
 core|RadioGroup.init|init|public init( items: Array<String>, selected!: Int64 = 0, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Cyan), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
 core|RadioGroup.handle|func|public func handle(key: KeyEvent): Bool
+core|RadioGroup.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|RadioGroup.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Select|class|public class Select <: Widget {
 core|Select.selected|var|public var selected: Int64
+core|Select.offset|var|public var offset: Int64 = 0
 core|Select.init|init|public init( items: Array<String>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 core|Select.selectedValue|func|public func selectedValue(): ?String
 core|Select.handle|func|public func handle(key: KeyEvent): ?String
+core|Select.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|Select.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Dropdown|class|public class Dropdown <: Widget {
 core|Dropdown.selected|var|public var selected: Int64
+core|Dropdown.offset|var|public var offset: Int64 = 0
 core|Dropdown.open|var|public var open: Bool
 core|Dropdown.init|init|public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 core|Dropdown.selectedValue|func|public func selectedValue(): ?String
 core|Dropdown.handle|func|public func handle(key: KeyEvent): ?String
+core|Dropdown.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|Dropdown.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Rect|struct|public struct Rect <: Equatable<Rect> {
 core|Rect.x|var|public var x: Int64
@@ -543,10 +602,19 @@ core|FlexItem|struct|public struct FlexItem {
 core|FlexItem.basis|let|public let basis: Int64
 core|FlexItem.grow|let|public let grow: Int64
 core|FlexItem.shrink|let|public let shrink: Int64
-core|FlexItem.init|init|public init(basis!: Int64 = 0, grow!: Int64 = 1, shrink!: Int64 = 1)
+core|FlexItem.minSize|let|public let minSize: Int64
+core|FlexItem.maxSize|let|public let maxSize: Int64
+core|FlexItem.init|init|public init( basis!: Int64 = 0, grow!: Int64 = 1, shrink!: Int64 = 1, minSize!: Int64 = 0, maxSize!: Int64 = Int64.Max )
+core|FlexItem.fromSizeHint|func|public static func fromSizeHint( hint: SizeHint, direction: Direction, grow!: Int64 = 1, shrink!: Int64 = 1 ): FlexItem
+core|FlexLayoutResult|class|public class FlexLayoutResult {
+core|FlexLayoutResult.rects|let|public let rects: Array<Rect>
+core|FlexLayoutResult.constraintsSatisfied|let|public let constraintsSatisfied: Bool
+core|FlexLayoutResult.effectiveGap|let|public let effectiveGap: Int64
+core|FlexLayoutResult.init|init|public init(rects: Array<Rect>, constraintsSatisfied: Bool, effectiveGap: Int64)
 core|FlexLayout|class|public class FlexLayout {
 core|FlexLayout.init|init|public init(direction: Direction, items: Array<FlexItem>, gap!: Int64 = 0)
 core|FlexLayout.split|func|public func split(area: Rect): Array<Rect>
+core|FlexLayout.resolve|func|public func resolve(area: Rect): FlexLayoutResult
 core|LayoutCache|class|public class LayoutCache {
 core|LayoutCache.init|init|public init()
 core|LayoutCache.get|func|public func get(area: Rect, compute: (Rect) -> Array<Rect>): Array<Rect>
@@ -620,6 +688,7 @@ core|Tabs|class|public class Tabs <: Widget {
 core|Tabs.selected|var|public var selected: Int64
 core|Tabs.init|init|public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 core|Tabs.handle|func|public func handle(key: KeyEvent): Bool
+core|Tabs.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|Tabs.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|StatusBarProgress|class|public class StatusBarProgress {
 core|StatusBarProgress.value|let|public let value: Int64
@@ -641,6 +710,46 @@ core|Viewport.init|init|public init(lines: Array<String>, offset!: Int64 = 0, bl
 core|Viewport.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 core|Viewport.scroll|func|public func scroll(delta: Int64, viewportHeight: Int64): Unit
 core|Viewport.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|widgetHitTest|func|public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool
+core|widgetRowAt|func|public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64
+core|mouseScrollDelta|func|public func mouseScrollDelta(mouse: MouseEvent): Int64
+core|PointerCapture|class|public class PointerCapture {
+core|PointerCapture.init|init|public init()
+core|PointerCapture.begin|func|public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool
+core|PointerCapture.owns|func|public func owns(owner: String): Bool
+core|PointerCapture.activeOwner|func|public func activeOwner(): ?String
+core|PointerCapture.origin|func|public func origin(): Position
+core|PointerCapture.initialValue|func|public func initialValue(): Int64
+core|PointerCapture.release|func|public func release(owner: String, mouse: MouseEvent): Bool
+core|PointerCapture.cancel|func|public func cancel(): Unit
+core|ProcessOutputStream|enum|public enum ProcessOutputStream { | Stdout | Stderr }
+core|ProcessOutputStream.Stdout|enum_constructor|Stdout
+core|ProcessOutputStream.Stderr|enum_constructor|Stderr
+core|ProcessEndReason|enum|public enum ProcessEndReason { | Exited | Cancelled | TimedOut | OutputLimit | DrainTimeout }
+core|ProcessEndReason.Exited|enum_constructor|Exited
+core|ProcessEndReason.Cancelled|enum_constructor|Cancelled
+core|ProcessEndReason.TimedOut|enum_constructor|TimedOut
+core|ProcessEndReason.OutputLimit|enum_constructor|OutputLimit
+core|ProcessEndReason.DrainTimeout|enum_constructor|DrainTimeout
+core|ProcessSpec|class|public class ProcessSpec {
+core|ProcessSpec.command|let|public let command: String
+core|ProcessSpec.args|let|public let args: Array<String>
+core|ProcessSpec.cwd|let|public let cwd: String
+core|ProcessSpec.env|let|public let env: Array<String>
+core|ProcessSpec.timeoutMillis|let|public let timeoutMillis: Int64
+core|ProcessSpec.maxOutputBytes|let|public let maxOutputBytes: Int64
+core|ProcessSpec.drainTimeoutMillis|let|public let drainTimeoutMillis: Int64
+core|ProcessSpec.init|init|public init(command: String, args!: Array<String> = [], cwd!: String = "", env!: Array<String> = [], timeoutMillis!: Int64 = 0, maxOutputBytes!: Int64 = 16 * 1024 * 1024, drainTimeoutMillis!: Int64 = 1000)
+core|ProcessResult|struct|public struct ProcessResult {
+core|ProcessResult.reason|let|public let reason: ProcessEndReason
+core|ProcessResult.status|let|public let status: PtyExitStatus
+core|ProcessResult.outputBytes|let|public let outputBytes: Int64
+core|ProcessResult.outputComplete|let|public let outputComplete: Bool
+core|ProcessResult.init|init|public init(reason: ProcessEndReason, status: PtyExitStatus, outputBytes: Int64, outputComplete!: Bool = true)
+core|Utf8StreamDecoder|class|public class Utf8StreamDecoder {
+core|Utf8StreamDecoder.init|init|public init()
+core|Utf8StreamDecoder.feed|func|public func feed(bytes: Array<Byte>): String
+core|Utf8StreamDecoder.finish|func|public func finish(): String
 core|PtyOutputStream|enum|public enum PtyOutputStream {
 core|PtyOutputStream.Stdout|enum_constructor|Stdout
 core|PtyOutputStream.Stderr|enum_constructor|Stderr
@@ -990,14 +1099,16 @@ core|MarkdownHighlightCache.visibleHighlights|func|public func visibleHighlights
 core|MarkdownHighlightCache.recomputeCount|func|public func recomputeCount(): Int64
 core|MarkdownHighlightCache.invalidate|func|public func invalidate(): Unit
 core|TextArea|class|public class TextArea <: Widget {
-core|TextArea.value|var|public var value: String
+core|TextArea.value|prop|public mut prop value: String {
+core|TextArea.textModel|prop|public prop textModel: EditableTextModel { get() { textModelValue } }
+core|TextArea.horizontalScroll|var|public var horizontalScroll: Int64 = 0
 core|TextArea.cursor|var|public var cursor: Int64
 core|TextArea.scroll|var|public var scroll: Int64
 core|TextArea.selectionStart|var|public var selectionStart: ?Int64 = None
 core|TextArea.selectionEnd|var|public var selectionEnd: ?Int64 = None
 core|TextArea.readOnly|var|public var readOnly: Bool
 core|TextArea.markdownEditing|var|public var markdownEditing: Bool
-core|TextArea.init|init|public init( value!: String = "", cursor!: Int64 = 0, scroll!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), lineNumbers!: Bool = false, lineNumberStyle!: Style = Style(fg: Color.Indexed(8)), foldState!: ?DocumentViewState = None, readOnly!: Bool = false, markdownEditing!: Bool = false, decorations!: Array<TextDecoration> = [] )
+core|TextArea.init|init|public init( value!: String = "", model!: ?EditableTextModel = None, cursor!: Int64 = 0, scroll!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), lineNumbers!: Bool = false, lineNumberStyle!: Style = Style(fg: Color.Indexed(8)), foldState!: ?DocumentViewState = None, readOnly!: Bool = false, markdownEditing!: Bool = false, decorations!: Array<TextDecoration> = [] )
 core|TextArea.handle|func|public func handle(key: KeyEvent): Bool
 core|TextArea.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
 core|TextArea.handleVimNavigation|func|public func handleVimNavigation(key: KeyEvent): Bool
@@ -1020,6 +1131,9 @@ core|TextArea.pasteFrom|func|public func pasteFrom(clipboard: Clipboard): Unit
 core|TextArea.deleteSelection|func|public func deleteSelection(): Unit
 core|TextArea.paste|func|public func paste(text: String): Unit
 core|TextArea.setDecorations|func|public func setDecorations(decorations: Array<TextDecoration>): Unit
+core|TextArea.setDecorationProviders|func|public func setDecorationProviders(providers: Array<TextDecorationProvider>): Unit
+core|TextArea.applyDecorationUpdate|func|public func applyDecorationUpdate(layer: String, update: TextDecorationUpdate): Bool
+core|TextArea.clearDecorationLayer|func|public func clearDecorationLayer(layer: String): Bool
 core|TextArea.setValue|func|public func setValue(value: String, cursor!: Int64 = -1): Unit
 core|TextArea.editRevision|func|public func editRevision(): Int64
 core|TextArea.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
@@ -1060,13 +1174,6 @@ core|MarkdownTextEditor.behavior|let|public let behavior: MarkdownEditorBehavior
 core|MarkdownTextEditor.init|init|public init(value!: String = "", block!: ?Block = None, lineNumbers!: Bool = true)
 core|MarkdownTextEditor.handle|func|public func handle(key: KeyEvent): Bool
 core|MarkdownTextEditor.render|func|public func render(areaRect: Rect, buffer: Buffer): Unit
-core|Clipboard|interface|public interface Clipboard {
-core|Clipboard.getText|func|func getText(): String
-core|Clipboard.setText|func|func setText(text: String): Unit
-core|MemoryClipboard|class|public class MemoryClipboard <: Clipboard {
-core|MemoryClipboard.init|init|public init(text!: String = "")
-core|MemoryClipboard.getText|func|public func getText(): String
-core|MemoryClipboard.setText|func|public func setText(text: String): Unit
 core|TextPosition|struct|public struct TextPosition <: Equatable<TextPosition> {
 core|TextPosition.line|let|public let line: Int64
 core|TextPosition.column|let|public let column: Int64
@@ -1078,7 +1185,8 @@ core|TextRange.end|let|public let end: TextPosition
 core|TextRange.init|init|public init(start: TextPosition, end: TextPosition)
 core|TextRange.isEmpty|func|public func isEmpty(): Bool
 core|TextBuffer|class|public class TextBuffer {
-core|TextBuffer.init|init|public init(text!: String = "")
+core|TextBuffer.init|init|public init(text!: String = "", model!: ?EditableTextModel = None)
+core|TextBuffer.textModel|prop|public prop textModel: EditableTextModel { get() { modelValue } }
 core|TextBuffer.setText|func|public func setText(text: String): Unit
 core|TextBuffer.text|func|public func text(): String
 core|TextBuffer.lineCount|func|public func lineCount(): Int64
@@ -1087,21 +1195,92 @@ core|TextBuffer.insert|func|public func insert(position: TextPosition, text: Str
 core|TextBuffer.replace|func|public func replace(range: TextRange, text: String): TextPosition
 core|TextBuffer.deleteRange|func|public func deleteRange(range: TextRange): TextPosition
 core|TextBuffer.slice|func|public func slice(range: TextRange): String
-core|TextBuffer.wordLeft|func|public func wordLeft(position: TextPosition): TextPosition
-core|TextBuffer.wordRight|func|public func wordRight(position: TextPosition): TextPosition
-core|TextBuffer.findPrevious|func|public func findPrevious(needle: String, start!: TextPosition = TextPosition(Int64.Max, Int64.Max)): ?TextPosition
-core|TextBuffer.findAll|func|public func findAll(needle: String): Array<TextRange>
-core|TextBuffer.replaceAll|func|public func replaceAll(needle: String, replacement: String): Int64
-core|TextBuffer.beginUndoGroup|func|public func beginUndoGroup(): Unit
-core|TextBuffer.endUndoGroup|func|public func endUndoGroup(): Unit
+core|TextBuffer.clampPosition|func|public func clampPosition(position: TextPosition): TextPosition
 core|TextBuffer.positionToOffset|func|public func positionToOffset(position: TextPosition): Int64
 core|TextBuffer.offsetToPosition|func|public func offsetToPosition(offset: Int64): TextPosition
 core|TextBuffer.deleteBackward|func|public func deleteBackward(position: TextPosition): TextPosition
 core|TextBuffer.deleteForward|func|public func deleteForward(position: TextPosition): TextPosition
+core|TextBuffer.beginUndoGroup|func|public func beginUndoGroup(): Unit
+core|TextBuffer.endUndoGroup|func|public func endUndoGroup(): Unit
 core|TextBuffer.undo|func|public func undo(): Bool
 core|TextBuffer.redo|func|public func redo(): Bool
+core|TextBuffer.wordLeft|func|public func wordLeft(position: TextPosition): TextPosition
+core|TextBuffer.wordRight|func|public func wordRight(position: TextPosition): TextPosition
 core|TextBuffer.find|func|public func find(needle: String, start!: TextPosition = TextPosition(0, 0)): ?TextPosition
-core|TextBuffer.clampPosition|func|public func clampPosition(position: TextPosition): TextPosition
+core|TextBuffer.findPrevious|func|public func findPrevious(needle: String, start!: TextPosition = TextPosition(Int64.Max, Int64.Max)): ?TextPosition
+core|TextBuffer.findAll|func|public func findAll(needle: String): Array<TextRange>
+core|TextBuffer.replaceAll|func|public func replaceAll(needle: String, replacement: String): Int64
+core|TextEditDelta|struct|public struct TextEditDelta {
+core|TextEditDelta.start|let|public let start: Int64
+core|TextEditDelta.end|let|public let end: Int64
+core|TextEditDelta.insertedBytes|let|public let insertedBytes: Int64
+core|TextEditDelta.beforeRevision|let|public let beforeRevision: Int64
+core|TextEditDelta.afterRevision|let|public let afterRevision: Int64
+core|TextEditDelta.init|init|public init(start: Int64, end: Int64, insertedBytes: Int64, beforeRevision: Int64, afterRevision: Int64)
+core|TextDecorationProvider|interface|public interface TextDecorationProvider {
+core|TextDecorationProvider.revision|func|func revision(): Int64
+core|TextDecorationProvider.query|func|func query(start: Int64, end: Int64): Array<TextDecoration>
+core|TextDecorationProvider.onEdit|func|func onEdit(edit: TextEditDelta): Unit
+core|TextDecorationUpdate|class|public class TextDecorationUpdate {
+core|TextDecorationUpdate.revision|let|public let revision: Int64
+core|TextDecorationUpdate.start|let|public let start: Int64
+core|TextDecorationUpdate.end|let|public let end: Int64
+core|TextDecorationUpdate.spans|let|public let spans: Array<TextDecoration>
+core|TextDecorationUpdate.init|init|public init(revision: Int64, start: Int64, end: Int64, spans: Array<TextDecoration>)
+core|TextDecorationStore|class|public class TextDecorationStore <: TextDecorationProvider {
+core|TextDecorationStore.init|init|public init(revision!: Int64 = 0)
+core|TextDecorationStore.revision|func|public func revision(): Int64
+core|TextDecorationStore.cachedRanges|func|public func cachedRanges(): Int64
+core|TextDecorationStore.invalidatedRanges|func|public func invalidatedRanges(): Int64
+core|TextDecorationStore.queryCount|func|public func queryCount(): Int64
+core|TextDecorationStore.apply|func|public func apply(update: TextDecorationUpdate): Bool
+core|TextDecorationStore.query|func|public func query(start: Int64, end: Int64): Array<TextDecoration>
+core|TextDecorationStore.onEdit|func|public func onEdit(edit: TextEditDelta): Unit
+core|TextDecorationStore.reset|func|public func reset(revision: Int64): Unit
+core|TextModel|interface|public interface TextModel {
+core|TextModel.byteLength|func|func byteLength(): Int64
+core|TextModel.lineCount|func|func lineCount(): Int64
+core|TextModel.line|func|func line(index: Int64): String
+core|TextModel.lineStart|func|func lineStart(index: Int64): Int64
+core|TextModel.lineForOffset|func|func lineForOffset(offset: Int64): Int64
+core|TextModel.slice|func|func slice(start: Int64, end: Int64): String
+core|TextModel.replace|func|func replace(start: Int64, end: Int64, text: String): Unit
+core|TextModel.text|func|func text(): String
+core|TextModel.revision|func|func revision(): Int64
+core|TextModel.metrics|func|func metrics(): TextModelMetrics
+core|TextModel.clampOffset|func|func clampOffset(offset: Int64): Int64
+core|EditableTextModel|interface|public interface EditableTextModel <: TextModel {
+core|EditableTextModel.beginUndoGroup|func|func beginUndoGroup(): Unit
+core|EditableTextModel.endUndoGroup|func|func endUndoGroup(): Unit
+core|EditableTextModel.undo|func|func undo(): Bool
+core|EditableTextModel.redo|func|func redo(): Bool
+core|EditableTextModel.clearHistory|func|func clearHistory(): Unit
+core|TextModelMetrics|struct|public struct TextModelMetrics {
+core|TextModelMetrics.nodeVisits|let|public let nodeVisits: Int64
+core|TextModelMetrics.bytesScanned|let|public let bytesScanned: Int64
+core|TextModelMetrics.bytesCopied|let|public let bytesCopied: Int64
+core|TextModelMetrics.materializations|let|public let materializations: Int64
+core|TextModelMetrics.pieceCount|let|public let pieceCount: Int64
+core|TextModelMetrics.treeHeight|let|public let treeHeight: Int64
+core|TextModelMetrics.init|init|public init(nodeVisits!: Int64 = 0, bytesScanned!: Int64 = 0, bytesCopied!: Int64 = 0, materializations!: Int64 = 0, pieceCount!: Int64 = 0, treeHeight!: Int64 = 0)
+core|PieceTableTextModel|class|public class PieceTableTextModel <: EditableTextModel {
+core|PieceTableTextModel.init|init|public init(text!: String = "")
+core|PieceTableTextModel.byteLength|func|public func byteLength(): Int64
+core|PieceTableTextModel.lineCount|func|public func lineCount(): Int64
+core|PieceTableTextModel.line|func|public func line(index: Int64): String
+core|PieceTableTextModel.lineStart|func|public func lineStart(index: Int64): Int64
+core|PieceTableTextModel.lineForOffset|func|public func lineForOffset(offset: Int64): Int64
+core|PieceTableTextModel.clampOffset|func|public func clampOffset(offset: Int64): Int64
+core|PieceTableTextModel.slice|func|public func slice(start: Int64, end: Int64): String
+core|PieceTableTextModel.replace|func|public func replace(start: Int64, end: Int64, text: String): Unit
+core|PieceTableTextModel.text|func|public func text(): String
+core|PieceTableTextModel.revision|func|public func revision(): Int64
+core|PieceTableTextModel.metrics|func|public func metrics(): TextModelMetrics
+core|PieceTableTextModel.beginUndoGroup|func|public func beginUndoGroup(): Unit
+core|PieceTableTextModel.endUndoGroup|func|public func endUndoGroup(): Unit
+core|PieceTableTextModel.undo|func|public func undo(): Bool
+core|PieceTableTextModel.redo|func|public func redo(): Bool
+core|PieceTableTextModel.clearHistory|func|public func clearHistory(): Unit
 core|ProgressBarDirection|enum|public enum ProgressBarDirection {
 core|ProgressBarDirection.Horizontal|enum_constructor|Horizontal
 core|ProgressBarDirection.Vertical|enum_constructor|Vertical
@@ -1192,6 +1371,7 @@ core|Paragraph.init|init|public init( text: String, block!: ?Block = None, style
 core|Paragraph.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|List|class|public class List <: Widget {
 core|List.init|init|public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|List.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|List.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ListState|class|public class ListState {
 core|ListState.selected|var|public var selected: ?Int64
@@ -1205,6 +1385,7 @@ core|ListState.previous|func|public func previous(total: Int64): Unit
 core|ListState.scrollToVisible|func|public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
 core|Table|class|public class Table <: Widget {
 core|Table.init|init|public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: Style = Style.default(), headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Table.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|Table.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|TableState|class|public class TableState {
 core|TableState.selectedRow|var|public var selectedRow: ?Int64
@@ -1217,6 +1398,7 @@ core|TableState.previous|func|public func previous(total: Int64): Unit
 core|TableState.scrollToVisible|func|public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
 core|Scrollbar|class|public class Scrollbar <: Widget {
 core|Scrollbar.init|init|public init( total: Int64, offset!: Int64 = 0, viewport!: Int64 = 0, style!: Style = Style(fg: Color.Indexed(8)), thumbStyle!: Style = Style(fg: Color.White) )
+core|Scrollbar.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool
 core|Scrollbar.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Input|class|public class Input <: Widget {
 core|Input.value|var|public var value: String
@@ -1224,6 +1406,7 @@ core|Input.cursor|var|public var cursor: Int64
 core|Input.init|init|public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)) )
 core|Input.handle|func|public func handle(key: KeyEvent): Bool
 core|Input.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+core|Input.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|Input.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Input.cursorPosition|func|public func cursorPosition(area: Rect): Position
 core|Input.setValue|func|public func setValue(value: String, cursor!: Int64 = -1): Unit
@@ -1251,3 +1434,23 @@ markdown_adapter|MarkdownPreviewIndex.sourceOffsetForRenderedLine|func|public fu
 markdown_adapter|MarkdownPreviewIndex.renderedLineForSourceOffset|func|public func renderedLineForSourceOffset(offset: Int64): Int64
 markdown_adapter|markdownOutline|func|public func markdownOutline(result: ParseResult): Array<OutlineNode>
 markdown_adapter|markdownPreviewIndex|func|public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex
+cjtui_testing|TestReport|class|public class TestReport {
+cjtui_testing|TestReport.passed|let|public let passed: Bool
+cjtui_testing|TestReport.exited|let|public let exited: Bool
+cjtui_testing|TestReport.frames|let|public let frames: Array<Buffer>
+cjtui_testing|TestReport.snapshots|let|public let snapshots: Array<String>
+cjtui_testing|TestReport.failures|let|public let failures: Array<String>
+cjtui_testing|TestReport.init|init|public init(passed: Bool, exited: Bool, frames: Array<Buffer>, snapshots: Array<String>, failures: Array<String>)
+cjtui_testing|TestReport.lastSnapshot|func|public func lastSnapshot(): String
+cjtui_testing|TestScenario|class|public class TestScenario {
+cjtui_testing|TestScenario.init|init|public init()
+cjtui_testing|TestScenario.event|func|public func event(value: Event): TestScenario
+cjtui_testing|TestScenario.key|func|public func key(value: KeyEvent): TestScenario
+cjtui_testing|TestScenario.paste|func|public func paste(text: String): TestScenario
+cjtui_testing|TestScenario.message|func|public func message(text: String): TestScenario
+cjtui_testing|TestScenario.render|func|public func render(): TestScenario
+cjtui_testing|TestScenario.resize|func|public func resize(width: Int64, height: Int64): TestScenario
+cjtui_testing|TestScenario.tick|func|public func tick(count!: Int64 = 1): TestScenario
+cjtui_testing|TestScenario.expectSnapshot|func|public func expectSnapshot(text: String): TestScenario
+cjtui_testing|TestScenario.expectCell|func|public func expectCell(x: Int64, y: Int64, symbol: String): TestScenario
+cjtui_testing|TestScenario.run|func|public func run( render: (Frame) -> Unit, update: (Event) -> UpdateResult, width!: Int64 = 80, height!: Int64 = 24, tickDeltaMillis!: Int64 = 16 ): TestReport

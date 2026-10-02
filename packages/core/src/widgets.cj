@@ -326,6 +326,21 @@ public class List <: Widget {
         this.selectedStyle = selectedStyle
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        let target = widgetInnerArea(area, block)
+        match (state) {
+            case Some(value) =>
+                let current = match (value.selected) { case Some(index) => index; case None => 0 }
+                if (let Some(index) <- selectionMouse(mouse, target, value.offset, items.size, current)) {
+                    value.selected = Some(index)
+                    value.scrollToVisible(items.size, target.height)
+                    return true
+                }
+            case None => ()
+        }
+        false
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -480,6 +495,22 @@ public class Table <: Widget {
         this.style = style
         this.headerStyle = headerStyle
         this.selectedStyle = selectedStyle
+    }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        let inner = widgetInnerArea(area, block)
+        let target = Rect(inner.x, inner.y + 2, inner.width, max(0, inner.height - 2))
+        match (state) {
+            case Some(value) =>
+                let current = match (value.selectedRow) { case Some(index) => index; case None => 0 }
+                if (let Some(index) <- selectionMouse(mouse, target, value.offset, rows.size, current)) {
+                    value.selectedRow = Some(index)
+                    value.scrollToVisible(rows.size, target.height)
+                    return true
+                }
+            case None => ()
+        }
+        false
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
@@ -647,6 +678,40 @@ public class Scrollbar <: Widget {
         this.thumbStyle = thumbStyle
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool {
+        if (capture.release(owner, mouse)) { return true }
+        if (area.width <= 0 || area.height <= 0 || total <= viewport || viewport <= 0) { return false }
+        let track = Rect(area.right - 1, area.y, 1, area.height)
+        let maximum = total - viewport
+        let thumbHeight = max(1, scaledChartHeight(min(viewport, total), area.height, total))
+        let travel = max(1, area.height - thumbHeight)
+        if (capture.owns(owner)) {
+            match (mouse.kind) {
+                case MouseKind.Drag =>
+                    let delta = clamp(mouse.y - capture.origin().y, -travel, travel)
+                    let amount = scaledChartHeight(if (delta < 0) { -delta } else { delta }, maximum, travel)
+                    state.offset = selectionMove(capture.initialValue(), if (delta < 0) { -amount } else { amount }, maximum + 1)
+                    return true
+                case _ => return false
+            }
+        }
+        if (!widgetHitTest(mouse, track) || capture.activeOwner().isSome()) { return false }
+        let wheel = mouseScrollDelta(mouse)
+        if (wheel != 0) {
+            state.offset = selectionMove(state.offset, wheel, maximum + 1)
+            return true
+        }
+        match ((mouse.kind, mouse.button)) {
+            case (MouseKind.Down, MouseButton.Left) =>
+                let top = area.y + scaledChartHeight(min(max(0, state.offset), maximum), travel, maximum)
+                if (mouse.y < top || mouse.y >= top + thumbHeight) {
+                    state.offset = scaledChartHeight(clamp(mouse.y - area.y, 0, travel), maximum, travel)
+                }
+                capture.begin(owner, mouse, track, value: state.offset)
+            case _ => false
+        }
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0 || total <= viewport || viewport <= 0) {
             return
@@ -655,10 +720,10 @@ public class Scrollbar <: Widget {
         for (y in area.y..area.bottom) {
             buffer.setString(x, y, "|", style: style)
         }
-        let thumbHeight = max(1, area.height * viewport / total)
+        let thumbHeight = max(1, scaledChartHeight(min(viewport, total), area.height, total))
         let maxOffset = max(1, total - viewport)
         let maxThumbTop = max(0, area.height - thumbHeight)
-        let thumbTop = area.y + min(maxThumbTop, offset * maxThumbTop / maxOffset)
+        let thumbTop = area.y + min(maxThumbTop, scaledChartHeight(min(offset, maxOffset), maxThumbTop, maxOffset))
         for (y in thumbTop..min(area.bottom, thumbTop + thumbHeight)) {
             buffer.setString(x, y, "#", style: thumbStyle)
         }
@@ -735,6 +800,18 @@ public class Input <: Widget {
             dirty.add(Rect(target.x, target.y, target.width, min(Int64(1), target.height)))
         }
         Some(dirty)
+    }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        let target = widgetInnerArea(area, block)
+        if (!widgetHitTest(mouse, target) || mouse.y != target.y) { return false }
+        match ((mouse.kind, mouse.button)) {
+            case (MouseKind.Down, MouseButton.Left) =>
+                ensureCursorVisible(target.width)
+                cursor = viewportOffset + offsetAtLineColumn(value[viewportOffset..], 0, mouse.x - target.x)
+                true
+            case _ => false
+        }
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {

@@ -3,7 +3,7 @@
   name = "cjtui_data_browser"
   organization = ""
   description = "Data widgets example for cjtui"
-  version = "1.0.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "executable"

@@ -3,7 +3,7 @@
   name = "terminal"
   organization = ""
   description = "ANSI terminal transcript and screen adapter for cjtui"
-  version = "0.1.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "static"

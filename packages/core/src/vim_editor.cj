@@ -68,10 +68,10 @@ public class VimEditorBehavior {
                     case VimMode.Normal =>
                         prefix = None
                         area.beginUndoGroup()
-                        let end = lineEnd(area.value, area.cursor)
-                        if (area.cursor < end) { area.cursor = nextGraphemeOffset(area.value, area.cursor) }
+                        let end = area.lineEndForOffset(area.cursor)
+                        if (area.cursor < end) { area.cursor = area.nextOffset(area.cursor) }
                         area.paste(text)
-                        area.cursor = if (text.endsWith("\n")) { area.cursor } else { previousGraphemeOffset(area.value, area.cursor) }
+                        area.cursor = if (text.endsWith("\n")) { area.cursor } else { area.previousOffset(area.cursor) }
                         area.endUndoGroup()
                         normalizeCursor()
                 }
@@ -172,15 +172,15 @@ public class VimEditorBehavior {
                     case r'k' => navigate(KeyCode.Up)
                     case r'w' => area.moveWordRight(); normalizeCursor()
                     case r'b' => area.moveWordLeft(); normalizeCursor()
-                    case r'0' => area.cursor = lineStart(area.value, area.cursor)
+                    case r'0' => area.cursor = area.lineStartForOffset(area.cursor)
                     case r'$' => area.cursor = lastCharacter(area.cursor)
                     case r'G' => jumpToLine(true)
                     case r'i' => enterInsert(area.cursor)
                     case r'a' =>
-                        let end = lineEnd(area.value, area.cursor)
-                        enterInsert(if (area.cursor < end) { nextGraphemeOffset(area.value, area.cursor) } else { end })
-                    case r'I' => enterInsert(firstNonBlank(lineStart(area.value, area.cursor)))
-                    case r'A' => enterInsert(lineEnd(area.value, area.cursor))
+                        let end = area.lineEndForOffset(area.cursor)
+                        enterInsert(if (area.cursor < end) { area.nextOffset(area.cursor) } else { end })
+                    case r'I' => enterInsert(firstNonBlank(area.lineStartForOffset(area.cursor)))
+                    case r'A' => enterInsert(area.lineEndForOffset(area.cursor))
                     case r'o' | r'O' => openLine(r == r'o')
                     case r'x' => if (!area.readOnly) { deleteCharacter() }
                     case r'u' => if (!area.readOnly) { _ = area.undo(); normalizeCursor() }
@@ -213,13 +213,13 @@ public class VimEditorBehavior {
     }
 
     private func navigate(code: KeyCode): Unit {
-        let start = lineStart(area.value, area.cursor)
-        let end = lineEnd(area.value, area.cursor)
+        let start = area.lineStartForOffset(area.cursor)
+        let end = area.lineEndForOffset(area.cursor)
         match (code) {
-            case KeyCode.Left => if (area.cursor > start) { area.cursor = previousGraphemeOffset(area.value, area.cursor) }
+            case KeyCode.Left => if (area.cursor > start) { area.cursor = area.previousOffset(area.cursor) }
             case KeyCode.Right =>
                 if (area.cursor < end) {
-                    let next = nextGraphemeOffset(area.value, area.cursor)
+                    let next = area.nextOffset(area.cursor)
                     if (next < end) { area.cursor = next }
                 }
             case KeyCode.Home => area.cursor = start
@@ -230,36 +230,36 @@ public class VimEditorBehavior {
     }
 
     private func lastCharacter(offset: Int64): Int64 {
-        let start = lineStart(area.value, offset)
-        let end = lineEnd(area.value, offset)
-        if (end == start) { start } else { previousGraphemeOffset(area.value, end) }
+        let start = area.lineStartForOffset(offset)
+        let end = area.lineEndForOffset(offset)
+        if (end == start) { start } else { area.previousOffset(end) }
     }
 
     private func firstNonBlank(start: Int64): Int64 {
-        let end = lineEnd(area.value, start)
+        let end = area.lineEndForOffset(start)
         var pos = start
         while (pos < end) {
-            let byte = unsafe { area.value.rawData()[pos] }
-            if (byte != b' ' && byte != b'\t') { break }
-            pos = nextGraphemeOffset(area.value, pos)
+            let part = area.textModel.slice(pos, area.nextOffset(pos))
+            if (part != " " && part != "\t") { break }
+            pos = area.nextOffset(pos)
         }
         if (pos == end) { start } else { pos }
     }
 
     private func jumpToLine(last: Bool): Unit {
-        let start = if (last) { lineStart(area.value, area.value.size) } else { 0 }
+        let start = if (last) { area.lineStartForOffset(area.textModel.byteLength()) } else { 0 }
         area.cursor = firstNonBlank(start)
         normalizeCursor()
     }
 
     private func normalizeCursor(): Unit {
-        let start = lineStart(area.value, area.cursor)
-        let end = lineEnd(area.value, area.cursor)
+        let start = area.lineStartForOffset(area.cursor)
+        let end = area.lineEndForOffset(area.cursor)
         if (start == end) { area.cursor = start; return }
-        let target = clampToRuneBoundary(area.value, area.cursor)
+        let target = area.textModel.clampOffset(area.cursor)
         var pos = start
         while (true) {
-            let next = nextGraphemeOffset(area.value, pos)
+            let next = area.nextOffset(pos)
             if (next >= end || next > target) { area.cursor = pos; return }
             pos = next
         }
@@ -274,7 +274,7 @@ public class VimEditorBehavior {
 
     private func leaveInsert(): Unit {
         area.endUndoGroup()
-        area.cursor = max(lineStart(area.value, area.cursor), previousGraphemeOffset(area.value, area.cursor))
+        area.cursor = max(area.lineStartForOffset(area.cursor), area.previousOffset(area.cursor))
         area.setCarets([TextAreaCaret(area.cursor)])
         prefix = None
         area.invalidateCompletionRequest()
@@ -285,8 +285,8 @@ public class VimEditorBehavior {
     private func openLine(below: Bool): Unit {
         if (area.readOnly) { return }
         area.beginUndoGroup()
-        let start = lineStart(area.value, area.cursor)
-        let end = lineEnd(area.value, area.cursor)
+        let start = area.lineStartForOffset(area.cursor)
+        let end = area.lineEndForOffset(area.cursor)
         area.cursor = if (below) { end } else { start }
         area.paste("\n")
         if (!below) { area.cursor = start }
@@ -294,30 +294,30 @@ public class VimEditorBehavior {
     }
 
     private func deleteCharacter(): Unit {
-        let end = lineEnd(area.value, area.cursor)
+        let end = area.lineEndForOffset(area.cursor)
         if (area.cursor >= end) { return }
         area.beginUndoGroup()
-        area.select(area.cursor, nextGraphemeOffset(area.value, area.cursor))
+        area.select(area.cursor, area.nextOffset(area.cursor))
         area.deleteSelection()
         area.endUndoGroup()
         normalizeCursor()
     }
 
     private func deleteLine(): Unit {
-        let start = lineStart(area.value, area.cursor)
-        let end = lineEnd(area.value, area.cursor)
-        if (start == 0 && end == 0 && area.value.isEmpty()) { return }
+        let start = area.lineStartForOffset(area.cursor)
+        let end = area.lineEndForOffset(area.cursor)
+        if (start == 0 && end == 0 && area.textModel.byteLength() == 0) { return }
         var from = start
         var to = end
-        if (end < area.value.size) { to++ }
+        if (end < area.textModel.byteLength()) { to++ }
         else if (start > 0) {
             from--
-            if (from > 0 && area.value[from] == b'\n' && area.value[from - 1] == b'\r') { from-- }
+            if (from > 0 && area.textModel.slice(from - 1, from + 1) == "\r\n") { from-- }
         }
         area.beginUndoGroup()
         area.select(from, to)
         area.deleteSelection()
-        area.cursor = firstNonBlank(lineStart(area.value, min(start, area.value.size)))
+        area.cursor = firstNonBlank(area.lineStartForOffset(min(start, area.textModel.byteLength())))
         area.endUndoGroup()
         normalizeCursor()
     }

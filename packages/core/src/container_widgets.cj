@@ -220,6 +220,17 @@ public class Scrollable <: Widget {
         state.handle(key, lines.size, viewportHeight)
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect, capture: PointerCapture, owner: String): Bool {
+        if (lines.size > area.height && area.width > 1) {
+            if (Scrollbar(lines.size, offset: state.offset, viewport: area.height).handleMouse(mouse, area, state, capture, owner)) { return true }
+        } else if (capture.release(owner, mouse)) { return true }
+        if (capture.activeOwner().isSome() || !widgetHitTest(mouse, area)) { return false }
+        let delta = mouseScrollDelta(mouse)
+        if (delta == 0) { return false }
+        state.offset = selectionMove(state.offset, delta, max(0, lines.size - area.height) + 1)
+        true
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let content = if (lines.size > area.height) { Rect(area.x, area.y, max(0, area.width - 1), area.height) } else { area }

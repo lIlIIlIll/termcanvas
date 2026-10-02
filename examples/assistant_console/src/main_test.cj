@@ -60,4 +60,27 @@ class AssistantConsoleTest {
             case _ => @Expect(false)
         }
     }
+    @TestCase
+    func approvalFocusScopeRestoresComposerAndBlocksBackgroundShortcut(): Unit {
+        let app = AssistantConsole()
+        let before = app.composer.area.value
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.F(2))))
+        @Expect(app.interaction.active(), Some("approval"))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'x'))))
+        @Expect(app.composer.area.value, before)
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Tab)))
+        @Expect(app.interaction.focus().current(), Some("confirm"))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Tab)))
+        @Expect(app.interaction.focus().current(), Some("cancel"))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Esc)))
+        @Expect(!app.showRequest)
+        @Expect(app.interaction.focus().current(), Some("composer"))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.F(2))))
+        @Expect(app.showRequest)
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Tab)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        @Expect(app.status, "approval: Confirm")
+        @Expect(app.interaction.focus().current(), Some("composer"))
+    }
+
 }

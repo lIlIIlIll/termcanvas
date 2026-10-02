@@ -60,12 +60,34 @@ chunks in addition to the configured gap.
 then splits every row into columns. `split(area)` returns an array of row arrays;
 all cell rectangles are derived from the same input area.
 
-`FlexLayout(direction: ..., items: ..., gap: ...)` is a lightweight grow-based
-alternative. Each `FlexItem(basis: ..., grow: ..., shrink: ...)` describes a
-preferred basis and growth weight. Extra available space is distributed by
-`grow`; the current implementation uses basis and growth for the split, while
-`shrink` remains part of the public item shape for callers that model flexible
-content.
+`FlexLayout(direction: ..., items: ..., gap: ...)` distributes space using
+`FlexItem(basis: ..., grow: ..., shrink: ..., minSize: ..., maxSize: ...)`.
+A basis is clamped to the non-negative minimum and maximum; an inconsistent
+maximum is raised to the minimum. `FlexItem.fromSizeHint(hint, direction)`
+projects the matching dimension of a `SizeHint` into an item.
+
+- Positive free space is distributed by `grow`, stopping at each maximum.
+- A deficit is distributed by `basis * shrink`, stopping at each minimum.
+- Saturated items leave the allocation pool; their share is redistributed.
+- A zero grow/shrink weight does not participate while a feasible weighted
+  allocation exists.
+- Integer cumulative quotas assign remainders deterministically in item order.
+  Repeating a resize with the same inputs produces the same rectangles.
+
+`split(area)` returns rectangles. `resolve(area)` also returns
+`constraintsSatisfied` and `effectiveGap`. When the viewport is too small,
+gaps are reduced to fit. If all minima cannot fit, minima are proportionally
+compressed. If zero-shrink bases cannot all survive after weighted shrinking,
+the remaining deficit is distributed over room above the minima. These cases
+set `constraintsSatisfied` to false, allowing the application to show a compact
+layout or a size warning. No child extends outside the representable input
+rectangle, including zero-width children. Unsatisfied minimum constraints never
+cause an arithmetic overflow or an offscreen rectangle. Unused space remains
+unused when all growing items reach their maxima or all growth weights are zero.
+
+Weight products and aggregate sizes use exact wide integer arithmetic, so
+`Int64.Max` bases, weights, and gaps do not overflow or lose rounding precision.
+No retained widget tree or CSS engine is involved.
 
 ## Preferred sizes and reuse
 
