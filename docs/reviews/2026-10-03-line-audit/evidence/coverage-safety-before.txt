@@ -1,0 +1,32 @@
+FFF
+======================================================================
+FAIL: test_owned_previous_report_is_replaced (__main__.CoverageOutputSafetyTest.test_owned_previous_report_is_replaced)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/40bf4f55d58a/termcanvas/scripts/test_coverage_output.py", line 50, in test_owned_previous_report_is_replaced
+    self.assertTrue((output / '.cjtui-coverage-output').exists())
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_repository_directory_is_preserved (__main__.CoverageOutputSafetyTest.test_repository_directory_is_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/40bf4f55d58a/termcanvas/scripts/test_coverage_output.py", line 44, in test_repository_directory_is_preserved
+    self.assertTrue(sentinel.exists(), result.stderr)
+AssertionError: False is not true : find: ‘/tmp/tmpwl69gb3q/repo/packages’: No such file or directory
+find: ‘/tmp/tmpwl69gb3q/repo/examples’: No such file or directory
+/tmp/tmpwl69gb3q/repo/scripts/coverage.sh: line 32: /tmp/tmpwl69gb3q/repo/scripts/cangjie_cmd.sh: No such file or directory
+
+
+======================================================================
+FAIL: test_unowned_nonempty_directory_is_preserved (__main__.CoverageOutputSafetyTest.test_unowned_nonempty_directory_is_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/40bf4f55d58a/termcanvas/scripts/test_coverage_output.py", line 39, in test_unowned_nonempty_directory_is_preserved
+    self.assertTrue(sentinel.exists(), result.stderr)
+AssertionError: False is not true :
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.035s
+
+FAILED (failures=3)

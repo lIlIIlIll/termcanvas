@@ -426,6 +426,8 @@ public class Buffer {
     }
 
     // Copy normalized cells, blanking a wide glyph cut by either boundary.
+    // The target origin corresponds to the requested sourceArea origin,
+    // including when the source rectangle is clipped by the source Buffer.
     // Existing destination glyphs are repaired as a group, as with setString.
     public func blitFrom(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit {
         blitCells(source, sourceArea, targetX, targetY, true)
@@ -440,6 +442,8 @@ public class Buffer {
     private func blitCells(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64, respectClip: Bool): Unit {
         let sourceClip = intersect(source.area, sourceArea)
         if (sourceClip.width <= 0 || sourceClip.height <= 0) { return }
+        let clippedTargetX = advanceCoordinate(targetX, sourceClip.x - sourceArea.x)
+        let clippedTargetY = advanceCoordinate(targetY, sourceClip.y - sourceArea.y)
         // Snapshot before writing, including when source and destination are
         // the same Buffer and the rectangles overlap.
         let copied = ArrayList<Cell>()
@@ -450,10 +454,10 @@ public class Buffer {
         if (!respectClip) { writeClip = None }
         try {
             for (row in 0..sourceClip.height) {
-                let y = advanceCoordinate(targetY, row)
+                let y = advanceCoordinate(clippedTargetY, row)
                 var column: Int64 = 0
                 while (column < sourceClip.width) {
-                    let x = advanceCoordinate(targetX, column)
+                    let x = advanceCoordinate(clippedTargetX, column)
                     let cell = copied[row * sourceClip.width + column]
                     let lead = match (cell.kind) { case CellKind.WideLead => true; case _ => false }
                     let pair = lead && column + 1 < sourceClip.width &&

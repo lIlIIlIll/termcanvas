@@ -1,0 +1,22 @@
+    TCS: Audit20261003AssistantInputTest, time elapsed: 1157966 ns, RESULT:
+    [ FAILED ] CASE: typingOrdinaryLettersDoesNotInvokeApplicationCommands (206762 ns)
+    Expect Failed: `(false == true)`
+       left: false
+      right: true
+
+    Expect Failed: app.composer.area.value != "aqua"
+        app.composer.area.value: ""
+                         "aqua": "aqua"
+
+    Expect Failed: `(! app.showRequest == true)`
+       left: false
+      right: true
+
+    TCS: AssistantConsoleTest, time elapsed: 4116968 ns, RESULT:
+    [ PASSED ] CASE: requestResultAndPasteUseTheRealUpdatePath (47261 ns)
+    [ PASSED ] CASE: pasteDoesNotBypassTheOpenRequest (15443 ns)
+    [ PASSED ] CASE: approvalKeyboardAndRenderingCoverBothApplicationSurfaces (3683284 ns)
+Summary: TOTAL: 4
+    PASSED: 3, SKIPPED: 0, ERROR: 0
+    FAILED: 1, listed below:
+            TCS: Audit20261003AssistantInputTest, CASE: typingOrdinaryLettersDoesNotInvokeApplicationCommands

@@ -1,0 +1,23 @@
+    TCS: Audit20261003SkinInputTest, time elapsed: 1119838 ns, RESULT:
+    [ FAILED ] CASE: focusedComposerOwnsOrdinaryCommandLetters (166361 ns)
+    Expect Failed: app.composer.area.value != "/btq"
+        app.composer.area.value: ""
+                         "/btq": "/btq"
+
+    Expect Failed: `(! app.paletteOpen == true)`
+       left: false
+      right: true
+
+    TCS: OhMyPiSkinTest, time elapsed: 66242479 ns, RESULT:
+    [ PASSED ] CASE: openPaletteReceivesQueryInput (106150 ns)
+    [ PASSED ] CASE: paletteActionUpdatesTheOwningApplication (20320 ns)
+    [ PASSED ] CASE: paletteQuitReturnsExit (19269 ns)
+    [ PASSED ] CASE: todoStateCoversExpansionSelectionAndViewportRules (48823 ns)
+    [ PASSED ] CASE: applicationUpdateCoversTimersFocusAndComposerRoutes (136296 ns)
+    [ PASSED ] CASE: paletteActionsCoverEveryCommandAndEscapePath (28423 ns)
+    [ PASSED ] CASE: renderingCoversCompactFullUnicodeAndAsciiSurfaces (55832124 ns)
+    [ PASSED ] CASE: timerAnimationAndGeometryBoundaryModesStayCovered (8942982 ns)
+Summary: TOTAL: 9
+    PASSED: 8, SKIPPED: 0, ERROR: 0
+    FAILED: 1, listed below:
+            TCS: Audit20261003SkinInputTest, CASE: focusedComposerOwnsOrdinaryCommandLetters

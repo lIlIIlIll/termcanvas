@@ -57,6 +57,8 @@ def main() -> int:
     parser.add_argument("--metrics", choices=("off", "on"), default="off")
     parser.add_argument("--frame-budget-ms", type=int, default=0)
     args = parser.parse_args()
+    if args.runs <= 0 or args.history <= 0:
+        parser.error("runs and history must be positive")
     binary = args.binary.resolve()
     args.output.mkdir(parents=True, exist_ok=True)
     records = []
@@ -96,6 +98,17 @@ def main() -> int:
             ),
             "stdout": completed.stdout,
         }
+        record["passed"] = (
+            record["returncode"] == 0
+            and long_match is not None
+            and gate_match is not None
+            and record["frames"] > 0
+            and record["configured_cards"] == args.history
+            and record["transcript_expected"] == record["transcript_actual"]
+            and record["content_preserved"] is True
+            and record["documents_actual"] <= record["documents_expected"]
+            and record["differential"] == "PASS"
+        )
         records.append(record)
         print(f"long-gate {args.metrics} run={run_id} exit={completed.returncode}")
     raw_path = args.output / f"long-gate-{args.metrics}.jsonl"
@@ -115,13 +128,13 @@ def main() -> int:
         "documents": distribution([record["documents"] for record in records if record["documents"] is not None]),
         "gates": [{key: record[key] for key in (
             "run_id", "configured_cards", "transcript_expected", "transcript_actual", "content_preserved",
-            "documents_expected", "documents_actual", "returncode", "differential"
+            "documents_expected", "documents_actual", "returncode", "differential", "passed"
         )} for record in records],
     }
     (args.output / f"long-gate-summary-{args.metrics}.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n"
     )
-    return 0 if all(record["returncode"] == 0 for record in records) else 1
+    return 0 if all(record["passed"] for record in records) else 1
 
 
 if __name__ == "__main__":

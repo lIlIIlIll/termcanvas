@@ -13,8 +13,33 @@ export CANGJIE_SDK_ROOT="$sdk_root"
 # Use a clean target root so dependencies are rebuilt with coverage enabled.
 export CJ_TUI_CANONICAL_TARGET_ROOT="$ROOT/.coverage-target"
 
-rm -rf -- "$OUTPUT_DIR" "$CJ_TUI_CANONICAL_TARGET_ROOT"
-mkdir -p -- "$OUTPUT_DIR" "$CJ_TUI_CANONICAL_TARGET_ROOT"
+# Never recursively erase an arbitrary caller-supplied directory. Only a
+# directory marked by a previous coverage run belongs to this script.
+OUTPUT_DIR=$(python3 - "$ROOT" "$OUTPUT_DIR" <<'PY'
+import shutil
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1]).resolve()
+requested = Path(sys.argv[2])
+output = requested.resolve()
+marker = output / ".cjtui-coverage-output"
+target = root / ".coverage-target"
+if requested.is_symlink() or output == root or output in root.parents or output.is_relative_to(target):
+    raise SystemExit(f"refusing unsafe coverage output: {requested}")
+if output.exists():
+    if not output.is_dir():
+        raise SystemExit(f"coverage output is not a directory: {output}")
+    if any(output.iterdir()) and not (marker.is_file() and marker.read_text() == "cjtui coverage\n"):
+        raise SystemExit(f"coverage output contains unowned files; choose an empty directory: {output}")
+    shutil.rmtree(output)
+output.mkdir(parents=True)
+marker.write_text("cjtui coverage\n")
+print(output)
+PY
+)
+rm -rf -- "$CJ_TUI_CANONICAL_TARGET_ROOT"
+mkdir -p -- "$CJ_TUI_CANONICAL_TARGET_ROOT"
 
 # Do not accumulate counters from an earlier local run.
 while IFS= read -r -d '' artifact; do
@@ -148,4 +173,3 @@ if line_rate < 0.90 or branch_rate < 0.80:
 PY
 
 printf 'coverage report: %s\n' "$OUTPUT_DIR/coverage.xml"
-

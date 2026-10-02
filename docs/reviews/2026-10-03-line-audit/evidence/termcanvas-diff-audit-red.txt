@@ -1,0 +1,27 @@
+    TCS: Audit20261003DiffTest, time elapsed: 1234160 ns, RESULT:
+    [ FAILED ] CASE: filePathsExcludeUnifiedDiffTimestampMetadata (240592 ns)
+    Expect Failed: doc.files[0].oldPath != "old name.txt"
+        doc.files[0].oldPath: "old name.txt	2026-10-01 12:00:00 +0000"
+              "old name.txt": "old name.txt··························"
+                               ============--------------------------
+
+    Expect Failed: doc.files[0].newPath != "new name.txt"
+        doc.files[0].newPath: "new name.txt	2026-10-02 12:00:00 +0000"
+              "new name.txt": "new name.txt··························"
+                               ============--------------------------
+
+    TCS: DiffExtensionTest, time elapsed: 18674192 ns, RESULT:
+    [ PASSED ] CASE: narrowViewsPreserveExistingWideGlyphsAcrossBothAreaEdges (634847 ns)
+    [ PASSED ] CASE: bothDiffLayoutsClipWideGlyphRepairsAtTheirOuterEdges (279852 ns)
+    [ PASSED ] CASE: diffBlockAlsoPreservesWideGlyphsAcrossTheOuterArea (355255 ns)
+    [ PASSED ] CASE: oneColumnSideBySideViewUsesTheUnifiedColumn (69594 ns)
+    [ PASSED ] CASE: twoColumnSideBySideViewKeepsBothSidesInsideTheArea (86280 ns)
+    [ PASSED ] CASE: hunkContentAndNoNewlineMarkersDoNotBecomeFileHeaders (25629 ns)
+    [ PASSED ] CASE: viewClampsSelectionAndClipsUnicodeAtDisplayBoundaries (181324 ns)
+    [ PASSED ] CASE: parsesUnifiedDiffFilesAndHunks (32038 ns)
+    [ PASSED ] CASE: rendersDiffViewWithStyles (66670 ns)
+    [ PASSED ] CASE: rendersSideBySideDiffWithLineNumbers (57837 ns)
+Summary: TOTAL: 11
+    PASSED: 10, SKIPPED: 0, ERROR: 0
+    FAILED: 1, listed below:
+            TCS: Audit20261003DiffTest, CASE: filePathsExcludeUnifiedDiffTimestampMetadata

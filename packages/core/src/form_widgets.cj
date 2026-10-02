@@ -349,7 +349,11 @@ public class MultiSelect <: Widget {
         this.cursor = clamp(cursor, 0, max(0, items.size - 1))
         this.style = style
         this.selectedStyle = selectedStyle
-        for (index in selected) { selectedItems.add(index) }
+        for (index in selected) {
+            if (index >= 0 && index < items.size && !containsIndex(selectedItems, index)) {
+                selectedItems.add(index)
+            }
+        }
     }
 
     public func selectedIndices(): Array<Int64> { selectedItems.toArray() }

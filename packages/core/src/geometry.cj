@@ -137,6 +137,7 @@ public class Layout {
         let available = max(0, total - totalGap)
         var fixed: Int64 = 0
         var minCount: Int64 = 0
+        var lastMin: Int64 = -1
         var maxCount: Int64 = 0
         let sizes = Array<Int64>(constraints.size, repeat: 0)
         for (i in 0..constraints.size) {
@@ -147,7 +148,7 @@ public class Layout {
                 case Percent(p) =>
                     sizes[i] = clamp(available * clamp(p, 0, 100) / 100, 0, available)
                     fixed += sizes[i]
-                case Min(_) => minCount++
+                case Min(_) => minCount++; lastMin = i
                 case Max(_) => maxCount++
                 case Ratio(n, d) =>
                     sizes[i] = if (d <= 0 || n <= 0) { 0 } else { clamp(available * n / d, 0, available) }
@@ -170,7 +171,7 @@ public class Layout {
                 case _ => ()
             }
         }
-        normalizeSizes(sizes, available, minCount > 0)
+        normalizeSizes(sizes, available, lastMin)
 
         let rects = Array<Rect>(constraints.size, repeat: Rect(area.x, area.y, 0, 0))
         let used = usedSize(sizes) + totalGap
@@ -212,7 +213,7 @@ public class Layout {
         used
     }
 
-    private static func normalizeSizes(sizes: Array<Int64>, total: Int64, fill: Bool): Unit {
+    private static func normalizeSizes(sizes: Array<Int64>, total: Int64, fillIndex: Int64): Unit {
         var used: Int64 = 0
         for (size in sizes) {
             used += size
@@ -224,8 +225,10 @@ public class Layout {
             used -= take
             i--
         }
-        if (fill && used < total && sizes.size > 0) {
-            sizes[sizes.size - 1] += total - used
+        if (fillIndex >= 0 && used < total) {
+            // Only a Min chunk may absorb a remainder. The last chunk can
+            // instead be a fixed Length, Ratio, Percent or capped Max.
+            sizes[fillIndex] += total - used
         }
     }
 }
@@ -339,8 +342,11 @@ public class LayoutCache {
         if (valid && this.area == area) {
             return rects
         }
+        // Publish the key and value together only after the callback has
+        // succeeded; a failed computation must not make old rects a hit.
+        let computed = compute(area)
         this.area = area
-        rects = compute(area)
+        rects = computed
         valid = true
         rects
     }

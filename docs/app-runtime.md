@@ -69,8 +69,10 @@ Choose one of these constructors for real-time ticks:
 
 `Event.Tick(TickEvent)` reports `deltaMillis`, `elapsedMillis`, `frameIndex`,
 and `droppedFrames`. With a late frame, `FrameMissPolicy.Drop` emits one tick
-and records dropped frames. `FrameMissPolicy.CatchUp(n)` advances by scheduled
-intervals with a bounded catch-up count.
+and records dropped frames. `FrameMissPolicy.CatchUp(n)` preserves the scheduled
+intervals while emitting the current tick and at most `max(0, n)` additional
+overdue ticks. Older slots beyond that budget are skipped and included in
+`droppedFrames`. The same policy applies to repeating timers.
 
 Timers emit `Event.Timer(TimerEvent)` and can be one-shot or repeating.
 

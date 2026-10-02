@@ -612,6 +612,7 @@ public class TextArea <: Widget {
 
     public func beginCompletion(requestId: String): TextCompletionRequest {
         synchronizeValue()
+        _ = cancelCompletion()
         let start = completionPrefixStart(value, cursor)
         let line = lineForOffset(cursor)
         let column = displayWidth(value[lineStartForOffset(cursor)..cursor])
@@ -645,17 +646,17 @@ public class TextArea <: Widget {
     }
 
     public func cancelCompletion(): Bool {
-        if (!completionOpen) { return false }
+        let wasOpen = completionOpen
         completionOpen = false
         completionItems = []
         completionIndex = 0
-        true
+        completionRequestId = ""
+        completionRevision = -1
+        wasOpen
     }
 
     internal func invalidateCompletionRequest(): Unit {
         _ = cancelCompletion()
-        completionRequestId = ""
-        completionRevision = -1
     }
 
     public func completionRows(maximum!: Int64 = 5): Int64 {
@@ -1277,7 +1278,8 @@ public class TextArea <: Widget {
 
     private func applyCompletionResult(result: TextCompletionResult): Bool {
         synchronizeValue()
-        if (completionRevision < 0 || result.requestId != completionRequestId || result.revision != revision) { return false }
+        if (completionRevision < 0 || result.requestId != completionRequestId ||
+            result.revision != completionRevision || result.revision != revision) { return false }
         completionItems = result.items
         completionReplaceStart = clampToRuneBoundary(value, result.replaceStart)
         completionReplaceEnd = clampToRuneBoundary(value, result.replaceEnd)
@@ -1295,7 +1297,7 @@ public class TextArea <: Widget {
                 completionIndex = min(max(0, completionItems.size - 1), completionIndex + 1)
                 true
             case KeyCode.Esc =>
-                completionOpen = false
+                _ = cancelCompletion()
                 true
             case KeyCode.Enter =>
                 if (readOnly) { false } else { acceptCompletion(); true }
@@ -1583,13 +1585,16 @@ func continuationMarker(line: String): String {
     let end = markdownListMarkerEnd(line)
     if (end <= start) { return "" }
     if (line[start] >= b'0' && line[start] <= b'9') {
-        var number: Int64 = 0
-        var i = start
-        while (i < line.size && line[i] >= b'0' && line[i] <= b'9') {
-            number = number * 10 + Int64(line[i] - b'0')
-            i++
-        }
-        return "${number + 1}. "
+        // Continue decimal markers directly, including those beyond Int64.
+        // Normalize leading zeroes as the previous numeric conversion did.
+        let numberEnd = end - 2
+        var numberStart = start
+        while (numberStart + 1 < numberEnd && line[numberStart] == b'0') { numberStart++ }
+        var carry = numberEnd - 1
+        while (carry >= numberStart && line[carry] == b'9') { carry-- }
+        if (carry < numberStart) { return "1" + repeat("0", numberEnd - numberStart) + ". " }
+        let incremented = runeToString(Rune(UInt32(line[carry]) + 1u32))
+        return line[numberStart..carry] + incremented + repeat("0", numberEnd - carry - 1) + ". "
     }
     let marker = line[start..end]
     if (hasTaskMarkerAfterListMarker(line, end)) {
@@ -1785,6 +1790,7 @@ public class MarkdownEditorBehavior {
     }
 
     public func handle(area: TextArea, key: KeyEvent): Bool {
+        if (area.readOnly) { return area.handle(key) }
         area.markdownEditing = true
         match (key.code) {
             case KeyCode.Enter =>
@@ -1817,18 +1823,22 @@ public class MarkdownEditorBehavior {
     }
 
     public func toggleBold(area: TextArea): Bool {
+        if (area.readOnly) { return false }
         wrapSelectionOrWord(area, "**", "**")
     }
 
     public func toggleItalic(area: TextArea): Bool {
+        if (area.readOnly) { return false }
         wrapSelectionOrWord(area, "*", "*")
     }
 
     public func toggleCode(area: TextArea): Bool {
+        if (area.readOnly) { return false }
         wrapSelectionOrWord(area, "`", "`")
     }
 
     public func insertLink(area: TextArea, url!: String = "https://example.com"): Bool {
+        if (area.readOnly) { return false }
         if (area.hasSelection()) {
             wrapSelection(area, "[", "](${url})")
         } else {
@@ -1838,6 +1848,7 @@ public class MarkdownEditorBehavior {
     }
 
     public func insertImage(area: TextArea, url!: String = "image.png", alt!: String = "alt"): Bool {
+        if (area.readOnly) { return false }
         if (area.hasSelection()) {
             match (area.selectedRange()) {
                 case Some((start, end)) =>
@@ -1855,6 +1866,7 @@ public class MarkdownEditorBehavior {
     }
 
     public func insertReferenceLink(area: TextArea, id!: String = "ref"): Bool {
+        if (area.readOnly) { return false }
         if (area.hasSelection()) {
             wrapSelection(area, "[", "][${id}]")
         } else {
@@ -1864,12 +1876,14 @@ public class MarkdownEditorBehavior {
     }
 
     public func insertReferenceDefinition(area: TextArea, id!: String = "ref", url!: String = "https://example.com", title!: String = ""): Bool {
+        if (area.readOnly) { return false }
         let suffix = if (title.isEmpty()) { "" } else { " \"${title}\"" }
         area.paste("[${id}]: ${url}${suffix}\n")
         true
     }
 
     public func insertFrontmatter(area: TextArea, title!: String = "Untitled"): Bool {
+        if (area.readOnly) { return false }
         let oldCursor = area.cursor
         let prefix = "---\ntitle: ${title}\n---\n\n"
         area.cursor = 0
@@ -1880,11 +1894,13 @@ public class MarkdownEditorBehavior {
     }
 
     public func insertTable(area: TextArea): Bool {
+        if (area.readOnly) { return false }
         area.paste("| Name | Value |\n| --- | --- |\n| item | value |\n")
         true
     }
 
     public func insertCodeFence(area: TextArea, language!: String = ""): Bool {
+        if (area.readOnly) { return false }
         area.paste("```" + language + "\n\n```\n")
         true
     }

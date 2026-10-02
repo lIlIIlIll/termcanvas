@@ -33,7 +33,7 @@ class AssistantConsoleTest {
     @TestCase
     func approvalKeyboardAndRenderingCoverBothApplicationSurfaces(): Unit {
         let app = AssistantConsole()
-        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'a'))))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.F(2))))
         @Expect(app.showRequest)
         _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Right)))
         let accepted = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
@@ -54,7 +54,7 @@ class AssistantConsoleTest {
         app.showRequest = true
         _ = terminal.draw { frame => app.render(frame) }
         @Assert(backend.snapshot().contains("Approval"))
-        let quit = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'q'))))
+        let quit = app.update(Event.KeyDown(KeyEvent(KeyCode.CtrlC)))
         match (quit) {
             case ControlFlow.Exit => ()
             case _ => @Expect(false)

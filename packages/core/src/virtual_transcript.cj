@@ -1071,6 +1071,10 @@ public class VirtualTranscriptView <: Widget {
                 entriesRemeasuredValue++
                 if (staleMeasurement) { staleEntriesEncounteredValue++ }
             }
+            // Provider/layout callbacks can throw. Invalidate before writing
+            // the new identity so a retry cannot hit the previous revision's
+            // rows under the new revision key.
+            entry.measured = false
             entry.id = id
             entry.revision = revision
             entry.sourceGeneration = sourceGeneration

@@ -88,9 +88,11 @@ public class ProgressBar <: Widget {
 
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
-        match (direction) {
-            case ProgressBarDirection.Horizontal => renderHorizontal(area, buffer)
-            case ProgressBarDirection.Vertical => renderVertical(area, buffer)
+        buffer.withCanvasClip(area) { =>
+            match (direction) {
+                case ProgressBarDirection.Horizontal => renderHorizontal(area, buffer)
+                case ProgressBarDirection.Vertical => renderVertical(area, buffer)
+            }
         }
     }
 
@@ -101,11 +103,11 @@ public class ProgressBar <: Widget {
         } else if (segments.size > 0) {
             renderHorizontalSegments(area, buffer)
         } else {
-            let filled = clamp(value, 0, total) * area.width / total
+            let filled = scaledChartHeight(clamp(value, 0, total), area.width, total)
             if (filled > 0) {
-                buffer.setString(area.x, area.y, repeat(symbols.filled, filled), style: themedAccent(fillStyle, theme))
+                _ = buffer.writeStringClipped(area.x, area.y, repeat(symbols.filled, filled), maxWidth: filled, style: themedAccent(fillStyle, theme))
                 if (filled < area.width && !symbols.head.isEmpty()) {
-                    buffer.setString(area.x + filled - 1, area.y, symbols.head, style: themedAccent(fillStyle, theme))
+                    _ = buffer.writeStringClipped(area.x + filled - 1, area.y, symbols.head, maxWidth: 1, style: themedAccent(fillStyle, theme))
                 }
             }
         }
@@ -129,17 +131,17 @@ public class ProgressBar <: Widget {
         var used = 0
         for (segment in segments) {
             if (x >= area.right) { break }
-            let width = segment.value * area.width / total
+            let width = scaledChartHeight(min(segment.value, total), area.width, total)
             let clipped = min(area.right - x, max(0, width))
             if (clipped > 0) {
-                buffer.setString(x, area.y, repeat(segment.symbol, clipped), style: themedAccent(segment.style, theme))
+                _ = buffer.writeStringClipped(x, area.y, repeat(segment.symbol, clipped), maxWidth: clipped, style: themedAccent(segment.style, theme))
                 x += clipped
                 used += clipped
             }
         }
         if (used == 0 && value > 0) {
-            let filled = max(1, clamp(value, 0, total) * area.width / total)
-            buffer.setString(area.x, area.y, repeat(symbols.filled, min(area.width, filled)), style: themedAccent(fillStyle, theme))
+            let filled = max(1, scaledChartHeight(clamp(value, 0, total), area.width, total))
+            _ = buffer.writeStringClipped(area.x, area.y, repeat(symbols.filled, min(area.width, filled)), maxWidth: min(area.width, filled), style: themedAccent(fillStyle, theme))
         }
     }
 
@@ -158,7 +160,7 @@ public class ProgressBar <: Widget {
                 }
             }
         } else {
-            let filled = clamp(value, 0, total) * area.height / total
+            let filled = scaledChartHeight(clamp(value, 0, total), area.height, total)
             for (row in 0..filled) {
                 let y = area.bottom - 1 - row
                 buffer.setString(area.x, y, repeat(symbols.filled, area.width), style: themedAccent(fillStyle, theme))
@@ -190,7 +192,7 @@ public class ProgressBar <: Widget {
         if (!label.isEmpty()) { return label }
         match (labelMode) {
             case ProgressBarLabelMode.Hidden => ""
-            case ProgressBarLabelMode.Percent => "${clamp(value, 0, total) * 100 / total}%"
+            case ProgressBarLabelMode.Percent => "${scaledChartHeight(clamp(value, 0, total), 100, total)}%"
             case ProgressBarLabelMode.Value => "${clamp(value, 0, total)}"
             case ProgressBarLabelMode.Ratio => "${clamp(value, 0, total)}/${total}"
             case ProgressBarLabelMode.Text(text) => text
@@ -215,7 +217,7 @@ public class Sparkline <: Widget {
         let bars = [" ", ".", "-", "=", "#"]
         let count = min(area.width, values.size)
         for (i in 0..count) {
-            let level = if (maxV <= 0) { 0 } else { clamp(values[i] * (bars.size - 1) / maxV, 0, bars.size - 1) }
+            let level = if (maxV <= 0) { 0 } else { scaledChartHeight(clamp(values[i], 0, maxV), bars.size - 1, maxV) }
             buffer.setString(area.x + i, area.y, bars[level], style: style)
         }
     }
@@ -268,7 +270,7 @@ public class Chart <: Widget {
         let maxV = max(1, maxArray(values))
         let count = min(target.width, values.size)
         for (i in 0..count) {
-            let height = max(1, values[i] * target.height / maxV)
+            let height = max(1, scaledChartHeight(clamp(values[i], 0, maxV), target.height, maxV))
             for (dy in 0..height) {
                 buffer.setString(target.x + i, target.bottom - 1 - dy, "#", style: style)
             }

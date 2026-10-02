@@ -316,6 +316,7 @@ public class AsciiAnimationView <: Widget {
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
+        let canvas = Canvas(buffer, target)
         let frame = animation.frameAtElapsed(elapsedMillis)
         let rowStyle = if (paused) { pausedStyle } else { style }
         var outY: Int64 = 0
@@ -325,10 +326,10 @@ public class AsciiAnimationView <: Widget {
             for (_ in 0..zoom) {
                 if (outY >= target.height) { break }
                 if (frame.hasColors()) {
-                    renderColoredAsciiLine(buffer, target.x, target.y + outY, line, frame, sourceY, zoom, target.width, rowStyle)
+                    renderColoredAsciiLine(canvas, target.x, target.y + outY, line, frame, sourceY, zoom, target.width, rowStyle)
                 } else {
                     let rendered = zoomAsciiLine(line, zoom, target.width)
-                    buffer.setString(target.x, target.y + outY, rendered, style: rowStyle)
+                    canvas.drawText(target.x, target.y + outY, rendered, rowStyle)
                 }
                 outY++
             }
@@ -339,8 +340,8 @@ public class AsciiAnimationView <: Widget {
 public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame {
     let targetWidth = max(0, width)
     let targetHeight = max(0, height)
-    let frameSize = targetWidth * targetHeight * 4
-    if (targetWidth <= 0 || targetHeight <= 0 || bytes.size < frameSize) {
+    // Divide before multiplying so untrusted dimensions cannot overflow.
+    if (targetWidth <= 0 || targetHeight <= 0 || targetHeight > bytes.size / 4 / targetWidth) {
         return AsciiFrame([], durationMillis: options.frameMillis())
     }
     match (options.mode) {
@@ -658,26 +659,28 @@ func zoomAsciiLine(line: String, zoom: Int64, maxWidth: Int64): String {
     if (zoom <= 1) { return truncateAscii(line, maxWidth) }
     let builder = StringBuilder()
     var cells: Int64 = 0
-    for (r in line.runes()) {
+    for (cluster in graphemeClusters(line)) {
+        if (cluster.width <= 0) { continue }
         for (_ in 0..zoom) {
-            if (cells >= maxWidth) { return builder.toString() }
-            builder.append(r)
-            cells++
+            if (cluster.width > maxWidth - cells) { return builder.toString() }
+            builder.append(cluster.text)
+            cells += cluster.width
         }
     }
-    truncateAscii(builder.toString(), maxWidth)
+    builder.toString()
 }
 
-func renderColoredAsciiLine(buffer: Buffer, x: Int64, y: Int64, line: String, frame: AsciiFrame, sourceY: Int64, zoom: Int64, maxWidth: Int64, baseStyle: Style): Unit {
+func renderColoredAsciiLine(canvas: Canvas, x: Int64, y: Int64, line: String, frame: AsciiFrame, sourceY: Int64, zoom: Int64, maxWidth: Int64, baseStyle: Style): Unit {
     var outX: Int64 = 0
     var sourceX: Int64 = 0
-    for (r in line.runes()) {
+    for (cluster in graphemeClusters(line)) {
+        if (cluster.width <= 0) { continue }
         for (_ in 0..zoom) {
-            if (outX >= maxWidth) { return }
+            if (cluster.width > maxWidth - outX) { return }
             let color = frame.colorAt(sourceY, sourceX)
             let cellStyle = if (colorEqualsLocal(color, Color.Reset)) { baseStyle } else { baseStyle.withFg(color) }
-            buffer.setString(x + outX, y, runeToStringLocal(r), style: cellStyle)
-            outX++
+            canvas.drawText(x + outX, y, cluster.text, cellStyle)
+            outX += cluster.width
         }
         sourceX++
     }
@@ -703,21 +706,7 @@ func joinLocal(parts: Array<String>, sep: String): String {
 }
 
 func truncateAscii(text: String, maxWidth: Int64): String {
-    if (maxWidth <= 0) { return "" }
-    let builder = StringBuilder()
-    var width: Int64 = 0
-    for (r in text.runes()) {
-        if (width >= maxWidth) { break }
-        builder.append(r)
-        width++
-    }
-    builder.toString()
-}
-
-func runeToStringLocal(r: Rune): String {
-    let builder = StringBuilder()
-    builder.append(r)
-    builder.toString()
+    graphemePrefix(text, max(0, maxWidth))
 }
 
 func colorEqualsLocal(a: Color, b: Color): Bool {

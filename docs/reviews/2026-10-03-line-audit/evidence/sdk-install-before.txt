@@ -1,0 +1,21 @@
+FF...........
+======================================================================
+FAIL: test_github_env_contains_actual_native_runtime_directory (__main__.ResolverArchiveSafetyTest.test_github_env_contains_actual_native_runtime_directory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/40bf4f55d58a/termcanvas/scripts/test_resolve_nightly_sdk.py", line 184, in test_github_env_contains_actual_native_runtime_directory
+    self.assertIn(str(runtime), library_line.split("=", 1)[1].split(":"))
+AssertionError: '/tmp/tmphqm45pu9/sdk/runtime/lib/linux_x86_64_cjnative' not found in ['/tmp/tmphqm45pu9/sdk/lib', '/tmp/tmphqm45pu9/sdk/runtime/lib', '']
+
+======================================================================
+FAIL: test_install_locates_official_archive_top_level_directory (__main__.ResolverArchiveSafetyTest.test_install_locates_official_archive_top_level_directory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/40bf4f55d58a/termcanvas/scripts/test_resolve_nightly_sdk.py", line 170, in test_install_locates_official_archive_top_level_directory
+    self.assertEqual(installed, root / "install/cangjie")
+AssertionError: None != PosixPath('/tmp/tmphbzaduzv/install/cangjie')
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.013s
+
+FAILED (failures=2)

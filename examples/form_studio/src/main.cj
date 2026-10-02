@@ -24,7 +24,7 @@ class FormStudio {
         match (event) {
             case Event.KeyDown(key) =>
                 match (key.code) {
-                    case KeyCode.CtrlC | KeyCode.Char(r'q') => return ControlFlow.Exit
+                    case KeyCode.CtrlC => return ControlFlow.Exit
                     case _ => ()
                 }
                 if (focus.handle(key)) { return ControlFlow.Continue }
@@ -103,7 +103,7 @@ class FormStudio {
         let right = Layout.vertical([Constraint.Length(5), Constraint.Length(2), Constraint.Min(2)]).withGap(1).split(cols[2])
         frame.renderWidget(tags, right[0])
         frame.renderWidget(date, right[1])
-        frame.renderWidget(Paragraph("focus: " + focusLabel() + "\nq/Ctrl-C exits", block: Block(title: "State")), right[2])
+        frame.renderWidget(Paragraph("focus: " + focusLabel() + "\nCtrl-C exits", block: Block(title: "State")), right[2])
         frame.renderWidget(StatusBar(left: status, right: date.value(), style: Style(fg: Color.White, bg: Color.Blue)), root[2])
         match (focus.current()) {
             case Some("name") => frame.setCursor(name.cursorPosition(left[0]))

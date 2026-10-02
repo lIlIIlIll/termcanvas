@@ -1,0 +1,202 @@
+==> canonical Cangjie SDK
+==> core tests
+Summary: TOTAL: 700
+    PASSED: 700, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 700
+    PASSED: 700, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> markdown adapter tests
+Summary: TOTAL: 44
+    PASSED: 44, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 44
+    PASSED: 44, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> terminal tests
+Summary: TOTAL: 14
+    PASSED: 14, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 14
+    PASSED: 14, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> diff tests
+Summary: TOTAL: 11
+    PASSED: 11, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 11
+    PASSED: 11, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> media tests
+Summary: TOTAL: 16
+    PASSED: 16, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 16
+    PASSED: 16, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> game tests
+Summary: TOTAL: 15
+    PASSED: 15, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 15
+    PASSED: 15, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> event script syntax
+==> golden snapshot files
+==> api index
+checked classified API contract: 2379 production declarations, 0 unclassified
+==> versioned api contract
+checked classified API contract: 2379 production declarations, 0 unclassified
+==> api extractor fixtures
+Ran 17 tests in 0.014s
+==> SDK resolver local fixtures
+Ran 13 tests in 0.009s
+==> example generator local fixtures
+Ran 4 tests in 0.045s
+==> Windows smoke wrapper local fixtures
+Ran 3 tests in 0.078s
+==> coverage output ownership fixtures
+Ran 4 tests in 0.157s
+==> long proof gate evidence fixtures
+Ran 3 tests in 0.109s
+==> architecture classification and fitness contracts
+architecture contracts ok: 371 production top-level declarations, stable=193, experimental=130, internal=34, test_only=14, unclassified=0, lifecycle=21/130
+==> unicode generated data
+==> examples
+==> arcade
+==> assistant_console
+==> btm_clone
+==> command_center
+==> crystal_caves
+==> data_browser
+==> debug_lab
+==> form_studio
+==> game_demo
+==> game_pressure_suite
+==> gif_ascii
+==> markdown_studio
+==> media_gallery
+==> oh_my_pi_skin
+==> ops_dashboard
+==> taskpad
+==> terminal_lab
+==> example package tests
+==> example tests: examples/assistant_console
+Summary: TOTAL: 4
+    PASSED: 4, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 4
+    PASSED: 4, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> example tests: examples/btm_clone
+Summary: TOTAL: 7
+    PASSED: 7, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 7
+    PASSED: 7, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> example tests: examples/data_browser
+Summary: TOTAL: 3
+    PASSED: 3, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 3
+    PASSED: 3, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> example tests: examples/form_studio
+Summary: TOTAL: 3
+    PASSED: 3, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 3
+    PASSED: 3, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> example tests: examples/game_demo
+Summary: TOTAL: 8
+    PASSED: 8, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 8
+    PASSED: 8, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> example tests: examples/markdown_studio
+Summary: TOTAL: 9
+    PASSED: 9, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 9
+    PASSED: 9, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> example tests: examples/oh_my_pi_skin
+Summary: TOTAL: 9
+    PASSED: 9, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 9
+    PASSED: 9, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> example tests: examples/ops_dashboard
+Summary: TOTAL: 2
+    PASSED: 2, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 2
+    PASSED: 2, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> example tests: examples/taskpad
+Summary: TOTAL: 4
+    PASSED: 4, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 4
+    PASSED: 4, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> example tests: examples/terminal_lab
+Summary: TOTAL: 6
+    PASSED: 6, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 6
+    PASSED: 6, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> example smoke checks
+example smoke checks ok: 17 examples
+==> scripted example workflows
+component composition smoke scenarios ok: 4
+==> pressure gate
+==> pressure-oriented unittest scenarios
+Summary: TOTAL: 700
+    PASSED: 700, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+    PASSED:
+Summary: TOTAL: 700
+    PASSED: 700, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+==> build application examples under pressure gate
+==> arcade
+==> assistant_console
+==> btm_clone
+==> command_center
+==> crystal_caves
+==> data_browser
+==> debug_lab
+==> form_studio
+==> game_demo
+==> game_pressure_suite
+==> gif_ascii
+==> markdown_studio
+==> media_gallery
+==> oh_my_pi_skin
+==> ops_dashboard
+==> taskpad
+==> terminal_lab
+pressure gate ok
+release gate ok

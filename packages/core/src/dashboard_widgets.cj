@@ -95,10 +95,11 @@ public class Legend <: Widget {
             let text = item.symbol + " " + item.label
             if (x >= area.right) { return }
             buffer.setString(x, area.y, truncate(text, area.right - x), style: item.style)
-            x += displayWidthFast(text) + gap.size
+            x += displayWidthFast(text)
             if (x < area.right) {
-                buffer.setString(x - gap.size, area.y, gap, style: Style.default())
+                buffer.setString(x, area.y, truncate(gap, area.right - x), style: Style.default())
             }
+            x += displayWidthFast(gap)
         }
     }
 }
@@ -128,9 +129,11 @@ public class TimeSeriesChart <: Widget {
     }
 }
 
-// The result is bounded by height because value < maximum. Keep the normal
-// path cheap, and divide the wide product incrementally when Int64 would wrap.
+// Scale a nonnegative value into a bounded extent without overflowing the
+// intermediate product. The same exact ratio is used by charts and progress.
 func scaledChartHeight(value: Int64, height: Int64, maximum: Int64): Int64 {
+    if (value <= 0 || height <= 0) { return 0 }
+    if (value >= maximum) { return height }
     if (value <= Int64.Max / height) { return value * height / maximum }
     let divisor = UInt64(maximum)
     let factor = UInt64(value)
@@ -261,6 +264,7 @@ public class InlineAlert <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        if (area.width <= 0 || area.height <= 0) { return }
         let style = match (state) {
             case StyleState.Error => Style(fg: Color.Red)
             case StyleState.Disabled => Style(fg: Color.Indexed(8))

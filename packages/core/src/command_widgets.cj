@@ -64,6 +64,7 @@ public class Menu <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        if (area.width <= 0 || area.height <= 0) { return }
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)
@@ -347,6 +348,7 @@ public class Dialog <: Widget {
         let block = Block(title: title, style: style)
         block.render(dialogArea, buffer)
         let inner = block.inner(dialogArea)
+        if (inner.width <= 0 || inner.height <= 0) { return }
         Paragraph(body, wrap: WrapMode.Word, style: style).render(Rect(inner.x, inner.y, inner.width, max(0, inner.height - 1)), buffer)
         var bx = inner.x
         let by = dialogArea.bottom - 2

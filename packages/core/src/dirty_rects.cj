@@ -26,6 +26,9 @@ public class DirtyRects {
             if (canMerge(current, merged)) {
                 merged = unionRect(current, merged)
                 items.remove(at: i)
+                // The bounding union can reach rectangles skipped before
+                // this merge; revisit them until the union is disjoint.
+                i = 0
             } else {
                 i++
             }

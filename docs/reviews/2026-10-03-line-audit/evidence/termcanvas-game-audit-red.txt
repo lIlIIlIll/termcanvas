@@ -1,0 +1,51 @@
+    TCS: Audit20261003GameTest, time elapsed: 1350556 ns, RESULT:
+    [ FAILED ] CASE: physicsPersistsImplicitZeroVelocityBeforeTheNextStep (57006 ns)
+    Expect Failed: `(velocities.has(entity) == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(transforms.get(entity).getOrThrow().position.y > 0.29 == true)`
+       left: false
+      right: true
+
+    [ FAILED ] CASE: tileMapUsesTheSameGraphemeColumnsForWidthLookupAndRender (151579 ns)
+    Expect Failed: map.tileAt(0, 0) != "e\u{301}"
+        map.tileAt(0, 0): "e"
+              "e\u{301}": "é"
+
+    Expect Failed: map.tileAt(1, 0) != "#"
+        map.tileAt(1, 0): "́"
+                     "#": "#"
+
+    Assert Failed: `(map.find("#").size == 1)`
+       left: 0
+      right: 1
+
+    [ FAILED ] CASE: spriteRendererKeepsJoinedEmojiAndFollowingColumnsIntact (155244 ns)
+    Expect Failed: buffer.getCell(0, 0).symbol != "👩‍💻"
+        buffer.getCell(0, 0).symbol: "👩"
+                      "👩‍💻": "👩‍💻"
+
+    Expect Failed: buffer.getCell(2, 0).symbol != "x"
+        buffer.getCell(2, 0).symbol: "‍"
+                                "x": "x"
+
+    TCS: GameExtensionTest, time elapsed: 1232789 ns, RESULT:
+    [ PASSED ] CASE: stationarySeparatedAxesDoNotBlockMotion (43767 ns)
+    [ PASSED ] CASE: movingSensorKeepsVelocityAndReportsOverlapSeparately (23725 ns)
+    [ PASSED ] CASE: entityWorldAndGenericStoresWork (13511 ns)
+    [ PASSED ] CASE: gameInputTracksPressedJustPressedAndAxis (21923 ns)
+    [ PASSED ] CASE: sweptAabbStopsFastBodyAtWall (20301 ns)
+    [ PASSED ] CASE: gravityDampingAndStaticBodiesBehave (14833 ns)
+    [ PASSED ] CASE: tileMapCreatesSolidCollidersAndBlocksMotion (40281 ns)
+    [ PASSED ] CASE: spriteRendererClipsTransparencyAndCamera (28754 ns)
+    [ PASSED ] CASE: physicsReportsSensorOverlapsWithoutBlockingMotion (26640 ns)
+    [ PASSED ] CASE: spriteAnimationAdvancesAndStops (13240 ns)
+    [ PASSED ] CASE: worldStoresAndKeyVariantsCoverBoundaryModes (34021 ns)
+    [ PASSED ] CASE: geometryAnimationAndRenderingBoundaryModesStayStable (40512 ns)
+Summary: TOTAL: 15
+    PASSED: 12, SKIPPED: 0, ERROR: 0
+    FAILED: 3, listed below:
+            TCS: Audit20261003GameTest, CASE: physicsPersistsImplicitZeroVelocityBeforeTheNextStep
+            TCS: Audit20261003GameTest, CASE: tileMapUsesTheSameGraphemeColumnsForWidthLookupAndRender
+            TCS: Audit20261003GameTest, CASE: spriteRendererKeepsJoinedEmojiAndFollowingColumnsIntact

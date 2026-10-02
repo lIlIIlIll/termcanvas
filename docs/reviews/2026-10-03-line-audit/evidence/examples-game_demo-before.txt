@@ -1,0 +1,118 @@
+    TCS: Audit20261003SaveVersionTest, time elapsed: 3356371 ns, RESULT:
+    [ FAILED ] CASE: unrecognizedSaveFilesArePreserved (1755627 ns)
+    Expect Failed: `(! game.saveLoaded == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(! game.saveAllowed == true)`
+       left: false
+      right: true
+
+    Expect Failed: String.fromUtf8(File.readFrom(path)) != original (multiline difference below)
+        -version=1
+        -day=1
+        -minute=360
+        -money=120
+        -energy=100
+        -player=6,6
+        -facing=2
+        -tool=0
+        -seed=0
+        -seeds=2,0,0
+        -inventory=0,0,0
+        -shipping=0,0,0
+        -lastEarned=0
+        -plots=
+        +unrelated UTF-8 text
+
+
+    Expect Failed: `(! game.saveLoaded == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(! game.saveAllowed == true)`
+       left: false
+      right: true
+
+    Expect Failed: String.fromUtf8(File.readFrom(path)) != original (multiline difference below)
+        -version=1
+        +version=2
+         ========!
+         day=123
+        -minute=360
+        -money=120
+        -energy=100
+        -player=6,6
+        -facing=2
+        -tool=0
+        -seed=0
+        -seeds=2,0,0
+        -inventory=0,0,0
+        -shipping=0,0,0
+        -lastEarned=0
+        -plots=
+
+
+    Expect Failed: `(! game.saveLoaded == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(! game.saveAllowed == true)`
+       left: false
+      right: true
+
+    Expect Failed: String.fromUtf8(File.readFrom(path)) != original (multiline difference below)
+        -version=1
+         day=123
+        -minute=360
+        -money=120
+        -energy=100
+        -player=6,6
+        -facing=2
+        -tool=0
+        -seed=0
+        -seeds=2,0,0
+        -inventory=0,0,0
+        -shipping=0,0,0
+        -lastEarned=0
+        -plots=
+
+
+    Expect Failed: `(! game.saveLoaded == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(! game.saveAllowed == true)`
+       left: false
+      right: true
+
+    Expect Failed: String.fromUtf8(File.readFrom(path)) != original (multiline difference below)
+         version=1
+        +version=2
+         day=123
+        -minute=360
+        -money=120
+        -energy=100
+        -player=6,6
+        -facing=2
+        -tool=0
+        -seed=0
+        -seeds=2,0,0
+        -inventory=0,0,0
+        -shipping=0,0,0
+        -lastEarned=0
+        -plots=
+
+
+    TCS: FarmGameRegressionTest, time elapsed: 283429955 ns, RESULT:
+    [ PASSED ] CASE: fullShippingBoxKeepsCropsAndShowsTheCapacityNotice (78614322 ns)
+    [ PASSED ] CASE: emptyBagHasADifferentNoticeFromAFullShippingBox (66659010 ns)
+    [ PASSED ] CASE: partialShippingCapacityTransfersOnlyTheAvailableSpace (67769365 ns)
+    [ PASSED ] CASE: realHeadlessFlowIncludesAnimatedDirtyRegionsAndSaveReload (4956233 ns)
+    [ PASSED ] CASE: failedDecodePreservesTheExistingFileDuringLaterSaveAttempts (3599297 ns)
+    [ PASSED ] CASE: extremeSaveValuesRemainWithinTheDocumentedGameDomain (749411 ns)
+    [ PASSED ] CASE: interactiveCommandsDecodeEdgesAndFrameModesStayCovered (58378310 ns)
+Summary: TOTAL: 8
+    PASSED: 7, SKIPPED: 0, ERROR: 0
+    FAILED: 1, listed below:
+            TCS: Audit20261003SaveVersionTest, CASE: unrecognizedSaveFilesArePreserved

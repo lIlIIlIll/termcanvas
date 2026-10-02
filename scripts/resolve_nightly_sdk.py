@@ -82,6 +82,12 @@ def sdk_prefix(os_name: str, arch: str) -> str:
     return f"cangjie-sdk-{os_name.lower()}-{arch_norm(arch)}-"
 
 
+def native_sdk_name(name: str, prefix: str) -> bool:
+    # The same prefix also matches x64-ohos/android cross toolchains.
+    # A native archive has its numeric SDK version directly after the arch.
+    return bool(re.match(re.escape(prefix) + r"\d", name))
+
+
 def version_prefix(channel: str) -> str:
     if channel in DYNAMIC_LATEST_CHANNELS:
         return DYNAMIC_CHANNEL_PACKAGE_PREFIXES[channel]
@@ -127,7 +133,7 @@ def load_manifest(
         name = str(item.get("name") or item.get("real_name") or item.get("filename") or "")
         url = str(item.get("url") or item.get("download_url") or "")
         version = str(item.get("version") or item.get("package_version") or extract_version(name))
-        if name.startswith(prefix) and version_matches(version, channel, requested_version) and url:
+        if native_sdk_name(name, prefix) and version_matches(version, channel, requested_version) and url:
             candidates.append(SdkCandidate(version, url, name))
     if not candidates:
         raise SystemExit(f"manifest has no SDK matching {prefix} and {wanted_version}")
@@ -154,7 +160,7 @@ def devrepo_latest(
         download_url = str(item.get("download_url") or item.get("url") or "")
         version = str(item.get("package_version") or item.get("version") or extract_version(name))
         if (
-            name.startswith(prefix)
+            native_sdk_name(name, prefix)
             and version_matches(version, channel, requested_version)
             and download_url
         ):
@@ -204,20 +210,25 @@ def resolve(args: argparse.Namespace) -> SdkCandidate:
 
 def safe_extract(archive: Path, dest: Path) -> None:
     dest.mkdir(parents=True, exist_ok=True)
+    root = dest.resolve()
     if archive.suffix == ".zip":
         with zipfile.ZipFile(archive) as zf:
             for member in zf.infolist():
-                target = (dest / member.filename).resolve()
-                if not str(target).startswith(str(dest.resolve())):
+                target = (root / member.filename).resolve()
+                if not target.is_relative_to(root):
                     raise SystemExit(f"unsafe zip path: {member.filename}")
             zf.extractall(dest)
         return
+    if not hasattr(tarfile, "data_filter"):
+        raise SystemExit("safe SDK extraction requires Python with tarfile.data_filter")
     with tarfile.open(archive, "r:*") as tf:
         for member in tf.getmembers():
-            target = (dest / (member.name or "")).resolve()
-            if not str(target).startswith(str(dest.resolve())):
+            target = (root / (member.name or "")).resolve()
+            if not target.is_relative_to(root):
                 raise SystemExit(f"unsafe tar path: {member.name}")
-        tf.extractall(dest)
+        # Validate links again as each member is extracted: a preceding member
+        # can create a symlink that changes the resolution of a later path.
+        tf.extractall(dest, filter="data")
 
 
 def download(url: str, dest: Path) -> None:
@@ -225,17 +236,25 @@ def download(url: str, dest: Path) -> None:
         shutil.copyfileobj(response, out)
 
 
-def install(candidate: SdkCandidate, install_dir: Path) -> None:
+def install(candidate: SdkCandidate, install_dir: Path) -> Path:
     with tempfile.TemporaryDirectory(prefix="cj-sdk-") as tmp:
         archive = Path(tmp) / (candidate.name or "sdk.tar.gz")
         download(candidate.url, archive)
         safe_extract(archive, install_dir)
+    for sdk_root in (install_dir, install_dir / "cangjie"):
+        if (sdk_root / "bin/cjc").is_file() and (sdk_root / "tools/bin/cjpm").is_file():
+            return sdk_root
+    raise SystemExit(f"SDK archive has no usable native toolchain under {install_dir}")
 
 
 def emit_github_env(install_dir: Path, version: str) -> None:
     github_path = os.environ.get("GITHUB_PATH")
     github_env = os.environ.get("GITHUB_ENV")
     old_library_path = os.environ.get("LD_LIBRARY_PATH", "")
+    runtime_dirs = sorted(path for path in (install_dir / "runtime/lib").glob("*_cjnative") if path.is_dir())
+    library_path = ":".join(str(path) for path in [*runtime_dirs, install_dir / "tools/lib"])
+    if old_library_path:
+        library_path += ":" + old_library_path
     if github_path:
         with open(github_path, "a", encoding="utf-8") as fh:
             fh.write(f"{install_dir / 'bin'}\n")
@@ -246,7 +265,7 @@ def emit_github_env(install_dir: Path, version: str) -> None:
             fh.write(f"CANGJIE_SDK_ROOT={install_dir}\n")
             fh.write(f"CJ_TUI_NIGHTLY_SDK_VERSION={version}\n")
             fh.write(
-                f"LD_LIBRARY_PATH={install_dir / 'lib'}:{install_dir / 'runtime/lib'}:{old_library_path}\n"
+                f"LD_LIBRARY_PATH={library_path}\n"
             )
 
 
@@ -269,10 +288,10 @@ def main(argv: Iterable[str]) -> int:
         install_dir = Path(args.install_dir or os.environ.get("RUNNER_TEMP", "/tmp")) / "cangjie-sdk"
         if install_dir.exists():
             shutil.rmtree(install_dir)
-        install(candidate, install_dir)
+        sdk_root = install(candidate, install_dir)
         if args.emit_github_env:
-            emit_github_env(install_dir, candidate.version)
-        subprocess.run([str(install_dir / "bin" / "cjc"), "-v"], check=True)
+            emit_github_env(sdk_root, candidate.version)
+        subprocess.run([str(sdk_root / "bin" / "cjc"), "-v"], check=True)
     return 0
 
 

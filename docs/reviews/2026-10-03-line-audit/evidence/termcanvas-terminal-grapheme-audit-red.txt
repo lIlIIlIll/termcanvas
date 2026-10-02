@@ -1,0 +1,48 @@
+    TCS: Audit20261003TerminalTest, time elapsed: 1922778 ns, RESULT:
+    [ PASSED ] CASE: eraseLineHonorsAllModesAndKeepsCursor (84597 ns)
+    [ PASSED ] CASE: eraseDisplayHonorsModesWithoutHomingCursor (70886 ns)
+    [ PASSED ] CASE: cursorPositionDefaultsEachMissingParameterIndependently (21722 ns)
+    [ FAILED ] CASE: graphemeClustersSurviveBothWholeAndFragmentedFeeds (347194 ns)
+    Expect Failed: screen.cell(0, 0).symbol != "e\u{301}"
+        screen.cell(0, 0).symbol: "e"
+                      "e\u{301}": "é"
+
+    Expect Failed: screen.cell(1, 0).symbol != "👩‍💻"
+        screen.cell(1, 0).symbol: "👩"
+                   "👩‍💻": "👩‍💻"
+
+    Expect Failed: screen.cell(3, 0).symbol != "x"
+        screen.cell(3, 0).symbol: "‍"
+                             "x": "x"
+
+    Expect Failed: screen.cell(0, 0).symbol != "e\u{301}"
+        screen.cell(0, 0).symbol: "e"
+                      "e\u{301}": "é"
+
+    Expect Failed: screen.cell(1, 0).symbol != "👩‍💻"
+        screen.cell(1, 0).symbol: "👩"
+                   "👩‍💻": "👩‍💻"
+
+    Expect Failed: screen.cell(3, 0).symbol != "x"
+        screen.cell(3, 0).symbol: "‍"
+                             "x": "x"
+
+    Expect Failed: full.cell(1, 0).symbol != "e\u{301}"
+        full.cell(1, 0).symbol: "e"
+                    "e\u{301}": "é"
+
+    TCS: TerminalExtensionTest, time elapsed: 11628019 ns, RESULT:
+    [ PASSED ] CASE: screenCroppingCopiesOnlyCompleteWideGlyphs (162265 ns)
+    [ PASSED ] CASE: screenPhysicalEdgesDoNotCopyPartialWideGlyphs (178930 ns)
+    [ PASSED ] CASE: fragmentedControlsStayBoundedAndKeepTheirState (9190475 ns)
+    [ PASSED ] CASE: fullRowsDelayWrappingUntilTheNextPrintableCharacter (74862 ns)
+    [ PASSED ] CASE: unicodeSearchUsesScreenColumnsAndPreservesWideCells (323177 ns)
+    [ PASSED ] CASE: parsesSgrAndTextTokens (33431 ns)
+    [ PASSED ] CASE: screenHandlesColorCarriageReturnAndErase (44386 ns)
+    [ PASSED ] CASE: transcriptAndViewRenderVisibleScreen (43336 ns)
+    [ PASSED ] CASE: transcriptTrimsChunksAndViewHighlightsSearch (134874 ns)
+    [ PASSED ] CASE: screenHandlesBrightAndBackgroundColors (23666 ns)
+Summary: TOTAL: 14
+    PASSED: 13, SKIPPED: 0, ERROR: 0
+    FAILED: 1, listed below:
+            TCS: Audit20261003TerminalTest, CASE: graphemeClustersSurviveBothWholeAndFragmentedFeeds

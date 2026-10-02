@@ -310,7 +310,7 @@ func appendInline(out: ArrayList<RichSpan>, node: NodeRef, theme: DocumentTheme,
                 case NodeKind.Emphasis => mergeInlineStyles(style, theme.emphasis)
                 case NodeKind.Strong => mergeInlineStyles(style, theme.strong)
                 case NodeKind.Strikethrough => mergeInlineStyles(style, theme.strikethrough)
-                case NodeKind.Link => theme.link
+                case NodeKind.Link => mergeInlineStyles(style, theme.link)
                 case _ => style
             }
             let nextLink = if (isLink(node)) {

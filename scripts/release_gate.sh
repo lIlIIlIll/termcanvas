@@ -55,6 +55,12 @@ python3 "$ROOT/scripts/test_new_example.py"
 echo "==> Windows smoke wrapper local fixtures"
 python3 "$ROOT/scripts/test_windows_smoke.py"
 
+echo "==> coverage output ownership fixtures"
+python3 "$ROOT/scripts/test_coverage_output.py"
+
+echo "==> long proof gate evidence fixtures"
+python3 "$ROOT/scripts/test_architecture_proof_audit_20261003.py"
+
 echo "==> architecture classification and fitness contracts"
 python3 "$ROOT/scripts/validate_architecture.py"
 
