@@ -6,7 +6,7 @@
 
 | 编号 | 基线位置 | 复现与影响 | 修复 |
 | --- | --- | --- | --- |
-| TOOL-01 / P1 | `scripts/coverage.sh:5–17` | 在临时隔离仓库运行 `coverage.sh .` 会删除仓库本身；指定已有非覆盖率目录也会删除其中用户文件。3 个隔离回归证明旧实现删除 sentinel。 | 拒绝仓库根/祖先/最终路径符号链接；非空目录必须有本脚本写入的所有权标记才允许清理。未标记旧报告需选空目录。 |
+| TOOL-01 / P1 | `scripts/coverage.sh:5–17` | 在临时隔离仓库运行 `coverage.sh .` 会删除仓库本身；指定已有非覆盖率目录也会删除其中用户文件。2 项隔离回归证明无关目录/仓库的 sentinel 被删除；另 1 项检查已授权报告的标记重建。 | 拒绝仓库根/祖先/最终路径符号链接；非空目录必须有本脚本写入的所有权标记才允许清理。未标记旧报告需选空目录。 |
 | TOOL-02 / P1 | `scripts/resolve_nightly_sdk.py:205–220` | `startswith` 把 `install-sibling` 当作 `install` 子路径；tar 中 `../install-sibling/escaped` 越界。另 `link -> ../outside` 后 `link/escaped` 能越界写，因为预检时链接尚未建立。 | 使用路径组件级 `is_relative_to`；tar 启用 Python `data` 过滤，在提取每项时检查链接与特殊文件。安全相对 SDK symlink 保留。没有 `tarfile.data_filter` 的旧 Python 明确拒绝 tar 安装。 |
 | TOOL-03 / P2 | `scripts/resolve_nightly_sdk.py:130,157` | 清单同时存在相同版本的 `linux-x64-1.1.3` 与 `linux-x64-ohos-1.1.3` 时，宽泛前缀与倒序排序会误选交叉 SDK。 | 原生 SDK 要求架构后紧接数字版本；清单和 DevRepo 共用匹配规则。 |
 | TOOL-04 / P2 | `scripts/resolve_nightly_sdk.py:228–249,272–275` | 官方归档含 `cangjie/` 顶层目录，但安装后从目标根查 `bin/cjc`；导出的运行库路径也遗漏 `runtime/lib/linux_x86_64_cjnative` 与 `tools/lib`，后续工具不能启动。 | 安装返回实际 SDK 根，支持扁平和 `cangjie/` 两种布局；导出实际 native runtime 目录与 tools/lib。 |

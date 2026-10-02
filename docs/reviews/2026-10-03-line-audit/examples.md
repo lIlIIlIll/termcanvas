@@ -25,7 +25,7 @@ CANGJIE_SDK_ROOT=/tmp/termcanvas-sdk/cangjie \
 python3 -m unittest discover -s scripts -p test_architecture_proof_audit_20261003.py
 ```
 
-| Package | Before new regressions | After |
+| Package | Baseline with new regressions | After |
 | --- | --- | --- |
 | assistant_console | 3 pass, 1 fail | 4 pass |
 | form_studio | 2 pass, 1 fail | 3 pass |

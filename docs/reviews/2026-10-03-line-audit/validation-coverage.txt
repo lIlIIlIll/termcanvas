@@ -1,0 +1,25 @@
+Command: CANGJIE_SDK_ROOT=/tmp/termcanvas-sdk/cangjie scripts/coverage.sh /tmp/termcanvas-audit-coverage
+Exit status: 0
+SDK: Cangjie/cjpm 1.1.3, Linux x86_64
+Raw log SHA256: 37734364492d5b6a960c0120f3a2fa6319a6860279944c7d8b1e5f6673e844a9
+
+==> core coverage
+==> markdown adapter coverage
+==> terminal coverage
+==> diff coverage
+==> media coverage
+==> game coverage
+==> example coverage: examples/assistant_console
+==> example coverage: examples/btm_clone
+==> example coverage: examples/data_browser
+==> example coverage: examples/form_studio
+==> example coverage: examples/game_demo
+==> example coverage: examples/markdown_studio
+==> example coverage: examples/oh_my_pi_skin
+==> example coverage: examples/ops_dashboard
+==> example coverage: examples/taskpad
+==> example coverage: examples/terminal_lab
+==> cjcov report
+generate html success.
+coverage scope: 44 production package files; lines=11730/12750 (92.00%); branches=16377/20324 (80.58%)
+coverage report: /tmp/termcanvas-audit-coverage/coverage.xml

@@ -39,7 +39,9 @@
 | API 生成与分类 | 2379 个公开声明，0 未分类；stable/experimental 契约不变 |
 | Unicode 17 数据 | 生成比较与现有字素测试 PASS |
 | 全部 17 示例构建、smoke、脚本化工作流与 pressure | PASS；`release gate ok`，退出 0 |
-| 覆盖率 | 单独执行；最终比例、退出状态见关联 PR 的验证记录 |
+| 覆盖率 | PASS，退出 0；44 个生产包文件：行 11730/12750（92.00%）、分支 16377/20324（80.58%）；门槛 90%/80% |
+
+完整闸门输出摘要见 [validation-release.txt](validation-release.txt)，覆盖率输出摘要及原始日志 SHA256 见 [validation-coverage.txt](validation-coverage.txt)。
 
 实际命令：
 
