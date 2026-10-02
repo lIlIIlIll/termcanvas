@@ -1,0 +1,68 @@
+    TCS: Audit20261003MediaTest, time elapsed: 21052636 ns, RESULT:
+    [ FAILED ] CASE: animationPreservesWideGlyphsAcrossRenderBoundary (232260 ns)
+    Expect Failed: `(buffer.getCell(0, 0) == lead)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: `(buffer.getCell(1, 0) == tail)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: `(buffer.getCell(0, 0) == lead)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: `(buffer.getCell(1, 0) == tail)`
+       left: <value not printable>
+      right: <value not printable>
+
+    [ FAILED ] CASE: animationClipsAndZoomsWholeGraphemesByDisplayWidth (453373 ns)
+    Expect Failed: `(buffer.getCell(3, 0) == sentinel)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: `(buffer.getCell(4, 0) == sentinel)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: buffer.getCell(1, 0).symbol != "中"
+        buffer.getCell(1, 0).symbol: " "
+                              "中": "中"
+
+    Expect Failed: buffer.getCell(2, 0).symbol != ""
+        buffer.getCell(2, 0).symbol: " "
+                                 "": ""
+
+    Expect Failed: `(buffer.getCell(3, 0) == sentinel)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: zoomAsciiLine("e\u{301}x", 2, 4) != "e\u{301}e\u{301}xx"
+        zoomAsciiLine("e\u{301}x", 2, 4): "eé́"
+                    "e\u{301}e\u{301}xx": "ééxx"
+
+    [ ERROR  ] CASE: rgbaDimensionsRejectUnrepresentableFrameSizes (18420657 ns)
+    REASON: An exception has occurred:OverflowException: mul
+	at media.rgbaToAsciiFrame(std.core.Array<...>, Int64, Int64, media.AsciiRenderOptions)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/media/src/media.cj:342)
+	at media/test.Audit20261003MediaTest.rgbaDimensionsRejectUnrepresentableFrameSizes()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/media/src/audit_20261003_media_test.cj:43)
+	at media/test.Audit20261003MediaTest.asTestSuite.lambda.2.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/media/src/audit_20261003_media_test.cj:46)
+    TCS: MediaExtensionTest, time elapsed: 18669832 ns, RESULT:
+    [ PASSED ] CASE: preferredProtocolUsesKittyBeforeSixelAndFallsBackToText (23767 ns)
+    [ PASSED ] CASE: externalAdapterBuildsCommandsAndFrames (4989373 ns)
+    [ PASSED ] CASE: requestedFrameIndexControlsSelectionAndUnsupportedSixelFallsBack (5005188 ns)
+    [ PASSED ] CASE: animationBudgetsRejectExtraAndPartialFrames (5117938 ns)
+    [ PASSED ] CASE: rgbaToAsciiFrameMapsBrightnessAlphaAndInvert (43445 ns)
+    [ PASSED ] CASE: highResolutionAsciiModesPackMultiplePixelsPerCell (31507 ns)
+    [ PASSED ] CASE: coloredAsciiFramesCarryPerCellRgbStyles (59881 ns)
+    [ PASSED ] CASE: highResolutionColorUsesOnlyVisiblePixels (19881 ns)
+    [ PASSED ] CASE: asciiAnimationSelectsFramesByIndexAndElapsedTime (15323 ns)
+    [ PASSED ] CASE: ffmpegAsciiDecoderBuildsCommandAndFailsGracefully (1672411 ns)
+    [ PASSED ] CASE: asciiAnimationViewRendersCurrentFrame (46900 ns)
+    [ PASSED ] CASE: fallbackCommandsAndAsciiBoundaryContractsStayCovered (77506 ns)
+    [ PASSED ] CASE: asciiConversionHelpersCoverAllPackingAndColorBoundaries (66851 ns)
+Summary: TOTAL: 16
+    PASSED: 13, SKIPPED: 0, ERROR: 1
+    FAILED: 2, listed below:
+            TCS: Audit20261003MediaTest, CASE: animationPreservesWideGlyphsAcrossRenderBoundary
+            TCS: Audit20261003MediaTest, CASE: animationClipsAndZoomsWholeGraphemesByDisplayWidth
+            TCS: Audit20261003MediaTest, CASE: rgbaDimensionsRejectUnrepresentableFrameSizes

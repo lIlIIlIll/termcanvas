@@ -100,6 +100,8 @@ public class TerminalScreen {
     private var style: Style = Style.default()
     private let parser = AnsiParser()
     private var wrapPending: Bool = false
+    private var lastGlyphX: Int64 = -1
+    private var lastGlyphY: Int64 = -1
 
     public init(cols!: Int64 = 80, rows!: Int64 = 24) {
         this.cols = max(1, cols)
@@ -149,6 +151,7 @@ public class TerminalScreen {
         while (offset < bytes.size) {
             let b = bytes[offset]
             if (b == b'\r') {
+                lastGlyphX = -1
                 cursorX = 0
                 wrapPending = false
                 offset++
@@ -156,26 +159,58 @@ public class TerminalScreen {
                 newline()
                 offset++
             } else if (b == 0x08) {
+                lastGlyphX = -1
                 wrapPending = false
                 cursorX = max(0, cursorX - 1)
                 offset++
             } else {
                 let next = nextUtf8(bytes, offset)
                 let textPart = unsafe { String.fromUtf8Unchecked(bytes[offset..next]) }
-                let width = displayWidth(textPart)
-                if (width > 0 && (wrapPending || cursorX + width > cols)) { newline() }
-                buffer.setString(cursorX, cursorY, textPart, style: style)
-                cursorX += width
-                if (cursorX >= cols) {
-                    cursorX = cols - 1
-                    wrapPending = true
-                }
+                writeScalar(textPart)
                 offset = next
             }
         }
     }
 
+    private func writeScalar(part: String): Unit {
+        if (lastGlyphX >= 0) {
+            let previous = buffer.getCell(lastGlyphX, lastGlyphY)
+            let joined = previous.symbol + part
+            // Keep the last rendered cluster open across feed calls. Unicode
+            // extensions (combining marks, ZWJ, RI pairs) must not advance as
+            // independent cells or trigger a pending wrap.
+            if (nextGraphemeOffset(joined, 0) == joined.size) {
+                let width = displayWidth(joined)
+                if (width <= cols - lastGlyphX) {
+                    buffer.setString(lastGlyphX, lastGlyphY, joined, style: previous.style)
+                    cursorX = min(cols - 1, lastGlyphX + width)
+                    wrapPending = lastGlyphX + width >= cols
+                } else {
+                    // A cluster can grow from one cell to two on a later feed.
+                    buffer.fill(Rect(lastGlyphX, lastGlyphY, displayWidth(previous.symbol), 1), Cell(" ", style: previous.style))
+                    newline()
+                    writeGlyph(joined, width, previous.style)
+                }
+                return
+            }
+        }
+        let width = displayWidth(part)
+        if (width <= 0) { lastGlyphX = -1; return }
+        if (wrapPending || width > cols - cursorX) { newline() }
+        writeGlyph(part, width, style)
+    }
+
+    private func writeGlyph(text: String, width: Int64, glyphStyle: Style): Unit {
+        if (width > cols) { lastGlyphX = -1; return }
+        lastGlyphX = cursorX
+        lastGlyphY = cursorY
+        buffer.setString(cursorX, cursorY, text, style: glyphStyle)
+        wrapPending = width >= cols - cursorX
+        cursorX = min(cols - 1, cursorX + width)
+    }
+
     private func newline(): Unit {
+        lastGlyphX = -1
         wrapPending = false
         cursorX = 0
         cursorY++
@@ -247,32 +282,35 @@ public class TerminalScreen {
     }
 
     private func applyErase(seq: String): Unit {
+        let params = csiParams(seq)
+        let mode = if (params.size > 0) { params[0] } else { 0 }
+        if (mode < 0 || mode > 2) { return }
+        lastGlyphX = -1
+        wrapPending = false
         if (seq.endsWith("K")) {
-            for (x in cursorX..cols) {
-                buffer.setCell(x, cursorY, Cell(" "))
-            }
+            let first = if (mode == 0) { cursorX } else { 0 }
+            let last = if (mode == 1) { cursorX + 1 } else { cols }
+            for (x in first..last) { buffer.setCell(x, cursorY, Cell(" ", style: style)) }
         } else if (seq.endsWith("J")) {
-            wrapPending = false
-            for (y in 0..rows) {
-                for (x in 0..cols) {
-                    buffer.setCell(x, y, Cell(" "))
-                }
+            let firstRow = if (mode == 0) { cursorY } else { 0 }
+            let lastRow = if (mode == 1) { cursorY + 1 } else { rows }
+            for (y in firstRow..lastRow) {
+                let first = if (mode == 0 && y == cursorY) { cursorX } else { 0 }
+                let last = if (mode == 1 && y == cursorY) { cursorX + 1 } else { cols }
+                for (x in first..last) { buffer.setCell(x, y, Cell(" ", style: style)) }
             }
-            cursorX = 0
-            cursorY = 0
         }
     }
 
     private func applyCursor(seq: String): Unit {
+        lastGlyphX = -1
         wrapPending = false
         let params = csiParams(seq)
-        if (params.size >= 2) {
-            cursorY = clampInt(params[0] - 1, 0, rows - 1)
-            cursorX = clampInt(params[1] - 1, 0, cols - 1)
-        } else {
-            cursorX = 0
-            cursorY = 0
-        }
+        // CUP defaults row and column independently; zero also means one.
+        let row = if (params.size > 0) { max(1, params[0]) } else { 1 }
+        let column = if (params.size > 1) { max(1, params[1]) } else { 1 }
+        cursorY = clampInt(row - 1, 0, rows - 1)
+        cursorX = clampInt(column - 1, 0, cols - 1)
     }
 }
 

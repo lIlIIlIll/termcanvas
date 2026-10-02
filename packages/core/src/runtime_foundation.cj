@@ -176,7 +176,13 @@ public class AsyncOwnershipRuntime {
     public func complete(completion: OwnedAsyncCompletion): CompletionDisposition {
         match (find(completion.operation)) {
             case Some(record) =>
-                if (record.owner != completion.owner || !owners.isCurrent(completion.owner)) {
+                if (record.owner != completion.owner) {
+                    // A malformed/stale routing identity must not consume an
+                    // operation belonging to a different owner.
+                    orphanValue++
+                    return CompletionDisposition.Orphan
+                }
+                if (!owners.isCurrent(completion.owner)) {
                     _ = record.settle()
                     orphanValue++
                     return CompletionDisposition.Orphan

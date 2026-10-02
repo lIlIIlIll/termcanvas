@@ -16,15 +16,16 @@ public class VBox <: Widget {
     public func render(area: Rect, buffer: Buffer): Unit {
         let inner = padding.inner(area)
         if (children.size == 0 || inner.width <= 0 || inner.height <= 0) { return }
-        let totalGap = gap * max(0, children.size - 1)
+        let gaps = children.size - 1
+        let totalGap = if (gaps == 0) { 0 } else if (gap > inner.height / gaps) { inner.height } else { gap * gaps }
         let childHeight = max(0, (inner.height - totalGap) / children.size)
         var y = inner.y
         for (i in 0..children.size) {
             let remaining = inner.bottom - y
             let height = if (i == children.size - 1) { remaining } else { min(childHeight, remaining) }
             children[i].render(Rect(inner.x, y, inner.width, height), buffer)
+            if (gap >= remaining - height) { return }
             y += height + gap
-            if (y >= inner.bottom) { return }
         }
     }
 }
@@ -43,15 +44,16 @@ public class HBox <: Widget {
     public func render(area: Rect, buffer: Buffer): Unit {
         let inner = padding.inner(area)
         if (children.size == 0 || inner.width <= 0 || inner.height <= 0) { return }
-        let totalGap = gap * max(0, children.size - 1)
+        let gaps = children.size - 1
+        let totalGap = if (gaps == 0) { 0 } else if (gap > inner.width / gaps) { inner.width } else { gap * gaps }
         let childWidth = max(0, (inner.width - totalGap) / children.size)
         var x = inner.x
         for (i in 0..children.size) {
             let remaining = inner.right - x
             let width = if (i == children.size - 1) { remaining } else { min(childWidth, remaining) }
             children[i].render(Rect(x, inner.y, width, inner.height), buffer)
+            if (gap >= remaining - width) { return }
             x += width + gap
-            if (x >= inner.right) { return }
         }
     }
 }

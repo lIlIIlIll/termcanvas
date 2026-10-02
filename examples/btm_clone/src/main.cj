@@ -1396,7 +1396,7 @@ class BtmClone <: Widget {
         lastProcessArea = Some(tableArea)
         lastProcessVisibleRows = visibleRows
         ensureProcessVisible(visibleRows)
-        if (isProcessRowOnlyDirty(frame, tableArea)) {
+        if (!showDetail && isProcessRowOnlyDirty(frame, tableArea)) {
             renderProcessRows(frame, tableArea)
             return
         }
@@ -2043,7 +2043,7 @@ func padLeft(text: String, width: Int64): String {
 }
 
 func truncateLocal(text: String, width: Int64): String {
-    if (width <= 0) { "" } else if (text.size <= width) { text } else { text[0..width] }
+    graphemePrefix(text, width)
 }
 
 func dirtyRectCount(result: UpdateResult): Int64 {

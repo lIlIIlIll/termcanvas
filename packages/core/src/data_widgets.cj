@@ -12,13 +12,13 @@ public class Paginator {
     public init(page!: Int64 = 0, pageSize!: Int64 = 10, total!: Int64 = 0) {
         this.pageSize = max(1, pageSize)
         this.total = max(0, total)
-        let pages = if (this.total <= 0) { 0 } else { (this.total + this.pageSize - 1) / this.pageSize }
+        let pages = if (this.total <= 0) { 0 } else { (this.total - 1) / this.pageSize + 1 }
         this.page = clamp(page, 0, max(0, pages - 1))
     }
 
     public func pageCount(): Int64 {
         if (total <= 0) { return 0 }
-        (total + pageSize - 1) / pageSize
+        (total - 1) / pageSize + 1
     }
 
     public func offset(): Int64 {
@@ -464,7 +464,7 @@ public class VirtualTable <: Widget {
                 case None => style
             }
             buffer.setString(alignedX(cellArea, displayWidthFast(text), column.align), y, text, style: rowStyle)
-            cx + column.width + 1
+            if (width >= right - cx) { right } else { cx + width + 1 }
     }
 
     private func ensureSelectedVisible(viewportHeight: Int64): Unit {
@@ -482,18 +482,28 @@ public class VirtualTable <: Widget {
     }
 
     private func ensureColumnVisible(width: Int64): Unit {
-        if (selectedColumn < columnOffset) {
-            columnOffset = selectedColumn
-            return
+        if (columns.size == 0) { return }
+        selectedColumn = clamp(selectedColumn, 0, columns.size - 1)
+        let frozen = clamp(frozenColumns, 0, columns.size)
+        if (selectedColumn < frozen) { return }
+        columnOffset = clamp(columnOffset, frozen, selectedColumn)
+
+        // Frozen cells occupy the viewport before the scrolling columns.
+        // Subtract bounded widths instead of summing potentially large widths.
+        var remaining = max(0, width)
+        for (i in 0..frozen) {
+            remaining -= min(remaining, max(0, columns[i].width))
+            if (remaining > 0) { remaining-- }
         }
-        var used: Int64 = 0
-        for (i in columnOffset..min(selectedColumn + 1, columns.size)) {
-            used += columns[i].width + 1
+        remaining -= min(remaining, max(0, columns[selectedColumn].width))
+        var start = selectedColumn
+        while (start > columnOffset) {
+            let previousWidth = max(0, columns[start - 1].width)
+            if (previousWidth >= remaining) { break }
+            remaining -= previousWidth + 1
+            start--
         }
-        while (used > width && columnOffset < selectedColumn) {
-            used -= columns[columnOffset].width + 1
-            columnOffset++
-        }
+        columnOffset = start
     }
 
     private func visibleIndices(): Array<Int64> {
@@ -1025,9 +1035,15 @@ func joinPath(base: String, name: String): String {
 }
 
 func parentPath(path: String): String {
-    if (path.isEmpty() || path == "." || path == "/") { return path }
+    if (path.isEmpty() || path == ".") { return ".." }
+    if (path == "/") { return path }
     var end = path.size
     while (end > 1 && path[end - 1] == b'/') { end-- }
+    let trimmed = path[..end]
+    if (trimmed == ".") { return ".." }
+    if (trimmed == ".." || trimmed.endsWith("/..")) { return trimmed + "/.." }
+    if (trimmed == "/.") { return "/" }
+    if (trimmed.endsWith("/.")) { return parentPath(trimmed[..trimmed.size - 2]) }
     var i = end - 1
     while (i >= 0) {
         if (path[i] == b'/') {

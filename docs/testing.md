@@ -156,3 +156,7 @@ socket.
   pass/fail result.
 - If the full unittest runner cannot start, check whether it has permission to
   create its local test runner TCP socket.
+
+## Coverage output ownership
+
+`coverage.sh` accepts an empty output directory or one previously marked by the script. It refuses to erase unrelated nonempty directories, repository roots/ancestors, or a symlink output. For an old unmarked report, choose a new empty directory. The 90% line and 80% branch thresholds are unchanged.

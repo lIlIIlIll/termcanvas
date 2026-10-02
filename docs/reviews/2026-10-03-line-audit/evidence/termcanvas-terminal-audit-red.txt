@@ -1,0 +1,62 @@
+    TCS: Audit20261003TerminalTest, time elapsed: 1508325 ns, RESULT:
+    [ FAILED ] CASE: eraseLineHonorsAllModesAndKeepsCursor (194884 ns)
+    Expect Failed: screen.lineText(0) != expected
+        screen.lineText(0): "ab   "
+                  expected: "   de"
+
+    Expect Failed: screen.lineText(0) != expected
+        screen.lineText(0): "ab   "
+                  expected: "     "
+                             !!===
+
+    [ FAILED ] CASE: eraseDisplayHonorsModesWithoutHomingCursor (116957 ns)
+    Expect Failed: screen.lineText(0) != first
+        screen.lineText(0): "   "
+                     first: "abc"
+
+    Expect Failed: screen.lineText(1) != second
+        screen.lineText(1): "   "
+                    second: "d  "
+
+    Expect Failed: screen.cell(1, 1).symbol != "X"
+        screen.cell(1, 1).symbol: " "
+                             "X": "X"
+
+    Expect Failed: screen.lineText(1) != second
+        screen.lineText(1): "   "
+                    second: "  f"
+
+    Expect Failed: screen.cell(1, 1).symbol != "X"
+        screen.cell(1, 1).symbol: " "
+                             "X": "X"
+
+    Expect Failed: screen.cell(1, 1).symbol != "X"
+        screen.cell(1, 1).symbol: " "
+                             "X": "X"
+
+    [ FAILED ] CASE: cursorPositionDefaultsEachMissingParameterIndependently (47792 ns)
+    Expect Failed: screen.cell(0, 2).symbol != "X"
+        screen.cell(0, 2).symbol: " "
+                             "X": "X"
+
+    Expect Failed: screen.cell(0, 3).symbol != "Y"
+        screen.cell(0, 3).symbol: " "
+                             "Y": "Y"
+
+    TCS: TerminalExtensionTest, time elapsed: 12769613 ns, RESULT:
+    [ PASSED ] CASE: screenCroppingCopiesOnlyCompleteWideGlyphs (219612 ns)
+    [ PASSED ] CASE: screenPhysicalEdgesDoNotCopyPartialWideGlyphs (179431 ns)
+    [ PASSED ] CASE: fragmentedControlsStayBoundedAndKeepTheirState (8394776 ns)
+    [ PASSED ] CASE: fullRowsDelayWrappingUntilTheNextPrintableCharacter (65409 ns)
+    [ PASSED ] CASE: unicodeSearchUsesScreenColumnsAndPreservesWideCells (415356 ns)
+    [ PASSED ] CASE: parsesSgrAndTextTokens (80761 ns)
+    [ PASSED ] CASE: screenHandlesColorCarriageReturnAndErase (86130 ns)
+    [ PASSED ] CASE: transcriptAndViewRenderVisibleScreen (133621 ns)
+    [ PASSED ] CASE: transcriptTrimsChunksAndViewHighlightsSearch (167422 ns)
+    [ PASSED ] CASE: screenHandlesBrightAndBackgroundColors (117266 ns)
+Summary: TOTAL: 13
+    PASSED: 10, SKIPPED: 0, ERROR: 0
+    FAILED: 3, listed below:
+            TCS: Audit20261003TerminalTest, CASE: eraseLineHonorsAllModesAndKeepsCursor
+            TCS: Audit20261003TerminalTest, CASE: eraseDisplayHonorsModesWithoutHomingCursor
+            TCS: Audit20261003TerminalTest, CASE: cursorPositionDefaultsEachMissingParameterIndependently

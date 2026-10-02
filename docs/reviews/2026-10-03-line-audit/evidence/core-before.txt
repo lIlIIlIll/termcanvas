@@ -1,0 +1,396 @@
+    TCS: Audit20261003RenderTest, time elapsed: 1890539 ns, RESULT:
+    [ FAILED ] CASE: layoutCacheRetriesAfterComputeFailure (51367 ns)
+    Expect Failed: `(cache.get(newArea, { area =>
+    [area]
+})[0] == newArea)`
+       left: <value not printable>
+      right: <value not printable>
+
+    [ FAILED ] CASE: transcriptRetriesFailedRevisionMaterialization (190727 ns)
+    Expect Failed: buffer.getCell(0, 0).symbol != "n"
+        buffer.getCell(0, 0).symbol: "o"
+                                "n": "n"
+
+    Expect Failed: `(source.calls == 3)`
+       left: 2
+      right: 3
+
+    [ FAILED ] CASE: dirtyRectUnionRevisitsEarlierRectangles (27151 ns)
+    Expect Failed: `(dirty.rects().size == 1)`
+       left: 2
+      right: 1
+
+    Expect Failed: `(dirty.cellCount() == 4)`
+       left: 5
+      right: 4
+
+    Expect Failed: `(dirty.rects()[0] == Rect(0, 0, 2, 2))`
+       left: <value not printable>
+      right: <value not printable>
+
+    [ FAILED ] CASE: blitPreservesRequestedSourceToDestinationTranslation (76626 ns)
+    Expect Failed: target.getCell(0, 0).symbol != "."
+        target.getCell(0, 0).symbol: "A"
+                                ".": "."
+
+    Expect Failed: target.getCell(1, 1).symbol != "A"
+        target.getCell(1, 1).symbol: "D"
+                                "A": "A"
+
+    Expect Failed: target.getCell(2, 1).symbol != "B"
+        target.getCell(2, 1).symbol: "."
+                                "B": "B"
+
+    Expect Failed: target.getCell(1, 2).symbol != "C"
+        target.getCell(1, 2).symbol: "."
+                                "C": "C"
+
+    Expect Failed: target.getCell(2, 2).symbol != "D"
+        target.getCell(2, 2).symbol: "."
+                                "D": "D"
+
+    Expect Failed: target.getCell(0, 0).symbol != "."
+        target.getCell(0, 0).symbol: "A"
+                                ".": "."
+
+    Expect Failed: target.getCell(1, 1).symbol != "A"
+        target.getCell(1, 1).symbol: "D"
+                                "A": "A"
+
+    Expect Failed: target.getCell(2, 1).symbol != "B"
+        target.getCell(2, 1).symbol: "."
+                                "B": "B"
+
+    Expect Failed: target.getCell(1, 2).symbol != "C"
+        target.getCell(1, 2).symbol: "."
+                                "C": "C"
+
+    Expect Failed: target.getCell(2, 2).symbol != "D"
+        target.getCell(2, 2).symbol: "."
+                                "D": "D"
+
+    [ FAILED ] CASE: textWidgetsDoNotRepairWideCellsOutsideTheirArea (293933 ns)
+    Expect Failed: `(buffer.getCell(0, 0) == left)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: `(buffer.getCell(0, 0) == left)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: `(buffer.getCell(0, 0) == left)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: `(buffer.getCell(0, 0) == left)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: `(buffer.getCell(5, 0) == right)`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: `(buffer.getCell(0, 0) == left)`
+       left: <value not printable>
+      right: <value not printable>
+
+    TCS: Audit20261003RuntimeTest, time elapsed: 1446610 ns, RESULT:
+    [ FAILED ] CASE: enhancedShiftTabMovesFocusBackward (204628 ns)
+    Expect Failed: focus.current() != Some("one")
+        focus.current(): "three"
+            Some("one"): "··one"
+                          --!!=
+
+    Expect Failed: focus.current() != Some("two")
+        focus.current(): "one"
+            Some("two"): "two"
+
+    Expect Failed: focus.current() != Some("one")
+        focus.current(): "three"
+            Some("one"): "··one"
+                          --!!=
+
+    [ FAILED ] CASE: unrelatedOwnerCannotConsumeAnotherOperationsCompletion (43416 ns)
+    Assert Failed: `(an unrelated completion settled the valid owner's operation)`
+
+    [ FAILED ] CASE: fullInvalidationSurvivesPartialUpdatesInEitherOrder (380734 ns)
+    Expect Failed: `(backend.assertCell(7, 0, "B") == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(backend.assertCell(7, 0, "B") == true)`
+       left: false
+      right: true
+
+    [ FAILED ] CASE: applicationCursorKeysDecodeAcrossEveryByteSplit (58989 ns)
+    Assert Failed: `(events.size == 2)`
+       left: 4
+      right: 2
+
+    TCS: Audit20261003TextTest, time elapsed: 81209659 ns, RESULT:
+    [ FAILED ] CASE: wordRightFromWhitespaceStopsAtNextWord (42895 ns)
+    Expect Failed: `(buffer.wordRight(TextPosition(0, 3)) == TextPosition(0, 4))`
+       left: <value not printable>
+      right: <value not printable>
+
+    Expect Failed: `(area.cursor == 4)`
+       left: 7
+      right: 4
+
+    Expect Failed: `(vimArea.cursor == 4)`
+       left: 6
+      right: 4
+
+    [ ERROR  ] CASE: orderedListContinuationDoesNotOverflow (20770936 ns)
+    REASON: An exception has occurred:OverflowException: add
+	at core.continuationMarker(std.core.String)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/text_area.cj:1592)
+	at core.TextArea.markdownEnterText()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/text_area.cj:1441)
+	at core.TextArea.handle(core.KeyEvent)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/text_area.cj:288)
+	at core/test.Audit20261003TextTest.orderedListContinuationDoesNotOverflow()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_text_test.cj:32)
+	at core/test.Audit20261003TextTest.asTestSuite.lambda.1.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_text_test.cj:121)
+    [ ERROR  ] CASE: overflowingDocumentSourceOffsetsAreIgnored (30843477 ns)
+    REASON: An exception has occurred:OverflowException: mul
+	at core.parseSourceOffset(std.core.String)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/document.cj:746)
+	at core.lineStartOffset(core.DocumentLine)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/document.cj:841)
+	at core.DocumentView.isLineFolded(core.DocumentLine)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/document.cj:605)
+	at core.DocumentView.appendLineRows(std.collection.ArrayList<...>, core.DocumentLine, Int64)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/document.cj:508)
+	at core.DocumentView.renderRows(core.Document, Int64)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/document.cj:471)
+	at core.DocumentView.sourceOffsetForRenderedLine(Int64, Int64)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/document.cj:336)
+	at core/test.Audit20261003TextTest.overflowingDocumentSourceOffsetsAreIgnored()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_text_test.cj:46)
+	at core/test.Audit20261003TextTest.asTestSuite.lambda.2.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_text_test.cj:121)
+    [ FAILED ] CASE: canceledPendingCompletionCannotReopen (39750 ns)
+    Expect Failed: `(! area.handleCompletionEvent(Event.TextCompletion("pending", result)) == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(! area.completionVisible() == true)`
+       left: false
+      right: true
+
+    [ FAILED ] CASE: escapeDismissalRejectsRepeatedCompletionResults (14782 ns)
+    Expect Failed: `(! area.handleCompletionEvent(Event.TextCompletion("visible", result)) == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(! area.completionVisible() == true)`
+       left: false
+      right: true
+
+    [ FAILED ] CASE: startingCompletionHidesPreviousResults (13571 ns)
+    Expect Failed: `(! area.completionVisible() == true)`
+       left: false
+      right: true
+
+    [ FAILED ] CASE: noOpTextBufferEditsPreserveRedo (146861 ns)
+    Expect Failed: `(! buffer.undo() == true)`
+       left: false
+      right: true
+
+    Expect Failed: buffer.text() != "abcd"
+        buffer.text(): "abc·"
+               "abcd": "abcd"
+                        ===+
+
+    Expect Failed: `(! buffer.undo() == true)`
+       left: false
+      right: true
+
+    Expect Failed: buffer.text() != "abcd"
+        buffer.text(): "abc·"
+               "abcd": "abcd"
+                        ===+
+
+    Expect Failed: `(! buffer.undo() == true)`
+       left: false
+      right: true
+
+    Expect Failed: buffer.text() != "abcd"
+        buffer.text(): "abc·"
+               "abcd": "abcd"
+                        ===+
+
+    Expect Failed: `(! buffer.undo() == true)`
+       left: false
+      right: true
+
+    Expect Failed: buffer.text() != "abcd"
+        buffer.text(): "abc·"
+               "abcd": "abcd"
+                        ===+
+
+    Expect Failed: `(! buffer.undo() == true)`
+       left: false
+      right: true
+
+    Expect Failed: buffer.text() != "abcd"
+        buffer.text(): "abc·"
+               "abcd": "abcd"
+                        ===+
+
+    Expect Failed: `(! buffer.undo() == true)`
+       left: false
+      right: true
+
+    Expect Failed: buffer.text() != "abcd"
+        buffer.text(): "abc·"
+               "abcd": "abcd"
+                        ===+
+
+    [ ERROR  ] CASE: markdownReadonlyCommandsKeepCursorAndSelectionValid (27551906 ns)
+    Expect Failed: `(! behavior.handle(area, KeyEvent(KeyCode.Char(r'['))) == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(area.cursor == 3)`
+       left: 4
+      right: 3
+
+    Expect Failed: `(! behavior.insertFrontmatter(area) == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(area.cursor == 3)`
+       left: 29
+      right: 3
+
+    Expect Failed: `(! behavior.toggleBold(area) == true)`
+       left: false
+      right: true
+
+    An exception has occurred:IndexOutOfBoundsException: Invalid range start: 0 or end: 5
+	at core.TextArea.cursorPosition(core.Rect)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/text_area.cj:427)
+	at core/test.Audit20261003TextTest.markdownReadonlyCommandsKeepCursorAndSelectionValid()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_text_test.cj:115)
+	at core/test.Audit20261003TextTest.asTestSuite.lambda.7.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_text_test.cj:121)
+    TCS: Audit20261003WidgetsTest, time elapsed: 126241771 ns, RESULT:
+    [ ERROR  ] CASE: progressScalingAcceptsLargeCounters (31775241 ns)
+    REASON: An exception has occurred:OverflowException: mul
+	at core.ProgressBar.renderHorizontal(core.Rect, core.Buffer)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/visual_widgets.cj:104)
+	at core.ProgressBar.render(core.Rect, core.Buffer)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/visual_widgets.cj:92)
+	at core/test.Audit20261003WidgetsTest.progressScalingAcceptsLargeCounters()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:11)
+	at core/test.Audit20261003WidgetsTest.asTestSuite.lambda.0.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:138)
+    [ ERROR  ] CASE: progressSegmentsScaleAndClipLargeValues (34916706 ns)
+    REASON: An exception has occurred:OverflowException: mul
+	at core.ProgressBar.renderHorizontalSegments(core.Rect, core.Buffer)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/visual_widgets.cj:132)
+	at core.ProgressBar.renderHorizontal(core.Rect, core.Buffer)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/visual_widgets.cj:102)
+	at core.ProgressBar.render(core.Rect, core.Buffer)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/visual_widgets.cj:92)
+	at core/test.Audit20261003WidgetsTest.progressSegmentsScaleAndClipLargeValues()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:25)
+	at core/test.Audit20261003WidgetsTest.asTestSuite.lambda.1.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:138)
+    [ FAILED ] CASE: progressCustomSymbolsStayInsideTheAssignedArea (434896 ns)
+    Expect Failed: `(auditWidgetOutsideChanges(segmented, area) == 0)`
+       left: 3
+      right: 0
+
+    [ ERROR  ] CASE: chartAndSparklineScaleLargeAndNegativeSamples (29477889 ns)
+    REASON: An exception has occurred:OverflowException: mul
+	at core.Chart.render(core.Rect, core.Buffer)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/visual_widgets.cj:271)
+	at core/test.Audit20261003WidgetsTest.chartAndSparklineScaleLargeAndNegativeSamples()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:48)
+	at core/test.Audit20261003WidgetsTest.asTestSuite.lambda.3.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:138)
+    [ ERROR  ] CASE: paginatorCeilingDivisionDoesNotOverflow (22941517 ns)
+    REASON: An exception has occurred:OverflowException: add
+	at core.Paginator.init(Int64, Int64, Int64)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/data_widgets.cj:15)
+	at core/test.Audit20261003WidgetsTest.paginatorCeilingDivisionDoesNotOverflow()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:58)
+	at core/test.Audit20261003WidgetsTest.asTestSuite.lambda.4.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:138)
+    [ FAILED ] CASE: frozenColumnsReserveSpaceForTheSelectedScrollingColumn (126131 ns)
+    Expect Failed: `(table.columnOffset == 2)`
+       left: 1
+      right: 2
+
+    Expect Failed: auditWidgetRow(buffer, 1) != "aaa ccc "
+        auditWidgetRow(buffer, 1): "aaa bbb "
+                       "aaa ccc ": "aaa ccc "
+                                    ====!!!=
+
+    [ FAILED ] CASE: multiselectInitialSelectionIsASetOfValidIndices (195144 ns)
+    Expect Failed:
+        Different sizes: 4(selector.selectedIndices()) != 1([0])
+
+    Expect Failed: `(selector.selectedIndices().size == 0)`
+       left: 3
+      right: 0
+
+    [ FAILED ] CASE: filePickerCanNavigateAboveTheDefaultRelativeDirectory (662629 ns)
+    Expect Failed: picker.selectedPath() != Some("..")
+        picker.selectedPath(): "."
+                   Some(".."): ".."
+
+    Expect Failed: `(picker.parent() == true)`
+       left: false
+      right: true
+
+    Expect Failed: picker.path != ".."
+        picker.path: "."
+               "..": ".."
+
+    Expect Failed: `(picker.parent() == true)`
+       left: false
+      right: true
+
+    Expect Failed: picker.path != "../.."
+        picker.path: "····."
+            "../..": "../.."
+                      ++++=
+
+    [ FAILED ] CASE: oneRowDialogDoesNotPaintButtonsAboveItsArea (138969 ns)
+    Expect Failed: `(auditWidgetOutsideChanges(buffer, area) == 0)`
+       left: 4
+      right: 0
+
+    [ FAILED ] CASE: emptyHeightMenuAndAlertDoNotPaint (145559 ns)
+    Expect Failed: `(auditWidgetOutsideChanges(buffer, area) == 0)`
+       left: 6
+      right: 0
+
+    [ FAILED ] CASE: legendUsesDisplayColumnsForUnicodeGaps (173993 ns)
+    Expect Failed: buffer.getCell(5, 0).symbol != "#"
+        buffer.getCell(5, 0).symbol: " "
+                                "#": "#"
+
+    Expect Failed: buffer.getCell(7, 0).symbol != "b"
+        buffer.getCell(7, 0).symbol: " "
+                                "b": "b"
+
+    [ FAILED ] CASE: composerAcceptsCompletionBeforeSubmitting (63436 ns)
+    Expect Failed: `(composer.handle(KeyEvent(KeyCode.Enter)).isNone() == true)`
+       left: false
+      right: true
+
+    Expect Failed: composer.area.value != "private"
+        composer.area.value: ""
+                  "private": "private"
+
+    Expect Failed: `(false == true)`
+       left: false
+      right: true
+
+Summary: TOTAL: 696
+    PASSED: 0, SKIPPED: 667, ERROR: 7
+    FAILED: 22, listed below:
+            TCS: Audit20261003RenderTest, CASE: layoutCacheRetriesAfterComputeFailure
+            TCS: Audit20261003RenderTest, CASE: transcriptRetriesFailedRevisionMaterialization
+            TCS: Audit20261003RenderTest, CASE: dirtyRectUnionRevisitsEarlierRectangles
+            TCS: Audit20261003RenderTest, CASE: blitPreservesRequestedSourceToDestinationTranslation
+            TCS: Audit20261003RenderTest, CASE: textWidgetsDoNotRepairWideCellsOutsideTheirArea
+            TCS: Audit20261003RuntimeTest, CASE: enhancedShiftTabMovesFocusBackward
+            TCS: Audit20261003RuntimeTest, CASE: unrelatedOwnerCannotConsumeAnotherOperationsCompletion
+            TCS: Audit20261003RuntimeTest, CASE: fullInvalidationSurvivesPartialUpdatesInEitherOrder
+            TCS: Audit20261003RuntimeTest, CASE: applicationCursorKeysDecodeAcrossEveryByteSplit
+            TCS: Audit20261003TextTest, CASE: wordRightFromWhitespaceStopsAtNextWord
+            TCS: Audit20261003TextTest, CASE: orderedListContinuationDoesNotOverflow
+            TCS: Audit20261003TextTest, CASE: overflowingDocumentSourceOffsetsAreIgnored
+            TCS: Audit20261003TextTest, CASE: canceledPendingCompletionCannotReopen
+            TCS: Audit20261003TextTest, CASE: escapeDismissalRejectsRepeatedCompletionResults
+            TCS: Audit20261003TextTest, CASE: startingCompletionHidesPreviousResults
+            TCS: Audit20261003TextTest, CASE: noOpTextBufferEditsPreserveRedo
+            TCS: Audit20261003TextTest, CASE: markdownReadonlyCommandsKeepCursorAndSelectionValid
+            TCS: Audit20261003WidgetsTest, CASE: progressScalingAcceptsLargeCounters
+            TCS: Audit20261003WidgetsTest, CASE: progressSegmentsScaleAndClipLargeValues
+            TCS: Audit20261003WidgetsTest, CASE: progressCustomSymbolsStayInsideTheAssignedArea
+            TCS: Audit20261003WidgetsTest, CASE: chartAndSparklineScaleLargeAndNegativeSamples
+            TCS: Audit20261003WidgetsTest, CASE: paginatorCeilingDivisionDoesNotOverflow
+            TCS: Audit20261003WidgetsTest, CASE: frozenColumnsReserveSpaceForTheSelectedScrollingColumn
+            TCS: Audit20261003WidgetsTest, CASE: multiselectInitialSelectionIsASetOfValidIndices
+            TCS: Audit20261003WidgetsTest, CASE: filePickerCanNavigateAboveTheDefaultRelativeDirectory
+            TCS: Audit20261003WidgetsTest, CASE: oneRowDialogDoesNotPaintButtonsAboveItsArea
+            TCS: Audit20261003WidgetsTest, CASE: emptyHeightMenuAndAlertDoNotPaint
+            TCS: Audit20261003WidgetsTest, CASE: legendUsesDisplayColumnsForUnicodeGaps
+            TCS: Audit20261003WidgetsTest, CASE: composerAcceptsCompletionBeforeSubmitting

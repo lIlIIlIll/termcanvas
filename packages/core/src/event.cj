@@ -571,6 +571,12 @@ public class EventParser {
             return parseCsiKey(events)
         } else if (pending.size >= 3 && pending[1] == b'O') {
             match (pending[2]) {
+                case b'A' => dropKey(events, KeyCode.Up, 3)
+                case b'B' => dropKey(events, KeyCode.Down, 3)
+                case b'C' => dropKey(events, KeyCode.Right, 3)
+                case b'D' => dropKey(events, KeyCode.Left, 3)
+                case b'H' => dropKey(events, KeyCode.Home, 3)
+                case b'F' => dropKey(events, KeyCode.End, 3)
                 case b'P' => dropKey(events, KeyCode.F(1), 3)
                 case b'Q' => dropKey(events, KeyCode.F(2), 3)
                 case b'R' => dropKey(events, KeyCode.F(3), 3)

@@ -1,0 +1,131 @@
+baseline_path,baseline_lines,review_scope
+.github/workflows/ci.yml,70,line-reviewed
+benchmarks/architecture-proof-step0/fixture/src/main.cj,184,line-reviewed
+examples/arcade/src/main.cj,120,line-reviewed
+examples/assistant_console/src/main.cj,67,line-reviewed
+examples/assistant_console/src/main_test.cj,63,related-test-review; executed-by-gate
+examples/btm_clone/src/main.cj,2349,line-reviewed
+examples/btm_clone/src/main_test.cj,220,related-test-review; executed-by-gate
+examples/command_center/src/main.cj,83,line-reviewed
+examples/crystal_caves/src/main.cj,527,line-reviewed
+examples/data_browser/src/main.cj,138,line-reviewed
+examples/data_browser/src/main_test.cj,100,related-test-review; executed-by-gate
+examples/debug_lab/src/main.cj,67,line-reviewed
+examples/form_studio/src/main.cj,130,line-reviewed
+examples/form_studio/src/main_test.cj,36,related-test-review; executed-by-gate
+examples/game_demo/src/main.cj,1317,line-reviewed
+examples/game_demo/src/main_test.cj,207,related-test-review; executed-by-gate
+examples/game_pressure_suite/src/main.cj,271,line-reviewed
+examples/gif_ascii/src/main.cj,294,line-reviewed
+examples/markdown_studio/src/main.cj,279,line-reviewed
+examples/markdown_studio/src/main_test.cj,275,related-test-review; executed-by-gate
+examples/media_gallery/src/main.cj,76,line-reviewed
+examples/oh_my_pi_skin/src/main.cj,933,line-reviewed
+examples/oh_my_pi_skin/src/main_test.cj,199,related-test-review; executed-by-gate
+examples/ops_dashboard/src/main.cj,77,line-reviewed
+examples/ops_dashboard/src/main_test.cj,55,related-test-review; executed-by-gate
+examples/taskpad/src/audit_input_test.cj,89,related-test-review; executed-by-gate
+examples/taskpad/src/main.cj,203,line-reviewed
+examples/terminal_lab/src/main.cj,71,line-reviewed
+examples/terminal_lab/src/main_test.cj,57,related-test-review; executed-by-gate
+packages/core/src/app.cj,3019,line-reviewed
+packages/core/src/architecture_proof_step0_test.cj,422,related-test-review; executed-by-gate
+packages/core/src/audit_input_round2_test.cj,408,related-test-review; executed-by-gate
+packages/core/src/audit_input_test.cj,592,related-test-review; executed-by-gate
+packages/core/src/audit_runtime_test.cj,708,related-test-review; executed-by-gate
+packages/core/src/audit_widgets_test.cj,639,related-test-review; executed-by-gate
+packages/core/src/boundary_extreme_test.cj,560,related-test-review; executed-by-gate
+packages/core/src/buffer.cj,591,line-reviewed
+packages/core/src/canvas.cj,256,line-reviewed
+packages/core/src/canvas_contract_test.cj,106,related-test-review; executed-by-gate
+packages/core/src/command_widgets.cj,377,line-reviewed
+packages/core/src/component_primitives_test.cj,454,related-test-review; executed-by-gate
+packages/core/src/container_widgets.cj,233,line-reviewed
+packages/core/src/content_widgets.cj,1011,line-reviewed
+packages/core/src/dashboard_widgets.cj,301,line-reviewed
+packages/core/src/data_widgets.cj,1049,line-reviewed
+packages/core/src/dirty_rects.cj,124,line-reviewed
+packages/core/src/document.cj,963,line-reviewed
+packages/core/src/event.cj,994,line-reviewed
+packages/core/src/expanded_contract_test.cj,2402,related-test-review; executed-by-gate
+packages/core/src/form_widgets.cj,427,line-reviewed
+packages/core/src/geometry.cj,359,line-reviewed
+packages/core/src/keymap.cj,138,line-reviewed
+packages/core/src/lib.cj,1,line-reviewed
+packages/core/src/lib_test.cj,3762,related-test-review; executed-by-gate
+packages/core/src/media.cj,227,line-reviewed
+packages/core/src/navigation.cj,175,line-reviewed
+packages/core/src/performance_test.cj,536,related-test-review; executed-by-gate
+packages/core/src/pty.cj,943,line-reviewed
+packages/core/src/round2_runtime_test.cj,323,related-test-review; executed-by-gate
+packages/core/src/round2_widgets_test.cj,273,related-test-review; executed-by-gate
+packages/core/src/runtime_foundation.cj,806,line-reviewed
+packages/core/src/runtime_foundation_test.cj,803,related-test-review; executed-by-gate
+packages/core/src/state_models.cj,201,line-reviewed
+packages/core/src/style.cj,143,line-reviewed
+packages/core/src/terminal.cj,2114,line-reviewed
+packages/core/src/text.cj,863,line-reviewed
+packages/core/src/text_area.cj,1910,line-reviewed
+packages/core/src/text_buffer.cj,456,line-reviewed
+packages/core/src/unicode_data.cj,2088,generator-and-fixture-verified
+packages/core/src/vim_editor.cj,324,line-reviewed
+packages/core/src/vim_editor_test.cj,239,related-test-review; executed-by-gate
+packages/core/src/virtual_transcript.cj,1331,line-reviewed
+packages/core/src/virtual_transcript_test.cj,1138,related-test-review; executed-by-gate
+packages/core/src/visual_widgets.cj,304,line-reviewed
+packages/core/src/widget_base.cj,110,line-reviewed
+packages/core/src/widgets.cj,842,line-reviewed
+packages/core/tests/fixtures/file_picker/.hidden.cj,2,test-fixture
+packages/core/tests/fixtures/file_picker/lib.cj,2,test-fixture
+packages/diff/src/diff.cj,363,line-reviewed
+packages/diff/src/diff_test.cj,172,related-test-review; executed-by-gate
+packages/example_smoke/src/main.cj,185,line-reviewed
+packages/game/src/game.cj,870,line-reviewed
+packages/game/src/game_test.cj,332,related-test-review; executed-by-gate
+packages/markdown_adapter/src/code_highlight.cj,780,line-reviewed
+packages/markdown_adapter/src/markdown.cj,437,line-reviewed
+packages/markdown_adapter/src/markdown_test.cj,991,related-test-review; executed-by-gate
+packages/markdown_adapter/src/syntax_config.cj,328,line-reviewed
+packages/media/src/media.cj,738,line-reviewed
+packages/media/src/media_test.cj,349,related-test-review; executed-by-gate
+packages/terminal/src/terminal.cj,417,line-reviewed
+packages/terminal/src/terminal_test.cj,167,related-test-review; executed-by-gate
+scripts/api_contract.py,654,line-reviewed
+scripts/architecture_proof_step0.py,272,line-reviewed
+scripts/architecture_proof_step05_build.py,188,line-reviewed
+scripts/architecture_proof_step05_pty.py,352,line-reviewed
+scripts/architecture_proof_step05_report.py,113,line-reviewed
+scripts/architecture_proof_step0_cold.py,116,line-reviewed
+scripts/architecture_proof_step0_pty.py,310,line-reviewed
+scripts/architecture_proof_step0_report.py,114,line-reviewed
+scripts/architecture_proof_step3b5_burst.py,422,line-reviewed
+scripts/architecture_proof_step3b5_long_gate.py,128,line-reviewed
+scripts/architecture_proof_step3c_composer.py,154,line-reviewed
+scripts/archive_nightly_failure.sh,36,line-reviewed
+scripts/build_examples.sh,19,line-reviewed
+scripts/cangjie_cmd.sh,36,line-reviewed
+scripts/check_golden_snapshots.sh,19,line-reviewed
+scripts/check_sdk.sh,55,line-reviewed
+scripts/ci_gate.sh,11,line-reviewed
+scripts/coverage.sh,151,line-reviewed
+scripts/generate_api_contract.sh,9,line-reviewed
+scripts/generate_api_index.sh,8,line-reviewed
+scripts/generate_unicode_tables.py,219,line-reviewed
+scripts/new_example.sh,30,line-reviewed
+scripts/prepare_macos_smoke_bundle.sh,36,line-reviewed
+scripts/release_gate.sh,87,line-reviewed
+scripts/resolve_nightly_sdk.py,280,line-reviewed
+scripts/run_event_script.sh,26,line-reviewed
+scripts/run_macos_smoke.sh,90,line-reviewed
+scripts/run_pressure.sh,12,line-reviewed
+scripts/run_regression_matrix.sh,6,line-reviewed
+scripts/run_windows_smoke.sh,122,line-reviewed
+scripts/test_api_contract.py,332,related-test-review; executed-by-gate
+scripts/test_examples.sh,94,related-test-review; executed-by-gate
+scripts/test_new_example.py,98,related-test-review; executed-by-gate
+scripts/test_resolve_nightly_sdk.py,100,related-test-review; executed-by-gate
+scripts/test_windows_smoke.py,140,related-test-review; executed-by-gate
+scripts/validate_architecture.py,477,line-reviewed
+scripts/validate_fitness.py,21,line-reviewed
+scripts/windows_repo_smoke.ps1,81,line-reviewed
+templates/basic_app/src/main.cj,39,line-reviewed

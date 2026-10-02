@@ -525,6 +525,16 @@ class FarmGame {
     }
 
     private func decodeSave(text: String): Unit {
+        // Unknown versions and unrelated UTF-8 files must retain the same
+        // preservation guarantee as unreadable or invalid-UTF-8 saves.
+        var versions: Int64 = 0
+        for (line in splitLines(text)) {
+            if (line.startsWith("version=")) {
+                versions++
+                if (line != "version=1") { throw IllegalArgumentException("unsupported save version") }
+            }
+        }
+        if (versions != 1) { throw IllegalArgumentException("missing or duplicate save version") }
         for (line in splitLines(text)) {
             if (line.startsWith("day=")) { day = parseInt(line[4..], day) }
             else if (line.startsWith("minute=")) { minute = parseInt(line[7..], minute) }

@@ -259,6 +259,11 @@ class OhMyPiSkin {
     }
 
     private func handlePrimaryKey(key: KeyEvent): UpdateResult {
+        let changesFocus = match (key.code) { case KeyCode.Tab => true; case _ => false }
+        if (!todoFocused && !changesFocus) {
+            _ = composer.handle(key)
+            return dirtyResult([composerArea])
+        }
         match (key.code) {
             case KeyCode.Char(r'q') => UpdateResult.exit()
             case KeyCode.Tab =>
@@ -290,8 +295,7 @@ class OhMyPiSkin {
             case KeyCode.Enter | KeyCode.Char(r' ') =>
                 handleTodoAction(key, { => todos.activate(todoViewportHeight) }, structural: true)
             case _ =>
-                _ = composer.handle(key)
-                dirtyResult([composerArea])
+                UpdateResult.unchanged()
         }
     }
 

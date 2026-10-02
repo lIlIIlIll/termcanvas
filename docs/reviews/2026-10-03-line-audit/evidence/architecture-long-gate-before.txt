@@ -1,0 +1,37 @@
+.FFFF
+======================================================================
+FAIL: test_reported_failed_invariants_are_not_a_pass (test_architecture_proof_audit_20261003.LongGateAuditTest.test_reported_failed_invariants_are_not_a_pass) (fields='configured=10 transcript_expected=11 transcript_actual=10 content_preserved=true documents_expected<=3 documents_actual=3')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/40bf4f55d58a/termcanvas/scripts/test_architecture_proof_audit_20261003.py", line 40, in test_reported_failed_invariants_are_not_a_pass
+    self.assertNotEqual(self.run_gate(prefix + "tui long transcript gates " + fields), 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_reported_failed_invariants_are_not_a_pass (test_architecture_proof_audit_20261003.LongGateAuditTest.test_reported_failed_invariants_are_not_a_pass) (fields='configured=10 transcript_expected=11 transcript_actual=11 content_preserved=false documents_expected<=3 documents_actual=3')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/40bf4f55d58a/termcanvas/scripts/test_architecture_proof_audit_20261003.py", line 40, in test_reported_failed_invariants_are_not_a_pass
+    self.assertNotEqual(self.run_gate(prefix + "tui long transcript gates " + fields), 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_reported_failed_invariants_are_not_a_pass (test_architecture_proof_audit_20261003.LongGateAuditTest.test_reported_failed_invariants_are_not_a_pass) (fields='configured=10 transcript_expected=11 transcript_actual=11 content_preserved=true documents_expected<=3 documents_actual=4')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/40bf4f55d58a/termcanvas/scripts/test_architecture_proof_audit_20261003.py", line 40, in test_reported_failed_invariants_are_not_a_pass
+    self.assertNotEqual(self.run_gate(prefix + "tui long transcript gates " + fields), 0)
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_zero_exit_without_proof_is_not_a_pass (test_architecture_proof_audit_20261003.LongGateAuditTest.test_zero_exit_without_proof_is_not_a_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/40bf4f55d58a/termcanvas/scripts/test_architecture_proof_audit_20261003.py", line 30, in test_zero_exit_without_proof_is_not_a_pass
+    self.assertNotEqual(self.run_gate(""), 0)
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.180s
+
+FAILED (failures=4)

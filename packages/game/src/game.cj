@@ -443,7 +443,7 @@ public class PhysicsWorld {
             if (resolved.normal.x != 0.0) { velocity.value.x = 0.0 }
             if (resolved.normal.y != 0.0) { velocity.value.y = 0.0 }
             _ = transforms.set(id, transform)
-            _ = velocities.set(id, velocity)
+            velocities.insert(id, velocity)
         }
     }
 
@@ -603,12 +603,11 @@ public class SpriteRenderer {
 
     private func drawSpriteRow(canvas: Canvas, x: Int64, y: Int64, row: String, sprite: Sprite2D): Unit {
         var cx = x
-        for (r in row.runes()) {
-            let text = r.toString()
-            if (text != sprite.transparent) {
-                canvas.drawText(cx, y, text, sprite.style)
+        for (cluster in graphemeClusters(row)) {
+            if (cluster.text != sprite.transparent) {
+                canvas.drawText(cx, y, cluster.text, sprite.style)
             }
-            cx += max(1, displayWidth(r))
+            cx += cluster.width
         }
     }
 }
@@ -851,9 +850,10 @@ func maxLineWidth(rows: Array<String>): Int64 {
 
 func symbolAt(row: String, x: Int64): String {
     var cx: Int64 = 0
-    for (r in row.runes()) {
-        if (cx == x) { return r.toString() }
-        cx += max(1, displayWidth(r))
+    for (cluster in graphemeClusters(row)) {
+        if (cluster.width <= 0) { continue }
+        if (cx == x) { return cluster.text }
+        cx += cluster.width
     }
     ""
 }

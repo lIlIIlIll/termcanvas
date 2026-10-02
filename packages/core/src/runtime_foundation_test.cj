@@ -693,7 +693,7 @@ class RuntimeFoundationTest {
         @Expect(droppedFrames(Duration.millisecond * 11, Duration.millisecond * 5, FrameMissPolicy.CatchUp(1)), 1)
         let now = MonoTime.now()
         @Expect(nextDue(now, now, Duration.millisecond, FrameMissPolicy.Drop) > now)
-        @Expect(nextDue(now, now - Duration.second, Duration.millisecond, FrameMissPolicy.CatchUp(1)) < now)
+        @Expect((nextDue(now, now - Duration.second, Duration.millisecond, FrameMissPolicy.CatchUp(1)) - now).toNanoseconds(), 0)
 
         let clock = TestClock()
         let drop = TimerRuntime(clock: clock)

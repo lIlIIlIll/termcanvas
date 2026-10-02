@@ -21,8 +21,8 @@ class AssistantConsole {
         match (event) {
             case Event.KeyDown(key) =>
                 match (key.code) {
-                    case KeyCode.CtrlC | KeyCode.Char(r'q') => return ControlFlow.Exit
-                    case KeyCode.Char(r'a') => showRequest = true
+                    case KeyCode.CtrlC => return ControlFlow.Exit
+                    case KeyCode.F(2) => showRequest = true
                     case KeyCode.Esc => showRequest = false
                     case _ =>
                         if (showRequest) {
@@ -52,7 +52,7 @@ class AssistantConsole {
         if (showRequest) {
             frame.renderWidget(request, Rect(frame.area.x + 4, frame.area.y + 2, max(20, frame.area.width - 8), max(8, frame.area.height - 6)))
         }
-        frame.renderWidget(StatusBar(left: "assistant_console  a approval  esc close  q quit", right: status, style: Style(fg: Color.White, bg: Color.Black)), rows[2])
+        frame.renderWidget(StatusBar(left: "assistant_console  F2 approval  esc close  Ctrl-C quit", right: status, style: Style(fg: Color.White, bg: Color.Black)), rows[2])
         if (!showRequest) { frame.setCursor(composer.area.cursorPosition(rows[1])) }
     }
 }

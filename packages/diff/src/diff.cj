@@ -291,7 +291,12 @@ func flushFile(files: ArrayList<DiffFile>, oldPath: String, newPath: String, hun
 }
 
 func stripDiffPath(path: String): String {
-    if (path.startsWith("a/") || path.startsWith("b/")) { path[2..] } else { path }
+    // Traditional unified diff separates a path and its timestamp with a tab.
+    // Spaces remain part of the path.
+    var end = path.size
+    for (i in 0..path.size) { if (path[i] == b'\t') { end = i; break } }
+    let name = path[..end]
+    if (name.startsWith("a/") || name.startsWith("b/")) { name[2..] } else { name }
 }
 
 func parseHunkHeader(header: String): (Int64, Int64) {

@@ -1,0 +1,21 @@
+    TCS: Audit20261003FormInputTest, time elapsed: 1278608 ns, RESULT:
+    [ FAILED ] CASE: letterQCanBeEnteredInBothEditors (265140 ns)
+    Expect Failed: `(false == true)`
+       left: false
+      right: true
+
+    Expect Failed: app.name.value != "q"
+        app.name.value: ""
+                   "q": "q"
+
+    Expect Failed: app.notes.value != "q"
+        app.notes.value: ""
+                    "q": "q"
+
+    TCS: FormStudioTest, time elapsed: 382176 ns, RESULT:
+    [ PASSED ] CASE: pasteFollowsTheFocusedEditor (45689 ns)
+    [ PASSED ] CASE: namePasteInsertsAtItsCursor (25849 ns)
+Summary: TOTAL: 3
+    PASSED: 2, SKIPPED: 0, ERROR: 0
+    FAILED: 1, listed below:
+            TCS: Audit20261003FormInputTest, CASE: letterQCanBeEnteredInBothEditors

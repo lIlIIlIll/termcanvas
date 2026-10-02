@@ -31,6 +31,10 @@ public class Tabs <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
+    }
+
+    private func renderClipped(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         var x = area.x
         for (i in 0..titles.size) {
@@ -96,6 +100,10 @@ public class StatusBar <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
+    }
+
+    private func renderClipped(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         buffer.setString(area.x, area.y, repeat(" ", area.width), style: style)
 
@@ -161,6 +169,10 @@ public class Viewport <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
+    }
+
+    private func renderClipped(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)

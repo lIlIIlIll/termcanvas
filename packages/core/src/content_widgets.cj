@@ -350,6 +350,14 @@ public class Composer <: Widget {
 
     public func handle(key: KeyEvent): ?ComposerSubmit {
         synchronizeAreaValue()
+        if (area.completionVisible()) {
+            match (key.code) {
+                case KeyCode.Enter | KeyCode.Tab | KeyCode.Up | KeyCode.Down | KeyCode.Esc =>
+                    handleAreaKey(key)
+                    return None
+                case _ => ()
+            }
+        }
         match (key.code) {
             case KeyCode.Enter =>
                 if (key.modifiers.shift || key.modifiers.alt) {

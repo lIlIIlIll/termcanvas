@@ -1,0 +1,33 @@
+    TCS: Audit20261003BtmRenderTest, time elapsed: 35230115 ns, RESULT:
+    [ ERROR  ] CASE: truncationUsesTerminalColumnsAndPreservesGraphemes (17092422 ns)
+    REASON: An exception has occurred:IllegalArgumentException: Invalid utf8 byte sequence.
+	at cjtui_btm_clone.truncateLocal(std.core.String, Int64)(/workspace/scratch/40bf4f55d58a/termcanvas/examples/btm_clone/src/main.cj:2046)
+	at cjtui_btm_clone/test.Audit20261003BtmRenderTest.truncationUsesTerminalColumnsAndPreservesGraphemes()(/workspace/scratch/40bf4f55d58a/termcanvas/examples/btm_clone/src/audit_20261003_render_test.cj:12)
+	at cjtui_btm_clone/test.Audit20261003BtmRenderTest.asTestSuite.lambda.0.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/examples/btm_clone/src/audit_20261003_render_test.cj:31)
+    [ FAILED ] CASE: navigatingWhileDetailIsOpenMatchesAFullRender (16546155 ns)
+    Expect Failed: afterNavigation != backend.snapshot() (multiline difference below)
+        (...40 equal lines skipped...)
+         |     7    0.00    0.00%(128K)     988K S  /usr/local/bin/sites-preview daemon                     |
+        -|                                                                                                  |
+        -|                                                                                                  |
+        -|                                                                                                  |
+        -|                                                                                                  |
+        +| +- detail -------------------------------------------------------------------------------------+ |
+        +| | pid 3  cpu 0.00%  mem 0.02%  rss 2M  virt 12M                                                | |
+        +| | rsync --daemon --no-detach                                                                   | |
+        +| +----------------------------------------------------------------------------------------------+ |
+         +--------------------------------------------------------------------------------------------------+
+
+         q quit  j/k move  +/- refresh  c/m/p/n sort  / search  space pause  enter det sort: CPU  refresh: 1s
+
+    TCS: BtmCloneInputTest, time elapsed: 31759159 ns, RESULT:
+    [ PASSED ] CASE: searchBackspaceRemovesAWholeRune (8557161 ns)
+    [ PASSED ] CASE: staleBackgroundSampleDoesNotReplaceInteractiveFilter (5912592 ns)
+    [ PASSED ] CASE: parserAndFormattingHelpersCoverTheirBoundaryContracts (169896 ns)
+    [ PASSED ] CASE: parsingSortingAndDirtyHelpersCoverAllModes (268194 ns)
+    [ PASSED ] CASE: applicationKeysAsyncUpdatesAndBothRenderSurfacesStayCovered (15622182 ns)
+Summary: TOTAL: 7
+    PASSED: 5, SKIPPED: 0, ERROR: 1
+    FAILED: 1, listed below:
+            TCS: Audit20261003BtmRenderTest, CASE: truncationUsesTerminalColumnsAndPreservesGraphemes
+            TCS: Audit20261003BtmRenderTest, CASE: navigatingWhileDetailIsOpenMatchesAFullRender

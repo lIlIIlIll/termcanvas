@@ -1,0 +1,33 @@
+    TCS: Audit20261003PtyUtf8Test, time elapsed: 216786538 ns, RESULT:
+    [ ERROR  ] CASE: splitUtf8IsDecodedAcrossOutputEvents (108228555 ns)
+    REASON: An exception has occurred:IllegalArgumentException: Invalid utf8 byte sequence.
+	at core.nextGraphemeOffset(std.core.String, Int64)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/text.cj:410)
+	at core.displayWidth(std.core.String, core.TextWidthOptions)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/text.cj:44)
+	at core.displayWidth(std.core.String)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/text.cj:35)
+	at terminal.TerminalScreen.writeText(std.core.String)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/terminal/src/terminal.cj:165)
+	at terminal.TerminalScreen.apply(terminal.AnsiToken)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/terminal/src/terminal.cj:138)
+	at terminal.TerminalScreen.feed(std.core.String)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/terminal/src/terminal.cj:126)
+	at terminal.TerminalTranscript.append(std.core.String)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/terminal/src/terminal.cj:296)
+	at terminal_lab.TerminalLab.update(core.Event)(/workspace/scratch/40bf4f55d58a/termcanvas/examples/terminal_lab/src/main.cj:37)
+	at terminal_lab/test.Audit20261003PtyUtf8Test.splitUtf8IsDecodedAcrossOutputEvents()(/workspace/scratch/40bf4f55d58a/termcanvas/examples/terminal_lab/src/audit_20261003_utf8_test.cj:12)
+	at terminal_lab/test.Audit20261003PtyUtf8Test.asTestSuite.lambda.0.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/examples/terminal_lab/src/audit_20261003_utf8_test.cj:24)
+    [ ERROR  ] CASE: invalidBytesAreReplacedWithoutLosingFollowingText (106767102 ns)
+    REASON: An exception has occurred:IllegalArgumentException: Invalid unicode scalar value.
+	at core.nextGraphemeOffset(std.core.String, Int64)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/text.cj:410)
+	at core.displayWidth(std.core.String, core.TextWidthOptions)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/text.cj:44)
+	at core.displayWidth(std.core.String)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/text.cj:35)
+	at terminal.TerminalScreen.writeText(std.core.String)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/terminal/src/terminal.cj:165)
+	at terminal.TerminalScreen.apply(terminal.AnsiToken)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/terminal/src/terminal.cj:138)
+	at terminal.TerminalScreen.feed(std.core.String)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/terminal/src/terminal.cj:126)
+	at terminal.TerminalTranscript.append(std.core.String)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/terminal/src/terminal.cj:296)
+	at terminal_lab.TerminalLab.update(core.Event)(/workspace/scratch/40bf4f55d58a/termcanvas/examples/terminal_lab/src/main.cj:37)
+	at terminal_lab/test.Audit20261003PtyUtf8Test.invalidBytesAreReplacedWithoutLosingFollowingText()(/workspace/scratch/40bf4f55d58a/termcanvas/examples/terminal_lab/src/audit_20261003_utf8_test.cj:20)
+	at terminal_lab/test.Audit20261003PtyUtf8Test.asTestSuite.lambda.1.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/examples/terminal_lab/src/audit_20261003_utf8_test.cj:24)
+    TCS: TerminalLabTest, time elapsed: 4144118 ns, RESULT:
+    [ PASSED ] CASE: ptyEventsDriveTheRealTranscriptAndStatus (1529346 ns)
+    [ PASSED ] CASE: modeSwitchAndPtyFailurePathsUpdateTheTranscript (2316472 ns)
+Summary: TOTAL: 4
+    PASSED: 2, SKIPPED: 0, ERROR: 2
+    FAILED: 0, listed below:
+            TCS: Audit20261003PtyUtf8Test, CASE: splitUtf8IsDecodedAcrossOutputEvents
+            TCS: Audit20261003PtyUtf8Test, CASE: invalidBytesAreReplacedWithoutLosingFollowingText

@@ -1,0 +1,36 @@
+    TCS: Audit20261003WidgetsTest, time elapsed: 255122952 ns, RESULT:
+    [ PASSED ] CASE: progressScalingAcceptsLargeCounters (267314 ns)
+    [ PASSED ] CASE: progressSegmentsScaleAndClipLargeValues (59801 ns)
+    [ PASSED ] CASE: progressCustomSymbolsStayInsideTheAssignedArea (320123 ns)
+    [ PASSED ] CASE: chartAndSparklineScaleLargeAndNegativeSamples (114402 ns)
+    [ PASSED ] CASE: paginatorCeilingDivisionDoesNotOverflow (42756 ns)
+    [ PASSED ] CASE: frozenColumnsReserveSpaceForTheSelectedScrollingColumn (50506 ns)
+    [ PASSED ] CASE: multiselectInitialSelectionIsASetOfValidIndices (79289 ns)
+    [ PASSED ] CASE: filePickerCanNavigateAboveTheDefaultRelativeDirectory (562599 ns)
+    [ PASSED ] CASE: oneRowDialogDoesNotPaintButtonsAboveItsArea (129675 ns)
+    [ PASSED ] CASE: emptyHeightMenuAndAlertDoNotPaint (95304 ns)
+    [ PASSED ] CASE: legendUsesDisplayColumnsForUnicodeGaps (205521 ns)
+    [ PASSED ] CASE: composerAcceptsCompletionBeforeSubmitting (51308 ns)
+    [ ERROR  ] CASE: clippedTableColumnDoesNotOverflowItsNextPosition (126568884 ns)
+    REASON: An exception has occurred:OverflowException: add
+	at core.VirtualTable.renderColumnCell(Int64, Int64, Int64, Int64, std.core.Array<...>, core.Buffer, core.Style, std.core.Option<...>)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/data_widgets.cj:467)
+	at core.VirtualTable.renderColumns(Int64, Int64, Int64, std.core.Array<...>, core.Buffer, core.Style, std.core.Option<...>)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/data_widgets.cj:444)
+	at core.VirtualTable.renderRows(core.Rect, core.Buffer)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/data_widgets.cj:165)
+	at core.VirtualTable.renderClipped.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/data_widgets.cj:151)
+	at core.Buffer.withCanvasClip(core.Rect, () -> Unit)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/buffer.cj:67)
+	at core.VirtualTable.renderClipped(core.Rect, core.Buffer)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/data_widgets.cj:151)
+	at core.VirtualTable.render.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/data_widgets.cj:143)
+	at core.Buffer.withCanvasClip(core.Rect, () -> Unit)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/buffer.cj:67)
+	at core.VirtualTable.render(core.Rect, core.Buffer)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/data_widgets.cj:143)
+	at core/test.Audit20261003WidgetsTest.clippedTableColumnDoesNotOverflowItsNextPosition()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:143)
+	at core/test.Audit20261003WidgetsTest.asTestSuite.lambda.12.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:158)
+    [ ERROR  ] CASE: oversizedContainerGapsDoNotOverflow (124087243 ns)
+    REASON: An exception has occurred:OverflowException: mul
+	at core.HBox.render(core.Rect, core.Buffer)(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/container_widgets.cj:46)
+	at core/test.Audit20261003WidgetsTest.oversizedContainerGapsDoNotOverflow()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:151)
+	at core/test.Audit20261003WidgetsTest.asTestSuite.lambda.13.lambda.0()(/workspace/scratch/40bf4f55d58a/termcanvas/packages/core/src/audit_20261003_widgets_test.cj:158)
+Summary: TOTAL: 700
+    PASSED: 12, SKIPPED: 686, ERROR: 2
+    FAILED: 0, listed below:
+            TCS: Audit20261003WidgetsTest, CASE: clippedTableColumnDoesNotOverflowItsNextPosition
+            TCS: Audit20261003WidgetsTest, CASE: oversizedContainerGapsDoNotOverflow

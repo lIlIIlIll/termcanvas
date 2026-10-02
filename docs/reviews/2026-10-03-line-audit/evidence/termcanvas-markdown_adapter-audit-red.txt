@@ -1,0 +1,58 @@
+    TCS: Audit20261003MarkdownTest, time elapsed: 1134991 ns, RESULT:
+    [ FAILED ] CASE: linksPreserveEnclosingStrongAndEmphasisModifiers (455266 ns)
+    Expect Failed: `(span.style.modifier.bold == true)`
+       left: false
+      right: true
+
+    Expect Failed: `(span.style.modifier.italic == true)`
+       left: false
+      right: true
+
+    TCS: MarkdownExtensionTest, time elapsed: 37773262 ns, RESULT:
+    [ PASSED ] CASE: outlineRetainsEarlierDeepAndLaterShallowHeadings (146872 ns)
+    [ PASSED ] CASE: parsesMarkdownIntoDocumentLines (283837 ns)
+    [ PASSED ] CASE: rendersChineseMarkdownTable (736080 ns)
+    [ PASSED ] CASE: preservesMarkdownHardBreaksAsDocumentRows (125679 ns)
+    [ PASSED ] CASE: optionallyPreservesMarkdownSoftBreaksAsDocumentRows (279411 ns)
+    [ PASSED ] CASE: rendersParsedDocumentWithMarkdownView (232320 ns)
+    [ PASSED ] CASE: mapsHeadingLevelsToPreviewStyles (153281 ns)
+    [ PASSED ] CASE: mapsExtendedMarkdownNodes (141193 ns)
+    [ PASSED ] CASE: mapsStrikethroughAndSourceOffsets (148384 ns)
+    [ PASSED ] CASE: rendersNestedEmphasisStyles (114052 ns)
+    [ PASSED ] CASE: rendersNestedListItemsFromAstChildren (192720 ns)
+    [ PASSED ] CASE: buildsOutlineAndPreviewIndex (313913 ns)
+    [ PASSED ] CASE: adapterPreservesTableAlignmentEscapesAndWrappedOffsets (434715 ns)
+    [ PASSED ] CASE: rendersFocusedMarkdownPreviewCases (1052076 ns)
+    [ PASSED ] CASE: rendersNestedBlockQuotesWithDepth (166401 ns)
+    [ PASSED ] CASE: rendersBlockElementsInsideQuotes (180423 ns)
+    [ PASSED ] CASE: rendersFencedCodeBlockInsideListItem (430058 ns)
+    [ PASSED ] CASE: quotedChildrenDoNotResetPreviewSourceOffsets (143436 ns)
+    [ PASSED ] CASE: previewSyncCanMoveUpInsideQuotedBlocks (158319 ns)
+    [ PASSED ] CASE: codePaletteSurvivesMarkdownMarkersAndUnicodeIdentifiers (1104857 ns)
+    [ PASSED ] CASE: sourceSpansAndDecorationsStayAnchoredAcrossRepeatedQuotedBlocks (613224 ns)
+    [ PASSED ] CASE: eachSupportedDialectColorsItsOwnSyntaxInBothSurfaces (2556855 ns)
+    [ PASSED ] CASE: literalDelimitersAndNumericSuffixesStopAtTheirActualBoundaries (2221549 ns)
+    [ PASSED ] CASE: quotedAndTabStrippedHereDocumentsStopAtTheirOwnDelimiters (403749 ns)
+    [ PASSED ] CASE: shellSpecialParametersAndEscapedHashKeepWordBoundaries (398660 ns)
+    [ PASSED ] CASE: pythonPrefixPairsColorOnlySupportedStringCombinations (328986 ns)
+    [ PASSED ] CASE: basedAndFractionalNumbersKeepOnlyValidSeparators (289507 ns)
+    [ PASSED ] CASE: astFenceOwnershipPreventsInnerMarkersFromLeakingStyles (414424 ns)
+    [ PASSED ] CASE: codeThemeBackgroundAndSelectionOverrideTokenForeground (260612 ns)
+    [ PASSED ] CASE: listIndentAndTabKeepKeywordOnItsOwnSourceBytes (162115 ns)
+    [ PASSED ] CASE: unsupportedAndIndentedCodeDoNotAcquireMarkdownOrLanguageColors (392691 ns)
+    [ PASSED ] CASE: numericSuffixesDoNotColorInvalidFollowingText (410589 ns)
+    [ PASSED ] CASE: cLineSplicesKeepCommentsAndQuotesAcrossCrLf (523640 ns)
+    [ PASSED ] CASE: unterminatedFenceMapsCrOnlyBodyBytesWithoutGuessing (195044 ns)
+    [ PASSED ] CASE: syntaxConfigRejectsAmbiguousDeclarationsWithPhysicalLines (351139 ns)
+    [ PASSED ] CASE: configuredAliasColorsBothSurfacesWithoutLeakingIntoUnknownFences (371641 ns)
+    [ PASSED ] CASE: configuredStringsAndNestedCommentsRespectStateAndBlockBoundary (484389 ns)
+    [ PASSED ] CASE: configuredPalettePreservesUtf8SourceMappingAndSelection (1640453 ns)
+    [ PASSED ] CASE: extendRetainsBuiltinLexerWhileReplaceUsesOnlyDeclaredRules (752384 ns)
+    [ PASSED ] CASE: separateConfigurationsCannotChangeExistingPresentation (1260271 ns)
+    [ PASSED ] CASE: syntaxConfigEnforcesEveryBoundAtTheDeclarationThatCrossesIt (11350593 ns)
+    [ PASSED ] CASE: configuredNumberProfilesKeepSignsRangesAndSuffixesDistinct (468576 ns)
+    [ PASSED ] CASE: bomCrConfigAndUnclosedStatesResetAtLineAndBlockBoundaries (340753 ns)
+Summary: TOTAL: 44
+    PASSED: 43, SKIPPED: 0, ERROR: 0
+    FAILED: 1, listed below:
+            TCS: Audit20261003MarkdownTest, CASE: linksPreserveEnclosingStrongAndEmphasisModifiers

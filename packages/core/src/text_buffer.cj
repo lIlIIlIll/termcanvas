@@ -89,23 +89,29 @@ public class TextBuffer {
     }
 
     public func insert(position: TextPosition, text: String): TextPosition {
+        let start = clampPosition(position)
+        if (text.isEmpty()) { return start }
         snapshot()
-        let pos = insertRaw(clampPosition(position), text)
+        let pos = insertRaw(start, text)
         clearRedo()
         pos
     }
 
     public func replace(range: TextRange, text: String): TextPosition {
+        let normalized = normalizedRange(range)
+        if (slice(normalized) == text) { return normalized.end }
         snapshot()
-        let start = deleteRangeRaw(range)
+        let start = deleteRangeRaw(normalized)
         let pos = insertRaw(start, text)
         clearRedo()
         pos
     }
 
     public func deleteRange(range: TextRange): TextPosition {
+        let normalized = normalizedRange(range)
+        if (normalized.isEmpty()) { return normalized.start }
         snapshot()
-        let pos = deleteRangeRaw(range)
+        let pos = deleteRangeRaw(normalized)
         clearRedo()
         pos
     }
@@ -176,8 +182,10 @@ public class TextBuffer {
             idx = stringIndexOf(source, needle, offset)
         }
         out.append(source[offset..])
+        let replacementText = out.toString()
+        if (replacementText == source) { return count }
         snapshot()
-        setText(out.toString())
+        setText(replacementText)
         clearRedo()
         count
     }
@@ -236,9 +244,9 @@ public class TextBuffer {
     }
 
     public func deleteBackward(position: TextPosition): TextPosition {
-        snapshot()
         let pos = clampPosition(position)
         if (pos.line == 0 && pos.column == 0) { return pos }
+        snapshot()
         clearRedo()
         if (pos.column > 0) {
             let current = lines[pos.line]
@@ -255,9 +263,10 @@ public class TextBuffer {
     }
 
     public func deleteForward(position: TextPosition): TextPosition {
-        snapshot()
         let pos = clampPosition(position)
         let current = lines[pos.line]
+        if (pos.column == current.size && pos.line + 1 == lines.size) { return pos }
+        snapshot()
         if (pos.column < current.size) {
             let next = nextRuneOffset(current, pos.column)
             lines[pos.line] = current[..pos.column] + current[next..]
@@ -433,7 +442,7 @@ func previousWordOffset(text: String, offset: Int64): Int64 {
 }
 
 func nextWordOffset(text: String, offset: Int64): Int64 {
-    var pos = nextRuneOffset(text, offset)
+    var pos = clampToRuneBoundary(text, offset)
     while (pos < text.size && !isAsciiSpace(runeAt(text, pos))) {
         pos = nextRuneOffset(text, pos)
     }

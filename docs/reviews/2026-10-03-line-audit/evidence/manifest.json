@@ -1,0 +1,97 @@
+[
+  {
+    "source_log": "core-added-before.log",
+    "original_sha256": "eacd2ef92b1dd65a4927d28e5ea7d17e8086d186c479e350778da2ed67afc971",
+    "excerpt": "core-added-before.txt"
+  },
+  {
+    "source_log": "architecture-long-gate-before.log",
+    "original_sha256": "c8aa09b981e338d979ad77456da38f87d7e35d06dec2e0320074c539b6f11105",
+    "excerpt": "architecture-long-gate-before.txt"
+  },
+  {
+    "source_log": "examples-form_studio-before.log",
+    "original_sha256": "61f0e0e326df9dd518b9a6cbe9a64f87416142adac9c6db6fb88fbdc78913d1a",
+    "excerpt": "examples-form_studio-before.txt"
+  },
+  {
+    "source_log": "examples-terminal_lab-before.log",
+    "original_sha256": "bcedd41da674f74814d03476c32d9425e707cf560779351d06ef13dfb930bacd",
+    "excerpt": "examples-terminal_lab-before.txt"
+  },
+  {
+    "source_log": "examples-btm_clone-before.log",
+    "original_sha256": "3dc8ce2748bd497ce2ee08cbf72c45aaf3f19eb226db4825f961365e8999b8ce",
+    "excerpt": "examples-btm_clone-before.txt"
+  },
+  {
+    "source_log": "sdk-before.log",
+    "original_sha256": "42af1763ceaa21692f0b48264a98880578fc2e2640d2a81f6c4d1e2c66a06ad1",
+    "excerpt": "sdk-before.txt"
+  },
+  {
+    "source_log": "examples-game_demo-before.log",
+    "original_sha256": "7edb29995e48a5197eaf17f6fa88e7a572028d4c47e822d8f5708f90c0a41be3",
+    "excerpt": "examples-game_demo-before.txt"
+  },
+  {
+    "source_log": "sdk-install-before.log",
+    "original_sha256": "436a3baf079cfb821b3e91e1735ca9bc75cbfc40d8816f7f6d4b1a35957daa01",
+    "excerpt": "sdk-install-before.txt"
+  },
+  {
+    "source_log": "core-before.log",
+    "original_sha256": "c979dce6ca932b62f73712eccc2830175e794302a51be977dd42d3d3eb6994f8",
+    "excerpt": "core-before.txt"
+  },
+  {
+    "source_log": "examples-oh_my_pi_skin-before.log",
+    "original_sha256": "eaeb1e65df8ccc081608c7153a0d07ada2d3eeecca053de615718ea357ce9f86",
+    "excerpt": "examples-oh_my_pi_skin-before.txt"
+  },
+  {
+    "source_log": "coverage-safety-before.log",
+    "original_sha256": "d7cc633d2f17a0c4ecdcfffcca5be7c6921377bd7a263fb8d0d78ff7c3a7f1f6",
+    "excerpt": "coverage-safety-before.txt"
+  },
+  {
+    "source_log": "examples-assistant-before.log",
+    "original_sha256": "14d9687814cba93bc597decf49dd89c1ead8e461b84f5e024ac0280131f738e1",
+    "excerpt": "examples-assistant-before.txt"
+  },
+  {
+    "source_log": "widgets-extra-before.log",
+    "original_sha256": "0042a73ea1130dd28b2be925b7150ce611fba27a3920ddbfac44d9d39896fc35",
+    "excerpt": "widgets-extra-before.txt"
+  },
+  {
+    "source_log": "termcanvas-markdown_adapter-audit-red.log",
+    "original_sha256": "f1b7e7d5322f9eb357bed044230ed783a7dc83ebaa65a3559ef9a3676dbf5dd9",
+    "excerpt": "termcanvas-markdown_adapter-audit-red.txt"
+  },
+  {
+    "source_log": "termcanvas-diff-audit-red.log",
+    "original_sha256": "604c0e6f15d4aa3ea4e14829c3cc2ef04a653b4553529696b1d5b8b74d52cdbe",
+    "excerpt": "termcanvas-diff-audit-red.txt"
+  },
+  {
+    "source_log": "termcanvas-terminal-grapheme-audit-red.log",
+    "original_sha256": "92cc89d90afe9ca059835b9abbffbb39ee3351ad4821b74154acfd96a7aaf6fa",
+    "excerpt": "termcanvas-terminal-grapheme-audit-red.txt"
+  },
+  {
+    "source_log": "termcanvas-terminal-audit-red.log",
+    "original_sha256": "47f051ec22d5f6f94b359597bdf5146932304ae4d5a4540d3f65dafe81050399",
+    "excerpt": "termcanvas-terminal-audit-red.txt"
+  },
+  {
+    "source_log": "termcanvas-game-audit-red.log",
+    "original_sha256": "b3279eb575e45eca10532e3f52bd48b427fbcaea946f3a1e333e8b8762ee9411",
+    "excerpt": "termcanvas-game-audit-red.txt"
+  },
+  {
+    "source_log": "termcanvas-media-audit-red.log",
+    "original_sha256": "f126ae80ffff179f7e51733b40fab0506cb95f9b3a9f69145a246a9845886d03",
+    "excerpt": "termcanvas-media-audit-red.txt"
+  }
+]

@@ -150,6 +150,9 @@ public enum Command {
 class TerminalLifecycleRequests {
     var resetRequested: Bool = false
     var suspendRequested: Bool = false
+    // Full invalidation dominates every partial update until presentation.
+    // An empty DirtyRects alone cannot represent that state after merging.
+    var fullRedrawRequested: Bool = true
     private let ownedPtys = ArrayList<String>()
 
     func trackPty(id: String): Unit {
@@ -507,14 +510,16 @@ func droppedFrameMillis(lateMillis: Int64, everyMillis: Int64, policy: FrameMiss
     let missed = lateMillis / everyMillis
     match (policy) {
         case FrameMissPolicy.Drop => missed
-        case FrameMissPolicy.CatchUp(maxCatchUp) => min(max(0, maxCatchUp), missed)
+        case FrameMissPolicy.CatchUp(maxCatchUp) => max(0, missed - max(0, maxCatchUp))
     }
 }
 
 func nextDueMillis(nowMillis: Int64, previousMillis: Int64, everyMillis: Int64, policy: FrameMissPolicy): Int64 {
     match (policy) {
         case FrameMissPolicy.Drop => nowMillis + everyMillis
-        case FrameMissPolicy.CatchUp(_) => previousMillis + everyMillis
+        case FrameMissPolicy.CatchUp(_) =>
+            let skipped = droppedFrameMillis(max(0, nowMillis - previousMillis), everyMillis, policy)
+            previousMillis + everyMillis * (skipped + 1)
     }
 }
 
@@ -523,18 +528,18 @@ func durationMillis(duration: Duration): Int64 {
 }
 
 func droppedFrames(late: Duration, every: Duration, policy: FrameMissPolicy): Int64 {
-    if (late <= Duration.Zero || every <= Duration.Zero) { return 0 }
-    let missed = late.toMilliseconds() / max(1, every.toMilliseconds())
+    if (late <= Duration.Zero || every <= Duration.Zero || late < every) { return 0 }
+    let missed = late.toNanoseconds() / every.toNanoseconds()
     match (policy) {
         case FrameMissPolicy.Drop => missed
-        case FrameMissPolicy.CatchUp(maxCatchUp) => min(max(0, maxCatchUp), missed)
+        case FrameMissPolicy.CatchUp(maxCatchUp) => max(0, missed - max(0, maxCatchUp))
     }
 }
 
 func nextDue(now: MonoTime, previous: MonoTime, every: Duration, policy: FrameMissPolicy): MonoTime {
     match (policy) {
         case FrameMissPolicy.Drop => now + every
-        case FrameMissPolicy.CatchUp(_) => previous + every
+        case FrameMissPolicy.CatchUp(_) => previous + every * (droppedFrames(now - previous, every, policy) + 1)
     }
 }
 
@@ -1761,6 +1766,7 @@ public class App {
                         _ = session.start()
                         terminal.clear()
                         pendingDirty.clear()
+                        lifecycle.fullRedrawRequested = true
                         dirty = true
                         frameSchedule.request(FrameRequestKind.SurfaceCritical)
                     }
@@ -1768,6 +1774,7 @@ public class App {
                         lifecycle.resetRequested = false
                         terminal.clear()
                         pendingDirty.clear()
+                        lifecycle.fullRedrawRequested = true
                         dirty = true
                         frameSchedule.request(FrameRequestKind.SurfaceCritical)
                     }
@@ -1818,6 +1825,7 @@ public class App {
                         // partial damage is stale and the new surface is
                         // immediately eligible for a full presentation.
                         dirty = true
+                        lifecycle.fullRedrawRequested = true
                         frameSchedule.request(FrameRequestKind.SurfaceCritical)
                     }
                     for (event in timerRuntime.drain()) {
@@ -1848,7 +1856,7 @@ public class App {
                             case Some(trace) => trace.renderStarted()
                             case None => ()
                         }
-                        let renderMetrics = if (pendingDirty.isEmpty()) {
+                        let renderMetrics = if (lifecycle.fullRedrawRequested || pendingDirty.isEmpty()) {
                             terminal.draw(render)
                         } else {
                             terminal.draw(render, dirtyRects: Some(pendingDirty.copy()))
@@ -1881,6 +1889,7 @@ public class App {
                         }
                         dirty = false
                         pendingDirty.clear()
+                        lifecycle.fullRedrawRequested = false
                     }
                     match (nextTick) {
                         case Some(due) =>
@@ -2398,6 +2407,18 @@ public class App {
                         queue.enterUpdate()
                         let result = try { update(event) } finally { queue.leaveUpdate() }
                         changed = changed || result.renderRequested
+                        if (result.renderRequested) {
+                            let fullRedraw = match (result.dirtyRects) {
+                                case Some(rects) => rects.isEmpty()
+                                case None => true
+                            }
+                            if (fullRedraw) {
+                                match (lifecycle) {
+                                    case Some(requests) => requests.fullRedrawRequested = true
+                                    case None => ()
+                                }
+                            }
+                        }
                         if (!App.applyUpdateResult(result, commandQueue, dirtySink: dirtySink)) {
                             queue.beginClosing()
                             return (false, changed)
@@ -2979,7 +3000,7 @@ public class FocusManager {
     public func handle(key: KeyEvent): Bool {
         match (key.code) {
             case KeyCode.Tab =>
-                _ = next()
+                if (key.modifiers.shift) { _ = previous() } else { _ = next() }
                 true
             case KeyCode.BackTab =>
                 _ = previous()

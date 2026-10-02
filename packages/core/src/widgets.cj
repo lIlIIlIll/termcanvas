@@ -278,6 +278,10 @@ public class Paragraph <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
+    }
+
+    private func renderClipped(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)
@@ -734,6 +738,10 @@ public class Input <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
+    }
+
+    private func renderClipped(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)

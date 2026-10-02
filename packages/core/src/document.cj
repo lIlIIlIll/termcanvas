@@ -743,7 +743,9 @@ func parseSourceOffset(value: String): ?Int64 {
     for (i in 0..value.size) {
         let b = value[i]
         if (b >= b'0' && b <= b'9') {
-            out = out * 10 + Int64(b - b'0')
+            let digit = Int64(b - b'0')
+            if (out > (Int64.Max - digit) / 10) { return None }
+            out = out * 10 + digit
             seen = true
         } else {
             break
