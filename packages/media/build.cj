@@ -6,7 +6,9 @@ func buildMediaFixture(): Int64 {
 }
 
 @When[os != "Windows"]
-func buildMediaFixture(): Int64 { 0 }
+func buildMediaFixture(): Int64 {
+    launch("cjc", ["testdata/media_tool.cj", "-o", "testdata/media_tool"]).wait()
+}
 
 main(): Int64 {
     match (Process.current.arguments[0]) {

@@ -13,8 +13,9 @@ func output(bytes: Array<Byte>): Int64 {
     0
 }
 
-// Native Windows equivalent of printf and fake_ffmpeg.sh used by the same
-// decoder assertions. Emit binary RGBA directly, without a shell or codec.
+// Emit binary RGBA directly, without a shell or codec. The still-image adapter
+// passes media-tool arguments that GNU printf ignores but BSD printf rejects,
+// so every platform uses this fixture for the same exact-byte assertions.
 main(args: Array<String>): Int64 {
     if (args.size == 0) { return 1 }
     if (args[0] == "x") { return output([120u8]) }

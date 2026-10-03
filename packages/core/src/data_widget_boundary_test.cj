@@ -1,5 +1,7 @@
 package core
 
+import std.env.*
+import std.fs.*
 import std.unittest.*
 import std.unittest.testmacro.*
 
@@ -344,22 +346,60 @@ class DataWidgetBoundaryTest {
 
     @TestCase
     func filePickerNavigationAndLexicalParentEdgesStayPredictable(): Unit {
-        let picker = FilePicker(path: "tests/fixtures/file_picker", showHidden: true)
-        @Expect(picker.handle(KeyEvent(KeyCode.End), 2))
-        @Expect(picker.handle(KeyEvent(KeyCode.Up), 2))
-        @Expect(picker.handle(KeyEvent(KeyCode.PageUp), 2))
-        @Expect(picker.handle(KeyEvent(KeyCode.PageDown), 2))
-        @Expect(picker.handle(KeyEvent(KeyCode.Home), 2))
-        @Expect(picker.selectedEntry(), Some(".."))
-        @Expect(picker.selectedInfo().getOrThrow().isDir)
-        @Expect(!picker.handle(KeyEvent(KeyCode.Esc), 2))
-        @Expect(picker.handle(KeyEvent(KeyCode.Enter), 2))
-        @Expect(picker.path, "tests/fixtures")
+        // Exercise lexical roots without enumerating the host's root drive.
         for ((path, expected) in [("/", "/"), ("/.", "/"), ("x/.", "."), ("x/./", "."), ("x/..", "x/../.."), ("x///", "."), (".", ".."), ("", "..")]) {
-            let lexical = FilePicker(path: path)
-            @Expect(lexical.selectedPath(), Some(expected))
-            @Expect(lexical.parent(), path != expected)
-            @Expect(lexical.path, expected)
+            @Expect(parentPath(path), expected)
+        }
+        let marker = File.createTemp(getTempDirectory())
+        let markerPath = marker.info.path.toString().replace("\\", "/")
+        marker.close()
+        let base = markerPath + "-picker"
+        try {
+            Directory.create(base)
+            Directory.create(base + "/$first")
+            Directory.create(base + "/x")
+            File.writeTo(base + "/note.txt", "fixture".toArray())
+            let picker = FilePicker(path: base, showHidden: true)
+            @Expect(picker.selectedEntry(), Some(".."))
+            @Expect(picker.handle(KeyEvent(KeyCode.Down), 2))
+            @Expect(picker.selectedEntry(), Some("$first"))
+            @Expect(picker.selectedPath(), Some(base + "/$first"))
+            @Expect(picker.handle(KeyEvent(KeyCode.Enter), 2))
+            @Expect(picker.path, base + "/$first")
+            @Expect(picker.selectedPath(), Some(base))
+            @Expect(picker.parent())
+            @Expect(picker.path, base)
+            @Expect(picker.handle(KeyEvent(KeyCode.End), 2))
+            @Expect(picker.selectedEntry(), Some("note.txt"))
+            @Expect(picker.handle(KeyEvent(KeyCode.Up), 2))
+            @Expect(picker.selectedEntry(), Some("x"))
+            @Expect(picker.handle(KeyEvent(KeyCode.PageUp), 2))
+            @Expect(picker.selectedEntry(), Some(".."))
+            @Expect(picker.handle(KeyEvent(KeyCode.PageDown), 2))
+            @Expect(picker.selectedEntry(), Some("x"))
+            @Expect(picker.handle(KeyEvent(KeyCode.Home), 2))
+            @Expect(picker.selectedEntry(), Some(".."))
+            @Expect(picker.selectedInfo().getOrThrow().isDir)
+            @Expect(!picker.handle(KeyEvent(KeyCode.Esc), 2))
+            // Enter on the parent item stays inside the owned fixture.
+            let child = FilePicker(path: base + "/x")
+            @Expect(child.handle(KeyEvent(KeyCode.Enter), 2))
+            @Expect(child.path, base)
+            for ((suffix, expected) in [("/x/.", base), ("/x/./", base), ("/x/..", base + "/x/../.."), ("/x///", base)]) {
+                let lexical = FilePicker(path: base + suffix)
+                @Expect(lexical.selectedPath(), Some(expected))
+                @Expect(lexical.parent())
+                @Expect(lexical.path, expected)
+            }
+            child.path = "/"
+            @Expect(!child.parent())
+            @Expect(child.path, "/")
+        } finally {
+            _ = removeIfExists(base + "/note.txt")
+            _ = removeIfExists(base + "/$first")
+            _ = removeIfExists(base + "/x")
+            _ = removeIfExists(base)
+            _ = removeIfExists(markerPath)
         }
     }
 }

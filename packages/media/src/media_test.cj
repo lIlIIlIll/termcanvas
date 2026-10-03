@@ -7,7 +7,7 @@ import std.unittest.testmacro.*
 @When[os == "Windows"]
 func mediaStillTool(): String { "./testdata/media_tool.exe" }
 @When[os != "Windows"]
-func mediaStillTool(): String { "/usr/bin/printf" }
+func mediaStillTool(): String { "./testdata/media_tool" }
 @When[os == "Windows"]
 func mediaFrameTool(): String { "./testdata/media_tool.exe" }
 @When[os != "Windows"]

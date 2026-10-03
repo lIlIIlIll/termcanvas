@@ -1058,7 +1058,6 @@ public class FilePicker <: Widget {
     public func refresh(): Unit {
         let dirs = ArrayList<String>()
         let files = ArrayList<String>()
-        dirs.add("..")
         try {
             for (entry in Directory.readFrom(path)) {
                 let name = entry.name
@@ -1072,6 +1071,7 @@ public class FilePicker <: Widget {
                 }
             }
         } catch (_) {}
+        dirs.add("..", at: 0) // The parent action must precede every sorted directory name.
         for (file in files) {
             dirs.add(file)
         }
