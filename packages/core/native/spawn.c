@@ -3,6 +3,7 @@
  * The child uses only async-signal-safe libc calls and never returns to CJ. */
 #define _POSIX_C_SOURCE 200809L
 #include <errno.h>
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +12,19 @@
 #include <unistd.h>
 
 extern char **environ;
+
+/* Cangjie calls these fixed-arity entry points. In particular, Apple's ARM64
+ * ABI passes variadic arguments on the stack, so declaring libc fcntl/ioctl
+ * as fixed-arity foreign functions does not pass their third argument safely. */
+int32_t termcanvas_fcntl(int32_t fd, int32_t command, int32_t value)
+{
+    return fcntl(fd, command, value);
+}
+
+int32_t termcanvas_ioctl(int32_t fd, uint64_t request, void *argument)
+{
+    return ioctl(fd, (unsigned long)request, argument);
+}
 
 static void release_strings(char **strings)
 {

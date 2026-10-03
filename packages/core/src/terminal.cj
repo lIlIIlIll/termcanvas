@@ -49,12 +49,14 @@ foreign func tcsetattr(fd: Int32, optionalActions: Int32, termios: CPointer<Unit
 foreign func tcsetattr(fd: Int32, optionalActions: Int32, termios: CPointer<Unit>): Int32
 
 @FastNative
-@When[os == "Linux"]
-foreign func ioctl(fd: Int32, request: UInt64, argp: CPointer<Unit>): Int32
+@When[os != "Windows"]
+foreign func termcanvas_ioctl(fd: Int32, request: UInt64, argp: CPointer<Unit>): Int32
 
-@FastNative
-@When[os == "macOS"]
-foreign func ioctl(fd: Int32, request: UInt64, argp: CPointer<Unit>): Int32
+// A fixed-arity declaration of libc's variadic ioctl breaks Apple ARM64.
+@When[os != "Windows"]
+func ioctl(fd: Int32, request: UInt64, argp: CPointer<Unit>): Int32 {
+    unsafe { termcanvas_ioctl(fd, request, argp) }
+}
 
 @FastNative
 @When[os == "Linux"]

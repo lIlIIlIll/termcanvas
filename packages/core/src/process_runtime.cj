@@ -245,7 +245,11 @@ public class PosixProcessRuntime <: ProcessRuntime {
             _ = drain()
             if (!processes.isEmpty()) { sleep(Duration.millisecond) }
         }
-        for (process in processes) { process.forceClose() }
+        for (process in processes) {
+            process.forceClose()
+            totalOutput += process.outputBytes
+            totalBackpressure += process.backpressureCount
+        }
         processes.clear()
     }
 }

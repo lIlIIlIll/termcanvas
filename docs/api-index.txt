@@ -1362,131 +1362,131 @@ packages/core/src/process_runtime.cj:223:public func activeCount(): Int64
 packages/core/src/process_runtime.cj:224:public func nextTimeoutMillis(): ?Int64
 packages/core/src/process_runtime.cj:232:public func metrics(): ProcessMetrics
 packages/core/src/process_runtime.cj:239:public func closeAll(): Unit
-packages/core/src/process_runtime.cj:429:public class Utf8StreamDecoder {
-packages/core/src/process_runtime.cj:431:public init()
-packages/core/src/process_runtime.cj:432:public func feed(bytes: Array<Byte>): String
-packages/core/src/process_runtime.cj:466:public func finish(): String
-packages/core/src/pty.cj:92:public enum PtyOutputStream {
-packages/core/src/pty.cj:93:Stdout
-packages/core/src/pty.cj:94:Stderr
-packages/core/src/pty.cj:97:public struct PtySize {
-packages/core/src/pty.cj:98:public let cols: Int64
-packages/core/src/pty.cj:99:public let rows: Int64
-packages/core/src/pty.cj:101:public init(cols!: Int64 = 80, rows!: Int64 = 24)
-packages/core/src/pty.cj:115:public class PtySpec {
-packages/core/src/pty.cj:116:public let command: String
-packages/core/src/pty.cj:117:public let args: Array<String>
-packages/core/src/pty.cj:118:public let cwd: String
-packages/core/src/pty.cj:119:public let env: Array<String>
-packages/core/src/pty.cj:120:public let size: PtySize
-packages/core/src/pty.cj:122:public init( command: String, args!: Array<String> = [], cwd!: String = "", env!: Array<String> = [], size!: PtySize = PtySize() )
-packages/core/src/pty.cj:137:public enum PtySignal {
-packages/core/src/pty.cj:138:Interrupt
-packages/core/src/pty.cj:139:Terminate
-packages/core/src/pty.cj:140:Kill
-packages/core/src/pty.cj:143:public enum PtyExitStatus {
-packages/core/src/pty.cj:144:Exited(Int64)
-packages/core/src/pty.cj:145:Signaled(Int32)
-packages/core/src/pty.cj:148:public interface PtyProcess {
-packages/core/src/pty.cj:149:func id(): String
-packages/core/src/pty.cj:153:func write(bytes: Array<Byte>): Bool
-packages/core/src/pty.cj:154:func writeText(text: String): Bool
-packages/core/src/pty.cj:155:func resize(size: PtySize): Bool
-packages/core/src/pty.cj:156:func signal(signal: PtySignal): Bool
-packages/core/src/pty.cj:159:func close(): Unit
-packages/core/src/pty.cj:162:public interface PtyRuntime {
-packages/core/src/pty.cj:164:func start(id: String, spec: PtySpec): Event
-packages/core/src/pty.cj:165:func process(id: String): ?PtyProcess
-packages/core/src/pty.cj:166:func write(id: String, bytes: Array<Byte>): Event
-packages/core/src/pty.cj:167:func resize(id: String, size: PtySize): Event
-packages/core/src/pty.cj:168:func signal(id: String, signal: PtySignal): Event
-packages/core/src/pty.cj:171:func close(id: String): Event
-packages/core/src/pty.cj:172:func sources(): Array<EventSource>
-packages/core/src/pty.cj:173:func drain(): Array<Event>
-packages/core/src/pty.cj:174:func activeCount(): Int64
-packages/core/src/pty.cj:177:public enum EventSourceInterest {
-packages/core/src/pty.cj:178:Read
-packages/core/src/pty.cj:179:Write
-packages/core/src/pty.cj:180:ReadWrite
-packages/core/src/pty.cj:183:public interface EventSource {
-packages/core/src/pty.cj:184:func id(): String
-packages/core/src/pty.cj:185:func fd(): ?Int32
-packages/core/src/pty.cj:188:func waitHandle(): ?CPointer<Unit>
-packages/core/src/pty.cj:189:func interests(): EventSourceInterest
-packages/core/src/pty.cj:190:func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
-packages/core/src/pty.cj:191:func drain(): Array<Event>
-packages/core/src/pty.cj:192:func close(): Unit
-packages/core/src/pty.cj:195:public class FakePtyProcess <: PtyProcess {
-packages/core/src/pty.cj:197:public var lastWrite: Array<Byte> = []
-packages/core/src/pty.cj:198:public var lastSize: PtySize
-packages/core/src/pty.cj:199:public var lastSignal: ?PtySignal = None
-packages/core/src/pty.cj:200:public var closed: Bool = false
-packages/core/src/pty.cj:202:public init(id: String, size!: PtySize = PtySize())
-packages/core/src/pty.cj:207:public func id(): String
-packages/core/src/pty.cj:209:public func write(bytes: Array<Byte>): Bool
-packages/core/src/pty.cj:214:public func writeText(text: String): Bool
-packages/core/src/pty.cj:218:public func resize(size: PtySize): Bool
-packages/core/src/pty.cj:223:public func signal(signal: PtySignal): Bool
-packages/core/src/pty.cj:228:public func close(): Unit
-packages/core/src/pty.cj:233:public class FakePtyRuntime <: PtyRuntime {
-packages/core/src/pty.cj:237:public init()
-packages/core/src/pty.cj:239:public func start(id: String, spec: PtySpec): Event
-packages/core/src/pty.cj:246:public func process(id: String): ?PtyProcess
-packages/core/src/pty.cj:253:public func fakeProcess(id: String): ?FakePtyProcess
-packages/core/src/pty.cj:258:public func sources(): Array<EventSource>
-packages/core/src/pty.cj:260:public func injectOutput(id: String, bytes: Array<Byte>, stream!: PtyOutputStream = PtyOutputStream.Stdout): Unit
-packages/core/src/pty.cj:264:public func injectText(id: String, text: String, stream!: PtyOutputStream = PtyOutputStream.Stdout): Unit
-packages/core/src/pty.cj:268:public func injectExit(id: String, status: PtyExitStatus): Unit
-packages/core/src/pty.cj:273:public func injectFailure(id: String, message: String): Unit
-packages/core/src/pty.cj:278:public func write(id: String, bytes: Array<Byte>): Event
-packages/core/src/pty.cj:286:public func resize(id: String, size: PtySize): Event
-packages/core/src/pty.cj:294:public func signal(id: String, signal: PtySignal): Event
-packages/core/src/pty.cj:302:public func close(id: String): Event
-packages/core/src/pty.cj:313:public func drain(): Array<Event>
-packages/core/src/pty.cj:321:public func activeCount(): Int64
-packages/core/src/pty.cj:341:public class UnsupportedPtyRuntime <: PtyRuntime {
-packages/core/src/pty.cj:342:public init()
-packages/core/src/pty.cj:344:public func start(id: String, spec: PtySpec): Event
-packages/core/src/pty.cj:348:public func process(id: String): ?PtyProcess
-packages/core/src/pty.cj:353:public func write(id: String, bytes: Array<Byte>): Event
-packages/core/src/pty.cj:357:public func resize(id: String, size: PtySize): Event
-packages/core/src/pty.cj:361:public func signal(id: String, signal: PtySignal): Event
-packages/core/src/pty.cj:365:public func close(id: String): Event
-packages/core/src/pty.cj:369:public func sources(): Array<EventSource>
-packages/core/src/pty.cj:371:public func drain(): Array<Event>
-packages/core/src/pty.cj:373:public func activeCount(): Int64
-packages/core/src/pty.cj:376:public struct PtyFlowMetrics {
-packages/core/src/pty.cj:377:public let queuedBytes: Int64
-packages/core/src/pty.cj:378:public let peakQueuedBytes: Int64
-packages/core/src/pty.cj:379:public let backpressureCount: Int64
-packages/core/src/pty.cj:380:public init(queuedBytes: Int64, peakQueuedBytes: Int64, backpressureCount: Int64)
-packages/core/src/pty.cj:403:public class LinuxPtyRuntime <: PtyRuntime {
-packages/core/src/pty.cj:411:public init(readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 2 * 1024 * 1024, maxProcesses!: Int64 = 32)
-packages/core/src/pty.cj:415:public func flowMetrics(): PtyFlowMetrics
-packages/core/src/pty.cj:417:public func start(id: String, spec: PtySpec): Event
-packages/core/src/pty.cj:488:public func process(id: String): ?PtyProcess
-packages/core/src/pty.cj:495:public func write(id: String, bytes: Array<Byte>): Event
-packages/core/src/pty.cj:503:public func resize(id: String, size: PtySize): Event
-packages/core/src/pty.cj:511:public func signal(id: String, signal: PtySignal): Event
-packages/core/src/pty.cj:519:public func close(id: String): Event
-packages/core/src/pty.cj:535:public func sources(): Array<EventSource>
-packages/core/src/pty.cj:545:public func drain(): Array<Event>
-packages/core/src/pty.cj:579:public func activeCount(): Int64
-packages/core/src/pty.cj:595:public class LinuxPtyProcess <: PtyProcess & EventSource {
-packages/core/src/pty.cj:611:public init(id: String, fd: Int32, stderrFd: Int32, pid: Int32, size: PtySize, events: ArrayList<Event>)
-packages/core/src/pty.cj:624:public func id(): String
-packages/core/src/pty.cj:626:public func fd(): ?Int32
-packages/core/src/pty.cj:630:public func interests(): EventSourceInterest
-packages/core/src/pty.cj:634:public func stderrSource(): EventSource
-packages/core/src/pty.cj:636:public func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
-packages/core/src/pty.cj:645:public func write(bytes: Array<Byte>): Bool
-packages/core/src/pty.cj:679:public func writeText(text: String): Bool
-packages/core/src/pty.cj:683:public func resize(size: PtySize): Bool
-packages/core/src/pty.cj:699:public func signal(signal: PtySignal): Bool
-packages/core/src/pty.cj:704:public func close(): Unit
-packages/core/src/pty.cj:771:public func drain(): Array<Event>
-packages/core/src/pty.cj:773:public func pollExit(): ?PtyExitStatus
-packages/core/src/pty.cj:784:public func reap(): PtyExitStatus
+packages/core/src/process_runtime.cj:433:public class Utf8StreamDecoder {
+packages/core/src/process_runtime.cj:435:public init()
+packages/core/src/process_runtime.cj:436:public func feed(bytes: Array<Byte>): String
+packages/core/src/process_runtime.cj:470:public func finish(): String
+packages/core/src/pty.cj:98:public enum PtyOutputStream {
+packages/core/src/pty.cj:99:Stdout
+packages/core/src/pty.cj:100:Stderr
+packages/core/src/pty.cj:103:public struct PtySize {
+packages/core/src/pty.cj:104:public let cols: Int64
+packages/core/src/pty.cj:105:public let rows: Int64
+packages/core/src/pty.cj:107:public init(cols!: Int64 = 80, rows!: Int64 = 24)
+packages/core/src/pty.cj:121:public class PtySpec {
+packages/core/src/pty.cj:122:public let command: String
+packages/core/src/pty.cj:123:public let args: Array<String>
+packages/core/src/pty.cj:124:public let cwd: String
+packages/core/src/pty.cj:125:public let env: Array<String>
+packages/core/src/pty.cj:126:public let size: PtySize
+packages/core/src/pty.cj:128:public init( command: String, args!: Array<String> = [], cwd!: String = "", env!: Array<String> = [], size!: PtySize = PtySize() )
+packages/core/src/pty.cj:143:public enum PtySignal {
+packages/core/src/pty.cj:144:Interrupt
+packages/core/src/pty.cj:145:Terminate
+packages/core/src/pty.cj:146:Kill
+packages/core/src/pty.cj:149:public enum PtyExitStatus {
+packages/core/src/pty.cj:150:Exited(Int64)
+packages/core/src/pty.cj:151:Signaled(Int32)
+packages/core/src/pty.cj:154:public interface PtyProcess {
+packages/core/src/pty.cj:155:func id(): String
+packages/core/src/pty.cj:159:func write(bytes: Array<Byte>): Bool
+packages/core/src/pty.cj:160:func writeText(text: String): Bool
+packages/core/src/pty.cj:161:func resize(size: PtySize): Bool
+packages/core/src/pty.cj:162:func signal(signal: PtySignal): Bool
+packages/core/src/pty.cj:165:func close(): Unit
+packages/core/src/pty.cj:168:public interface PtyRuntime {
+packages/core/src/pty.cj:170:func start(id: String, spec: PtySpec): Event
+packages/core/src/pty.cj:171:func process(id: String): ?PtyProcess
+packages/core/src/pty.cj:172:func write(id: String, bytes: Array<Byte>): Event
+packages/core/src/pty.cj:173:func resize(id: String, size: PtySize): Event
+packages/core/src/pty.cj:174:func signal(id: String, signal: PtySignal): Event
+packages/core/src/pty.cj:177:func close(id: String): Event
+packages/core/src/pty.cj:178:func sources(): Array<EventSource>
+packages/core/src/pty.cj:179:func drain(): Array<Event>
+packages/core/src/pty.cj:180:func activeCount(): Int64
+packages/core/src/pty.cj:183:public enum EventSourceInterest {
+packages/core/src/pty.cj:184:Read
+packages/core/src/pty.cj:185:Write
+packages/core/src/pty.cj:186:ReadWrite
+packages/core/src/pty.cj:189:public interface EventSource {
+packages/core/src/pty.cj:190:func id(): String
+packages/core/src/pty.cj:191:func fd(): ?Int32
+packages/core/src/pty.cj:194:func waitHandle(): ?CPointer<Unit>
+packages/core/src/pty.cj:195:func interests(): EventSourceInterest
+packages/core/src/pty.cj:196:func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
+packages/core/src/pty.cj:197:func drain(): Array<Event>
+packages/core/src/pty.cj:198:func close(): Unit
+packages/core/src/pty.cj:201:public class FakePtyProcess <: PtyProcess {
+packages/core/src/pty.cj:203:public var lastWrite: Array<Byte> = []
+packages/core/src/pty.cj:204:public var lastSize: PtySize
+packages/core/src/pty.cj:205:public var lastSignal: ?PtySignal = None
+packages/core/src/pty.cj:206:public var closed: Bool = false
+packages/core/src/pty.cj:208:public init(id: String, size!: PtySize = PtySize())
+packages/core/src/pty.cj:213:public func id(): String
+packages/core/src/pty.cj:215:public func write(bytes: Array<Byte>): Bool
+packages/core/src/pty.cj:220:public func writeText(text: String): Bool
+packages/core/src/pty.cj:224:public func resize(size: PtySize): Bool
+packages/core/src/pty.cj:229:public func signal(signal: PtySignal): Bool
+packages/core/src/pty.cj:234:public func close(): Unit
+packages/core/src/pty.cj:239:public class FakePtyRuntime <: PtyRuntime {
+packages/core/src/pty.cj:243:public init()
+packages/core/src/pty.cj:245:public func start(id: String, spec: PtySpec): Event
+packages/core/src/pty.cj:252:public func process(id: String): ?PtyProcess
+packages/core/src/pty.cj:259:public func fakeProcess(id: String): ?FakePtyProcess
+packages/core/src/pty.cj:264:public func sources(): Array<EventSource>
+packages/core/src/pty.cj:266:public func injectOutput(id: String, bytes: Array<Byte>, stream!: PtyOutputStream = PtyOutputStream.Stdout): Unit
+packages/core/src/pty.cj:270:public func injectText(id: String, text: String, stream!: PtyOutputStream = PtyOutputStream.Stdout): Unit
+packages/core/src/pty.cj:274:public func injectExit(id: String, status: PtyExitStatus): Unit
+packages/core/src/pty.cj:279:public func injectFailure(id: String, message: String): Unit
+packages/core/src/pty.cj:284:public func write(id: String, bytes: Array<Byte>): Event
+packages/core/src/pty.cj:292:public func resize(id: String, size: PtySize): Event
+packages/core/src/pty.cj:300:public func signal(id: String, signal: PtySignal): Event
+packages/core/src/pty.cj:308:public func close(id: String): Event
+packages/core/src/pty.cj:319:public func drain(): Array<Event>
+packages/core/src/pty.cj:327:public func activeCount(): Int64
+packages/core/src/pty.cj:347:public class UnsupportedPtyRuntime <: PtyRuntime {
+packages/core/src/pty.cj:348:public init()
+packages/core/src/pty.cj:350:public func start(id: String, spec: PtySpec): Event
+packages/core/src/pty.cj:354:public func process(id: String): ?PtyProcess
+packages/core/src/pty.cj:359:public func write(id: String, bytes: Array<Byte>): Event
+packages/core/src/pty.cj:363:public func resize(id: String, size: PtySize): Event
+packages/core/src/pty.cj:367:public func signal(id: String, signal: PtySignal): Event
+packages/core/src/pty.cj:371:public func close(id: String): Event
+packages/core/src/pty.cj:375:public func sources(): Array<EventSource>
+packages/core/src/pty.cj:377:public func drain(): Array<Event>
+packages/core/src/pty.cj:379:public func activeCount(): Int64
+packages/core/src/pty.cj:382:public struct PtyFlowMetrics {
+packages/core/src/pty.cj:383:public let queuedBytes: Int64
+packages/core/src/pty.cj:384:public let peakQueuedBytes: Int64
+packages/core/src/pty.cj:385:public let backpressureCount: Int64
+packages/core/src/pty.cj:386:public init(queuedBytes: Int64, peakQueuedBytes: Int64, backpressureCount: Int64)
+packages/core/src/pty.cj:409:public class LinuxPtyRuntime <: PtyRuntime {
+packages/core/src/pty.cj:417:public init(readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 2 * 1024 * 1024, maxProcesses!: Int64 = 32)
+packages/core/src/pty.cj:421:public func flowMetrics(): PtyFlowMetrics
+packages/core/src/pty.cj:423:public func start(id: String, spec: PtySpec): Event
+packages/core/src/pty.cj:494:public func process(id: String): ?PtyProcess
+packages/core/src/pty.cj:501:public func write(id: String, bytes: Array<Byte>): Event
+packages/core/src/pty.cj:509:public func resize(id: String, size: PtySize): Event
+packages/core/src/pty.cj:517:public func signal(id: String, signal: PtySignal): Event
+packages/core/src/pty.cj:525:public func close(id: String): Event
+packages/core/src/pty.cj:541:public func sources(): Array<EventSource>
+packages/core/src/pty.cj:551:public func drain(): Array<Event>
+packages/core/src/pty.cj:585:public func activeCount(): Int64
+packages/core/src/pty.cj:601:public class LinuxPtyProcess <: PtyProcess & EventSource {
+packages/core/src/pty.cj:617:public init(id: String, fd: Int32, stderrFd: Int32, pid: Int32, size: PtySize, events: ArrayList<Event>)
+packages/core/src/pty.cj:630:public func id(): String
+packages/core/src/pty.cj:632:public func fd(): ?Int32
+packages/core/src/pty.cj:636:public func interests(): EventSourceInterest
+packages/core/src/pty.cj:640:public func stderrSource(): EventSource
+packages/core/src/pty.cj:642:public func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
+packages/core/src/pty.cj:651:public func write(bytes: Array<Byte>): Bool
+packages/core/src/pty.cj:685:public func writeText(text: String): Bool
+packages/core/src/pty.cj:689:public func resize(size: PtySize): Bool
+packages/core/src/pty.cj:705:public func signal(signal: PtySignal): Bool
+packages/core/src/pty.cj:710:public func close(): Unit
+packages/core/src/pty.cj:777:public func drain(): Array<Event>
+packages/core/src/pty.cj:779:public func pollExit(): ?PtyExitStatus
+packages/core/src/pty.cj:790:public func reap(): PtyExitStatus
 packages/core/src/runtime_foundation.cj:23:public enum RuntimeState {
 packages/core/src/runtime_foundation.cj:24:Running
 packages/core/src/runtime_foundation.cj:25:Closing
@@ -1693,260 +1693,260 @@ packages/core/src/style.cj:134:Selected
 packages/core/src/style.cj:135:Disabled
 packages/core/src/style.cj:136:Error
 packages/core/src/style.cj:137:Accent
-packages/core/src/terminal.cj:120:public enum CursorShape {
-packages/core/src/terminal.cj:121:Block
-packages/core/src/terminal.cj:122:Bar
-packages/core/src/terminal.cj:133:public interface Backend {
-packages/core/src/terminal.cj:134:func clear(): Unit
-packages/core/src/terminal.cj:135:func moveTo(x: Int64, y: Int64): Unit
-packages/core/src/terminal.cj:136:func enterAlternateScreen(): Unit
-packages/core/src/terminal.cj:137:func leaveAlternateScreen(): Unit
-packages/core/src/terminal.cj:138:func hideCursor(): Unit
-packages/core/src/terminal.cj:139:func showCursor(): Unit
-packages/core/src/terminal.cj:140:func setCursorShape(_: ?CursorShape): Unit
-packages/core/src/terminal.cj:141:func enableMouse(): Unit
-packages/core/src/terminal.cj:142:func disableMouse(): Unit
-packages/core/src/terminal.cj:143:func enableBracketedPaste(): Unit
-packages/core/src/terminal.cj:144:func disableBracketedPaste(): Unit
-packages/core/src/terminal.cj:145:func size(): Rect
-packages/core/src/terminal.cj:146:func draw(buffer: Buffer): Unit
-packages/core/src/terminal.cj:147:func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
-packages/core/src/terminal.cj:148:func drawMedia(ops: Array<MediaOp>): Unit
-packages/core/src/terminal.cj:149:func write(text: String): Unit
-packages/core/src/terminal.cj:150:func flush(): Unit
-packages/core/src/terminal.cj:153:func setInstrumentationEnabled(_: Bool): Unit
-packages/core/src/terminal.cj:154:func diagnosticByteCount(): Int64
-packages/core/src/terminal.cj:157:public struct RenderDiffSpan {
-packages/core/src/terminal.cj:158:public let x: Int64
-packages/core/src/terminal.cj:159:public let y: Int64
-packages/core/src/terminal.cj:160:public let text: String
-packages/core/src/terminal.cj:161:public let style: Style
-packages/core/src/terminal.cj:163:public init(x: Int64, y: Int64, text: String, style: Style)
-packages/core/src/terminal.cj:171:public struct RenderDiffPlan {
-packages/core/src/terminal.cj:172:public let dirtyCells: Int64
-packages/core/src/terminal.cj:173:public let spans: Array<RenderDiffSpan>
-packages/core/src/terminal.cj:175:public init(dirtyCells: Int64, spans: Array<RenderDiffSpan>)
-packages/core/src/terminal.cj:181:public class Frame {
-packages/core/src/terminal.cj:182:public let area: Rect
-packages/core/src/terminal.cj:188:public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None)
-packages/core/src/terminal.cj:194:public func renderWidget(widget: Widget, area: Rect): Unit
-packages/core/src/terminal.cj:199:public func canvas(area!: Rect = this.area): Canvas
-packages/core/src/terminal.cj:203:public func fill(area: Rect, style: Style): Unit
-packages/core/src/terminal.cj:208:public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit
-packages/core/src/terminal.cj:213:public func isDirty(area: Rect): Bool
-packages/core/src/terminal.cj:220:public func isDirtyCell(x: Int64, y: Int64): Bool
-packages/core/src/terminal.cj:227:public func dirtyRects(): Array<Rect>
-packages/core/src/terminal.cj:234:public func addMedia(placement: MediaPlacement): Unit
-packages/core/src/terminal.cj:238:public func setCursor(position: Position): Unit
-packages/core/src/terminal.cj:242:public func setCursorShape(shape: CursorShape): Unit
-packages/core/src/terminal.cj:250:public func getCursor(): ?Position
-packages/core/src/terminal.cj:255:public enum RenderMode {
-packages/core/src/terminal.cj:256:Diff
-packages/core/src/terminal.cj:257:Full
-packages/core/src/terminal.cj:260:public class Terminal {
-packages/core/src/terminal.cj:270:public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )
-packages/core/src/terminal.cj:281:public func draw(render: (Frame) -> Unit): RenderMetrics
-packages/core/src/terminal.cj:285:public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
-packages/core/src/terminal.cj:436:public func clear(): Unit
-packages/core/src/terminal.cj:597:public enum KeyboardProtocolMode {
-packages/core/src/terminal.cj:598:Basic
-packages/core/src/terminal.cj:599:ModifyOtherKeys
-packages/core/src/terminal.cj:600:Kitty
-packages/core/src/terminal.cj:601:Auto
-packages/core/src/terminal.cj:604:public enum TerminalProbeMode {
-packages/core/src/terminal.cj:605:Disabled
-packages/core/src/terminal.cj:606:EnvOnly
-packages/core/src/terminal.cj:607:Active
-packages/core/src/terminal.cj:610:public struct KeyboardOptions {
-packages/core/src/terminal.cj:611:public let mode: KeyboardProtocolMode
-packages/core/src/terminal.cj:612:public let probe: TerminalProbeMode
-packages/core/src/terminal.cj:613:public let probeBudgetMillis: Int64
-packages/core/src/terminal.cj:614:public let escDelayMillis: Int64
-packages/core/src/terminal.cj:615:public let repeatHeldMillis: Int64
-packages/core/src/terminal.cj:617:public init( mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic, probe!: TerminalProbeMode = TerminalProbeMode.Disabled, probeBudgetMillis!: Int64 = 100, escDelayMillis!: Int64 = 25, repeatHeldMillis!: Int64 = 120 )
-packages/core/src/terminal.cj:632:public struct TerminalProbeResult {
-packages/core/src/terminal.cj:633:public let capabilities: TerminalCapabilities
-packages/core/src/terminal.cj:636:public let consumedBytes: Array<Byte>
-packages/core/src/terminal.cj:637:public let budgetMillis: Int64
-packages/core/src/terminal.cj:638:public let elapsedMillis: Int64
-packages/core/src/terminal.cj:640:public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64)
-packages/core/src/terminal.cj:648:public class TerminalProbe {
-packages/core/src/terminal.cj:649:public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult
-packages/core/src/terminal.cj:698:public class TerminalSession {
-packages/core/src/terminal.cj:723:public prop rawModeEnabled: Bool { get() { rawActive } }
-packages/core/src/terminal.cj:725:public init( backend: Backend, driver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions() )
-packages/core/src/terminal.cj:751:public func probeResult(): ?TerminalProbeResult
-packages/core/src/terminal.cj:766:public func start(): Bool
-packages/core/src/terminal.cj:809:public func stop(): Unit
-packages/core/src/terminal.cj:817:public func run(action: () -> Unit): Unit
-packages/core/src/terminal.cj:1088:public interface TerminalDriver {
-packages/core/src/terminal.cj:1089:func name(): String
-packages/core/src/terminal.cj:1090:func enterRawMode(): Bool
-packages/core/src/terminal.cj:1091:func restore(): Unit
-packages/core/src/terminal.cj:1092:func size(): ?Rect
-packages/core/src/terminal.cj:1093:func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1097:public class LinuxTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1098:public init()
-packages/core/src/terminal.cj:1100:public func name(): String
-packages/core/src/terminal.cj:1101:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1102:public func restore(): Unit
-packages/core/src/terminal.cj:1103:public func size(): ?Rect
-packages/core/src/terminal.cj:1104:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1109:public class FallbackTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1111:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1115:public func name(): String
-packages/core/src/terminal.cj:1116:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1117:public func restore(): Unit
-packages/core/src/terminal.cj:1118:public func size(): ?Rect
-packages/core/src/terminal.cj:1119:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1133:public class MacOSTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1136:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1140:public func name(): String
-packages/core/src/terminal.cj:1141:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1142:public func restore(): Unit
-packages/core/src/terminal.cj:1143:public func size(): ?Rect
-packages/core/src/terminal.cj:1144:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1158:public class MacOSTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1159:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1163:public func name(): String
-packages/core/src/terminal.cj:1164:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1165:public func restore(): Unit
-packages/core/src/terminal.cj:1166:public func size(): ?Rect
-packages/core/src/terminal.cj:1167:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1173:public class WindowsTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1176:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1180:public func name(): String
-packages/core/src/terminal.cj:1181:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1182:public func restore(): Unit
-packages/core/src/terminal.cj:1183:public func size(): ?Rect
-packages/core/src/terminal.cj:1184:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1198:public class WindowsTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1199:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1203:public func name(): String
-packages/core/src/terminal.cj:1204:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1205:public func restore(): Unit
-packages/core/src/terminal.cj:1206:public func size(): ?Rect
-packages/core/src/terminal.cj:1207:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1213:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1218:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1223:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1227:public class AnsiBackend <: Backend {
-packages/core/src/terminal.cj:1235:public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1241:public func clear(): Unit
-packages/core/src/terminal.cj:1245:public func moveTo(x: Int64, y: Int64): Unit
-packages/core/src/terminal.cj:1249:public func enterAlternateScreen(): Unit
-packages/core/src/terminal.cj:1250:public func leaveAlternateScreen(): Unit
-packages/core/src/terminal.cj:1251:public func hideCursor(): Unit
-packages/core/src/terminal.cj:1252:public func showCursor(): Unit
-packages/core/src/terminal.cj:1253:public func setCursorShape(shape: ?CursorShape): Unit
-packages/core/src/terminal.cj:1259:public func enableMouse(): Unit
-packages/core/src/terminal.cj:1260:public func disableMouse(): Unit
-packages/core/src/terminal.cj:1261:public func enableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1262:public func disableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1264:public func size(): Rect
-packages/core/src/terminal.cj:1271:public func draw(buffer: Buffer): Unit
-packages/core/src/terminal.cj:1290:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
-packages/core/src/terminal.cj:1311:public func drawMedia(ops: Array<MediaOp>): Unit
-packages/core/src/terminal.cj:1321:public func write(text: String): Unit
-packages/core/src/terminal.cj:1327:public func setInstrumentationEnabled(enabled: Bool): Unit
-packages/core/src/terminal.cj:1331:public func diagnosticByteCount(): Int64
-packages/core/src/terminal.cj:1335:public func flush(): Unit
-packages/core/src/terminal.cj:1363:public class TestBackend <: Backend {
-packages/core/src/terminal.cj:1377:public init( area!: Rect = Rect(0, 0, 80, 24), captureSnapshots!: Bool = true )
-packages/core/src/terminal.cj:1385:public func clear(): Unit
-packages/core/src/terminal.cj:1389:public func moveTo(x: Int64, y: Int64): Unit
-packages/core/src/terminal.cj:1393:public func enterAlternateScreen(): Unit
-packages/core/src/terminal.cj:1394:public func leaveAlternateScreen(): Unit
-packages/core/src/terminal.cj:1395:public func hideCursor(): Unit
-packages/core/src/terminal.cj:1396:public func showCursor(): Unit
-packages/core/src/terminal.cj:1397:public func setCursorShape(shape: ?CursorShape): Unit
-packages/core/src/terminal.cj:1403:public func enableMouse(): Unit
-packages/core/src/terminal.cj:1404:public func disableMouse(): Unit
-packages/core/src/terminal.cj:1405:public func enableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1406:public func disableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1408:public func size(): Rect
-packages/core/src/terminal.cj:1412:public func setSize(area: Rect): Unit
-packages/core/src/terminal.cj:1416:public func draw(buffer: Buffer): Unit
-packages/core/src/terminal.cj:1426:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
-packages/core/src/terminal.cj:1436:public func drawMedia(ops: Array<MediaOp>): Unit
-packages/core/src/terminal.cj:1443:public func write(text: String): Unit
-packages/core/src/terminal.cj:1449:public func flush(): Unit
-packages/core/src/terminal.cj:1451:public func output(): String
-packages/core/src/terminal.cj:1455:public func clearOutput(): Unit
-packages/core/src/terminal.cj:1461:public func lastBuffer(): ?Buffer
-packages/core/src/terminal.cj:1465:public func lastDiffOps(): Int64
-packages/core/src/terminal.cj:1469:public func lastDiffWrites(): Int64
-packages/core/src/terminal.cj:1473:public func lastMediaOps(): Array<MediaOp>
-packages/core/src/terminal.cj:1478:public func mediaFrameCount(): Int64
-packages/core/src/terminal.cj:1482:public func snapshot(): String
-packages/core/src/terminal.cj:1489:public func snapshots(): Array<String>
-packages/core/src/terminal.cj:1493:public func snapshotAt(index: Int64): String
-packages/core/src/terminal.cj:1498:public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool
-packages/core/src/terminal.cj:1507:public func assertSnapshot(expected: String): Bool
-packages/core/src/terminal.cj:1511:public func assertSnapshotAt(index: Int64, expected: String): Bool
-packages/core/src/terminal.cj:1515:public func assertLastMediaOpCount(expected: Int64): Bool
-packages/core/src/terminal.cj:1528:public struct TerminalCapabilities {
-packages/core/src/terminal.cj:1529:public let size: Rect
-packages/core/src/terminal.cj:1530:public let trueColor: Bool
-packages/core/src/terminal.cj:1531:public let colorLevel: Int64
-packages/core/src/terminal.cj:1532:public let mouse: Bool
-packages/core/src/terminal.cj:1533:public let mouseMove: Bool
-packages/core/src/terminal.cj:1534:public let focusEvents: Bool
-packages/core/src/terminal.cj:1535:public let bracketedPaste: Bool
-packages/core/src/terminal.cj:1536:public let alternateScreen: Bool
-packages/core/src/terminal.cj:1537:public let unicode: Bool
-packages/core/src/terminal.cj:1538:public let kittyGraphics: Bool
-packages/core/src/terminal.cj:1539:public let sixel: Bool
-packages/core/src/terminal.cj:1540:public let osc8: Bool
-packages/core/src/terminal.cj:1541:public let keyboardProtocol: KeyProtocol
-packages/core/src/terminal.cj:1542:public let keyUp: Bool
-packages/core/src/terminal.cj:1543:public let keyRepeat: Bool
-packages/core/src/terminal.cj:1544:public let recommendedFps: Int64
-packages/core/src/terminal.cj:1545:public let cellWidthPixels: Int64
-packages/core/src/terminal.cj:1546:public let cellHeightPixels: Int64
-packages/core/src/terminal.cj:1547:public let driverName: String
-packages/core/src/terminal.cj:1549:public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = "linux-glibc" )
-packages/core/src/terminal.cj:1591:public static func detect(backend!: Backend = AnsiBackend(), driverName!: String = "linux-glibc"): TerminalCapabilities
-packages/core/src/terminal.cj:1701:public struct RenderMetrics {
-packages/core/src/terminal.cj:1702:public let size: Rect
-packages/core/src/terminal.cj:1703:public let dirtyCells: Int64
-packages/core/src/terminal.cj:1704:public let diffWrites: Int64
-packages/core/src/terminal.cj:1705:public let mediaOps: Int64
-packages/core/src/terminal.cj:1706:public let fullRedraw: Bool
-packages/core/src/terminal.cj:1707:public let renderMillis: Int64
-packages/core/src/terminal.cj:1708:public let drawMillis: Int64
-packages/core/src/terminal.cj:1709:public let totalMillis: Int64
-packages/core/src/terminal.cj:1710:public let renderedCells: Int64
-packages/core/src/terminal.cj:1711:public let dirtyRects: Int64
-packages/core/src/terminal.cj:1712:public let copiedCells: Int64
-packages/core/src/terminal.cj:1713:public let bufferCellAttempts: Int64
-packages/core/src/terminal.cj:1714:public let bufferCellWrites: Int64
-packages/core/src/terminal.cj:1715:public let diffCells: Int64
-packages/core/src/terminal.cj:1716:public let diffSpans: Int64
-packages/core/src/terminal.cj:1717:public let renderNanos: Int64
-packages/core/src/terminal.cj:1718:public let diffNanos: Int64
-packages/core/src/terminal.cj:1719:public let writeNanos: Int64
-packages/core/src/terminal.cj:1720:public let totalNanos: Int64
-packages/core/src/terminal.cj:1721:public let ansiBytes: Int64
-packages/core/src/terminal.cj:1723:public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
-packages/core/src/terminal.cj:1766:public class DebugOverlay <: Widget {
-packages/core/src/terminal.cj:1770:public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
-packages/core/src/terminal.cj:1775:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/terminal.cj:1800:public class TerminalMode {
-packages/core/src/terminal.cj:1806:public static func lastError(): ?String
-packages/core/src/terminal.cj:1810:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:1850:public static func restore(): Unit
-packages/core/src/terminal.cj:1868:public static func size(): ?Rect
-packages/core/src/terminal.cj:1906:public class MacOSTerminalMode {
-packages/core/src/terminal.cj:1913:public static func lastError(): ?String
-packages/core/src/terminal.cj:1917:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:1963:public static func restore(): Unit
-packages/core/src/terminal.cj:1981:public static func size(): ?Rect
-packages/core/src/terminal.cj:2002:public class WindowsConsoleMode {
-packages/core/src/terminal.cj:2009:public static func lastError(): ?String
-packages/core/src/terminal.cj:2013:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:2053:public static func restore(): Unit
-packages/core/src/terminal.cj:2071:public static func size(): ?Rect
+packages/core/src/terminal.cj:122:public enum CursorShape {
+packages/core/src/terminal.cj:123:Block
+packages/core/src/terminal.cj:124:Bar
+packages/core/src/terminal.cj:135:public interface Backend {
+packages/core/src/terminal.cj:136:func clear(): Unit
+packages/core/src/terminal.cj:137:func moveTo(x: Int64, y: Int64): Unit
+packages/core/src/terminal.cj:138:func enterAlternateScreen(): Unit
+packages/core/src/terminal.cj:139:func leaveAlternateScreen(): Unit
+packages/core/src/terminal.cj:140:func hideCursor(): Unit
+packages/core/src/terminal.cj:141:func showCursor(): Unit
+packages/core/src/terminal.cj:142:func setCursorShape(_: ?CursorShape): Unit
+packages/core/src/terminal.cj:143:func enableMouse(): Unit
+packages/core/src/terminal.cj:144:func disableMouse(): Unit
+packages/core/src/terminal.cj:145:func enableBracketedPaste(): Unit
+packages/core/src/terminal.cj:146:func disableBracketedPaste(): Unit
+packages/core/src/terminal.cj:147:func size(): Rect
+packages/core/src/terminal.cj:148:func draw(buffer: Buffer): Unit
+packages/core/src/terminal.cj:149:func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+packages/core/src/terminal.cj:150:func drawMedia(ops: Array<MediaOp>): Unit
+packages/core/src/terminal.cj:151:func write(text: String): Unit
+packages/core/src/terminal.cj:152:func flush(): Unit
+packages/core/src/terminal.cj:155:func setInstrumentationEnabled(_: Bool): Unit
+packages/core/src/terminal.cj:156:func diagnosticByteCount(): Int64
+packages/core/src/terminal.cj:159:public struct RenderDiffSpan {
+packages/core/src/terminal.cj:160:public let x: Int64
+packages/core/src/terminal.cj:161:public let y: Int64
+packages/core/src/terminal.cj:162:public let text: String
+packages/core/src/terminal.cj:163:public let style: Style
+packages/core/src/terminal.cj:165:public init(x: Int64, y: Int64, text: String, style: Style)
+packages/core/src/terminal.cj:173:public struct RenderDiffPlan {
+packages/core/src/terminal.cj:174:public let dirtyCells: Int64
+packages/core/src/terminal.cj:175:public let spans: Array<RenderDiffSpan>
+packages/core/src/terminal.cj:177:public init(dirtyCells: Int64, spans: Array<RenderDiffSpan>)
+packages/core/src/terminal.cj:183:public class Frame {
+packages/core/src/terminal.cj:184:public let area: Rect
+packages/core/src/terminal.cj:190:public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None)
+packages/core/src/terminal.cj:196:public func renderWidget(widget: Widget, area: Rect): Unit
+packages/core/src/terminal.cj:201:public func canvas(area!: Rect = this.area): Canvas
+packages/core/src/terminal.cj:205:public func fill(area: Rect, style: Style): Unit
+packages/core/src/terminal.cj:210:public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit
+packages/core/src/terminal.cj:215:public func isDirty(area: Rect): Bool
+packages/core/src/terminal.cj:222:public func isDirtyCell(x: Int64, y: Int64): Bool
+packages/core/src/terminal.cj:229:public func dirtyRects(): Array<Rect>
+packages/core/src/terminal.cj:236:public func addMedia(placement: MediaPlacement): Unit
+packages/core/src/terminal.cj:240:public func setCursor(position: Position): Unit
+packages/core/src/terminal.cj:244:public func setCursorShape(shape: CursorShape): Unit
+packages/core/src/terminal.cj:252:public func getCursor(): ?Position
+packages/core/src/terminal.cj:257:public enum RenderMode {
+packages/core/src/terminal.cj:258:Diff
+packages/core/src/terminal.cj:259:Full
+packages/core/src/terminal.cj:262:public class Terminal {
+packages/core/src/terminal.cj:272:public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )
+packages/core/src/terminal.cj:283:public func draw(render: (Frame) -> Unit): RenderMetrics
+packages/core/src/terminal.cj:287:public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
+packages/core/src/terminal.cj:438:public func clear(): Unit
+packages/core/src/terminal.cj:599:public enum KeyboardProtocolMode {
+packages/core/src/terminal.cj:600:Basic
+packages/core/src/terminal.cj:601:ModifyOtherKeys
+packages/core/src/terminal.cj:602:Kitty
+packages/core/src/terminal.cj:603:Auto
+packages/core/src/terminal.cj:606:public enum TerminalProbeMode {
+packages/core/src/terminal.cj:607:Disabled
+packages/core/src/terminal.cj:608:EnvOnly
+packages/core/src/terminal.cj:609:Active
+packages/core/src/terminal.cj:612:public struct KeyboardOptions {
+packages/core/src/terminal.cj:613:public let mode: KeyboardProtocolMode
+packages/core/src/terminal.cj:614:public let probe: TerminalProbeMode
+packages/core/src/terminal.cj:615:public let probeBudgetMillis: Int64
+packages/core/src/terminal.cj:616:public let escDelayMillis: Int64
+packages/core/src/terminal.cj:617:public let repeatHeldMillis: Int64
+packages/core/src/terminal.cj:619:public init( mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic, probe!: TerminalProbeMode = TerminalProbeMode.Disabled, probeBudgetMillis!: Int64 = 100, escDelayMillis!: Int64 = 25, repeatHeldMillis!: Int64 = 120 )
+packages/core/src/terminal.cj:634:public struct TerminalProbeResult {
+packages/core/src/terminal.cj:635:public let capabilities: TerminalCapabilities
+packages/core/src/terminal.cj:638:public let consumedBytes: Array<Byte>
+packages/core/src/terminal.cj:639:public let budgetMillis: Int64
+packages/core/src/terminal.cj:640:public let elapsedMillis: Int64
+packages/core/src/terminal.cj:642:public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64)
+packages/core/src/terminal.cj:650:public class TerminalProbe {
+packages/core/src/terminal.cj:651:public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult
+packages/core/src/terminal.cj:700:public class TerminalSession {
+packages/core/src/terminal.cj:725:public prop rawModeEnabled: Bool { get() { rawActive } }
+packages/core/src/terminal.cj:727:public init( backend: Backend, driver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions() )
+packages/core/src/terminal.cj:753:public func probeResult(): ?TerminalProbeResult
+packages/core/src/terminal.cj:768:public func start(): Bool
+packages/core/src/terminal.cj:811:public func stop(): Unit
+packages/core/src/terminal.cj:819:public func run(action: () -> Unit): Unit
+packages/core/src/terminal.cj:1090:public interface TerminalDriver {
+packages/core/src/terminal.cj:1091:func name(): String
+packages/core/src/terminal.cj:1092:func enterRawMode(): Bool
+packages/core/src/terminal.cj:1093:func restore(): Unit
+packages/core/src/terminal.cj:1094:func size(): ?Rect
+packages/core/src/terminal.cj:1095:func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1099:public class LinuxTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1100:public init()
+packages/core/src/terminal.cj:1102:public func name(): String
+packages/core/src/terminal.cj:1103:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1104:public func restore(): Unit
+packages/core/src/terminal.cj:1105:public func size(): ?Rect
+packages/core/src/terminal.cj:1106:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1111:public class FallbackTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1113:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1117:public func name(): String
+packages/core/src/terminal.cj:1118:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1119:public func restore(): Unit
+packages/core/src/terminal.cj:1120:public func size(): ?Rect
+packages/core/src/terminal.cj:1121:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1135:public class MacOSTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1138:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1142:public func name(): String
+packages/core/src/terminal.cj:1143:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1144:public func restore(): Unit
+packages/core/src/terminal.cj:1145:public func size(): ?Rect
+packages/core/src/terminal.cj:1146:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1160:public class MacOSTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1161:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1165:public func name(): String
+packages/core/src/terminal.cj:1166:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1167:public func restore(): Unit
+packages/core/src/terminal.cj:1168:public func size(): ?Rect
+packages/core/src/terminal.cj:1169:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1175:public class WindowsTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1178:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1182:public func name(): String
+packages/core/src/terminal.cj:1183:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1184:public func restore(): Unit
+packages/core/src/terminal.cj:1185:public func size(): ?Rect
+packages/core/src/terminal.cj:1186:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1200:public class WindowsTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1201:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1205:public func name(): String
+packages/core/src/terminal.cj:1206:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1207:public func restore(): Unit
+packages/core/src/terminal.cj:1208:public func size(): ?Rect
+packages/core/src/terminal.cj:1209:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1215:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1220:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1225:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1229:public class AnsiBackend <: Backend {
+packages/core/src/terminal.cj:1237:public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1243:public func clear(): Unit
+packages/core/src/terminal.cj:1247:public func moveTo(x: Int64, y: Int64): Unit
+packages/core/src/terminal.cj:1251:public func enterAlternateScreen(): Unit
+packages/core/src/terminal.cj:1252:public func leaveAlternateScreen(): Unit
+packages/core/src/terminal.cj:1253:public func hideCursor(): Unit
+packages/core/src/terminal.cj:1254:public func showCursor(): Unit
+packages/core/src/terminal.cj:1255:public func setCursorShape(shape: ?CursorShape): Unit
+packages/core/src/terminal.cj:1261:public func enableMouse(): Unit
+packages/core/src/terminal.cj:1262:public func disableMouse(): Unit
+packages/core/src/terminal.cj:1263:public func enableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1264:public func disableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1266:public func size(): Rect
+packages/core/src/terminal.cj:1273:public func draw(buffer: Buffer): Unit
+packages/core/src/terminal.cj:1292:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+packages/core/src/terminal.cj:1313:public func drawMedia(ops: Array<MediaOp>): Unit
+packages/core/src/terminal.cj:1323:public func write(text: String): Unit
+packages/core/src/terminal.cj:1329:public func setInstrumentationEnabled(enabled: Bool): Unit
+packages/core/src/terminal.cj:1333:public func diagnosticByteCount(): Int64
+packages/core/src/terminal.cj:1337:public func flush(): Unit
+packages/core/src/terminal.cj:1365:public class TestBackend <: Backend {
+packages/core/src/terminal.cj:1379:public init( area!: Rect = Rect(0, 0, 80, 24), captureSnapshots!: Bool = true )
+packages/core/src/terminal.cj:1387:public func clear(): Unit
+packages/core/src/terminal.cj:1391:public func moveTo(x: Int64, y: Int64): Unit
+packages/core/src/terminal.cj:1395:public func enterAlternateScreen(): Unit
+packages/core/src/terminal.cj:1396:public func leaveAlternateScreen(): Unit
+packages/core/src/terminal.cj:1397:public func hideCursor(): Unit
+packages/core/src/terminal.cj:1398:public func showCursor(): Unit
+packages/core/src/terminal.cj:1399:public func setCursorShape(shape: ?CursorShape): Unit
+packages/core/src/terminal.cj:1405:public func enableMouse(): Unit
+packages/core/src/terminal.cj:1406:public func disableMouse(): Unit
+packages/core/src/terminal.cj:1407:public func enableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1408:public func disableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1410:public func size(): Rect
+packages/core/src/terminal.cj:1414:public func setSize(area: Rect): Unit
+packages/core/src/terminal.cj:1418:public func draw(buffer: Buffer): Unit
+packages/core/src/terminal.cj:1428:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+packages/core/src/terminal.cj:1438:public func drawMedia(ops: Array<MediaOp>): Unit
+packages/core/src/terminal.cj:1445:public func write(text: String): Unit
+packages/core/src/terminal.cj:1451:public func flush(): Unit
+packages/core/src/terminal.cj:1453:public func output(): String
+packages/core/src/terminal.cj:1457:public func clearOutput(): Unit
+packages/core/src/terminal.cj:1463:public func lastBuffer(): ?Buffer
+packages/core/src/terminal.cj:1467:public func lastDiffOps(): Int64
+packages/core/src/terminal.cj:1471:public func lastDiffWrites(): Int64
+packages/core/src/terminal.cj:1475:public func lastMediaOps(): Array<MediaOp>
+packages/core/src/terminal.cj:1480:public func mediaFrameCount(): Int64
+packages/core/src/terminal.cj:1484:public func snapshot(): String
+packages/core/src/terminal.cj:1491:public func snapshots(): Array<String>
+packages/core/src/terminal.cj:1495:public func snapshotAt(index: Int64): String
+packages/core/src/terminal.cj:1500:public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool
+packages/core/src/terminal.cj:1509:public func assertSnapshot(expected: String): Bool
+packages/core/src/terminal.cj:1513:public func assertSnapshotAt(index: Int64, expected: String): Bool
+packages/core/src/terminal.cj:1517:public func assertLastMediaOpCount(expected: Int64): Bool
+packages/core/src/terminal.cj:1530:public struct TerminalCapabilities {
+packages/core/src/terminal.cj:1531:public let size: Rect
+packages/core/src/terminal.cj:1532:public let trueColor: Bool
+packages/core/src/terminal.cj:1533:public let colorLevel: Int64
+packages/core/src/terminal.cj:1534:public let mouse: Bool
+packages/core/src/terminal.cj:1535:public let mouseMove: Bool
+packages/core/src/terminal.cj:1536:public let focusEvents: Bool
+packages/core/src/terminal.cj:1537:public let bracketedPaste: Bool
+packages/core/src/terminal.cj:1538:public let alternateScreen: Bool
+packages/core/src/terminal.cj:1539:public let unicode: Bool
+packages/core/src/terminal.cj:1540:public let kittyGraphics: Bool
+packages/core/src/terminal.cj:1541:public let sixel: Bool
+packages/core/src/terminal.cj:1542:public let osc8: Bool
+packages/core/src/terminal.cj:1543:public let keyboardProtocol: KeyProtocol
+packages/core/src/terminal.cj:1544:public let keyUp: Bool
+packages/core/src/terminal.cj:1545:public let keyRepeat: Bool
+packages/core/src/terminal.cj:1546:public let recommendedFps: Int64
+packages/core/src/terminal.cj:1547:public let cellWidthPixels: Int64
+packages/core/src/terminal.cj:1548:public let cellHeightPixels: Int64
+packages/core/src/terminal.cj:1549:public let driverName: String
+packages/core/src/terminal.cj:1551:public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = "linux-glibc" )
+packages/core/src/terminal.cj:1593:public static func detect(backend!: Backend = AnsiBackend(), driverName!: String = "linux-glibc"): TerminalCapabilities
+packages/core/src/terminal.cj:1703:public struct RenderMetrics {
+packages/core/src/terminal.cj:1704:public let size: Rect
+packages/core/src/terminal.cj:1705:public let dirtyCells: Int64
+packages/core/src/terminal.cj:1706:public let diffWrites: Int64
+packages/core/src/terminal.cj:1707:public let mediaOps: Int64
+packages/core/src/terminal.cj:1708:public let fullRedraw: Bool
+packages/core/src/terminal.cj:1709:public let renderMillis: Int64
+packages/core/src/terminal.cj:1710:public let drawMillis: Int64
+packages/core/src/terminal.cj:1711:public let totalMillis: Int64
+packages/core/src/terminal.cj:1712:public let renderedCells: Int64
+packages/core/src/terminal.cj:1713:public let dirtyRects: Int64
+packages/core/src/terminal.cj:1714:public let copiedCells: Int64
+packages/core/src/terminal.cj:1715:public let bufferCellAttempts: Int64
+packages/core/src/terminal.cj:1716:public let bufferCellWrites: Int64
+packages/core/src/terminal.cj:1717:public let diffCells: Int64
+packages/core/src/terminal.cj:1718:public let diffSpans: Int64
+packages/core/src/terminal.cj:1719:public let renderNanos: Int64
+packages/core/src/terminal.cj:1720:public let diffNanos: Int64
+packages/core/src/terminal.cj:1721:public let writeNanos: Int64
+packages/core/src/terminal.cj:1722:public let totalNanos: Int64
+packages/core/src/terminal.cj:1723:public let ansiBytes: Int64
+packages/core/src/terminal.cj:1725:public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
+packages/core/src/terminal.cj:1768:public class DebugOverlay <: Widget {
+packages/core/src/terminal.cj:1772:public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+packages/core/src/terminal.cj:1777:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/terminal.cj:1802:public class TerminalMode {
+packages/core/src/terminal.cj:1808:public static func lastError(): ?String
+packages/core/src/terminal.cj:1812:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:1852:public static func restore(): Unit
+packages/core/src/terminal.cj:1870:public static func size(): ?Rect
+packages/core/src/terminal.cj:1908:public class MacOSTerminalMode {
+packages/core/src/terminal.cj:1915:public static func lastError(): ?String
+packages/core/src/terminal.cj:1919:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:1965:public static func restore(): Unit
+packages/core/src/terminal.cj:1983:public static func size(): ?Rect
+packages/core/src/terminal.cj:2004:public class WindowsConsoleMode {
+packages/core/src/terminal.cj:2011:public static func lastError(): ?String
+packages/core/src/terminal.cj:2015:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:2055:public static func restore(): Unit
+packages/core/src/terminal.cj:2073:public static func size(): ?Rect
 packages/core/src/text.cj:7:public enum AmbiguousWidth {
 packages/core/src/text.cj:8:Narrow
 packages/core/src/text.cj:9:Wide

@@ -101,9 +101,12 @@ does not claim to terminate those escaped processes.
 
 `ProcessSpec.timeoutMillis = 0` disables the execution deadline; the default
 output limit is 16 MiB. `PosixProcessRuntime` defaults to 32 active children,
-16 KiB read quanta and 64 KiB queued bytes per child. Full output queues pause
+16 KiB read quanta and 64 KiB queued bytes per child. At the default quantum,
+all children share a 64 KiB read budget per runtime turn. A rotating start
+position and alternating stdout/stderr order prevent one ready stream from
+monopolizing that budget. Full output queues pause
 reads and apply kernel-pipe backpressure. `metrics()` exposes queued/peak bytes,
-delivered bytes and backpressure observations. `App.attachProcessRuntime` must
+accepted output bytes and backpressure observations. `App.attachProcessRuntime` must
 run before `run`; attaching transfers session ownership of that runtime, and
 App shutdown calls `closeAll()`, including when update throws.
 
@@ -146,8 +149,10 @@ slot until they actually complete. Capacity failure is an `AsyncFailed` event.
 Cancellation remains cooperative for arbitrary user task functions.
 
 `LinuxPtyRuntime` defaults to 32 children, 16 KiB reads per source and a 2 MiB
-queued-output budget. Readiness and nonblocking polling both respect read
-quanta, including trailing output after child exit. Full queues pause reads;
+queued-output budget. At the default quantum, all PTY children share a 64 KiB
+read budget per runtime turn and rotate their starting position. Readiness and
+nonblocking polling both respect these budgets, including trailing output
+after child exit. Full queues pause reads;
 `flowMetrics()` reports queued/peak bytes and backpressure. PTY close allows an
 additional bounded 8 MiB reserve to drain bytes already in kernel buffers;
 reserve exhaustion is an explicit `PtyFailed`, never silent truncation.

@@ -33,7 +33,13 @@ foreign func pipe(pipefd: CPointer<Int32>): Int32
 
 @FastNative
 @When[os != "Windows"]
-foreign func fcntl(fd: Int32, cmd: Int32, value: Int32): Int32
+foreign func termcanvas_fcntl(fd: Int32, cmd: Int32, value: Int32): Int32
+
+// libc fcntl is variadic; the native shim supplies the platform's varargs ABI.
+@When[os != "Windows"]
+func fcntl(fd: Int32, cmd: Int32, value: Int32): Int32 {
+    unsafe { termcanvas_fcntl(fd, cmd, value) }
+}
 
 @FastNative
 @When[os != "Windows"]

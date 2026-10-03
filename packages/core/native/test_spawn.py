@@ -27,6 +27,53 @@ class NativeSpawnTest(unittest.TestCase):
         cls.start.argtypes = [strings, strings, ctypes.c_char_p] + [ctypes.c_int32] * 5 + [
             ctypes.POINTER(ctypes.c_int32), ctypes.c_int64]
         cls.start.restype = ctypes.c_int32
+        cls.fcntl = cls.library.termcanvas_fcntl
+        cls.fcntl.argtypes = [ctypes.c_int32] * 3
+        cls.fcntl.restype = ctypes.c_int32
+        cls.ioctl = cls.library.termcanvas_ioctl
+        cls.ioctl.argtypes = [ctypes.c_int32, ctypes.c_uint64, ctypes.c_void_p]
+        cls.ioctl.restype = ctypes.c_int32
+
+    def test_fixed_arity_fcntl_sets_actual_nonblocking_and_cloexec_flags(self):
+        import fcntl
+
+        read_fd, write_fd = os.pipe()
+        duplicate = -1
+        try:
+            # Reset Python's default CLOEXEC so the native wrapper must set it.
+            os.set_inheritable(read_fd, True)
+            flags = self.fcntl(read_fd, fcntl.F_GETFL, 0)
+            self.assertGreaterEqual(flags, 0)
+            self.assertEqual(self.fcntl(read_fd, fcntl.F_SETFL, flags | os.O_NONBLOCK), 0)
+            self.assertEqual(self.fcntl(read_fd, fcntl.F_SETFD, fcntl.FD_CLOEXEC), 0)
+            self.assertTrue(fcntl.fcntl(read_fd, fcntl.F_GETFL) & os.O_NONBLOCK)
+            self.assertTrue(fcntl.fcntl(read_fd, fcntl.F_GETFD) & fcntl.FD_CLOEXEC)
+            with self.assertRaises(BlockingIOError):
+                os.read(read_fd, 1)
+            duplicate = self.fcntl(read_fd, fcntl.F_DUPFD, max(read_fd, write_fd) + 1)
+            self.assertGreater(duplicate, max(read_fd, write_fd))
+        finally:
+            if duplicate >= 0:
+                os.close(duplicate)
+            os.close(read_fd)
+            os.close(write_fd)
+
+    def test_fixed_arity_ioctl_sets_and_gets_native_pty_size(self):
+        import fcntl
+        import struct
+        import termios
+
+        master, slave = os.openpty()
+        try:
+            requested = ctypes.create_string_buffer(struct.pack("HHHH", 31, 93, 0, 0))
+            self.assertEqual(self.ioctl(master, termios.TIOCSWINSZ, requested), 0)
+            actual = ctypes.create_string_buffer(8)
+            self.assertEqual(self.ioctl(slave, termios.TIOCGWINSZ, actual), 0)
+            self.assertEqual(struct.unpack("HHHH", actual.raw), (31, 93, 0, 0))
+            self.assertEqual(fcntl.ioctl(slave, termios.TIOCGWINSZ, bytes(8)), actual.raw)
+        finally:
+            os.close(master)
+            os.close(slave)
 
     def run_child(self, args, *, env=(), cwd="", terminal=False):
         pairs = [os.pipe() for _ in range(4)]

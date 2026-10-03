@@ -738,7 +738,7 @@ func addVirtualTableRowDirty(dirty: DirtyRects, area: Rect, selected: ?Int64, of
     match (selected) {
         case Some(index) =>
             let row = index - offset + headerRows
-            if (row >= 0 && row < area.height) {
+            if (row >= headerRows && row < area.height) {
                 dirty.add(Rect(area.x, area.y + row, area.width, 1))
             }
         case None => ()
