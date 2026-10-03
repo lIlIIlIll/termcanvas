@@ -13,3 +13,6 @@
   package-configuration = {}
 
 [dependencies]
+
+[ffi.c]
+  termcanvas_posix = { path = "./native/build" }

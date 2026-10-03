@@ -82,6 +82,14 @@ public func defaultProcessRuntime(): ProcessRuntime { PosixProcessRuntime() }
 @When[os == "Windows"]
 public func defaultProcessRuntime(): ProcessRuntime { UnsupportedProcessRuntime() }
 
+@When[os != "Windows"]
+class ProcessReadBudget {
+    let capacity: Int64
+    var remaining: Int64
+    init(quantum: Int64) { capacity = max(64 * 1024, min(64 * 1024, quantum) * 2); remaining = capacity }
+    func reset(): Unit { remaining = capacity }
+}
+
 // Each source reads one quantum. A full per-process buffer stops reading and
 // lets the kernel pipe apply lossless backpressure until drain() consumes it.
 @When[os != "Windows"]
@@ -90,12 +98,16 @@ public class PosixProcessRuntime <: ProcessRuntime {
     private let maxProcesses: Int64
     private let readBudgetBytes: Int64
     private let maxQueuedBytes: Int64
+    private let turnBudget: ProcessReadBudget
+    private var drainCursor: Int64 = 0
+    private var sourceStderrFirst = false
     private var totalOutput: Int64 = 0
     private var totalBackpressure: Int64 = 0
     private var peakQueued: Int64 = 0
     public init(maxProcesses!: Int64 = 32, readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 64 * 1024) {
         if (maxProcesses <= 0 || readBudgetBytes <= 0 || maxQueuedBytes <= 0) { throw IllegalArgumentException("process runtime budgets must be positive") }
         this.maxProcesses = maxProcesses; this.readBudgetBytes = readBudgetBytes; this.maxQueuedBytes = maxQueuedBytes
+        turnBudget = ProcessReadBudget(readBudgetBytes)
     }
     public func start(id: String, spec: ProcessSpec): Event {
         for (process in processes) {
@@ -118,11 +130,9 @@ public class PosixProcessRuntime <: ProcessRuntime {
             }
             let prepared = PreparedPtyCommand(PtySpec(spec.command, args: spec.args, cwd: spec.cwd, env: spec.env))
             try {
-                child = unsafe { fork() }
-                if (child < 0) { return Event.ProcessFailed(id, "process fork failed") }
-                if (child == 0) {
-                    childExecPipes(prepared, input, output, errors, startup)
-                }
+                child = prepared.startNative(input[0], output[1], errors[1], -1, startup[1],
+                    [input[0], input[1], output[0], output[1], errors[0], errors[1], startup[0]])
+                if (child < 0) { return Event.ProcessFailed(id, "process native spawn failed") }
             } finally { prepared.release() }
             unsafe {
                 _ = close(input[0]); input[0] = -1
@@ -133,7 +143,7 @@ public class PosixProcessRuntime <: ProcessRuntime {
             }
             let failure = readPtyStartupError(startup[0])
             if (failure != 0) { return Event.ProcessFailed(id, "process startup failed at stage ${failure}") }
-            processes.add(PipeProcess(id, child, output[0], errors[0], spec, readBudgetBytes, maxQueuedBytes))
+            processes.add(PipeProcess(id, child, output[0], errors[0], spec, readBudgetBytes, maxQueuedBytes, turnBudget))
             transferred = true
             Event.ProcessStarted(id)
         } finally {
@@ -164,16 +174,25 @@ public class PosixProcessRuntime <: ProcessRuntime {
     }
     public func sources(): Array<EventSource> {
         let out = ArrayList<EventSource>()
-        for (process in processes) {
-            out.add(PipeOutputSource(process, ProcessOutputStream.Stdout))
-            out.add(PipeOutputSource(process, ProcessOutputStream.Stderr))
+        for (offset in 0..processes.size) {
+            let process = processes[(drainCursor + offset) % processes.size]
+            if (sourceStderrFirst) {
+                out.add(PipeOutputSource(process, ProcessOutputStream.Stderr))
+                out.add(PipeOutputSource(process, ProcessOutputStream.Stdout))
+            } else {
+                out.add(PipeOutputSource(process, ProcessOutputStream.Stdout))
+                out.add(PipeOutputSource(process, ProcessOutputStream.Stderr))
+            }
         }
         out.toArray()
     }
     public func drain(): Array<Event> {
         let out = ArrayList<Event>()
-        var index: Int64 = 0
-        while (index < processes.size) {
+        var index = if (processes.isEmpty()) { 0 } else { drainCursor % processes.size }
+        var visits = processes.size
+        while (visits > 0 && !processes.isEmpty()) {
+            index %= processes.size
+            visits--
             let process = processes[index]
             process.advance()
             // Polling drain also works without a platform waiter, e.g. tools
@@ -190,6 +209,10 @@ public class PosixProcessRuntime <: ProcessRuntime {
                 processes.remove(at: index)
             } else { index++ }
         }
+        if (!processes.isEmpty()) { drainCursor = (drainCursor + 1) % processes.size }
+        else { drainCursor = 0 }
+        sourceStderrFirst = !sourceStderrFirst
+        turnBudget.reset()
         out.toArray()
     }
     private func queuedBytes(): Int64 {
@@ -236,6 +259,7 @@ class PipeProcess {
     private let spec: ProcessSpec
     private let readBudget: Int64
     private let maxQueued: Int64
+    private let turnBudget: ProcessReadBudget
     private let events = ArrayList<Event>()
     private let started = MonoTime.now()
     private var stopAt: ?MonoTime = None
@@ -249,12 +273,13 @@ class PipeProcess {
     var peakQueuedBytes: Int64 = 0
     var outputBytes: Int64 = 0
     var backpressureCount: Int64 = 0
-    init(id: String, pid: Int32, stdout: Int32, stderr: Int32, spec: ProcessSpec, budget: Int64, maxQueued: Int64) {
+    init(id: String, pid: Int32, stdout: Int32, stderr: Int32, spec: ProcessSpec, budget: Int64, maxQueued: Int64, turnBudget: ProcessReadBudget) {
         processId = id; this.pid = pid; stdoutFd = stdout; stderrFd = stderr
         this.spec = spec; readBudget = min(budget, max(1, maxQueued / 2)); this.maxQueued = maxQueued
+        this.turnBudget = turnBudget
     }
     func sourceFd(stream: ProcessOutputStream): ?Int32 {
-        if (queuedBytes >= maxQueued) { return None }
+        if (queuedBytes >= maxQueued || turnBudget.remaining <= 0) { return None }
         let fd = streamFd(stream)
         if (fd < 0) { None } else { Some(fd) }
     }
@@ -316,8 +341,8 @@ class PipeProcess {
         let fd = streamFd(stream)
         if (fd < 0) { return }
         var budget = readBudget
-        while (budget > 0) {
-            let capacity = min(min(budget, 4096), maxQueued - queuedBytes)
+        while (budget > 0 && turnBudget.remaining > 0) {
+            let capacity = min(min(min(budget, 4096), turnBudget.remaining), maxQueued - queuedBytes)
             if (capacity <= 0) { backpressureCount++; return }
             let bytes = Array<Byte>(capacity, repeat: 0)
             let n = unsafe {
@@ -329,6 +354,7 @@ class PipeProcess {
             if (n > 0) {
                 lastReadAt = MonoTime.now()
                 budget -= Int64(n)
+                turnBudget.remaining -= Int64(n)
                 let accepted = min(Int64(n), max(0, spec.maxOutputBytes - outputBytes))
                 if (accepted > 0) {
                     events.add(Event.ProcessOutput(processId, stream, bytes[..accepted]))
@@ -396,24 +422,6 @@ class PipeOutputSource <: EventSource {
     }
     public func drain(): Array<Event> { [] }
     public func close(): Unit { process.requestStop(ProcessEndReason.Cancelled) }
-}
-
-@When[os != "Windows"]
-func childExecPipes(command: PreparedPtyCommand, input: Array<Int32>, output: Array<Int32>, errors: Array<Int32>, startup: Array<Int32>): Unit {
-    unsafe {
-        _ = close(input[1]); _ = close(output[0]); _ = close(errors[0]); _ = close(startup[0])
-        if (setsid() < 0) { childPtyFailure(command, startup[1], 1) }
-        if (dup2(input[0], STDIN_FILENO) < 0 || dup2(output[1], STDOUT_FILENO) < 0 || dup2(errors[1], STDERR_FILENO) < 0) {
-            childPtyFailure(command, startup[1], 2)
-        }
-        if (input[0] > STDERR_FILENO) { _ = close(input[0]) }
-        if (output[1] > STDERR_FILENO) { _ = close(output[1]) }
-        if (errors[1] > STDERR_FILENO) { _ = close(errors[1]) }
-        if (command.hasCwd && chdir(command.cwd) != 0) { childPtyFailure(command, startup[1], 3) }
-        for (i in 0..command.envCount) { if (putenv((command.env + i).read()) != 0) { childPtyFailure(command, startup[1], 4) } }
-        _ = execvp(command.argv.read(), command.argv)
-        childPtyFailure(command, startup[1], 5)
-    }
 }
 
 // One decoder per output stream. Invalid bytes are replaced deterministically;

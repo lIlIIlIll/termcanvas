@@ -52,6 +52,9 @@ and coverage gates. `scripts/native_terminal_harness.py` builds its own probe
 from `tests/fixtures/native_terminal`; see [downstream testing](downstream-testing.md)
 for the observed input, resize, idle-wakeup and restoration contracts.
 The Windows harness uses a pinned ConPTY dependency installed by CI.
+Windows stdin drains available console records without blocking on a second
+text read. UTF-16 surrogate pairs are preserved across reads and converted to
+the shared UTF-8 parser; redirected pipes use a readiness check before reading.
 
 Ordinary streaming `ProcessRuntime` and native PTY child processes currently
 have POSIX implementations. Windows reports an explicit unsupported-process

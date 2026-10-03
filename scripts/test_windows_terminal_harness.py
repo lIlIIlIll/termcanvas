@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Transport contract tests, runnable without Windows; native CI runs ConPTY."""
 from pathlib import Path
+import json
 import socket
 import types
 import unittest
@@ -56,9 +57,24 @@ class FakeProcess:
             self.mark("NATIVE_EXPECTED_EXCEPTION")
             self.finish(17)
         elif text == "x":
-            self.mark("NATIVE_INPUT_OK")
+            self.mark("NATIVE_LOAD_INPUT_OK" if self.mode == "load" else "NATIVE_INPUT_OK")
         elif text == "w":
             self.mark("NATIVE_AWAKE")
+        elif text == "界😀":
+            self.mark("NATIVE_UNICODE_BMP_OK")
+            self.mark("NATIVE_UNICODE_PAIR_OK")
+        elif text == "\x1b[A":
+            self.mark("NATIVE_ARROW_OK")
+        elif text == "l":
+            self.mark("NATIVE_LOAD_ACTIVE")
+            if self.fault != "ticks":
+                self.mark("NATIVE_LOAD_TICKS_OK")
+        elif text == "s":
+            counts = {"accepted": 2048, "received": 2047 if self.fault == "lost" else 2048,
+                      "ticks": 4, "frames": 8, "inputs": 1, "resizes": 1,
+                      "backpressure": 16, "queue_max": 128, "queue_overflows": 0}
+            (self.observations / "NATIVE_LOAD_COUNTS.json").write_text(json.dumps(counts), encoding="utf-8")
+            self.mark("NATIVE_LOAD_DRAINED")
 
     def setwinsize(self, rows, cols):
         self.sizes.append((rows, cols))
@@ -93,9 +109,9 @@ class ConPtyContractTests(unittest.TestCase):
     def checks(self):
         return run_checks(Path("probe.exe"), {"PYWINPTY_BACKEND": "1"}, 0.05, ConPtySession)
 
-    def test_three_scenarios_use_conpty_and_console_observations(self):
+    def test_four_scenarios_use_conpty_and_console_observations(self):
         report = self.checks()
-        self.assertEqual([item["scenario"] for item in report], ["input", "external", "exception"])
+        self.assertEqual([item["scenario"] for item in report], ["input", "external", "load", "exception"])
         for instance in FakeProcess.instances:
             self.assertEqual(instance.options["backend"], "0")
             self.assertEqual(instance.options["dimensions"], (24, 80))
@@ -103,7 +119,21 @@ class ConPtyContractTests(unittest.TestCase):
             self.assertFalse(instance.observations.exists())
             self.assertTrue(all("\n" not in value for value in instance.inputs))
         self.assertEqual(FakeProcess.instances[0].sizes, [(31, 93)])
-        self.assertEqual(FakeProcess.instances[2].exitstatus, 17)
+        self.assertEqual(FakeProcess.instances[2].sizes, [(37, 101)])
+        self.assertEqual(FakeProcess.instances[3].exitstatus, 17)
+
+    def test_load_rejects_lost_accepted_events(self):
+        FakeProcess.fault = "lost"
+        with self.assertRaisesRegex(AssertionError, "lost accepted events"):
+            self.checks()
+        self.assertTrue(FakeProcess.instances[2].killed)
+        self.assertTrue(FakeProcess.instances[2].closed)
+
+    def test_load_rejects_starved_timers(self):
+        FakeProcess.fault = "ticks"
+        with self.assertRaisesRegex(AssertionError, "NATIVE_LOAD_TICKS_OK"):
+            self.checks()
+        self.assertTrue(FakeProcess.instances[2].killed)
 
     def test_missing_raw_evidence_fails_and_terminates_child(self):
         FakeProcess.fault = "raw"

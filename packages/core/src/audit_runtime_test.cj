@@ -614,8 +614,11 @@ class AuditRuntimeLinuxTest {
             let interrupted = AuditRuntimePtyEvents()
             @Expect(auditWaitPty(runtime, waiter, interrupted, { => interrupted.exits > 0 }))
             @Expect(interrupted.status, -2)
+            // Do not spawn a fresh sleep after READY: TERM can arrive between
+            // READY and that fork, leaving sh waiting for an unsignalled child
+            // longer than the runtime's bounded graceful-shutdown interval.
             @Assert(auditPtyStarted(runtime.start("close", PtySpec("/bin/sh",
-                args: ["-c", "trap 'exit 23' TERM; printf READY; while :; do sleep 1; done"]))))
+                args: ["-c", "trap 'exit 23' TERM; printf READY; while :; do :; done"]))))
             let closed = AuditRuntimePtyEvents()
             @Assert(auditWaitPty(runtime, waiter, closed, { => closed.output.contains("READY") }))
             closed.observe(runtime.close("close"))

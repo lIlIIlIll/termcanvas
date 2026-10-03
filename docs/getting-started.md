@@ -5,6 +5,13 @@ state, `update(Event)` returns commands and redraw requests, and `render(Frame)`
 draws the current state. Start with a source checkout and the pinned Cangjie SDK
 listed in [Versioning and Compatibility](versioning.md).
 
+Linux and macOS builds also need a C compiler (`cc`, GCC or Clang) and `ar`
+(binutils or Xcode Command Line Tools). The normal `cjpm build`/`test` command
+automatically builds the small POSIX process-launch library through the core
+package's build hook, including when core is a path dependency of an external
+application. Windows builds do not require a C compiler. Do not use
+`--skip-script` on a clean checkout: the native archive must exist before linking.
+
 ## Create an independent application
 
 Your application does not need to live inside this repository. From the

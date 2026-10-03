@@ -37,13 +37,16 @@ class PtySession:
         self.selector = selectors.DefaultSelector()
         self.process = None
         self.output = bytearray()
+        self.seen = set()
+        self.temporary = tempfile.TemporaryDirectory(prefix="termcanvas-pty-observations-")
+        self.observations = Path(self.temporary.name)
         try:
             self.original = termios.tcgetattr(self.slave)
             self.resize(80, 24)
             env = environment.copy()
             env.update({"TERM": "xterm-256color", "COLORTERM": "truecolor"})
             self.process = subprocess.Popen(
-                [str(binary), mode], stdin=self.slave, stdout=self.slave, stderr=self.slave,
+                [str(binary), mode, str(self.observations)], stdin=self.slave, stdout=self.slave, stderr=self.slave,
                 env=env, start_new_session=True, close_fds=True
             )
             self.selector.register(self.master, selectors.EVENT_READ)
@@ -66,6 +69,10 @@ class PtySession:
                     return
                 raise
             self.output.extend(data)
+        for marker in sorted(self.observations.iterdir()):
+            if marker.name not in self.seen:
+                self.seen.add(marker.name)
+                self.output.extend(marker.name.encode("ascii") + b"\n")
 
     def wait_for(self, marker: bytes, start: int = 0):
         deadline = time.monotonic() + self.timeout
@@ -113,6 +120,7 @@ class PtySession:
         self.selector.close()
         os.close(self.master)
         os.close(self.slave)
+        self.temporary.cleanup()
 
 
 def run_checks(binary: Path, environment: dict[str, str], timeout: float,
@@ -124,7 +132,7 @@ def run_checks(binary: Path, environment: dict[str, str], timeout: float,
         else:
             session_type = PtySession
     results = []
-    for mode in ("input", "external", "exception"):
+    for mode in ("input", "external", "load", "exception"):
         session = session_type(binary, mode, environment, timeout)
         try:
             session.wait_for(b"NATIVE_READY")
@@ -132,11 +140,17 @@ def run_checks(binary: Path, environment: dict[str, str], timeout: float,
             if mode == "input":
                 session.send(b"x")
                 session.wait_for(b"NATIVE_INPUT_OK")
+                session.send("界😀".encode("utf-8"))
+                session.wait_for(b"NATIVE_UNICODE_BMP_OK")
+                session.wait_for(b"NATIVE_UNICODE_PAIR_OK")
+                session.send(b"\x1b[A")
+                session.wait_for(b"NATIVE_ARROW_OK")
                 session.resize(93, 31)
                 session.wait_for(b"NATIVE_RESIZE_93x31")
                 session.send(b"q")
                 session.assert_closed(0)
-                results.append({"scenario": mode, "passed": True, "resize": [93, 31]})
+                results.append({"scenario": mode, "passed": True, "resize": [93, 31],
+                                "unicode": ["BMP", "surrogate pair"], "navigation": "Up"})
             elif mode == "external":
                 start = len(session.output)
                 written = time.monotonic()
@@ -150,6 +164,31 @@ def run_checks(binary: Path, environment: dict[str, str], timeout: float,
                 session.send(b"q")
                 session.assert_closed(0)
                 results.append({"scenario": mode, "passed": True, "wake_seconds": elapsed})
+            elif mode == "load":
+                session.send(b"l")
+                session.wait_for(b"NATIVE_LOAD_ACTIVE")
+                written = time.monotonic()
+                session.send(b"x")
+                session.wait_for(b"NATIVE_LOAD_INPUT_OK")
+                elapsed = time.monotonic() - written
+                if elapsed >= 3:
+                    raise AssertionError(f"input starved under sustained load for {elapsed:.3f}s")
+                session.resize(101, 37)
+                session.wait_for(b"NATIVE_RESIZE_101x37")
+                session.wait_for(b"NATIVE_LOAD_TICKS_OK")
+                session.send(b"s")
+                session.wait_for(b"NATIVE_LOAD_DRAINED")
+                counts = json.loads((session.observations / "NATIVE_LOAD_COUNTS.json").read_text(encoding="utf-8"))
+                if counts["accepted"] < 1024 or counts["received"] != counts["accepted"]:
+                    raise AssertionError(f"sustained load lost accepted events: {counts}")
+                if (counts["ticks"] < 2 or counts["frames"] < 2 or
+                        counts["inputs"] < 1 or counts["resizes"] < 1):
+                    raise AssertionError(f"sustained load starved input/timers/draw/resize: {counts}")
+                if counts["backpressure"] < 1 or not 0 < counts["queue_max"] <= 4096 or counts["queue_overflows"] != 0:
+                    raise AssertionError(f"sustained load did not preserve bounded backpressure: {counts}")
+                session.send(b"q")
+                session.assert_closed(0)
+                results.append({"scenario": mode, "passed": True, "input_seconds": elapsed, **counts})
             else:
                 session.send(b"x")
                 session.wait_for(b"NATIVE_EXPECTED_EXCEPTION")
@@ -187,6 +226,12 @@ def main() -> int:
                 subprocess.run([str(root / f"tools/bin/cjpm{suffix}"), "build", "--target-dir", str(target)],
                                cwd=ROOT / "tests/fixtures/native_terminal", env=env, check=True, timeout=300)
                 binary = target / f"release/bin/main{suffix}"
+            redirected = subprocess.run([str(binary.resolve()), "redirected"], env=env,
+                                        input="A界😀Z".encode("utf-8"), capture_output=True,
+                                        timeout=args.timeout, check=True)
+            if b"NATIVE_REDIRECTED_OK" not in redirected.stdout:
+                raise AssertionError("redirected stdin did not preserve UTF-8 bytes")
+            report["redirected_input"] = True
             report["scenarios"] = run_checks(binary.resolve(), env, args.timeout)
         report["passed"] = True
     except Exception as error:

@@ -66,6 +66,9 @@ public class TextDecorationStore <: TextDecorationProvider {
 
     public func apply(update: TextDecorationUpdate): Bool {
         if (update.revision != currentRevision) { return false }
+        // A half-open empty range overlaps no cached bytes. In particular,
+        // a parser reporting an empty line must not evict its enclosing block.
+        if (update.start == update.end) { return true }
         let next = ArrayList<DecorationChunk>()
         var added = false
         for (chunk in chunks) {
@@ -80,6 +83,7 @@ public class TextDecorationStore <: TextDecorationProvider {
 
     public func query(start: Int64, end: Int64): Array<TextDecoration> {
         queries++
+        if (end <= start) { return [] }
         let out = ArrayList<TextDecoration>()
         var low: Int64 = 0
         var high = chunks.size
@@ -102,6 +106,10 @@ public class TextDecorationStore <: TextDecorationProvider {
 
     public func onEdit(edit: TextEditDelta): Unit {
         if (edit.beforeRevision != currentRevision) { reset(edit.afterRevision); return }
+        if (edit.start == edit.end && edit.insertedBytes == 0) {
+            currentRevision = edit.afterRevision
+            return
+        }
         let next = ArrayList<DecorationChunk>()
         let delta = edit.insertedBytes - (edit.end - edit.start)
         for (chunk in chunks) {

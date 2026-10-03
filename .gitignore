@@ -8,6 +8,8 @@ target/
 __pycache__/
 *.py[cod]
 *.cjo
+**/build-script-cache/
+packages/core/native/build/
 
 # Generated benchmark/experiment output (not source)
 benchmarks/**/results/

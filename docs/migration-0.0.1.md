@@ -77,6 +77,12 @@ independent application, and [platforms](platforms.md) for the native matrix.
 `scripts/native_sdk.py` provides one argv-safe command entry point on Linux,
 macOS and Windows; it still requires the pinned Cangjie/cjpm 1.1.3 toolchain.
 
+POSIX consumers now also need `cc` and `ar`. The core package's automatic
+`cjpm` build hook compiles a small native launcher that keeps the entire
+fork-to-exec interval outside the managed runtime. This applies to external
+path dependencies as well as repository examples; no manual library-copy or
+extra runtime installation is required. Windows builds require no C compiler.
+
 API classifications and generated contracts record the exact 0.0.1 surface.
 Optional platform adapters and advanced data/focus integration remain
 EXPERIMENTAL; their presence is not a claim of independent production adoption.

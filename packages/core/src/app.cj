@@ -156,6 +156,28 @@ class TerminalLifecycleRequests {
     // An empty DirtyRects alone cannot represent that state after merging.
     var fullRedrawRequested: Bool = true
     private let ownedPtys = ArrayList<String>()
+    let asyncEvents = RuntimeEventBatch()
+    let ptyEvents = RuntimeEventBatch()
+    let processEvents = RuntimeEventBatch()
+
+    func hasPendingSources(): Bool {
+        asyncEvents.size() > 0 || ptyEvents.size() > 0 || processEvents.size() > 0
+    }
+
+    func stagePtyEvents(events: Array<Event>, runtime: PtyRuntime): Unit {
+        for (event in events) {
+            match (event) {
+                case Event.PtyStarted(id) => trackPty(id)
+                // A deferred write failure does not end the process. Also,
+                // an old terminal event may arrive after this ID was reused.
+                // Retain ownership while the runtime still has a live entry.
+                case Event.PtyExited(id, _) => if (runtime.process(id).isNone()) { releasePty(id) }
+                case Event.PtyFailed(id, _) => if (runtime.process(id).isNone()) { releasePty(id) }
+                case _ => ()
+            }
+        }
+        ptyEvents.append(events)
+    }
 
     func trackPty(id: String): Unit {
         for (owned in ownedPtys) {
@@ -452,6 +474,7 @@ class TimerState {
 public class TimerRuntime {
     private let timers = ArrayList<TimerState>()
     private let clock: RuntimeClock
+    private var nextTimerIndex: Int64 = 0
 
     public init(clock!: RuntimeClock = MonotonicRuntimeClock()) {
         this.clock = clock
@@ -467,6 +490,7 @@ public class TimerRuntime {
         while (i < timers.size) {
             if (timers[i].spec.id == id) {
                 timers.remove(at: i)
+                if (i < nextTimerIndex) { nextTimerIndex-- }
                 return true
             }
             i++
@@ -474,12 +498,15 @@ public class TimerRuntime {
         false
     }
 
-    func drain(): Array<Event> {
+    func drain(maxEvents!: Int64 = Int64.Max): Array<Event> {
         let nowMillis = clock.nowMillis()
         let out = ArrayList<Event>()
-        var i: Int64 = 0
-        while (i < timers.size) {
+        var remaining = timers.size
+        var i = nextTimerIndex
+        while (remaining > 0 && out.size < max(0, maxEvents)) {
+            if (i >= timers.size) { i = 0 }
             let timer = timers[i]
+            remaining--
             if (nowMillis >= timer.nextDueMillis) {
                 let everyMillis = max(1, timer.spec.every.toMilliseconds())
                 let lateMillis = max(0, nowMillis - timer.nextDueMillis)
@@ -501,6 +528,7 @@ public class TimerRuntime {
             }
             i++
         }
+        nextTimerIndex = i
         out.toArray()
     }
 
@@ -519,6 +547,7 @@ public class TimerRuntime {
 
     func clear(): Unit {
         timers.clear()
+        nextTimerIndex = 0
     }
 }
 
@@ -1860,7 +1889,7 @@ public class App {
                         lifecycle.fullRedrawRequested = true
                         frameSchedule.request(FrameRequestKind.SurfaceCritical)
                     }
-                    for (event in timerRuntime.drain()) {
+                    for (event in timerRuntime.drain(maxEvents: min(64, max(0, 256 - runtimeQueue.size())))) {
                         if (running) {
                             let (nextRunning, changed) = enqueueAndProcess(
                                 event,
@@ -1897,7 +1926,7 @@ public class App {
                             case Some(m) => m.record(
                                 renderMetrics,
                                 frameIndex: frameIndex,
-                                eventQueueLength: max(0, pendingInputEvents.size - pendingInputIndex) + commandQueue.size,
+                                eventQueueLength: max(0, pendingInputEvents.size - pendingInputIndex) + commandQueue.size + runtimeQueue.size(),
                                 droppedTicks: droppedTickCount,
                                 tickDeltaMillis: lastTickDelta
                             )
@@ -2016,7 +2045,7 @@ public class App {
                             pendingEscSince = None
                         }
                     }
-                    if (pendingInputIndex < pendingInputEvents.size) {
+                    if (pendingInputIndex < pendingInputEvents.size && runtimeQueue.size() < 256) {
                         // Paint between buffered input events.  Draining the
                         // complete parser batch before rendering makes key
                         // repeat appear as groups of characters even when each
@@ -2059,7 +2088,7 @@ public class App {
                             while (
                                 running &&
                                 pendingInputIndex < pendingInputEvents.size &&
-                                batchCount < 256
+                                batchCount < 63 && runtimeQueue.size() < 256
                             ) {
                                 let queuedEvent = pendingInputEvents[pendingInputIndex]
                                 pendingInputIndex++
@@ -2120,7 +2149,7 @@ public class App {
                                     }
                                 }
                             }
-                            if (running && !flushed && commandQueue.size == 0 && runtimeQueue.size() == 0 && !parser.hasPendingInputDrain()) {
+                            if (running && !flushed && commandQueue.size == 0 && runtimeQueue.size() == 0 && !parser.hasPendingInputDrain() && !lifecycle.hasPendingSources()) {
                                 lastLoopTask = "event_wait"
                                 eventWaiter.wait(
                                     waitTimeoutMillis(
@@ -2369,7 +2398,11 @@ public class App {
         var importSources = queue.takeSourceTurn()
         while (true) {
             if (!queue.tryConsumeWork()) { return (true, changed) }
-            if (commandQueue.size > 0) {
+            // A callback may perpetually replenish the command queue. Drain
+            // admitted events below the low-water mark before issuing more
+            // commands, or feedback can keep the queue above the admission
+            // mark forever and starve deferred input, timers and sources.
+            if (commandQueue.size > 0 && queue.size() < 128) {
                 let command = commandQueue[0]
                 commandQueue.remove(at: 0)
                 match (command) {
@@ -2401,10 +2434,10 @@ public class App {
                         if (ptyRuntime.process(id).isSome()) {
                             let closed = ptyRuntime.close(id)
                             App.drainPtyEvents(ptyRuntime, queue, lifecycle)
-                            App.enqueuePtyEvent(closed, queue, lifecycle)
+                            App.stagePtyEvent(closed, queue, lifecycle, ptyRuntime)
                         }
                         let event = ptyRuntime.start(id, spec)
-                        App.enqueuePtyEvent(event, queue, lifecycle)
+                        App.stagePtyEvent(event, queue, lifecycle, ptyRuntime)
                     case Command.PtyWrite(id, bytes) =>
                         _ = queue.enqueueEvent(ptyRuntime.write(id, bytes))
                     case Command.PtyResize(id, size) =>
@@ -2417,7 +2450,7 @@ public class App {
                         // Deliver it before the returned terminal event so an
                         // update may finish immediately on Exited without loss.
                         App.drainPtyEvents(ptyRuntime, queue, lifecycle)
-                        App.enqueuePtyEvent(event, queue, lifecycle)
+                        App.stagePtyEvent(event, queue, lifecycle, ptyRuntime)
                     case Command.StartTimer(spec) => timerRuntime.start(spec)
                     case Command.StopTimer(id) => _ = timerRuntime.stop(id)
                     case Command.RestartTimer(spec) =>
@@ -2448,9 +2481,19 @@ public class App {
 
             if (importSources && queue.size() < 256) {
                 importSources = false
-                for (event in asyncRuntime.drain()) { _ = queue.enqueueEvent(event) }
-                App.drainPtyEvents(ptyRuntime, queue, lifecycle)
-                for (event in processRuntime.drain()) { _ = queue.enqueueEvent(event) }
+                match (lifecycle) {
+                    case Some(requests) =>
+                        if (requests.asyncEvents.size() == 0) { requests.asyncEvents.replace(asyncRuntime.drain()) }
+                        if (requests.ptyEvents.size() == 0) { requests.stagePtyEvents(ptyRuntime.drain(), ptyRuntime) }
+                        if (requests.processEvents.size() == 0) { requests.processEvents.replace(processRuntime.drain()) }
+                        for (event in requests.asyncEvents.take(64)) { _ = queue.enqueueEvent(event) }
+                        for (event in requests.ptyEvents.take(64)) { _ = queue.enqueueEvent(event) }
+                        for (event in requests.processEvents.take(64)) { _ = queue.enqueueEvent(event) }
+                    case None =>
+                        for (event in asyncRuntime.drain()) { _ = queue.enqueueEvent(event) }
+                        App.drainPtyEvents(ptyRuntime, queue, lifecycle)
+                        for (event in processRuntime.drain()) { _ = queue.enqueueEvent(event) }
+                }
             }
 
             match (queue.dequeue()) {
@@ -2487,20 +2530,20 @@ public class App {
     }
 
     private static func drainPtyEvents(ptyRuntime: PtyRuntime, queue: RuntimeQueue<Unit>, lifecycle: ?TerminalLifecycleRequests): Unit {
-        for (event in ptyRuntime.drain()) { App.enqueuePtyEvent(event, queue, lifecycle) }
+        match (lifecycle) {
+            case Some(requests) => requests.stagePtyEvents(ptyRuntime.drain(), ptyRuntime)
+            case None => for (event in ptyRuntime.drain()) { _ = queue.enqueueEvent(event) }
+        }
     }
 
-    private static func enqueuePtyEvent(event: Event, queue: RuntimeQueue<Unit>, lifecycle: ?TerminalLifecycleRequests): Unit {
+    private static func stagePtyEvent(event: Event, queue: RuntimeQueue<Unit>, lifecycle: ?TerminalLifecycleRequests, runtime: PtyRuntime): Unit {
         match (lifecycle) {
-            case Some(requests) => match (event) {
-                case Event.PtyStarted(id) => requests.trackPty(id)
-                case Event.PtyExited(id, _) => requests.releasePty(id)
-                case Event.PtyFailed(id, _) => requests.releasePty(id)
-                case _ => ()
-            }
-            case None => ()
+            case Some(requests) =>
+                // Ownership begins at start, even if App exits before the
+                // bounded source batch reaches the Started callback.
+                requests.stagePtyEvents([event], runtime)
+            case None => _ = queue.enqueueEvent(event)
         }
-        _ = queue.enqueueEvent(event)
     }
 
     @When[os != "Windows"]

@@ -84,13 +84,21 @@ The driver builds the probe in a temporary target unless `--binary` supplies an
 existing probe. `--target-dir` preserves a selected build target; `--timeout`
 sets the positive per-step deadline. On Linux and macOS it checks:
 
-1. The application enters raw mode, receives an ordinary key, and observes a
-   real PTY resize from 80×24 to 93×31.
+1. The application enters raw mode, receives an ordinary key, BMP and
+   supplementary Unicode characters and an arrow key, and observes a real
+   PTY resize from 80×24 to 93×31. A separate redirected-stdin probe preserves
+   UTF-8 across two-byte reads.
 2. A background producer wakes an otherwise idle application through
    `ExternalPort`, with no ticks or resize polling needed to deliver the event.
 3. An exception thrown from update unwinds the terminal session and exits with
    the probe's expected nonzero status.
-4. Each scenario restores the exact original termios attributes, leaves the
+4. A continuously replenished 64-entry external port delivers at least 1,024
+   sequenced events while real keyboard input, a 101×37 resize, timer ticks,
+   and rendering keep progressing. The producer retries `Full` without
+   discarding a value. After stopping and joining the producer, every accepted
+   event must have reached update in order. The report includes event, frame,
+   tick, backpressure and queue counts, and rejects queue overflow.
+5. Each scenario restores the exact original termios attributes, leaves the
    alternate screen, and restores cursor visibility.
 
 The POSIX driver enforces deadlines and reaps the process group on a failed scenario.
@@ -101,13 +109,13 @@ presentation latency or physical keyboard delivery.
 On Windows, install `python -m pip install pywinpty==3.0.5`, then run the same
 script with `CANGJIE_SDK_ROOT` set. `windows_terminal_harness.py` explicitly
 selects the native ConPTY backend; it does not fall back to WinPTY. It drives
-the same ordinary key (without a newline), 93×31 resize, external wake, and
-exception exit scenarios. The child queries `GetConsoleMode` to verify line
+the same ordinary key (without a newline), resize, external wake, sustained
+load, and exception exit scenarios. The child queries `GetConsoleMode` to verify line
 input and echo are disabled and VT input/output are enabled. Before returning
 from both ordinary and exception paths it checks the original input/output
 modes and `GetConsoleCursorInfo` cursor size/visibility are restored exactly.
 
-ConPTY may turn stdout into partial screen updates. The Windows probe therefore
+ConPTY may turn stdout into partial screen updates. The native probe therefore
 writes sidecar observations only after handling an event or checking console
 state; the harness uses those observations and the native process exit status
 as evidence. It drains ConPTY output for diagnostics, enforces deadlines, and
@@ -122,3 +130,6 @@ and its [transport tests](https://github.com/andfoy/pywinpty/blob/v3.0.5/winpty/
 contract checks on any platform; those checks are not evidence that Windows
 Console APIs work. Actual Windows/macOS coverage is established only by a
 successful native CI job on that OS. Linux PTY checks can run locally.
+The native CI job preserves the JSON report as an artifact, and each package
+validation command has a 15-minute deadline so a blocked process produces a
+bounded failure rather than consuming the entire platform job.

@@ -167,6 +167,9 @@ CANGJIE_SDK_ROOT=/path/to/cangjie \
 
 ## 平台与限制
 
+- Linux/macOS 构建需要 `cc` 和 `ar`（GCC/Clang 或 Xcode Command Line Tools）；
+  `cjpm` 自动构建 POSIX 进程启动库，仓库外路径依赖也适用。Windows 无需 C 编译器。
+
 - Linux/glibc 是当前完整验证的终端目标。
 - macOS 和 Windows 纳入原生 CI；适配器仍属实验支持，实测结果以对应运行记录为准。
 - Windows 默认 waiter 支持提供 `waitHandle()` 的 `EventSource`；只有 POSIX

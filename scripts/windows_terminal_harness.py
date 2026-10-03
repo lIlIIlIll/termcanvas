@@ -86,7 +86,7 @@ class ConPtySession:
                 )
 
     def send(self, data: bytes):
-        self.process.write(data.decode("ascii"))
+        self.process.write(data.decode("utf-8"))
 
     def assert_raw(self):
         self.wait_for(b"NATIVE_RAW_OK")

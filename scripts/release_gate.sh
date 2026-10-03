@@ -69,6 +69,9 @@ echo "==> native SDK wrapper fixtures"
 python3 "$ROOT/scripts/test_native_sdk.py"
 python3 "$ROOT/scripts/test_windows_terminal_harness.py"
 
+echo "==> native POSIX process launcher"
+python3 "$ROOT/packages/core/native/test_spawn.py"
+
 echo "==> independent downstream application"
 python3 "$ROOT/scripts/test_downstream_app.py"
 

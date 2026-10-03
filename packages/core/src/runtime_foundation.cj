@@ -223,6 +223,43 @@ public struct SequencedRuntimeItem<A> {
     }
 }
 
+// A source snapshot remains owned by the runtime until every event has been
+// admitted. Never read another snapshot while this one is pending: the native
+// source can then apply byte backpressure instead of growing a second queue.
+class RuntimeEventBatch {
+    private var events: Array<Event> = []
+    private var index: Int64 = 0
+
+    func size(): Int64 { events.size - index }
+
+    func replace(batch: Array<Event>): Unit {
+        if (size() != 0) { throw IllegalStateException("source batch is still pending") }
+        events = batch
+        index = 0
+    }
+
+    func take(maxEvents: Int64): Array<Event> {
+        let count = min(size(), max(0, maxEvents))
+        let out = events[index..index + count].clone()
+        index += count
+        if (index == events.size) {
+            events = []
+            index = 0
+        }
+        out
+    }
+
+    func append(batch: Array<Event>): Unit {
+        if (batch.isEmpty()) { return }
+        let pending = size()
+        let merged = Array<Event>(pending + batch.size, { position =>
+            if (position < pending) { events[index + position] } else { batch[position - pending] }
+        })
+        events = merged
+        index = 0
+    }
+}
+
 // Single-consumer FIFO. Producers never access this queue directly; external
 // producers use ExternalPort and the runtime imports immutable actions.
 public class RuntimeQueue<A> {

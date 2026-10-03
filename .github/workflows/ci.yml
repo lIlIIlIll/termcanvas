@@ -61,6 +61,15 @@ jobs:
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
+      - name: Preserve coverage evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cangjie-coverage
+          path: ${{ runner.temp }}/cjtui-codecov
+          retention-days: 7
+          if-no-files-found: ignore
+
       - name: Archive nightly failure
         if: failure() && steps.release_gate.outcome == 'failure' && github.event_name != 'pull_request'
         shell: bash
@@ -98,3 +107,11 @@ jobs:
         run: python -m pip install pywinpty==3.0.5
       - name: Native tests, independent consumer and terminal lifecycle
         run: python scripts/native_ci.py
+      - name: Preserve native terminal evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-terminal-${{ matrix.os }}
+          path: ${{ runner.temp }}/cjtui-native-target/native-terminal.json
+          retention-days: 7
+          if-no-files-found: ignore

@@ -5,19 +5,14 @@ import std.time.*
 
 @FastNative
 @When[os != "Windows"]
-foreign func forkpty(amaster: CPointer<Int32>, name: CPointer<UInt8>, termp: CPointer<Unit>, winp: CPointer<Unit>): Int32
-
-@FastNative
-@When[os != "Windows"]
 foreign func openpty(amaster: CPointer<Int32>, aslave: CPointer<Int32>, name: CPointer<UInt8>, termp: CPointer<Unit>, winp: CPointer<Unit>): Int32
 
-@FastNative
+// This call may allocate in the parent; it must use the ordinary FFI entry.
+// Only native code executes in the child, all the way through exec/_exit.
 @When[os != "Windows"]
-foreign func fork(): Int32
-
-@FastNative
-@When[os != "Windows"]
-foreign func setsid(): Int32
+foreign func termcanvas_spawn(argv: CPointer<CString>, env: CPointer<CString>, cwd: CString,
+    input: Int32, output: Int32, errors: Int32, terminal: Int32, errorFd: Int32,
+    closeFds: CPointer<Int32>, closeCount: Int64): Int32
 
 @FastNative
 @When[os == "Linux"]
@@ -34,23 +29,7 @@ func ptyErrno(): Int32 { unsafe { __error().read() } }
 
 @FastNative
 @When[os != "Windows"]
-foreign func dup2(oldfd: Int32, newfd: Int32): Int32
-
-@FastNative
-@When[os != "Windows"]
 foreign func pipe(pipefd: CPointer<Int32>): Int32
-
-@FastNative
-@When[os != "Windows"]
-foreign func execvp(file: CString, argv: CPointer<CString>): Int32
-
-@FastNative
-@When[os != "Windows"]
-foreign func chdir(path: CString): Int32
-
-@FastNative
-@When[os != "Windows"]
-foreign func putenv(str: CString): Int32
 
 @FastNative
 @When[os != "Windows"]
@@ -410,8 +389,14 @@ class PtyReadBudget {
     var blocked: Int64 = 0
     let quantum: Int64
     let capacity: Int64
-    init(quantum: Int64, capacity: Int64) { this.quantum = quantum; this.capacity = capacity }
+    let turnCapacity: Int64
+    var remaining: Int64
+    init(quantum: Int64, capacity: Int64) {
+        this.quantum = quantum; this.capacity = capacity
+        turnCapacity = max(64 * 1024, min(64 * 1024, quantum) * 2); remaining = turnCapacity
+    }
     func accepted(count: Int64): Unit { queued += count; peak = max(peak, queued) }
+    func resetTurn(): Unit { remaining = turnCapacity }
 }
 
 @When[os != "Windows"]
@@ -420,6 +405,8 @@ public class LinuxPtyRuntime <: PtyRuntime {
     private let events = ArrayList<Event>()
     private let flow: PtyReadBudget
     private let maxProcesses: Int64
+    private var drainCursor: Int64 = 0
+    private var sourceStderrFirst = false
 
     public init(readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 2 * 1024 * 1024, maxProcesses!: Int64 = 32) {
         if (readBudgetBytes <= 0 || maxQueuedBytes <= 0 || maxProcesses <= 0) { throw IllegalArgumentException("PTY budgets must be positive") }
@@ -448,8 +435,9 @@ public class LinuxPtyRuntime <: PtyRuntime {
                 rc
             }
             if (opened != 0) { return Event.PtyFailed(id, "openpty failed") }
-            master = unsafe { masterPtr.read() }
-            slave = unsafe { slavePtr.read() }
+            master = reservePtyFd(unsafe { masterPtr.read() })
+            slave = reservePtyFd(unsafe { slavePtr.read() })
+            if (master < 0 || slave < 0) { return Event.PtyFailed(id, "pty descriptor reservation failed") }
             if (!makePtyPipe(stderrPipe) || !makePtyPipe(startupPipe)) {
                 return Event.PtyFailed(id, "pty pipe failed")
             }
@@ -458,14 +446,10 @@ public class LinuxPtyRuntime <: PtyRuntime {
             }
             let command = PreparedPtyCommand(spec)
             try {
-                child = unsafe { fork() }
-                if (child < 0) { return Event.PtyFailed(id, "fork failed") }
-                if (child == 0) {
-                    unsafe { _ = close(startupPipe[0]) }
-                    childExecWithStreams(command, master, slave, stderrPipe[0], stderrPipe[1], startupPipe[1])
-                }
+                child = command.startNative(slave, slave, stderrPipe[1], slave, startupPipe[1],
+                    [master, slave, stderrPipe[0], stderrPipe[1], startupPipe[0]])
+                if (child < 0) { return Event.PtyFailed(id, "pty native spawn failed") }
             } finally {
-                // The child exits/execs without returning to this parent path.
                 command.release()
             }
             unsafe { _ = close(slave); _ = close(stderrPipe[1]); _ = close(startupPipe[1]) }
@@ -550,9 +534,10 @@ public class LinuxPtyRuntime <: PtyRuntime {
 
     public func sources(): Array<EventSource> {
         let out = ArrayList<EventSource>()
-        for (process in processes) {
-            out.add(process)
-            out.add(process.stderrSource())
+        for (offset in 0..processes.size) {
+            let process = processes[(drainCursor + offset) % processes.size]
+            if (sourceStderrFirst) { out.add(process.stderrSource()); out.add(process) }
+            else { out.add(process); out.add(process.stderrSource()) }
         }
         out.toArray()
     }
@@ -562,8 +547,11 @@ public class LinuxPtyRuntime <: PtyRuntime {
         for (event in events) { out.add(event) }
         events.clear()
         flow.queued = 0
-        var index: Int64 = 0
-        while (index < processes.size) {
+        var index = if (processes.isEmpty()) { 0 } else { drainCursor % processes.size }
+        var visits = processes.size
+        while (visits > 0 && !processes.isEmpty()) {
+            index %= processes.size
+            visits--
             let process = processes[index]
             // A busy App may deliberately avoid blocking in its waiter. Read
             // one quantum here too so command traffic cannot starve PTYs.
@@ -581,6 +569,10 @@ public class LinuxPtyRuntime <: PtyRuntime {
                 case None => index++
             }
         }
+        if (!processes.isEmpty()) { drainCursor = (drainCursor + 1) % processes.size }
+        else { drainCursor = 0 }
+        sourceStderrFirst = !sourceStderrFirst
+        flow.resetTurn()
         out.toArray()
     }
 
@@ -613,6 +605,7 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
     private var pendingWrite: Array<Byte> = []
     private var writeOffset: Int64 = 0
     private var stdoutEnded: Bool = false
+    private var stderrFirst = false
     private let flow: PtyReadBudget
 
     public init(id: String, fd: Int32, stderrFd: Int32, pid: Int32, size: PtySize, events: ArrayList<Event>) {
@@ -631,7 +624,7 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
     public func id(): String { processId }
 
     public func fd(): ?Int32 {
-        if (closed || stdoutEnded || flow.queued >= flow.capacity) { None } else { Some(masterFd) }
+        if (closed || stdoutEnded || flow.queued >= flow.capacity || flow.remaining <= 0) { None } else { Some(masterFd) }
     }
 
     public func interests(): EventSourceInterest {
@@ -747,7 +740,7 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
     }
 
     func stderrFdValue(): ?Int32 {
-        if (stderrClosed || closed || flow.queued >= flow.capacity) { None } else { Some(stderrFd) }
+        if (stderrClosed || closed || flow.queued >= flow.capacity || flow.remaining <= 0) { None } else { Some(stderrFd) }
     }
 
     func onStderrReady(readable: Bool, error: Bool, hangup: Bool): Unit {
@@ -765,8 +758,14 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
     func outputEnded(): Bool { stdoutEnded && stderrClosed }
 
     func drainRemaining(): Unit {
-        if (!closed) { readAvailable(masterFd, PtyOutputStream.Stdout) }
-        if (!stderrClosed) { readAvailable(stderrFd, PtyOutputStream.Stderr) }
+        if (stderrFirst) {
+            if (!stderrClosed) { readAvailable(stderrFd, PtyOutputStream.Stderr) }
+            if (!closed) { readAvailable(masterFd, PtyOutputStream.Stdout) }
+        } else {
+            if (!closed) { readAvailable(masterFd, PtyOutputStream.Stdout) }
+            if (!stderrClosed) { readAvailable(stderrFd, PtyOutputStream.Stderr) }
+        }
+        stderrFirst = !stderrFirst
     }
 
     public func drain(): Array<Event> { [] }
@@ -803,9 +802,10 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
                 if (stderrClosed) { return }
         }
         var remaining = flow.quantum
-        while (!closed && remaining > 0) {
+        while (!closed && remaining > 0 && (closing || flow.remaining > 0)) {
             let limit = if (closing) { flow.capacity + 8 * 1024 * 1024 } else { flow.capacity }
-            let capacity = min(min(PTY_READ_BYTES, remaining), limit - flow.queued)
+            let capacity = min(min(min(PTY_READ_BYTES, remaining), limit - flow.queued),
+                if (closing) { remaining } else { flow.remaining })
             if (capacity <= 0) {
                 flow.blocked++
                 if (closing) { throw IllegalStateException("PTY final output capacity exhausted") }
@@ -820,6 +820,7 @@ public class LinuxPtyProcess <: PtyProcess & EventSource {
             }
             if (n > 0) {
                 remaining -= Int64(n)
+                if (!closing) { flow.remaining -= Int64(n) }
                 flow.accepted(Int64(n))
                 eventQueue.add(Event.PtyOutput(processId, stream, bytes[..Int64(n)]))
             } else {
@@ -866,30 +867,39 @@ func ptySignalName(signal: PtySignal): String {
 }
 
 @When[os != "Windows"]
-// Prepare native storage before fork. The child only borrows its forked copy
-// for POSIX calls, then execs or _exits; the parent releases its own copy.
+// Prepare native storage for a single native fork/exec call. Cangjie always
+// remains in the parent; even an allocation-free CJ child can hit runtime locks.
 class PreparedPtyCommand {
     let cwd: CString
-    let hasCwd: Bool
     let env: CPointer<CString>
     let envCount: Int64
     let argv: CPointer<CString>
     let argvCount: Int64
-    let errorByte = LibC.malloc<Byte>()
 
     init(spec: PtySpec) {
         cwd = unsafe { LibC.mallocCString(spec.cwd) }
-        hasCwd = !spec.cwd.isEmpty()
         envCount = spec.env.size
-        env = LibC.malloc<CString>(count: max(1, envCount))
+        env = LibC.malloc<CString>(count: envCount + 1)
         argvCount = spec.args.size + 1
         argv = LibC.malloc<CString>(count: argvCount + 1)
         unsafe {
             for (i in 0..envCount) { (env + i).write(LibC.mallocCString(spec.env[i])) }
+            (env + envCount).write(CString(CPointer<UInt8>()))
             argv.write(LibC.mallocCString(spec.command))
             for (i in 0..spec.args.size) { (argv + i + 1).write(LibC.mallocCString(spec.args[i])) }
             (argv + argvCount).write(CString(CPointer<UInt8>()))
         }
+    }
+
+    func startNative(input: Int32, output: Int32, errors: Int32, terminal: Int32, errorFd: Int32,
+        closeFds: Array<Int32>): Int32 {
+        let descriptors = LibC.malloc<Int32>(count: closeFds.size)
+        try {
+            unsafe {
+                for (i in 0..closeFds.size) { (descriptors + i).write(closeFds[i]) }
+                termcanvas_spawn(argv, env, cwd, input, output, errors, terminal, errorFd, descriptors, closeFds.size)
+            }
+        } finally { unsafe { LibC.free(descriptors) } }
     }
 
     func release(): Unit {
@@ -899,39 +909,7 @@ class PreparedPtyCommand {
             for (i in 0..argvCount) { LibC.free((argv + i).read()) }
             LibC.free(env)
             LibC.free(argv)
-            LibC.free(errorByte)
         }
-    }
-}
-
-@When[os != "Windows"]
-func childPtyFailure(command: PreparedPtyCommand, fd: Int32, stage: Byte): Unit {
-    unsafe {
-        command.errorByte.write(stage)
-        var rc = write(fd, CPointer<Unit>(command.errorByte), 1)
-        while (rc < 0 && ptyErrno() == 4) { rc = write(fd, CPointer<Unit>(command.errorByte), 1) }
-        _exit(127)
-    }
-    while (true) {}
-}
-
-@When[os != "Windows"]
-func childExecWithStreams(command: PreparedPtyCommand, masterFd: Int32, slaveFd: Int32, stderrReadFd: Int32, stderrWriteFd: Int32, errorFd: Int32): Unit {
-    unsafe {
-        _ = close(masterFd)
-        _ = close(stderrReadFd)
-        if (setsid() < 0 || ioctl(slaveFd, TIOCSCTTY, CPointer<Unit>()) != 0) { childPtyFailure(command, errorFd, 1) }
-        if (dup2(slaveFd, STDIN_FILENO) < 0 || dup2(slaveFd, STDOUT_FILENO) < 0 || dup2(stderrWriteFd, STDERR_FILENO) < 0) {
-            childPtyFailure(command, errorFd, 2)
-        }
-        if (slaveFd > STDERR_FILENO) { _ = close(slaveFd) }
-        if (stderrWriteFd > STDERR_FILENO) { _ = close(stderrWriteFd) }
-        if (command.hasCwd && chdir(command.cwd) != 0) { childPtyFailure(command, errorFd, 3) }
-        for (i in 0..command.envCount) {
-            if (putenv((command.env + i).read()) != 0) { childPtyFailure(command, errorFd, 4) }
-        }
-        _ = execvp(command.argv.read(), command.argv)
-        childPtyFailure(command, errorFd, 5)
     }
 }
 
@@ -942,11 +920,28 @@ func makePtyPipe(fds: Array<Int32>): Bool {
         let rc = pipe(handle.pointer)
         releaseArrayRawData(handle)
         if (rc != 0) { return false }
-        for (fd in fds) {
-            if (fcntl(fd, F_SETFD, FD_CLOEXEC) < 0) { return false }
+        for (i in 0..fds.size) {
+            fds[i] = reservePtyFd(fds[i])
+            if (fds[i] < 0) { return false }
         }
     }
     true
+}
+
+// A caller may have closed one of its standard streams. Keep every owned fd
+// above stderr so dup2 cannot overwrite another child's stream/startup pipe.
+@When[os != "Windows"]
+func reservePtyFd(fd: Int32): Int32 {
+    unsafe {
+        var owned = fd
+        if (owned < 0) { return -1 }
+        if (owned <= STDERR_FILENO) {
+            owned = fcntl(fd, 0, STDERR_FILENO + 1) // F_DUPFD
+            _ = close(fd)
+        }
+        if (owned >= 0 && fcntl(owned, F_SETFD, FD_CLOEXEC) < 0) { _ = close(owned); return -1 }
+        owned
+    }
 }
 
 @When[os != "Windows"]

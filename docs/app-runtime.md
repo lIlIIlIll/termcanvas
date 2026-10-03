@@ -116,9 +116,24 @@ commands; they do not wait for a running subprocess to finish.
 
 An App loop dispatches at most 256 command/event steps before returning to
 input, timers and presentation. Pending work resumes in FIFO order on later
-turns; command execution and event dispatch alternate. External-port imports
+turns; command execution and event dispatch alternate. Above 128 pending events,
+dispatch first reduces the event backlog before executing further commands, so
+self-replenishing commands cannot permanently block new input or source events.
+External-port imports
 take at most 64 entries at a time and leave remaining entries and their wake
-pending. Internal event and command queues each have a 4096-entry hard limit;
+pending. Async, PTY and pipe-process snapshots each admit at most 64 events per
+turn. An unfinished snapshot is retained in order and consumed before reading
+another snapshot from that runtime, so a large source batch cannot overflow the
+event queue. Pending snapshots prevent an idle wait. Explicit PTY close and
+replacement preserve trailing output before their terminal events through the
+same admission path.
+
+Decoded input and due timers each admit at most 64 events per turn and pause
+admission when the event queue reaches its 256-entry high-water mark. Deferred
+input remains in the parser batch; deferred timers keep their deadlines and the
+next timer scan resumes where the previous bounded scan stopped. These bounds
+leave a turn for input, timers and presentation during sustained source traffic.
+Internal event and command queues each have a 4096-entry hard limit;
 overflow raises a descriptive exception and runs session cleanup rather than
 silently dropping accepted output. These are entry-count bounds, not bounds on
 arbitrary application-owned event payloads. User update callbacks still run to

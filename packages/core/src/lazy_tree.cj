@@ -66,6 +66,7 @@ public class LazyTreeModel {
         None
     }
     public func selectById(id: String): Bool {
+        if (findById(id).isNone()) { return false }
         if (let Some(path) <- source.pathForId(id)) {
             if (indexForPath(path).isSome()) { selection = Some(id); return true }
         }
@@ -99,6 +100,8 @@ public class LazyTreeModel {
         }
         let index = path[path.size - 1]
         if (index < 0 || index >= parent.count) { return false }
+        let node = match (source.nodeAt(path)) { case Some(value) => value; case None => return false }
+        if (node.id != id) { return false }
         for (i in 0..parent.children.size) {
             if (parent.children[i].path[path.size - 1] == index) {
                 if (!expanded) { parent.children.remove(at: i) }
@@ -106,7 +109,6 @@ public class LazyTreeModel {
             }
         }
         if (!expanded) { return true }
-        let node = match (source.nodeAt(path)) { case Some(value) => value; case None => return false }
         if (node.childCount == 0) { return true }
         let branch = LazyTreeBranch(path, node.childCount)
         var at = parent.children.size

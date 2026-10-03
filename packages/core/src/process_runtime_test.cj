@@ -6,6 +6,10 @@ import std.time.*
 import std.unittest.*
 import std.unittest.testmacro.*
 
+@FastNative
+@When[os == "Linux"]
+foreign func poll(fds: CPointer<Unit>, nfds: UIntNative, timeout: Int32): Int32
+
 class ProcessObservation {
     var stdoutBytes: Int64 = 0
     var stderrBytes: Int64 = 0
@@ -43,6 +47,119 @@ func collectProcess(runtime: ProcessRuntime): ProcessObservation {
 @Test
 class ProcessRuntimeTest {
     @TestCase
+    func readyStreamsShareEvenASingleByteQueue(): Unit {
+        let runtime = PosixProcessRuntime(maxQueuedBytes: 1)
+        try {
+            _ = runtime.start("tiny", ProcessSpec("/bin/sh", args: ["-c", "printf 1234567890; printf x >&2"]))
+            let sources = runtime.sources()
+            let pollBytes = Array<Byte>(16, repeat: 0)
+            writeUInt32LE(pollBytes, 0, UInt32(sources[0].fd().getOrThrow()))
+            writeUInt32LE(pollBytes, 8, UInt32(sources[1].fd().getOrThrow()))
+            writeUInt16LE(pollBytes, 4, 1)
+            writeUInt16LE(pollBytes, 12, 1)
+            // Observe readiness without consuming either stream. Both writes
+            // must be available before asserting scheduling fairness.
+            var ready: Int32 = 0
+            let deadline = MonoTime.now() + Duration.second * 2
+            while (ready < 2 && MonoTime.now() < deadline) {
+                ready = unsafe {
+                    let handle = acquireArrayRawData(pollBytes)
+                    let count = poll(CPointer<Unit>(handle.pointer), 2, 0)
+                    releaseArrayRawData(handle)
+                    count
+                }
+                sleep(Duration.millisecond)
+            }
+            @Assert(ready, 2)
+            let seen = ProcessObservation()
+            for (_ in 0..4) {
+                for (source in runtime.sources()) { source.onReady(true, false, false, false) }
+                for (event in runtime.drain()) { seen.record(event) }
+            }
+            @Expect(seen.stderrBytes, 1)
+            @Expect(seen.stdoutBytes <= 3)
+        } finally { runtime.closeAll() }
+    }
+
+    @TestCase
+    func nativeLaunchPreservesArgumentsEnvironmentPathAndWorkingDirectory(): Unit {
+        let runtime = PosixProcessRuntime()
+        let text = StringBuilder()
+        let literal = "a b;$(printf injected)\"'中"
+        let seen = ProcessObservation()
+        try {
+            let script = "printf '%s|%s|' \"$1\" \"$TERMCANVAS_SPAWN_TEST\"; pwd"
+            match (runtime.start("native", ProcessSpec("sh", args: ["-c", script, "sh", literal],
+                cwd: "/", env: ["PATH=/bin:/usr/bin", "TERMCANVAS_SPAWN_TEST=old", "TERMCANVAS_SPAWN_TEST=exact"]))) {
+                case Event.ProcessStarted(_) => (); case _ => @Expect(false)
+            }
+            let deadline = MonoTime.now() + Duration.second * 5
+            while (runtime.activeCount() > 0 && MonoTime.now() < deadline) {
+                for (event in runtime.drain()) {
+                    seen.record(event)
+                    match (event) {
+                        case Event.ProcessOutput(_, ProcessOutputStream.Stdout, bytes) => text.append(String.fromUtf8(bytes))
+                        case _ => ()
+                    }
+                }
+                sleep(Duration.millisecond)
+            }
+            @Expect(text.toString(), literal + "|exact|/\n")
+            @Expect(seen.finishes, 1)
+            match (runtime.start("bad-cwd", ProcessSpec("/bin/sh", cwd: "/termcanvas-does-not-exist"))) {
+                case Event.ProcessFailed(_, _) => (); case _ => @Expect(false)
+            }
+            @Expect(runtime.activeCount(), 0)
+        } finally { runtime.closeAll() }
+    }
+
+    @TestCase
+    func repeatedNativeStartsDoNotReturnThroughManagedChildCode(): Unit {
+        let runtime = PosixProcessRuntime()
+        try {
+            for (i in 0..20) {
+                match (runtime.start("repeat", ProcessSpec("/bin/sh", args: ["-c", "printf ok"], timeoutMillis: 1000))) {
+                    case Event.ProcessStarted(_) => (); case _ => @Expect(false)
+                }
+                let seen = collectProcess(runtime)
+                @Expect(seen.stdoutBytes, 2)
+                @Expect(seen.finishes, 1)
+                @Expect(runtime.activeCount(), 0)
+            }
+        } finally { runtime.closeAll() }
+    }
+
+    @TestCase
+    func aggregateReadTurnIsBoundedAndRotatesAcrossProcesses(): Unit {
+        let runtime = PosixProcessRuntime()
+        let delivered = HashSet<String>()
+        var finishes: Int64 = 0
+        try {
+            for (i in 0..8) {
+                _ = runtime.start("fair-${i}", ProcessSpec("/bin/sh", args: ["-c", "head -c 131072 /dev/zero"], timeoutMillis: 4000))
+            }
+            let deadline = MonoTime.now() + Duration.second * 5
+            while (runtime.activeCount() > 0 && MonoTime.now() < deadline) {
+                var bytes: Int64 = 0
+                for (event in runtime.drain()) {
+                    match (event) {
+                        case Event.ProcessOutput(id, _, chunk) => delivered.add(id); bytes += chunk.size
+                        case Event.ProcessFinished(_, result) =>
+                            finishes++
+                            @Expect(result.outputBytes, 131072)
+                            @Expect(result.outputComplete)
+                        case _ => ()
+                    }
+                }
+                @Expect(bytes <= 64 * 1024)
+                sleep(Duration.millisecond)
+            }
+            @Expect(delivered.size, 8)
+            @Expect(finishes, 8)
+        } finally { runtime.closeAll() }
+    }
+
+    @TestCase
     func dualStreamsLargerThanPipeCapacityAreDeliveredBeforeExit(): Unit {
         let runtime = PosixProcessRuntime()
         try {
@@ -78,7 +195,9 @@ class ProcessRuntimeTest {
         let runtime = PosixProcessRuntime()
         let started = MonoTime.now()
         try {
-            _ = runtime.start("deadline", ProcessSpec("/bin/sh", args: ["-c", "trap '' TERM; while :; do :; done"], timeoutMillis: 20))
+            // Give the interpreter time to install the handler under loaded
+            // CI. A 20 ms deadline could kill it before this tested state.
+            _ = runtime.start("deadline", ProcessSpec("/bin/sh", args: ["-c", "trap '' TERM; while :; do :; done"], timeoutMillis: 250))
             let seen = collectProcess(runtime)
             @Expect(runtime.activeCount(), 0)
             @Expect(seen.finishes, 1)
@@ -107,8 +226,8 @@ class ProcessRuntimeTest {
         let runtime = PosixProcessRuntime(readBudgetBytes: 1024, maxQueuedBytes: 4096)
         try {
             _ = runtime.start("bounded", ProcessSpec("/bin/sh", args: ["-c", "head -c 65536 /dev/zero"], timeoutMillis: 4000))
-            let until = MonoTime.now() + Duration.millisecond * 50
-            while (MonoTime.now() < until) {
+            let until = MonoTime.now() + Duration.second * 2
+            while (MonoTime.now() < until && runtime.metrics().backpressureCount == 0) {
                 for (source in runtime.sources()) { source.onReady(true, false, false, false) }
                 sleep(Duration.millisecond)
             }
@@ -213,6 +332,40 @@ class ProcessRuntimeTest {
             @Expect(exits, 1)
             @Expect(runtime.flowMetrics().peakQueuedBytes <= 4096)
         } finally { if (runtime.activeCount() > 0) { _ = runtime.close("pty-budget") } }
+    }
+
+    @TestCase
+    func aggregatePtyReadTurnRotatesWithoutLosingTailBytes(): Unit {
+        let runtime = LinuxPtyRuntime()
+        let totals = HashMap<String, Int64>()
+        var exits: Int64 = 0
+        try {
+            for (i in 0..8) {
+                _ = runtime.start("pty-fair-${i}", PtySpec("/bin/sh", args: ["-c", "head -c 131072 /dev/zero"]))
+            }
+            let deadline = MonoTime.now() + Duration.second * 5
+            while (runtime.activeCount() > 0 && MonoTime.now() < deadline) {
+                var bytes: Int64 = 0
+                for (event in runtime.drain()) {
+                    match (event) {
+                        case Event.PtyOutput(id, _, chunk) =>
+                            totals[id] = (totals.get(id) ?? 0) + chunk.size
+                            bytes += chunk.size
+                        case Event.PtyExited(_, status) =>
+                            exits++
+                            match (status) { case PtyExitStatus.Exited(0) => (); case _ => @Expect(false) }
+                        case _ => ()
+                    }
+                }
+                @Expect(bytes <= 64 * 1024)
+                sleep(Duration.millisecond)
+            }
+            @Expect(totals.size, 8)
+            for ((_, bytes) in totals) { @Expect(bytes, 131072) }
+            @Expect(exits, 8)
+        } finally {
+            for (i in 0..8) { _ = runtime.close("pty-fair-${i}") }
+        }
     }
 }
 
