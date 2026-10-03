@@ -3,7 +3,7 @@
   name = "cjtui_example_smoke"
   organization = ""
   description = "Headless component composition checks for cj_tui examples"
-  version = "0.1.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "executable"

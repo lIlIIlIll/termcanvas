@@ -18,6 +18,8 @@ public class Menu <: Widget {
     private let title: String
     private let items: Array<MenuItem>
     public var selected: Int64
+    public var offset: Int64 = 0
+    private var viewportHeight: Int64 = 1
     private let block: ?Block
     private let style: Style
     private let selectedStyle: Style
@@ -42,25 +44,30 @@ public class Menu <: Widget {
     }
 
     public func handle(key: KeyEvent): ?String {
-        if (items.size == 0) { return None }
+        if (items.isEmpty()) { return None }
+        selected = clamp(selected, 0, items.size - 1)
+        if (let Some(index) <- selectionNavigation(key, selected, items.size, viewportHeight)) {
+            selected = index
+            return None
+        }
         match (key.code) {
-            case KeyCode.Up =>
-                selected = max(0, selected - 1)
-                None
-            case KeyCode.Down =>
-                selected = min(items.size - 1, selected + 1)
-                None
-            case KeyCode.Home =>
-                selected = 0
-                None
-            case KeyCode.End =>
-                selected = items.size - 1
-                None
             case KeyCode.Enter | KeyCode.Char(r' ') =>
-                let item = items[selected]
-                if (item.enabled) { Some(item.action) } else { None }
+                if (items[selected].enabled) { Some(items[selected].action) } else { None }
             case _ => None
         }
+    }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
+        var target = widgetInnerArea(area, block)
+        if (block.isNone() && !title.isEmpty()) {
+            target = Rect(area.x, area.y + 1, area.width, max(0, area.height - 1))
+        }
+        offset = selectionViewportOffset(offset, selected, items.size, target.height)
+        if (let Some(index) <- selectionMouse(mouse, target, offset, items.size, selected)) {
+            selected = index
+            if (mouseScrollDelta(mouse) == 0 && items[index].enabled) { return Some(items[index].action) }
+        }
+        None
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
@@ -73,11 +80,15 @@ public class Menu <: Widget {
             buffer.setString(area.x, area.y, truncate(title, area.width), style: style)
             target = Rect(area.x, area.y + 1, area.width, max(0, area.height - 1))
         }
-        for (row in 0..min(target.height, items.size)) {
-            let item = items[row]
+        viewportHeight = max(1, target.height)
+        selected = clamp(selected, 0, max(0, items.size - 1))
+        offset = selectionViewportOffset(offset, selected, items.size, target.height)
+        for (row in 0..min(target.height, items.size - offset)) {
+            let index = offset + row
+            let item = items[index]
             let rowStyle = if (!item.enabled) {
                 disabledStyle
-            } else if (row == selected) {
+            } else if (index == selected) {
                 selectedStyle
             } else {
                 style
@@ -124,6 +135,21 @@ public class MenuBar <: Widget {
         }
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        if (!widgetHitTest(mouse, area) || mouse.y != area.y) { return false }
+        match ((mouse.kind, mouse.button)) {
+            case (MouseKind.Down, MouseButton.Left) =>
+                var x = area.x
+                for (i in 0..menus.size) {
+                    let width = displayWidth(" " + menus[i] + " ")
+                    if (mouse.x >= x && mouse.x - x < width) { selected = i; return true }
+                    x += width
+                }
+                false
+            case _ => false
+        }
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         var x = area.x
@@ -141,6 +167,9 @@ public class CommandPalette <: Widget {
     private let items: Array<MenuItem>
     public var query: String
     public var selected: Int64
+    public var offset: Int64 = 0
+    private var viewportHeight: Int64 = 1
+    private var lastQuery: String = ""
     private let block: ?Block
     private let style: Style
     private let selectedStyle: Style
@@ -155,6 +184,7 @@ public class CommandPalette <: Widget {
     ) {
         this.items = items
         this.query = query
+        this.lastQuery = query
         this.selected = max(0, selected)
         this.block = block
         this.style = style
@@ -163,6 +193,11 @@ public class CommandPalette <: Widget {
     }
 
     public func handle(key: KeyEvent): ?String {
+        synchronizeQuery()
+        if (let Some(index) <- selectionNavigation(key, selected, filtered().size, viewportHeight)) {
+            selected = index
+            return None
+        }
         match (key.code) {
             case KeyCode.Char(r) =>
                 query += match (key.text) { case Some(text) => text; case None => runeToString(r) }
@@ -189,7 +224,30 @@ public class CommandPalette <: Widget {
         }
     }
 
+    public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
+        synchronizeQuery()
+        let inner = widgetInnerArea(area, block)
+        let target = Rect(inner.x, inner.y + 1, inner.width, max(0, inner.height - 1))
+        let rows = filtered()
+        offset = selectionViewportOffset(offset, selected, rows.size, target.height)
+        if (let Some(index) <- selectionMouse(mouse, target, offset, rows.size, selected)) {
+            selected = index
+            if (mouseScrollDelta(mouse) == 0 && rows[index].enabled) { return Some(rows[index].action) }
+        }
+        None
+    }
+
+    private func synchronizeQuery(): Unit {
+        if (lastQuery != query) {
+            selected = 0
+            offset = 0
+            lastQuery = query
+        }
+        clampSelection()
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
+        synchronizeQuery()
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)
@@ -198,13 +256,16 @@ public class CommandPalette <: Widget {
         if (target.width <= 0 || target.height <= 0) { return }
         buffer.setString(target.x, target.y, truncate("> " + query, target.width), style: style)
         let rows = filtered()
-        for (row in 0..min(max(0, target.height - 1), rows.size)) {
-            let item = rows[row]
+        viewportHeight = max(1, target.height - 1)
+        offset = selectionViewportOffset(offset, selected, rows.size, target.height - 1)
+        for (row in 0..min(max(0, target.height - 1), rows.size - offset)) {
+            let index = offset + row
+            let item = rows[index]
             buffer.setString(
                 target.x,
                 target.y + 1 + row,
                 truncate(item.label, target.width),
-                style: if (row == selected) { selectedStyle } else { style }
+                style: if (index == selected) { selectedStyle } else { style }
             )
         }
     }
@@ -336,6 +397,26 @@ public class Dialog <: Widget {
                 if (buttons.size > 0) { Some(buttons[selected]) } else { None }
             case _ => None
         }
+    }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
+        match ((mouse.kind, mouse.button)) {
+            case (MouseKind.Down, MouseButton.Left) => ()
+            case _ => return None
+        }
+        let actualWidth = min(width, area.width)
+        let actualHeight = min(height, area.height)
+        let outer = Rect(area.x + max(0, (area.width - actualWidth) / 2),
+            area.y + max(0, (area.height - actualHeight) / 2), actualWidth, actualHeight)
+        let inner = Block(title: title).inner(outer)
+        if (!widgetHitTest(mouse, inner) || mouse.y != outer.bottom - 2) { return None }
+        var x = inner.x
+        for (i in 0..buttons.size) {
+            let width = displayWidth("[" + buttons[i] + "]")
+            if (mouse.x >= x && mouse.x - x < width) { selected = i; return Some(buttons[i]) }
+            x += width + 1
+        }
+        None
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {

@@ -2,27 +2,6 @@ package core
 
 import std.collection.*
 
-public interface Clipboard {
-    func getText(): String
-    func setText(text: String): Unit
-}
-
-public class MemoryClipboard <: Clipboard {
-    private var textValue: String = ""
-
-    public init(text!: String = "") {
-        this.textValue = text
-    }
-
-    public func getText(): String {
-        textValue
-    }
-
-    public func setText(text: String): Unit {
-        textValue = text
-    }
-}
-
 public struct TextPosition <: Equatable<TextPosition> {
     public let line: Int64
     public let column: Int64
@@ -56,336 +35,170 @@ public struct TextRange {
     }
 }
 
+// Line/column compatibility facade over the same incremental model TextArea uses.
 public class TextBuffer {
-    private let lines = ArrayList<String>()
-    private let undoStack = ArrayList<String>()
-    private let redoStack = ArrayList<String>()
-    private var grouping: Bool = false
-    private var groupSnapshot: ?String = None
-
-    public init(text!: String = "") {
-        setText(text)
+    private let modelValue: EditableTextModel
+    public init(text!: String = "", model!: ?EditableTextModel = None) {
+        modelValue = match (model) { case Some(source) => source; case None => PieceTableTextModel(text: text) }
     }
-
+    public prop textModel: EditableTextModel { get() { modelValue } }
     public func setText(text: String): Unit {
-        lines.clear()
-        for (line in splitLines(text)) {
-            lines.add(line)
-        }
-        if (lines.size == 0) { lines.add("") }
+        modelValue.replace(0, modelValue.byteLength(), text)
+        modelValue.clearHistory()
     }
-
-    public func text(): String {
-        join(lines.toArray(), "\n")
-    }
-
-    public func lineCount(): Int64 {
-        lines.size
-    }
-
+    public func text(): String { modelValue.text() }
+    public func lineCount(): Int64 { modelValue.lineCount() }
     public func line(index: Int64): String {
-        if (index < 0 || index >= lines.size) { return "" }
-        lines[index]
+        if (index < 0 || index >= lineCount()) { "" } else { modelValue.line(index) }
     }
-
     public func insert(position: TextPosition, text: String): TextPosition {
-        let start = clampPosition(position)
-        if (text.isEmpty()) { return start }
-        snapshot()
-        let pos = insertRaw(start, text)
-        clearRedo()
-        pos
+        let start = positionToOffset(position)
+        modelValue.replace(start, start, text)
+        offsetToPosition(start + text.size)
     }
-
     public func replace(range: TextRange, text: String): TextPosition {
-        let normalized = normalizedRange(range)
-        if (slice(normalized) == text) { return normalized.end }
-        snapshot()
-        let start = deleteRangeRaw(normalized)
-        let pos = insertRaw(start, text)
-        clearRedo()
-        pos
+        let start = positionToOffset(range.start)
+        let end = positionToOffset(range.end)
+        modelValue.replace(start, end, text)
+        offsetToPosition(min(start, end) + text.size)
     }
-
-    public func deleteRange(range: TextRange): TextPosition {
-        let normalized = normalizedRange(range)
-        if (normalized.isEmpty()) { return normalized.start }
-        snapshot()
-        let pos = deleteRangeRaw(normalized)
-        clearRedo()
-        pos
-    }
-
+    public func deleteRange(range: TextRange): TextPosition { replace(range, "") }
     public func slice(range: TextRange): String {
-        let r = normalizedRange(range)
-        if (r.isEmpty()) { return "" }
-        if (r.start.line == r.end.line) {
-            let line = lines[r.start.line]
-            return line[r.start.column..r.end.column]
-        }
-        let out = ArrayList<String>()
-        out.add(lines[r.start.line][r.start.column..])
-        var line = r.start.line + 1
-        while (line < r.end.line) {
-            out.add(lines[line])
-            line++
-        }
-        out.add(lines[r.end.line][..r.end.column])
-        join(out.toArray(), "\n")
+        modelValue.slice(positionToOffset(range.start), positionToOffset(range.end))
     }
-
+    public func clampPosition(position: TextPosition): TextPosition {
+        let index = clamp(position.line, 0, lineCount() - 1)
+        let start = modelValue.lineStart(index)
+        let end = if (index + 1 < lineCount()) { modelValue.lineStart(index + 1) - 1 } else { modelValue.byteLength() }
+        let column = min(position.column, end - start)
+        TextPosition(index, modelValue.clampOffset(start + column) - start)
+    }
+    public func positionToOffset(position: TextPosition): Int64 {
+        let pos = clampPosition(position)
+        modelValue.lineStart(pos.line) + pos.column
+    }
+    public func offsetToPosition(offset: Int64): TextPosition {
+        let pos = modelValue.clampOffset(offset)
+        let index = modelValue.lineForOffset(pos)
+        TextPosition(index, pos - modelValue.lineStart(index))
+    }
+    public func deleteBackward(position: TextPosition): TextPosition {
+        let pos = clampPosition(position)
+        let offset = positionToOffset(pos)
+        if (offset == 0) { return pos }
+        let previous = if (pos.column == 0) { offset - 1 } else {
+            modelValue.lineStart(pos.line) + previousGraphemeOffset(line(pos.line), pos.column)
+        }
+        modelValue.replace(previous, offset, "")
+        offsetToPosition(previous)
+    }
+    public func deleteForward(position: TextPosition): TextPosition {
+        let pos = clampPosition(position)
+        let offset = positionToOffset(pos)
+        if (offset >= modelValue.byteLength()) { return pos }
+        let current = line(pos.line)
+        let next = if (pos.column >= current.size) { offset + 1 } else {
+            modelValue.lineStart(pos.line) + nextGraphemeOffset(current, pos.column)
+        }
+        modelValue.replace(offset, next, "")
+        pos
+    }
+    public func beginUndoGroup(): Unit { modelValue.beginUndoGroup() }
+    public func endUndoGroup(): Unit { modelValue.endUndoGroup() }
+    public func undo(): Bool { modelValue.undo() }
+    public func redo(): Bool { modelValue.redo() }
     public func wordLeft(position: TextPosition): TextPosition {
-        let offset = absoluteOffset(clampPosition(position))
-        TextPositionFromOffset(previousWordOffset(text(), offset))
+        offsetToPosition(indexedWordOffset(modelValue, positionToOffset(position), false))
     }
-
     public func wordRight(position: TextPosition): TextPosition {
-        let offset = absoluteOffset(clampPosition(position))
-        TextPositionFromOffset(nextWordOffset(text(), offset))
+        offsetToPosition(indexedWordOffset(modelValue, positionToOffset(position), true))
     }
-
+    public func find(needle: String, start!: TextPosition = TextPosition(0, 0)): ?TextPosition {
+        if (needle.isEmpty()) { return None }
+        let index = stringIndexOf(text(), needle, positionToOffset(start))
+        if (index < 0) { None } else { Some(offsetToPosition(index)) }
+    }
     public func findPrevious(needle: String, start!: TextPosition = TextPosition(Int64.Max, Int64.Max)): ?TextPosition {
         if (needle.isEmpty()) { return None }
-        let endOffset = min(absoluteOffset(clampPosition(start)), text().size)
-        let idx = stringLastIndexOf(text(), needle, endOffset)
-        if (idx < 0) { return None }
-        Some(TextPositionFromOffset(idx))
+        let index = stringLastIndexOf(text(), needle, positionToOffset(start))
+        if (index < 0) { None } else { Some(offsetToPosition(index)) }
     }
-
     public func findAll(needle: String): Array<TextRange> {
-        let ranges = ArrayList<TextRange>()
         if (needle.isEmpty()) { return [] }
         let source = text()
-        var offset: Int64 = 0
-        while (offset <= source.size) {
-            let idx = stringIndexOf(source, needle, offset)
-            if (idx < 0) { break }
-            ranges.add(TextRange(TextPositionFromOffset(idx), TextPositionFromOffset(idx + needle.size)))
-            offset = idx + max(1, needle.size)
+        let ranges = ArrayList<TextRange>()
+        var start: Int64 = 0
+        while (start <= source.size) {
+            let index = stringIndexOf(source, needle, start)
+            if (index < 0) { break }
+            ranges.add(TextRange(offsetToPosition(index), offsetToPosition(index + needle.size)))
+            start = index + needle.size
         }
         ranges.toArray()
     }
-
     public func replaceAll(needle: String, replacement: String): Int64 {
         if (needle.isEmpty()) { return 0 }
         let source = text()
+        let builder = StringBuilder()
         var offset: Int64 = 0
         var count: Int64 = 0
-        var idx = stringIndexOf(source, needle, offset)
-        if (idx < 0) { return 0 }
-        let out = StringBuilder()
-        while (idx >= 0) {
-            out.append(source[offset..idx])
-            out.append(replacement)
-            offset = idx + needle.size
+        while (true) {
+            let index = stringIndexOf(source, needle, offset)
+            if (index < 0) { break }
+            builder.append(source[offset..index])
+            builder.append(replacement)
+            offset = index + needle.size
             count++
-            idx = stringIndexOf(source, needle, offset)
         }
-        out.append(source[offset..])
-        let replacementText = out.toString()
-        if (replacementText == source) { return count }
-        snapshot()
-        setText(replacementText)
-        clearRedo()
+        if (count == 0) { return 0 }
+        builder.append(source[offset..])
+        modelValue.replace(0, modelValue.byteLength(), builder.toString())
         count
     }
+}
 
-    public func beginUndoGroup(): Unit {
-        if (!grouping) {
-            grouping = true
-            groupSnapshot = Some(text())
-        }
-    }
-
-    public func endUndoGroup(): Unit {
-        if (!grouping) { return }
-        match (groupSnapshot) {
-            case Some(before) =>
-                if (before != text()) {
-                    undoStack.add(before)
-                    clearRedo()
-                }
-            case None => ()
-        }
-        grouping = false
-        groupSnapshot = None
-    }
-
-    public func positionToOffset(position: TextPosition): Int64 {
-        absoluteOffset(clampPosition(position))
-    }
-
-    public func offsetToPosition(offset: Int64): TextPosition {
-        TextPositionFromOffset(offset)
-    }
-
-    private func insertRaw(position: TextPosition, text: String): TextPosition {
-        if (text.isEmpty()) { return position }
-        let parts = splitLines(text)
-        let current = lines[position.line]
-        let prefix = current[..position.column]
-        let suffix = current[position.column..]
-        if (parts.size == 1) {
-            lines[position.line] = prefix + text + suffix
-            return TextPosition(position.line, position.column + text.size)
-        }
-        let last = parts.size - 1
-        let replacement = ArrayList<String>()
-        replacement.add(prefix + parts[0])
-        var index: Int64 = 1
-        while (index < last) {
-            replacement.add(parts[index])
-            index++
-        }
-        replacement.add(parts[last] + suffix)
-        lines.remove(at: position.line)
-        lines.add(all: replacement, at: position.line)
-        TextPosition(position.line + last, parts[last].size)
-    }
-
-    public func deleteBackward(position: TextPosition): TextPosition {
-        let pos = clampPosition(position)
-        if (pos.line == 0 && pos.column == 0) { return pos }
-        snapshot()
-        clearRedo()
-        if (pos.column > 0) {
-            let current = lines[pos.line]
-            let prev = previousRuneOffset(current, pos.column)
-            lines[pos.line] = current[..prev] + current[pos.column..]
-            return TextPosition(pos.line, prev)
-        }
-        let previous = lines[pos.line - 1]
-        let current = lines[pos.line]
-        let nextColumn = previous.size
-        lines[pos.line - 1] = previous + current
-        lines.remove(at: pos.line)
-        TextPosition(pos.line - 1, nextColumn)
-    }
-
-    public func deleteForward(position: TextPosition): TextPosition {
-        let pos = clampPosition(position)
-        let current = lines[pos.line]
-        if (pos.column == current.size && pos.line + 1 == lines.size) { return pos }
-        snapshot()
-        if (pos.column < current.size) {
-            let next = nextRuneOffset(current, pos.column)
-            lines[pos.line] = current[..pos.column] + current[next..]
-        } else if (pos.line + 1 < lines.size) {
-            lines[pos.line] = current + lines[pos.line + 1]
-            lines.remove(at: pos.line + 1)
-        }
-        clearRedo()
-        pos
-    }
-
-    public func undo(): Bool {
-        if (undoStack.size == 0) { return false }
-        redoStack.add(text())
-        let previous = undoStack[undoStack.size - 1]
-        undoStack.remove(at: undoStack.size - 1)
-        setText(previous)
-        true
-    }
-
-    public func redo(): Bool {
-        if (redoStack.size == 0) { return false }
-        undoStack.add(text())
-        let next = redoStack[redoStack.size - 1]
-        redoStack.remove(at: redoStack.size - 1)
-        setText(next)
-        true
-    }
-
-    public func find(needle: String, start!: TextPosition = TextPosition(0, 0)): ?TextPosition {
-        if (needle.isEmpty()) { return None }
-        var lineIndex = clamp(start.line, 0, max(0, lines.size - 1))
-        while (lineIndex < lines.size) {
-            let begin = if (lineIndex == start.line) { start.column } else { 0 }
-            let idx = stringIndexOf(lines[lineIndex], needle, begin)
-            if (idx >= 0) { return Some(TextPosition(lineIndex, idx)) }
+// Word traversal materializes each visited line once. Walking by repeatedly
+// asking the model for the next grapheme would copy a long line per character.
+func indexedWordOffset(model: TextModel, offset: Int64, right: Bool): Int64 {
+    let position = model.clampOffset(offset)
+    var lineIndex = model.lineForOffset(position)
+    var local = position - model.lineStart(lineIndex)
+    var skippingSpace = false
+    if (right) {
+        while (lineIndex < model.lineCount()) {
+            let start = model.lineStart(lineIndex)
+            for (cluster in graphemeClusters(model.line(lineIndex))) {
+                if (cluster.endOffset <= local) { continue }
+                let space = isAsciiSpace(runeAt(cluster.text, 0))
+                if (skippingSpace && !space) { return start + cluster.startOffset }
+                if (space) { skippingSpace = true }
+            }
+            // The line separator is whitespace even for an empty line.
+            skippingSpace = true
             lineIndex++
+            local = 0
         }
-        None
+        return model.byteLength()
     }
-
-    public func clampPosition(position: TextPosition): TextPosition {
-        let line = clamp(position.line, 0, max(0, lines.size - 1))
-        TextPosition(line, clampToRuneBoundary(lines[line], position.column))
-    }
-
-    private func newline(position: TextPosition): TextPosition {
-        let current = lines[position.line]
-        let before = current[..position.column]
-        let after = current[position.column..]
-        lines[position.line] = before
-        lines.add(after)
-        var i = lines.size - 1
-        while (i > position.line + 1) {
-            lines[i] = lines[i - 1]
-            i--
+    var foundWord = false
+    var result = position
+    while (lineIndex >= 0) {
+        let start = model.lineStart(lineIndex)
+        let clusters = graphemeClusters(model.line(lineIndex))
+        var index = clusters.size - 1
+        while (index >= 0) {
+            let cluster = clusters[index]
+            index--
+            if (cluster.startOffset >= local) { continue }
+            let space = isAsciiSpace(runeAt(cluster.text, 0))
+            if (space && foundWord) { return result }
+            if (!space) { foundWord = true; result = start + cluster.startOffset }
         }
-        lines[position.line + 1] = after
-        TextPosition(position.line + 1, 0)
+        if (foundWord) { return result }
+        lineIndex--
+        local = Int64.Max
     }
-
-    private func deleteRangeRaw(range: TextRange): TextPosition {
-        let r = normalizedRange(range)
-        if (r.isEmpty()) { return r.start }
-        if (r.start.line == r.end.line) {
-            let line = lines[r.start.line]
-            lines[r.start.line] = line[..r.start.column] + line[r.end.column..]
-            return r.start
-        }
-        let first = lines[r.start.line][..r.start.column]
-        let last = lines[r.end.line][r.end.column..]
-        lines[r.start.line] = first + last
-        var remaining = r.end.line - r.start.line
-        while (remaining > 0 && r.start.line + 1 < lines.size) {
-            lines.remove(at: r.start.line + 1)
-            remaining--
-        }
-        r.start
-    }
-
-    private func normalizedRange(range: TextRange): TextRange {
-        TextRange(clampPosition(range.start), clampPosition(range.end))
-    }
-
-    private func absoluteOffset(position: TextPosition): Int64 {
-        var offset: Int64 = 0
-        var line: Int64 = 0
-        while (line < position.line && line < lines.size) {
-            offset += lines[line].size + 1
-            line++
-        }
-        offset + position.column
-    }
-
-    private func TextPositionFromOffset(offset: Int64): TextPosition {
-        var rest = clamp(offset, 0, text().size)
-        for (line in 0..lines.size) {
-            if (rest <= lines[line].size) {
-                return TextPosition(line, clampToRuneBoundary(lines[line], rest))
-            }
-            rest -= lines[line].size + 1
-        }
-        TextPosition(lines.size - 1, lines[lines.size - 1].size)
-    }
-
-    private func snapshot(): Unit {
-        if (grouping) {
-            match (groupSnapshot) {
-                case Some(_) => ()
-                case None => groupSnapshot = Some(text())
-            }
-        } else {
-            undoStack.add(text())
-        }
-    }
-
-    private func clearRedo(): Unit {
-        while (redoStack.size > 0) { redoStack.remove(at: 0) }
-    }
+    0
 }
 
 func compareTextPosition(a: TextPosition, b: TextPosition): Int64 {

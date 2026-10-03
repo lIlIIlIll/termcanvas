@@ -3,7 +3,7 @@
   name = "core"
   organization = ""
   description = "Immediate-mode terminal UI toolkit for Cangjie"
-  version = "0.1.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "static"
@@ -13,3 +13,6 @@
   package-configuration = {}
 
 [dependencies]
+
+[ffi.c]
+  termcanvas_posix = { path = "./native/build" }

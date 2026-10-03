@@ -1,143 +1,132 @@
 # Getting Started
 
-## Goal
+Termcanvas 0.0.1 builds terminal applications in Cangjie. The application owns its
+state, `update(Event)` returns commands and redraw requests, and `render(Frame)`
+draws the current state. Start with a source checkout and the pinned Cangjie SDK
+listed in [Versioning and Compatibility](versioning.md).
 
-Build and run the repository's basic application, then verify the complete path:
-application-owned state → `App`/`update` → immediate `Widget` rendering. The
-application exits from a key event and changes its state through a `Command`.
+Linux and macOS builds also need a C compiler (`cc`, GCC or Clang) and `ar`
+(binutils or Xcode Command Line Tools). The normal `cjpm build`/`test` command
+automatically builds the small POSIX process-launch library through the core
+package's build hook, including when core is a path dependency of an external
+application. Windows builds do not require a C compiler. Do not use
+`--skip-script` on a clean checkout: the native archive must exist before linking.
 
-## Prerequisites
+## Create an independent application
 
-- A checkout of this repository, with commands run from its root unless noted.
-- The Cangjie SDK available locally. Set `CANGJIE_SDK_ROOT` to its location;
-  the repository wrapper configures the compiler and runtime paths.
-- A terminal that can run an interactive application. The template manifest
-  declares `cjc-version = "1.1.0"`; the exact canonical verification pin is
-  recorded in [Versioning and Compatibility](versioning.md).
+Your application does not need to live inside this repository. From the
+termcanvas checkout, generate a new directory:
 
-## Run the basic application
+```sh
+python3 scripts/new_example.py my_console --output /path/to/my_console \
+  --library-root /path/to/termcanvas
+```
 
-The complete first application is already in
-[`templates/basic_app/src/main.cj`](../templates/basic_app/src/main.cj), with its
-package manifest in [`templates/basic_app/cjpm.toml`](../templates/basic_app/cjpm.toml).
-Open the source first so the state, event, command, and render paths are visible:
+The generator copies the basic application and an executable regression test.
+It writes path dependencies for `core` and `cjtui_testing` relative to the new
+application. Use `--dependency-path absolute` if the library checkout has a
+fixed installation path. On Windows, dependencies on another drive use an
+absolute path automatically. Paths containing spaces and quotes are encoded as
+valid TOML strings. An existing destination is always preserved.
+
+For a repository example, the shorter form remains available:
+
+```sh
+python3 scripts/new_example.py my_console
+# Linux/macOS compatibility wrapper:
+scripts/new_example.sh my_console
+```
+
+This creates `examples/my_console`. `--library-root` selects the source checkout
+whose packages are used; it is not a registry download or a bundled library copy.
+Keep the generated dependency paths valid when moving either directory.
+
+## Build, test, and run
+
+Set `CANGJIE_SDK_ROOT` to your installed SDK. The native wrapper sets compiler,
+package manager, and runtime library paths on Linux, macOS, and Windows:
+
+```sh
+export CANGJIE_SDK_ROOT=/path/to/cangjie
+python3 /path/to/termcanvas/scripts/native_sdk.py --run /path/to/my_console -- cjpm build
+python3 /path/to/termcanvas/scripts/native_sdk.py --run /path/to/my_console -- cjpm test
+python3 /path/to/termcanvas/scripts/native_sdk.py --run /path/to/my_console -- cjpm run
+```
+
+In PowerShell use `$env:CANGJIE_SDK_ROOT = "C:\path\to\cangjie"` and `python`
+instead of `python3` if that is the installed interpreter command. The paths
+passed to `--run` may be absolute or relative.
+
+The sample displays a count. Press `+` to increment it and `q` or Ctrl-C to exit.
+Its `--headless-smoke` mode also supports noninteractive startup verification:
+
+```sh
+python3 /path/to/termcanvas/scripts/native_sdk.py --run /path/to/my_console -- cjpm run -- --headless-smoke
+```
+
+You can run the unchanged template directly by using
+`templates/basic_app` as the working directory.
+
+## Understand the application
+
+The generated `DemoApp` separates state and effects:
 
 ```cangjie
-package cjtui_basic_app
-
-import core.*
-
 class DemoApp {
     var count: Int64 = 0
 
     func update(event: Event): UpdateResult {
         match (event) {
-            case Event.KeyDown(key) =>
-                match (key.code) {
-                    case KeyCode.CtrlC | KeyCode.Char(r'q') => UpdateResult.exit()
-                    case KeyCode.Char(r'+') => UpdateResult.withCommand(Command.Message("inc"))
-                    case _ => UpdateResult.unchanged()
-                }
+            case Event.KeyDown(key) => match (key.code) {
+                case KeyCode.Char(r'+') =>
+                    UpdateResult.withCommand(Command.Message("inc"))
+                case KeyCode.Char(r'q') | KeyCode.CtrlC => UpdateResult.exit()
+                case _ => UpdateResult.unchanged()
+            }
+            case Event.Message("inc") => count++; UpdateResult.next()
             case Event.Resize(_) => UpdateResult.next()
-            case Event.Message("inc") =>
-                count++
-                UpdateResult.next()
             case _ => UpdateResult.unchanged()
         }
     }
 
     func render(frame: Frame): Unit {
-        frame.renderWidget(
-            Paragraph("count: ${count}\n+: increment\nq/Ctrl-C: quit", block: Block(title: "cjtui")),
-            frame.area
-        )
+        frame.renderWidget(Paragraph("count: ${count}"), frame.area)
     }
 }
+```
 
-main(): Int64 {
-    let app = DemoApp()
-    App().runWithCommands(
+Start the interactive loop with
+`App().runWithCommands({ frame => app.render(frame) }, { event => app.update(event) })`.
+Keep persistent selection, editor and application state on the application;
+constructing a widget each frame does not create a second event loop.
+
+## Verify behavior
+
+The generated `main_test.cj` imports the supported `cjtui_testing` package:
+
+```cangjie
+let app = DemoApp()
+let report = TestScenario().key(KeyEvent(KeyCode.Char(r'+')))
+    .resize(32, 8).tick().run(
         { frame => app.render(frame) },
         { event => app.update(event) }
     )
-    0
-}
+@Expect(report.passed)
+@Expect(app.count, 1)
+@Expect(report.lastSnapshot().contains("count: 1"))
 ```
 
-From the repository root, build the template with the wrapper:
-
-```bash
-CANGJIE_SDK_ROOT=/path/to/cangjie \
-  scripts/cangjie_cmd.sh templates/basic_app cjpm build
-```
-
-Run it with the same command shape:
-
-```bash
-CANGJIE_SDK_ROOT=/path/to/cangjie \
-  scripts/cangjie_cmd.sh templates/basic_app cjpm run
-```
-
-### Verify the first success
-
-The running application renders `count` and the `+`/quit key hints. Press `+`
-and verify that `count` increases. Press `q` or `Ctrl-C` and verify that the
-application exits. This exercises the application-owned state update, the
-`Command.Message("inc")` message action, and the immediate `Paragraph` render.
-
-## Add layout and widgets
-
-Keep rendering immediate: compute layout from `frame.area`, then pass each area
-to `frame.renderWidget(widget, area)`. Start with:
-
-- `Block` and `Paragraph` for framed text;
-- `List` and `Table` for structured rows; and
-- `Input`, `TextArea`, or `DocumentView` for editing and rich content.
-
-When selection or scrolling must persist across frames, keep the corresponding
-state in the application-owned state and pass `ListState` or `TableState` rather
-than relying on transient constructor values.
-
-## Add effects through `Command`
-
-Use `App.runWithCommands()` when an update needs an effect. Return
-`UpdateResult.withCommand(...)` from `update`; the runtime executes accepted work
-in order and delivers results back through `Event` and the same update path.
-
-- Use `Command.Message` for internal actions.
-- Use `Command.AsyncTask` for background work. Workers return immutable results;
-  apply them to application-owned state only from `update`.
-- Use `Command.AsyncExec` for background process execution.
-- Use `Command.StartTimer(TimerSpec(...))` for one-shot or repeating real-time
-  timers.
-- Keep `Command.Exec` for short synchronous commands.
-
-## Verify event workflows
-
-For deterministic event-script checks, run this command from the repository root:
-
-```bash
-scripts/run_event_script.sh \
-  packages/core/tests/events/basic.events \
-  packages/core/tests/events/scenario.events
-```
-
-The script validates the repository's event scenario syntax. For render
-assertions and captured frames, use `TestBackend` and the snapshot helpers
-covered by [Testing](testing.md).
+This drives the real update/command/render path and captures frames. You do not
+need repository-only `HeadlessScript`, `AppTestRunner`, or fake runtime types.
+See [Downstream Testing](downstream-testing.md) for the public contract and
+native-terminal verification boundaries.
 
 ## Next steps
 
-- Browse the [17-example catalog](examples.md), starting with
-  [`taskpad`](../examples/taskpad/) and then choosing a focused application.
-- Read [App runtime](app-runtime.md) for event, command, timer, and redraw
-  behavior.
-- Read [Widgets](widgets.md), [Layout](layout.md), and [Events](events.md) as
-  the application grows.
-- Check [API Overview](api.md) and [Versioning and Compatibility](versioning.md)
-  before adopting experimental or extension-package declarations.
-- Before sharing a build, run the repository [release gate](../scripts/release_gate.sh):
-
-  ```bash
-  scripts/release_gate.sh
-  ```
+- [Examples](examples.md): choose among forms, file/data browsers, Markdown,
+  monitoring, assistant interfaces, games and media demonstrations.
+- [App Runtime](app-runtime.md): command ordering, timers and redraws.
+- [Widgets](widgets.md), [Layout](layout.md), and [Events](events.md): compose the UI.
+- [API Overview](api.md): check the compatibility tier of advanced APIs.
+- `python3 scripts/test_downstream_app.py`: independently generate, build, test,
+  and run a clean application outside the repository; used by native CI.

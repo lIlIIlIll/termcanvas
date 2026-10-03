@@ -3,7 +3,7 @@
   name = "cjtui_basic_app"
   organization = ""
   description = "cjtui app template"
-  version = "1.0.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "executable"
@@ -14,3 +14,4 @@
 
 [dependencies]
   "core" = { path = "../../packages/core", output-type = "static" }
+  "cjtui_testing" = { path = "../../packages/testing", output-type = "static" }

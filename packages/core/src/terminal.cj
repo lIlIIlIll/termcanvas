@@ -49,12 +49,14 @@ foreign func tcsetattr(fd: Int32, optionalActions: Int32, termios: CPointer<Unit
 foreign func tcsetattr(fd: Int32, optionalActions: Int32, termios: CPointer<Unit>): Int32
 
 @FastNative
-@When[os == "Linux"]
-foreign func ioctl(fd: Int32, request: UInt64, argp: CPointer<Unit>): Int32
+@When[os != "Windows"]
+foreign func termcanvas_ioctl(fd: Int32, request: UInt64, argp: CPointer<Unit>): Int32
 
-@FastNative
-@When[os == "macOS"]
-foreign func ioctl(fd: Int32, request: UInt64, argp: CPointer<Unit>): Int32
+// A fixed-arity declaration of libc's variadic ioctl breaks Apple ARM64.
+@When[os != "Windows"]
+func ioctl(fd: Int32, request: UInt64, argp: CPointer<Unit>): Int32 {
+    unsafe { termcanvas_ioctl(fd, request, argp) }
+}
 
 @FastNative
 @When[os == "Linux"]
@@ -1939,6 +1941,12 @@ public class MacOSTerminalMode {
         unsafe {
             let handle = acquireArrayRawData(raw)
             cfmakeraw(CPointer<Unit>(handle.pointer))
+            // Darwin LP64 termios has four unsigned-long flags before c_cc;
+            // VMIN=16 and VTIME=17 (xnu bsd/sys/termios.h). cfmakeraw leaves
+            // VMIN=1, which blocks the input drain after its first ready byte.
+            // Match the event loop's nonblocking Linux input contract.
+            raw[32 + 16] = 0
+            raw[32 + 17] = 0
             let rc = tcsetattr(STDIN_FILENO, TCSAFLUSH, CPointer<Unit>(handle.pointer))
             releaseArrayRawData(handle)
             if (rc != 0) {

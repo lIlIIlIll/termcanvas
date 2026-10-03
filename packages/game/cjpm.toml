@@ -3,7 +3,7 @@
   name = "game"
   organization = ""
   description = "2D ECS, continuous collision, input, and sprite helpers for cjtui games"
-  version = "0.1.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "static"

@@ -10,6 +10,12 @@ The application/model owns canonical state. `update` applies `Event` values and 
 
 Use the stable sections below for application code. Before depending on an advanced declaration, check the generated inventory for its exact tier, owner, and signature. An API can be exported from `core` and still be experimental, internal, or test-only.
 
+The [0.0.1 migration guide](migration-0.0.1.md) covers the breaking version reset.
+New focused guides describe [interaction](interaction.md), [indexed editing](text-editing.md),
+[clipboard](clipboard.md), [paged data](data-sources.md) and
+[downstream testing](downstream-testing.md). The supported testing entry point is
+`cjtui_testing.TestScenario` / `TestReport`; core headless helpers remain test-only.
+
 ## Reference: authority and scope
 
 This page is a human-oriented map, not the API contract. The generated [`api-inventory.json`](api-inventory.json) is authoritative for exhaustive membership, ownership, signatures, and stability. Its `counts.production_public_top_level` and `counts.top_level_by_stability` fields provide current totals; this page intentionally does not duplicate numbers that can drift when declarations change.
@@ -74,5 +80,6 @@ Current families include:
 - `packages/core` owns the stable editor primitives. The former advanced editor shell and the `packages/editor` and `packages/document` alias facades are retired.
 - `packages/markdown_adapter` converts [markdown v0.9.0](https://github.com/lIlIIlIll/markdown/releases/tag/v0.9.0) parse results into the core document model; the external parser owns diagnostics and source positions.
 - `packages/terminal`, `packages/diff`, `packages/media`, and `packages/game` provide specialized extension capabilities without owning application state.
+- `packages/testing` owns the stable downstream test facade, declared as package `cjtui_testing`.
 
 The former Component lifecycle package and retained ViewNode/CSS package are not current modules or API choices. Their history is recorded in ADR-008 (`adr/008-component-and-viewnode-disposition.md`).

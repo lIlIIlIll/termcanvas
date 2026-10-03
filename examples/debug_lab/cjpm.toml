@@ -3,7 +3,7 @@
   name = "cjtui_debug_lab"
   organization = ""
   description = "Terminal capability and metrics lab example for cjtui"
-  version = "1.0.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "executable"

@@ -2,7 +2,7 @@
 
 ## Explanation: support level and selection
 
-`cjtui` is Linux/glibc-first today. Linux/glibc is the fully validated terminal target. macOS and Windows have native experimental terminal paths; until a platform is included in the tested regression matrix, document it as experimental.
+`cjtui` is Linux/glibc-first today. Linux/glibc is the locally validated terminal target. The 0.0.1 CI matrix adds native macOS and Windows package, downstream-consumer and terminal-lifecycle checks. These adapters remain experimental; a configured CI job is not evidence of a successful platform run. Release notes must record each actual result.
 
 Platform defaults are isolated behind `@When[os == ...]` factories, so non-Linux targets do not have to use Linux terminal defaults. The default selectors are:
 
@@ -22,7 +22,7 @@ Linux app loops use `LinuxEpollEventWaiter` for stdin and external event-source 
 
 macOS terminal sessions use `MacOSTerminalDriver`, Darwin termios with `cfmakeraw()`, window-size detection, capability detection, and ANSI rendering.
 
-macOS app loops use `MacOSPollEventWaiter` for stdin and external `EventSource` readiness. The same smoke package must be run from a checkout on the macOS host. Transferring this repository to a remote macOS host requires explicit approval or a pre-synced checkout.
+macOS app loops use `MacOSPollEventWaiter` for stdin and external `EventSource` readiness. Raw-mode reads use `VMIN=0, VTIME=0` so an input drain cannot block after consuming the ready bytes. The native CI job runs on a macOS host using its native SDK.
 
 ### Windows
 
@@ -45,6 +45,21 @@ handle is not waitable by the default waiter and requires a custom waiter.
 Tests and examples should use `TestBackend` when terminal behavior is not the subject under test. The application path remains application-owned state → `App` / `update` → immediate `Widget` rendering on every platform; platform code supplies terminal mode, waiting, and output boundaries rather than a second application lifecycle.
 
 ## Reference: verification matrix
+
+The pull-request workflow runs `scripts/native_ci.py` on macOS and Windows,
+with the pinned native Cangjie/cjpm 1.1.3 SDK. Linux retains the complete release
+and coverage gates. `scripts/native_terminal_harness.py` builds its own probe
+from `tests/fixtures/native_terminal`; see [downstream testing](downstream-testing.md)
+for the observed input, resize, idle-wakeup and restoration contracts.
+The Windows harness uses a pinned ConPTY dependency installed by CI.
+Windows stdin drains available console records without blocking on a second
+text read. UTF-16 surrogate pairs are preserved across reads and converted to
+the shared UTF-8 parser; redirected pipes use a readiness check before reading.
+
+Ordinary streaming `ProcessRuntime` and native PTY child processes currently
+have POSIX implementations. Windows reports an explicit unsupported-process
+failure; Windows terminal UI support does not imply a Windows subprocess
+implementation. See [app runtime](app-runtime.md) for resource limits.
 
 Before claiming full support for another platform, add or update its driver implementation and run the regression matrix from the repository root:
 

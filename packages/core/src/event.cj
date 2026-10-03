@@ -10,9 +10,18 @@ public interface InputSource {
 }
 
 public class StdinInputSource <: InputSource {
+    @When[os == "Windows"]
+    private let console = WindowsConsoleInput()
+
     public init() {}
 
-    public func readAvailable(maxBytes: Int64): Array<Byte> {
+    public func readAvailable(maxBytes: Int64): Array<Byte> { readNative(maxBytes) }
+
+    @When[os == "Windows"]
+    private func readNative(maxBytes: Int64): Array<Byte> { console.readAvailable(maxBytes) }
+
+    @When[os != "Windows"]
+    private func readNative(maxBytes: Int64): Array<Byte> {
         let capacity = max(1, maxBytes)
         let bytes = Array<Byte>(capacity, repeat: 0)
         unsafe {
@@ -241,6 +250,11 @@ public enum Event {
     | Message(String)
     | ExecResult(String, Int64, String)
     | TextCompletion(String, TextCompletionResult)
+    | ProcessStarted(String)
+    | ProcessOutput(String, ProcessOutputStream, Array<Byte>)
+    | ProcessFinished(String, ProcessResult)
+    | ProcessFailed(String, String)
+    | ProcessCancelRequested(String)
     | PtyStarted(String)
     | PtyOutput(String, PtyOutputStream, Array<Byte>)
     | PtyExited(String, PtyExitStatus)

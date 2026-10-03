@@ -1,0 +1,10 @@
+[package]
+  cjc-version = "1.1.0"
+  name = "cjtui_testing"
+  organization = ""
+  description = "Supported downstream application testing for termcanvas"
+  version = "0.0.1"
+  output-type = "static"
+
+[dependencies]
+  "core" = { path = "../core", output-type = "static" }

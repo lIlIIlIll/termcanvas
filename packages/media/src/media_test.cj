@@ -4,6 +4,19 @@ import core.*
 import std.unittest.*
 import std.unittest.testmacro.*
 
+@When[os == "Windows"]
+func mediaStillTool(): String { "./testdata/media_tool.exe" }
+@When[os != "Windows"]
+func mediaStillTool(): String { "./testdata/media_tool" }
+@When[os == "Windows"]
+func mediaFrameTool(): String { "./testdata/media_tool.exe" }
+@When[os != "Windows"]
+func mediaFrameTool(): String { "./testdata/fake_ffmpeg.sh" }
+@When[os == "Windows"]
+func mediaFailureTool(): String { "./testdata/media_tool.exe" }
+@When[os != "Windows"]
+func mediaFailureTool(): String { "/bin/false" }
+
 @Test
 public class MediaExtensionTest {
     @TestCase
@@ -19,7 +32,7 @@ public class MediaExtensionTest {
         for (_ in 0..128) { pixels += "\\377\\000\\000\\377" }
         let source = MediaSource("img", pixels, alt: "demo")
         let request = MediaDecodeRequest(source, Rect(0, 0, 1, 1), MediaProtocol.Kitty)
-        let adapter = ExternalMediaAdapter(magick: "/usr/bin/printf")
+        let adapter = ExternalMediaAdapter(magick: mediaStillTool())
         @Expect(adapter.commandFor(request).contains("-resize 8x16!"))
         let frame = adapter.decode(request)
         @Expect(isKitty(frame.protocol))
@@ -41,7 +54,7 @@ public class MediaExtensionTest {
         @Expect(adapter.commandFor(first).contains("select=eq(n\\,0)"))
         @Expect(adapter.commandFor(later).contains("select=eq(n\\,7)"))
         @Expect(isText(adapter.decode(MediaDecodeRequest(source, Rect(0, 0, 1, 1), MediaProtocol.Sixel, frameIndex: 7)).protocol))
-        let fixture = ExternalMediaAdapter(ffmpeg: "./testdata/fake_ffmpeg.sh")
+        let fixture = ExternalMediaAdapter(ffmpeg: mediaFrameTool())
         let selected = MediaSource("frames", "selected-frame", kind: MediaKind.Animation)
         let red = fixture.decode(MediaDecodeRequest(selected, Rect(0, 0, 1, 1), MediaProtocol.Kitty))
         let blue = fixture.decode(MediaDecodeRequest(selected, Rect(0, 0, 1, 1), MediaProtocol.Kitty, frameIndex: 7))
@@ -52,7 +65,7 @@ public class MediaExtensionTest {
 
     @TestCase
     func animationBudgetsRejectExtraAndPartialFrames(): Unit {
-        let decoder = FfmpegAsciiAnimationDecoder(ffmpeg: "./testdata/fake_ffmpeg.sh")
+        let decoder = FfmpegAsciiAnimationDecoder(ffmpeg: mediaFrameTool())
         let options = AsciiRenderOptions(width: 1, height: 1)
         match (decoder.decode(MediaSource("one", "one-frame"), options)) {
             case Some(animation) => @Expect(animation.frameCount(), 1)
@@ -157,7 +170,7 @@ public class MediaExtensionTest {
     func ffmpegAsciiDecoderBuildsCommandAndFailsGracefully(): Unit {
         let source = MediaSource("gif", "demo.gif", kind: MediaKind.Animation)
         let options = AsciiRenderOptions(width: 12, height: 5, fps: 7, mode: AsciiRenderMode.Braille)
-        let decoder = FfmpegAsciiAnimationDecoder(ffmpeg: "/bin/false")
+        let decoder = FfmpegAsciiAnimationDecoder(ffmpeg: mediaFailureTool())
         let command = decoder.commandFor(source, options)
         @Expect(command.contains("-vf fps=7,scale=24:20:flags=lanczos"))
         @Expect(command.contains("-pix_fmt rgba"))
@@ -187,10 +200,10 @@ public class MediaExtensionTest {
         let request = MediaDecodeRequest(source, Rect(0, 0, 2, 3), MediaProtocol.Kitty, frameIndex: -4)
         @Expect(request.frameIndex, 0)
         @Expect(isText(FallbackMediaAdapter().decode(request).protocol))
-        let adapter = ExternalMediaAdapter(magick: "/bin/false", ffmpeg: "/bin/false", sixelEncoder: "/bin/false")
+        let adapter = ExternalMediaAdapter(magick: mediaFailureTool(), ffmpeg: mediaFailureTool(), sixelEncoder: mediaFailureTool())
         @Expect(adapter.commandFor(MediaDecodeRequest(source, Rect(0, 0, 5000, 1), MediaProtocol.Kitty)), "")
         @Expect(adapter.commandFor(MediaDecodeRequest(source, Rect(0, 0, 1, 1), MediaProtocol.Text)), "")
-        @Expect(adapter.commandFor(MediaDecodeRequest(source, Rect(0, 0, 1, 1), MediaProtocol.Sixel)), "/bin/false -w 8 -h 16 image.png")
+        @Expect(adapter.commandFor(MediaDecodeRequest(source, Rect(0, 0, 1, 1), MediaProtocol.Sixel)), "${mediaFailureTool()} -w 8 -h 16 image.png")
         @Expect(adapter.commandFor(MediaDecodeRequest(source, Rect(0, 0, 1, 1), MediaProtocol.Sixel, frameIndex: 1)), "")
         let video = MediaSource("video", "movie.mp4", kind: MediaKind.Video)
         let animation = MediaSource("animation", "movie.gif", kind: MediaKind.Animation)

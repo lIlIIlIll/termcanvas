@@ -3,7 +3,7 @@
   name = "cjtui_crystal_caves"
   organization = ""
   description = "Playable multi-level side-scrolling crystal cave game for cjtui"
-  version = "1.0.0"
+  version = "0.0.1"
   target-dir = ""
   script-dir = ""
   output-type = "executable"

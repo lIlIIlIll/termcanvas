@@ -363,10 +363,11 @@ def extract(metadata: dict, root: Path = ROOT) -> list[dict]:
     records: list[dict] = []
     for path in production_files(metadata, root):
         relative = path.relative_to(root).as_posix()
-        package = relative.split("/")[1]
         source = path.read_text(encoding="utf-8")
         lines = physical_source_lines(source)
         masked = mask_comments_and_literals(source)
+        package_match = re.search(r"^\s*package\s+([A-Za-z_][A-Za-z0-9_.]*)", masked, re.MULTILINE)
+        package = package_match.group(1) if package_match else relative.split("/")[1]
         masked_lines = physical_source_lines(masked)
         offsets = line_offsets(source)
         depths = line_brace_depths(masked)
@@ -633,7 +634,7 @@ def generate(check: bool) -> int:
         if not path.exists() or path.read_text(encoding="utf-8") != content:
             stale.append(path)
             if not check:
-                path.write_text(content, encoding="utf-8")
+                path.write_text(content, encoding="utf-8", newline="\n")
     if check and stale:
         for path in stale:
             print(f"stale generated API output: {path.relative_to(ROOT)}", file=sys.stderr)

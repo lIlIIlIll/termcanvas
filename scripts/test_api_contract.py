@@ -93,6 +93,13 @@ public class PublicTestFixture {
         self.assertIn("StableType", qualified)
         self.assertIn("StableType.value", qualified)
 
+    def test_declared_package_name_can_differ_from_source_directory(self):
+        source = self.root / "packages/sample/src/renamed.cj"
+        source.write_text("package downstream_testing\npublic class Scenario {}\n", encoding="utf-8")
+        records = api_contract.extract(self.metadata, self.root)
+        scenario = next(record for record in records if record["qualified_symbol"] == "Scenario")
+        self.assertEqual(scenario["package"], "downstream_testing")
+
     def test_test_source_public_helper_is_excluded_by_path(self):
         qualified = {record["qualified_symbol"] for record in self.records()}
         self.assertNotIn("PublicTestFixture", qualified)

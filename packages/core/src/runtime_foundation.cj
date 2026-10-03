@@ -223,6 +223,43 @@ public struct SequencedRuntimeItem<A> {
     }
 }
 
+// A source snapshot remains owned by the runtime until every event has been
+// admitted. Never read another snapshot while this one is pending: the native
+// source can then apply byte backpressure instead of growing a second queue.
+class RuntimeEventBatch {
+    private var events: Array<Event> = []
+    private var index: Int64 = 0
+
+    func size(): Int64 { events.size - index }
+
+    func replace(batch: Array<Event>): Unit {
+        if (size() != 0) { throw IllegalStateException("source batch is still pending") }
+        events = batch
+        index = 0
+    }
+
+    func take(maxEvents: Int64): Array<Event> {
+        let count = min(size(), max(0, maxEvents))
+        let out = events[index..index + count].clone()
+        index += count
+        if (index == events.size) {
+            events = []
+            index = 0
+        }
+        out
+    }
+
+    func append(batch: Array<Event>): Unit {
+        if (batch.isEmpty()) { return }
+        let pending = size()
+        let merged = Array<Event>(pending + batch.size, { position =>
+            if (position < pending) { events[index + position] } else { batch[position - pending] }
+        })
+        events = merged
+        index = 0
+    }
+}
+
 // Single-consumer FIFO. Producers never access this queue directly; external
 // producers use ExternalPort and the runtime imports immutable actions.
 public class RuntimeQueue<A> {
@@ -235,8 +272,33 @@ public class RuntimeQueue<A> {
     private var maximumUpdateDepth: Int64 = 0
     private var maximumDepth: Int64 = 0
     private let metrics: ?AppMetrics
+    private let capacityValue: Int64
+    private var remainingWork: Int64 = Int64.Max
+    private var sourceTurn: Bool = true
+    private var yieldedValue: Int64 = 0
+    private var overflowValue: Int64 = 0
+    private var reportedYield: Bool = false
 
-    public init(metrics!: ?AppMetrics = None) { this.metrics = metrics }
+    public init(metrics!: ?AppMetrics = None, capacity!: Int64 = 4096) {
+        if (capacity <= 0) { throw IllegalArgumentException("runtime queue capacity must be positive") }
+        this.metrics = metrics; capacityValue = capacity
+    }
+    public func capacity(): Int64 { capacityValue }
+    public func yieldedTurns(): Int64 { yieldedValue }
+    public func overflowCount(): Int64 { overflowValue }
+    // One App turn includes command callbacks, input, timers and presentation.
+    func beginTurn(workBudget!: Int64 = 256): Unit { remainingWork = max(1, workBudget); sourceTurn = true; reportedYield = false }
+    func takeSourceTurn(): Bool { let value = sourceTurn; sourceTurn = false; value }
+    func tryConsumeWork(): Bool {
+        if (remainingWork <= 0) {
+            if (!reportedYield) {
+                yieldedValue++; reportedYield = true
+                match (metrics) { case Some(value) => value.runtimeYielded(); case None => () }
+            }
+            return false
+        }
+        remainingWork--; true
+    }
 
     public func state(): RuntimeState { stateValue }
     public func size(): Int64 { max(0, items.size - readIndex) }
@@ -260,6 +322,11 @@ public class RuntimeQueue<A> {
         match (stateValue) {
             case RuntimeState.Running => ()
             case _ => return None
+        }
+        if (size() >= capacityValue) {
+            overflowValue++
+            match (metrics) { case Some(value) => value.runtimeOverflowed(); case None => () }
+            throw IllegalStateException("runtime event capacity exhausted (${capacityValue})")
         }
         let sequence = nextSequence
         nextSequence++
@@ -755,13 +822,21 @@ public class ExternalPort<A> {
         actions.toArray()
     }
 
-    func drainEntries(): Array<ExternalPortEntry<A>> {
+    func drainEntries(maxEntries!: Int64 = Int64.Max): Array<ExternalPortEntry<A>> {
         lock.lock()
         try {
-            let drained = values.toArray()
-            values.clear()
-            wakeSource.clearLocked()
-            drained
+            let count = min(values.size, max(0, maxEntries))
+            let drained = ArrayList<ExternalPortEntry<A>>()
+            for (i in 0..count) { drained.add(values[i]) }
+            if (count >= values.size) {
+                values.clear()
+                wakeSource.clearLocked()
+            } else {
+                let remaining = values.toArray()[count..]
+                values.clear()
+                for (entry in remaining) { values.add(entry) }
+            }
+            drained.toArray()
         } finally {
             lock.unlock()
         }

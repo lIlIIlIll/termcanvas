@@ -13,9 +13,12 @@ core|RuntimeMetricsSnapshot.queueEnqueued|let|public let queueEnqueued: Int64
 core|RuntimeMetricsSnapshot.queueProcessed|let|public let queueProcessed: Int64
 core|RuntimeMetricsSnapshot.maxQueueDepth|let|public let maxQueueDepth: Int64
 core|RuntimeMetricsSnapshot.maxUpdateDepth|let|public let maxUpdateDepth: Int64
+core|RuntimeMetricsSnapshot.yieldedTurns|let|public let yieldedTurns: Int64
+core|RuntimeMetricsSnapshot.queueOverflows|let|public let queueOverflows: Int64
 core|RuntimeMetricsSnapshot.scheduling|let|public let scheduling: FrameSchedulingSnapshot
-core|RuntimeMetricsSnapshot.init|init|public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )
+core|RuntimeMetricsSnapshot.init|init|public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, yieldedTurns!: Int64 = 0, queueOverflows!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )
 core|App.attachTraceSink|func|public func attachTraceSink(traceSink: AppTraceSink): Unit
+core|App.attachProcessRuntime|func|public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit
 core|App.attachPtyRuntime|func|public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit
 core|FocusManager|class|public class FocusManager {
 core|FocusManager.init|init|public init()
@@ -61,6 +64,27 @@ core|Canvas.drawSprite|func|public func drawSprite(x: Int64, y: Int64, lines: Ar
 core|Canvas.render|func|public func render(widget: Widget, area: Rect): Unit
 core|Canvas.composite|func|public func composite(surface: Surface): Unit
 core|centeredViewport|func|public func centeredViewport(area: Rect, width: Int64, height: Int64): Rect
+core|NativeClipboardCommandRunner|class|public class NativeClipboardCommandRunner <: ClipboardCommandRunner {
+core|NativeClipboardCommandRunner.init|init|public init()
+core|NativeClipboardCommandRunner.platform|func|public func platform(): String
+core|NativeClipboardCommandRunner.environment|func|public func environment(name: String): String
+core|NativeClipboardCommandRunner.available|func|public func available(command: String): Bool
+core|NativeClipboardCommandRunner.run|func|public func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult
+core|SystemClipboard|class|public class SystemClipboard <: Clipboard {
+core|SystemClipboard.init|init|public init(runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024)
+core|SystemClipboard.capabilities|func|public func capabilities(): ClipboardCapabilities
+core|SystemClipboard.readText|func|public func readText(): ClipboardResult
+core|SystemClipboard.writeText|func|public func writeText(text: String): ClipboardResult
+core|SystemClipboard.getText|func|public func getText(): String
+core|SystemClipboard.setText|func|public func setText(text: String): Unit
+core|Osc52Clipboard|class|public class Osc52Clipboard <: Clipboard {
+core|Osc52Clipboard.init|init|public init(emit: (String) -> Unit, enabled!: Bool = true, maxBytes!: Int64 = 100000, tmuxPassthrough!: Bool = false)
+core|Osc52Clipboard.capabilities|func|public func capabilities(): ClipboardCapabilities
+core|Osc52Clipboard.readText|func|public func readText(): ClipboardResult
+core|Osc52Clipboard.writeText|func|public func writeText(text: String): ClipboardResult
+core|Osc52Clipboard.getText|func|public func getText(): String
+core|Osc52Clipboard.setText|func|public func setText(text: String): Unit
+core|detectClipboard|func|public func detectClipboard( runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), osc52Emitter!: ?(String) -> Unit = None, timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024 ): Clipboard
 core|MenuItem|class|public class MenuItem {
 core|MenuItem.label|let|public let label: String
 core|MenuItem.action|let|public let action: String
@@ -68,19 +92,24 @@ core|MenuItem.enabled|let|public let enabled: Bool
 core|MenuItem.init|init|public init(label: String, action!: String = "", enabled!: Bool = true)
 core|Menu|class|public class Menu <: Widget {
 core|Menu.selected|var|public var selected: Int64
+core|Menu.offset|var|public var offset: Int64 = 0
 core|Menu.init|init|public init( title: String, items: Array<MenuItem>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)) )
 core|Menu.handle|func|public func handle(key: KeyEvent): ?String
+core|Menu.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|Menu.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|MenuBar|class|public class MenuBar <: Widget {
 core|MenuBar.selected|var|public var selected: Int64
 core|MenuBar.init|init|public init( menus: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 core|MenuBar.handle|func|public func handle(key: KeyEvent): Bool
+core|MenuBar.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|MenuBar.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|CommandPalette|class|public class CommandPalette <: Widget {
 core|CommandPalette.query|var|public var query: String
 core|CommandPalette.selected|var|public var selected: Int64
+core|CommandPalette.offset|var|public var offset: Int64 = 0
 core|CommandPalette.init|init|public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 core|CommandPalette.handle|func|public func handle(key: KeyEvent): ?String
+core|CommandPalette.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|CommandPalette.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Toast|class|public class Toast {
 core|Toast.message|let|public let message: String
@@ -100,6 +129,7 @@ core|Dialog|class|public class Dialog <: Widget {
 core|Dialog.selected|var|public var selected: Int64
 core|Dialog.init|init|public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
 core|Dialog.handle|func|public func handle(key: KeyEvent): ?String
+core|Dialog.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|Dialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ConfirmDialog|class|public class ConfirmDialog <: Widget {
 core|ConfirmDialog.confirmed|var|public var confirmed: Bool = false
@@ -262,7 +292,9 @@ core|VirtualTable.stickyHeader|var|public var stickyHeader: Bool = true
 core|VirtualTable.status|var|public var status: TableStatus = TableStatus.Ready
 core|VirtualTable.emptyText|var|public var emptyText: String = "No rows"
 core|VirtualTable.loadingText|var|public var loadingText: String = "Loading"
-core|VirtualTable.init|init|public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan), statusStyle!: Style = Style(fg: Color.Indexed(8)), selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None )
+core|VirtualTable.init|init|public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan), statusStyle!: Style = Style(fg: Color.Indexed(8)), selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None, dataModel!: ?PagedTableModel = None, cacheCapacity!: Int64 = 1024 )
+core|VirtualTable.init|init|public init(columns: Array<TableColumn>, model: PagedTableModel, block!: ?Block = None)
+core|VirtualTable.handle|func|public func handle(mouse: MouseEvent, area: Rect): Bool
 core|VirtualTable.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|VirtualTable.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 core|VirtualTable.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
@@ -292,7 +324,9 @@ core|TreeNode.childNodes|func|public func childNodes(): Array<TreeNode>
 core|Tree|class|public class Tree <: Widget {
 core|Tree.selected|var|public var selected: Int64
 core|Tree.offset|var|public var offset: Int64
-core|Tree.init|init|public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Tree.init|init|public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), dataModel!: ?LazyTreeModel = None )
+core|Tree.init|init|public init(model: LazyTreeModel, block!: ?Block = None)
+core|Tree.handle|func|public func handle(mouse: MouseEvent, area: Rect): Bool
 core|Tree.toggleSelected|func|public func toggleSelected(): Unit
 core|Tree.selectedId|func|public func selectedId(): ?String
 core|Tree.selectById|func|public func selectById(id: String): Bool
@@ -308,13 +342,16 @@ core|ColorPicker.selected|var|public var selected: Int64
 core|ColorPicker.init|init|public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)
 core|ColorPicker.selectedColor|func|public func selectedColor(): ?Color
 core|ColorPicker.handle|func|public func handle(key: KeyEvent): Bool
+core|ColorPicker.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|ColorPicker.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|MultiSelect|class|public class MultiSelect <: Widget {
 core|MultiSelect.cursor|var|public var cursor: Int64
+core|MultiSelect.offset|var|public var offset: Int64 = 0
 core|MultiSelect.init|init|public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White))
 core|MultiSelect.selectedIndices|func|public func selectedIndices(): Array<Int64>
 core|MultiSelect.toggle|func|public func toggle(): Unit
 core|MultiSelect.handle|func|public func handle(key: KeyEvent): Bool
+core|MultiSelect.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|MultiSelect.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|DatePicker|class|public class DatePicker <: Widget {
 core|DatePicker.year|var|public var year: Int64
@@ -324,6 +361,104 @@ core|DatePicker.init|init|public init(year!: Int64 = 2026, month!: Int64 = 1, da
 core|DatePicker.value|func|public func value(): String
 core|DatePicker.handle|func|public func handle(key: KeyEvent): Bool
 core|DatePicker.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|LazyTreeNode|class|public class LazyTreeNode {
+core|LazyTreeNode.id|let|public let id: String
+core|LazyTreeNode.label|let|public let label: String
+core|LazyTreeNode.childCount|let|public let childCount: Int64
+core|LazyTreeNode.init|init|public init(id: String, label: String, childCount!: Int64 = 0)
+core|TreeDataSource|interface|public interface TreeDataSource {
+core|TreeDataSource.rootCount|func|func rootCount(): Int64
+core|TreeDataSource.nodeAt|func|func nodeAt(path: Array<Int64>): ?LazyTreeNode
+core|TreeDataSource.pathForId|func|func pathForId(id: String): ?Array<Int64>
+core|LazyTreeRow|class|public class LazyTreeRow {
+core|LazyTreeRow.node|let|public let node: LazyTreeNode
+core|LazyTreeRow.depth|let|public let depth: Int64
+core|LazyTreeRow.expanded|let|public let expanded: Bool
+core|LazyTreeRow.index|let|public let index: Int64
+core|LazyTreeModel|class|public class LazyTreeModel {
+core|LazyTreeModel.init|init|public init(source: TreeDataSource)
+core|LazyTreeModel.visibleCount|func|public func visibleCount(): Int64
+core|LazyTreeModel.selectedId|func|public func selectedId(): ?String
+core|LazyTreeModel.findById|func|public func findById(id: String): ?LazyTreeNode
+core|LazyTreeModel.selectedIndex|func|public func selectedIndex(): ?Int64
+core|LazyTreeModel.selectById|func|public func selectById(id: String): Bool
+core|LazyTreeModel.selectIndex|func|public func selectIndex(index: Int64): Bool
+core|LazyTreeModel.rowAt|func|public func rowAt(index: Int64): ?LazyTreeRow
+core|LazyTreeModel.rows|func|public func rows(offset: Int64, height: Int64): Array<LazyTreeRow>
+core|LazyTreeModel.setExpanded|func|public func setExpanded(id: String, expanded: Bool): Bool
+core|LazyTreeModel.toggleSelected|func|public func toggleSelected(): Bool
+core|LazyTreeModel.collapseAll|func|public func collapseAll(): Unit
+core|LazyTreeModel.refresh|func|public func refresh(): Unit
+core|ModalFocusState|class|public class ModalFocusState {
+core|ModalFocusState.init|init|public init(base: FocusManager, keymap!: KeyMap = KeyMap())
+core|ModalFocusState.open|func|public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
+core|ModalFocusState.active|func|public func active(): ?String
+core|ModalFocusState.focus|func|public func focus(): FocusManager
+core|ModalFocusState.close|func|public func close(): ?String
+core|ModalFocusState.handle|func|public func handle(key: KeyEvent): Bool
+core|ModalFocusState.actionFor|func|public func actionFor(key: KeyEvent): ?String
+core|TableDataRow|class|public class TableDataRow {
+core|TableDataRow.id|let|public let id: String
+core|TableDataRow.cells|let|public let cells: Array<String>
+core|TableDataRow.init|init|public init(id: String, cells: Array<String>)
+core|TableQuery|struct|public struct TableQuery {
+core|TableQuery.filter|let|public let filter: String
+core|TableQuery.sortColumn|let|public let sortColumn: ?Int64
+core|TableQuery.descending|let|public let descending: Bool
+core|TableQuery.init|init|public init(filter!: String = "", sortColumn!: ?Int64 = None, descending!: Bool = false)
+core|TablePageRequest|class|public class TablePageRequest {
+core|TablePageRequest.revision|let|public let revision: Int64
+core|TablePageRequest.requestId|let|public let requestId: Int64
+core|TablePageRequest.offset|let|public let offset: Int64
+core|TablePageRequest.limit|let|public let limit: Int64
+core|TablePageRequest.query|let|public let query: TableQuery
+core|TablePage|class|public class TablePage {
+core|TablePage.rows|let|public let rows: Array<TableDataRow>
+core|TablePage.totalRows|let|public let totalRows: Int64
+core|TablePage.init|init|public init(rows: Array<TableDataRow>, totalRows: Int64)
+core|TableDataSource|interface|public interface TableDataSource {
+core|TableDataSource.load|func|func load(request: TablePageRequest): TablePage
+core|PagedTableModel|class|public class PagedTableModel {
+core|PagedTableModel.pageSize|let|public let pageSize: Int64
+core|PagedTableModel.maxPages|let|public let maxPages: Int64
+core|PagedTableModel.init|init|public init(pageSize!: Int64 = 128, maxPages!: Int64 = 8)
+core|PagedTableModel.query|func|public func query(): TableQuery
+core|PagedTableModel.revision|func|public func revision(): Int64
+core|PagedTableModel.totalRows|func|public func totalRows(): Int64
+core|PagedTableModel.hasTotal|func|public func hasTotal(): Bool
+core|PagedTableModel.cachedPageCount|func|public func cachedPageCount(): Int64
+core|PagedTableModel.pendingPageCount|func|public func pendingPageCount(): Int64
+core|PagedTableModel.cachedRowCount|func|public func cachedRowCount(): Int64
+core|PagedTableModel.selectedId|func|public func selectedId(): ?String
+core|PagedTableModel.selectedIndex|func|public func selectedIndex(): ?Int64
+core|PagedTableModel.selectedIds|func|public func selectedIds(): Array<String>
+core|PagedTableModel.isSelected|func|public func isSelected(id: String): Bool
+core|PagedTableModel.toggle|func|public func toggle(id: String): Unit
+core|PagedTableModel.selectIndex|func|public func selectIndex(index: Int64): Unit
+core|PagedTableModel.selectId|func|public func selectId(id: String): Unit
+core|PagedTableModel.setQuery|func|public func setQuery(query: TableQuery): Bool
+core|PagedTableModel.invalidate|func|public func invalidate(): Unit
+core|PagedTableModel.row|func|public func row(index: Int64): ?TableDataRow
+core|PagedTableModel.statusAt|func|public func statusAt(index: Int64): TableStatus
+core|PagedTableModel.requestViewport|func|public func requestViewport(offset: Int64, height: Int64, retry!: Bool = false): Array<TablePageRequest>
+core|PagedTableModel.accept|func|public func accept(request: TablePageRequest, page: TablePage): Bool
+core|PagedTableModel.fail|func|public func fail(request: TablePageRequest, message: String): Bool
+core|PagedTableModel.isPending|func|public func isPending(request: TablePageRequest): Bool
+core|ProcessMetrics|struct|public struct ProcessMetrics {
+core|ProcessMetrics.queuedBytes|let|public let queuedBytes: Int64
+core|ProcessMetrics.peakQueuedBytes|let|public let peakQueuedBytes: Int64
+core|ProcessMetrics.outputBytes|let|public let outputBytes: Int64
+core|ProcessMetrics.backpressureCount|let|public let backpressureCount: Int64
+core|ProcessMetrics.init|init|public init(queuedBytes!: Int64 = 0, peakQueuedBytes!: Int64 = 0, outputBytes!: Int64 = 0, backpressureCount!: Int64 = 0)
+core|ProcessRuntime|interface|public interface ProcessRuntime {
+core|ProcessRuntime.start|func|func start(id: String, spec: ProcessSpec): Event
+core|ProcessRuntime.cancel|func|func cancel(id: String): Event
+core|ProcessRuntime.sources|func|func sources(): Array<EventSource>
+core|ProcessRuntime.drain|func|func drain(): Array<Event>
+core|ProcessRuntime.activeCount|func|func activeCount(): Int64
+core|ProcessRuntime.nextTimeoutMillis|func|func nextTimeoutMillis(): ?Int64
+core|ProcessRuntime.metrics|func|func metrics(): ProcessMetrics
+core|ProcessRuntime.closeAll|func|func closeAll(): Unit
 core|PtyProcess|interface|public interface PtyProcess {
 core|PtyProcess.id|func|func id(): String
 core|PtyProcess.write|func|func write(bytes: Array<Byte>): Bool
@@ -353,6 +488,11 @@ core|EventSource.interests|func|func interests(): EventSourceInterest
 core|EventSource.onReady|func|func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
 core|EventSource.drain|func|func drain(): Array<Event>
 core|EventSource.close|func|func close(): Unit
+core|PtyFlowMetrics|struct|public struct PtyFlowMetrics {
+core|PtyFlowMetrics.queuedBytes|let|public let queuedBytes: Int64
+core|PtyFlowMetrics.peakQueuedBytes|let|public let peakQueuedBytes: Int64
+core|PtyFlowMetrics.backpressureCount|let|public let backpressureCount: Int64
+core|PtyFlowMetrics.init|init|public init(queuedBytes: Int64, peakQueuedBytes: Int64, backpressureCount: Int64)
 core|FrameSchedulingSnapshot|struct|public struct FrameSchedulingSnapshot {
 core|FrameSchedulingSnapshot.reason|let|public let reason: String
 core|FrameSchedulingSnapshot.frameRequests|let|public let frameRequests: Int64

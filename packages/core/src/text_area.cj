@@ -3,15 +3,15 @@ package core
 import std.collection.*
 
 class TextAreaSnapshot {
-    let value: String
+    let modelRevision: Int64
     let cursor: Int64
     let scroll: Int64
     let selectionStart: ?Int64
     let selectionEnd: ?Int64
     let extraCarets: Array<TextAreaCaret>
 
-    init(value: String, cursor: Int64, scroll: Int64, selectionStart: ?Int64, selectionEnd: ?Int64, extraCarets: Array<TextAreaCaret>) {
-        this.value = value
+    init(modelRevision: Int64, cursor: Int64, scroll: Int64, selectionStart: ?Int64, selectionEnd: ?Int64, extraCarets: Array<TextAreaCaret>) {
+        this.modelRevision = modelRevision
         this.cursor = cursor
         this.scroll = scroll
         this.selectionStart = selectionStart
@@ -167,7 +167,27 @@ public class MarkdownHighlightCache {
 }
 
 public class TextArea <: Widget {
-    public var value: String
+    private let textModelValue: EditableTextModel
+    // Explicit whole-document access remains convenient for small inputs.
+    // Editing, movement and viewport rendering use the indexed model directly.
+    public mut prop value: String {
+        get() { textModelValue.text() }
+        set(next) {
+            synchronizeValue()
+            pushUndoSnapshot()
+            replaceModelRange(0, textModelValue.byteLength(), next)
+            cursor = textModelValue.clampOffset(cursor)
+            markEdited()
+            clearRedo()
+        }
+    }
+    public prop textModel: EditableTextModel { get() { textModelValue } }
+    public var horizontalScroll: Int64 = 0
+    private var viewportHeight: Int64 = 1
+    private var viewportWidth: Int64 = 0
+    private var preferredColumn: ?Int64 = None
+    private var verticalColumns: Array<Int64> = []
+    private var verticalOffsets: Array<Int64> = []
     public var cursor: Int64
     public var scroll: Int64
     public var selectionStart: ?Int64 = None
@@ -182,6 +202,9 @@ public class TextArea <: Widget {
     private let foldState: ?DocumentViewState
     public var readOnly: Bool
     public var markdownEditing: Bool
+    private var decorationProviders: Array<TextDecorationProvider> = []
+    private let decorationLayerNames = ArrayList<String>()
+    private let decorationStores = ArrayList<TextDecorationStore>()
     private var decorations: Array<TextDecoration>
     private let undoStack = ArrayList<TextAreaSnapshot>()
     private let redoStack = ArrayList<TextAreaSnapshot>()
@@ -190,7 +213,6 @@ public class TextArea <: Widget {
     private var extraCarets: Array<TextAreaCaret> = []
     private var dragAnchor: ?Int64 = None
     private var revision: Int64 = 0
-    private var revisionValue: String
     private var completionRequestId: String = ""
     private var completionRevision: Int64 = -1
     private var completionReplaceStart: Int64 = 0
@@ -199,14 +221,13 @@ public class TextArea <: Widget {
     private var completionIndex: Int64 = 0
     private var completionOpen: Bool = false
     private var cachedLineRevision: Int64 = -1
-    private var cachedLines: Array<String> = []
-    private var cachedLineOffsets: Array<Int64> = []
     private var cachedVisibleLines: Array<Int64> = []
     private var cachedFoldRevision: Int64 = -1
     private var cachedLineRebuilds: Int64 = 0
 
     public init(
         value!: String = "",
+        model!: ?EditableTextModel = None,
         cursor!: Int64 = 0,
         scroll!: Int64 = 0,
         block!: ?Block = None,
@@ -221,9 +242,12 @@ public class TextArea <: Widget {
         markdownEditing!: Bool = false,
         decorations!: Array<TextDecoration> = []
     ) {
-        this.value = value
-        this.revisionValue = value
-        this.cursor = clampToRuneBoundary(value, cursor)
+        this.textModelValue = match (model) {
+            case Some(source) => source
+            case None => PieceTableTextModel(text: value)
+        }
+        this.revision = textModelValue.revision()
+        this.cursor = textModelValue.clampOffset(cursor)
         this.scroll = max(0, scroll)
         this.block = block
         this.style = style
@@ -244,19 +268,27 @@ public class TextArea <: Widget {
         match (key.code) {
             case Char(r) =>
                 if (key.modifiers.ctrl && r == r'a') {
+                    verticalColumns = []
+                    invalidateCompletionRequest()
                     cursor = lineStartForOffset(cursor)
                     clearSelection()
                     true
                 } else if (key.modifiers.ctrl && r == r'b') {
-                    cursor = previousRuneOffset(value, cursor)
+                    verticalColumns = []
+                    invalidateCompletionRequest()
+                    cursor = previousOffset(cursor)
                     clearSelection()
                     true
                 } else if (key.modifiers.ctrl && r == r'e') {
-                    cursor = lineEnd(value, cursor)
+                    verticalColumns = []
+                    invalidateCompletionRequest()
+                    cursor = lineEndForOffset(cursor)
                     clearSelection()
                     true
                 } else if (key.modifiers.ctrl && r == r'f') {
-                    cursor = nextRuneOffset(value, cursor)
+                    verticalColumns = []
+                    invalidateCompletionRequest()
+                    cursor = nextOffset(cursor)
                     clearSelection()
                     true
                 } else if (key.modifiers.ctrl && r == r'k') {
@@ -303,37 +335,8 @@ public class TextArea <: Widget {
                 if (readOnly) { false } else { indentSelectedLines(); true }
             case BackTab =>
                 if (readOnly) { false } else { outdentSelectedLines(); true }
-            case Left =>
-                cursor = if (key.modifiers.ctrl) { previousWordOffset(value, cursor) } else { previousRuneOffset(value, cursor) }
-                clearSelection()
-                true
-            case Right =>
-                cursor = if (key.modifiers.ctrl) { nextWordOffset(value, cursor) } else { nextRuneOffset(value, cursor) }
-                clearSelection()
-                true
-            case Up =>
-                moveVertical(-1)
-                clearSelection()
-                true
-            case Down =>
-                moveVertical(1)
-                clearSelection()
-                true
-            case PageUp =>
-                moveVertical(-5)
-                clearSelection()
-                true
-            case PageDown =>
-                moveVertical(5)
-                clearSelection()
-                true
-            case Home =>
-                cursor = if (key.modifiers.ctrl) { 0 } else { lineStartForOffset(cursor) }
-                clearSelection()
-                true
-            case End =>
-                cursor = if (key.modifiers.ctrl) { value.size } else { lineEnd(value, cursor) }
-                clearSelection()
+            case Left | Right | Up | Down | PageUp | PageDown | Home | End =>
+                navigateCarets(key)
                 true
             case _ => false
         }
@@ -384,31 +387,31 @@ public class TextArea <: Widget {
     public func render(area: Rect, buffer: Buffer): Unit {
         synchronizeValue()
         var target = area
-        if (let Some(b) <- block) {
-            b.render(area, buffer)
-            target = b.inner(area)
-        }
+        if (let Some(b) <- block) { b.render(area, buffer); target = b.inner(area) }
         if (target.width <= 0 || target.height <= 0) { return }
-        let lines = linesForRender()
-        let gutter = if (lineNumbers) { min(6, max(3, decimalDigits(lines.size) + 1)) } else { 0 }
+        let gutter = min(target.width, gutterWidth())
         let textTarget = Rect(target.x + gutter, target.y, max(0, target.width - gutter), target.height)
-        if (value.isEmpty() && !placeholder.isEmpty()) {
-            buffer.setString(textTarget.x, textTarget.y, truncate(placeholder, textTarget.width), style: placeholderStyle)
+        viewportHeight = max(1, textTarget.height)
+        viewportWidth = textTarget.width
+        ensureCursorVisible(textTarget.height)
+        ensureHorizontalVisible(textTarget.width)
+        if (textModelValue.byteLength() == 0 && !placeholder.isEmpty()) {
+            buffer.writeStringClipped(textTarget.x, textTarget.y, placeholder, maxWidth: textTarget.width, style: placeholderStyle)
             renderCompletion(area, textTarget, buffer)
             return
         }
-        let visible = visibleLineIndexes()
-        ensureCursorVisible(textTarget.height)
         for (row in 0..textTarget.height) {
             let visibleIndex = row + scroll
-            if (visibleIndex >= visible.size) { break }
-            let lineIndex = visible[visibleIndex]
+            if (visibleIndex >= visibleLineCount()) { break }
+            let lineIndex = visibleLineAt(visibleIndex)
+            let line = textModelValue.line(lineIndex)
             if (lineNumbers) {
-                buffer.setString(target.x, target.y + row, truncate("${lineIndex + 1} ", gutter), style: lineNumberStyle)
+                buffer.writeStringClipped(target.x, target.y + row, "${lineIndex + 1} ", maxWidth: gutter, style: lineNumberStyle)
             }
-            renderLine(textTarget.x, textTarget.y + row, textTarget.width, lineIndex, lines[lineIndex], buffer)
-            if (lineHasFoldMarker(lineIndex)) {
-                buffer.setString(max(textTarget.x, min(textTarget.x + textTarget.width - 3, textTarget.x + displayWidth(lines[lineIndex]) + 1)), textTarget.y + row, "...", style: lineNumberStyle)
+            renderLine(textTarget.x, textTarget.y + row, textTarget.width, lineIndex, line, buffer)
+            if (lineHasFoldMarker(lineIndex) && textTarget.width > 0) {
+                let markerX = max(textTarget.x, min(textTarget.right - 3, textTarget.x + displayWidth(line) - horizontalScroll + 1))
+                buffer.writeStringClipped(markerX, textTarget.y + row, "...", maxWidth: textTarget.right - markerX, style: lineNumberStyle)
             }
         }
         renderCompletion(area, textTarget, buffer)
@@ -416,42 +419,35 @@ public class TextArea <: Widget {
 
     public func cursorPosition(area: Rect): Position {
         synchronizeValue()
-        var target = area
-        if (let Some(b) <- block) {
-            target = b.inner(area)
-        }
-        let gutter = if (lineNumbers) { min(6, max(3, decimalDigits(lineCount()) + 1)) } else { 0 }
-        let textTarget = Rect(target.x + gutter, target.y, max(0, target.width - gutter), target.height)
-        ensureCursorVisible(textTarget.height)
+        let target = textViewport(area)
+        viewportHeight = max(1, target.height)
+        viewportWidth = target.width
+        ensureCursorVisible(target.height)
+        ensureHorizontalVisible(target.width)
         let row = visibleRowForLine(lineForOffset(cursor))
-        let col = displayWidth(value[lineStartForOffset(cursor)..cursor])
-        Position(textTarget.x + min(col, textTarget.width), textTarget.y + clamp(row - scroll, 0, max(0, textTarget.height - 1)))
+        let col = columnForOffset(cursor)
+        Position(target.x + clamp(col - horizontalScroll, 0, max(0, target.width - 1)),
+            target.y + clamp(row - scroll, 0, max(0, target.height - 1)))
     }
 
     public func cursorPositions(area: Rect): Array<Position> {
         let out = ArrayList<Position>()
         out.add(cursorPosition(area))
-        var target = area
-        if (let Some(b) <- block) { target = b.inner(area) }
-        let gutter = if (lineNumbers) { min(6, max(3, decimalDigits(lineCount()) + 1)) } else { 0 }
-        let width = max(0, target.width - gutter)
-        // The primary caret chooses the viewport once. Off-screen extra
-        // carets are omitted instead of scrolling and clamping ghost cursors.
+        let target = textViewport(area)
         for (caret in extraCarets) {
-            let offset = clampToRuneBoundary(value, caret.offset)
-            let lineStart = lineStartForOffset(offset)
-            if (lineOffsetHidden(lineStart)) { continue }
+            let offset = textModelValue.clampOffset(caret.offset)
+            if (lineOffsetHidden(lineStartForOffset(offset))) { continue }
             let row = visibleRowForLine(lineForOffset(offset)) - scroll
-            if (row < 0 || row >= target.height) { continue }
-            let col = displayWidth(value[lineStart..offset])
-            out.add(Position(target.x + gutter + min(col, width), target.y + row))
+            let col = columnForOffset(offset) - horizontalScroll
+            if (row < 0 || row >= target.height || col < 0 || col >= target.width) { continue }
+            out.add(Position(target.x + col, target.y + row))
         }
         out.toArray()
     }
 
     public func select(start: Int64, end: Int64): Unit {
-        selectionStart = Some(clampToRuneBoundary(value, start))
-        selectionEnd = Some(clampToRuneBoundary(value, end))
+        selectionStart = Some(textModelValue.clampOffset(start))
+        selectionEnd = Some(textModelValue.clampOffset(end))
     }
 
     public func clearSelection(): Unit {
@@ -469,7 +465,7 @@ public class TextArea <: Widget {
     public func selectedText(): String {
         synchronizeValue()
         match (selectionBounds()) {
-            case Some((start, end)) => value[start..end]
+            case Some((start, end)) => textModelValue.slice(start, end)
             case None => ""
         }
     }
@@ -487,8 +483,10 @@ public class TextArea <: Widget {
     }
 
     public func setCarets(carets: Array<TextAreaCaret>): Unit {
+        verticalColumns = []
+        preferredColumn = None
         if (carets.size == 0) {
-            cursor = clampToRuneBoundary(value, cursor)
+            cursor = textModelValue.clampOffset(cursor)
             clearSelection()
             extraCarets = []
             return
@@ -502,6 +500,8 @@ public class TextArea <: Widget {
     }
 
     public func addCaret(caret: TextAreaCaret): Unit {
+        verticalColumns = []
+        preferredColumn = None
         let extras = ArrayList<TextAreaCaret>()
         for (item in extraCarets) { extras.add(item) }
         extras.add(normalizedCaret(caret))
@@ -517,7 +517,7 @@ public class TextArea <: Widget {
         let out = ArrayList<String>()
         for (caret in carets()) {
             match (caretRange(caret)) {
-                case Some((start, end)) => out.add(value[start..end])
+                case Some((start, end)) => out.add(textModelValue.slice(start, end))
                 case None => ()
             }
         }
@@ -526,18 +526,19 @@ public class TextArea <: Widget {
 
     public func copySelectionTo(clipboard: Clipboard): Bool {
         if (!hasSelection()) { return false }
-        clipboard.setText(selectedText())
-        true
+        clipboard.writeText(selectedText()).isSuccess()
     }
 
     public func cutSelectionTo(clipboard: Clipboard): Bool {
+        if (readOnly) { return false }
         if (!copySelectionTo(clipboard)) { return false }
         deleteSelection()
         true
     }
 
     public func pasteFrom(clipboard: Clipboard): Unit {
-        paste(clipboard.getText())
+        let result = clipboard.readText()
+        if (result.isSuccess()) { paste(result.text) }
     }
 
     public func deleteSelection(): Unit {
@@ -559,12 +560,50 @@ public class TextArea <: Widget {
         this.decorations = decorations
     }
 
+    public func setDecorationProviders(providers: Array<TextDecorationProvider>): Unit {
+        decorationProviders = providers
+    }
+
+    public func applyDecorationUpdate(layer: String, update: TextDecorationUpdate): Bool {
+        synchronizeValue()
+        if (update.revision != revision || update.end > textModelValue.byteLength()) { return false }
+        for (i in 0..decorationLayerNames.size) {
+            if (decorationLayerNames[i] == layer) { return decorationStores[i].apply(update) }
+        }
+        let store = TextDecorationStore(revision: revision)
+        decorationLayerNames.add(layer)
+        decorationStores.add(store)
+        store.apply(update)
+    }
+
+    public func clearDecorationLayer(layer: String): Bool {
+        for (i in 0..decorationLayerNames.size) {
+            if (decorationLayerNames[i] == layer) {
+                decorationLayerNames.remove(at: i)
+                decorationStores.remove(at: i)
+                return true
+            }
+        }
+        false
+    }
+
+    private func notifyDecorationEdit(edit: TextEditDelta): Unit {
+        for (store in decorationStores) { store.onEdit(edit) }
+        for (provider in decorationProviders) { provider.onEdit(edit) }
+    }
+
+    private func resetDecorationStores(): Unit {
+        for (store in decorationStores) { store.reset(textModelValue.revision()) }
+    }
+
     public func setValue(value: String, cursor!: Int64 = -1): Unit {
-        this.value = value
-        this.cursor = if (cursor < 0) { value.size } else { clampToRuneBoundary(value, cursor) }
+        textModelValue.replace(0, textModelValue.byteLength(), value)
+        this.cursor = if (cursor < 0) { textModelValue.byteLength() } else { textModelValue.clampOffset(cursor) }
         scroll = 0
+        horizontalScroll = 0
         clearSelection()
         clearExtraCarets()
+        resetDecorationStores()
         markEdited()
         clearHistory()
     }
@@ -584,16 +623,29 @@ public class TextArea <: Widget {
             case MouseKind.Down =>
                 match (offsetForMouse(mouse, area)) {
                     case Some(offset) =>
+                        invalidateCompletionRequest()
+                        if (mouse.modifiers.alt) {
+                            addCaret(TextAreaCaret(offset))
+                            verticalColumns = []
+                            preferredColumn = None
+                            return true
+                        }
+                        let anchor = if (mouse.modifiers.shift) {
+                            match (selectionStart) { case Some(start) => start; case None => cursor }
+                        } else { offset }
                         cursor = offset
-                        clearSelection()
+                        verticalColumns = []
+                        preferredColumn = None
+                        if (mouse.modifiers.shift) { select(anchor, offset) } else { clearSelection() }
                         clearExtraCarets()
-                        dragAnchor = Some(offset)
+                        dragAnchor = Some(anchor)
                         true
                     case None => false
                 }
             case MouseKind.Drag =>
                 match (offsetForMouse(mouse, area)) {
                     case Some(offset) =>
+                        invalidateCompletionRequest()
                         let anchor = match (dragAnchor) {
                             case Some(value) => value
                             case None => cursor
@@ -613,14 +665,15 @@ public class TextArea <: Widget {
     public func beginCompletion(requestId: String): TextCompletionRequest {
         synchronizeValue()
         _ = cancelCompletion()
-        let start = completionPrefixStart(value, cursor)
+        let source = value
+        let start = completionPrefixStart(source, cursor)
         let line = lineForOffset(cursor)
-        let column = displayWidth(value[lineStartForOffset(cursor)..cursor])
+        let column = displayWidth(textModelValue.slice(lineStartForOffset(cursor), cursor))
         completionRequestId = requestId
         completionRevision = revision
         completionReplaceStart = start
         completionReplaceEnd = cursor
-        TextCompletionRequest(requestId, revision, value, cursor, start, cursor, value[start..cursor], line, column)
+        TextCompletionRequest(requestId, revision, source, cursor, start, cursor, textModelValue.slice(start, cursor), line, column)
     }
 
     public func completionCommand(requestId: String, provider: (TextCompletionRequest) -> TextCompletionResult): Command {
@@ -676,13 +729,17 @@ public class TextArea <: Widget {
 
     public func clearHistory(): Unit {
         undoGroupSnapshot = None
+        textModelValue.clearHistory()
         while (undoStack.size > 0) { undoStack.remove(at: 0) }
         clearRedo()
     }
 
     internal func beginUndoGroup(): Unit {
         synchronizeValue()
-        if (let None <- undoGroupSnapshot) { undoGroupSnapshot = Some(snapshot()) }
+        if (let None <- undoGroupSnapshot) {
+            undoGroupSnapshot = Some(snapshot())
+            textModelValue.beginUndoGroup()
+        }
     }
 
     internal func endUndoGroup(): Unit {
@@ -690,7 +747,8 @@ public class TextArea <: Widget {
         let initial = undoGroupSnapshot
         undoGroupSnapshot = None
         if (let Some(item) <- initial) {
-            if (value != item.value) {
+            textModelValue.endUndoGroup()
+            if (textModelValue.revision() != item.modelRevision) {
                 undoStack.add(item)
                 clearRedo()
             }
@@ -700,10 +758,10 @@ public class TextArea <: Widget {
     public func undo(): Bool {
         endUndoGroup()
         synchronizeValue()
-        if (undoStack.size == 0) { return false }
-        redoStack.add(snapshot())
-        let previous = undoStack[undoStack.size - 1]
-        undoStack.remove(at: undoStack.size - 1)
+        let before = snapshot()
+        if (!textModelValue.undo()) { return false }
+        redoStack.add(before)
+        let previous = if (undoStack.size > 0) { undoStack.remove(at: undoStack.size - 1) } else { before }
         restoreSnapshot(previous)
         true
     }
@@ -711,10 +769,10 @@ public class TextArea <: Widget {
     public func redo(): Bool {
         endUndoGroup()
         synchronizeValue()
-        if (redoStack.size == 0) { return false }
-        undoStack.add(snapshot())
-        let next = redoStack[redoStack.size - 1]
-        redoStack.remove(at: redoStack.size - 1)
+        let before = snapshot()
+        if (!textModelValue.redo()) { return false }
+        undoStack.add(before)
+        let next = if (redoStack.size > 0) { redoStack.remove(at: redoStack.size - 1) } else { before }
         restoreSnapshot(next)
         true
     }
@@ -722,7 +780,7 @@ public class TextArea <: Widget {
     private func deleteSelectionRaw(): Unit {
         match (selectionBounds()) {
             case Some((start, end)) =>
-                value = value[..start] + value[end..]
+                replaceModelRange(start, end, "")
                 cursor = start
                 clearSelection()
             case None => ()
@@ -752,30 +810,33 @@ public class TextArea <: Widget {
     }
 
     public func moveWordLeft(): Unit {
-        cursor = previousWordOffset(value, cursor)
+        cursor = wordOffset(cursor, false)
         clearSelection()
     }
 
     public func moveWordRight(): Unit {
-        cursor = nextWordOffset(value, cursor)
+        cursor = wordOffset(cursor, true)
         clearSelection()
     }
 
     private func insert(text: String): Unit {
-        value = value[..cursor] + text + value[cursor..]
+        replaceModelRange(cursor, cursor, text)
         cursor += text.size
     }
 
     private func replaceSelectionOrInsert(text: String): Unit {
-        if (extraCarets.size > 0) {
-            applyCaretsEdit(text)
+        if (extraCarets.size > 0) { applyCaretsEdit(text); return }
+        let bounds = match (selectionBounds()) { case Some(range) => range; case None => (cursor, cursor) }
+        if (bounds[0] == bounds[1] && text.isEmpty()) { return }
+        if (bounds[1] - bounds[0] == text.size && textModelValue.slice(bounds[0], bounds[1]) == text) {
+            cursor = bounds[0] + text.size
+            clearSelection()
             return
         }
         pushUndoSnapshot()
-        if (hasSelection()) {
-            deleteSelectionRaw()
-        }
-        insert(text)
+        replaceModelRange(bounds[0], bounds[1], text)
+        cursor = bounds[0] + text.size
+        clearSelection()
         markEdited()
         clearRedo()
     }
@@ -787,8 +848,8 @@ public class TextArea <: Widget {
         }
         if (cursor <= 0) { return }
         pushUndoSnapshot()
-        let prev = previousRuneOffset(value, cursor)
-        value = value[..prev] + value[cursor..]
+        let prev = previousOffset(cursor)
+        replaceModelRange(prev, cursor, "")
         cursor = prev
         markEdited()
         clearRedo()
@@ -799,10 +860,10 @@ public class TextArea <: Widget {
             applyCaretsDeleteForward()
             return
         }
-        if (cursor >= value.size) { return }
+        if (cursor >= textModelValue.byteLength()) { return }
         pushUndoSnapshot()
-        let next = nextRuneOffset(value, cursor)
-        value = value[..cursor] + value[next..]
+        let next = nextOffset(cursor)
+        replaceModelRange(cursor, next, "")
         markEdited()
         clearRedo()
     }
@@ -820,7 +881,7 @@ public class TextArea <: Widget {
             deleteSelection()
             return
         }
-        deleteRange(cursor, lineEnd(value, cursor))
+        deleteRange(cursor, lineEndForOffset(cursor))
     }
 
     private func deletePreviousWord(): Unit {
@@ -828,15 +889,15 @@ public class TextArea <: Widget {
             deleteSelection()
             return
         }
-        deleteRange(previousWordOffset(value, cursor), cursor)
+        deleteRange(wordOffset(cursor, false), cursor)
     }
 
     private func deleteRange(start: Int64, end: Int64): Unit {
-        let from = clampToRuneBoundary(value, min(start, end))
-        let to = clampToRuneBoundary(value, max(start, end))
+        let from = textModelValue.clampOffset(min(start, end))
+        let to = textModelValue.clampOffset(max(start, end))
         if (from == to) { return }
         pushUndoSnapshot()
-        value = value[..from] + value[to..]
+        replaceModelRange(from, to, "")
         cursor = from
         clearSelection()
         clearExtraCarets()
@@ -845,7 +906,7 @@ public class TextArea <: Widget {
     }
 
     private func snapshot(): TextAreaSnapshot {
-        TextAreaSnapshot(value, cursor, scroll, selectionStart, selectionEnd, extraCarets)
+        TextAreaSnapshot(textModelValue.revision(), cursor, scroll, selectionStart, selectionEnd, extraCarets)
     }
 
     private func pushUndoSnapshot(): Unit {
@@ -854,8 +915,8 @@ public class TextArea <: Widget {
     }
 
     private func restoreSnapshot(item: TextAreaSnapshot): Unit {
-        value = item.value
-        cursor = clampToRuneBoundary(value, item.cursor)
+        resetDecorationStores()
+        cursor = textModelValue.clampOffset(item.cursor)
         scroll = max(0, item.scroll)
         selectionStart = item.selectionStart
         selectionEnd = item.selectionEnd
@@ -869,13 +930,117 @@ public class TextArea <: Widget {
     }
 
     private func moveVertical(delta: Int64): Unit {
-        let line = lineForOffset(cursor)
-        let col = displayWidth(value[lineStartForOffset(cursor)..cursor])
-        let visible = visibleLineIndexes()
-        let row = visibleRowForLine(line)
-        let targetVisible = clamp(row + delta, 0, max(0, visible.size - 1))
-        let targetLine = if (visible.size == 0) { 0 } else { visible[targetVisible] }
-        cursor = offsetAtCachedLineColumn(targetLine, col)
+        let col = match (preferredColumn) { case Some(value) => value; case None => columnForOffset(cursor) }
+        preferredColumn = Some(col)
+        cursor = verticalOffset(cursor, delta, col)
+    }
+
+    private func columnForOffset(offset: Int64): Int64 {
+        displayWidth(textModelValue.slice(lineStartForOffset(offset), offset))
+    }
+
+    internal func previousOffset(offset: Int64): Int64 {
+        let pos = textModelValue.clampOffset(offset)
+        if (pos <= 0) { return 0 }
+        if (pos >= 2 && textModelValue.slice(pos - 2, pos) == "\r\n") { return pos - 2 }
+        let index = lineForOffset(pos)
+        let start = textModelValue.lineStart(index)
+        if (pos == start) { return pos - 1 }
+        start + previousGraphemeOffset(textModelValue.line(index), pos - start)
+    }
+
+    internal func nextOffset(offset: Int64): Int64 {
+        let pos = textModelValue.clampOffset(offset)
+        if (pos >= textModelValue.byteLength()) { return textModelValue.byteLength() }
+        if (textModelValue.slice(pos, min(pos + 2, textModelValue.byteLength())) == "\r\n") { return pos + 2 }
+        let index = lineForOffset(pos)
+        let start = textModelValue.lineStart(index)
+        let line = textModelValue.line(index)
+        if (pos - start >= line.size) { return min(textModelValue.byteLength(), pos + 1) }
+        start + nextGraphemeOffset(line, pos - start)
+    }
+
+    private func wordOffset(offset: Int64, right: Bool): Int64 {
+        indexedWordOffset(textModelValue, offset, right)
+    }
+
+    private func verticalOffset(offset: Int64, delta: Int64, column: Int64): Int64 {
+        let row = visibleRowForLine(lineForOffset(offset))
+        let next = clamp(row + delta, 0, max(0, visibleLineCount() - 1))
+        offsetAtCachedLineColumn(visibleLineAt(next), column)
+    }
+
+    private func navigateCarets(key: KeyEvent): Unit {
+        let original = carets()
+        let isVertical = match (key.code) {
+            case KeyCode.Up | KeyCode.Down | KeyCode.PageUp | KeyCode.PageDown => true
+            case _ => false
+        }
+        var continuesVertical = verticalColumns.size == original.size && verticalOffsets.size == original.size
+        if (continuesVertical) {
+            for (i in 0..original.size) {
+                if (original[i].offset != verticalOffsets[i]) { continuesVertical = false; break }
+            }
+        }
+        if (isVertical && !continuesVertical) {
+            let columns = ArrayList<Int64>()
+            for (caret in original) { columns.add(columnForOffset(caret.offset)) }
+            verticalColumns = columns.toArray()
+        } else if (!isVertical) { verticalColumns = []; preferredColumn = None }
+        let next = ArrayList<TextAreaCaret>()
+        for (i in 0..original.size) {
+            let caret = normalizedCaret(original[i])
+            var target = caret.offset
+            let range = caretRange(caret)
+            match (key.code) {
+                case KeyCode.Left =>
+                    if (!key.modifiers.shift && !key.modifiers.ctrl && range.isSome()) {
+                        if (let Some((start, _)) <- range) { target = start }
+                    } else { target = if (key.modifiers.ctrl) { wordOffset(target, false) } else { previousOffset(target) } }
+                case KeyCode.Right =>
+                    if (!key.modifiers.shift && !key.modifiers.ctrl && range.isSome()) {
+                        if (let Some((_, end)) <- range) { target = end }
+                    } else { target = if (key.modifiers.ctrl) { wordOffset(target, true) } else { nextOffset(target) } }
+                case KeyCode.Up => target = verticalOffset(target, -1, verticalColumns[i])
+                case KeyCode.Down => target = verticalOffset(target, 1, verticalColumns[i])
+                case KeyCode.PageUp => target = verticalOffset(target, -viewportHeight, verticalColumns[i])
+                case KeyCode.PageDown => target = verticalOffset(target, viewportHeight, verticalColumns[i])
+                case KeyCode.Home => target = if (key.modifiers.ctrl) { 0 } else { lineStartForOffset(target) }
+                case KeyCode.End => target = if (key.modifiers.ctrl) { textModelValue.byteLength() } else { lineEndForOffset(target) }
+                case _ => ()
+            }
+            let anchor: ?Int64 = if (key.modifiers.shift) {
+                match (caret.anchor) { case Some(value) => Some(value); case None => Some(caret.offset) }
+            } else { None }
+            next.add(TextAreaCaret(target, anchor: anchor))
+        }
+        let retainedColumns = verticalColumns
+        setCarets(next.toArray())
+        if (isVertical) {
+            verticalColumns = retainedColumns
+            let offsets = ArrayList<Int64>()
+            for (caret in next) { offsets.add(caret.offset) }
+            verticalOffsets = offsets.toArray()
+        } else { verticalOffsets = [] }
+        invalidateCompletionRequest()
+    }
+
+    private func gutterWidth(): Int64 {
+        if (lineNumbers) { min(6, max(3, decimalDigits(lineCount()) + 1)) } else { 0 }
+    }
+
+    private func textViewport(area: Rect): Rect {
+        let target = match (block) { case Some(value) => value.inner(area); case None => area }
+        let gutter = min(target.width, gutterWidth())
+        Rect(target.x + gutter, target.y, max(0, target.width - gutter), target.height)
+    }
+
+    private func ensureHorizontalVisible(width: Int64): Unit {
+        horizontalScroll = max(0, horizontalScroll)
+        if (width <= 0) { return }
+        let column = columnForOffset(cursor)
+        if (column < horizontalScroll) { horizontalScroll = column }
+        else if (column >= horizontalScroll + width) { horizontalScroll = column - width + 1 }
     }
 
     private func ensureCursorVisible(height: Int64): Unit {
@@ -904,8 +1069,8 @@ public class TextArea <: Widget {
     }
 
     private func normalizedCaret(caret: TextAreaCaret): TextAreaCaret {
-        TextAreaCaret(clampToRuneBoundary(value, caret.offset), anchor: match (caret.anchor) {
-            case Some(anchor) => Some(clampToRuneBoundary(value, anchor))
+        TextAreaCaret(textModelValue.clampOffset(caret.offset), anchor: match (caret.anchor) {
+            case Some(anchor) => Some(textModelValue.clampOffset(anchor))
             case None => None
         })
     }
@@ -935,27 +1100,41 @@ public class TextArea <: Widget {
     }
 
     private func markEdited(): Unit {
-        revisionValue = value
-        revision++
+        if (undoGroupSnapshot.isNone() && undoStack.size > 0 &&
+            undoStack[undoStack.size - 1].modelRevision == textModelValue.revision()) {
+            undoStack.remove(at: undoStack.size - 1)
+        }
+        revision = textModelValue.revision()
+        preferredColumn = None
+        verticalColumns = []
         invalidateLineCache()
-        completionOpen = false
-        completionItems = []
+        invalidateCompletionRequest()
     }
 
     private func synchronizeValue(): Unit {
-        // Keep the public field shape. String equality detects direct writes
-        // exactly; the unchanged immutable value needs no hash or line scan.
-        if (value == revisionValue) { return }
-        cursor = clampToRuneBoundary(value, cursor)
+        cursor = textModelValue.clampOffset(cursor)
         selectionStart = match (selectionStart) {
-            case Some(offset) => Some(clampToRuneBoundary(value, offset))
+            case Some(offset) => Some(textModelValue.clampOffset(offset))
             case None => None
         }
         selectionEnd = match (selectionEnd) {
-            case Some(offset) => Some(clampToRuneBoundary(value, offset))
+            case Some(offset) => Some(textModelValue.clampOffset(offset))
             case None => None
         }
+        if (revision == textModelValue.revision()) { return }
+        undoStack.clear()
+        redoStack.clear()
+        undoGroupSnapshot = None
+        resetDecorationStores()
         markEdited()
+    }
+
+    private func replaceModelRange(start: Int64, end: Int64, text: String): Unit {
+        let before = textModelValue.revision()
+        textModelValue.replace(start, end, text)
+        if (textModelValue.revision() != before) {
+            notifyDecorationEdit(TextEditDelta(start, end, text.size, before, textModelValue.revision()))
+        }
     }
 
     private func applyCaretsEdit(text: String): Unit {
@@ -967,7 +1146,7 @@ public class TextArea <: Widget {
                     edits.add(TextAreaEdit(start, end, text))
                     nextCarets.add(TextAreaCaret(start))
                 case None =>
-                    let offset = clampToRuneBoundary(value, caret.offset)
+                    let offset = textModelValue.clampOffset(caret.offset)
                     edits.add(TextAreaEdit(offset, offset, text))
                     nextCarets.add(TextAreaCaret(offset))
             }
@@ -984,9 +1163,9 @@ public class TextArea <: Widget {
                     edits.add(TextAreaEdit(start, end, ""))
                     nextCarets.add(TextAreaCaret(start))
                 case None =>
-                    let offset = clampToRuneBoundary(value, caret.offset)
+                    let offset = textModelValue.clampOffset(caret.offset)
                     if (offset > 0) {
-                        let prev = previousRuneOffset(value, offset)
+                        let prev = previousOffset(offset)
                         edits.add(TextAreaEdit(prev, offset, ""))
                         nextCarets.add(TextAreaCaret(prev))
                     } else {
@@ -1006,9 +1185,9 @@ public class TextArea <: Widget {
                     edits.add(TextAreaEdit(start, end, ""))
                     nextCarets.add(TextAreaCaret(start))
                 case None =>
-                    let offset = clampToRuneBoundary(value, caret.offset)
-                    if (offset < value.size) {
-                        let next = nextRuneOffset(value, offset)
+                    let offset = textModelValue.clampOffset(caret.offset)
+                    if (offset < textModelValue.byteLength()) {
+                        let next = nextOffset(offset)
                         edits.add(TextAreaEdit(offset, next, ""))
                     }
                     nextCarets.add(TextAreaCaret(offset))
@@ -1020,12 +1199,10 @@ public class TextArea <: Widget {
     private func applyEdits(items: Array<TextAreaEdit>, nextCarets: Array<TextAreaCaret>): Unit {
         if (items.size == 0) { return }
         pushUndoSnapshot()
-        var nextValue = value
         let applied = normalizeEditsDescending(items)
-        for (edit in applied) {
-            nextValue = nextValue[..edit.start] + edit.text + nextValue[edit.end..]
-        }
-        value = nextValue
+        textModelValue.beginUndoGroup()
+        for (edit in applied) { replaceModelRange(edit.start, edit.end, edit.text) }
+        textModelValue.endUndoGroup()
         setCarets(transformCaretsAfterEdits(nextCarets, applied))
         coalesceEditedCarets()
         markEdited()
@@ -1147,74 +1324,43 @@ public class TextArea <: Widget {
     }
 
     private func ensureLineCache(): Unit {
-        if (!lineCacheStale()) { return }
-        cachedLines = splitLines(value)
-        cachedLineOffsets = lineStartOffsets(value)
-        cachedVisibleLines = []
+        if (cachedLineRevision == revision) { return }
         cachedLineRebuilds++
         cachedLineRevision = revision
+        cachedVisibleLines = []
     }
 
-    private func lineCacheStale(): Bool {
-        cachedLineRevision != revision || cachedLines.size == 0 || cachedLineOffsets.size == 0
-    }
-
-    private func linesForRender(): Array<String> {
-        ensureLineCache()
-        cachedLines
-    }
-
-    private func lineOffsetsForRender(): Array<Int64> {
-        ensureLineCache()
-        cachedLineOffsets
-    }
-
-    private func lineCount(): Int64 {
-        linesForRender().size
-    }
-
-    private func lineForOffset(offset: Int64): Int64 {
-        let target = clampToRuneBoundary(value, offset)
-        let offsets = lineOffsetsForRender()
-        var low: Int64 = 0
-        var high = offsets.size
-        while (low < high) {
-            let middle = low + (high - low) / 2
-            if (offsets[middle] <= target) { low = middle + 1 } else { high = middle }
-        }
-        max(0, low - 1)
-    }
-
-    private func offsetAtCachedLineColumn(line: Int64, column: Int64): Int64 {
-        ensureLineCache()
-        let lineIndex = clamp(line, 0, max(0, cachedLines.size - 1))
-        let localLine = cachedLines[lineIndex]
-        cachedLineOffsets[lineIndex] + offsetAtLineColumn(localLine, 0, column)
-    }
-
-    private func lineStartForOffset(offset: Int64): Int64 {
+    private func lineCount(): Int64 { ensureLineCache(); textModelValue.lineCount() }
+    private func lineForOffset(offset: Int64): Int64 { ensureLineCache(); textModelValue.lineForOffset(offset) }
+    internal func lineStartForOffset(offset: Int64): Int64 { textModelValue.lineStart(lineForOffset(offset)) }
+    internal func lineEndForOffset(offset: Int64): Int64 {
         let line = lineForOffset(offset)
-        let offsets = lineOffsetsForRender()
-        if (line >= 0 && line < offsets.size) { offsets[line] } else { 0 }
+        if (line + 1 < textModelValue.lineCount()) { textModelValue.lineStart(line + 1) - 1 }
+        else { textModelValue.byteLength() }
     }
-
-    public func lineCacheRebuildCount(): Int64 {
-        cachedLineRebuilds
+    private func offsetAtCachedLineColumn(line: Int64, column: Int64): Int64 {
+        let index = clamp(line, 0, max(0, textModelValue.lineCount() - 1))
+        textModelValue.lineStart(index) + offsetAtLineColumn(textModelValue.line(index), 0, column)
     }
+    public func lineCacheRebuildCount(): Int64 { cachedLineRebuilds }
 
+    private func hasFolds(): Bool {
+        match (foldState) { case Some(state) => state.folds().size > 0; case None => false }
+    }
+    private func visibleLineCount(): Int64 {
+        if (hasFolds()) { visibleLineIndexes().size } else { lineCount() }
+    }
+    private func visibleLineAt(index: Int64): Int64 {
+        if (hasFolds()) { visibleLineIndexes()[index] } else { index }
+    }
     private func visibleLineIndexes(): Array<Int64> {
         ensureLineCache()
         let foldRevision = match (foldState) { case Some(state) => state.foldRevision(); case None => 0 }
-        if (cachedFoldRevision != foldRevision) {
-            cachedFoldRevision = foldRevision
-            cachedVisibleLines = []
-        }
+        if (cachedFoldRevision != foldRevision) { cachedFoldRevision = foldRevision; cachedVisibleLines = [] }
         if (cachedVisibleLines.size > 0) { return cachedVisibleLines }
-        let lines = cachedLines
-        let offsets = cachedLineOffsets
         let out = ArrayList<Int64>()
-        for (i in 0..lines.size) {
-            if (!lineOffsetHidden(offsets[i])) { out.add(i) }
+        for (i in 0..textModelValue.lineCount()) {
+            if (!lineOffsetHidden(textModelValue.lineStart(i))) { out.add(i) }
         }
         if (out.size == 0) { out.add(0) }
         cachedVisibleLines = out.toArray()
@@ -1233,9 +1379,8 @@ public class TextArea <: Widget {
     }
 
     private func lineHasFoldMarker(lineIndex: Int64): Bool {
-        let offsets = lineOffsetsForRender()
-        if (lineIndex < 0 || lineIndex >= offsets.size) { return false }
-        let offset = offsets[lineIndex]
+        if (lineIndex < 0 || lineIndex >= textModelValue.lineCount()) { return false }
+        let offset = textModelValue.lineStart(lineIndex)
         match (foldState) {
             case Some(state) =>
                 for (range in state.folds()) {
@@ -1247,6 +1392,7 @@ public class TextArea <: Widget {
     }
 
     private func visibleRowForLine(line: Int64): Int64 {
+        if (!hasFolds()) { return clamp(line, 0, max(0, lineCount() - 1)) }
         let visible = visibleLineIndexes()
         var low: Int64 = 0
         var high = visible.size
@@ -1258,22 +1404,15 @@ public class TextArea <: Widget {
     }
 
     private func offsetForMouse(mouse: MouseEvent, area: Rect): ?Int64 {
-        var target = area
-        if (let Some(b) <- block) { target = b.inner(area) }
+        let outer = match (block) { case Some(value) => value.inner(area); case None => area }
+        let target = textViewport(area)
         if (target.width <= 0 || target.height <= 0) { return None }
-        let lines = linesForRender()
-        let gutter = if (lineNumbers) { min(6, max(3, decimalDigits(lines.size) + 1)) } else { 0 }
-        if (mouse.y < target.y || mouse.y >= target.y + target.height) { return None }
-        let visible = visibleLineIndexes()
-        let visibleIndex = scroll + mouse.y - target.y
-        if (visibleIndex < 0 || visibleIndex >= visible.size) { return None }
-        let lineIndex = visible[visibleIndex]
-        if (lineNumbers && mouse.x < target.x + gutter) {
-            return Some(offsetAtCachedLineColumn(lineIndex, 0))
-        }
-        let textX = target.x + gutter
-        let column = max(0, mouse.x - textX)
-        Some(offsetAtCachedLineColumn(lineIndex, column))
+        if (mouse.x < outer.x || mouse.x >= outer.right || mouse.y < target.y || mouse.y >= target.bottom) { return None }
+        let index = scroll + mouse.y - target.y
+        if (index < 0 || index >= visibleLineCount()) { return None }
+        let line = visibleLineAt(index)
+        let column = if (mouse.x < target.x) { 0 } else { horizontalScroll + mouse.x - target.x }
+        Some(offsetAtCachedLineColumn(line, column))
     }
 
     private func applyCompletionResult(result: TextCompletionResult): Bool {
@@ -1281,8 +1420,8 @@ public class TextArea <: Widget {
         if (completionRevision < 0 || result.requestId != completionRequestId ||
             result.revision != completionRevision || result.revision != revision) { return false }
         completionItems = result.items
-        completionReplaceStart = clampToRuneBoundary(value, result.replaceStart)
-        completionReplaceEnd = clampToRuneBoundary(value, result.replaceEnd)
+        completionReplaceStart = textModelValue.clampOffset(result.replaceStart)
+        completionReplaceEnd = textModelValue.clampOffset(result.replaceEnd)
         completionIndex = 0
         completionOpen = result.items.size > 0
         completionOpen
@@ -1311,9 +1450,9 @@ public class TextArea <: Widget {
         if (readOnly || !completionOpen || completionItems.size == 0) { return }
         let item = completionItems[completionIndex]
         pushUndoSnapshot()
-        let start = clamp(completionReplaceStart, 0, value.size)
-        let end = clamp(completionReplaceEnd, start, value.size)
-        value = value[..start] + item.insertText + value[end..]
+        let start = clamp(completionReplaceStart, 0, textModelValue.byteLength())
+        let end = clamp(completionReplaceEnd, start, textModelValue.byteLength())
+        replaceModelRange(start, end, item.insertText)
         cursor = start + item.insertText.size
         clearSelection()
         clearExtraCarets()
@@ -1342,29 +1481,31 @@ public class TextArea <: Widget {
     }
 
     private func renderLine(x: Int64, y: Int64, width: Int64, lineIndex: Int64, line: String, buffer: Buffer): Unit {
-        let offsets = lineOffsetsForRender()
-        let lineStartOffset = offsets[lineIndex]
-        let styled = lineDecorations(line, lineStartOffset)
-        let ranges = selectionRangesForLine(lineStartOffset, line.size)
-        if (ranges.size == 0) {
-            renderDecoratedLine(buffer, x, y, width, styled)
-            return
-        }
-        var offset: Int64 = 0
-        var cx = x
-        for (range in ranges) {
-            if (range.start > offset) {
-                let segment = sliceRichSpans(styled, offset, range.start, None)
-                renderDecoratedLine(buffer, cx, y, max(0, width - (cx - x)), segment)
-                cx += displayWidth(line[offset..range.start])
+        if (width <= 0) { return }
+        let start = textModelValue.lineStart(lineIndex)
+        let styled = lineDecorations(line, start)
+        let ranges = selectionRangesForLine(start, line.size)
+        buffer.withCanvasClip(Rect(x, y, width, 1)) { =>
+            var column: Int64 = 0
+            var offset: Int64 = 0
+            buffer.fill(Rect(x, y, width, 1), style: style)
+            for (span in styled) {
+                for (cluster in graphemeClusters(span.text)) {
+                    if (column >= horizontalScroll + width) { break }
+                    if (column >= horizontalScroll && column + cluster.width <= horizontalScroll + width) {
+                        var cellStyle = span.style
+                        let from = offset + cluster.startOffset
+                        let to = offset + cluster.endOffset
+                        for (range in ranges) {
+                            if (range.start < to && range.end > from) { cellStyle = cellStyle.patch(selectedStyle); break }
+                        }
+                        buffer.writeStringClipped(x + column - horizontalScroll, y, cluster.text,
+                            maxWidth: horizontalScroll + width - column, style: cellStyle)
+                    }
+                    column += cluster.width
+                }
+                offset += span.text.size
             }
-            let selected = sliceRichSpans(styled, range.start, range.end, Some(selectedStyle))
-            renderDecoratedLine(buffer, cx, y, max(0, width - (cx - x)), selected)
-            cx += displayWidth(line[range.start..range.end])
-            offset = range.end
-        }
-        if (offset < line.size) {
-            renderDecoratedLine(buffer, cx, y, max(0, width - (cx - x)), sliceRichSpans(styled, offset, line.size, None))
         }
     }
 
@@ -1386,18 +1527,21 @@ public class TextArea <: Widget {
 
     private func lineDecorations(line: String, lineStartOffset: Int64): Array<RichSpan> {
         if (line.isEmpty()) { return [RichSpan("", style: style)] }
-        let lineMarkers = decorationsForLine(lineStartOffset, line.size)
-        let markers = if (markdownEditing && decorations.size == 0) { markdownLineDecorations(line, lineStartOffset) } else { lineMarkers }
+        let allMarkers = ArrayList<TextDecoration>()
+        if (markdownEditing && decorations.size == 0) { allMarkers.add(all: markdownLineDecorations(line, lineStartOffset)) }
+        allMarkers.add(all: decorationsForLine(lineStartOffset, line.size))
+        let markers = allMarkers.toArray()
         let spans = ArrayList<RichSpan>()
-        var offset: Int64 = 0
         var runStart: Int64 = 0
         var currentStyle = style
         var hasCurrent = false
-        while (offset < line.size) {
-            let next = nextRuneOffset(line, offset)
+        // A decoration that intersects a grapheme styles that whole grapheme;
+        // splitting at rune boundaries can break combining and ZWJ sequences.
+        for (cluster in graphemeClusters(line)) {
+            let offset = cluster.startOffset
             var nextStyle = style
             let absStart = lineStartOffset + offset
-            let absEnd = lineStartOffset + next
+            let absEnd = lineStartOffset + cluster.endOffset
             for (decoration in markers) {
                 if (decoration.end > absStart && decoration.start < absEnd) {
                     nextStyle = nextStyle.patch(decoration.style)
@@ -1412,7 +1556,6 @@ public class TextArea <: Widget {
                 runStart = offset
                 currentStyle = nextStyle
             }
-            offset = next
         }
         if (hasCurrent) { spans.add(RichSpan(line[runStart..line.size], style: currentStyle)) }
         spans.toArray()
@@ -1422,9 +1565,13 @@ public class TextArea <: Widget {
         let out = ArrayList<TextDecoration>()
         let lineEnd = lineStartOffset + lineSize
         for (decoration in decorations) {
-            if (decoration.end > lineStartOffset && decoration.start < lineEnd) {
-                out.add(decoration)
-            }
+            if (decoration.end > lineStartOffset && decoration.start < lineEnd) { out.add(decoration) }
+        }
+        for (provider in decorationProviders) {
+            if (provider.revision() == revision) { out.add(all: provider.query(lineStartOffset, lineEnd)) }
+        }
+        for (store in decorationStores) {
+            if (store.revision() == revision) { out.add(all: store.query(lineStartOffset, lineEnd)) }
         }
         out.toArray()
     }
@@ -1435,8 +1582,8 @@ public class TextArea <: Widget {
 
     private func markdownEnterText(): String {
         let start = lineStartForOffset(cursor)
-        let end = lineEnd(value, cursor)
-        let line = value[start..end]
+        let end = lineEndForOffset(cursor)
+        let line = textModelValue.slice(start, end)
         let indent = line[..leadingSpacesLocal(line)]
         let markerEnd = markdownListMarkerEnd(line)
         if (markerEnd > 0) {
@@ -1454,13 +1601,13 @@ public class TextArea <: Widget {
 
     private func finishEmptyMarkdownListItem(): Bool {
         let start = lineStartForOffset(cursor)
-        let end = lineEnd(value, cursor)
-        let line = value[start..end]
+        let end = lineEndForOffset(cursor)
+        let line = textModelValue.slice(start, end)
         let markerEnd = markdownListMarkerEnd(line)
         if (markerEnd <= 0 || !trimAsciiSpacesLocal(line[markerEnd..]).isEmpty()) { return false }
         let indent = line[..leadingSpacesLocal(line)]
         pushUndoSnapshot()
-        value = value[..start] + indent + value[end..]
+        replaceModelRange(start, end, indent)
         cursor = start + indent.size
         clearSelection()
         markEdited()
@@ -1477,7 +1624,7 @@ public class TextArea <: Widget {
 
     private func outdentCurrentLine(): Unit {
         let start = lineStartForOffset(cursor)
-        let remove = if (start + 2 <= value.size && value[start..start + 2] == "  ") { 2 } else if (start < value.size && value[start] == b' ') { 1 } else { 0 }
+        let remove = if (start + 2 <= textModelValue.byteLength() && textModelValue.slice(start, start + 2) == "  ") { 2 } else if (start < textModelValue.byteLength() && textModelValue.slice(start, start + 1) == " ") { 1 } else { 0 }
         if (remove <= 0) { return }
         cursor = start
         select(start, start + remove)
@@ -1499,9 +1646,9 @@ public class TextArea <: Widget {
     }
 
     private func replaceLineRangeIndent(start: Int64, end: Int64, indent: Bool): Unit {
-        let rangeStart = lineStart(value, start)
-        let rangeEnd = lineEnd(value, end)
-        let lines = splitLines(value[rangeStart..rangeEnd])
+        let rangeStart = lineStartForOffset(start)
+        let rangeEnd = lineEndForOffset(end)
+        let lines = splitLines(textModelValue.slice(rangeStart, rangeEnd))
         var next = ""
         for (i in 0..lines.size) {
             if (i > 0) { next += "\n" }

@@ -132,6 +132,8 @@ public enum Command {
     | AsyncExec(String, String)
     | AsyncExecArgs(String, String, Array<String>)
     | CancelAsync(String)
+    | ProcessStart(String, ProcessSpec)
+    | ProcessCancel(String)
     | PtyStart(String, PtySpec)
     | PtyWrite(String, Array<Byte>)
     | PtyResize(String, PtySize)
@@ -154,6 +156,28 @@ class TerminalLifecycleRequests {
     // An empty DirtyRects alone cannot represent that state after merging.
     var fullRedrawRequested: Bool = true
     private let ownedPtys = ArrayList<String>()
+    let asyncEvents = RuntimeEventBatch()
+    let ptyEvents = RuntimeEventBatch()
+    let processEvents = RuntimeEventBatch()
+
+    func hasPendingSources(): Bool {
+        asyncEvents.size() > 0 || ptyEvents.size() > 0 || processEvents.size() > 0
+    }
+
+    func stagePtyEvents(events: Array<Event>, runtime: PtyRuntime): Unit {
+        for (event in events) {
+            match (event) {
+                case Event.PtyStarted(id) => trackPty(id)
+                // A deferred write failure does not end the process. Also,
+                // an old terminal event may arrive after this ID was reused.
+                // Retain ownership while the runtime still has a live entry.
+                case Event.PtyExited(id, _) => if (runtime.process(id).isNone()) { releasePty(id) }
+                case Event.PtyFailed(id, _) => if (runtime.process(id).isNone()) { releasePty(id) }
+                case _ => ()
+            }
+        }
+        ptyEvents.append(events)
+    }
 
     func trackPty(id: String): Unit {
         for (owned in ownedPtys) {
@@ -259,6 +283,8 @@ public class AppMetrics {
     private var queueProcessedValue: Int64 = 0
     private var maxQueueDepthValue: Int64 = 0
     private var maxUpdateDepthValue: Int64 = 0
+    private var yieldedTurnsValue: Int64 = 0
+    private var queueOverflowValue: Int64 = 0
     private var schedulingValue = FrameSchedulingSnapshot()
 
     public init(maxFrames!: ?Int64 = Some(600)) {
@@ -369,6 +395,8 @@ public class AppMetrics {
         queueProcessedValue = 0
         maxQueueDepthValue = 0
         maxUpdateDepthValue = 0
+        yieldedTurnsValue = 0
+        queueOverflowValue = 0
         schedulingValue = FrameSchedulingSnapshot()
     }
 
@@ -382,6 +410,9 @@ public class AppMetrics {
         maxUpdateDepthValue = max(maxUpdateDepthValue, max(0, updateDepth))
     }
 
+    func runtimeYielded(): Unit { yieldedTurnsValue++ }
+    func runtimeOverflowed(): Unit { queueOverflowValue++ }
+
     func frameScheduled(snapshot: FrameSchedulingSnapshot): Unit {
         schedulingValue = snapshot
     }
@@ -392,6 +423,8 @@ public class AppMetrics {
             queueProcessed: queueProcessedValue,
             maxQueueDepth: maxQueueDepthValue,
             maxUpdateDepth: maxUpdateDepthValue,
+            yieldedTurns: yieldedTurnsValue,
+            queueOverflows: queueOverflowValue,
             scheduling: schedulingValue
         )
     }
@@ -402,6 +435,8 @@ public struct RuntimeMetricsSnapshot {
     public let queueProcessed: Int64
     public let maxQueueDepth: Int64
     public let maxUpdateDepth: Int64
+    public let yieldedTurns: Int64
+    public let queueOverflows: Int64
     public let scheduling: FrameSchedulingSnapshot
 
     public init(
@@ -409,12 +444,16 @@ public struct RuntimeMetricsSnapshot {
         queueProcessed!: Int64 = 0,
         maxQueueDepth!: Int64 = 0,
         maxUpdateDepth!: Int64 = 0,
+        yieldedTurns!: Int64 = 0,
+        queueOverflows!: Int64 = 0,
         scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot()
     ) {
         this.queueEnqueued = max(0, queueEnqueued)
         this.queueProcessed = max(0, queueProcessed)
         this.maxQueueDepth = max(0, maxQueueDepth)
         this.maxUpdateDepth = max(0, maxUpdateDepth)
+        this.yieldedTurns = max(0, yieldedTurns)
+        this.queueOverflows = max(0, queueOverflows)
         this.scheduling = scheduling
     }
 }
@@ -435,6 +474,7 @@ class TimerState {
 public class TimerRuntime {
     private let timers = ArrayList<TimerState>()
     private let clock: RuntimeClock
+    private var nextTimerIndex: Int64 = 0
 
     public init(clock!: RuntimeClock = MonotonicRuntimeClock()) {
         this.clock = clock
@@ -450,6 +490,7 @@ public class TimerRuntime {
         while (i < timers.size) {
             if (timers[i].spec.id == id) {
                 timers.remove(at: i)
+                if (i < nextTimerIndex) { nextTimerIndex-- }
                 return true
             }
             i++
@@ -457,12 +498,15 @@ public class TimerRuntime {
         false
     }
 
-    func drain(): Array<Event> {
+    func drain(maxEvents!: Int64 = Int64.Max): Array<Event> {
         let nowMillis = clock.nowMillis()
         let out = ArrayList<Event>()
-        var i: Int64 = 0
-        while (i < timers.size) {
+        var remaining = timers.size
+        var i = nextTimerIndex
+        while (remaining > 0 && out.size < max(0, maxEvents)) {
+            if (i >= timers.size) { i = 0 }
             let timer = timers[i]
+            remaining--
             if (nowMillis >= timer.nextDueMillis) {
                 let everyMillis = max(1, timer.spec.every.toMilliseconds())
                 let lateMillis = max(0, nowMillis - timer.nextDueMillis)
@@ -484,6 +528,7 @@ public class TimerRuntime {
             }
             i++
         }
+        nextTimerIndex = i
         out.toArray()
     }
 
@@ -502,6 +547,7 @@ public class TimerRuntime {
 
     func clear(): Unit {
         timers.clear()
+        nextTimerIndex = 0
     }
 }
 
@@ -562,11 +608,16 @@ public class AsyncRuntime {
     private let completionWake = ExternalPort<Unit>(capacity: 1)
     private var closed: Bool = false
     var transient: Bool = false
+    private let maxPendingTasks: Int64
 
-    public init() {}
+    public init(maxPendingTasks!: Int64 = 256) {
+        if (maxPendingTasks <= 0) { throw IllegalArgumentException("async task capacity must be positive") }
+        this.maxPendingTasks = maxPendingTasks
+    }
 
     public func start(id: String, task: () -> Event): Event {
         if (closed) { return Event.AsyncFailed(id, "async runtime is closed") }
+        if (tasks.size >= maxPendingTasks) { return Event.AsyncFailed(id, "async task capacity exhausted") }
         cancel(id)
         for (previous in tasks) {
             if (previous.id == id) { previous.superseded = true }
@@ -1476,6 +1527,7 @@ public class App {
     private let missPolicy: FrameMissPolicy
     private let idleSleep: Duration
     private let resizePollEvery: Duration
+    private var processRuntime: ProcessRuntime = defaultProcessRuntime()
     private var ptyRuntime: PtyRuntime
     private let eventWaiter: EventWaiter
     private let metrics: ?AppMetrics
@@ -1607,6 +1659,7 @@ public class App {
         idleSleep!: Duration = Duration.millisecond * 10,
         resizePollEvery!: Duration = Duration.millisecond * 250,
         ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(),
+        processRuntime!: ProcessRuntime = defaultProcessRuntime(),
         metrics!: ?AppMetrics = None,
         instrumentationEnabled!: Bool = false
     ) {
@@ -1629,6 +1682,7 @@ public class App {
         this.idleSleep = if (idleSleep <= Duration.Zero) { Duration.Zero } else { idleSleep }
         this.resizePollEvery = if (resizePollEvery <= Duration.Zero) { Duration.millisecond * 250 } else { resizePollEvery }
         this.ptyRuntime = ptyRuntime
+        this.processRuntime = processRuntime
         this.eventWaiter = eventWaiter
         this.metrics = metrics
         this.instrumentationEnabled = instrumentationEnabled
@@ -1646,6 +1700,11 @@ public class App {
 
     // Experimental PTY support is an explicit pre-run capability. Normal App
     // construction keeps the unsupported default as an implementation detail.
+    public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit {
+        if (runStarted) { throw Exception("process runtime must be attached before App.run") }
+        this.processRuntime = processRuntime
+    }
+
     public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit {
         if (runStarted) {
             throw Exception("PTY runtime must be attached before App.run")
@@ -1685,6 +1744,7 @@ public class App {
         )
         let commandQueue = ArrayList<Command>()
         let runtimeQueue = RuntimeQueue<Unit>(metrics: metrics)
+        runtimeQueue.beginTurn()
         let frameSchedule = FrameCoalescingState(App.frameCoalescingBudgetMillis())
         let pendingInputEvents = ArrayList<Event>()
         let asyncRuntime = AsyncRuntime()
@@ -1745,6 +1805,7 @@ public class App {
                     dirtyRectsBeforeMerge: pendingDirty.rects().size
                 )
                 while (running) {
+                    runtimeQueue.beginTurn()
                     let loopStartedAt = MonoTime.now()
                     let loopInterval = (loopStartedAt - lastLoopStartedAt).toNanoseconds()
                     // A deliberate blocking wait is idle time, not an event
@@ -1790,7 +1851,7 @@ public class App {
                             timerRuntime,
                             Some(pendingDirty),
                             Some(lifecycle),
-                            runtimeQueue: Some(runtimeQueue)
+                            runtimeQueue: Some(runtimeQueue), processRuntime: processRuntime
                         )
                         running = nextRunning
                         dirty = dirty || changed
@@ -1828,7 +1889,7 @@ public class App {
                         lifecycle.fullRedrawRequested = true
                         frameSchedule.request(FrameRequestKind.SurfaceCritical)
                     }
-                    for (event in timerRuntime.drain()) {
+                    for (event in timerRuntime.drain(maxEvents: min(64, max(0, 256 - runtimeQueue.size())))) {
                         if (running) {
                             let (nextRunning, changed) = enqueueAndProcess(
                                 event,
@@ -1865,7 +1926,7 @@ public class App {
                             case Some(m) => m.record(
                                 renderMetrics,
                                 frameIndex: frameIndex,
-                                eventQueueLength: max(0, pendingInputEvents.size - pendingInputIndex) + commandQueue.size,
+                                eventQueueLength: max(0, pendingInputEvents.size - pendingInputIndex) + commandQueue.size + runtimeQueue.size(),
                                 droppedTicks: droppedTickCount,
                                 tickDeltaMillis: lastTickDelta
                             )
@@ -1937,7 +1998,7 @@ public class App {
                                     timerRuntime,
                                     Some(pendingDirty),
                                     Some(lifecycle),
-                                    runtimeQueue: Some(runtimeQueue)
+                                    runtimeQueue: Some(runtimeQueue), processRuntime: processRuntime
                                 )
                                 running = nextRunning
                                 dirty = dirty || changed
@@ -1958,7 +2019,7 @@ public class App {
                                     timerRuntime,
                                     Some(pendingDirty),
                                     Some(lifecycle),
-                                    runtimeQueue: Some(runtimeQueue)
+                                    runtimeQueue: Some(runtimeQueue), processRuntime: processRuntime
                                 )
                                 running = nextRunning
                                 dirty = dirty || changed
@@ -1984,7 +2045,7 @@ public class App {
                             pendingEscSince = None
                         }
                     }
-                    if (pendingInputIndex < pendingInputEvents.size) {
+                    if (pendingInputIndex < pendingInputEvents.size && runtimeQueue.size() < 256) {
                         // Paint between buffered input events.  Draining the
                         // complete parser batch before rendering makes key
                         // repeat appear as groups of characters even when each
@@ -2027,7 +2088,7 @@ public class App {
                             while (
                                 running &&
                                 pendingInputIndex < pendingInputEvents.size &&
-                                batchCount < 256
+                                batchCount < 63 && runtimeQueue.size() < 256
                             ) {
                                 let queuedEvent = pendingInputEvents[pendingInputIndex]
                                 pendingInputIndex++
@@ -2088,7 +2149,7 @@ public class App {
                                     }
                                 }
                             }
-                            if (running && !flushed && commandQueue.size == 0 && !parser.hasPendingInputDrain()) {
+                            if (running && !flushed && commandQueue.size == 0 && runtimeQueue.size() == 0 && !parser.hasPendingInputDrain() && !lifecycle.hasPendingSources()) {
                                 lastLoopTask = "event_wait"
                                 eventWaiter.wait(
                                     waitTimeoutMillis(
@@ -2114,6 +2175,7 @@ public class App {
             timerRuntime.clear()
             asyncRuntime.cancelAll()
             lifecycle.closeOwnedPtys(ptyRuntime)
+            processRuntime.closeAll()
             try {
                 eventWaiter.close()
             } catch (_: Exception) {
@@ -2176,7 +2238,7 @@ public class App {
             timerRuntime,
             Some(dirtySink),
             Some(lifecycle),
-            runtimeQueue: Some(runtimeQueue)
+            runtimeQueue: Some(runtimeQueue), processRuntime: processRuntime
         )
     }
 
@@ -2187,7 +2249,7 @@ public class App {
         match (externalPort) {
             case Some(port) =>
                 var imported: Int64 = 0
-                for (entry in port.drainEntries()) {
+                for (entry in port.drainEntries(maxEntries: min(64, max(0, 256 - runtimeQueue.size())))) {
                     match ((traceSink, entry.acceptedAt)) {
                         case (Some(trace), Some(acceptedAt)) => trace.externalDequeued(
                             max(0, (MonoTime.now() - acceptedAt).toNanoseconds())
@@ -2207,6 +2269,7 @@ public class App {
     private func waitSources(externalPort: ?ExternalPort<Event>, asyncRuntime: AsyncRuntime): Array<EventSource> {
         let sources = ArrayList<EventSource>()
         for (source in ptyRuntime.sources()) { sources.add(source) }
+        for (source in processRuntime.sources()) { sources.add(source) }
         sources.add(asyncRuntime.eventSource())
         match (externalPort) {
             case Some(port) => sources.add(port.eventSource())
@@ -2232,6 +2295,10 @@ public class App {
                     case Some(current) => Some(min(current, value))
                     case None => Some(value)
                 }
+            case None => ()
+        }
+        match (processRuntime.nextTimeoutMillis()) {
+            case Some(value) => wait = match (wait) { case Some(current) => Some(min(current, value)); case None => Some(value) }
             case None => ()
         }
         match (frameWakeMillis) {
@@ -2279,9 +2346,10 @@ public class App {
         commandQueue: ArrayList<Command>,
         asyncRuntime!: AsyncRuntime = transientAsyncRuntime(),
         ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(),
+        processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(),
         timerRuntime!: TimerRuntime = TimerRuntime()
     ): Bool {
-        let (running, _) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, timerRuntime: timerRuntime)
+        let (running, _) = App.processCommandsWithEvents(update, commandQueue, asyncRuntime: asyncRuntime, ptyRuntime: ptyRuntime, processRuntime: processRuntime, timerRuntime: timerRuntime)
         running
     }
 
@@ -2290,6 +2358,7 @@ public class App {
         commandQueue: ArrayList<Command>,
         asyncRuntime!: AsyncRuntime = transientAsyncRuntime(),
         ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(),
+        processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(),
         timerRuntime!: TimerRuntime = TimerRuntime(),
         dirtySink!: ?DirtyRects = None
     ): (Bool, Bool) {
@@ -2302,7 +2371,8 @@ public class App {
                 ptyRuntime,
                 timerRuntime,
                 dirtySink,
-                None
+                None,
+                processRuntime: processRuntime
             )
         } finally {
             if (asyncRuntime.transient) { asyncRuntime.cancelAll() }
@@ -2317,15 +2387,22 @@ public class App {
         timerRuntime: TimerRuntime,
         dirtySink: ?DirtyRects,
         lifecycle: ?TerminalLifecycleRequests,
-        runtimeQueue!: ?RuntimeQueue<Unit> = None
+        runtimeQueue!: ?RuntimeQueue<Unit> = None,
+        processRuntime!: ProcessRuntime = UnsupportedProcessRuntime()
     ): (Bool, Bool) {
         let queue = match (runtimeQueue) {
             case Some(existing) => existing
             case None => RuntimeQueue<Unit>()
         }
         var changed = false
+        var importSources = queue.takeSourceTurn()
         while (true) {
-            while (commandQueue.size > 0) {
+            if (!queue.tryConsumeWork()) { return (true, changed) }
+            // A callback may perpetually replenish the command queue. Drain
+            // admitted events below the low-water mark before issuing more
+            // commands, or feedback can keep the queue above the admission
+            // mark forever and starve deferred input, timers and sources.
+            if (commandQueue.size > 0 && queue.size() < 128) {
                 let command = commandQueue[0]
                 commandQueue.remove(at: 0)
                 match (command) {
@@ -2345,6 +2422,10 @@ public class App {
                         _ = queue.enqueueEvent(asyncRuntime.startExecArgs(id, program, args))
                     case Command.CancelAsync(id) =>
                         _ = asyncRuntime.cancel(id)
+                    case Command.ProcessStart(id, spec) =>
+                        _ = queue.enqueueEvent(processRuntime.start(id, spec))
+                    case Command.ProcessCancel(id) =>
+                        _ = queue.enqueueEvent(processRuntime.cancel(id))
                     case Command.PtyStart(id, spec) =>
                         // Complete the previous instance before publishing a
                         // new Started with the same public id. This also imports
@@ -2353,10 +2434,10 @@ public class App {
                         if (ptyRuntime.process(id).isSome()) {
                             let closed = ptyRuntime.close(id)
                             App.drainPtyEvents(ptyRuntime, queue, lifecycle)
-                            App.enqueuePtyEvent(closed, queue, lifecycle)
+                            App.stagePtyEvent(closed, queue, lifecycle, ptyRuntime)
                         }
                         let event = ptyRuntime.start(id, spec)
-                        App.enqueuePtyEvent(event, queue, lifecycle)
+                        App.stagePtyEvent(event, queue, lifecycle, ptyRuntime)
                     case Command.PtyWrite(id, bytes) =>
                         _ = queue.enqueueEvent(ptyRuntime.write(id, bytes))
                     case Command.PtyResize(id, size) =>
@@ -2369,7 +2450,7 @@ public class App {
                         // Deliver it before the returned terminal event so an
                         // update may finish immediately on Exited without loss.
                         App.drainPtyEvents(ptyRuntime, queue, lifecycle)
-                        App.enqueuePtyEvent(event, queue, lifecycle)
+                        App.stagePtyEvent(event, queue, lifecycle, ptyRuntime)
                     case Command.StartTimer(spec) => timerRuntime.start(spec)
                     case Command.StopTimer(id) => _ = timerRuntime.stop(id)
                     case Command.RestartTimer(spec) =>
@@ -2398,8 +2479,22 @@ public class App {
                 }
             }
 
-            for (event in asyncRuntime.drain()) { _ = queue.enqueueEvent(event) }
-            App.drainPtyEvents(ptyRuntime, queue, lifecycle)
+            if (importSources && queue.size() < 256) {
+                importSources = false
+                match (lifecycle) {
+                    case Some(requests) =>
+                        if (requests.asyncEvents.size() == 0) { requests.asyncEvents.replace(asyncRuntime.drain()) }
+                        if (requests.ptyEvents.size() == 0) { requests.stagePtyEvents(ptyRuntime.drain(), ptyRuntime) }
+                        if (requests.processEvents.size() == 0) { requests.processEvents.replace(processRuntime.drain()) }
+                        for (event in requests.asyncEvents.take(64)) { _ = queue.enqueueEvent(event) }
+                        for (event in requests.ptyEvents.take(64)) { _ = queue.enqueueEvent(event) }
+                        for (event in requests.processEvents.take(64)) { _ = queue.enqueueEvent(event) }
+                    case None =>
+                        for (event in asyncRuntime.drain()) { _ = queue.enqueueEvent(event) }
+                        App.drainPtyEvents(ptyRuntime, queue, lifecycle)
+                        for (event in processRuntime.drain()) { _ = queue.enqueueEvent(event) }
+                }
+            }
 
             match (queue.dequeue()) {
                 case Some(item) => match (item.envelope) {
@@ -2428,27 +2523,27 @@ public class App {
                         queue.beginClosing()
                         return (false, changed)
                 }
-                case None => return (true, changed)
+                case None => if (commandQueue.isEmpty()) { return (true, changed) }
             }
         }
         (true, changed)
     }
 
     private static func drainPtyEvents(ptyRuntime: PtyRuntime, queue: RuntimeQueue<Unit>, lifecycle: ?TerminalLifecycleRequests): Unit {
-        for (event in ptyRuntime.drain()) { App.enqueuePtyEvent(event, queue, lifecycle) }
+        match (lifecycle) {
+            case Some(requests) => requests.stagePtyEvents(ptyRuntime.drain(), ptyRuntime)
+            case None => for (event in ptyRuntime.drain()) { _ = queue.enqueueEvent(event) }
+        }
     }
 
-    private static func enqueuePtyEvent(event: Event, queue: RuntimeQueue<Unit>, lifecycle: ?TerminalLifecycleRequests): Unit {
+    private static func stagePtyEvent(event: Event, queue: RuntimeQueue<Unit>, lifecycle: ?TerminalLifecycleRequests, runtime: PtyRuntime): Unit {
         match (lifecycle) {
-            case Some(requests) => match (event) {
-                case Event.PtyStarted(id) => requests.trackPty(id)
-                case Event.PtyExited(id, _) => requests.releasePty(id)
-                case Event.PtyFailed(id, _) => requests.releasePty(id)
-                case _ => ()
-            }
-            case None => ()
+            case Some(requests) =>
+                // Ownership begins at start, even if App exits before the
+                // bounded source batch reaches the Started callback.
+                requests.stagePtyEvents([event], runtime)
+            case None => _ = queue.enqueueEvent(event)
         }
-        _ = queue.enqueueEvent(event)
     }
 
     @When[os != "Windows"]
@@ -2516,7 +2611,9 @@ public class App {
                 for (item in commands) {
                     App.enqueue(item, commandQueue)
                 }
-            case _ => commandQueue.add(command)
+            case _ =>
+                if (commandQueue.size >= 4096) { throw IllegalStateException("runtime command capacity exhausted (4096)") }
+                commandQueue.add(command)
         }
     }
 

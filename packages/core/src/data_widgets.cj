@@ -89,6 +89,9 @@ public class VirtualTable <: Widget {
     public var loadingText: String = "Loading"
     private let selectedRows = ArrayList<Int64>()
     private let rowCache = HashMap<Int64, Array<String>>()
+    private let cacheOrder = ArrayList<Int64>()
+    private let cacheCapacity: Int64
+    private let dataModel: ?PagedTableModel
     private var cachedVisibleIndices: ?Array<Int64> = None
     private var cachedVisibleFilterText: String = ""
     private var cachedVisibleSortColumn: ?Int64 = None
@@ -119,7 +122,9 @@ public class VirtualTable <: Widget {
         selectionModel!: ?SelectionModel = None,
         scrollState!: ?ScrollState = None,
         sortState!: ?SortState = None,
-        filterState!: ?FilterState = None
+        filterState!: ?FilterState = None,
+        dataModel!: ?PagedTableModel = None,
+        cacheCapacity!: Int64 = 1024
     ) {
         this.columns = columns
         this.rowCount = max(0, rowCount)
@@ -137,6 +142,52 @@ public class VirtualTable <: Widget {
         this.scrollState = scrollState
         this.sortState = sortState
         this.filterState = filterState
+        if (dataModel.isSome() && (sortState.isSome() || filterState.isSome() || selectionModel.isSome())) {
+            throw IllegalArgumentException("PagedTableModel owns query and ID selection; legacy bindings cannot be combined")
+        }
+        this.dataModel = dataModel
+        this.cacheCapacity = max(1, cacheCapacity)
+    }
+
+    public init(columns: Array<TableColumn>, model: PagedTableModel, block!: ?Block = None) {
+        this(columns, 0, { _ => Array<String>() }, block: block, dataModel: Some(model))
+    }
+
+    public func handle(mouse: MouseEvent, area: Rect): Bool {
+        syncExternalState()
+        let target = contentArea(area)
+        if (!widgetHitTest(mouse, target)) { return false }
+        ensureColumnVisible(target.width)
+        let headers: Int64 = if (stickyHeader) { 1 } else { 0 }
+        let scroll = mouseScrollDelta(mouse)
+        if (scroll != 0) {
+            offset = boundedDataMove(offset, scroll * 3, max(0, visibleRowCount() - max(1, target.height - headers)))
+            if (let Some(state) <- scrollState) { state.offset = offset }
+            return true
+        }
+        match ((mouse.kind, mouse.button)) { case (MouseKind.Down, MouseButton.Left) => (); case _ => return false }
+        var column: Int64 = -1
+        var x = target.x
+        for (i in 0..columns.size) {
+            if (i >= frozenColumns && i < max(columnOffset, frozenColumns)) { continue }
+            let width = min(columns[i].width, max(0, target.right - x))
+            if (mouse.x >= x && mouse.x < x + width) { column = i; break }
+            if (width >= target.right - x) { break }
+            x += width + 1
+        }
+        if (column < 0) { return false }
+        if (headers > 0 && mouse.y == target.y) {
+            sortBy(column, descending: sortColumn == Some(column) && !sortDescending)
+            return true
+        }
+        let body = Rect(target.x, target.y + headers, target.width, max(0, target.height - headers))
+        if (let Some(row) <- widgetRowAt(mouse, body, offset, visibleRowCount())) {
+            selectedRow = Some(row); selectedColumn = column
+            if (let Some(model) <- dataModel) { model.selectIndex(row) }
+            if (mouse.modifiers.ctrl) { toggleSelectedRow() }
+            return true
+        }
+        false
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
@@ -170,10 +221,19 @@ public class VirtualTable <: Widget {
             let index = offset + row
             match (sourceIndexAtVisible(index)) {
                 case Some(sourceIndex) =>
-                    let active = match (selectedRow) {
+                    var active = match (selectedRow) {
                         case Some(v) => v == index
                         case None => false
                     } || isSelected(sourceIndex)
+                    if (let Some(model) <- dataModel) {
+                        if (let Some(value) <- model.row(index)) {
+                            active = model.selectedId() == Some(value.id) || model.isSelected(value.id)
+                        } else {
+                            let message = match (model.statusAt(index)) { case TableStatus.Error(error) => error; case _ => loadingText }
+                            buffer.setString(target.x, target.y + headerRows + row, truncate(message, target.width), style: statusStyle)
+                            continue
+                        }
+                    }
                     renderColumns(
                         target.x,
                         target.y + headerRows + row,
@@ -209,7 +269,7 @@ public class VirtualTable <: Widget {
                 ensureSelectedVisible(viewportHeight)
                 true
             case KeyCode.PageDown =>
-                selectedRow = Some(min(max(0, total - 1), current + max(1, viewportHeight)))
+                selectedRow = Some(boundedDataMove(current, max(1, viewportHeight), max(0, total - 1)))
                 ensureSelectedVisible(viewportHeight)
                 true
             case KeyCode.Left =>
@@ -234,6 +294,11 @@ public class VirtualTable <: Widget {
             case _ => false
         }
         if (handled) {
+            if (let Some(model) <- dataModel) {
+                if (selectedRow != model.selectedIndex()) {
+                    if (let Some(index) <- selectedRow) { model.selectIndex(index) }
+                }
+            }
             match (scrollState) {
                 case Some(state) => state.offset = offset
                 case None => ()
@@ -312,17 +377,21 @@ public class VirtualTable <: Widget {
     }
 
     public func clearCachedRows(): Unit {
+        if (let Some(model) <- dataModel) { model.invalidate() }
         clearRowCache()
     }
 
     public func cachedRowCount(): Int64 {
+        if (let Some(model) <- dataModel) { return model.cachedRowCount() }
         rowCache.size
     }
 
     public func sortBy(column: Int64, descending!: Bool = false): Unit {
+        syncExternalState()
         let sortedColumn = clamp(column, 0, max(0, columns.size - 1))
         sortColumn = Some(sortedColumn)
         sortDescending = descending
+        if (let Some(model) <- dataModel) { _ = model.setQuery(TableQuery(filter: filterText, sortColumn: sortColumn, descending: descending)) }
         offset = 0
         match (scrollState) {
             case Some(state) => state.offset = 0
@@ -336,8 +405,10 @@ public class VirtualTable <: Widget {
     }
 
     public func clearSort(): Unit {
+        syncExternalState()
         sortColumn = None
         sortDescending = false
+        if (let Some(model) <- dataModel) { _ = model.setQuery(TableQuery(filter: filterText)) }
         match (sortState) {
             case Some(state) => state.clear()
             case None => ()
@@ -356,7 +427,9 @@ public class VirtualTable <: Widget {
     }
 
     public func setFilter(text: String): Unit {
+        syncExternalState()
         filterText = text
+        if (let Some(model) <- dataModel) { _ = model.setQuery(TableQuery(filter: text, sortColumn: sortColumn, descending: sortDescending)) }
         offset = 0
         selectedRow = None
         match (filterState) {
@@ -375,6 +448,10 @@ public class VirtualTable <: Widget {
     }
 
     public func toggleSelectedRow(): Unit {
+        if (let Some(model) <- dataModel) {
+            if (let Some(id) <- model.selectedId()) { model.toggle(id) }
+            return
+        }
         match (selectedRow) {
             case Some(row) =>
                 match (sourceIndexAtVisible(row)) {
@@ -554,11 +631,13 @@ public class VirtualTable <: Widget {
     }
 
     private func visibleRowCount(): Int64 {
+        if (let Some(model) <- dataModel) { return model.totalRows() }
         if (!usesDerivedRows()) { return rowCount }
         visibleIndices().size
     }
 
     private func sourceIndexAtVisible(index: Int64): ?Int64 {
+        if (let Some(model) <- dataModel) { return if (index >= 0 && index < model.totalRows()) { Some(index) } else { None } }
         if (index < 0) { return None }
         if (!usesDerivedRows()) {
             if (index >= rowCount) { return None }
@@ -583,17 +662,21 @@ public class VirtualTable <: Widget {
     }
 
     private func cachedRow(index: Int64): Array<String> {
+        if (let Some(model) <- dataModel) { return match (model.row(index)) { case Some(row) => row.cells; case None => [] } }
         match (rowCache.get(index)) {
             case Some(row) => return row
             case None => ()
         }
         let row = rowAt(index)
         rowCache.add(index, row)
+        cacheOrder.add(index)
+        while (cacheOrder.size > cacheCapacity) { rowCache.remove(cacheOrder.remove(at: 0)) }
         row
     }
 
     private func clearRowCache(): Unit {
         rowCache.clear()
+        cacheOrder.clear()
         cachedVisibleIndices = None
     }
 
@@ -620,9 +703,14 @@ public class VirtualTable <: Widget {
     }
 
     private func syncExternalState(): Unit {
-        match (scrollState) {
-            case Some(state) => offset = state.offset
-            case None => ()
+        match (scrollState) { case Some(state) => offset = state.offset; case None => () }
+        if (let Some(model) <- dataModel) {
+            let query = model.query()
+            filterText = query.filter; sortColumn = query.sortColumn; sortDescending = query.descending
+            selectedRow = model.selectedIndex()
+            if (model.hasTotal()) { offset = clamp(offset, 0, max(0, model.totalRows() - 1)) }
+            status = model.statusAt(offset)
+            if (let Some(state) <- scrollState) { state.offset = offset }
         }
         match (sortState) {
             case Some(state) =>
@@ -650,7 +738,7 @@ func addVirtualTableRowDirty(dirty: DirtyRects, area: Rect, selected: ?Int64, of
     match (selected) {
         case Some(index) =>
             let row = index - offset + headerRows
-            if (row >= 0 && row < area.height) {
+            if (row >= headerRows && row < area.height) {
                 dirty.add(Rect(area.x, area.y + row, area.width, 1))
             }
         case None => ()
@@ -684,6 +772,9 @@ public class TreeNode {
 
 public class Tree <: Widget {
     private let roots: Array<TreeNode>
+    private let dataModel: ?LazyTreeModel
+    private var stableId: ?String = None
+    private var rememberedIndex: Int64 = -1
     public var selected: Int64
     public var offset: Int64
     private let block: ?Block
@@ -696,9 +787,11 @@ public class Tree <: Widget {
         offset!: Int64 = 0,
         block!: ?Block = None,
         style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
+        dataModel!: ?LazyTreeModel = None
     ) {
         this.roots = roots
+        this.dataModel = dataModel
         this.selected = max(0, selected)
         this.offset = max(0, offset)
         this.block = block
@@ -706,7 +799,36 @@ public class Tree <: Widget {
         this.selectedStyle = selectedStyle
     }
 
+    public init(model: LazyTreeModel, block!: ?Block = None) {
+        this([], block: block, dataModel: Some(model))
+        if (model.selectedId().isNone()) { _ = model.selectIndex(0) }
+    }
+
+    public func handle(mouse: MouseEvent, area: Rect): Bool {
+        let target = match (block) { case Some(b) => b.inner(area); case None => area }
+        if (!widgetHitTest(mouse, target)) { return false }
+        let total = match (dataModel) { case Some(model) => model.visibleCount(); case None => visibleRows().size }
+        let delta = mouseScrollDelta(mouse)
+        if (delta != 0) { offset = boundedDataMove(offset, delta * 3, max(0, total - max(1, target.height))); return true }
+        match ((mouse.kind, mouse.button)) { case (MouseKind.Down, MouseButton.Left) => (); case _ => return false }
+        if (let Some(index) <- widgetRowAt(mouse, target, offset, total)) {
+            selected = index
+            var depth: Int64 = 0
+            if (let Some(model) <- dataModel) {
+                _ = model.selectIndex(index)
+                if (let Some(row) <- model.rowAt(index)) { depth = row.depth }
+            } else {
+                let rows = visibleRows()
+                stableId = Some(rows[index][0].id); rememberedIndex = index; depth = rows[index][1]
+            }
+            if (mouse.x >= target.x + depth * 2 && mouse.x < target.x + depth * 2 + 2) { toggleSelected() }
+            return true
+        }
+        false
+    }
+
     public func toggleSelected(): Unit {
+        if (let Some(model) <- dataModel) { _ = model.toggleSelected(); return }
         let nodes = visibleNodes()
         if (selected >= 0 && selected < nodes.size) {
             nodes[selected].expanded = !nodes[selected].expanded
@@ -714,19 +836,22 @@ public class Tree <: Widget {
     }
 
     public func selectedId(): ?String {
-        let nodes = visibleNodes()
-        if (selected >= 0 && selected < nodes.size) {
-            Some(nodes[selected].id)
-        } else {
-            None
-        }
+        if (let Some(model) <- dataModel) { return model.selectedId() }
+        _ = visibleRows()
+        stableId
     }
 
     public func selectById(id: String): Bool {
+        if (let Some(model) <- dataModel) {
+            let found = model.selectById(id)
+            if (let Some(index) <- model.selectedIndex()) { selected = index }
+            return found
+        }
         let nodes = visibleNodes()
         for (i in 0..nodes.size) {
             if (nodes[i].id == id) {
                 selected = i
+                stableId = Some(id); rememberedIndex = i
                 return true
             }
         }
@@ -734,6 +859,7 @@ public class Tree <: Widget {
     }
 
     public func findById(id: String): ?TreeNode {
+        if (dataModel.isSome()) { throw IllegalStateException("Use LazyTreeModel.findById for provider nodes") }
         for (root in roots) {
             match (findTreeNode(root, id)) {
                 case Some(node) => return Some(node)
@@ -744,12 +870,14 @@ public class Tree <: Widget {
     }
 
     public func expandAll(): Unit {
+        if (dataModel.isSome()) { throw IllegalStateException("Lazy trees expand explicit IDs; expandAll would enumerate the source") }
         for (root in roots) {
             setExpandedRecursive(root, true)
         }
     }
 
     public func collapseAll(): Unit {
+        if (let Some(model) <- dataModel) { model.collapseAll(); offset = 0; return }
         for (root in roots) {
             setExpandedRecursive(root, false)
         }
@@ -758,6 +886,25 @@ public class Tree <: Widget {
     }
 
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
+        if (let Some(model) <- dataModel) {
+            let current = match (model.selectedIndex()) { case Some(index) => index; case None => 0 }
+            let total = model.visibleCount()
+            var next = current
+            match (key.code) {
+                case KeyCode.Up => next = max(0, current - 1)
+                case KeyCode.Down => next = min(max(0, total - 1), current + 1)
+                case KeyCode.PageUp => next = max(0, current - max(1, viewportHeight))
+                case KeyCode.PageDown => next = boundedDataMove(current, max(1, viewportHeight), max(0, total - 1))
+                case KeyCode.Home => next = 0
+                case KeyCode.End => next = max(0, total - 1)
+                case KeyCode.Left => collapseSelected(); return true
+                case KeyCode.Right => expandSelected(); return true
+                case KeyCode.Enter | KeyCode.Char(r' ') => toggleSelected(); return true
+                case _ => return false
+            }
+            _ = model.selectIndex(next); selected = next; ensureVisible(total, max(1, viewportHeight))
+            return true
+        }
         let total = visibleNodes().size
         match (key.code) {
             case KeyCode.Up => selected = max(0, selected - 1); ensureVisible(total, viewportHeight); true
@@ -770,6 +917,10 @@ public class Tree <: Widget {
     }
 
     public func expandSelected(): Unit {
+        if (let Some(model) <- dataModel) {
+            if (let Some(id) <- model.selectedId()) { _ = model.setExpanded(id, true) }
+            return
+        }
         let nodes = visibleNodes()
         if (selected >= 0 && selected < nodes.size) {
             nodes[selected].expanded = true
@@ -777,6 +928,10 @@ public class Tree <: Widget {
     }
 
     public func collapseSelected(): Unit {
+        if (let Some(model) <- dataModel) {
+            if (let Some(id) <- model.selectedId()) { _ = model.setExpanded(id, false) }
+            return
+        }
         let nodes = visibleNodes()
         if (selected >= 0 && selected < nodes.size) {
             nodes[selected].expanded = false
@@ -789,21 +944,32 @@ public class Tree <: Widget {
             b.render(area, buffer)
             target = b.inner(area)
         }
+        if (let Some(model) <- dataModel) {
+            let canvas = Canvas(buffer, target)
+            for (row in model.rows(offset, target.height)) {
+                let marker = if (row.node.childCount > 0) { if (row.expanded) { "- " } else { "+ " } } else { "  " }
+                canvas.drawText(target.x, target.y + row.index - offset, repeat("  ", row.depth) + marker + row.node.label,
+                    if (model.selectedId() == Some(row.node.id)) { selectedStyle } else { style })
+            }
+            if (let Some(index) <- model.selectedIndex()) { selected = index }
+            return
+        }
         let nodes = visibleRows()
+        let canvas = Canvas(buffer, target)
         for (row in 0..target.height) {
             let index = offset + row
             if (index >= nodes.size) { return }
             let (node, depth) = nodes[index]
             let marker = if (node.childNodes().size > 0) { if (node.expanded) { "- " } else { "+ " } } else { "  " }
             let text = repeat("  ", depth) + marker + node.label
-            buffer.setString(target.x, target.y + row, truncate(text, target.width), style: if (index == selected) { selectedStyle } else { style })
+            canvas.drawText(target.x, target.y + row, text, if (index == selected) { selectedStyle } else { style })
         }
     }
 
     private func ensureVisible(total: Int64, viewportHeight: Int64): Unit {
         if (selected < offset) {
             offset = selected
-        } else if (selected >= offset + viewportHeight) {
+        } else if (selected - offset >= viewportHeight) {
             offset = selected - viewportHeight + 1
         }
         offset = clamp(offset, 0, max(0, total - viewportHeight))
@@ -823,6 +989,13 @@ public class Tree <: Widget {
         for (node in roots) {
             collectTreeRows(node, 0, rows)
         }
+        if (selected != rememberedIndex) {
+            stableId = if (selected >= 0 && selected < rows.size) { Some(rows[selected][0].id) } else { None }
+        } else if (let Some(id) <- stableId) {
+            selected = -1
+            for (i in 0..rows.size) { if (rows[i][0].id == id) { selected = i; break } }
+        }
+        rememberedIndex = selected
         rows.toArray()
     }
 }
@@ -885,7 +1058,6 @@ public class FilePicker <: Widget {
     public func refresh(): Unit {
         let dirs = ArrayList<String>()
         let files = ArrayList<String>()
-        dirs.add("..")
         try {
             for (entry in Directory.readFrom(path)) {
                 let name = entry.name
@@ -899,6 +1071,7 @@ public class FilePicker <: Widget {
                 }
             }
         } catch (_) {}
+        dirs.add("..", at: 0) // The parent action must precede every sorted directory name.
         for (file in files) {
             dirs.add(file)
         }
@@ -1062,4 +1235,10 @@ func isDirectory(path: String): Bool {
     } catch (_) {
         false
     }
+}
+
+func boundedDataMove(value: Int64, delta: Int64, upper: Int64): Int64 {
+    let current = clamp(value, 0, upper)
+    if (delta >= 0) { current + min(delta, upper - current) }
+    else { current - min(-delta, current) }
 }
