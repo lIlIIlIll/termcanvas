@@ -13,6 +13,62 @@ import tempfile
 import time
 
 
+def check_message_pipe(binary: Path, environment: dict[str, str], timeout: float):
+    """A two-byte native read must retain ERROR_MORE_DATA message prefixes."""
+    import ctypes
+    from ctypes import wintypes
+    import msvcrt
+    import os
+    import subprocess
+    import uuid
+
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.CreateNamedPipeW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                                      wintypes.DWORD, wintypes.DWORD, wintypes.DWORD,
+                                      wintypes.DWORD, wintypes.LPVOID]
+    kernel.CreateNamedPipeW.restype = wintypes.HANDLE
+    kernel.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD,
+                                 wintypes.LPVOID, wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    kernel.CreateFileW.restype = wintypes.HANDLE
+    kernel.ConnectNamedPipe.argtypes = [wintypes.HANDLE, wintypes.LPVOID]
+    kernel.WriteFile.argtypes = [wintypes.HANDLE, wintypes.LPCVOID, wintypes.DWORD,
+                                ctypes.POINTER(wintypes.DWORD), wintypes.LPVOID]
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    name = "\\\\.\\pipe\\termcanvas-input-" + uuid.uuid4().hex
+    invalid = ctypes.c_void_p(-1).value
+    server = kernel.CreateNamedPipeW(name, 1, 4 | 2, 1, 4096, 4096, 0, None)
+    if server == invalid:
+        raise ctypes.WinError(ctypes.get_last_error())
+    writer = invalid
+    stream = None
+    try:
+        writer = kernel.CreateFileW(name, 0x40000000, 0, None, 3, 0, None)
+        if writer == invalid:
+            raise ctypes.WinError(ctypes.get_last_error())
+        if not kernel.ConnectNamedPipe(server, None) and ctypes.get_last_error() != 535:
+            raise ctypes.WinError(ctypes.get_last_error())
+        payload = "A界😀Z".encode("utf-8")
+        written = wintypes.DWORD()
+        if not kernel.WriteFile(writer, payload, len(payload), ctypes.byref(written), None):
+            raise ctypes.WinError(ctypes.get_last_error())
+        if written.value != len(payload):
+            raise AssertionError("message pipe fixture did not write its complete payload")
+        descriptor = msvcrt.open_osfhandle(server, os.O_RDONLY | os.O_BINARY)
+        server = invalid  # descriptor owns the server handle from this point.
+        stream = os.fdopen(descriptor, "rb", buffering=0)
+        result = subprocess.run([str(binary), "redirected"], stdin=stream, env=environment,
+                                capture_output=True, timeout=timeout, check=True)
+        if b"NATIVE_REDIRECTED_OK" not in result.stdout:
+            raise AssertionError("message-mode stdin lost a partial ReadFile prefix")
+    finally:
+        if stream is not None:
+            stream.close()
+        if server != invalid:
+            kernel.CloseHandle(server)
+        if writer != invalid:
+            kernel.CloseHandle(writer)
+
+
 class ConPtySession:
     def __init__(self, binary: Path, mode: str, environment: dict[str, str], timeout: float):
         try:

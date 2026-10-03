@@ -22,6 +22,10 @@ foreign func PeekNamedPipe(handle: CPointer<Unit>, buffer: CPointer<Unit>, size:
 @When[os == "Windows"]
 foreign func ReadFile(handle: CPointer<Unit>, buffer: CPointer<Unit>, size: UInt32, bytesRead: CPointer<UInt32>, overlapped: CPointer<Unit>): Int32
 
+@FastNative
+@When[os == "Windows"]
+foreign func GetLastError(): UInt32
+
 // Console input consists of UTF-16 code units. Keep a high surrogate across
 // native read boundaries and expose UTF-8 to the common incremental parser.
 class ConsoleUtf16Decoder {
@@ -119,9 +123,12 @@ class WindowsConsoleInput {
             let readCount = acquireArrayRawData(count)
             let success = ReadFile(input, CPointer<Unit>(raw.pointer), UInt32(capacity),
                 CPointer<UInt32>(readCount.pointer), CPointer<Unit>())
+            // ERROR_MORE_DATA on a message pipe still delivered this prefix.
+            // Capture the thread-local error before any other native call.
+            let error = if (success == 0) { GetLastError() } else { 0u32 }
             releaseArrayRawData(readCount)
             releaseArrayRawData(raw)
-            if (success == 0) { return [] }
+            if (success == 0 && error != 234u32) { return [] }
         }
         bytes[..Int64(count[0])]
     }

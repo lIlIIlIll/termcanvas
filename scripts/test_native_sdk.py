@@ -13,7 +13,9 @@ class NativeSdkTests(unittest.TestCase):
     def setUp(self):
         temp = tempfile.TemporaryDirectory(prefix="cjtui-sdk-")
         self.addCleanup(temp.cleanup)
-        self.root = Path(temp.name)
+        # macOS /var aliases and Windows 8.3 temporary paths resolve to the
+        # same directory that sdk_environment deliberately canonicalizes.
+        self.root = Path(temp.name).resolve()
 
     def fixture(self, system, arch):
         prefix, extension, executable = {

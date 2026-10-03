@@ -232,6 +232,10 @@ def main() -> int:
             if b"NATIVE_REDIRECTED_OK" not in redirected.stdout:
                 raise AssertionError("redirected stdin did not preserve UTF-8 bytes")
             report["redirected_input"] = True
+            if windows:
+                from windows_terminal_harness import check_message_pipe
+                check_message_pipe(binary.resolve(), env, args.timeout)
+                report["message_pipe_input"] = True
             report["scenarios"] = run_checks(binary.resolve(), env, args.timeout)
         report["passed"] = True
     except Exception as error:

@@ -114,6 +114,9 @@ load, and exception exit scenarios. The child queries `GetConsoleMode` to verify
 input and echo are disabled and VT input/output are enabled. Before returning
 from both ordinary and exception paths it checks the original input/output
 modes and `GetConsoleCursorInfo` cursor size/visibility are restored exactly.
+Windows also repeats the redirected-input check through a native message-mode
+named pipe. Reads smaller than a message must preserve the prefix returned
+with `ERROR_MORE_DATA`, including a UTF-8 character split across reads.
 
 ConPTY may turn stdout into partial screen updates. The native probe therefore
 writes sidecar observations only after handling an event or checking console
@@ -133,3 +136,21 @@ successful native CI job on that OS. Linux PTY checks can run locally.
 The native CI job preserves the JSON report as an artifact, and each package
 validation command has a 15-minute deadline so a blocked process produces a
 bounded failure rather than consuming the entire platform job.
+
+With Cangjie/cjpm 1.1.3 on Windows, a project directory containing spaces needs
+`package.script-dir` set to a build-script output directory without spaces:
+the SDK currently fails to quote its default build-script cache path. The
+downstream fixture retains its `standalone app` directory and uses an isolated
+sibling script cache; build hooks, compilation, tests and execution all run.
+The generator exposes this setting through its public `--script-dir` option:
+
+```powershell
+python scripts/new_example.py my_app --output "C:/work/my app" --script-dir C:/work/my-app-build-scripts
+cd "C:/work/my app"
+cjpm build --target-dir C:/work/my-app-target
+cjpm test --target-dir C:/work/my-app-target
+& C:/work/my-app-target/release/bin/main.exe --headless-smoke
+```
+
+Keep the library checkout and both output directories free of spaces with
+this SDK. The application directory itself is covered by the native test.

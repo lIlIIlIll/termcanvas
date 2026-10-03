@@ -136,6 +136,16 @@ class NewExampleTests(unittest.TestCase):
         dependency = manifest["dependencies"]["core"]["path"]
         self.assertEqual((actual / "app" / dependency).resolve(), self.root / "packages" / "core")
 
+    def test_explicit_script_cache_is_emitted_for_independent_builds(self):
+        destination = self.root / "independent app"
+        script_cache = self.root / "scripts-cache"
+        result = self.run_generator("portal", "--output", str(destination),
+                                    "--script-dir", str(script_cache))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        manifest = tomllib.loads((destination / "cjpm.toml").read_text())
+        self.assertEqual(Path(manifest["package"]["script-dir"]), script_cache.resolve())
+        self.assertFalse(script_cache.exists())
+
 
 if __name__ == "__main__":
     unittest.main()
