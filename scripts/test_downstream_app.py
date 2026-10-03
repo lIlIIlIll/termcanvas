@@ -26,7 +26,7 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="termcanvas-downstream-") as temporary:
         application = Path(temporary) / "standalone app"
         create_application("downstream_probe", application, args.library_root,
-                           script_dir=Path(temporary) / "build-scripts" if os.name == "nt" else None)
+                           script_dir=Path(temporary) / "build-scripts")
         target = Path(temporary) / "build"
         for operation in ("build", "test"):
             subprocess.run([str(cjpm), operation, "--target-dir", str(target)],

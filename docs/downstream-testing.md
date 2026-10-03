@@ -137,12 +137,14 @@ The native CI job preserves the JSON report as an artifact, and each package
 validation command has a 15-minute deadline so a blocked process produces a
 bounded failure rather than consuming the entire platform job.
 
-With Cangjie/cjpm 1.1.3 on Windows, a project directory containing spaces needs
+With Cangjie/cjpm 1.1.3, a project directory containing spaces needs
 `package.script-dir` set to a build-script output directory without spaces:
-the SDK currently fails to quote its default build-script cache path. The
+the SDK currently fails to quote its default build-script cache path on both
+Windows and Linux. Use the same setting on macOS for portable projects. The
 downstream fixture retains its `standalone app` directory and uses an isolated
 sibling script cache; build hooks, compilation, tests and execution all run.
-The generator exposes this setting through its public `--script-dir` option:
+The generator exposes this setting through its public `--script-dir` option.
+For Windows:
 
 ```powershell
 python scripts/new_example.py my_app --output "C:/work/my app" --script-dir C:/work/my-app-build-scripts
@@ -150,6 +152,16 @@ cd "C:/work/my app"
 cjpm build --target-dir C:/work/my-app-target
 cjpm test --target-dir C:/work/my-app-target
 & C:/work/my-app-target/release/bin/main.exe --headless-smoke
+```
+
+For Linux and macOS (from a library checkout without spaces):
+
+```sh
+python3 scripts/new_example.py my_app --output "/tmp/my app" --script-dir /tmp/my-app-build-scripts
+cd "/tmp/my app"
+cjpm build --target-dir /tmp/my-app-target
+cjpm test --target-dir /tmp/my-app-target
+/tmp/my-app-target/release/bin/main --headless-smoke
 ```
 
 Keep the library checkout and both output directories free of spaces with

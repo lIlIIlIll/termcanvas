@@ -634,7 +634,7 @@ def generate(check: bool) -> int:
         if not path.exists() or path.read_text(encoding="utf-8") != content:
             stale.append(path)
             if not check:
-                path.write_text(content, encoding="utf-8")
+                path.write_text(content, encoding="utf-8", newline="\n")
     if check and stale:
         for path in stale:
             print(f"stale generated API output: {path.relative_to(ROOT)}", file=sys.stderr)

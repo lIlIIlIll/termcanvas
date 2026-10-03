@@ -146,6 +146,14 @@ class NewExampleTests(unittest.TestCase):
         self.assertEqual(Path(manifest["package"]["script-dir"]), script_cache.resolve())
         self.assertFalse(script_cache.exists())
 
+    def test_script_cache_with_spaces_is_rejected_before_creating_app(self):
+        destination = self.root / "independent app"
+        result = self.run_generator("portal", "--output", str(destination),
+                                    "--script-dir", str(self.root / "cache with spaces"))
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("requires --script-dir without spaces", result.stderr)
+        self.assertFalse(destination.exists())
+
 
 if __name__ == "__main__":
     unittest.main()
