@@ -46,6 +46,7 @@ from the resulting state.
   completion.
 - `Button`: action-oriented button presentation.
 - `Checkbox`: boolean choice.
+- `Switch`: EXPERIMENTAL boolean choice; Space/Enter or a left-button Down on its first visible row toggles the state.
 - `RadioGroup`: one choice from a group.
 - `Select`, `Dropdown`, `MultiSelect`: one or many selectable values. `Dropdown` can opt into transactional preview/commit; legacy behavior remains the default.
 - `DatePicker`: date selection workflow.
@@ -118,6 +119,11 @@ variant uses `theme.focused` as `focusedStyle`, `theme.disabled` as
 `disabledStyle`, and `theme` for semantic state resolution. The Disabled row
 sets `disabled`; these are style choices, not separate widget classes or an
 enum.
+
+`Switch` is EXPERIMENTAL. It renders as `label [off]` or `label [on]`, with only
+the bracketed state for an empty label. Space or Enter toggles; a left-button
+Down on the first visible row toggles once. `setVisualState` selects normal,
+focused, or disabled Theme roles; disabled state rejects input.
 
 The stable `Input.setVisualState(focused: Bool = false, disabled: Bool = false,
 error: Bool = false, theme: ?Theme = None)` method configures the visual and

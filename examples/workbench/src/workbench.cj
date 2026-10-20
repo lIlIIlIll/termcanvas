@@ -16,6 +16,7 @@ class WorkbenchApp {
     let galleryTabs = Tabs(["Overview", "Layout", "Forms", "Navigation", "Data", "Feedback", "Overlays", "Themes"])
     let galleryInput = Input(value: "", placeholder: "Type to edit this input")
     let galleryCheckbox = Checkbox("Compact density")
+    let gallerySwitch = Switch("Auto sync")
     let gallerySelect = Select(["Compact", "Normal", "Comfortable"], selected: 1)
     let galleryCapabilityPreview = Select(["Native", "xterm-256", "ANSI-8", "Monochrome"])
     let galleryNavigationTabs = Tabs(["Overview", "Sources", "Output"])
@@ -420,6 +421,12 @@ class WorkbenchApp {
                     statusMessage = if (galleryCheckbox.checked) { "Compact density enabled" } else { "Normal density enabled" }
                 }
                 return Some(UpdateResult.next())
+
+            case "gallery-switch" =>
+                if (gallerySwitch.handle(key)) {
+                    statusMessage = "Auto sync: " + if (gallerySwitch.checked) { "on" } else { "off" }
+                }
+                return Some(UpdateResult.next())
             case "gallery-select" =>
                 match (gallerySelect.handle(key)) {
                     case Some(value) => statusMessage = "Density: " + value
@@ -755,6 +762,11 @@ class WorkbenchApp {
             if (galleryCheckbox.handleMouse(mouse, areas.checkbox)) {
                 _ = focus.focus("gallery-checkbox")
                 statusMessage = if (galleryCheckbox.checked) { "Compact density enabled" } else { "Normal density enabled" }
+                return UpdateResult.next()
+            }
+            if (gallerySwitch.handleMouse(mouse, areas.switchControl)) {
+                _ = focus.focus("gallery-switch")
+                statusMessage = "Auto sync: " + if (gallerySwitch.checked) { "on" } else { "off" }
                 return UpdateResult.next()
             }
             if (let Some(value) <- gallerySelect.handleMouse(mouse, areas.select)) {
@@ -1428,7 +1440,7 @@ class WorkbenchApp {
     private func syncFocus(preserveCurrent: Bool): Unit {
         let old = focus.current()
         if (preserveCurrent) { rememberCurrentFocus() }
-        for (id in ["tabs", "gallery-tabs", "gallery-overview-forms", "gallery-overview-navigation", "gallery-overview-data", "gallery-overview-toast", "gallery-overview-dialog", "gallery-ascii-toggle", "gallery-button-primary", "gallery-button-secondary", "gallery-button-ghost", "gallery-button-danger", "gallery-button-disabled", "gallery-input", "gallery-checkbox", "gallery-select", "gallery-nav-tabs", "gallery-nav-menu", "gallery-nav-tree", "gallery-data-sample-tabs", "gallery-data-table", "gallery-data-list", "gallery-toast-success", "gallery-toast-warning", "gallery-toast-error", "gallery-toast-info", "gallery-open-palette", "gallery-open-dialog", "gallery-theme-toggle", "gallery-accent", "gallery-capability-preview", "projects", "log-view", "task-search", "task-filter", "task-run", "task-edit", "task-reset", "task-table", "theme-radio", "accent-picker", "setting-motion", "setting-speed", "setting-pause", "setting-reset"]) {
+        for (id in ["tabs", "gallery-tabs", "gallery-overview-forms", "gallery-overview-navigation", "gallery-overview-data", "gallery-overview-toast", "gallery-overview-dialog", "gallery-ascii-toggle", "gallery-button-primary", "gallery-button-secondary", "gallery-button-ghost", "gallery-button-danger", "gallery-button-disabled", "gallery-input", "gallery-checkbox", "gallery-switch", "gallery-select", "gallery-nav-tabs", "gallery-nav-menu", "gallery-nav-tree", "gallery-data-sample-tabs", "gallery-data-table", "gallery-data-list", "gallery-toast-success", "gallery-toast-warning", "gallery-toast-error", "gallery-toast-info", "gallery-open-palette", "gallery-open-dialog", "gallery-theme-toggle", "gallery-accent", "gallery-capability-preview", "projects", "log-view", "task-search", "task-filter", "task-run", "task-edit", "task-reset", "task-table", "theme-radio", "accent-picker", "setting-motion", "setting-speed", "setting-pause", "setting-reset"]) {
             focus.remove(id)
         }
         if (!layout.interactive) { return }
@@ -1453,6 +1465,7 @@ class WorkbenchApp {
                         focus.add("gallery-input")
                         focus.add("gallery-checkbox")
                         focus.add("gallery-select")
+                        focus.add("gallery-switch")
                     case 3 =>
                         focus.add("gallery-nav-tabs")
                         focus.add("gallery-nav-menu")

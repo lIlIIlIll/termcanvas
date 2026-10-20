@@ -351,6 +351,13 @@ core|Tree.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): 
 core|Tree.expandSelected|func|public func expandSelected(): Unit
 core|Tree.collapseSelected|func|public func collapseSelected(): Unit
 core|Tree.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Switch|class|public class Switch <: Widget {
+core|Switch.checked|var|public var checked: Bool
+core|Switch.init|init|public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+core|Switch.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+core|Switch.handle|func|public func handle(key: KeyEvent): Bool
+core|Switch.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+core|Switch.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Dropdown.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
 core|Dropdown.setTransactionalSelection|func|public func setTransactionalSelection(enabled!: Bool): Unit
 core|Dropdown.cancelSelection|func|public func cancelSelection(): Unit

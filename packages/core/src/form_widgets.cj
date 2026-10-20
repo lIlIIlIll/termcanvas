@@ -114,6 +114,89 @@ public class Checkbox <: Widget {
     }
 }
 
+/** 在首行显示“标签 [off/on]”状态；标签为空时只显示状态文字。
+ */
+public class Switch <: Widget {
+    /** 当前开关状态；绘制时显示对应状态，可通过按键或鼠标操作切换。
+     */
+    public var checked: Bool
+    private let label: String
+    private var focused: Bool
+    private var disabled: Bool
+    private let style: Style
+    private let focusedStyle: Style
+    private let disabledStyle: Style
+    private var theme: ?Theme
+
+    /** 保存标签、初始开关状态及绘制状态和样式。
+     */
+    public init(
+        label: String,
+        checked!: Bool = false,
+        focused!: Bool = false,
+        disabled!: Bool = false,
+        style!: Style = Style.default(),
+        focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
+        disabledStyle!: Style = Style(fg: Color.Indexed(8)),
+        theme!: ?Theme = None
+    ) {
+        this.label = label
+        this.checked = checked
+        this.focused = focused
+        this.disabled = disabled
+        this.style = style
+        this.focusedStyle = focusedStyle
+        this.disabledStyle = disabledStyle
+        this.theme = theme
+    }
+
+    /** 设置聚焦、禁用状态和语义主题；禁用时拒绝键盘与鼠标输入。
+     */
+    public func setVisualState(
+        focused!: Bool = false,
+        disabled!: Bool = false,
+        theme!: ?Theme = None
+    ): Unit {
+        this.focused = focused
+        this.disabled = disabled
+        this.theme = theme
+    }
+
+    /** 未禁用时，空格或回车翻转状态并返回 true；禁用或其他按键时返回 false。
+     */
+    public func handle(key: KeyEvent): Bool {
+        if (disabled) { return false }
+        match (key.code) {
+            case KeyCode.Char(r' ') | KeyCode.Enter =>
+                checked = !checked
+                true
+            case _ => false
+        }
+    }
+
+    /** 左键在首行按下时切换一次；其他鼠标事件、行、区域外点击及禁用状态不改变 checked。
+     */
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        if (disabled || area.width <= 0 || area.height <= 0) { return false }
+        if (!widgetHitTest(mouse, Rect(area.x, area.y, area.width, 1))) { return false }
+        match ((mouse.kind, mouse.button)) {
+            case (MouseKind.Down, MouseButton.Left) => checked = !checked; true
+            case _ => false
+        }
+    }
+
+    /** 在非空区域首行绘制 label [off] 或 label [on]；空标签只绘制状态文字，并按区域宽度截断。
+     */
+    public func render(area: Rect, buffer: Buffer): Unit {
+        if (area.width <= 0 || area.height <= 0) { return }
+        let state = if (checked) { "on" } else { "off" }
+        let text = if (label.isEmpty()) { "[${state}]" } else { "${label} [${state}]" }
+        let rowStyle = resolvedStateStyle(style, focusedStyle, disabledStyle, focused, disabled, theme)
+        buffer.fillRect(Rect(area.x, area.y, area.width, 1), style: rowStyle)
+        buffer.setString(area.x, area.y, truncate(text, area.width), style: rowStyle)
+    }
+}
+
 public class RadioGroup <: Widget {
     public var selected: Int64
     public var offset: Int64 = 0

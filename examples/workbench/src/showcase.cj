@@ -54,7 +54,7 @@ func galleryCategoryDescription(category: Int64): String {
     match (category) {
         case 0 => "Semantic colors, comfortable density, and real component previews."
         case 1 => "Rounded Unicode panels, borderless surfaces, and an ASCII fallback toggle."
-        case 2 => "Tab to controls; type in the focused field, toggle the checkbox, or change the select."
+        case 2 => "Tab to controls; toggle the checkbox or Switch, type in the field, or change the select."
         case 4 => "Select Table, List, or Progress; rows and viewport state persist between samples."
         case 5 => "Semantic severity markers use Theme roles and the shared three-second toast lifetime."
         case 6 => "Open a real confirmation; Escape closes it, Tab moves between actions."
@@ -125,6 +125,10 @@ func renderGalleryForms(app: WorkbenchApp, frame: Frame, areas: WorkbenchGallery
     let select = Select(["Compact", "Normal", "Comfortable"], selected: app.gallerySelect.selected,
         style: app.theme.normal, selectedStyle: app.theme.selected)
     frame.renderWidget(select, areas.select)
+    app.gallerySwitch.setVisualState(focused: app.focus.isFocused("gallery-switch"), theme: Some(app.theme))
+    frame.renderWidget(app.gallerySwitch, areas.switchControl)
+    let switchState = if (app.gallerySwitch.checked) { "on" } else { "off" }
+    frame.renderWidget(Paragraph("Auto sync: ${switchState}", style: app.secondaryStyle), areas.switchValue)
 }
 
 func renderGalleryNavigation(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryAreas): Unit {

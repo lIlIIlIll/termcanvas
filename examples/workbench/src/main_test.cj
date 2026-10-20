@@ -483,6 +483,55 @@ class WorkbenchGalleryInteractionTest {
     }
 
     @TestCase
+    func switchT012GalleryKeyboardMouseAndResponsiveSizes(): Unit {
+        for (area in [Rect(0, 0, 80, 24), Rect(0, 0, 120, 36), Rect(0, 0, 160, 45)]) {
+            let app = WorkbenchApp()
+            _ = app.update(Event.Resize(area))
+            workbenchGalleryKey(app, KeyCode.Tab)
+            workbenchGalleryKey(app, KeyCode.Right)
+            workbenchGalleryKey(app, KeyCode.Right)
+            for (_ in 0..8) { workbenchGalleryKey(app, KeyCode.Tab) }
+            @Expect(app.galleryTabs.selected, 2)
+            @Expect(app.focus.current(), Some("gallery-switch"))
+
+            let areas = workbenchGalleryAreas(app.layout.galleryContent, 2)
+            @Expect(areas.switchControl.height, 1)
+            @Assert(workbenchRectContained(app.layout.galleryContent, areas.switchControl))
+            @Assert(workbenchRectContained(app.layout.galleryContent, areas.switchValue))
+            let backend = TestBackend(area: area)
+            let terminal = Terminal(backend, renderMode: RenderMode.Full)
+            _ = terminal.draw { frame => app.render(frame) }
+
+            workbenchGalleryKey(app, KeyCode.Char(r' '))
+            @Expect(app.gallerySwitch.checked, true)
+            _ = terminal.draw { frame => app.render(frame) }
+            @Expect(backend.snapshot().contains("Auto sync [on]"), true)
+            @Expect(backend.snapshot().contains("Auto sync: on"), true)
+
+            workbenchGalleryKey(app, KeyCode.Enter)
+            @Expect(app.gallerySwitch.checked, false)
+            _ = terminal.draw { frame => app.render(frame) }
+            @Expect(backend.snapshot().contains("Auto sync [off]"), true)
+            @Expect(backend.snapshot().contains("Auto sync: off"), true)
+
+            let x = areas.switchControl.x + 1
+            let y = areas.switchControl.y
+            _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, x, y)))
+            @Expect(app.gallerySwitch.checked, true)
+            _ = app.update(Event.Mouse(MouseEvent(MouseKind.Up, MouseButton.Left, x, y)))
+            @Expect(app.gallerySwitch.checked, true)
+            _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Right, x, y)))
+            @Expect(app.gallerySwitch.checked, true)
+            _ = app.update(Event.Mouse(MouseEvent(
+                MouseKind.Down, MouseButton.Left, areas.switchControl.x - 1, y)))
+            @Expect(app.gallerySwitch.checked, true)
+            _ = terminal.draw { frame => app.render(frame) }
+            @Expect(backend.snapshot().contains("Auto sync [on]"), true)
+            @Expect(backend.snapshot().contains("Auto sync: on"), true)
+        }
+    }
+
+    @TestCase
     func dataGallerySupportsKeyboardAndMouseSelection(): Unit {
         let app = WorkbenchApp()
         workbenchGalleryKey(app, KeyCode.Tab)
@@ -807,7 +856,7 @@ class WorkbenchGalleryInteractionTest {
                     for (rect in areas.formInputs) {
                         @Assert(workbenchRectContained(app.layout.galleryContent, rect))
                     }
-                    for (rect in [areas.checkbox, areas.select, areas.asciiToggle, areas.layoutSample,
+                    for (rect in [areas.checkbox, areas.select, areas.switchControl, areas.switchValue, areas.asciiToggle, areas.layoutSample,
                         areas.navTabs, areas.navMenu, areas.navTree, areas.dataSampleTabs,
                         areas.dataTable, areas.dataList, areas.dataProgress, areas.toasts,
                         areas.paletteButton, areas.dialogButton, areas.themeToggle, areas.themeAccent,

@@ -49,6 +49,18 @@ func runWorkbenchHeadlessSmoke(): Int64 {
         !formsPaste.lastSnapshot().contains("Read only")) {
         return workbenchSmokeFailure("Forms live input paste")
     }
+
+    let formsSwitch = runWorkbenchScenario(app, TestScenario()
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.Char(r' ')))
+        .render())
+    if (!formsSwitch.passed || !app.gallerySwitch.checked ||
+        !formsSwitch.lastSnapshot().contains("Auto sync [on]") ||
+        !formsSwitch.lastSnapshot().contains("Auto sync: on")) {
+        return workbenchSmokeFailure("Forms Switch value")
+    }
     let overview = runWorkbenchScenario(app, TestScenario()
         .key(KeyEvent(KeyCode.F(3)))
         .render())

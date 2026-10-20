@@ -19,7 +19,9 @@ The Workbench opens in the Graphite / Cyan theme. `Tab` enters category
 navigation; Left/Right changes categories; Tab then reaches the category's real
 controls. Mouse clicks use the same widget hit regions. `F2` opens the existing
 command palette, `F3` changes Workbench pages, and `Esc` closes overlays. The
-Forms page demonstrates normal, focused, error, and disabled control states.
+Forms page demonstrates normal, focused, error, and disabled control states. Its real
+Switch toggles on/off with Space, Enter, or a first-row left click and keeps a
+visible value synchronized across the supported terminal sizes.
 Its Button row maps Primary to accent, Secondary to surface, Ghost to normal,
 and Danger to error styles. The live editor remains separate from static state
 previews.
@@ -74,6 +76,7 @@ demonstration does not promote an experimental declaration.
 | --- | --- | --- | --- |
 | `Button`, `Input`, `List`, `Table`, and stable `Tabs` controls | Implemented | STABLE | Focus preview, visible List-row hit/render, and Tabs keyboard, mouse, and no-theme boundary behavior in the [Workbench tests](../examples/workbench/src/main_test.cj) and [core widget tests](../packages/core/src/widget_render_boundary_test.cj). |
 | `Tabs.setTheme` | Implemented | EXPERIMENTAL | Workbench category, sample, and Navigation selectors use semantic roles; core tests cover opt-in, explicit-style preservation, focus modifiers, Unicode, and clipping. |
+| `Switch` keyboard, pointer, state text, and responsive routing | Implemented | EXPERIMENTAL | Core T012 tests cover input, disabled state, style roles, empty labels, and clipping; Workbench verifies visible values at 80×24, 120×36, and 160×45. |
 | `Gauge`, `Sparkline`, `FocusManager`, and `ModalFocusState` | Implemented | EXPERIMENTAL | Demonstrated by the Workbench; consult each symbol's inventory entry before depending on it. |
 | `CommandPalette` search, paste, theme, disabled, and empty-state behavior | Implemented | EXPERIMENTAL | Workbench F2 covers case-insensitive search, disabled commands, `No matches`, mouse activation, Escape, and focus restoration; core tests cover case-sensitive defaults, action matching, Unicode paste reset, theme precedence, and full-row clearing. |
 | `Dialog` theme, selection normalization, and `ConfirmDialog` actions | Implemented | EXPERIMENTAL | Core boundary tests cover legacy and themed style precedence, 80×24 No/Yes hits, and invalid clicks; the Workbench test covers visible outcomes, theme refresh, resize, and modal focus restoration. |
@@ -107,7 +110,7 @@ not used as evidence; no metadata has been backfilled.
 - `TextArea` edits multiline text with selection, scrolling, find helpers,
   PageUp/PageDown, Ctrl+A/Ctrl+E, optional line numbers, multi-caret editing,
   paste, undo/redo, folds, decorations, and completion.
-- `Button`, `Checkbox`, and `RadioGroup` cover common choices and actions.
+- `Button`, `Checkbox`, `Switch`, and `RadioGroup` cover common choices and actions.
 - `Select`, `Dropdown`, and `MultiSelect` cover one- or many-value selection; Dropdown transactions are opt-in, so the legacy preview behavior remains the default.
 - `DatePicker` supports date selection workflows.
 

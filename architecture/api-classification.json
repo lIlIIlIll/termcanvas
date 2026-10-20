@@ -331,7 +331,7 @@
     },
     {
       "id": "core-widget-experimental",
-      "match": {"package": "core", "symbols": ["ColorPicker", "MultiSelect", "DatePicker", "MenuItem", "Menu", "MenuBar", "CommandPalette", "Toast", "ToastKind", "ToastManager", "Spinner", "Dialog", "ConfirmDialog", "MetricCard", "Meter", "LegendItem", "Legend", "TimeSeriesChart", "HeaderBar", "FooterBar", "EmptyState", "ErrorBox", "LoadingOverlay", "Skeleton", "InlineAlert", "Sparkline", "Gauge", "Chart", "LogView"]},
+      "match": {"package": "core", "symbols": ["ColorPicker", "MultiSelect", "DatePicker", "MenuItem", "Menu", "MenuBar", "CommandPalette", "Toast", "ToastKind", "ToastManager", "Spinner", "Dialog", "ConfirmDialog", "MetricCard", "Meter", "LegendItem", "Legend", "TimeSeriesChart", "HeaderBar", "FooterBar", "EmptyState", "ErrorBox", "LoadingOverlay", "Skeleton", "InlineAlert", "Sparkline", "Gauge", "Chart", "LogView", "Switch"]},
       "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
       "reason": "Advanced widget families have examples but insufficient independent real-consumer evidence for a stable promise.",
       "consumer_evidence": "Examples/tests primarily.",
