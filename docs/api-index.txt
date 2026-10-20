@@ -1210,51 +1210,52 @@ packages/core/src/media.cj:148:public func mediaFallbackText(source: MediaSource
 packages/core/src/media.cj:154:public func mediaProtocolName(protocol: MediaProtocol): String
 packages/core/src/navigation.cj:7:public class Tabs <: Widget {
 packages/core/src/navigation.cj:11:public var selected: Int64
-packages/core/src/navigation.cj:19:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
-packages/core/src/navigation.cj:32:public func setFocused(focused: Bool): Unit
-packages/core/src/navigation.cj:38:public func handle(key: KeyEvent): Bool
-packages/core/src/navigation.cj:53:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/navigation.cj:78:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:132:public class StatusBarProgress {
-packages/core/src/navigation.cj:133:public let value: Int64
-packages/core/src/navigation.cj:134:public let total: Int64
-packages/core/src/navigation.cj:135:public let width: Int64
-packages/core/src/navigation.cj:136:public let label: String
-packages/core/src/navigation.cj:137:public let labelMode: ProgressBarLabelMode
-packages/core/src/navigation.cj:138:public let style: Style
-packages/core/src/navigation.cj:139:public let fillStyle: Style
-packages/core/src/navigation.cj:140:public let labelStyle: Style
-packages/core/src/navigation.cj:141:public let symbols: ProgressBarSymbols
-packages/core/src/navigation.cj:143:public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = "", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: Style = Style(fg: Color.Indexed(8), bg: Color.White), fillStyle!: Style = Style(fg: Color.Cyan, bg: Color.White), labelStyle!: Style = Style(fg: Color.Black, bg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols(filled: "=", empty: "-", head: ">", indeterminate: ">") )
-packages/core/src/navigation.cj:166:public class StatusBar <: Widget {
-packages/core/src/navigation.cj:172:public init( left!: String = "", right!: String = "", style!: Style = Style(fg: Color.Black, bg: Color.White), progress!: ?StatusBarProgress = None )
-packages/core/src/navigation.cj:184:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:224:public class Viewport <: Widget {
-packages/core/src/navigation.cj:226:public var offset: Int64
-packages/core/src/navigation.cj:230:public init(lines: Array<String>, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default())
-packages/core/src/navigation.cj:237:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/navigation.cj:249:public func scroll(delta: Int64, viewportHeight: Int64): Unit
-packages/core/src/navigation.cj:253:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:273:public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/navigation.cj:278:public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64
-packages/core/src/navigation.cj:284:public func mouseScrollDelta(mouse: MouseEvent): Int64
-packages/core/src/navigation.cj:295:public class PointerCapture {
-packages/core/src/navigation.cj:300:public init()
-packages/core/src/navigation.cj:302:public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool
-packages/core/src/navigation.cj:314:public func owns(owner: String): Bool
-packages/core/src/navigation.cj:315:public func activeOwner(): ?String
-packages/core/src/navigation.cj:316:public func origin(): Position
-packages/core/src/navigation.cj:317:public func initialValue(): Int64
-packages/core/src/navigation.cj:319:public func release(owner: String, mouse: MouseEvent): Bool
-packages/core/src/navigation.cj:327:public func cancel(): Unit
-packages/core/src/navigation.cj:345:public class ModalFocusState {
-packages/core/src/navigation.cj:350:public init(base: FocusManager, keymap!: KeyMap = KeyMap())
-packages/core/src/navigation.cj:355:public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
-packages/core/src/navigation.cj:362:public func active(): ?String
-packages/core/src/navigation.cj:366:public func focus(): FocusManager
-packages/core/src/navigation.cj:370:public func close(): ?String
-packages/core/src/navigation.cj:381:public func handle(key: KeyEvent): Bool
-packages/core/src/navigation.cj:389:public func actionFor(key: KeyEvent): ?String
+packages/core/src/navigation.cj:20:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/navigation.cj:33:public func setFocused(focused: Bool): Unit
+packages/core/src/navigation.cj:39:public func setTheme(theme: ?Theme): Unit
+packages/core/src/navigation.cj:45:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:61:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:87:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:153:public class StatusBarProgress {
+packages/core/src/navigation.cj:154:public let value: Int64
+packages/core/src/navigation.cj:155:public let total: Int64
+packages/core/src/navigation.cj:156:public let width: Int64
+packages/core/src/navigation.cj:157:public let label: String
+packages/core/src/navigation.cj:158:public let labelMode: ProgressBarLabelMode
+packages/core/src/navigation.cj:159:public let style: Style
+packages/core/src/navigation.cj:160:public let fillStyle: Style
+packages/core/src/navigation.cj:161:public let labelStyle: Style
+packages/core/src/navigation.cj:162:public let symbols: ProgressBarSymbols
+packages/core/src/navigation.cj:164:public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = "", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: Style = Style(fg: Color.Indexed(8), bg: Color.White), fillStyle!: Style = Style(fg: Color.Cyan, bg: Color.White), labelStyle!: Style = Style(fg: Color.Black, bg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols(filled: "=", empty: "-", head: ">", indeterminate: ">") )
+packages/core/src/navigation.cj:187:public class StatusBar <: Widget {
+packages/core/src/navigation.cj:193:public init( left!: String = "", right!: String = "", style!: Style = Style(fg: Color.Black, bg: Color.White), progress!: ?StatusBarProgress = None )
+packages/core/src/navigation.cj:205:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:245:public class Viewport <: Widget {
+packages/core/src/navigation.cj:247:public var offset: Int64
+packages/core/src/navigation.cj:251:public init(lines: Array<String>, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default())
+packages/core/src/navigation.cj:258:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/navigation.cj:270:public func scroll(delta: Int64, viewportHeight: Int64): Unit
+packages/core/src/navigation.cj:274:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:294:public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:299:public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64
+packages/core/src/navigation.cj:305:public func mouseScrollDelta(mouse: MouseEvent): Int64
+packages/core/src/navigation.cj:316:public class PointerCapture {
+packages/core/src/navigation.cj:321:public init()
+packages/core/src/navigation.cj:323:public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool
+packages/core/src/navigation.cj:335:public func owns(owner: String): Bool
+packages/core/src/navigation.cj:336:public func activeOwner(): ?String
+packages/core/src/navigation.cj:337:public func origin(): Position
+packages/core/src/navigation.cj:338:public func initialValue(): Int64
+packages/core/src/navigation.cj:340:public func release(owner: String, mouse: MouseEvent): Bool
+packages/core/src/navigation.cj:348:public func cancel(): Unit
+packages/core/src/navigation.cj:366:public class ModalFocusState {
+packages/core/src/navigation.cj:371:public init(base: FocusManager, keymap!: KeyMap = KeyMap())
+packages/core/src/navigation.cj:376:public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
+packages/core/src/navigation.cj:383:public func active(): ?String
+packages/core/src/navigation.cj:387:public func focus(): FocusManager
+packages/core/src/navigation.cj:391:public func close(): ?String
+packages/core/src/navigation.cj:402:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:410:public func actionFor(key: KeyEvent): ?String
 packages/core/src/paged_table.cj:5:public class TableDataRow {
 packages/core/src/paged_table.cj:6:public let id: String
 packages/core/src/paged_table.cj:7:public let cells: Array<String>

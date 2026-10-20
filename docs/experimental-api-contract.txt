@@ -389,6 +389,7 @@ core|LazyTreeModel.setExpanded|func|public func setExpanded(id: String, expanded
 core|LazyTreeModel.toggleSelected|func|public func toggleSelected(): Bool
 core|LazyTreeModel.collapseAll|func|public func collapseAll(): Unit
 core|LazyTreeModel.refresh|func|public func refresh(): Unit
+core|Tabs.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|ModalFocusState|class|public class ModalFocusState {
 core|ModalFocusState.init|init|public init(base: FocusManager, keymap!: KeyMap = KeyMap())
 core|ModalFocusState.open|func|public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
