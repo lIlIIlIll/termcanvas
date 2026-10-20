@@ -442,15 +442,18 @@ packages/core/src/command_widgets.cj:344:public init(label!: String = "", frame!
 packages/core/src/command_widgets.cj:350:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:358:public class Dialog <: Widget {
 packages/core/src/command_widgets.cj:362:public var selected: Int64
-packages/core/src/command_widgets.cj:368:public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
-packages/core/src/command_widgets.cj:388:public func handle(key: KeyEvent): ?String
-packages/core/src/command_widgets.cj:402:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
-packages/core/src/command_widgets.cj:422:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/command_widgets.cj:445:public class ConfirmDialog <: Widget {
-packages/core/src/command_widgets.cj:447:public var confirmed: Bool = false
-packages/core/src/command_widgets.cj:448:public init(message: String)
-packages/core/src/command_widgets.cj:449:public func handle(key: KeyEvent): ?Bool
-packages/core/src/command_widgets.cj:457:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/command_widgets.cj:369:public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+packages/core/src/command_widgets.cj:392:public func setTheme(theme: ?Theme): Unit
+packages/core/src/command_widgets.cj:396:public func handle(key: KeyEvent): ?String
+packages/core/src/command_widgets.cj:411:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
+packages/core/src/command_widgets.cj:432:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/command_widgets.cj:465:public class ConfirmDialog <: Widget {
+packages/core/src/command_widgets.cj:467:public var confirmed: Bool = false
+packages/core/src/command_widgets.cj:469:public init( message: String, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+packages/core/src/command_widgets.cj:487:public func setTheme(theme: ?Theme): Unit
+packages/core/src/command_widgets.cj:491:public func handle(key: KeyEvent): ?Bool
+packages/core/src/command_widgets.cj:511:public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
+packages/core/src/command_widgets.cj:520:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/container_widgets.cj:5:public class VBox <: Widget {
 packages/core/src/container_widgets.cj:10:public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())
 packages/core/src/container_widgets.cj:16:public func render(area: Rect, buffer: Buffer): Unit
@@ -574,14 +577,15 @@ packages/core/src/content_widgets.cj:721:public init(steps: Array<ActivityStep>,
 packages/core/src/content_widgets.cj:726:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/content_widgets.cj:742:public class RequestDialog <: Widget {
 packages/core/src/content_widgets.cj:748:public var selected: Int64
-packages/core/src/content_widgets.cj:750:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0)
-packages/core/src/content_widgets.cj:759:public func handle(key: KeyEvent): ?String
-packages/core/src/content_widgets.cj:771:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:780:public type DecisionDialog = RequestDialog
-packages/core/src/content_widgets.cj:782:public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
-packages/core/src/content_widgets.cj:821:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
-packages/core/src/content_widgets.cj:843:public func transcriptStatusLabel(status: TranscriptItemStatus): String
-packages/core/src/content_widgets.cj:861:public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
+packages/core/src/content_widgets.cj:753:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None)
+packages/core/src/content_widgets.cj:766:public func setTheme(theme: ?Theme): Unit
+packages/core/src/content_widgets.cj:770:public func handle(key: KeyEvent): ?String
+packages/core/src/content_widgets.cj:782:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/content_widgets.cj:791:public type DecisionDialog = RequestDialog
+packages/core/src/content_widgets.cj:793:public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
+packages/core/src/content_widgets.cj:832:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
+packages/core/src/content_widgets.cj:854:public func transcriptStatusLabel(status: TranscriptItemStatus): String
+packages/core/src/content_widgets.cj:872:public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
 packages/core/src/dashboard_widgets.cj:5:public class MetricCard <: Widget {
 packages/core/src/dashboard_widgets.cj:13:public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: Style = Style.default(), valueStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()) )
 packages/core/src/dashboard_widgets.cj:29:public func render(area: Rect, buffer: Buffer): Unit

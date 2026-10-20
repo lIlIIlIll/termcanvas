@@ -650,13 +650,8 @@ func renderModal(app: WorkbenchApp, frame: Frame): Unit {
         case Some("gallery-dialog") =>
             if (frame.isDirty(app.layout.dialog)) {
                 frame.fill(app.layout.dialog, app.theme.normal)
-                let selected = if (app.interaction.focus().isFocused("gallery-dialog-confirm")) { 1 } else { 0 }
-                app.galleryDialog.selected = selected
-                let dialog = Dialog(title: "Component dialog",
-                    body: "This is the real Dialog widget.\nConfirm returns to the gallery.",
-                    buttons: ["Cancel", "Confirm"], selected: selected, width: 52, height: 9,
-                    style: app.surfaceStyle, selectedStyle: app.theme.selected)
-                frame.renderWidget(dialog, app.layout.dialog)
+                app.galleryDialog.confirmed = app.interaction.focus().current() == Some("gallery-dialog-confirm")
+                frame.renderWidget(app.galleryDialog, app.layout.dialog)
             }
         case Some("help") =>
             if (app.editingId.isSome()) { renderEditor(app, frame) }

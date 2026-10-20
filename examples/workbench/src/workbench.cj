@@ -39,7 +39,7 @@ class WorkbenchApp {
     let galleryTree = Tree(galleryTreeNodes, selected: 2)
     let galleryTableState = TableState(selectedRow: Some(0))
     let galleryListState = ListState(selected: Some(0))
-    let galleryDialog = Dialog(title: "Component dialog", body: "This is the real Dialog widget.\nConfirm returns to the gallery.", buttons: ["Cancel", "Confirm"], width: 52, height: 9)
+    let galleryDialog = ConfirmDialog("This is a real confirmation dialog.\nYes confirms; No declines.", selectedStyle: Style.default())
     var galleryAsciiFallback: Bool = false
     let projects = Tree([
         TreeNode("all", "All projects"),
@@ -82,9 +82,9 @@ class WorkbenchApp {
         MenuItem("Help", action: "help"),
         MenuItem("Quit", action: "app.quit")
     ])
-    let helpDialog = Dialog(title: "Workbench help", body: "F1 help   F2 commands   F3 next page\nF4 edit task F5 run task F6 pause\nTab changes focus. / searches. q exits.\nGallery: Left/Right categories; click controls.\nMouse supports selection, sorting, scrolling, and modal actions.", buttons: ["Close"], width: 68, height: 10)
-    let resetDialog = Dialog(title: "Reset task", body: "Return this task to the queued state?", buttons: ["Cancel", "Reset"], width: 56, height: 9)
-    let demoResetDialog = Dialog(title: "Reset local demo", body: "Discard demo progress and restore all 120 tasks?", buttons: ["Cancel", "Reset"], width: 62, height: 9)
+    let helpDialog = Dialog(title: "Workbench help", body: "F1 help   F2 commands   F3 next page\nF4 edit task F5 run task F6 pause\nTab changes focus. / searches. q exits.\nGallery: Left/Right categories; click controls.\nMouse supports selection, sorting, scrolling, and modal actions.", buttons: ["Close"], width: 68, height: 10, selectedStyle: Style.default())
+    let resetDialog = Dialog(title: "Reset task", body: "Return this task to the queued state?", buttons: ["Cancel", "Reset"], width: 56, height: 9, selectedStyle: Style.default())
+    let demoResetDialog = Dialog(title: "Reset local demo", body: "Discard demo progress and restore all 120 tasks?", buttons: ["Cancel", "Reset"], width: 62, height: 9, selectedStyle: Style.default())
 
     var darkTheme: Bool = true
     var capabilities: TerminalCapabilities = TerminalCapabilities()
@@ -459,7 +459,7 @@ class WorkbenchApp {
             case "gallery-open-palette" =>
                 if (galleryButton(this, "Palette", 1, id).handle(key)) { openPalette(); return Some(UpdateResult.next()) }
             case "gallery-open-dialog" =>
-                if (galleryButton(this, "Dialog", 1, id).handle(key)) { openGalleryDialog(); return Some(UpdateResult.next()) }
+                if (galleryButton(this, "Open confirmation", 1, id).handle(key)) { openGalleryDialog(); return Some(UpdateResult.next()) }
             case "gallery-theme-toggle" =>
                 if (galleryButton(this, "Theme", 1, id).handle(key)) {
                     themeRadio.selected = if (darkTheme) { 1 } else { 0 }
@@ -502,18 +502,12 @@ class WorkbenchApp {
                     case None => UpdateResult.next()
                 }
             case Some("gallery-dialog") =>
-                match (key.code) {
-                    case KeyCode.Esc =>
-                        closeModal()
+                galleryDialog.confirmed = interaction.focus().current() == Some("gallery-dialog-confirm")
+                match (galleryDialog.handle(key)) {
+                    case Some(accepted) => finishGalleryDialog(accepted)
+                    case None =>
+                        _ = interaction.focus().focus(if (galleryDialog.confirmed) { "gallery-dialog-confirm" } else { "gallery-dialog-cancel" })
                         UpdateResult.next()
-                    case _ =>
-                        galleryDialog.selected = if (interaction.focus().current() == Some("gallery-dialog-confirm")) { 1 } else { 0 }
-                        match (galleryDialog.handle(key)) {
-                            case Some(action) => finishGalleryDialog(action)
-                            case None =>
-                                _ = interaction.focus().focus(if (galleryDialog.selected == 1) { "gallery-dialog-confirm" } else { "gallery-dialog-cancel" })
-                                UpdateResult.next()
-                        }
                 }
             case Some("editor") => updateEditorKey(key)
             case Some("reset-confirm") =>
@@ -834,7 +828,7 @@ class WorkbenchApp {
                 openPalette()
                 return UpdateResult.next()
             }
-            if (galleryButton(this, "Dialog", 1, "gallery-open-dialog").handleMouse(mouse, areas.dialogButton)) {
+            if (galleryButton(this, "Open confirmation", 1, "gallery-open-dialog").handleMouse(mouse, areas.dialogButton)) {
                 _ = focus.focus("gallery-open-dialog")
                 openGalleryDialog()
                 return UpdateResult.next()
@@ -878,12 +872,12 @@ class WorkbenchApp {
                     case None => UpdateResult.next()
                 }
             case Some("gallery-dialog") =>
-                galleryDialog.selected = if (interaction.focus().current() == Some("gallery-dialog-confirm")) { 1 } else { 0 }
+                galleryDialog.confirmed = interaction.focus().current() == Some("gallery-dialog-confirm")
                 match (galleryDialog.handleMouse(mouse, layout.dialog)) {
-                    case Some(action) => finishGalleryDialog(action)
-                    case None =>
-                        _ = interaction.focus().focus(if (galleryDialog.selected == 1) { "gallery-dialog-confirm" } else { "gallery-dialog-cancel" })
-                        UpdateResult.next()
+                    case Some(accepted) =>
+                        _ = interaction.focus().focus(if (accepted) { "gallery-dialog-confirm" } else { "gallery-dialog-cancel" })
+                        finishGalleryDialog(accepted)
+                    case None => UpdateResult.next()
                 }
             case Some("editor") => routeEditorMouse(mouse)
             case Some("reset-confirm") =>
@@ -1363,19 +1357,19 @@ class WorkbenchApp {
     }
 
     private func openGalleryDialog(): Unit {
-        galleryDialog.selected = 0
+        galleryDialog.confirmed = false
         _ = interaction.open("gallery-dialog", ["gallery-dialog-cancel", "gallery-dialog-confirm"])
         _ = interaction.focus().focus("gallery-dialog-cancel")
         layout = workbenchLayout(screen, page)
     }
 
-    private func finishGalleryDialog(action: String): UpdateResult {
+    private func finishGalleryDialog(accepted: Bool): UpdateResult {
         closeModal()
-        if (action == "Confirm") {
-            statusMessage = "Dialog confirmed"
+        if (accepted) {
+            statusMessage = "Confirmation accepted"
             pushGalleryToast("Success")
         } else {
-            statusMessage = "Dialog canceled"
+            statusMessage = "Confirmation declined"
         }
         UpdateResult.next()
     }
@@ -1737,6 +1731,10 @@ class WorkbenchApp {
             Style(fg: accentForeground(accent), bg: accent),
             effective
         )
+        galleryDialog.setTheme(Some(theme))
+        helpDialog.setTheme(Some(theme))
+        resetDialog.setTheme(Some(theme))
+        demoResetDialog.setTheme(Some(theme))
     }
 
     func actualColorTier(): Int64 {

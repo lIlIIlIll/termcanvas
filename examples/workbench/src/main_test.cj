@@ -603,7 +603,8 @@ class WorkbenchGalleryInteractionTest {
         @Expect(app.interaction.focus().current(), Some("gallery-dialog-confirm"))
         workbenchGalleryKey(app, KeyCode.Enter)
         @Expect(app.interaction.active().isNone())
-        @Expect(app.statusMessage, "Dialog confirmed")
+        @Expect(app.statusMessage, "Confirmation accepted")
+        @Expect(app.focus.current(), Some("gallery-open-dialog"))
 
         let areas = workbenchGalleryAreas(app.layout.galleryContent, 6)
         _ = app.update(Event.Mouse(MouseEvent(
@@ -616,12 +617,13 @@ class WorkbenchGalleryInteractionTest {
             MouseKind.Down, MouseButton.Left, areas.dialogButton.right - 1, areas.dialogButton.y)))
         @Expect(app.interaction.active(), Some("gallery-dialog"))
         let modal = app.layout.dialog
-        let outerX = modal.x + (modal.width - 52) / 2
-        let outerY = modal.y + (modal.height - 9) / 2
+        let outerX = modal.x + (modal.width - 40) / 2
+        let outerY = modal.y + (modal.height - 7) / 2
         _ = app.update(Event.Mouse(MouseEvent(
-            MouseKind.Down, MouseButton.Left, outerX + 10, outerY + 7)))
+            MouseKind.Down, MouseButton.Left, outerX + 7, outerY + 5)))
         @Expect(app.interaction.active().isNone())
-        @Expect(app.statusMessage, "Dialog confirmed")
+        @Expect(app.statusMessage, "Confirmation accepted")
+        @Expect(app.focus.current(), Some("gallery-open-dialog"))
 
         let themed = WorkbenchApp()
         workbenchGalleryKey(themed, KeyCode.Tab)
@@ -635,6 +637,77 @@ class WorkbenchGalleryInteractionTest {
         @Expect(themed.theme.accent, Style(fg: Color.Magenta, bg: Color.Rgb(247, 249, 252)))
     }
 
+    @TestCase
+    func confirmationDialogMapsActionsRefreshesThemeAndRestoresFocus(): Unit {
+        let app = WorkbenchApp()
+        _ = app.update(Event.Resize(Rect(0, 0, 80, 24)))
+        workbenchGalleryKey(app, KeyCode.Tab)
+        for (_ in 0..6) { workbenchGalleryKey(app, KeyCode.Right) }
+        workbenchGalleryKey(app, KeyCode.Tab)
+        workbenchGalleryKey(app, KeyCode.Tab)
+        workbenchGalleryKey(app, KeyCode.Enter)
+        @Expect(app.interaction.active(), Some("gallery-dialog"))
+        let returnFocus = app.focus.current()
+        @Expect(app.interaction.focus().current(), Some("gallery-dialog-cancel"))
+
+        let firstModal = app.layout.dialog
+        let firstX = firstModal.x + (firstModal.width - 40) / 2
+        let firstY = firstModal.y + (firstModal.height - 7) / 2
+        let beforeTheme = app.theme.selected
+        let before = TestScenario().render().run(
+            { frame => app.render(frame) },
+            { event => app.update(event) },
+            width: 80,
+            height: 24
+        )
+        @Expect(before.passed, true)
+        @Expect(before.frames[before.frames.size - 1].getCell(firstX + 1, firstY + 5).style, beforeTheme)
+
+        _ = app.update(Event.Capabilities(TerminalCapabilities(trueColor: false, colorLevel: 8)))
+        @Assert(app.theme.selected != beforeTheme)
+        let after = TestScenario().render().run(
+            { frame => app.render(frame) },
+            { event => app.update(event) },
+            width: 80,
+            height: 24
+        )
+        @Expect(after.passed, true)
+        @Expect(after.frames[after.frames.size - 1].getCell(firstX + 1, firstY + 5).style, app.theme.selected)
+
+        _ = app.update(Event.Resize(Rect(0, 0, 100, 30)))
+        @Expect(app.interaction.active(), Some("gallery-dialog"))
+        @Expect(app.interaction.focus().current(), Some("gallery-dialog-cancel"))
+        workbenchGalleryKey(app, KeyCode.Enter)
+        @Expect(app.interaction.active().isNone())
+        @Expect(app.statusMessage, "Confirmation declined")
+        @Expect(app.focus.current(), returnFocus)
+
+        workbenchGalleryKey(app, KeyCode.Enter)
+        let modal = app.layout.dialog
+        let outerX = modal.x + (modal.width - 40) / 2
+        let outerY = modal.y + (modal.height - 7) / 2
+        let buttonY = outerY + 5
+        _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, outerX + 5, buttonY)))
+        _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, outerX, buttonY)))
+        _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Right, outerX + 7, buttonY)))
+        _ = app.update(Event.Mouse(MouseEvent(MouseKind.Up, MouseButton.Left, outerX + 7, buttonY)))
+        @Expect(app.interaction.active(), Some("gallery-dialog"))
+        @Expect(app.interaction.focus().current(), Some("gallery-dialog-cancel"))
+
+        _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, outerX + 2, buttonY)))
+        @Expect(app.interaction.active().isNone())
+        @Expect(app.statusMessage, "Confirmation declined")
+        @Expect(app.focus.current(), returnFocus)
+
+        workbenchGalleryKey(app, KeyCode.Enter)
+        let confirmModal = app.layout.dialog
+        let confirmX = confirmModal.x + (confirmModal.width - 40) / 2
+        let confirmY = confirmModal.y + (confirmModal.height - 7) / 2
+        _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, confirmX + 7, confirmY + 5)))
+        @Expect(app.interaction.active().isNone())
+        @Expect(app.statusMessage, "Confirmation accepted")
+        @Expect(app.focus.current(), returnFocus)
+    }
     @TestCase
     func galleryRendersAllCategoriesWithinSupportedTerminalSizes(): Unit {
         let app = WorkbenchApp()

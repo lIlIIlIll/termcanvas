@@ -442,14 +442,17 @@ packages/core/src/command_widgets.cj:public init(label!: String = "", frame!: In
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class Dialog <: Widget {
 packages/core/src/command_widgets.cj:public var selected: Int64
-packages/core/src/command_widgets.cj:public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/command_widgets.cj:public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+packages/core/src/command_widgets.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?String
 packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class ConfirmDialog <: Widget {
 packages/core/src/command_widgets.cj:public var confirmed: Bool = false
-packages/core/src/command_widgets.cj:public init(message: String)
+packages/core/src/command_widgets.cj:public init( message: String, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+packages/core/src/command_widgets.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?Bool
+packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/container_widgets.cj:public class VBox <: Widget {
 packages/core/src/container_widgets.cj:public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())
@@ -574,7 +577,8 @@ packages/core/src/content_widgets.cj:public init(steps: Array<ActivityStep>, blo
 packages/core/src/content_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/content_widgets.cj:public class RequestDialog <: Widget {
 packages/core/src/content_widgets.cj:public var selected: Int64
-packages/core/src/content_widgets.cj:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0)
+packages/core/src/content_widgets.cj:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None)
+packages/core/src/content_widgets.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/content_widgets.cj:public func handle(key: KeyEvent): ?String
 packages/core/src/content_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/content_widgets.cj:public type DecisionDialog = RequestDialog

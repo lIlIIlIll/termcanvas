@@ -127,14 +127,17 @@ core|Spinner.init|init|public init(label!: String = "", frame!: Int64 = 0, style
 core|Spinner.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Dialog|class|public class Dialog <: Widget {
 core|Dialog.selected|var|public var selected: Int64
-core|Dialog.init|init|public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Dialog.init|init|public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+core|Dialog.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|Dialog.handle|func|public func handle(key: KeyEvent): ?String
 core|Dialog.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|Dialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ConfirmDialog|class|public class ConfirmDialog <: Widget {
 core|ConfirmDialog.confirmed|var|public var confirmed: Bool = false
-core|ConfirmDialog.init|init|public init(message: String)
+core|ConfirmDialog.init|init|public init( message: String, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+core|ConfirmDialog.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|ConfirmDialog.handle|func|public func handle(key: KeyEvent): ?Bool
+core|ConfirmDialog.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
 core|ConfirmDialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|TranscriptItemKind|enum|public enum TranscriptItemKind {
 core|TranscriptItemKind.Text|enum_constructor|Text
@@ -213,7 +216,8 @@ core|ActivityTimeline.init|init|public init(steps: Array<ActivityStep>, block!: 
 core|ActivityTimeline.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|RequestDialog|class|public class RequestDialog <: Widget {
 core|RequestDialog.selected|var|public var selected: Int64
-core|RequestDialog.init|init|public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0)
+core|RequestDialog.init|init|public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None)
+core|RequestDialog.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|RequestDialog.handle|func|public func handle(key: KeyEvent): ?String
 core|RequestDialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|DecisionDialog|type|public type DecisionDialog = RequestDialog

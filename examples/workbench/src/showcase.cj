@@ -45,7 +45,7 @@ func galleryCategoryTitle(category: Int64): String {
         case 3 => "Navigation  /  Tabs, menu, tree"
         case 4 => "Data  /  Table, list, progress"
         case 5 => "Feedback  /  Toast lifecycle"
-        case 6 => "Overlays  /  Dialog and command palette"
+        case 6 => "Overlays  /  ConfirmDialog and command palette"
         case _ => "Themes  /  palette and terminal color tiers"
     }
 }
@@ -57,7 +57,7 @@ func galleryCategoryDescription(category: Int64): String {
         case 2 => "Tab to controls; type in the focused field, toggle the checkbox, or change the select."
         case 4 => "Select Table, List, or Progress; rows and viewport state persist between samples."
         case 5 => "Each severity uses the shared ToastManager and its existing three-second lifetime."
-        case 6 => "Open a real modal; Escape closes it, Tab moves between dialog actions."
+        case 6 => "Open a real confirmation; Escape closes it, Tab moves between actions."
         case _ => "Switch dark/light and accent; preview only the terminal's actual or lower color tier."
     }
 }
@@ -244,10 +244,10 @@ func renderGalleryFeedback(app: WorkbenchApp, frame: Frame, areas: WorkbenchGall
 
 func renderGalleryOverlays(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryAreas): Unit {
     frame.renderWidget(galleryButton(app, "Palette · F2", 1, "gallery-open-palette"), areas.paletteButton)
-    frame.renderWidget(galleryButton(app, "Open dialog", 1, "gallery-open-dialog"), areas.dialogButton)
+    frame.renderWidget(galleryButton(app, "Open confirmation", 1, "gallery-open-dialog"), areas.dialogButton)
     frame.renderWidget(Paragraph("The palette is the Workbench command palette, not a mock-up.", style: app.theme.normal),
         galleryRect(app.layout.galleryContent, 0, 5, app.layout.galleryContent.width, 1))
-    frame.renderWidget(Paragraph("Dialog actions close the existing modal focus scope.", style: app.theme.disabled),
+    frame.renderWidget(Paragraph("ConfirmDialog actions close the existing modal focus scope.", style: app.theme.disabled),
         galleryRect(app.layout.galleryContent, 0, 6, app.layout.galleryContent.width, 1))
 }
 

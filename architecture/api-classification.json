@@ -294,6 +294,24 @@
       "sunset_condition": "Revisit or remove if consumers do not need semantic Tabs themes or cannot keep selected-style ownership predictable."
     },
     {
+      "id": "core-dialog-theme-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Dialog.setTheme", "ConfirmDialog.setTheme"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Optional semantic dialog themes preserve no-theme rendering and explicit selected-style precedence.",
+      "consumer_evidence": "Workbench confirmation, help, and reset dialogs; direct core theme, selection-clamp, and mouse-hit tests.",
+      "promotion_condition": "Independent consumers validate theme opt-in, legacy rendering, selected-style ownership, and rendered hit behavior.",
+      "sunset_condition": "Revisit the setters if consumers do not need semantic dialog themes or selected-style ownership becomes unpredictable."
+    },
+    {
+      "id": "core-request-dialog-theme-experimental",
+      "match": {"package": "core", "qualified_symbols": ["RequestDialog.setTheme"]},
+      "stability": "EXPERIMENTAL", "subsystem": "document_editor", "owner": "core/editor",
+      "reason": "Optional request themes forward Dialog styling without changing risk or document-detail composition.",
+      "consumer_evidence": "assistant_console and example_smoke consumers; direct RequestDialog and DecisionDialog theme tests.",
+      "promotion_condition": "Independent document-workflow consumers validate theme forwarding while retaining document-detail composition.",
+      "sunset_condition": "Revisit or remove the setter if request workflows do not need semantic themes or detail rendering cannot remain independently owned."
+    },
+    {
       "id": "core-dropdown-state-experimental",
       "match": {"package": "core", "qualified_symbols": ["Dropdown.setVisualState", "Dropdown.setTransactionalSelection", "Dropdown.cancelSelection"]},
       "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",

@@ -60,6 +60,11 @@ construction. A display-only instance without a supplied state ignores mouse
 selection. `Input` maps a content click to the visible text cursor. `Tabs`,
 `MenuBar`, `ColorPicker`, and `Dialog` expose their own geometry-aware mouse helpers.
 
+`Dialog` normalizes its public `selected` index before keyboard, mouse, and render
+work. `ConfirmDialog` starts on No; only a left-button-down hit on the rendered
+`[No]` or `[Yes]` label returns `Some(false)` or `Some(true)`. Gaps, borders,
+body clicks, releases, and right-button clicks return `None`.
+
 The shared functions are deliberately small:
 
 - `widgetHitTest(mouse, area)` tests geometry only; it does not imply activation.

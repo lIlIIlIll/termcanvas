@@ -364,6 +364,7 @@ public class Dialog <: Widget {
     private let height: Int64
     private let style: Style
     private let selectedStyle: Style
+    private var theme: ?Theme = None
 
     public init(
         title!: String = "",
@@ -373,7 +374,8 @@ public class Dialog <: Widget {
         width!: Int64 = 40,
         height!: Int64 = 7,
         style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
+        theme!: ?Theme = None
     ) {
         this.title = title
         this.body = body
@@ -383,9 +385,16 @@ public class Dialog <: Widget {
         this.height = max(4, height)
         this.style = style
         this.selectedStyle = selectedStyle
+        this.theme = theme
+    }
+    /** 设置对话框使用的语义主题；None 保持未启用主题时的样式。
+     */
+    public func setTheme(theme: ?Theme): Unit {
+        this.theme = theme
     }
 
     public func handle(key: KeyEvent): ?String {
+        normalizeSelected()
         match (key.code) {
             case KeyCode.Left =>
                 selected = max(0, selected - 1)
@@ -400,6 +409,7 @@ public class Dialog <: Widget {
     }
 
     public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
+        normalizeSelected()
         match ((mouse.kind, mouse.button)) {
             case (MouseKind.Down, MouseButton.Left) => ()
             case _ => return None
@@ -420,41 +430,95 @@ public class Dialog <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        normalizeSelected()
         let actualWidth = min(width, area.width)
         let actualHeight = min(height, area.height)
         if (actualWidth <= 0 || actualHeight <= 0) { return }
         let x = area.x + max(0, (area.width - actualWidth) / 2)
         let y = area.y + max(0, (area.height - actualHeight) / 2)
         let dialogArea = Rect(x, y, actualWidth, actualHeight)
-        let block = Block(title: title, style: style)
+        let renderStyle = themedNormal(style, theme)
+        let renderSelectedStyle = if (theme.isSome() && selectedStyle == Style.default()) {
+            themedSelected(selectedStyle, theme)
+        } else {
+            selectedStyle
+        }
+        let block = Block(title: title, style: renderStyle)
         block.render(dialogArea, buffer)
         let inner = block.inner(dialogArea)
         if (inner.width <= 0 || inner.height <= 0) { return }
-        Paragraph(body, wrap: WrapMode.Word, style: style).render(Rect(inner.x, inner.y, inner.width, max(0, inner.height - 1)), buffer)
+        Paragraph(body, wrap: WrapMode.Word, style: renderStyle).render(Rect(inner.x, inner.y, inner.width, max(0, inner.height - 1)), buffer)
         var bx = inner.x
         let by = dialogArea.bottom - 2
         for (i in 0..buttons.size) {
             if (bx >= inner.right) { return }
             let label = "[" + buttons[i] + "]"
-            buffer.setString(bx, by, truncate(label, inner.right - bx), style: if (i == selected) { selectedStyle } else { style })
+            buffer.setString(bx, by, truncate(label, inner.right - bx), style: if (i == selected) { renderSelectedStyle } else { renderStyle })
             bx += displayWidth(label) + 1
         }
+    }
+    private func normalizeSelected(): Unit {
+        selected = clamp(selected, 0, max(0, buttons.size - 1))
     }
 }
 
 public class ConfirmDialog <: Widget {
-    private let message: String
+    private let dialog: Dialog
     public var confirmed: Bool = false
-    public init(message: String) { this.message = message }
+
+    public init(
+        message: String,
+        style!: Style = Style.default(),
+        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
+        theme!: ?Theme = None
+    ) {
+        this.dialog = Dialog(
+            title: "Confirm",
+            body: message,
+            buttons: ["No", "Yes"],
+            style: style,
+            selectedStyle: selectedStyle,
+            theme: theme
+        )
+    }
+
+    /** 设置确认提示使用的语义主题；None 清除主题。
+     */
+    public func setTheme(theme: ?Theme): Unit {
+        dialog.setTheme(theme)
+    }
+
     public func handle(key: KeyEvent): ?Bool {
+        dialog.selected = if (confirmed) { 1 } else { 0 }
         match (key.code) {
+            case KeyCode.Left =>
+                _ = dialog.handle(key)
+                confirmed = dialog.selected == 1
+                None
+            case KeyCode.Right =>
+                _ = dialog.handle(key)
+                confirmed = dialog.selected == 1
+                None
             case KeyCode.Char(r'y') => confirmed = true; Some(true)
             case KeyCode.Enter => Some(confirmed)
             case KeyCode.Char(r'n') | KeyCode.Esc => confirmed = false; Some(false)
             case _ => None
         }
     }
+
+    /** 仅左键按下并命中“No”或“Yes”标签时返回对应布尔结果；其余鼠标事件返回 None。
+     */
+    public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool {
+        dialog.selected = if (confirmed) { 1 } else { 0 }
+        match (dialog.handleMouse(mouse, area)) {
+            case Some("No") => confirmed = false; Some(false)
+            case Some("Yes") => confirmed = true; Some(true)
+            case _ => None
+        }
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
-        Dialog(title: "Confirm", body: message, buttons: ["No", "Yes"], selected: if (confirmed) { 1 } else { 0 }).render(area, buffer)
+        dialog.selected = if (confirmed) { 1 } else { 0 }
+        dialog.render(area, buffer)
     }
 }

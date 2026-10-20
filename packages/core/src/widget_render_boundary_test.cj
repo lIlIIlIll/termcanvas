@@ -79,6 +79,98 @@ class WidgetRenderBoundaryTest {
     }
 
     @TestCase
+    func dialogClampsPublicSelectionBeforeActionsAndRendering(): Unit {
+        let area = Rect(0, 0, 40, 7)
+        let dialog = Dialog(buttons: ["No", "Yes"])
+        dialog.selected = 99
+        @Expect(dialog.handle(KeyEvent(KeyCode.Enter)), Some("Yes"))
+        @Expect(dialog.selected, 1)
+        dialog.selected = -5
+        _ = dialog.handle(KeyEvent(KeyCode.Left))
+        @Expect(dialog.selected, 0)
+        dialog.selected = 99
+        dialog.render(area, Buffer(area))
+        @Expect(dialog.selected, 1)
+    }
+
+    @TestCase
+    func dialogThemeIsOptInAndExplicitSelectedStyleWins(): Unit {
+        let area = Rect(0, 0, 40, 7)
+        let normalRole = Style(fg: Color.Blue, bg: Color.Black)
+        let selectedRole = Style(fg: Color.Green, bg: Color.Magenta, modifier: Modifier.strong())
+        let theme = Theme(normal: normalRole, selected: selectedRole)
+        let customNormal = Style(fg: Color.Red)
+        let dialog = Dialog(body: "Body", buttons: ["No", "Yes"], style: customNormal, selectedStyle: Style.default())
+
+        let legacy = Buffer(area)
+        dialog.render(area, legacy)
+        @Expect(legacy.getCell(1, 5).style, Style.default())
+        @Expect(legacy.getCell(1, 1).style, customNormal)
+
+        dialog.setTheme(Some(theme))
+        let themed = Buffer(area)
+        dialog.render(area, themed)
+        @Expect(themed.getCell(1, 1).style, normalRole.patch(customNormal))
+        @Expect(themed.getCell(1, 5).style, selectedRole)
+        @Expect(themed.getCell(6, 5).style, normalRole.patch(customNormal))
+
+        let explicit = Style(fg: Color.Yellow, bg: Color.Red)
+        let overridden = Dialog(buttons: ["No"], selectedStyle: explicit, theme: Some(theme))
+        let explicitBuffer = Buffer(area)
+        overridden.render(area, explicitBuffer)
+        @Expect(explicitBuffer.getCell(1, 5).style, explicit)
+    }
+
+    @TestCase
+    func confirmDialogMapsKeyboardAndRenderedMouseHitsToBooleans(): Unit {
+        let area = Rect(0, 0, 80, 24)
+        let selected = Style(fg: Color.Green, bg: Color.Blue)
+        let confirm = ConfirmDialog("Proceed?", selectedStyle: Style.default(), theme: Some(Theme(selected: selected)))
+        @Expect(confirm.handle(KeyEvent(KeyCode.Enter)), Some(false))
+        @Expect(confirm.confirmed, false)
+        @Expect(confirm.handle(KeyEvent(KeyCode.Right)).isNone())
+        @Expect(confirm.confirmed, true)
+        @Expect(confirm.handle(KeyEvent(KeyCode.Enter)), Some(true))
+
+        confirm.confirmed = false
+        let buffer = Buffer(area)
+        confirm.render(area, buffer)
+        @Expect(buffer.getCell(21, 13).style, selected)
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 27, 13), area), Some(true))
+        @Expect(confirm.confirmed, true)
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 22, 13), area), Some(false))
+        @Expect(confirm.confirmed, false)
+
+        confirm.confirmed = true
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 25, 13), area).isNone())
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 20, 13), area).isNone())
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 22, 10), area).isNone())
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Right, 27, 13), area).isNone())
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Up, MouseButton.Left, 27, 13), area).isNone())
+        @Expect(confirm.confirmed, true)
+    }
+
+    @TestCase
+    func requestAndDecisionDialogsForwardThemeOptions(): Unit {
+        let area = Rect(0, 0, 40, 12)
+        let normal = Style(fg: Color.Cyan, bg: Color.Black)
+        let selected = Style(fg: Color.Yellow, bg: Color.Blue)
+        let theme = Theme(normal: normal, selected: selected)
+        let customNormal = Style(fg: Color.Red)
+        let request = RequestDialog(body: "Run?", buttons: ["No", "Yes"], selected: 1, style: customNormal, selectedStyle: Style.default())
+        request.setTheme(Some(theme))
+        let requestBuffer = Buffer(area)
+        request.render(area, requestBuffer)
+        @Expect(requestBuffer.getCell(1, 3).style, normal.patch(customNormal))
+        @Expect(requestBuffer.getCell(6, 7).style, selected)
+
+        let decision = DecisionDialog(body: "Approve?", buttons: ["No", "Yes"], selected: 1, selectedStyle: Style.default(), theme: Some(theme))
+        let decisionBuffer = Buffer(area)
+        decision.render(area, decisionBuffer)
+        @Expect(decisionBuffer.getCell(6, 7).style, selected)
+    }
+
+    @TestCase
     func menuBarRendersSelectedStylesAndClipsAtDisplayColumns(): Unit {
         let normal = Style(fg: Color.Green)
         let selected = Style(fg: Color.Red)

@@ -57,8 +57,13 @@ from the resulting state.
 - `CommandPalette`: queryable command items that return optional action strings.
 - `ToastManager`: short-lived notifications; `tick()` ages them.
 - `Spinner`: lightweight progress animation.
-- `Dialog`: centered overlay content.
-- `FileDialog`, `ConfirmDialog`, `ColorPicker`: common application workflows.
+- `Dialog`: centered buttons with optional semantic themes. No-theme rendering
+  remains unchanged; explicit selected styles win, and public selection is
+  clamped before input or rendering.
+- `ConfirmDialog`: No/Yes confirmation; Enter starts on No, Left/Right select,
+  and left-button-down on a rendered label returns its boolean result.
+- `RequestDialog` / `DecisionDialog`: request workflows with optional Dialog
+  styles and themes; risk text and document-detail composition remain separate.
 
 ### Data display
 
