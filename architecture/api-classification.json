@@ -285,6 +285,15 @@
       "sunset_condition": "Revisit or remove if consumers cannot safely own paste normalization and cursor-boundary policy."
     },
     {
+      "id": "core-tabs-theme-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Tabs.setTheme"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Theme-aware Tabs are opt-in so the legacy selectedStyle default and no-theme rendering remain unchanged.",
+      "consumer_evidence": "Workbench category, sample, and Navigation tabs; direct theme and boundary tests.",
+      "promotion_condition": "Independent consumers validate theme opt-in, explicit selected-style ownership, and Unicode/windowing behavior without changing no-theme output.",
+      "sunset_condition": "Revisit or remove if consumers do not need semantic Tabs themes or cannot keep selected-style ownership predictable."
+    },
+    {
       "id": "core-widget-experimental",
       "match": {"package": "core", "symbols": ["ColorPicker", "MultiSelect", "DatePicker", "MenuItem", "Menu", "MenuBar", "CommandPalette", "Toast", "ToastManager", "Spinner", "Dialog", "ConfirmDialog", "MetricCard", "Meter", "LegendItem", "Legend", "TimeSeriesChart", "HeaderBar", "FooterBar", "EmptyState", "ErrorBox", "LoadingOverlay", "Skeleton", "InlineAlert", "Sparkline", "Gauge", "Chart", "LogView"]},
       "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",

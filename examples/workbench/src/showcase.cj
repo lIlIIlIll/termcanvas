@@ -11,9 +11,9 @@ func renderShowcase(app: WorkbenchApp, frame: Frame): Unit {
         let categories = Tabs(
             ["Overview", "Layout", "Forms", "Navigation", "Data", "Feedback", "Overlays", "Themes"],
             selected: app.galleryTabs.selected,
-            style: app.theme.disabled,
-            selectedStyle: app.theme.selected
+            selectedStyle: Style.default()
         )
+        categories.setTheme(Some(app.theme))
         categories.setFocused(app.focus.isFocused("gallery-tabs"))
         frame.renderWidget(categories, layout.galleryNav)
     }
@@ -129,7 +129,8 @@ func renderGalleryForms(app: WorkbenchApp, frame: Frame, areas: WorkbenchGallery
 
 func renderGalleryNavigation(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryAreas): Unit {
     let tabs = Tabs(["Overview", "Sources", "Output"], selected: app.galleryNavigationTabs.selected,
-        style: app.theme.disabled, selectedStyle: app.theme.selected)
+        selectedStyle: Style.default())
+    tabs.setTheme(Some(app.theme))
     tabs.setFocused(app.focus.isFocused("gallery-nav-tabs"))
     frame.renderWidget(tabs, areas.navTabs)
 
@@ -152,7 +153,8 @@ func renderGalleryNavigation(app: WorkbenchApp, frame: Frame, areas: WorkbenchGa
 
 func renderGalleryData(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryAreas): Unit {
     let sampleTabs = Tabs(["Table", "List", "Progress"], selected: app.galleryDataTabs.selected,
-        style: app.theme.disabled, selectedStyle: app.theme.selected)
+        selectedStyle: Style.default())
+    sampleTabs.setTheme(Some(app.theme))
     sampleTabs.setFocused(app.focus.isFocused("gallery-data-sample-tabs"))
     frame.renderWidget(sampleTabs, areas.dataSampleTabs)
 

@@ -359,7 +359,8 @@ func renderWorkbench(app: WorkbenchApp, frame: Frame): Unit {
     }
     if (frame.isDirty(layout.tabs)) {
         let pageTabs = Tabs(["Gallery", "Overview", "Tasks", "Settings"], selected: app.tabs.selected,
-            style: app.theme.disabled, selectedStyle: app.theme.selected)
+            selectedStyle: Style.default())
+        pageTabs.setTheme(Some(app.theme))
         pageTabs.setFocused(app.focus.isFocused("tabs"))
         frame.renderWidget(pageTabs, layout.tabs)
     }

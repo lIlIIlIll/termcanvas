@@ -318,6 +318,43 @@ class WorkbenchGalleryInteractionTest {
             @Expect(rendered.getCell(area.x, area.y).style == buttonStyles[index], true)
         }
     }
+
+    @TestCase
+    func tabsThemeIsAppliedAcrossWorkbenchNavigation(): Unit {
+        let app = WorkbenchApp()
+        workbenchGalleryKey(app, KeyCode.Tab)
+        @Expect(app.focus.current(), Some("gallery-tabs"))
+        app.galleryTabs.selected = 3
+
+        let backend = TestBackend(area: app.screen, captureSnapshots: false)
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        _ = terminal.draw { frame => app.render(frame) }
+        let navigationBuffer = backend.lastBuffer().getOrThrow()
+        let categoryArea = app.layout.galleryNav
+        let focusedCategory = navigationBuffer.getCell(categoryArea.x + 26, categoryArea.y).style
+        @Expect(focusedCategory.fg, app.theme.selected.fg)
+        @Expect(focusedCategory.bg, app.theme.selected.bg)
+        @Expect(focusedCategory.modifier.bold)
+        @Expect(focusedCategory.modifier.underline)
+        @Expect(navigationBuffer.getCell(categoryArea.x + 11, categoryArea.y).style, app.theme.normal)
+
+        let navigationAreas = workbenchGalleryAreas(app.layout.galleryContent, 3)
+        @Expect(navigationBuffer.getCell(navigationAreas.navTabs.x + 1, navigationAreas.navTabs.y).style,
+            app.theme.selected)
+        @Expect(navigationBuffer.getCell(navigationAreas.navTabs.x + 11, navigationAreas.navTabs.y).style,
+            app.theme.normal)
+
+        app.galleryTabs.selected = 4
+        _ = terminal.draw { frame => app.render(frame) }
+        let dataBuffer = backend.lastBuffer().getOrThrow()
+        let dataAreas = workbenchGalleryAreas(app.layout.galleryContent, 4)
+        @Expect(dataBuffer.getCell(dataAreas.dataSampleTabs.x + 1, dataAreas.dataSampleTabs.y).style,
+            app.theme.selected)
+        @Expect(dataBuffer.getCell(dataAreas.dataSampleTabs.x + 8, dataAreas.dataSampleTabs.y).style,
+            app.theme.normal)
+        let pageTabsArea = app.layout.tabs
+        @Expect(dataBuffer.getCell(pageTabsArea.x + 1, pageTabsArea.y).style, app.theme.selected)
+    }
     @TestCase
     func keyboardNavigationActivatesControlsAndKeepsInputEditableAfterFocusRestore(): Unit {
         let app = WorkbenchApp()

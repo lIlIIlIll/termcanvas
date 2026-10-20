@@ -15,6 +15,12 @@ func renderBoundarySentinels(): Buffer {
     buffer
 }
 
+func renderBoundaryWideSentinels(): Buffer {
+    let buffer = Buffer(Rect(0, 0, 32, 12))
+    for (row in 0..12) { buffer.setString(0, row, "ssssssssssssssssssssssssssssssss") }
+    buffer
+}
+
 func renderBoundaryOutsideChanges(buffer: Buffer, area: Rect): Int64 {
     var changed: Int64 = 0
     for (row in 0..buffer.area.height) {
@@ -154,6 +160,119 @@ class WidgetRenderBoundaryTest {
         @Expect(tabs.selected, 2)
         @Expect(renderBoundaryOutsideChanges(narrowBuffer, narrow), 0)
         @Expect(!Tabs([]).handle(KeyEvent(KeyCode.Left)))
+    }
+
+    @TestCase
+    func tabsThemeIsOptInAndFocusedSelectionKeepsModifiers(): Unit {
+        let theme = Theme(
+            normal: Style(fg: Color.Yellow, bg: Color.Blue),
+            selected: Style(fg: Color.White, bg: Color.Green)
+        )
+        let legacyNormal = Style(fg: Color.Red)
+        let legacySelected = Style(fg: Color.White, bg: Color.Magenta)
+        let legacyTabs = Tabs(["A", "B"], selected: 1, style: legacyNormal, selectedStyle: legacySelected)
+        legacyTabs.setTheme(Some(theme))
+        let legacyBuffer = Buffer(Rect(0, 0, 8, 1))
+        legacyTabs.render(legacyBuffer.area, legacyBuffer)
+        @Expect(legacyBuffer.getCell(1, 0).style, legacyNormal)
+        @Expect(legacyBuffer.getCell(4, 0).style, legacySelected)
+
+        let tabs = Tabs(["A", "B"], selected: 1, selectedStyle: Style.default())
+        tabs.setTheme(Some(theme))
+        tabs.setFocused(true)
+        let themedBuffer = Buffer(Rect(0, 0, 8, 1))
+        tabs.render(themedBuffer.area, themedBuffer)
+        @Expect(themedBuffer.getCell(1, 0).style, theme.normal)
+        let selectedCell = themedBuffer.getCell(4, 0)
+        @Expect(selectedCell.style.fg, theme.selected.fg)
+        @Expect(selectedCell.style.bg, theme.selected.bg)
+        @Expect(selectedCell.style.modifier.bold)
+        @Expect(selectedCell.style.modifier.underline)
+
+        tabs.setTheme(None)
+        let clearedBuffer = Buffer(Rect(0, 0, 8, 1))
+        tabs.render(clearedBuffer.area, clearedBuffer)
+        @Expect(clearedBuffer.getCell(1, 0).style, Style.default())
+        @Expect(clearedBuffer.getCell(4, 0).style.fg, Color.Reset)
+        @Expect(clearedBuffer.getCell(4, 0).style.bg, Color.Reset)
+        @Expect(clearedBuffer.getCell(4, 0).style.modifier.bold)
+        @Expect(clearedBuffer.getCell(4, 0).style.modifier.underline)
+    }
+
+    @TestCase
+    func tabsNormalizePublicSelectionBeforeKeysAndRender(): Unit {
+        let tabs = Tabs(["A", "B", "C"])
+        tabs.selected = -1
+        @Expect(tabs.handle(KeyEvent(KeyCode.Right)))
+        @Expect(tabs.selected, 1)
+
+        tabs.selected = 9223372036854775807i64
+        @Expect(tabs.handle(KeyEvent(KeyCode.Right)))
+        @Expect(tabs.selected, 2)
+        let tiny = Rect(2, 2, 0, 1)
+        let buffer = renderBoundarySentinels()
+        tabs.selected = 9223372036854775807i64
+        tabs.render(tiny, buffer)
+        @Expect(tabs.selected, 2)
+        tabs.selected = -1
+        tabs.render(tiny, buffer)
+        @Expect(tabs.selected, 0)
+        @Expect(renderBoundaryOutsideChanges(buffer, Rect(0, 0, 0, 0)), 0)
+
+        let empty = Tabs([])
+        empty.selected = 9223372036854775807i64
+        @Expect(!empty.handle(KeyEvent(KeyCode.Right)))
+        @Expect(empty.selected, 0)
+        empty.selected = 9223372036854775807i64
+        empty.render(Rect(0, 0, 0, 0), buffer)
+        @Expect(empty.selected, 0)
+    }
+
+    @TestCase
+    func tabsUnicodeViewportAndHitAreasStayAlignedAcrossResizes(): Unit {
+        let tabs = Tabs(
+            ["界面选择", "😀工作台", "Final"],
+            selected: 2,
+            style: Style(fg: Color.Red),
+            selectedStyle: Style(fg: Color.White, bg: Color.Blue)
+        )
+        tabs.setFocused(true)
+        for (width in [Int64(1), 5, 28]) {
+            tabs.selected = 2
+            let area = Rect(2, 2, width, 2)
+            let buffer = renderBoundaryWideSentinels()
+            tabs.render(area, buffer)
+            @Expect(tabs.selected, 2)
+            var selectedVisible = false
+            for (column in area.x..area.right) {
+                if (buffer.getCell(column, area.y).style.bg == Color.Blue) { selectedVisible = true }
+            }
+            @Expect(selectedVisible)
+            @Expect(renderBoundaryOutsideChanges(buffer, area), 0)
+
+            if (width == 28) {
+                var cjkColumn: Int64 = -1
+                var emojiColumn: Int64 = -1
+                var finalColumn: Int64 = -1
+                for (column in area.x..area.right) {
+                    let symbol = buffer.getCell(column, area.y).symbol
+                    if (symbol == "界") { cjkColumn = column }
+                    if (symbol == "😀") { emojiColumn = column }
+                    if (symbol == "F") { finalColumn = column }
+                }
+                @Assert(cjkColumn >= area.x)
+                @Assert(emojiColumn >= area.x)
+                @Assert(finalColumn >= area.x)
+                @Expect(tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, cjkColumn, area.y), area))
+                @Expect(tabs.selected, 0)
+                tabs.selected = 2
+                @Expect(tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, emojiColumn, area.y), area))
+                @Expect(tabs.selected, 1)
+                tabs.selected = 2
+                @Expect(tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, finalColumn, area.y), area))
+                @Expect(tabs.selected, 2)
+            }
+        }
     }
 
     @TestCase

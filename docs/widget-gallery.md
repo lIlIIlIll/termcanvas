@@ -71,7 +71,8 @@ demonstration does not promote an experimental declaration.
 
 | Capability | Status | API tier | Current evidence |
 | --- | --- | --- | --- |
-| `Button`, `Input`, `List`, `Table`, and `Tabs` controls | Implemented | STABLE | Focus preview, visible List-row hit/render, and focused Tabs assertions in the [Workbench tests](../examples/workbench/src/main_test.cj) and [core widget tests](../packages/core/src/widget_render_boundary_test.cj). |
+| `Button`, `Input`, `List`, `Table`, and stable `Tabs` controls | Implemented | STABLE | Focus preview, visible List-row hit/render, and Tabs keyboard, mouse, and no-theme boundary behavior in the [Workbench tests](../examples/workbench/src/main_test.cj) and [core widget tests](../packages/core/src/widget_render_boundary_test.cj). |
+| `Tabs.setTheme` | Implemented | EXPERIMENTAL | Workbench category, sample, and Navigation selectors use semantic roles; core tests cover opt-in, explicit-style preservation, focus modifiers, Unicode, and clipping. |
 | `Gauge`, `Sparkline`, `Dialog`, `CommandPalette`, `FocusManager`, and `ModalFocusState` | Implemented | EXPERIMENTAL | Demonstrated by the Workbench; consult each symbol's inventory entry before depending on it. |
 | Sample routing, visible-control focus sets, responsive layout, and modal focus restoration | Application composition required | Application code | Covered by `dataSampleNavigationPreservesFocusAndValuesAcrossResponsiveSizes` and `dataGallerySupportsKeyboardAndMouseSelection`. |
 | Remaining gallery scope in tracking issue #16 | Planned | Varies; inventory is authoritative | Later issue batches add coverage without changing the library's API tier by demonstration alone. |

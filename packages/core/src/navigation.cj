@@ -6,11 +6,12 @@ import std.collection.*
  */
 public class Tabs <: Widget {
     private let titles: Array<String>
-    /** 当前选中标签的索引，从 0 开始；构造时会限制在标题索引范围内，此字段也可直接修改。
+    /** 当前选中标签的索引，从 0 开始，可直接修改；构造、键盘、鼠标及绘制操作会先将其限制在标题索引范围内，空标题列表中为 0。
      */
     public var selected: Int64
     private let style: Style
     private let selectedStyle: Style
+    private var theme: ?Theme = None
 
     private var focused: Bool = false
     private var firstVisible: Int64 = 0
@@ -33,9 +34,16 @@ public class Tabs <: Widget {
         this.focused = focused
     }
 
-    /** 左右方向键在非空标签列表中切换选中项并返回 true；空列表或其他按键返回 false。
+    /** 设置标签栏使用的语义主题；只有 selectedStyle 为 Style.default() 时才应用 normal/selected 角色；None 清除主题。
+     */
+    public func setTheme(theme: ?Theme): Unit {
+        this.theme = theme
+    }
+
+    /** 左右方向键在非空标签列表中切换选中项并返回 true；按键前先限制公开索引，空列表或其他按键返回 false。
      */
     public func handle(key: KeyEvent): Bool {
+        normalizeSelected()
         if (titles.isEmpty()) { return false }
         match (key.code) {
             case KeyCode.Left =>
@@ -51,6 +59,7 @@ public class Tabs <: Widget {
     /** 按当前可见标签的字符单元格命中鼠标；标题截断或窄区域滚动后命中范围与实际显示一致。
      */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        normalizeSelected()
         if (!widgetHitTest(mouse, area) || mouse.y != area.y) { return false }
         match ((mouse.kind, mouse.button)) {
             case (MouseKind.Down, MouseButton.Left) =>
@@ -73,9 +82,10 @@ public class Tabs <: Widget {
         }
     }
 
-    /** 在区域首行绘制当前视口内的标签；选中标签使用选中样式，聚焦时再加粗并下划线，窄区域自动截断并滚动到选中项。
+    /** 在区域首行绘制当前视口内的标签；选中标签使用选中样式，聚焦时再加粗并下划线，绘制前限制公开索引。
      */
     public func render(area: Rect, buffer: Buffer): Unit {
+        normalizeSelected()
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
 
@@ -83,12 +93,17 @@ public class Tabs <: Widget {
         if (area.width <= 0 || area.height <= 0 || titles.isEmpty()) { return }
         var x = area.x
         let first = ensureSelectionVisible(area.width)
+        let useTheme = selectedStyle == Style.default()
         for (i in first..titles.size) {
             if (x >= area.right) { return }
             let full = " " + titles[i] + " "
             let text = truncate(full, area.right - x)
             let visibleWidth = displayWidth(text)
-            var itemStyle = if (i == selected) { selectedStyle } else { style }
+            var itemStyle = if (useTheme) {
+                if (i == selected) { themedSelected(selectedStyle, theme) } else { themedNormal(style, theme) }
+            } else {
+                if (i == selected) { selectedStyle } else { style }
+            }
             if (i == selected && focused) {
                 var modifier = itemStyle.modifier
                 modifier.bold = true
@@ -102,12 +117,18 @@ public class Tabs <: Widget {
         }
     }
 
-    private func ensureSelectionVisible(width: Int64): Int64 {
+    private func normalizeSelected(): Unit {
         if (titles.isEmpty()) {
+            selected = 0
             firstVisible = 0
-            return 0
+        } else {
+            selected = clamp(selected, 0, titles.size - 1)
         }
-        selected = clamp(selected, 0, titles.size - 1)
+    }
+
+    private func ensureSelectionVisible(width: Int64): Int64 {
+        normalizeSelected()
+        if (titles.isEmpty()) { return 0 }
         if (width <= 0) {
             firstVisible = selected
             return firstVisible

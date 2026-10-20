@@ -91,6 +91,13 @@ from the resulting state.
 component-specific color literals; applications remain responsible for choosing
 the actual palette.
 
+`Tabs.setTheme(theme: ?Theme)` is EXPERIMENTAL. The default `selectedStyle`
+remains black on white; pass `selectedStyle: Style.default()` to opt into the
+theme's `normal` and `selected` roles. A custom `style` patches the normal role
+after opt-in. Without that opt-in, `style` and `selectedStyle` keep their
+existing rendering even when a theme is set. Passing `None` clears the theme.
+A focused selected tab still adds bold and underline.
+
 `Button` fills its assigned cell rectangle, centers its label, and resolves
 disabled and focused styles through its existing style parameters and optional
 theme. Workbench maps `Primary` to `accentButtonStyle`, `Secondary` to
