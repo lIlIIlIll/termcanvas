@@ -273,6 +273,9 @@ core|Skeleton.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|InlineAlert|class|public class InlineAlert <: Widget {
 core|InlineAlert.init|init|public init(message: String, state!: StyleState = StyleState.Accent)
 core|InlineAlert.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Badge|class|public class Badge <: Widget {
+core|Badge.init|init|public init(label: String, style!: Style = Style.default(), theme!: ?Theme = None)
+core|Badge.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Paginator|class|public class Paginator {
 core|Paginator.page|var|public var page: Int64
 core|Paginator.pageSize|var|public var pageSize: Int64

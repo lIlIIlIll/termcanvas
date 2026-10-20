@@ -634,6 +634,9 @@ packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Bu
 packages/core/src/dashboard_widgets.cj:public class InlineAlert <: Widget {
 packages/core/src/dashboard_widgets.cj:public init(message: String, state!: StyleState = StyleState.Accent)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:public class Badge <: Widget {
+packages/core/src/dashboard_widgets.cj:public init(label: String, style!: Style = Style.default(), theme!: ?Theme = None)
+packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/data_widgets.cj:public class Paginator {
 packages/core/src/data_widgets.cj:public var page: Int64
 packages/core/src/data_widgets.cj:public var pageSize: Int64
