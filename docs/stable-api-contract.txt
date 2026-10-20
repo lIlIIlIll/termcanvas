@@ -1405,6 +1405,7 @@ core|Input|class|public class Input <: Widget {
 core|Input.value|var|public var value: String
 core|Input.cursor|var|public var cursor: Int64
 core|Input.init|init|public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)) )
+core|Input.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
 core|Input.handle|func|public func handle(key: KeyEvent): Bool
 core|Input.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
 core|Input.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool

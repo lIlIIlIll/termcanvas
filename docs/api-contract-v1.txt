@@ -2443,6 +2443,8 @@ packages/core/src/widgets.cj:public class Input <: Widget {
 packages/core/src/widgets.cj:public var value: String
 packages/core/src/widgets.cj:public var cursor: Int64
 packages/core/src/widgets.cj:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)) )
+packages/core/src/widgets.cj:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/widgets.cj:public func paste(text: String): Unit
 packages/core/src/widgets.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/widgets.cj:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
 packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool

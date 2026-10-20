@@ -685,6 +685,7 @@ core|LogView|class|public class LogView <: Widget {
 core|LogView.offset|var|public var offset: Int64
 core|LogView.init|init|public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
 core|LogView.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Input.paste|func|public func paste(text: String): Unit
 diff|DiffLineKind|enum|public enum DiffLineKind {
 diff|DiffLineKind.Context|enum_constructor|Context
 diff|DiffLineKind.Add|enum_constructor|Add
