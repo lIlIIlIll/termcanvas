@@ -66,6 +66,8 @@ from the resulting state.
 - `ToastManager`: theme-aware semantic notifications; it preserves `kind=None`
   styles, draws stable markers, and can cap the queue while retaining newest
   rows. `tick()` advances positive TTL values in tick-count units.
+- `Badge` (EXPERIMENTAL): display-only `[label]`; resolves the normal Theme role
+  and styles visible text cells only.
 - `Spinner`: lightweight progress animation.
 - `Dialog`: centered buttons with optional semantic themes. No-theme rendering
   remains unchanged; explicit selected styles win, and public selection is

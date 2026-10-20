@@ -105,6 +105,7 @@ class WorkbenchGalleryAreas {
     var dataList: Rect = Rect(0, 0, 0, 0)
     var dataProgress: Rect = Rect(0, 0, 0, 0)
     var toasts: Rect = Rect(0, 0, 0, 0)
+    var badge: Rect = Rect(0, 0, 0, 0)
     var paletteButton: Rect = Rect(0, 0, 0, 0)
     var dialogButton: Rect = Rect(0, 0, 0, 0)
     var themeToggle: Rect = Rect(0, 0, 0, 0)
@@ -165,6 +166,7 @@ func workbenchGalleryAreas(area: Rect, category: Int64, sample!: Int64 = 0): Wor
         }
     } else if (category == 5) {
         out.buttons = galleryColumns(area, 3, 1, 4)
+        out.badge = galleryRect(area, 0, 4, area.width, 1)
         out.toasts = galleryRect(area, 0, 5, area.width, min(5, max(0, area.height - 5)))
     } else if (category == 6) {
         out.paletteButton = galleryRect(area, 0, 3, min(22, area.width), 1)

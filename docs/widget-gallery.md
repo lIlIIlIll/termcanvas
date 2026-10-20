@@ -145,6 +145,8 @@ not used as evidence; no metadata has been backfilled.
 - `ToastManager` renders semantic markers and Theme roles. The Workbench ages
   its toasts with its existing 3000 ms application clock and rebuilds the
   remaining tick-count TTL; it does not call `tick()` as a second timer.
+- `Badge` displays `[Toasts: N]` from the live toast count. It has no focus or
+  input behavior.
 - `Spinner` renders lightweight progress.
 - `Dialog` renders centered overlay content.
 - `FileDialog`, `ConfirmDialog`, and `ColorPicker` support common application

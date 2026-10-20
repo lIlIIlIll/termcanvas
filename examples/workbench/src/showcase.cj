@@ -246,6 +246,7 @@ func galleryTable(app: WorkbenchApp, width: Int64): Table {
 func renderGalleryFeedback(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryAreas): Unit {
     renderGalleryButtonRow(app, frame, areas, ["Success", "Warning", "Error", "Info"],
         ["gallery-toast-success", "gallery-toast-warning", "gallery-toast-error", "gallery-toast-info"], [0, 1, 3, 2])
+    frame.renderWidget(Badge("Toasts: ${app.toastManager.count()}", theme: Some(app.theme)), areas.badge)
     let toastBlock = galleryBlock(app, "ToastManager · 3s", BorderKind.Rounded)
     let toastArea = toastBlock.inner(areas.toasts)
     frame.renderWidget(toastBlock, areas.toasts)

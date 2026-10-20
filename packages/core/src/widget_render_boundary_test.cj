@@ -475,4 +475,75 @@ class WidgetRenderBoundaryTest {
             @Expect(buffer.getCell(0, 0).style, expected)
         }
     }
+    @TestCase
+    func badgeUsesNormalThemeRoleAndPatchesExplicitStyleWithoutFillingArea(): Unit {
+        let area = Rect(3, 2, 7, 2)
+        let buffer = renderBoundarySentinels()
+        let normal = Style(fg: Color.Blue, bg: Color.Indexed(8))
+        let theme = Theme(normal: normal)
+        let patch = Style(fg: Color.Yellow)
+        let expected = normal.patch(patch)
+        Badge("OK", style: patch, theme: Some(theme)).render(area, buffer)
+        @Expect(buffer.getCell(3, 2).symbol, "[")
+        @Expect(buffer.getCell(6, 2).symbol, "]")
+        for (x in 3..7) { @Expect(buffer.getCell(x, 2).style, expected) }
+        for (x in 7..area.right) {
+            @Expect(buffer.getCell(x, 2).symbol, "s")
+            @Expect(buffer.getCell(x, 2).style, Style.default())
+        }
+        for (x in area.x..area.right) { @Expect(buffer.getCell(x, 3).symbol, "s") }
+        @Expect(renderBoundaryOutsideChanges(buffer, area), 0)
+
+        let themed = renderBoundarySentinels()
+        Badge("OK", theme: Some(theme)).render(Rect(2, 1, 4, 1), themed)
+        for (x in 2..6) { @Expect(themed.getCell(x, 1).style, normal) }
+
+        let unthemed = renderBoundarySentinels()
+        Badge("OK", style: patch).render(Rect(2, 1, 4, 1), unthemed)
+        for (x in 2..6) { @Expect(unthemed.getCell(x, 1).style, patch) }
+    }
+
+    @TestCase
+    func badgeHandlesZeroAndOneColumnAreasAndEmptyLabels(): Unit {
+        let buffer = renderBoundarySentinels()
+        let emptyStyle = Style(fg: Color.Green)
+        Badge("OK").render(Rect(2, 2, 0, 1), buffer)
+        @Expect(buffer.getCell(2, 2).symbol, "s")
+
+        Badge("OK").render(Rect(4, 2, 1, 1), buffer)
+        @Expect(buffer.getCell(4, 2).symbol, "[")
+        @Expect(buffer.getCell(5, 2).symbol, "s")
+
+        Badge("", style: emptyStyle).render(Rect(7, 2, 2, 1), buffer)
+        @Expect(buffer.getCell(7, 2).symbol, "[")
+        @Expect(buffer.getCell(8, 2).symbol, "]")
+        @Expect(buffer.getCell(7, 2).style, emptyStyle)
+        @Expect(buffer.getCell(8, 2).style, emptyStyle)
+
+        Badge("skip").render(Rect(11, 2, 3, 0), buffer)
+        @Expect(buffer.getCell(11, 2).symbol, "s")
+        @Expect(renderBoundaryOutsideChanges(buffer, Rect(2, 2, 9, 1)), 0)
+    }
+
+    @TestCase
+    func badgeKeepsUnicodeCellsWholeAndClipsAtAreaEnd(): Unit {
+        let style = Style(fg: Color.Magenta)
+        let buffer = renderBoundarySentinels()
+        let area = Rect(5, 5, 4, 1)
+        Badge("界", style: style).render(area, buffer)
+        @Expect(buffer.getCell(5, 5).symbol, "[")
+        @Expect(buffer.getCell(6, 5), Cell("界", style: style, kind: CellKind.WideLead))
+        @Expect(buffer.getCell(7, 5), Cell("", style: style, kind: CellKind.WideCont))
+        @Expect(buffer.getCell(8, 5).symbol, "]")
+        @Expect(renderBoundaryOutsideChanges(buffer, area), 0)
+
+        let clipped = renderBoundarySentinels()
+        let narrow = Rect(8, 4, 2, 1)
+        Badge("界", style: style).render(narrow, clipped)
+        @Expect(clipped.getCell(8, 4).symbol, "[")
+        @Expect(clipped.getCell(9, 4).symbol, "s")
+        @Expect(clipped.getCell(9, 4).style, Style.default())
+        @Expect(renderBoundaryOutsideChanges(clipped, narrow), 0)
+    }
+
 }

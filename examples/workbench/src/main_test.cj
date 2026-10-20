@@ -706,6 +706,40 @@ class WorkbenchGalleryInteractionTest {
     }
 
     @TestCase
+    func feedbackBadgeTracksToastDataAcrossGallerySizes(): Unit {
+        for (area in [Rect(0, 0, 80, 24), Rect(0, 0, 120, 36), Rect(0, 0, 160, 45)]) {
+            let app = WorkbenchApp()
+            app.paused = true
+            _ = app.update(Event.Resize(area))
+            workbenchGalleryKey(app, KeyCode.Tab)
+            for (_ in 0..5) { workbenchGalleryKey(app, KeyCode.Right) }
+            @Expect(app.galleryTabs.selected, 5)
+
+            let backend = TestBackend(area: area, captureSnapshots: false)
+            let terminal = Terminal(backend, renderMode: RenderMode.Full)
+            _ = terminal.draw { frame => app.render(frame) }
+            let badgeArea = workbenchGalleryAreas(app.layout.galleryContent, 5).badge
+            let initial = backend.lastBuffer().getOrThrow()
+            @Expect(initial.getCell(badgeArea.x, badgeArea.y).symbol, "[")
+            @Expect(initial.getCell(badgeArea.x + 9, badgeArea.y).symbol, "0")
+            @Expect(initial.getCell(badgeArea.x + 10, badgeArea.y).symbol, "]")
+
+            _ = app.update(Event.Mouse(MouseEvent(
+                MouseKind.Down, MouseButton.Left, badgeArea.x, badgeArea.y)))
+            @Expect(app.toastManager.count(), 0)
+
+            workbenchGalleryKey(app, KeyCode.Tab)
+            workbenchGalleryKey(app, KeyCode.Enter)
+            @Expect(app.toastManager.count(), 1)
+            _ = terminal.draw { frame => app.render(frame) }
+            let updated = backend.lastBuffer().getOrThrow()
+            @Expect(updated.getCell(badgeArea.x, badgeArea.y).symbol, "[")
+            @Expect(updated.getCell(badgeArea.x + 9, badgeArea.y).symbol, "1")
+            @Expect(updated.getCell(badgeArea.x + 10, badgeArea.y).symbol, "]")
+        }
+    }
+
+    @TestCase
     func dialogPaletteAndThemeControlsUseExistingInteractionScopes(): Unit {
         let app = WorkbenchApp()
         workbenchGalleryKey(app, KeyCode.Tab)

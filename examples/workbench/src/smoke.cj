@@ -22,6 +22,37 @@ func runWorkbenchHeadlessSmoke(): Int64 {
         !showcase.lastSnapshot().contains("Terminal-native")) {
         return workbenchSmokeFailure("component gallery")
     }
+    let badgeApp = WorkbenchApp()
+    badgeApp.paused = true
+    let badgeInitial = runWorkbenchScenario(badgeApp, TestScenario()
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.Right))
+        .key(KeyEvent(KeyCode.Right))
+        .key(KeyEvent(KeyCode.Right))
+        .key(KeyEvent(KeyCode.Right))
+        .key(KeyEvent(KeyCode.Right))
+        .render())
+    if (!badgeInitial.passed || badgeApp.galleryTabs.selected != 5 ||
+        !badgeInitial.lastSnapshot().contains("[Toasts: 0]")) {
+        return workbenchSmokeFailure("Badge feedback sample")
+    }
+    let badgeArea = workbenchGalleryAreas(badgeApp.layout.galleryContent, 5).badge
+    let badgeClick = runWorkbenchScenario(badgeApp, TestScenario()
+        .event(Event.Mouse(MouseEvent(
+            MouseKind.Down, MouseButton.Left, badgeArea.x, badgeArea.y)))
+        .render())
+    if (!badgeClick.passed || badgeApp.toastManager.count() != 0) {
+        return workbenchSmokeFailure("Badge remains display-only")
+    }
+    let badgeTriggered = runWorkbenchScenario(badgeApp, TestScenario()
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.Enter))
+        .render())
+    if (!badgeTriggered.passed || badgeApp.toastManager.count() != 1 ||
+        !badgeTriggered.lastSnapshot().contains("[Toasts: 1]")) {
+        return workbenchSmokeFailure("Badge follows toast data")
+    }
+
     let forms = runWorkbenchScenario(app, TestScenario()
         .key(KeyEvent(KeyCode.Tab))
         .key(KeyEvent(KeyCode.Right))
