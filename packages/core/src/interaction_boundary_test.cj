@@ -359,4 +359,125 @@ class InteractionBoundaryTest {
         @Expect(widgetRowAt(down, area, 9, 10).isNone())
         @Expect(widgetRowAt(down, area, 8, 10), Some(9))
     }
+
+    @TestCase
+    func semanticToastsPatchThemeRolesAndPreserveLegacyStyles(): Unit {
+        let theme = Theme(
+            success: Style(fg: Color.Green),
+            warning: Style(fg: Color.Yellow),
+            error: Style(fg: Color.Red),
+            info: Style(fg: Color.Cyan)
+        )
+        let success = Toast("saved", kind: Some(ToastKind.Success))
+        let warning = Toast("review", kind: Some(ToastKind.Warning), style: Style(bg: Color.Blue))
+        let error = Toast("failed", kind: Some(ToastKind.Error))
+        let info = Toast("ready", kind: Some(ToastKind.Info))
+        @Expect(success.message, "saved")
+        @Expect(success.kind.isSome(), true)
+
+        let area = Rect(0, 0, 12, 4)
+        let buffer = Buffer(area)
+        buffer.fill(area, Cell("q", style: Style(fg: Color.White, bg: Color.Black)))
+        let manager = ToastManager(
+            toasts: [success, warning, error, info],
+            theme: Some(theme)
+        )
+        manager.render(area, buffer)
+        @Expect(buffer.getCell(0, 0).symbol, "+")
+        @Expect(buffer.getCell(2, 0).symbol, "s")
+        @Expect(buffer.getCell(0, 0).style, theme.success)
+        @Expect(buffer.getCell(0, 1).symbol, "!")
+        @Expect(buffer.getCell(0, 1).style, theme.warning.patch(Style(bg: Color.Blue)))
+        @Expect(buffer.getCell(0, 2).symbol, "x")
+        @Expect(buffer.getCell(0, 2).style, theme.error)
+        @Expect(buffer.getCell(0, 3).symbol, "i")
+        @Expect(buffer.getCell(0, 3).style, theme.info)
+        @Expect(buffer.getCell(11, 0).symbol, " ")
+        @Expect(buffer.getCell(11, 0).style, theme.success)
+
+        manager.setTheme(Some(Theme(success: Style(fg: Color.Blue))))
+        let rethemed = Buffer(area)
+        manager.render(area, rethemed)
+        @Expect(rethemed.getCell(0, 0).style, Style(fg: Color.Blue))
+
+        let legacy = Toast("legacy")
+        @Expect(legacy.kind.isNone(), true)
+        let legacyBuffer = Buffer(Rect(0, 0, 10, 1))
+        ToastManager(toasts: [legacy], theme: Some(theme)).render(legacyBuffer.area, legacyBuffer)
+        @Expect(legacyBuffer.getCell(0, 0).symbol, "l")
+        @Expect(
+            legacyBuffer.getCell(0, 0).style,
+            Style(fg: Color.Black, bg: Color.Yellow)
+        )
+    }
+
+    @TestCase
+    func toastCapacityKeepsNewestRowsAndTickPreservesSemanticState(): Unit {
+        let theme = Theme(
+            warning: Style(fg: Color.Yellow),
+            error: Style(fg: Color.Red)
+        )
+        let manager = ToastManager(maxToasts: Some(2), theme: Some(theme))
+        manager.push(Toast("A", ttl: 4))
+        manager.push(Toast("B", kind: Some(ToastKind.Warning), ttl: 2))
+        manager.push(Toast("Charlie", kind: Some(ToastKind.Error), ttl: 2))
+        @Expect(manager.count(), 2)
+
+        let area = Rect(0, 0, 5, 2)
+        let buffer = Buffer(area)
+        buffer.fill(area, Cell("q"))
+        manager.render(area, buffer)
+        @Expect(buffer.getCell(0, 0).symbol, "!")
+        @Expect(buffer.getCell(2, 0).symbol, "B")
+        @Expect(buffer.getCell(4, 0).symbol, " ")
+        @Expect(buffer.getCell(4, 0).style, theme.warning)
+        @Expect(buffer.getCell(0, 1).symbol, "x")
+        @Expect(buffer.getCell(4, 1).symbol, "a")
+
+        manager.tick()
+        @Expect(manager.count(), 2)
+        let afterOneTick = Buffer(area)
+        manager.render(area, afterOneTick)
+        @Expect(afterOneTick.getCell(0, 0).symbol, "!")
+        @Expect(afterOneTick.getCell(0, 1).symbol, "x")
+        manager.tick()
+        @Expect(manager.count(), 0)
+    }
+
+    @TestCase
+    func toastIgnoresExpiredEntriesAndClampsCapacityToZero(): Unit {
+        let expired = ToastManager(toasts: [Toast("zero", ttl: 0), Toast("negative", ttl: -1)])
+        @Expect(expired.count(), 0)
+        expired.push(Toast("also expired", ttl: 0))
+        @Expect(expired.count(), 0)
+
+        let zeroCapacity = ToastManager(
+            toasts: [Toast("initial", ttl: 2)],
+            maxToasts: Some(-3)
+        )
+        zeroCapacity.push(Toast("capacity", ttl: 2))
+        @Expect(zeroCapacity.count(), 0)
+        let blank = Buffer(Rect(0, 0, 8, 1))
+        zeroCapacity.render(blank.area, blank)
+        @Expect(blank.getCell(0, 0).symbol, " ")
+
+        let preloaded = ToastManager(
+            toasts: [
+                Toast("expired", ttl: 0),
+                Toast("A"),
+                Toast("B"),
+                Toast("C")
+            ],
+            maxToasts: Some(2)
+        )
+        @Expect(preloaded.count(), 2)
+        let retainedRows = Buffer(Rect(0, 0, 4, 2))
+        preloaded.render(retainedRows.area, retainedRows)
+        @Expect(retainedRows.getCell(0, 0).symbol, "B")
+        @Expect(retainedRows.getCell(0, 1).symbol, "C")
+
+        let unbounded = ToastManager()
+        for (index in 0..4) { unbounded.push(Toast("item-${index}")) }
+        @Expect(unbounded.count(), 4)
+    }
 }

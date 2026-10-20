@@ -343,28 +343,85 @@ public class CommandPalette <: Widget {
     }
 }
 
+public enum ToastKind {
+    | Success
+    | Warning
+    | Error
+    | Info
+}
+
 public class Toast {
     public let message: String
     public let ttl: Int64
     public let style: Style
+    public let kind: ?ToastKind
 
     public init(message: String, ttl!: Int64 = 3, style!: Style = Style(fg: Color.Black, bg: Color.Yellow)) {
         this.message = message
         this.ttl = max(0, ttl)
         this.style = style
+        this.kind = None
+    }
+
+    public init(
+        message: String,
+        kind!: ?ToastKind,
+        ttl!: Int64 = 3,
+        style!: Style = Style.default()
+    ) {
+        this.message = message
+        this.ttl = max(0, ttl)
+        this.style = style
+        this.kind = kind
     }
 }
 
 public class ToastManager <: Widget {
     private let toasts = ArrayList<Toast>()
+    private let maxToasts: ?Int64
+    private var theme: ?Theme
 
-    public init(toasts!: Array<Toast> = []) {
-        for (toast in toasts) {
-            this.toasts.add(toast)
+    public init(
+        toasts!: Array<Toast> = [],
+        maxToasts!: ?Int64 = None,
+        theme!: ?Theme = None
+    ) {
+        this.maxToasts = match (maxToasts) {
+            case Some(limit) => Some(max(0, limit))
+            case None => None
+        }
+        this.theme = theme
+
+        if (let Some(limit) <- this.maxToasts) {
+            if (limit > 0) {
+                var liveCount: Int64 = 0
+                for (toast in toasts) {
+                    if (toast.ttl > 0) { liveCount++ }
+                }
+                var skipped = max(0, liveCount - limit)
+                for (toast in toasts) {
+                    if (toast.ttl > 0) {
+                        if (skipped > 0) {
+                            skipped--
+                        } else {
+                            this.toasts.add(toast)
+                        }
+                    }
+                }
+            }
+        } else {
+            for (toast in toasts) {
+                if (toast.ttl > 0) { this.toasts.add(toast) }
+            }
         }
     }
 
     public func push(toast: Toast): Unit {
+        if (toast.ttl <= 0) { return }
+        if (let Some(limit) <- maxToasts) {
+            if (limit == 0) { return }
+            if (toasts.size >= limit) { toasts.remove(at: 0) }
+        }
         toasts.add(toast)
     }
 
@@ -372,15 +429,28 @@ public class ToastManager <: Widget {
         toasts.size
     }
 
+    public func setTheme(theme: ?Theme): Unit {
+        this.theme = theme
+    }
+
     public func tick(): Unit {
-        let kept = ArrayList<Toast>()
-        for (toast in toasts) {
+        var writeIndex: Int64 = 0
+        let originalCount = toasts.size
+        for (readIndex in 0..originalCount) {
+            let toast = toasts[readIndex]
             if (toast.ttl > 1) {
-                kept.add(Toast(toast.message, ttl: toast.ttl - 1, style: toast.style))
+                toasts[writeIndex] = Toast(
+                    toast.message,
+                    kind: toast.kind,
+                    ttl: toast.ttl - 1,
+                    style: toast.style
+                )
+                writeIndex++
             }
         }
-        while (toasts.size > 0) { toasts.remove(at: 0) }
-        for (toast in kept) { toasts.add(toast) }
+        while (toasts.size > writeIndex) {
+            toasts.remove(at: toasts.size - 1)
+        }
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
@@ -388,22 +458,61 @@ public class ToastManager <: Widget {
         let rows = min(area.height, toasts.size)
         for (i in 0..rows) {
             let toast = toasts[toasts.size - rows + i]
-            buffer.setString(area.x, area.y + i, truncate(toast.message, area.width), style: toast.style)
+            let y = area.y + i
+            let style = resolvedStyle(toast)
+            let text = match (toast.kind) {
+                case Some(kind) => marker(kind) + " " + toast.message
+                case None => toast.message
+            }
+            buffer.fillLine(y, area.x, area.width, style: style)
+            buffer.setString(area.x, y, truncate(text, area.width), style: style)
+        }
+    }
+
+    private func resolvedStyle(toast: Toast): Style {
+        match ((toast.kind, theme)) {
+            case (Some(kind), Some(currentTheme)) => semanticStyle(currentTheme, kind).patch(toast.style)
+            case (Some(_), None) => Style(fg: Color.Black, bg: Color.Yellow).patch(toast.style)
+            case _ => toast.style
+        }
+    }
+
+    private func semanticStyle(currentTheme: Theme, kind: ToastKind): Style {
+        match (kind) {
+            case ToastKind.Success => currentTheme.success
+            case ToastKind.Warning => currentTheme.warning
+            case ToastKind.Error => currentTheme.error
+            case ToastKind.Info => currentTheme.info
+        }
+    }
+
+    private func marker(kind: ToastKind): String {
+        match (kind) {
+            case ToastKind.Success => "+"
+            case ToastKind.Warning => "!"
+            case ToastKind.Error => "x"
+            case ToastKind.Info => "i"
         }
     }
 }
 
+/** 按指定帧显示“|”“/”“-”“\”之一，并可在其后显示标签；绘制本身不推进帧。
+ */
 public class Spinner <: Widget {
     private let label: String
     private let frame: Int64
     private let style: Style
 
+    /** 创建带标签、帧序号和样式的旋转指示符；负帧序号按 0 保存。
+     */
     public init(label!: String = "", frame!: Int64 = 0, style!: Style = Style(fg: Color.Cyan)) {
         this.label = label
         this.frame = max(0, frame)
         this.style = style
     }
 
+    /** 在区域左上角绘制由帧序号选出的符号及非空标签，文字按区域宽度截断；宽或高不为正时不绘制。
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let frames = ["|", "/", "-", "\\"]

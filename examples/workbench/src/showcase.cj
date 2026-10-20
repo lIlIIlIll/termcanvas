@@ -56,7 +56,7 @@ func galleryCategoryDescription(category: Int64): String {
         case 1 => "Rounded Unicode panels, borderless surfaces, and an ASCII fallback toggle."
         case 2 => "Tab to controls; type in the focused field, toggle the checkbox, or change the select."
         case 4 => "Select Table, List, or Progress; rows and viewport state persist between samples."
-        case 5 => "Each severity uses the shared ToastManager and its existing three-second lifetime."
+        case 5 => "Semantic severity markers use Theme roles and the shared three-second toast lifetime."
         case 6 => "Open a real confirmation; Escape closes it, Tab moves between actions."
         case _ => "Switch dark/light and accent; preview only the terminal's actual or lower color tier."
     }

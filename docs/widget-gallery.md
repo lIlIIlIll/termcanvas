@@ -30,7 +30,8 @@ and remains interactive at `80×24`, adapting panel content to available cells.
 
 The data gallery uses task progress in hundredths of a percent (`0..10000`) for
 both its label and `Gauge`; `0.83%` is therefore a small fraction, not 83% of the
-bar. Toast examples use the Workbench's shared `ToastManager` and tick lifecycle.
+bar. Toast examples use semantic severity kinds and Theme roles; the Workbench's
+existing 3000 ms application clock remains the only lifetime source.
 
 The Data category exposes Table, List, and Progress samples through a `Tabs`
 selector. Switching samples preserves separate table/list selections, and only
@@ -132,8 +133,9 @@ not used as evidence; no metadata has been backfilled.
 - `MenuBar` navigates horizontal menu labels.
 - `Menu` and `CommandPalette` return optional action strings from `handle`; map
   those strings to `Command.Message` or another `Command` in update.
-- `ToastManager` renders short-lived notifications; call `tick()` from the
-  application's `Event.Tick(TickEvent)` handling to age them.
+- `ToastManager` renders semantic markers and Theme roles. The Workbench ages
+  its toasts with its existing 3000 ms application clock and rebuilds the
+  remaining tick-count TTL; it does not call `tick()` as a second timer.
 - `Spinner` renders lightweight progress.
 - `Dialog` renders centered overlay content.
 - `FileDialog`, `ConfirmDialog`, and `ColorPicker` support common application

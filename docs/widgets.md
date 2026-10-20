@@ -60,7 +60,9 @@ from the resulting state.
   Explicit selected styles remain authoritative; disabled items use
   `disabledStyle`; missing results show `No matches` and cannot activate.
   Without a theme, the default disabled style uses indexed color 8.
-- `ToastManager`: short-lived notifications; `tick()` ages them.
+- `ToastManager`: theme-aware semantic notifications; it preserves `kind=None`
+  styles, draws stable markers, and can cap the queue while retaining newest
+  rows. `tick()` advances positive TTL values in tick-count units.
 - `Spinner`: lightweight progress animation.
 - `Dialog`: centered buttons with optional semantic themes. No-theme rendering
   remains unchanged; explicit selected styles win, and public selection is
@@ -217,8 +219,20 @@ lifecycle host, or overlay stack. `KeyMap` remains STABLE application policy.
 
 `Menu` and `CommandPalette` return action strings from `handle`. Map those
 strings to `Command.Message` (or another command) inside update when using
-`App.runWithCommands()`. Call `ToastManager.tick()` from the application's
-`Event.Tick(TickEvent)` handling when notifications should age.
+`App.runWithCommands()`.
+
+`Toast` retains the legacy `Toast(message, ttl:, style:)` constructor, its
+black/yellow default, and unmarked `kind=None` rendering. Semantic notices use
+`Toast(message, kind: Some(ToastKind.Success))`; the stored message remains
+unchanged. A themed manager renders `+`, `!`, `x`, or `i`, then patches the
+matching Theme role with the toast's explicit style. Without a theme, semantic
+notices use the black/yellow base; `kind=None` always uses stored style.
+`setTheme` updates existing notices. `maxToasts: None` is unbounded; `Some(n)` clamps at
+zero and evicts oldest notices. Notices with `ttl <= 0` are ignored; each
+`tick()` reduces remaining TTL by one tick. The manager fills each displayed
+row, truncates messages to width, and renders only the latest visible rows.
+Call `ToastManager.tick()` from the application's `Event.Tick(TickEvent)`
+handling when notifications should age.
 
 The exact stability tier of each declaration is defined by
 [`api-inventory.json`](api-inventory.json), not by this page or by its package

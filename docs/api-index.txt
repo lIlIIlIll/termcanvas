@@ -428,34 +428,42 @@ packages/core/src/command_widgets.cj:209:public func paste(text: String): Unit
 packages/core/src/command_widgets.cj:214:public func handle(key: KeyEvent): ?String
 packages/core/src/command_widgets.cj:245:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/command_widgets.cj:268:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/command_widgets.cj:346:public class Toast {
-packages/core/src/command_widgets.cj:347:public let message: String
-packages/core/src/command_widgets.cj:348:public let ttl: Int64
-packages/core/src/command_widgets.cj:349:public let style: Style
-packages/core/src/command_widgets.cj:351:public init(message: String, ttl!: Int64 = 3, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
-packages/core/src/command_widgets.cj:358:public class ToastManager <: Widget {
-packages/core/src/command_widgets.cj:361:public init(toasts!: Array<Toast> = [])
-packages/core/src/command_widgets.cj:367:public func push(toast: Toast): Unit
-packages/core/src/command_widgets.cj:371:public func count(): Int64
-packages/core/src/command_widgets.cj:375:public func tick(): Unit
-packages/core/src/command_widgets.cj:386:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/command_widgets.cj:396:public class Spinner <: Widget {
-packages/core/src/command_widgets.cj:401:public init(label!: String = "", frame!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
-packages/core/src/command_widgets.cj:407:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/command_widgets.cj:415:public class Dialog <: Widget {
-packages/core/src/command_widgets.cj:419:public var selected: Int64
-packages/core/src/command_widgets.cj:426:public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
-packages/core/src/command_widgets.cj:449:public func setTheme(theme: ?Theme): Unit
-packages/core/src/command_widgets.cj:453:public func handle(key: KeyEvent): ?String
-packages/core/src/command_widgets.cj:468:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
-packages/core/src/command_widgets.cj:489:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/command_widgets.cj:522:public class ConfirmDialog <: Widget {
-packages/core/src/command_widgets.cj:524:public var confirmed: Bool = false
-packages/core/src/command_widgets.cj:526:public init( message: String, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
-packages/core/src/command_widgets.cj:544:public func setTheme(theme: ?Theme): Unit
-packages/core/src/command_widgets.cj:548:public func handle(key: KeyEvent): ?Bool
-packages/core/src/command_widgets.cj:568:public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
-packages/core/src/command_widgets.cj:577:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/command_widgets.cj:346:public enum ToastKind {
+packages/core/src/command_widgets.cj:347:Success
+packages/core/src/command_widgets.cj:348:Warning
+packages/core/src/command_widgets.cj:349:Error
+packages/core/src/command_widgets.cj:350:Info
+packages/core/src/command_widgets.cj:353:public class Toast {
+packages/core/src/command_widgets.cj:354:public let message: String
+packages/core/src/command_widgets.cj:355:public let ttl: Int64
+packages/core/src/command_widgets.cj:356:public let style: Style
+packages/core/src/command_widgets.cj:357:public let kind: ?ToastKind
+packages/core/src/command_widgets.cj:359:public init(message: String, ttl!: Int64 = 3, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+packages/core/src/command_widgets.cj:366:public init( message: String, kind!: ?ToastKind, ttl!: Int64 = 3, style!: Style = Style.default() )
+packages/core/src/command_widgets.cj:379:public class ToastManager <: Widget {
+packages/core/src/command_widgets.cj:384:public init( toasts!: Array<Toast> = [], maxToasts!: ?Int64 = None, theme!: ?Theme = None )
+packages/core/src/command_widgets.cj:419:public func push(toast: Toast): Unit
+packages/core/src/command_widgets.cj:428:public func count(): Int64
+packages/core/src/command_widgets.cj:432:public func setTheme(theme: ?Theme): Unit
+packages/core/src/command_widgets.cj:436:public func tick(): Unit
+packages/core/src/command_widgets.cj:456:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/command_widgets.cj:501:public class Spinner <: Widget {
+packages/core/src/command_widgets.cj:508:public init(label!: String = "", frame!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
+packages/core/src/command_widgets.cj:516:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/command_widgets.cj:524:public class Dialog <: Widget {
+packages/core/src/command_widgets.cj:528:public var selected: Int64
+packages/core/src/command_widgets.cj:535:public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+packages/core/src/command_widgets.cj:558:public func setTheme(theme: ?Theme): Unit
+packages/core/src/command_widgets.cj:562:public func handle(key: KeyEvent): ?String
+packages/core/src/command_widgets.cj:577:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
+packages/core/src/command_widgets.cj:598:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/command_widgets.cj:631:public class ConfirmDialog <: Widget {
+packages/core/src/command_widgets.cj:633:public var confirmed: Bool = false
+packages/core/src/command_widgets.cj:635:public init( message: String, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+packages/core/src/command_widgets.cj:653:public func setTheme(theme: ?Theme): Unit
+packages/core/src/command_widgets.cj:657:public func handle(key: KeyEvent): ?Bool
+packages/core/src/command_widgets.cj:677:public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
+packages/core/src/command_widgets.cj:686:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/container_widgets.cj:5:public class VBox <: Widget {
 packages/core/src/container_widgets.cj:10:public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())
 packages/core/src/container_widgets.cj:16:public func render(area: Rect, buffer: Buffer): Unit

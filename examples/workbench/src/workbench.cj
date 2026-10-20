@@ -125,7 +125,7 @@ class WorkbenchApp {
     private let tickChangedIds = ArrayList<Int64>()
     private let toastAges = ArrayList<Int64>()
     private var logFollowTail: Bool = true
-    var toastManager: ToastManager = ToastManager()
+    var toastManager: ToastManager = ToastManager(maxToasts: Some(8))
 
     init() {
         interaction = ModalFocusState(focus, keymap: KeyMap(bindings: [
@@ -1314,7 +1314,7 @@ class WorkbenchApp {
             model = WorkbenchModel()
             toastAges.clear()
             toastItems.clear()
-            toastManager = ToastManager()
+            toastManager = ToastManager(maxToasts: Some(8), theme: Some(theme))
             logFollowTail = true
             logScroll.offset = 0
             recordActivity("Local demo initialized: 120 tasks")
@@ -1740,6 +1740,7 @@ class WorkbenchApp {
         helpDialog.setTheme(Some(theme))
         resetDialog.setTheme(Some(theme))
         demoResetDialog.setTheme(Some(theme))
+        toastManager.setTheme(Some(theme))
     }
 
     func actualColorTier(): Int64 {
@@ -1781,31 +1782,25 @@ class WorkbenchApp {
 
 
     private func pushToast(message: String, success: Bool): Unit {
-        pushStyledToast(message, if (success) { theme.success } else { theme.error })
+        pushSemanticToast(message, if (success) { ToastKind.Success } else { ToastKind.Error })
     }
 
     private func pushGalleryToast(severity: String): Unit {
-        let symbol = match (severity) {
-            case "Success" => "+"
-            case "Warning" => "!"
-            case "Error" => "x"
-            case _ => "i"
+        let kind = match (severity) {
+            case "Success" => ToastKind.Success
+            case "Warning" => ToastKind.Warning
+            case "Error" => ToastKind.Error
+            case _ => ToastKind.Info
         }
-        let style = match (severity) {
-            case "Success" => theme.success
-            case "Warning" => theme.warning
-            case "Error" => theme.error
-            case _ => theme.info
-        }
-        pushStyledToast(symbol + " " + severity + " notification", style)
+        pushSemanticToast(severity + " notification", kind)
     }
 
-    private func pushStyledToast(message: String, style: Style): Unit {
-        if (toastItems.size >= 8) {
+    private func pushSemanticToast(message: String, kind: ToastKind): Unit {
+        while (toastItems.size >= 8) {
             toastItems.remove(at: 0)
             toastAges.remove(at: 0)
         }
-        toastItems.add(Toast(message, ttl: 3, style: style))
+        toastItems.add(Toast(message, kind: Some(kind), ttl: 3))
         toastAges.add(0)
         rebuildToastManager()
     }
@@ -1831,13 +1826,18 @@ class WorkbenchApp {
     }
 
     private func rebuildToastManager(): Unit {
-        let visible = ArrayList<Toast>()
+        let manager = ToastManager(maxToasts: Some(8), theme: Some(theme))
         for (index in 0..toastItems.size) {
             let toast = toastItems[index]
             let remaining = max(1, (3000 - toastAges[index] + 999) / 1000)
-            visible.add(Toast(toast.message, ttl: remaining, style: toast.style))
+            manager.push(Toast(
+                toast.message,
+                kind: toast.kind,
+                ttl: remaining,
+                style: toast.style
+            ))
         }
-        toastManager = ToastManager(toasts: visible.toArray())
+        toastManager = manager
     }
 
     private func recordActivity(message: String): Unit {

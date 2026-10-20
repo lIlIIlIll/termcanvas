@@ -428,15 +428,23 @@ packages/core/src/command_widgets.cj:public func paste(text: String): Unit
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?String
 packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/command_widgets.cj:public enum ToastKind {
+packages/core/src/command_widgets.cj:Success
+packages/core/src/command_widgets.cj:Warning
+packages/core/src/command_widgets.cj:Error
+packages/core/src/command_widgets.cj:Info
 packages/core/src/command_widgets.cj:public class Toast {
 packages/core/src/command_widgets.cj:public let message: String
 packages/core/src/command_widgets.cj:public let ttl: Int64
 packages/core/src/command_widgets.cj:public let style: Style
+packages/core/src/command_widgets.cj:public let kind: ?ToastKind
 packages/core/src/command_widgets.cj:public init(message: String, ttl!: Int64 = 3, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+packages/core/src/command_widgets.cj:public init( message: String, kind!: ?ToastKind, ttl!: Int64 = 3, style!: Style = Style.default() )
 packages/core/src/command_widgets.cj:public class ToastManager <: Widget {
-packages/core/src/command_widgets.cj:public init(toasts!: Array<Toast> = [])
+packages/core/src/command_widgets.cj:public init( toasts!: Array<Toast> = [], maxToasts!: ?Int64 = None, theme!: ?Theme = None )
 packages/core/src/command_widgets.cj:public func push(toast: Toast): Unit
 packages/core/src/command_widgets.cj:public func count(): Int64
+packages/core/src/command_widgets.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/command_widgets.cj:public func tick(): Unit
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class Spinner <: Widget {

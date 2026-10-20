@@ -308,6 +308,13 @@ class WorkbenchMotionRenderingTest {
             case Some(rects) => @Expect(rects.intersects(app.layout.toast), true)
             case None => @Expect(false)
         }
+        let backend = TestBackend(area: app.screen, captureSnapshots: false)
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        _ = terminal.draw { frame => app.render(frame) }
+        let buffer = backend.lastBuffer().getOrThrow()
+        @Expect(buffer.getCell(app.layout.toast.x, app.layout.toast.y).symbol, "+")
+        @Expect(buffer.getCell(app.layout.toast.x, app.layout.toast.y).style, app.theme.success)
+        @Expect(buffer.getCell(app.layout.toast.x + 2, app.layout.toast.y).symbol, "C")
 
         _ = app.update(Event.Tick(TickEvent(deltaMillis: 2999)))
         @Expect(app.toastManager.count(), 1)
@@ -566,7 +573,7 @@ class WorkbenchGalleryInteractionTest {
     }
 
     @TestCase
-    func feedbackUsesToastManagerLifecycleAndSeverityStyle(): Unit {
+    func feedbackToastCapacityAndAgesStaySynchronized(): Unit {
         let app = WorkbenchApp()
         app.paused = true
         workbenchGalleryKey(app, KeyCode.Tab)
@@ -574,7 +581,13 @@ class WorkbenchGalleryInteractionTest {
         @Expect(app.galleryTabs.selected, 5)
         workbenchGalleryKey(app, KeyCode.Tab)
         workbenchGalleryKey(app, KeyCode.Enter)
-        @Expect(app.toastManager.count(), 1)
+        for (_ in 0..7) { workbenchGalleryKey(app, KeyCode.Enter) }
+        @Expect(app.toastManager.count(), 8)
+
+        _ = app.update(Event.Tick(TickEvent(deltaMillis: 2999)))
+        @Expect(app.toastManager.count(), 8)
+        workbenchGalleryKey(app, KeyCode.Enter)
+        @Expect(app.toastManager.count(), 8)
 
         let rendered = TestScenario().render().run(
             { frame => app.render(frame) },
@@ -584,9 +597,18 @@ class WorkbenchGalleryInteractionTest {
         )
         @Expect(rendered.passed, true)
         @Assert(rendered.lastSnapshot().contains("+ Success notification"))
-        _ = app.update(Event.Tick(TickEvent(deltaMillis: 2999)))
-        @Expect(app.toastManager.count(), 1)
+        @Assert(!rendered.lastSnapshot().contains("+ + Success notification"))
+
         _ = app.update(Event.Tick(TickEvent(deltaMillis: 1)))
+        @Expect(app.toastManager.count(), 1)
+        let latest = TestScenario().render().run(
+            { frame => app.render(frame) },
+            { event => app.update(event) },
+            width: 120,
+            height: 36
+        )
+        @Assert(latest.lastSnapshot().contains("+ Success notification"))
+        _ = app.update(Event.Tick(TickEvent(deltaMillis: 2999)))
         @Expect(app.toastManager.count(), 0)
     }
 

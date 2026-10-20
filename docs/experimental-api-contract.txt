@@ -113,15 +113,23 @@ core|CommandPalette.paste|func|public func paste(text: String): Unit
 core|CommandPalette.handle|func|public func handle(key: KeyEvent): ?String
 core|CommandPalette.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|CommandPalette.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|ToastKind|enum|public enum ToastKind {
+core|ToastKind.Success|enum_constructor|Success
+core|ToastKind.Warning|enum_constructor|Warning
+core|ToastKind.Error|enum_constructor|Error
+core|ToastKind.Info|enum_constructor|Info
 core|Toast|class|public class Toast {
 core|Toast.message|let|public let message: String
 core|Toast.ttl|let|public let ttl: Int64
 core|Toast.style|let|public let style: Style
+core|Toast.kind|let|public let kind: ?ToastKind
 core|Toast.init|init|public init(message: String, ttl!: Int64 = 3, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+core|Toast.init|init|public init( message: String, kind!: ?ToastKind, ttl!: Int64 = 3, style!: Style = Style.default() )
 core|ToastManager|class|public class ToastManager <: Widget {
-core|ToastManager.init|init|public init(toasts!: Array<Toast> = [])
+core|ToastManager.init|init|public init( toasts!: Array<Toast> = [], maxToasts!: ?Int64 = None, theme!: ?Theme = None )
 core|ToastManager.push|func|public func push(toast: Toast): Unit
 core|ToastManager.count|func|public func count(): Int64
+core|ToastManager.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|ToastManager.tick|func|public func tick(): Unit
 core|ToastManager.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Spinner|class|public class Spinner <: Widget {
