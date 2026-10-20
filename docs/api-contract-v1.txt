@@ -1240,6 +1240,14 @@ packages/core/src/navigation.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/navigation.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/navigation.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/navigation.cj:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:public class SegmentedControl <: Widget {
+packages/core/src/navigation.cj:public var selected: Int64
+packages/core/src/navigation.cj:public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: Style = Style(fg: Color.Indexed(8)), focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )
+packages/core/src/navigation.cj:public func selectedValue(): ?String
+packages/core/src/navigation.cj:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/navigation.cj:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/navigation.cj:public class StatusBarProgress {
 packages/core/src/navigation.cj:public let value: Int64
 packages/core/src/navigation.cj:public let total: Int64
