@@ -35,3 +35,4 @@ docs/reviews/*/findings.json
 !architecture/consolidation-baseline.json
 !architecture/evidence-index.json
 !packages/core/tests/fixtures/file_picker/notes.txt
+!examples/workbench/screenshots/b00-capture-manifest.json

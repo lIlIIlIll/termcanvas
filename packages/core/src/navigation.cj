@@ -2,12 +2,20 @@ package core
 
 import std.collection.*
 
+/** 按顺序在一行绘制标签标题，以不同样式标示当前选中项；左右方向键可切换选中项。
+ */
 public class Tabs <: Widget {
     private let titles: Array<String>
+    /** 当前选中标签的索引，从 0 开始；构造时会限制在标题索引范围内，此字段也可直接修改。
+     */
     public var selected: Int64
     private let style: Style
     private let selectedStyle: Style
 
+    private var focused: Bool = false
+    private var firstVisible: Int64 = 0
+    /** 保存标签标题和两种绘制样式，并将初始选中索引限制在 0 到最后一个标题索引之间；没有标题时设为 0。
+     */
     public init(
         titles: Array<String>,
         selected!: Int64 = 0,
@@ -19,48 +27,105 @@ public class Tabs <: Widget {
         this.style = style
         this.selectedStyle = selectedStyle
     }
+    /** 设置当前标签栏是否具有焦点；聚焦时选中标签额外显示粗体和下划线。
+     */
+    public func setFocused(focused: Bool): Unit {
+        this.focused = focused
+    }
 
+    /** 左右方向键在非空标签列表中切换选中项并返回 true；空列表或其他按键返回 false。
+     */
     public func handle(key: KeyEvent): Bool {
+        if (titles.isEmpty()) { return false }
         match (key.code) {
             case KeyCode.Left =>
                 selected = max(0, selected - 1)
                 true
             case KeyCode.Right =>
-                selected = min(max(0, titles.size - 1), selected + 1)
+                selected = min(titles.size - 1, selected + 1)
                 true
             case _ => false
         }
     }
 
+    /** 按当前可见标签的字符单元格命中鼠标；标题截断或窄区域滚动后命中范围与实际显示一致。
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         if (!widgetHitTest(mouse, area) || mouse.y != area.y) { return false }
         match ((mouse.kind, mouse.button)) {
             case (MouseKind.Down, MouseButton.Left) =>
                 var x = area.x
-                for (i in 0..titles.size) {
-                    let width = displayWidth(" " + titles[i] + " ")
-                    if (mouse.x >= x && mouse.x - x < width) { selected = i; return true }
-                    x += width
+                let first = ensureSelectionVisible(area.width)
+                for (i in first..titles.size) {
+                    if (x >= area.right) { return false }
+                    let fullWidth = displayWidth(" " + titles[i] + " ")
+                    let visibleWidth = min(fullWidth, area.right - x)
+                    if (mouse.x >= x && mouse.x - x < visibleWidth) {
+                        selected = i
+                        _ = ensureSelectionVisible(area.width)
+                        return true
+                    }
+                    x += visibleWidth
+                    if (visibleWidth < fullWidth) { return false }
                 }
                 false
             case _ => false
         }
     }
 
+    /** 在区域首行绘制当前视口内的标签；选中标签使用选中样式，聚焦时再加粗并下划线，窄区域自动截断并滚动到选中项。
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
 
     private func renderClipped(area: Rect, buffer: Buffer): Unit {
-        if (area.width <= 0 || area.height <= 0) { return }
+        if (area.width <= 0 || area.height <= 0 || titles.isEmpty()) { return }
         var x = area.x
-        for (i in 0..titles.size) {
+        let first = ensureSelectionVisible(area.width)
+        for (i in first..titles.size) {
             if (x >= area.right) { return }
-            let text = " " + titles[i] + " "
-            let active = i == selected
-            buffer.setString(x, area.y, truncate(text, area.right - x), style: if (active) { selectedStyle } else { style })
-            x += displayWidth(text)
+            let full = " " + titles[i] + " "
+            let text = truncate(full, area.right - x)
+            let visibleWidth = displayWidth(text)
+            var itemStyle = if (i == selected) { selectedStyle } else { style }
+            if (i == selected && focused) {
+                var modifier = itemStyle.modifier
+                modifier.bold = true
+                modifier.underline = true
+                itemStyle = itemStyle.withModifier(modifier)
+            }
+            buffer.setString(x, area.y, text, style: itemStyle)
+            let fullWidth = displayWidth(full)
+            x += visibleWidth
+            if (visibleWidth < fullWidth) { return }
         }
+    }
+
+    private func ensureSelectionVisible(width: Int64): Int64 {
+        if (titles.isEmpty()) {
+            firstVisible = 0
+            return 0
+        }
+        selected = clamp(selected, 0, titles.size - 1)
+        if (width <= 0) {
+            firstVisible = selected
+            return firstVisible
+        }
+        var first = selected
+        var used = displayWidth(" " + titles[selected] + " ")
+        if (used > width) {
+            firstVisible = selected
+            return firstVisible
+        }
+        while (first > 0) {
+            let previousWidth = displayWidth(" " + titles[first - 1] + " ")
+            if (previousWidth > width - used) { break }
+            used += previousWidth
+            first--
+        }
+        firstVisible = first
+        firstVisible
     }
 }
 

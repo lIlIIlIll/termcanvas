@@ -115,9 +115,11 @@ main(): Int64 {
 | PTY、终端转录与 diff | [`terminal_lab`](examples/terminal_lab/) |
 | 媒体协议与回退 | [`media_gallery`](examples/media_gallery/) |
 | 压力与规模验证 | [`game_pressure_suite`](examples/game_pressure_suite/) |
+| 本地终端工作台 | [workbench](examples/workbench/) |
 
-完整目录包含 17 个示例：8 个推荐应用、2 个实验应用、6 个功能演示和 1 个
-压力/证明工作负载。查看[示例目录](docs/examples.md)了解每个示例的用途。
+The complete catalog contains 18 examples: 9 recommended applications, 2
+experimental applications, 6 feature demonstrations, and 1 proof workload.
+See the [example catalog](docs/examples.md) for each example's purpose.
 
 从仓库根目录运行单个示例：
 

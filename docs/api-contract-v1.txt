@@ -1211,6 +1211,7 @@ packages/core/src/media.cj:public func mediaProtocolName(protocol: MediaProtocol
 packages/core/src/navigation.cj:public class Tabs <: Widget {
 packages/core/src/navigation.cj:public var selected: Int64
 packages/core/src/navigation.cj:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/navigation.cj:public func setFocused(focused: Bool): Unit
 packages/core/src/navigation.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/navigation.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/navigation.cj:public func render(area: Rect, buffer: Buffer): Unit

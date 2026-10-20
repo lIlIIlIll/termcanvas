@@ -49,6 +49,17 @@ let report = TestScenario()
 @Expect(report.lastSnapshot().contains("hello 世界"))
 ```
 
+## In-repository downstream example
+
+[`examples/workbench`](../examples/workbench/) is an application-level consumer
+with explicit `core` and `cjtui_testing` path dependencies. Its tests combine
+`TestScenario` workflows with `TestBackend` assertions. They verify that Data
+sample changes preserve selection and focus at `80×24`, `120×36`, and `160×45`,
+that a clicked visible List row matches the rendered selection, and that the
+progress tick's partial frame matches a full render. These headless assertions
+do not establish native terminal behavior; see the [Gallery capture
+record](widget-gallery.md#capture-evidence).
+
 Snapshot tests exercise application state and rendering. They do not verify
 native terminal mode, OS input delivery, clipboard availability, PTY process
 creation, or a real terminal's image support. For deterministic asynchronous

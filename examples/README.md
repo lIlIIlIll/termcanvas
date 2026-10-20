@@ -1,6 +1,6 @@
 # Examples
 
-This index sits beside the 17 example directories. Use
+This index sits beside the 18 example directories. Use
 [`docs/examples.md`](../docs/examples.md) to choose an example by learning goal;
 use this page when you are already working in `examples/`.
 
@@ -30,7 +30,7 @@ CANGJIE_SDK_ROOT=/path/to/cangjie ../scripts/build_examples.sh
 The runnable starter application is also available at
 [`templates/basic_app`](../templates/basic_app/).
 
-## Recommended applications (8)
+## Recommended applications (9)
 
 - [`taskpad`](taskpad/): task board with input, `KeyMap`, command palette, and toasts.
 - [`form_studio`](form_studio/): forms, focus routing, paste, and common controls.
@@ -40,6 +40,9 @@ The runnable starter application is also available at
 - [`command_center`](command_center/): async tasks, timers, dialogs, spinner, and toasts.
 - [`assistant_console`](assistant_console/): transcript, composer, activity timeline, and dialogs.
 - [`oh_my_pi_skin`](oh_my_pi_skin/): terminal-native canvas skin with timed regions.
+- [`workbench`](workbench/): local workbench with a component-showcase landing page,
+  common widget previews, a status dashboard, progress history, ready-queue
+  preview, search/filtering, editing, resets, settings, and bounded animation.
 
 ## Experimental applications (2)
 

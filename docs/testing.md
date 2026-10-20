@@ -8,7 +8,7 @@ check fails. The layers are deliberately different:
 
 1. package/core unit tests prove local behavior.
 2. Headless scripts and snapshots prove deterministic application workflows.
-3. All 17 current official examples are built and smoked against their machine
+3. All 18 current official examples are built and smoked against their machine
    inventory.
 4. API, architecture, and fitness validators enforce classified surface and
    permanent invariants.
@@ -129,7 +129,12 @@ The repository's additional workflow commands are:
 - `scripts/generate_api_index.sh`
 - `packages/example_smoke` through `scripts/release_gate.sh` for four core component compositions: `Composer`, `CommandPalette`, `RequestDialog`, and `VirtualTable`.
 - Every example package that contains `src/*_test.cj` is discovered and run by `scripts/release_gate.sh`; these tests exercise the corresponding application package.
-- `scripts/test_examples.sh` checks the example inventory and source expectations, then runs CLI headless smoke for `btm_clone`, `media_gallery`, and `game_demo`.
+- `scripts/test_examples.sh` checks the example inventory and source expectations,
+  then runs CLI headless smoke for `btm_clone`, `media_gallery`, `game_demo`,
+  and `workbench`.
+- `examples/workbench` tests cover Gallery sample routing, focus restoration,
+  responsive sizes, hit-testing/render parity, and partial/full frame equality.
+  Native capture evidence is tracked in `docs/widget-gallery.md`.
 - `python3 scripts/test_windows_smoke.py` validates Windows runner generation and shared-file restoration with local command doubles; it does not start a Windows VM.
 - `python3 scripts/test_resolve_nightly_sdk.py` validates SDK candidate selection with local manifest and response fixtures; it does not download an SDK.
 - `scripts/run_windows_smoke.sh` provides Windows VM package smoke and game pressure build coverage of the staged current checkout.

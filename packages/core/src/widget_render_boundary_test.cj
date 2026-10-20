@@ -132,6 +132,29 @@ class WidgetRenderBoundaryTest {
         @Expect(!Tabs([]).handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 3, 3), area))
         @Expect(tabs.selected, 1)
     }
+    @TestCase
+    func tabsScrollAndTruncateWithMatchingMouseHitAreas(): Unit {
+        let tabs = Tabs(["Overview", "Layout", "Forms", "Long navigation"], selected: 3,
+            style: Style(fg: Color.Indexed(8)), selectedStyle: Style(fg: Color.White, bg: Color.Blue))
+        tabs.setFocused(true)
+        let area = Rect(2, 2, 5, 2)
+        let buffer = renderBoundarySentinels()
+        tabs.render(area, buffer)
+        @Expect(buffer.getCell(2, 2).style.modifier.bold)
+        @Expect(buffer.getCell(2, 2).style.modifier.underline)
+        @Expect(tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 6, 2), area))
+        @Expect(tabs.selected, 3)
+        @Expect(renderBoundaryOutsideChanges(buffer, area), 0)
+
+        tabs.selected = 2
+        let narrow = Rect(3, 4, 1, 1)
+        let narrowBuffer = renderBoundarySentinels()
+        tabs.render(narrow, narrowBuffer)
+        @Expect(tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 3, 4), narrow))
+        @Expect(tabs.selected, 2)
+        @Expect(renderBoundaryOutsideChanges(narrowBuffer, narrow), 0)
+        @Expect(!Tabs([]).handle(KeyEvent(KeyCode.Left)))
+    }
 
     @TestCase
     func verticalIndeterminateProgressMovesAndWrapsWithinItsArea(): Unit {

@@ -1,7 +1,7 @@
 # Examples
 
 Use this page to choose an example by the part of `cjtui` you want to learn. All
-17 current examples are grouped by support and purpose; the links open their
+18 current examples are grouped by support and purpose; the links open their
 source directories. For the directory-local index and commands, see
 [`examples/README.md`](../examples/README.md).
 
@@ -22,7 +22,7 @@ example set instead of launching one application:
 CANGJIE_SDK_ROOT=/path/to/cangjie scripts/build_examples.sh
 ```
 
-## Recommended applications (8)
+## Recommended applications (9)
 
 These are the best starting points for application-shaped code on the primary
 application-owned state → `App`/`update` → immediate `Widget` path.
@@ -43,6 +43,10 @@ application-owned state → `App`/`update` → immediate `Widget` path.
   activity timeline, and request/decision dialogs.
 - [`oh_my_pi_skin`](../examples/oh_my_pi_skin/): terminal-native skin with canvas,
   transcript, composer, palette, status line, and timed regions.
+- [`workbench`](../examples/workbench/): local workbench with a component-showcase
+  landing page for common controls, tables, trees, palettes, dialogs, notifications,
+  progress, tabs, and themes; retains the task dashboard, search/filtering, editing,
+  resets, settings, and bounded motion.
 
 ## Experimental applications (2)
 
@@ -86,6 +90,21 @@ Create a new example scaffold from the repository root:
 ```bash
 scripts/new_example.sh my_example
 ```
+
+Run the integrated local workbench or its deterministic headless smoke:
+
+```bash
+CANGJIE_SDK_ROOT=/path/to/cangjie \
+  scripts/cangjie_cmd.sh examples/workbench cjpm run
+
+CANGJIE_SDK_ROOT=/path/to/cangjie \
+  scripts/cangjie_cmd.sh examples/workbench cjpm run -- --headless-smoke
+```
+
+The interactive application displays a 120-task local dataset. The smoke mode
+drives the same update and render functions without opening a terminal.
+
+Successful smoke mode prints `workbench headless smoke ok`.
 
 Run Markdown Studio with its built-in Markdown sample. The editor and preview
 both color the `main`, `Int64`, and `0` tokens in its `cj` code block:

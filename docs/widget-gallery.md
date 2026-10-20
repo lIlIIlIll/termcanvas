@@ -7,6 +7,57 @@ Use this page to scan the available immediate widgets by job, then read
 renders into an area supplied by the application; derive those areas with
 [`layout.md`](layout.md) and apply input in the `App` update path.
 
+## Interactive Workbench Gallery
+
+Run the live gallery from the repository root with the configured Cangjie SDK:
+
+```bash
+scripts/cangjie_cmd.sh examples/workbench cjpm run
+```
+
+The Workbench opens in the Graphite / Cyan theme. `Tab` enters category
+navigation; Left/Right changes categories; Tab then reaches the category's real
+controls. Mouse clicks use the same widget hit regions. `F2` opens the existing
+command palette, `F3` changes Workbench pages, and `Esc` closes overlays. The
+Forms page demonstrates normal, focused, error, and disabled control states;
+Themes switches Dark/Light and the accent; Layout toggles ASCII border fallback.
+The gallery remains interactive at `80×24` and adapts panel content to the
+available terminal cells.
+
+The data gallery uses task progress in hundredths of a percent (`0..10000`) for
+both its label and `Gauge`; `0.83%` is therefore a small fraction, not 83% of the
+bar. Toast examples use the Workbench's shared `ToastManager` and tick lifecycle.
+
+The Data category exposes Table, List, and Progress samples through a `Tabs`
+selector. Switching samples preserves separate table/list selections, and only
+visible controls enter the focus order. Table and List viewports expand with
+available height; Progress pairs the weighted gauge with the progress-history
+sparkline.
+
+### Capability matrix
+
+API tiers follow the generated [API inventory](api-inventory.json); a Gallery
+demonstration does not promote an experimental declaration.
+
+| Capability | Status | API tier | Current evidence |
+| --- | --- | --- | --- |
+| `Button`, `Input`, `List`, `Table`, and `Tabs` controls | Implemented | STABLE | Focus preview, visible List-row hit/render, and focused Tabs assertions in the [Workbench tests](../examples/workbench/src/main_test.cj) and [core widget tests](../packages/core/src/widget_render_boundary_test.cj). |
+| `Gauge`, `Sparkline`, `Dialog`, `CommandPalette`, `FocusManager`, and `ModalFocusState` | Implemented | EXPERIMENTAL | Demonstrated by the Workbench; consult each symbol's inventory entry before depending on it. |
+| Sample routing, visible-control focus sets, responsive layout, and modal focus restoration | Application composition required | Application code | Covered by `dataSampleNavigationPreservesFocusAndValuesAcrossResponsiveSizes` and `dataGallerySupportsKeyboardAndMouseSelection`. |
+| Remaining gallery scope in tracking issue #16 | Planned | Varies; inventory is authoritative | Later issue batches add coverage without changing the library's API tier by demonstration alone. |
+| Native captures on other terminals and Windows/macOS | Unverified | N/A | Not established by B00; see capture record below. |
+
+### Capture evidence
+
+The [B00 capture manifest](../examples/workbench/screenshots/b00-capture-manifest.json)
+records the source revision and digest, responsive TestBackend sizes, observed
+80×24 PTY size, and capture outcome. No B00 PNG is published: the native capture
+attempt did not expose the Workbench surface, and isolated headless compositor
+startup did not become ready.
+
+Historical PNGs without source-bound provenance are excluded from B00 and are
+not used as evidence; no metadata has been backfilled.
+
 ## Framing and text
 
 - `Block` draws borders, titles, padding, margins, and content areas.

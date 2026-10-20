@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "batch": "B00",
+  "source": {
+    "base_commit": "6b814b3dff8eb124778daf1af3b1aa9191c42691",
+    "revision_note": "The listed source inputs were fingerprinted from the working tree based on this commit; the digest identifies their exact contents.",
+    "digest_algorithm": "SHA-256",
+    "digest_scope": "SHA-256 of the ordered per-file SHA-256 records produced by digest_command",
+    "digest_command": "export LC_ALL=C && sha256sum examples/workbench/cjpm.toml examples/workbench/src/*.cj packages/core/src/navigation.cj packages/core/src/widget_render_boundary_test.cj | sha256sum",
+    "digest": "6519756878359c763e998e0348f63b910b7ec3e6d9ba0e8eef12c0472c1ac81b",
+    "inputs": [
+      "examples/workbench/cjpm.toml",
+      "examples/workbench/src/*.cj",
+      "packages/core/src/navigation.cj",
+      "packages/core/src/widget_render_boundary_test.cj"
+    ]
+  },
+  "toolchain": {
+    "cangjie_sdk": "1.1.3"
+  },
+  "responsive_tests": {
+    "backend": "TestBackend",
+    "terminal_cells": [
+      { "columns": 80, "rows": 24 },
+      { "columns": 120, "rows": 36 },
+      { "columns": 160, "rows": 45 }
+    ],
+    "result": "Workbench interaction tests passed."
+  },
+  "verification": [
+    {
+      "command": "scripts/cangjie_cmd.sh examples/workbench cjpm test --target-dir <task-temp>/workbench-b00-target",
+      "result": "26 tests passed; 0 failed."
+    },
+    {
+      "command": "scripts/cangjie_cmd.sh packages/core cjpm test --target-dir <task-temp>/core-b00-target",
+      "result": "879 tests passed; 0 failed."
+    },
+    {
+      "command": "scripts/cangjie_cmd.sh examples/workbench cjpm build --target-dir <task-temp>/workbench-b00-target",
+      "result": "cjpm build success."
+    },
+    {
+      "command": "scripts/cangjie_cmd.sh examples/workbench cjpm run --target-dir <task-temp>/workbench-b00-target -- --headless-smoke",
+      "result": "workbench headless smoke ok."
+    }
+  ],
+  "native_capture": {
+    "status": "unavailable",
+    "terminal": "foot 1.28.0",
+    "compositor": "Scroll 1.13-dev",
+    "requested_cells": { "columns": 80, "rows": 24 },
+    "observed_pty_cells": { "columns": 80, "rows": 24 },
+    "command": "foot --font=monospace:size=14 --app-id=termcanvas-workbench-b00-capture --window-size-chars=80x24 -- <workbench-binary>; swaymsg '[app_id=\"termcanvas-workbench-b00-capture\"] floating enable'; grim -g <workbench-window-geometry> <capture.png>",
+    "result": "The captured region did not show the Workbench surface; the image was discarded. No B00 PNG is published."
+  },
+  "isolated_headless_capture_attempt": {
+    "compositor": "SwayFX 0.6 (based on Sway 1.12.0)",
+    "backend": "headless",
+    "renderer": "pixman",
+    "result": "Startup did not reach IPC readiness and reported EGL_BAD_ALLOC; no capture was produced."
+  },
+  "captures": []
+}

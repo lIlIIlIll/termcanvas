@@ -687,6 +687,7 @@ core|mediaProtocolName|func|public func mediaProtocolName(protocol: MediaProtoco
 core|Tabs|class|public class Tabs <: Widget {
 core|Tabs.selected|var|public var selected: Int64
 core|Tabs.init|init|public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Tabs.setFocused|func|public func setFocused(focused: Bool): Unit
 core|Tabs.handle|func|public func handle(key: KeyEvent): Bool
 core|Tabs.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|Tabs.render|func|public func render(area: Rect, buffer: Buffer): Unit
