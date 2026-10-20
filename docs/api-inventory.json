@@ -14,11 +14,11 @@
     "Nested generic payload dependencies are resolved by exact top-level symbol names within the declaring package."
   ],
   "counts": {
-    "production_public_declarations": 2791,
+    "production_public_declarations": 2792,
     "production_public_top_level": 423,
     "test_source_public_declarations_excluded": 1,
     "by_stability": {
-      "EXPERIMENTAL": 982,
+      "EXPERIMENTAL": 983,
       "INTERNAL": 227,
       "STABLE": 1458,
       "TEST_ONLY": 124
@@ -19327,13 +19327,13 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 721,
+      "line": 725,
       "level": "member",
       "kind": "init",
       "symbol": "init",
       "owner_symbol": "DatePicker",
       "qualified_symbol": "DatePicker.init",
-      "signature": "public init(year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1)",
+      "signature": "public init( year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1, style!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None )",
       "visibility": "public",
       "visibility_origin": "explicit",
       "stability": "EXPERIMENTAL",
@@ -19345,7 +19345,25 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 727,
+      "line": 743,
+      "level": "member",
+      "kind": "func",
+      "symbol": "setVisualState",
+      "owner_symbol": "DatePicker",
+      "qualified_symbol": "DatePicker.setVisualState",
+      "signature": "public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit",
+      "visibility": "public",
+      "visibility_origin": "explicit",
+      "stability": "EXPERIMENTAL",
+      "classification_rule": "core-widget-experimental",
+      "subsystem": "widgets",
+      "architecture_owner": "core/widgets",
+      "disposition": "keep"
+    },
+    {
+      "package": "core",
+      "path": "packages/core/src/form_widgets.cj",
+      "line": 759,
       "level": "member",
       "kind": "func",
       "symbol": "value",
@@ -19363,7 +19381,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 729,
+      "line": 763,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -19381,7 +19399,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 745,
+      "line": 795,
       "level": "member",
       "kind": "func",
       "symbol": "render",

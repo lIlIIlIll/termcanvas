@@ -384,7 +384,8 @@ core|DatePicker|class|public class DatePicker <: Widget {
 core|DatePicker.year|var|public var year: Int64
 core|DatePicker.month|var|public var month: Int64
 core|DatePicker.day|var|public var day: Int64
-core|DatePicker.init|init|public init(year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1)
+core|DatePicker.init|init|public init( year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1, style!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None )
+core|DatePicker.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
 core|DatePicker.value|func|public func value(): String
 core|DatePicker.handle|func|public func handle(key: KeyEvent): Bool
 core|DatePicker.render|func|public func render(area: Rect, buffer: Buffer): Unit

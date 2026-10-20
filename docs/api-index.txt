@@ -1059,10 +1059,11 @@ packages/core/src/form_widgets.cj:716:public class DatePicker <: Widget {
 packages/core/src/form_widgets.cj:717:public var year: Int64
 packages/core/src/form_widgets.cj:718:public var month: Int64
 packages/core/src/form_widgets.cj:719:public var day: Int64
-packages/core/src/form_widgets.cj:721:public init(year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1)
-packages/core/src/form_widgets.cj:727:public func value(): String
-packages/core/src/form_widgets.cj:729:public func handle(key: KeyEvent): Bool
-packages/core/src/form_widgets.cj:745:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:725:public init( year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1, style!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:743:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/form_widgets.cj:759:public func value(): String
+packages/core/src/form_widgets.cj:763:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:795:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/geometry.cj:5:public struct Rect <: Equatable<Rect> {
 packages/core/src/geometry.cj:6:public var x: Int64
 packages/core/src/geometry.cj:7:public var y: Int64
