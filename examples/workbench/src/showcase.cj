@@ -105,14 +105,19 @@ func renderGalleryForms(app: WorkbenchApp, frame: Frame, areas: WorkbenchGallery
     for (index in 0..min(labels.size, areas.formLabels.size)) {
         frame.renderWidget(Paragraph(labels[index], style: app.theme.disabled), areas.formLabels[index])
     }
-    frame.renderWidget(Input(value: "Ready", placeholder: "Normal", style: app.theme.normal), areas.formInputs[0])
+    frame.renderWidget(Input(
+        value: "Ready",
+        placeholder: "Normal",
+        style: app.theme.normal,
+        placeholderStyle: app.theme.normal
+    ), areas.formInputs[0])
     let focusedInputStyle = if (app.focus.isFocused("gallery-input")) { app.theme.focused } else { app.theme.normal }
     frame.renderWidget(Input(value: app.galleryInput.value, cursor: app.galleryInput.cursor,
-        placeholder: "Focused", style: focusedInputStyle), areas.formInputs[1])
+        placeholder: "Focused", style: focusedInputStyle, placeholderStyle: focusedInputStyle), areas.formInputs[1])
     frame.renderWidget(Input(value: "Check this value", placeholder: "Error",
-        style: app.theme.error), areas.formInputs[2])
+        style: app.theme.error, placeholderStyle: app.theme.error), areas.formInputs[2])
     frame.renderWidget(Input(value: "Read only", placeholder: "Disabled",
-        style: app.theme.disabled), areas.formInputs[3])
+        style: app.theme.disabled, placeholderStyle: app.theme.disabled), areas.formInputs[3])
     frame.renderWidget(Checkbox("Compact density", checked: app.galleryCheckbox.checked,
         focused: app.focus.isFocused("gallery-checkbox"), style: app.theme.normal,
         focusedStyle: app.theme.focused, disabledStyle: app.theme.disabled, theme: Some(app.theme)), areas.checkbox)
