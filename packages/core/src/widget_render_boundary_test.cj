@@ -193,7 +193,7 @@ class WidgetRenderBoundaryTest {
         @Expect(selectedCell.style.modifier.bold)
         @Expect(selectedCell.style.modifier.underline)
 
-        tabs.setTheme(None)
+        tabs.setTheme(Option<Theme>.None)
         let defaultSelectedBase = Style.default()
         var defaultSelectedModifier = defaultSelectedBase.modifier
         defaultSelectedModifier.bold = true
