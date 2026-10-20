@@ -180,21 +180,29 @@ class WidgetRenderBoundaryTest {
         let tabs = Tabs(["A", "B"], selected: 1, selectedStyle: Style.default())
         tabs.setTheme(Some(theme))
         tabs.setFocused(true)
+        let themedSelectedBase = theme.selected
+        var themedSelectedModifier = themedSelectedBase.modifier
+        themedSelectedModifier.bold = true
+        themedSelectedModifier.underline = true
+        let focusedThemedSelected = themedSelectedBase.withModifier(themedSelectedModifier)
         let themedBuffer = Buffer(Rect(0, 0, 8, 1))
         tabs.render(themedBuffer.area, themedBuffer)
         @Expect(themedBuffer.getCell(1, 0).style, theme.normal)
         let selectedCell = themedBuffer.getCell(4, 0)
-        @Expect(selectedCell.style.fg, theme.selected.fg)
-        @Expect(selectedCell.style.bg, theme.selected.bg)
+        @Expect(selectedCell.style, focusedThemedSelected)
         @Expect(selectedCell.style.modifier.bold)
         @Expect(selectedCell.style.modifier.underline)
 
         tabs.setTheme(None)
+        let defaultSelectedBase = Style.default()
+        var defaultSelectedModifier = defaultSelectedBase.modifier
+        defaultSelectedModifier.bold = true
+        defaultSelectedModifier.underline = true
+        let focusedDefaultSelected = defaultSelectedBase.withModifier(defaultSelectedModifier)
         let clearedBuffer = Buffer(Rect(0, 0, 8, 1))
         tabs.render(clearedBuffer.area, clearedBuffer)
         @Expect(clearedBuffer.getCell(1, 0).style, Style.default())
-        @Expect(clearedBuffer.getCell(4, 0).style.fg, Color.Reset)
-        @Expect(clearedBuffer.getCell(4, 0).style.bg, Color.Reset)
+        @Expect(clearedBuffer.getCell(4, 0).style, focusedDefaultSelected)
         @Expect(clearedBuffer.getCell(4, 0).style.modifier.bold)
         @Expect(clearedBuffer.getCell(4, 0).style.modifier.underline)
     }
@@ -237,6 +245,11 @@ class WidgetRenderBoundaryTest {
             selectedStyle: Style(fg: Color.White, bg: Color.Blue)
         )
         tabs.setFocused(true)
+        let selectedBase = Style(fg: Color.White, bg: Color.Blue)
+        var selectedModifier = selectedBase.modifier
+        selectedModifier.bold = true
+        selectedModifier.underline = true
+        let focusedSelectedStyle = selectedBase.withModifier(selectedModifier)
         for (width in [Int64(1), 5, 28]) {
             tabs.selected = 2
             let area = Rect(2, 2, width, 2)
@@ -245,7 +258,7 @@ class WidgetRenderBoundaryTest {
             @Expect(tabs.selected, 2)
             var selectedVisible = false
             for (column in area.x..area.right) {
-                if (buffer.getCell(column, area.y).style.bg == Color.Blue) { selectedVisible = true }
+                if (buffer.getCell(column, area.y).style == focusedSelectedStyle) { selectedVisible = true }
             }
             @Expect(selectedVisible)
             @Expect(renderBoundaryOutsideChanges(buffer, area), 0)
