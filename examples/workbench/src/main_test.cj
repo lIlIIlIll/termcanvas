@@ -288,13 +288,13 @@ class WorkbenchGalleryInteractionTest {
         _ = terminal.draw { frame => app.render(frame) }
         let inputArea = workbenchGalleryAreas(app.layout.galleryContent, 2).formInputs[1]
         let previewStyle = backend.lastBuffer().getOrThrow().getCell(inputArea.x, inputArea.y).style
-        @Expect(previewStyle == app.theme.disabled.withBg(app.theme.normal.bg), true)
+        @Expect(previewStyle == app.theme.normal, true)
 
         for (_ in 0..4) { workbenchGalleryKey(app, KeyCode.Tab) }
         @Expect(app.focus.current(), Some("gallery-input"))
         _ = terminal.draw { frame => app.render(frame) }
         let focusedStyle = backend.lastBuffer().getOrThrow().getCell(inputArea.x, inputArea.y).style
-        @Expect(focusedStyle == app.theme.disabled.withBg(app.theme.focused.bg), true)
+        @Expect(focusedStyle == app.theme.focused, true)
     }
     @TestCase
     func keyboardNavigationActivatesControlsAndKeepsInputEditableAfterFocusRestore(): Unit {
