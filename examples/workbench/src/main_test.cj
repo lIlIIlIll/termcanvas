@@ -332,8 +332,12 @@ class WorkbenchGalleryInteractionTest {
         let navigationBuffer = backend.lastBuffer().getOrThrow()
         let categoryArea = app.layout.galleryNav
         let focusedCategory = navigationBuffer.getCell(categoryArea.x + 26, categoryArea.y).style
-        @Expect(focusedCategory.fg, app.theme.selected.fg)
-        @Expect(focusedCategory.bg, app.theme.selected.bg)
+        let categorySelectedBase = app.theme.selected
+        var categorySelectedModifier = categorySelectedBase.modifier
+        categorySelectedModifier.bold = true
+        categorySelectedModifier.underline = true
+        let focusedCategoryStyle = categorySelectedBase.withModifier(categorySelectedModifier)
+        @Expect(focusedCategory, focusedCategoryStyle)
         @Expect(focusedCategory.modifier.bold)
         @Expect(focusedCategory.modifier.underline)
         @Expect(navigationBuffer.getCell(categoryArea.x + 11, categoryArea.y).style, app.theme.normal)
