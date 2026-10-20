@@ -1008,6 +1008,9 @@ packages/core/src/form_widgets.cj:public var selected: Int64
 packages/core/src/form_widgets.cj:public var offset: Int64 = 0
 packages/core/src/form_widgets.cj:public var open: Bool
 packages/core/src/form_widgets.cj:public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/form_widgets.cj:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/form_widgets.cj:public func setTransactionalSelection(enabled!: Bool): Unit
+packages/core/src/form_widgets.cj:public func cancelSelection(): Unit
 packages/core/src/form_widgets.cj:public func selectedValue(): ?String
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): ?String
 packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String

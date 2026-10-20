@@ -307,6 +307,12 @@ public class Dropdown <: Widget {
     private let placeholder: String
     private let style: Style
     private let selectedStyle: Style
+    private var focused: Bool = false
+    private var disabled: Bool = false
+    private var theme: ?Theme = None
+    private var transactionalSelection: Bool = false
+    private var transactionActive: Bool = false
+    private var originalSelection: Int64 = 0
 
     public init(
         items: Array<String>,
@@ -324,71 +330,180 @@ public class Dropdown <: Widget {
         this.selectedStyle = selectedStyle
     }
 
+    /** 设置聚焦、禁用状态和语义主题；禁用时拒绝键盘与鼠标输入。selectedStyle 显式设为 Style.default() 时使用主题选中角色，其余显式选中样式保持优先。
+     */
+    public func setVisualState(
+        focused!: Bool = false,
+        disabled!: Bool = false,
+        theme!: ?Theme = None
+    ): Unit {
+        this.focused = focused
+        this.disabled = disabled
+        this.theme = theme
+    }
+
+    /** 启用后，展开时保存原选项；导航和滚轮仅预览，Enter、空格及可见选项点击提交，Esc、标题折叠和 cancelSelection() 恢复。默认关闭以保留旧行为；关闭事务模式会取消进行中的事务。
+     */
+    public func setTransactionalSelection(enabled!: Bool): Unit {
+        if (transactionalSelection == enabled) { return }
+        if (enabled) {
+            transactionalSelection = true
+            observeTransactionState()
+        } else {
+            observeTransactionState()
+            cancelSelection()
+            transactionalSelection = false
+        }
+    }
+
+    /** 取消展开选择；事务模式恢复展开前索引，非事务模式保留当前索引，并关闭列表。应用可用于处理区域外点击、焦点丢失、重置或页面关闭。
+     */
+    public func cancelSelection(): Unit {
+        if (transactionActive) {
+            selected = clamp(originalSelection, 0, max(0, items.size - 1))
+            transactionActive = false
+        }
+        open = false
+        normalizeSelection()
+    }
+
+    private func beginSelectionTransaction(): Unit {
+        if (!transactionalSelection || !open || transactionActive) { return }
+        normalizeSelection()
+        originalSelection = selected
+        transactionActive = true
+    }
+
+    private func observeTransactionState(): Unit {
+        if (!transactionalSelection) { return }
+        if (open) {
+            beginSelectionTransaction()
+        } else if (transactionActive) {
+            cancelSelection()
+        }
+    }
+
+    private func normalizeSelection(): Unit {
+        selected = clamp(selected, 0, max(0, items.size - 1))
+        offset = selectionViewportOffset(offset, selected, items.size, viewportHeight)
+    }
+
+    private func commitSelection(): ?String {
+        transactionActive = false
+        open = false
+        selectedValue()
+    }
+
+    private func resolvedHeaderStyle(): Style {
+        if (disabled) { return themedDisabled(style, theme) }
+        if (focused) { return themedFocused(style, theme) }
+        themedNormal(style, theme)
+    }
+
+    private func resolvedListStyle(): Style {
+        if (disabled) { return themedDisabled(style, theme) }
+        themedNormal(style, theme)
+    }
+
+    private func resolvedSelectedRowStyle(): Style {
+        if (disabled) { return themedDisabled(selectedStyle, theme) }
+        let base = if (selectedStyle == Style.default()) {
+            themedSelected(selectedStyle, theme)
+        } else {
+            selectedStyle
+        }
+        if (focused) { addFocusedModifiers(base, Style.default(), theme) } else { base }
+    }
+
     public func selectedValue(): ?String {
         if (selected >= 0 && selected < items.size) { Some(items[selected]) } else { None }
     }
 
+    /** 关闭时按回车或空格会展开；默认非事务模式下 Esc 关闭但保留预览索引。启用事务模式后，导航仅预览，回车或空格提交，Esc 恢复展开前索引。
+     */
     public func handle(key: KeyEvent): ?String {
+        observeTransactionState()
+        if (disabled) { return None }
         if (!open) {
             match (key.code) {
                 case KeyCode.Enter | KeyCode.Char(r' ') =>
+                    normalizeSelection()
                     open = true
+                    beginSelectionTransaction()
                     None
                 case _ => None
             }
         } else {
+            normalizeSelection()
             if (let Some(index) <- selectionNavigation(key, selected, items.size, viewportHeight)) {
                 selected = index
+                normalizeSelection()
                 return None
             }
             match (key.code) {
                 case KeyCode.Esc =>
-                    open = false
+                    cancelSelection()
                     None
-                case KeyCode.Up =>
-                    selected = max(0, selected - 1)
-                    None
-                case KeyCode.Down =>
-                    selected = min(max(0, items.size - 1), selected + 1)
-                    None
-                case KeyCode.Enter | KeyCode.Char(r' ') =>
-                    open = false
-                    selectedValue()
+                case KeyCode.Enter | KeyCode.Char(r' ') => commitSelection()
                 case _ => None
             }
         }
     }
 
+    /** 标题点击切换展开状态；事务模式下可见选项点击提交，滚轮只预览当前选项。
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
-        if (!widgetHitTest(mouse, area)) { return None }
+        if (open) { viewportHeight = max(0, area.height - 1) }
+        observeTransactionState()
+        if (disabled || !widgetHitTest(mouse, area)) { return None }
+        normalizeSelection()
         match ((mouse.kind, mouse.button)) {
             case (MouseKind.Down, MouseButton.Left) =>
-                if (mouse.y == area.y) { open = !open; return None }
+                if (mouse.y == area.y) {
+                    if (open) {
+                        cancelSelection()
+                    } else {
+                        open = true
+                        viewportHeight = max(0, area.height - 1)
+                        beginSelectionTransaction()
+                    }
+                    return None
+                }
             case _ => ()
         }
         if (!open) { return None }
         let target = Rect(area.x, area.y + 1, area.width, max(0, area.height - 1))
-        offset = selectionViewportOffset(offset, selected, items.size, target.height)
+        viewportHeight = target.height
+        normalizeSelection()
         if (let Some(index) <- selectionMouse(mouse, target, offset, items.size, selected)) {
             selected = index
-            if (mouseScrollDelta(mouse) == 0) { open = false; return selectedValue() }
+            normalizeSelection()
+            if (mouseScrollDelta(mouse) == 0) { return commitSelection() }
         }
         None
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
+        if (open) { viewportHeight = max(0, area.height - 1) }
+        observeTransactionState()
+        normalizeSelection()
         let current = match (selectedValue()) {
             case Some(value) => value
             case None => placeholder
         }
         let mark = if (open) { "v " } else { "> " }
-        buffer.setString(area.x, area.y, truncate(mark + current, area.width), style: style)
-        if (open && area.height > 1) {
-            viewportHeight = max(1, area.height - 1)
-            let select = Select(items, selected: selected, style: style, selectedStyle: selectedStyle)
+        buffer.setString(area.x, area.y, truncate(mark + current, area.width), style: resolvedHeaderStyle())
+        if (open) {
+            let target = Rect(area.x, area.y + 1, area.width, max(0, area.height - 1))
+            let select = Select(
+                items,
+                selected: selected,
+                style: resolvedListStyle(),
+                selectedStyle: resolvedSelectedRowStyle()
+            )
             select.offset = offset
-            select.render(Rect(area.x, area.y + 1, area.width, area.height - 1), buffer)
+            select.render(target, buffer)
             selected = select.selected
             offset = select.offset
         }

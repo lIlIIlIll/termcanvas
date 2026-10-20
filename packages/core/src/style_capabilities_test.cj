@@ -196,6 +196,62 @@ class StyleCapabilitiesTest {
         ).render(radioBuffer.area, radioBuffer)
         @Expect(radioBuffer.getCell(0, 0).style, selectedStyle)
     }
+    @TestCase
+    func dropdownSemanticStylesRespectSelectedStyleAndDisabledInput(): Unit {
+        var focusedModifier = Modifier()
+        focusedModifier.bold = true
+        focusedModifier.underline = true
+        var selectedModifier = Modifier()
+        selectedModifier.italic = true
+        let theme = Theme(
+            normal: Style(fg: Color.White, bg: Color.Black),
+            focused: Style(fg: Color.Cyan, bg: Color.Blue, modifier: focusedModifier),
+            selected: Style(fg: Color.Green, bg: Color.Magenta, modifier: selectedModifier),
+            disabled: Style(fg: Color.Indexed(8), bg: Color.Black),
+            error: Style.default()
+        )
+        let area = Rect(0, 0, 20, 3)
+        let themed = Dropdown(["active", "other"], open: true, selectedStyle: Style.default())
+        themed.setVisualState(focused: true, theme: Some(theme))
+        let themedBuffer = Buffer(area)
+        themed.render(area, themedBuffer)
+        var combined = Modifier()
+        combined.bold = true
+        combined.italic = true
+        combined.underline = true
+        @Expect(themedBuffer.getCell(0, 0).style, theme.focused)
+        @Expect(themedBuffer.getCell(0, 1).style,
+            Style(fg: Color.Green, bg: Color.Magenta, modifier: combined))
+        @Expect(themedBuffer.getCell(0, 2).style, theme.normal)
+
+        let explicitStyle = Style(fg: Color.Red, bg: Color.Yellow)
+        let explicit = Dropdown(["active", "other"], open: true, selectedStyle: explicitStyle)
+        explicit.setVisualState(theme: Some(theme))
+        let explicitBuffer = Buffer(area)
+        explicit.render(area, explicitBuffer)
+        @Expect(explicitBuffer.getCell(0, 1).style, explicitStyle)
+
+        let disabled = Dropdown(["active", "other"], selected: 1, open: true, selectedStyle: Style.default())
+        disabled.setVisualState(disabled: true, theme: Some(theme))
+        let disabledBuffer = Buffer(area)
+        disabled.render(area, disabledBuffer)
+        @Expect(disabledBuffer.getCell(0, 0).style, theme.disabled)
+        @Expect(disabledBuffer.getCell(0, 1).style, theme.disabled)
+        @Expect(disabledBuffer.getCell(0, 2).style, theme.disabled)
+        @Expect(disabled.handle(KeyEvent(KeyCode.Down)).isNone())
+        @Expect(disabled.selected, 1)
+        @Expect(
+            disabled.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 1, 2), area).isNone()
+        )
+        @Expect(disabled.selected, 1)
+
+        let disabledClosed = Dropdown(["active"])
+        disabledClosed.setVisualState(disabled: true, theme: Some(theme))
+        _ = disabledClosed.handle(KeyEvent(KeyCode.Enter))
+        @Expect(!disabledClosed.open)
+        _ = disabledClosed.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 1, 0), area)
+        @Expect(!disabledClosed.open)
+    }
 }
 
 private func capabilityAnsiText(style: Style): String {

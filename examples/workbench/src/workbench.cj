@@ -48,7 +48,7 @@ class WorkbenchApp {
         TreeNode("project-gamma", "Gamma")
     ], selected: 0, block: Some(Block(title: "Projects")))
     let taskSearch = Input(value: "", placeholder: "Search by task name, ID, or text", block: Block(title: "Search"))
-    let taskFilter = Dropdown(["All", "Queued", "Running", "Done"], placeholder: "Status")
+    let taskFilter = Dropdown(["All", "Queued", "Running", "Done"], placeholder: "Status", selectedStyle: Style.default())
     let taskState = TableState(selectedRow: Some(0))
     let taskScroll = ScrollState()
     let logScroll = ScrollState()
@@ -132,6 +132,7 @@ class WorkbenchApp {
             KeyBinding([KeyEvent(KeyCode.F(5))], "task.start"),
             KeyBinding([KeyEvent(KeyCode.F(6))], "simulation.pause")
         ]))
+        taskFilter.setTransactionalSelection(enabled: true)
         refreshTheme()
         projects.expandAll()
         _ = projects.selectById("all")
@@ -156,7 +157,7 @@ class WorkbenchApp {
                 UpdateResult.next()
             case Event.FocusOut =>
                 cancelPointerCapture()
-                taskFilter.open = false
+                taskFilter.cancelSelection()
                 statusMessage = "Terminal focus lost"
                 UpdateResult.next()
             case Event.FocusIn =>
@@ -281,12 +282,6 @@ class WorkbenchApp {
         }
         if (interaction.active().isSome()) { return updateModalKey(key) }
         if (taskFilter.open) {
-            match (key.code) {
-                case KeyCode.Esc =>
-                    taskFilter.open = false
-                    return UpdateResult.next()
-                case _ => ()
-            }
             match (taskFilter.handle(key)) {
                 case Some(_) => applyTaskFilters(); statusMessage = "Status filter: " + filterLabel(); return UpdateResult.next()
                 case None => return UpdateResult.next()
@@ -593,7 +588,7 @@ class WorkbenchApp {
         if (capture.activeOwner().isSome()) { return routeCapturedMouse(mouse) }
         if (taskFilter.open) {
             if (!widgetHitTest(mouse, layout.taskFilter)) {
-                taskFilter.open = false
+                taskFilter.cancelSelection()
                 return UpdateResult.next()
             }
             _ = focus.focus("task-filter")
@@ -1317,6 +1312,7 @@ class WorkbenchApp {
 
     private func finishDemoReset(action: String): UpdateResult {
         if (action == "Reset") {
+            taskFilter.cancelSelection()
             model = WorkbenchModel()
             toastAges.clear()
             toastItems.clear()
@@ -1327,7 +1323,6 @@ class WorkbenchApp {
             model.sampleHistory(model.totalProgressHundredths())
             taskSearch.setValue("")
             taskFilter.selected = 0
-            taskFilter.open = false
             projectFilter = None
             _ = projects.selectById("all")
             tabs.selected = 0
@@ -1402,6 +1397,7 @@ class WorkbenchApp {
     }
 
     private func switchPage(next: WorkbenchPage): Unit {
+        taskFilter.cancelSelection()
         rememberCurrentFocus()
         page = next
         tabs.selected = match (next) {

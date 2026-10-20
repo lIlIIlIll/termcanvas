@@ -294,6 +294,15 @@
       "sunset_condition": "Revisit or remove if consumers do not need semantic Tabs themes or cannot keep selected-style ownership predictable."
     },
     {
+      "id": "core-dropdown-state-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Dropdown.setVisualState", "Dropdown.setTransactionalSelection", "Dropdown.cancelSelection"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Opt-in semantic visual state and transactional selection add theme, disabled-input, preview, and rollback behavior without changing the stable Dropdown constructor or legacy defaults.",
+      "consumer_evidence": "Workbench Tasks status filter plus direct core commit/cancel, resize, theme, selected-style-precedence, and disabled-input tests.",
+      "promotion_condition": "Independent consumers validate commit/cancel lifecycle, explicit selected-style ownership, disabled behavior, and viewport resizing.",
+      "sunset_condition": "Revisit or remove the optional state contract if consumers do not need transactional Dropdown behavior."
+    },
+    {
       "id": "core-widget-experimental",
       "match": {"package": "core", "symbols": ["ColorPicker", "MultiSelect", "DatePicker", "MenuItem", "Menu", "MenuBar", "CommandPalette", "Toast", "ToastManager", "Spinner", "Dialog", "ConfirmDialog", "MetricCard", "Meter", "LegendItem", "Legend", "TimeSeriesChart", "HeaderBar", "FooterBar", "EmptyState", "ErrorBox", "LoadingOverlay", "Skeleton", "InlineAlert", "Sparkline", "Gauge", "Chart", "LogView"]},
       "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",

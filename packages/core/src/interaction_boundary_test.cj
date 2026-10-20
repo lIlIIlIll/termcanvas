@@ -75,6 +75,7 @@ class InteractionBoundaryTest {
         @Expect(dropdown.open)
         _ = dropdown.handle(KeyEvent(KeyCode.Esc))
         @Expect(!dropdown.open)
+        @Expect(dropdown.selected, 1)
         _ = dropdown.handle(KeyEvent(KeyCode.Enter))
         @Expect(dropdown.handle(KeyEvent(KeyCode.Enter)), Some("one"))
         @Expect(!dropdown.open)
@@ -85,6 +86,62 @@ class InteractionBoundaryTest {
         @Expect(interactionRow(buffer, 0).startsWith("v empty"))
         @Expect(empty.handle(KeyEvent(KeyCode.Enter)).isNone())
         @Expect(!empty.open)
+    }
+
+    @TestCase
+    func transactionalDropdownSeparatesPreviewCommitAndCancellation(): Unit {
+        let area = Rect(1, 1, 12, 4)
+        let dropdown = Dropdown(["zero", "one", "two", "three"], selected: 1)
+        dropdown.setTransactionalSelection(enabled: true)
+        _ = dropdown.handle(KeyEvent(KeyCode.Enter))
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        @Expect(dropdown.selected, 3)
+        @Expect(dropdown.handle(KeyEvent(KeyCode.Esc)).isNone())
+        @Expect(dropdown.selected, 1)
+        @Expect(!dropdown.open)
+
+        _ = dropdown.handle(KeyEvent(KeyCode.Enter))
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        @Expect(dropdown.handle(KeyEvent(KeyCode.Enter)), Some("two"))
+        @Expect(dropdown.selected, 2)
+        @Expect(!dropdown.open)
+
+        dropdown.selected = 0
+        _ = dropdown.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, area.x + 1, area.y), area)
+        _ = dropdown.handleMouse(MouseEvent(MouseKind.Scroll, MouseButton.WheelDown, area.x + 1, area.y + 1), area)
+        @Expect(dropdown.selected, 1)
+        @Expect(dropdown.open)
+        @Expect(
+            dropdown.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, area.x + 1, area.y + 2), area),
+            Some("one")
+        )
+        @Expect(!dropdown.open)
+
+        dropdown.selected = 2
+        _ = dropdown.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, area.x + 1, area.y), area)
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        _ = dropdown.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, area.x + 1, area.y), area)
+        @Expect(dropdown.selected, 2)
+        @Expect(!dropdown.open)
+
+        dropdown.selected = 1
+        _ = dropdown.handle(KeyEvent(KeyCode.Enter))
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        dropdown.cancelSelection()
+        @Expect(dropdown.selected, 1)
+        @Expect(!dropdown.open)
+        dropdown.selected = 3
+        dropdown.cancelSelection()
+        @Expect(dropdown.selected, 3)
+        dropdown.selected = 0
+        dropdown.open = true
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        @Expect(dropdown.selected, 1)
+        dropdown.open = false
+        dropdown.render(area, Buffer(area))
+        @Expect(dropdown.selected, 0)
+        @Expect(!dropdown.open)
     }
 
     @TestCase

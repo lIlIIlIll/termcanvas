@@ -48,7 +48,22 @@ class WorkbenchInteractionTest {
     @TestCase
     func mouseStatusFilterAndProjectTreeUpdateVisibleRows(): Unit {
         let app = WorkbenchApp()
+        _ = app.update(Event.Resize(Rect(0, 0, 100, 24)))
         _ = app.perform("page.tasks")
+        _ = app.focus.focus("task-filter")
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+        @Expect(app.taskFilter.selected, 1)
+        @Expect(app.model.visibleIds().size, 120)
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Esc)))
+        @Expect(app.taskFilter.selected, 0)
+        @Expect(app.model.visibleIds().size, 120)
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        @Expect(app.taskFilter.selected, 1)
+        @Expect(app.model.visibleIds().size, 119)
+
         let filterArea = app.layout.taskFilter
         _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, filterArea.x + 1, filterArea.y)))
         @Expect(app.taskFilter.open)
@@ -63,6 +78,8 @@ class WorkbenchInteractionTest {
         @Expect(app.taskFilter.selected, 0)
         @Expect(app.model.visibleIds().size, 120)
 
+        _ = app.update(Event.Resize(Rect(0, 0, 120, 36)))
+
         let tree = app.layout.projectTree
         _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, tree.x + 3, tree.y + 2)))
         @Expect(app.projectFilter, Some("Alpha"))
@@ -72,6 +89,39 @@ class WorkbenchInteractionTest {
         _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, nameHeaderX, app.layout.taskTable.y)))
         @Expect(app.model.sortColumn, 1)
         @Expect(app.selectedId, Some(1))
+    }
+
+    @TestCase
+    func dropdownOutsideFocusAndPageDismissalRestorePreview(): Unit {
+        let app = WorkbenchApp()
+        _ = app.perform("page.tasks")
+        app.taskFilter.selected = 1
+        _ = app.focus.focus("task-filter")
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+        @Expect(app.taskFilter.selected, 2)
+        @Expect(app.model.visibleIds().size, 120)
+
+        let table = app.layout.taskTable
+        _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, table.x + 1, table.y + 1)))
+        @Expect(!app.taskFilter.open)
+        @Expect(app.taskFilter.selected, 1)
+        @Expect(app.model.visibleIds().size, 120)
+
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+        _ = app.update(Event.FocusOut)
+        @Expect(!app.taskFilter.open)
+        @Expect(app.taskFilter.selected, 1)
+
+        _ = app.update(Event.FocusIn)
+        _ = app.focus.focus("task-filter")
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+        _ = app.perform("page.showcase")
+        @Expect(app.page, WorkbenchPage.Showcase)
+        @Expect(!app.taskFilter.open)
+        @Expect(app.taskFilter.selected, 1)
     }
 
     @TestCase
@@ -134,6 +184,11 @@ class WorkbenchInteractionTest {
         _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'/'))))
         _ = app.update(Event.Paste("Task 9"))
         @Expect(app.model.visibleIds().size > 0)
+        app.taskFilter.selected = 1
+        _ = app.focus.focus("task-filter")
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Enter)))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+        @Expect(app.taskFilter.selected, 2)
         _ = app.perform("demo.reset")
         @Expect(app.interaction.active(), Some("demo-confirm"))
         _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Right)))
@@ -141,6 +196,8 @@ class WorkbenchInteractionTest {
         @Expect(app.interaction.active().isNone())
         @Expect(app.page, WorkbenchPage.Overview)
         @Expect(app.paused, false)
+        app.taskFilter.cancelSelection()
+        @Expect(app.taskFilter.selected, 0)
         @Expect(app.motionEnabled, false)
         @Expect(app.darkTheme, false)
         @Expect(app.themeRadio.selected, 1)

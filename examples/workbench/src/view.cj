@@ -555,6 +555,10 @@ func renderTasks(app: WorkbenchApp, frame: Frame): Unit {
     if (layout.taskDetail.width > 0) { renderTaskDetail(app, frame) }
     if (frame.isDirty(layout.taskFilter)) {
         frame.fill(layout.taskFilter, app.theme.normal)
+        app.taskFilter.setVisualState(
+            focused: app.focus.current() == Some("task-filter"),
+            theme: Some(app.theme)
+        )
         frame.renderWidget(app.taskFilter, layout.taskFilter)
     }
 }

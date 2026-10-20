@@ -47,7 +47,7 @@ from the resulting state.
 - `Button`: action-oriented button presentation.
 - `Checkbox`: boolean choice.
 - `RadioGroup`: one choice from a group.
-- `Select`, `Dropdown`, `MultiSelect`: one or many selectable values.
+- `Select`, `Dropdown`, `MultiSelect`: one or many selectable values. `Dropdown` can opt into transactional preview/commit; legacy behavior remains the default.
 - `DatePicker`: date selection workflow.
 
 ### Commands and overlays

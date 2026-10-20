@@ -105,7 +105,7 @@ not used as evidence; no metadata has been backfilled.
   PageUp/PageDown, Ctrl+A/Ctrl+E, optional line numbers, multi-caret editing,
   paste, undo/redo, folds, decorations, and completion.
 - `Button`, `Checkbox`, and `RadioGroup` cover common choices and actions.
-- `Select`, `Dropdown`, and `MultiSelect` cover one- or many-value selection.
+- `Select`, `Dropdown`, and `MultiSelect` cover one- or many-value selection; Dropdown transactions are opt-in, so the legacy preview behavior remains the default.
 - `DatePicker` supports date selection workflows.
 
 ## Lists, tables, and navigation

@@ -14,6 +14,28 @@ height, keeping the selected item visible after a resize. `Up`, `Down`, `Home`,
 content height, excluding borders, titles, and the palette query/dropdown header.
 Before the first render, page size is one row.
 
+`Dropdown` refreshes its list viewport on every valid open render using the
+available height below its header. A one-row area draws only the header and has
+no selectable list row; page navigation still advances by at least one option.
+
+By default, a Dropdown remains non-transactional: navigation and wheel input
+change `selected`, and Escape closes without restoring it. The experimental
+`setTransactionalSelection(enabled: true)` mode snapshots the selection on open;
+keyboard and wheel navigation preview, while Enter, Space, or a visible-row
+click commits. Escape, clicking the open header, or `cancelSelection()` restores
+the snapshot. Applications retain outside-click, focus-loss, reset, and
+page-dismissal policy; call `cancelSelection()` at those boundaries and before
+resetting `selected`. Because `open` remains public, direct writes are observed
+at the next render or input handler; call `cancelSelection()` for immediate
+rollback.
+
+`setVisualState(...)` applies focused, disabled, and theme roles; disabled
+Dropdowns reject keyboard and mouse input. The legacy `selectedStyle` default
+remains unchanged and takes precedence over the theme's selected role. Pass
+`selectedStyle: Style.default()` to opt into the theme's selected role.
+Workbench's Tasks status filter uses transactional mode and applies the filter
+only after a commit or reset.
+
 A palette query change resets the selected filtered-result row and offset to zero.
 Rendering or accepting a choice also validates directly assigned query/selection
 values. `MultiSelect.selectedIndices()` and selection return values still identify

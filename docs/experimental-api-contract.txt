@@ -337,6 +337,9 @@ core|Tree.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): 
 core|Tree.expandSelected|func|public func expandSelected(): Unit
 core|Tree.collapseSelected|func|public func collapseSelected(): Unit
 core|Tree.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Dropdown.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+core|Dropdown.setTransactionalSelection|func|public func setTransactionalSelection(enabled!: Bool): Unit
+core|Dropdown.cancelSelection|func|public func cancelSelection(): Unit
 core|ColorPicker|class|public class ColorPicker <: Widget {
 core|ColorPicker.selected|var|public var selected: Int64
 core|ColorPicker.init|init|public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)
