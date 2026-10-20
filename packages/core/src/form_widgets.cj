@@ -50,9 +50,11 @@ public class Button <: Widget {
         }
         if (target.width <= 0 || target.height <= 0) { return }
         let rowStyle = resolvedStateStyle(style, focusedStyle, disabledStyle, focused, disabled, theme)
+        buffer.fillRect(target, style: rowStyle)
         let text = truncate(label, target.width)
         let x = alignedX(target, displayWidth(text), TextAlign.Center)
-        buffer.setString(x, target.y, text, style: rowStyle)
+        let y = target.y + (target.height - 1) / 2
+        buffer.setString(x, y, text, style: rowStyle)
     }
 }
 
