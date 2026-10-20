@@ -1686,6 +1686,9 @@ packages/core/src/style.cj:public let warning: Style
 packages/core/src/style.cj:public let info: Style
 packages/core/src/style.cj:public init( normal!: Style = Style.default(), focused!: Style = Style(fg: Color.Black, bg: Color.White), selected!: Style = Style(fg: Color.Black, bg: Color.White), disabled!: Style = Style(fg: Color.Indexed(8)), error!: Style = Style(fg: Color.Red), accent!: Style = Style(fg: Color.Cyan), success!: Style = Style(fg: Color.Green), warning!: Style = Style(fg: Color.Yellow), info!: Style = Style(fg: Color.Cyan) )
 packages/core/src/style.cj:public static func default(): Theme
+packages/core/src/style.cj:public static func graphite(accent!: Color = Color.Cyan): Theme
+packages/core/src/style.cj:public static func light(accent!: Color = Color.Cyan): Theme
+packages/core/src/style.cj:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: Color = Color.Cyan ): Theme
 packages/core/src/style.cj:public func serialize(): String
 packages/core/src/style.cj:public enum StyleState {
 packages/core/src/style.cj:Normal
@@ -2201,6 +2204,7 @@ packages/core/src/text_model.cj:public func endUndoGroup(): Unit
 packages/core/src/text_model.cj:public func undo(): Bool
 packages/core/src/text_model.cj:public func redo(): Bool
 packages/core/src/text_model.cj:public func clearHistory(): Unit
+packages/core/src/theme_capabilities.cj:public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style
 packages/core/src/vim_editor.cj:public enum VimMode {
 packages/core/src/vim_editor.cj:Normal
 packages/core/src/vim_editor.cj:Insert

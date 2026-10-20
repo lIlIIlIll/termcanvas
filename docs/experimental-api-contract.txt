@@ -518,6 +518,9 @@ core|ExternalPort.fullCount|func|public func fullCount(): Int64
 core|ExternalPort.closedCount|func|public func closedCount(): Int64
 core|ExternalPort.wakeSignals|func|public func wakeSignals(): Int64
 core|ExternalPort.wakeCoalesced|func|public func wakeCoalesced(): Int64
+core|Theme.graphite|func|public static func graphite(accent!: Color = Color.Cyan): Theme
+core|Theme.light|func|public static func light(accent!: Color = Color.Cyan): Theme
+core|Theme.forCapabilities|func|public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: Color = Color.Cyan ): Theme
 core|StyleState|enum|public enum StyleState {
 core|StyleState.Normal|enum_constructor|Normal
 core|StyleState.Focused|enum_constructor|Focused
@@ -578,6 +581,7 @@ core|TestBackend.setCursorShape|func|public func setCursorShape(shape: ?CursorSh
 core|DebugOverlay|class|public class DebugOverlay <: Widget {
 core|DebugOverlay.init|init|public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
 core|DebugOverlay.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|adaptStyleForCapabilities|func|public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style
 core|VimMode|enum|public enum VimMode {
 core|VimMode.Normal|enum_constructor|Normal
 core|VimMode.Insert|enum_constructor|Insert
