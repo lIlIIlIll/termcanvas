@@ -1,6 +1,7 @@
 package core
 
 import std.collection.*
+import std.unicode.*
 
 public class MenuItem {
     public let label: String
@@ -173,6 +174,9 @@ public class CommandPalette <: Widget {
     private let block: ?Block
     private let style: Style
     private let selectedStyle: Style
+    private let disabledStyle: Style
+    private var theme: ?Theme = None
+    private let caseSensitive: Bool
 
     public init(
         items: Array<MenuItem>,
@@ -180,7 +184,10 @@ public class CommandPalette <: Widget {
         selected!: Int64 = 0,
         block!: ?Block = Some(Block(title: "Command")),
         style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
+        disabledStyle!: Style = Style.default(),
+        theme!: ?Theme = None,
+        caseSensitive!: Bool = true
     ) {
         this.items = items
         this.query = query
@@ -189,12 +196,24 @@ public class CommandPalette <: Widget {
         this.block = block
         this.style = style
         this.selectedStyle = selectedStyle
+        this.disabledStyle = disabledStyle
+        this.theme = theme
+        this.caseSensitive = caseSensitive
         clampSelection()
     }
 
+    public func setTheme(theme: ?Theme): Unit {
+        this.theme = theme
+    }
+
+    public func paste(text: String): Unit {
+        query += text
+        _ = synchronizeQuery()
+    }
+
     public func handle(key: KeyEvent): ?String {
-        synchronizeQuery()
-        if (let Some(index) <- selectionNavigation(key, selected, filtered().size, viewportHeight)) {
+        let rows = synchronizeQuery()
+        if (let Some(index) <- selectionNavigation(key, selected, rows.size, viewportHeight)) {
             selected = index
             return None
         }
@@ -211,10 +230,9 @@ public class CommandPalette <: Widget {
                 selected = max(0, selected - 1)
                 None
             case KeyCode.Down =>
-                selected = min(max(0, filtered().size - 1), selected + 1)
+                selected = min(max(0, rows.size - 1), selected + 1)
                 None
             case KeyCode.Enter =>
-                let rows = filtered()
                 if (selected >= 0 && selected < rows.size && rows[selected].enabled) {
                     Some(rows[selected].action)
                 } else {
@@ -225,10 +243,9 @@ public class CommandPalette <: Widget {
     }
 
     public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
-        synchronizeQuery()
+        let rows = synchronizeQuery()
         let inner = widgetInnerArea(area, block)
         let target = Rect(inner.x, inner.y + 1, inner.width, max(0, inner.height - 1))
-        let rows = filtered()
         offset = selectionViewportOffset(offset, selected, rows.size, target.height)
         if (let Some(index) <- selectionMouse(mouse, target, offset, rows.size, selected)) {
             selected = index
@@ -237,36 +254,46 @@ public class CommandPalette <: Widget {
         None
     }
 
-    private func synchronizeQuery(): Unit {
+    private func synchronizeQuery(): Array<MenuItem> {
         if (lastQuery != query) {
             selected = 0
             offset = 0
             lastQuery = query
         }
-        clampSelection()
+        let rows = filtered()
+        selected = clamp(selected, 0, max(0, rows.size - 1))
+        rows
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
-        synchronizeQuery()
+        let rows = synchronizeQuery()
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
-        buffer.setString(target.x, target.y, truncate("> " + query, target.width), style: style)
-        let rows = filtered()
-        viewportHeight = max(1, target.height - 1)
-        offset = selectionViewportOffset(offset, selected, rows.size, target.height - 1)
-        for (row in 0..min(max(0, target.height - 1), rows.size - offset)) {
-            let index = offset + row
-            let item = rows[index]
-            buffer.setString(
-                target.x,
-                target.y + 1 + row,
-                truncate(item.label, target.width),
-                style: if (index == selected) { selectedStyle } else { style }
-            )
+        let normalRowStyle = resolvedNormalStyle()
+        buffer.fillLine(target.y, target.x, target.width, style: normalRowStyle)
+        buffer.setString(target.x, target.y, truncate("> " + query, target.width), style: normalRowStyle)
+        let contentHeight = max(0, target.height - 1)
+        viewportHeight = max(1, contentHeight)
+        offset = selectionViewportOffset(offset, selected, rows.size, contentHeight)
+        for (row in 0..contentHeight) {
+            let y = target.y + 1 + row
+            if (rows.isEmpty() && row == 0) {
+                let emptyStyle = resolvedDisabledStyle()
+                buffer.fillLine(y, target.x, target.width, style: emptyStyle)
+                buffer.setString(target.x, y, truncate("No matches", target.width), style: emptyStyle)
+            } else if (row < rows.size - offset) {
+                let index = offset + row
+                let item = rows[index]
+                let rowStyle = resolvedRowStyle(item, index)
+                buffer.fillLine(y, target.x, target.width, style: rowStyle)
+                buffer.setString(target.x, y, truncate(item.label, target.width), style: rowStyle)
+            } else {
+                buffer.fillLine(y, target.x, target.width, style: normalRowStyle)
+            }
         }
     }
 
@@ -274,13 +301,43 @@ public class CommandPalette <: Widget {
         selected = clamp(selected, 0, max(0, filtered().size - 1))
     }
 
+    private func resolvedNormalStyle(): Style {
+        themedNormal(style, theme)
+    }
+
+    private func resolvedSelectedStyle(): Style {
+        if (selectedStyle == Style.default()) { themedSelected(selectedStyle, theme) } else { selectedStyle }
+    }
+
+    private func resolvedDisabledStyle(): Style {
+        if (theme.isSome() || disabledStyle != Style.default()) {
+            themedDisabled(disabledStyle, theme)
+        } else {
+            Style(fg: Color.Indexed(8))
+        }
+    }
+
+    private func resolvedRowStyle(item: MenuItem, index: Int64): Style {
+        if (!item.enabled) {
+            resolvedDisabledStyle()
+        } else if (index == selected) {
+            resolvedSelectedStyle()
+        } else {
+            resolvedNormalStyle()
+        }
+    }
+
     private func filtered(): Array<MenuItem> {
         if (query.isEmpty()) { return items }
+        let searchQuery = if (caseSensitive) { query } else { query.toLower() }
         let rows = ArrayList<MenuItem>()
         for (item in items) {
-            if (item.label.contains(query) || item.action.contains(query)) {
-                rows.add(item)
+            let matches = if (caseSensitive) {
+                item.label.contains(query) || item.action.contains(query)
+            } else {
+                item.label.toLower().contains(searchQuery) || item.action.toLower().contains(searchQuery)
             }
+            if (matches) { rows.add(item) }
         }
         rows.toArray()
     }

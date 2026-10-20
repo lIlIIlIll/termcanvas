@@ -158,9 +158,25 @@ func runWorkbenchHeadlessSmoke(): Int64 {
         case None => return workbenchSmokeFailure("task 4 missing")
     }
 
+    let paletteReturnFocus = app.focus.current()
+    let emptyPalette = runWorkbenchScenario(app, TestScenario()
+        .key(KeyEvent(KeyCode.F(2)))
+        .paste("NO-SUCH-COMMAND")
+        .render())
+    if (!emptyPalette.passed || app.interaction.active() != Some("palette") ||
+        !emptyPalette.lastSnapshot().contains("No matches")) {
+        return workbenchSmokeFailure("palette no-match state")
+    }
+    let escapePalette = runWorkbenchScenario(app, TestScenario()
+        .key(KeyEvent(KeyCode.Esc))
+        .render())
+    if (!escapePalette.passed || app.interaction.active().isSome() ||
+        app.focus.current() != paletteReturnFocus) {
+        return workbenchSmokeFailure("palette Escape and focus restoration")
+    }
     let openReset = runWorkbenchScenario(app, TestScenario()
         .key(KeyEvent(KeyCode.F(2)))
-        .paste("Reset selected task")
+        .paste("RESET SELECTED TASK")
         .key(KeyEvent(KeyCode.Enter))
         .render())
     if (!openReset.passed || app.interaction.active() != Some("reset-confirm")) {
@@ -173,6 +189,7 @@ func runWorkbenchHeadlessSmoke(): Int64 {
     if (!confirmReset.passed || app.interaction.active().isSome()) {
         return workbenchSmokeFailure("task reset confirmation")
     }
+
     match (app.model.job(4)) {
         case Some(task) => if (task.status != WorkbenchJobStatus.Queued || task.progressPercent != 0) {
             return workbenchSmokeFailure("reset task state")

@@ -636,6 +636,57 @@ class WorkbenchGalleryInteractionTest {
         workbenchGalleryKey(themed, KeyCode.Left)
         @Expect(themed.theme.accent, Style(fg: Color.Magenta, bg: Color.Rgb(247, 249, 252)))
     }
+    @TestCase
+    func palettePasteSearchMouseActivationAndEscapeRestoreFocus(): Unit {
+        let app = WorkbenchApp()
+        let originalFocus = app.focus.current()
+        workbenchGalleryKey(app, KeyCode.F(2))
+        @Expect(app.interaction.active(), Some("palette"))
+        _ = app.update(Event.Paste("COMPONENT"))
+        @Expect(app.palette.query, "COMPONENT")
+
+        let paletteArea = app.layout.palette
+        let paletteContent = Block(title: "Command").inner(paletteArea)
+        _ = app.update(Event.Mouse(MouseEvent(
+            MouseKind.Down,
+            MouseButton.Left,
+            paletteContent.x + 1,
+            paletteContent.y + 1
+        )))
+        @Expect(app.interaction.active().isNone())
+        @Expect(app.focus.current(), originalFocus)
+
+        let disabledApp = WorkbenchApp()
+        let disabledFocus = disabledApp.focus.current()
+        workbenchGalleryKey(disabledApp, KeyCode.F(2))
+        _ = disabledApp.update(Event.Paste("UNAVAILABLE"))
+        workbenchGalleryKey(disabledApp, KeyCode.Enter)
+        @Expect(disabledApp.interaction.active(), Some("palette"))
+        let disabledContent = Block(title: "Command").inner(disabledApp.layout.palette)
+        _ = disabledApp.update(Event.Mouse(MouseEvent(
+            MouseKind.Down,
+            MouseButton.Left,
+            disabledContent.x + 1,
+            disabledContent.y + 1
+        )))
+        @Expect(disabledApp.interaction.active(), Some("palette"))
+        workbenchGalleryKey(disabledApp, KeyCode.Esc)
+        @Expect(disabledApp.interaction.active().isNone())
+        @Expect(disabledApp.focus.current(), disabledFocus)
+        let emptyApp = WorkbenchApp()
+        workbenchGalleryKey(emptyApp, KeyCode.F(2))
+        _ = emptyApp.update(Event.Paste("NO-SUCH-COMMAND"))
+        workbenchGalleryKey(emptyApp, KeyCode.Enter)
+        @Expect(emptyApp.interaction.active(), Some("palette"))
+        let emptyRender = TestScenario().render().run(
+            { frame => emptyApp.render(frame) },
+            { event => emptyApp.update(event) },
+            width: 120,
+            height: 36
+        )
+        @Expect(emptyRender.passed, true)
+        @Expect(emptyRender.lastSnapshot().contains("No matches"), true)
+    }
 
     @TestCase
     func confirmationDialogMapsActionsRefreshesThemeAndRestoresFocus(): Unit {

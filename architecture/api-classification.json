@@ -312,6 +312,15 @@
       "sunset_condition": "Revisit or remove the setter if request workflows do not need semantic themes or detail rendering cannot remain independently owned."
     },
     {
+      "id": "core-command-palette-search-experimental",
+      "match": {"package": "core", "qualified_symbols": ["CommandPalette.setTheme", "CommandPalette.paste"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Optional case-aware palette search, paste synchronization, and theme roles extend the existing immediate command selector without changing its defaults.",
+      "consumer_evidence": "Workbench F2 search and mouse routing plus TaskPad and oh_my_pi_skin paste consumers; direct core filtering, Unicode synchronization, disabled/empty, and style-precedence tests.",
+      "promotion_condition": "Independent applications validate case configuration, paste synchronization, theme ownership, empty results, and disabled activation behavior.",
+      "sunset_condition": "Revisit the optional palette behaviors if independent consumers do not need search, paste, or semantic disabled styling."
+    },
+    {
       "id": "core-dropdown-state-experimental",
       "match": {"package": "core", "qualified_symbols": ["Dropdown.setVisualState", "Dropdown.setTransactionalSelection", "Dropdown.cancelSelection"]},
       "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",

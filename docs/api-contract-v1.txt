@@ -422,7 +422,9 @@ packages/core/src/command_widgets.cj:public class CommandPalette <: Widget {
 packages/core/src/command_widgets.cj:public var query: String
 packages/core/src/command_widgets.cj:public var selected: Int64
 packages/core/src/command_widgets.cj:public var offset: Int64 = 0
-packages/core/src/command_widgets.cj:public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/command_widgets.cj:public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style.default(), theme!: ?Theme = None, caseSensitive!: Bool = true )
+packages/core/src/command_widgets.cj:public func setTheme(theme: ?Theme): Unit
+packages/core/src/command_widgets.cj:public func paste(text: String): Unit
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?String
 packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit

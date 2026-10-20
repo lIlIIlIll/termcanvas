@@ -248,7 +248,10 @@ class OhMyPiSkin {
                         }
                 }
             case Event.Paste(text) =>
-                if (!paletteOpen && !todoFocused) {
+                if (paletteOpen) {
+                    palette.paste(text)
+                    dirtyResult([paletteArea])
+                } else if (!todoFocused) {
                     _ = composer.paste(text)
                     dirtyResult([composerArea])
                 } else {

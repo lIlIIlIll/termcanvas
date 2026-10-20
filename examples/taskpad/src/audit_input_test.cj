@@ -49,6 +49,12 @@ class TaskPadInputTest {
         _ = app.update(Event.Paste("find"))
         @Expect(app.palette.query, "find")
         @Expect(app.palette.selected, 0)
+        app.palette.selected = 3
+        app.palette.offset = 5
+        _ = app.update(Event.Paste("中\n"))
+        @Expect(app.palette.query, "find中 ")
+        @Expect(app.palette.selected, 0)
+        @Expect(app.palette.offset, 0)
         @Expect(app.input.value, "前ab 中")
     }
 

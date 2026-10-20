@@ -57,6 +57,145 @@ class InteractionBoundaryTest {
         @Expect(palette.query, "")
         @Expect(palette.handle(KeyEvent(KeyCode.Esc)).isNone())
     }
+    @TestCase
+    func commandPaletteCaseSensitivityAndActionMatchingAreExplicit(): Unit {
+        let sensitive = CommandPalette(
+            [MenuItem("Open File", action: "file.open")],
+            query: "OPEN",
+            block: None
+        )
+        @Expect(sensitive.handle(KeyEvent(KeyCode.Enter)).isNone())
+
+        let insensitiveLabel = CommandPalette(
+            [MenuItem("Open File", action: "file.open")],
+            query: "OPEN",
+            block: None,
+            caseSensitive: false
+        )
+        @Expect(insensitiveLabel.handle(KeyEvent(KeyCode.Enter)), Some("file.open"))
+
+        let insensitiveAction = CommandPalette(
+            [MenuItem("Help", action: "system.help")],
+            query: "SYSTEM",
+            block: None,
+            caseSensitive: false
+        )
+        @Expect(insensitiveAction.handle(KeyEvent(KeyCode.Enter)), Some("system.help"))
+        let unicodeInsensitive = CommandPalette(
+            [MenuItem("Éclair", action: "dessert")],
+            query: "ÉCLAIR",
+            block: None,
+            caseSensitive: false
+        )
+        @Expect(unicodeInsensitive.handle(KeyEvent(KeyCode.Enter)), Some("dessert"))
+    }
+
+    @TestCase
+    func commandPalettePasteAppendsUnicodeAndResetsSelectionViewport(): Unit {
+        let palette = CommandPalette(
+            [MenuItem("zero"), MenuItem("one"), MenuItem("two"), MenuItem("中文")],
+            query: "find",
+            block: None
+        )
+        palette.selected = 3
+        palette.offset = 6
+
+        palette.paste("中")
+
+        @Expect(palette.query, "find中")
+        @Expect(palette.selected, 0)
+        @Expect(palette.offset, 0)
+    }
+
+    @TestCase
+    func commandPaletteEmptyAndDisabledRowsCannotActivateAndFillCells(): Unit {
+        let customNormal = Style(fg: Color.Red)
+        let customSelected = Style(fg: Color.Green, bg: Color.Blue)
+        let theme = Theme(
+            normal: Style(fg: Color.White, bg: Color.Black),
+            selected: Style(fg: Color.White, bg: Color.Magenta),
+            disabled: Style(fg: Color.Indexed(8), bg: Color.Black)
+        )
+        let area = Rect(0, 0, 12, 4)
+        let palette = CommandPalette(
+            [MenuItem("chosen"), MenuItem("blocked", enabled: false)],
+            block: None,
+            style: customNormal,
+            selectedStyle: customSelected,
+            disabledStyle: Style.default(),
+            theme: Some(theme)
+        )
+        let buffer = Buffer(area)
+        buffer.fill(area, Cell("x"))
+        palette.render(area, buffer)
+
+        @Expect(buffer.getCell(0, 0).style, theme.normal.patch(customNormal))
+        @Expect(buffer.getCell(11, 0).symbol, " ")
+        @Expect(buffer.getCell(0, 1).style, customSelected)
+        @Expect(buffer.getCell(11, 1).symbol, " ")
+        @Expect(buffer.getCell(0, 2).style, theme.disabled)
+        @Expect(buffer.getCell(11, 2).symbol, " ")
+        let explicitDisabledStyle = Style(fg: Color.Yellow)
+        let explicitDisabled = CommandPalette(
+            [MenuItem("blocked", enabled: false)],
+            block: None,
+            disabledStyle: explicitDisabledStyle,
+            theme: Some(theme)
+        )
+        let explicitDisabledBuffer = Buffer(area)
+        explicitDisabled.render(area, explicitDisabledBuffer)
+        @Expect(
+            explicitDisabledBuffer.getCell(0, 1).style,
+            theme.disabled.patch(explicitDisabledStyle)
+        )
+        explicitDisabled.setTheme(Option<Theme>.None)
+        let unthemedDisabledBuffer = Buffer(area)
+        explicitDisabled.render(area, unthemedDisabledBuffer)
+        @Expect(unthemedDisabledBuffer.getCell(0, 1).style, explicitDisabledStyle)
+
+        let legacyPalette = CommandPalette([MenuItem("legacy")], block: None)
+        let legacyBuffer = Buffer(area)
+        legacyPalette.render(area, legacyBuffer)
+        @Expect(legacyBuffer.getCell(0, 0).style, Style.default())
+        @Expect(
+            legacyBuffer.getCell(0, 1).style,
+            Style(fg: Color.Black, bg: Color.White)
+        )
+
+        let themedSelectedPalette = CommandPalette(
+            [MenuItem("selected")],
+            block: None,
+            selectedStyle: Style.default(),
+            theme: Some(theme)
+        )
+        let themedSelectedBuffer = Buffer(area)
+        themedSelectedPalette.render(area, themedSelectedBuffer)
+        @Expect(themedSelectedBuffer.getCell(0, 1).style, theme.selected)
+
+        let defaultDisabled = CommandPalette([MenuItem("blocked", enabled: false)], block: None)
+        let defaultDisabledBuffer = Buffer(area)
+        defaultDisabled.render(area, defaultDisabledBuffer)
+        @Expect(defaultDisabledBuffer.getCell(0, 1).style, Style(fg: Color.Indexed(8)))
+        palette.selected = 1
+        @Expect(palette.handle(KeyEvent(KeyCode.Enter)).isNone())
+        @Expect(palette.handleMouse(
+            MouseEvent(MouseKind.Down, MouseButton.Left, 0, 2), area
+        ).isNone())
+
+        palette.query = "missing"
+        let emptyBuffer = Buffer(area)
+        emptyBuffer.fill(area, Cell("x"))
+        palette.render(area, emptyBuffer)
+        @Expect(emptyBuffer.getCell(0, 1).symbol, "N")
+        @Expect(emptyBuffer.getCell(11, 1).symbol, " ")
+        @Expect(emptyBuffer.getCell(0, 1).style, theme.disabled)
+        @Expect(emptyBuffer.getCell(0, 2).symbol, " ")
+        @Expect(emptyBuffer.getCell(0, 2).style, theme.normal.patch(customNormal))
+        @Expect(palette.handle(KeyEvent(KeyCode.Enter)).isNone())
+        @Expect(palette.handleMouse(
+            MouseEvent(MouseKind.Down, MouseButton.Left, 0, 1), area
+        ).isNone())
+    }
 
     @TestCase
     func dropdownOpenCloseScrollAndEmptyStatesKeepTheirContracts(): Unit {

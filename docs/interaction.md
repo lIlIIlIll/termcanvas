@@ -36,10 +36,15 @@ remains unchanged and takes precedence over the theme's selected role. Pass
 Workbench's Tasks status filter uses transactional mode and applies the filter
 only after a commit or reset.
 
-A palette query change resets the selected filtered-result row and offset to zero.
-Rendering or accepting a choice also validates directly assigned query/selection
-values. `MultiSelect.selectedIndices()` and selection return values still identify
-the complete original item list, independent of the visible window.
+Palette filtering recomputes against the current item list; query changes reset
+the selected filtered-result row and offset to zero. `paste(text)` appends text
+and synchronizes both values immediately. `caseSensitive: false` enables Unicode
+lowercase substring matching across labels and actions. `setTheme(theme)` applies
+normal/selected/disabled roles; an explicit non-default `selectedStyle` wins,
+while `Style.default()` opts into the selected role. A missing result renders
+`No matches`; disabled rows and empty results cannot activate. `MultiSelect.selectedIndices()`
+and selection return values still identify the complete original item list,
+independent of the visible window.
 
 Keep a widget instance or its explicit state alive when its scroll position should
 survive updates. Recreating a widget preserves only values supplied by the caller.

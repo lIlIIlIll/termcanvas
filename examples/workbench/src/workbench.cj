@@ -80,8 +80,12 @@ class WorkbenchApp {
         MenuItem("Toggle motion", action: "motion.toggle"),
         MenuItem("Reset demo", action: "demo.reset"),
         MenuItem("Help", action: "help"),
-        MenuItem("Quit", action: "app.quit")
-    ])
+        MenuItem("Quit", action: "app.quit"),
+        MenuItem("Unavailable command", action: "unavailable", enabled: false)
+    ],
+        selectedStyle: Style.default(),
+        caseSensitive: false
+    )
     let helpDialog = Dialog(title: "Workbench help", body: "F1 help   F2 commands   F3 next page\nF4 edit task F5 run task F6 pause\nTab changes focus. / searches. q exits.\nGallery: Left/Right categories; click controls.\nMouse supports selection, sorting, scrolling, and modal actions.", buttons: ["Close"], width: 68, height: 10, selectedStyle: Style.default())
     let resetDialog = Dialog(title: "Reset task", body: "Return this task to the queued state?", buttons: ["Cancel", "Reset"], width: 56, height: 9, selectedStyle: Style.default())
     let demoResetDialog = Dialog(title: "Reset local demo", body: "Discard demo progress and restore all 120 tasks?", buttons: ["Cancel", "Reset"], width: 62, height: 9, selectedStyle: Style.default())
@@ -560,7 +564,7 @@ class WorkbenchApp {
                 }
                 UpdateResult.next()
             case Some("palette") =>
-                palette.query += text
+                palette.paste(text)
                 UpdateResult.next()
             case _ =>
                 match (focus.current()) {
@@ -1731,6 +1735,7 @@ class WorkbenchApp {
             Style(fg: accentForeground(accent), bg: accent),
             effective
         )
+        palette.setTheme(Some(theme))
         galleryDialog.setTheme(Some(theme))
         helpDialog.setTheme(Some(theme))
         resetDialog.setTheme(Some(theme))

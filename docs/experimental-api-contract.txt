@@ -107,7 +107,9 @@ core|CommandPalette|class|public class CommandPalette <: Widget {
 core|CommandPalette.query|var|public var query: String
 core|CommandPalette.selected|var|public var selected: Int64
 core|CommandPalette.offset|var|public var offset: Int64 = 0
-core|CommandPalette.init|init|public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|CommandPalette.init|init|public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style.default(), theme!: ?Theme = None, caseSensitive!: Bool = true )
+core|CommandPalette.setTheme|func|public func setTheme(theme: ?Theme): Unit
+core|CommandPalette.paste|func|public func paste(text: String): Unit
 core|CommandPalette.handle|func|public func handle(key: KeyEvent): ?String
 core|CommandPalette.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|CommandPalette.render|func|public func render(area: Rect, buffer: Buffer): Unit

@@ -73,8 +73,7 @@ class TaskPad {
             case Event.Paste(text) =>
                 let pasted = singleLinePaste(text)
                 if (commandMode) {
-                    palette.query += pasted
-                    palette.selected = 0
+                    palette.paste(pasted)
                 } else {
                     input.paste(pasted)
                 }

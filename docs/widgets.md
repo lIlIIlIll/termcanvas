@@ -54,7 +54,12 @@ from the resulting state.
 
 - `MenuBar`: horizontal menu navigation.
 - `Menu`: selectable items that return optional action strings.
-- `CommandPalette`: queryable command items that return optional action strings.
+- `CommandPalette`: substring search across labels and actions, case-sensitive
+  by default; `caseSensitive: false` uses Unicode lowercase matching. `paste(text)`
+  appends and synchronizes selection/offset; `setTheme` enables semantic roles.
+  Explicit selected styles remain authoritative; disabled items use
+  `disabledStyle`; missing results show `No matches` and cannot activate.
+  Without a theme, the default disabled style uses indexed color 8.
 - `ToastManager`: short-lived notifications; `tick()` ages them.
 - `Spinner`: lightweight progress animation.
 - `Dialog`: centered buttons with optional semantic themes. No-theme rendering

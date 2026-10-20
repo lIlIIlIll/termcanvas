@@ -245,9 +245,9 @@ func renderGalleryFeedback(app: WorkbenchApp, frame: Frame, areas: WorkbenchGall
 func renderGalleryOverlays(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryAreas): Unit {
     frame.renderWidget(galleryButton(app, "Palette · F2", 1, "gallery-open-palette"), areas.paletteButton)
     frame.renderWidget(galleryButton(app, "Open confirmation", 1, "gallery-open-dialog"), areas.dialogButton)
-    frame.renderWidget(Paragraph("The palette is the Workbench command palette, not a mock-up.", style: app.theme.normal),
+    frame.renderWidget(Paragraph("F2 search ignores case; disabled commands stay visible.", style: app.theme.normal),
         galleryRect(app.layout.galleryContent, 0, 5, app.layout.galleryContent.width, 1))
-    frame.renderWidget(Paragraph("ConfirmDialog actions close the existing modal focus scope.", style: app.theme.disabled),
+    frame.renderWidget(Paragraph("No matches is explicit; ConfirmDialog closes its focus scope.", style: app.theme.disabled),
         galleryRect(app.layout.galleryContent, 0, 6, app.layout.galleryContent.width, 1))
 }
 
