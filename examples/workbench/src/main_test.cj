@@ -532,6 +532,50 @@ class WorkbenchGalleryInteractionTest {
     }
 
     @TestCase
+    func segmentedControlT013GalleryKeyboardMouseAndResponsiveSizes(): Unit {
+        for (area in [Rect(0, 0, 80, 24), Rect(0, 0, 120, 36), Rect(0, 0, 160, 45)]) {
+            let app = WorkbenchApp()
+            _ = app.update(Event.Resize(area))
+            workbenchGalleryKey(app, KeyCode.Tab)
+            for (_ in 0..3) { workbenchGalleryKey(app, KeyCode.Right) }
+            @Expect(app.galleryTabs.selected, 3)
+
+            workbenchGalleryKey(app, KeyCode.Tab)
+            @Expect(app.focus.current(), Some("gallery-nav-tabs"))
+            workbenchGalleryKey(app, KeyCode.Tab)
+            @Expect(app.focus.current(), Some("gallery-nav-segments"))
+            @Expect(app.galleryNavigationSegments.selectedValue(), Some("Normal"))
+            workbenchGalleryKey(app, KeyCode.Right)
+            @Expect(app.galleryNavigationSegments.selectedValue(), Some("Comfortable"))
+            workbenchGalleryKey(app, KeyCode.Right)
+            @Expect(app.galleryNavigationSegments.selected, 2)
+            @Expect(app.statusMessage, "Density: Comfortable")
+
+            let areas = workbenchGalleryAreas(app.layout.galleryContent, 3)
+            @Expect(areas.navSegments.height, 1)
+            @Assert(workbenchRectContained(app.layout.galleryContent, areas.navSegments))
+            @Assert(workbenchRectContained(app.layout.galleryContent, areas.navSegmentValue))
+            let backend = TestBackend(area: area)
+            let terminal = Terminal(backend, renderMode: RenderMode.Full)
+            _ = terminal.draw { frame => app.render(frame) }
+            @Expect(backend.snapshot().contains("Preview density: Comfortable"), true)
+
+            _ = app.update(Event.Mouse(MouseEvent(
+                MouseKind.Down, MouseButton.Left, areas.navSegments.x + 9, areas.navSegments.y)))
+            @Expect(app.galleryNavigationSegments.selected, 2)
+            _ = terminal.draw { frame => app.render(frame) }
+            @Expect(backend.snapshot().contains("Preview density: Comfortable"), true)
+
+            _ = app.update(Event.Mouse(MouseEvent(
+                MouseKind.Down, MouseButton.Left, areas.navSegments.x + 1, areas.navSegments.y)))
+            @Expect(app.galleryNavigationSegments.selected, 0)
+            @Expect(app.statusMessage, "Density: Compact")
+            _ = terminal.draw { frame => app.render(frame) }
+            @Expect(backend.snapshot().contains("Preview density: Compact"), true)
+        }
+    }
+
+    @TestCase
     func dataGallerySupportsKeyboardAndMouseSelection(): Unit {
         let app = WorkbenchApp()
         workbenchGalleryKey(app, KeyCode.Tab)
@@ -856,8 +900,9 @@ class WorkbenchGalleryInteractionTest {
                     for (rect in areas.formInputs) {
                         @Assert(workbenchRectContained(app.layout.galleryContent, rect))
                     }
-                    for (rect in [areas.checkbox, areas.select, areas.switchControl, areas.switchValue, areas.asciiToggle, areas.layoutSample,
-                        areas.navTabs, areas.navMenu, areas.navTree, areas.dataSampleTabs,
+                    for (rect in [
+                        areas.checkbox, areas.select, areas.switchControl, areas.switchValue, areas.asciiToggle, areas.layoutSample,
+                        areas.navTabs, areas.navSegments, areas.navSegmentValue, areas.navMenu, areas.navTree, areas.dataSampleTabs,
                         areas.dataTable, areas.dataList, areas.dataProgress, areas.toasts,
                         areas.paletteButton, areas.dialogButton, areas.themeToggle, areas.themeAccent,
                         areas.themeCapabilityLabel, areas.themeCapabilityPreview]) {

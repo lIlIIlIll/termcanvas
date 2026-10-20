@@ -65,6 +65,11 @@ construction. A display-only instance without a supplied state ignores mouse
 selection. `Input` maps a content click to the visible text cursor. `Tabs`,
 `MenuBar`, `ColorPicker`, and `Dialog` expose their own geometry-aware mouse helpers.
 
+`SegmentedControl.handleMouse` accepts only left-button Down on visible first-row
+segment text; the one-cell separator is inert. Left/Right clamp and Home/End jump.
+Empty and disabled controls reject input; `selectedValue()` returns `None` for
+an empty list.
+
 `Dialog` normalizes its public `selected` index before keyboard, mouse, and render
 work. `ConfirmDialog` starts on No; only a left-button-down hit on the rendered
 `[No]` or `[Yes]` label returns `Some(false)` or `Some(true)`. Gaps, borders,

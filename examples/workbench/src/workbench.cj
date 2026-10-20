@@ -20,6 +20,7 @@ class WorkbenchApp {
     let gallerySelect = Select(["Compact", "Normal", "Comfortable"], selected: 1)
     let galleryCapabilityPreview = Select(["Native", "xterm-256", "ANSI-8", "Monochrome"])
     let galleryNavigationTabs = Tabs(["Overview", "Sources", "Output"])
+    let galleryNavigationSegments = SegmentedControl(["Compact", "Normal", "Comfortable"], selected: 1)
     let galleryDataTabs = Tabs(["Table", "List", "Progress"])
     let galleryMenu = Menu("Actions", [
         MenuItem("Open item", action: "open"),
@@ -435,6 +436,14 @@ class WorkbenchApp {
                 return Some(UpdateResult.next())
             case "gallery-nav-tabs" =>
                 if (galleryNavigationTabs.handle(key)) { return Some(UpdateResult.next()) }
+            case "gallery-nav-segments" =>
+                if (galleryNavigationSegments.handle(key)) {
+                    match (galleryNavigationSegments.selectedValue()) {
+                        case Some(value) => statusMessage = "Density: " + value
+                        case None => ()
+                    }
+                    return Some(UpdateResult.next())
+                }
             case "gallery-nav-menu" =>
                 match (galleryMenu.handle(key)) {
                     case Some(action) => statusMessage = "Menu action: " + action
@@ -782,6 +791,18 @@ class WorkbenchApp {
         } else if (category == 3) {
             if (galleryNavigationTabs.handleMouse(mouse, areas.navTabs)) {
                 _ = focus.focus("gallery-nav-tabs")
+                return UpdateResult.next()
+            }
+            if (galleryNavigationSegments.handleMouse(mouse, areas.navSegments)) {
+                _ = focus.focus("gallery-nav-segments")
+                match (galleryNavigationSegments.selectedValue()) {
+                    case Some(value) => statusMessage = "Density: " + value
+                    case None => ()
+                }
+                return UpdateResult.next()
+            }
+            if (widgetHitTest(mouse, areas.navSegments)) {
+                _ = focus.focus("gallery-nav-segments")
                 return UpdateResult.next()
             }
             let menuBlock = galleryBlock(this, "Menu", BorderKind.Rounded)
@@ -1440,7 +1461,18 @@ class WorkbenchApp {
     private func syncFocus(preserveCurrent: Bool): Unit {
         let old = focus.current()
         if (preserveCurrent) { rememberCurrentFocus() }
-        for (id in ["tabs", "gallery-tabs", "gallery-overview-forms", "gallery-overview-navigation", "gallery-overview-data", "gallery-overview-toast", "gallery-overview-dialog", "gallery-ascii-toggle", "gallery-button-primary", "gallery-button-secondary", "gallery-button-ghost", "gallery-button-danger", "gallery-button-disabled", "gallery-input", "gallery-checkbox", "gallery-switch", "gallery-select", "gallery-nav-tabs", "gallery-nav-menu", "gallery-nav-tree", "gallery-data-sample-tabs", "gallery-data-table", "gallery-data-list", "gallery-toast-success", "gallery-toast-warning", "gallery-toast-error", "gallery-toast-info", "gallery-open-palette", "gallery-open-dialog", "gallery-theme-toggle", "gallery-accent", "gallery-capability-preview", "projects", "log-view", "task-search", "task-filter", "task-run", "task-edit", "task-reset", "task-table", "theme-radio", "accent-picker", "setting-motion", "setting-speed", "setting-pause", "setting-reset"]) {
+        for (id in [
+            "tabs", "gallery-tabs", "gallery-overview-forms", "gallery-overview-navigation", "gallery-overview-data",
+            "gallery-overview-toast", "gallery-overview-dialog", "gallery-ascii-toggle", "gallery-button-primary",
+            "gallery-button-secondary", "gallery-button-ghost", "gallery-button-danger", "gallery-button-disabled",
+            "gallery-input", "gallery-checkbox", "gallery-switch", "gallery-select", "gallery-nav-tabs",
+            "gallery-nav-segments", "gallery-nav-menu", "gallery-nav-tree", "gallery-data-sample-tabs", "gallery-data-table",
+            "gallery-data-list", "gallery-toast-success", "gallery-toast-warning", "gallery-toast-error", "gallery-toast-info",
+            "gallery-open-palette", "gallery-open-dialog", "gallery-theme-toggle", "gallery-accent",
+            "gallery-capability-preview", "projects", "log-view", "task-search", "task-filter", "task-run", "task-edit",
+            "task-reset", "task-table", "theme-radio", "accent-picker", "setting-motion", "setting-speed", "setting-pause",
+            "setting-reset"
+        ]) {
             focus.remove(id)
         }
         if (!layout.interactive) { return }
@@ -1468,6 +1500,7 @@ class WorkbenchApp {
                         focus.add("gallery-switch")
                     case 3 =>
                         focus.add("gallery-nav-tabs")
+                        focus.add("gallery-nav-segments")
                         focus.add("gallery-nav-menu")
                         focus.add("gallery-nav-tree")
                     case 4 =>

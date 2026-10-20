@@ -61,6 +61,35 @@ func runWorkbenchHeadlessSmoke(): Int64 {
         !formsSwitch.lastSnapshot().contains("Auto sync: on")) {
         return workbenchSmokeFailure("Forms Switch value")
     }
+    let navigation = runWorkbenchScenario(app, TestScenario()
+        .event(Event.Mouse(MouseEvent(
+            MouseKind.Down, MouseButton.Left, app.layout.galleryNav.x + 26, app.layout.galleryNav.y)))
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.Right))
+        .render())
+    if (!navigation.passed || app.galleryTabs.selected != 3 ||
+        app.galleryNavigationSegments.selectedValue() != Some("Comfortable") ||
+        !navigation.lastSnapshot().contains("Preview density: Comfortable")) {
+        return workbenchSmokeFailure("Navigation SegmentedControl keyboard value")
+    }
+    let navigationAreas = workbenchGalleryAreas(app.layout.galleryContent, 3)
+    let separator = runWorkbenchScenario(app, TestScenario()
+        .event(Event.Mouse(MouseEvent(
+            MouseKind.Down, MouseButton.Left, navigationAreas.navSegments.x + 9, navigationAreas.navSegments.y)))
+        .render())
+    if (!separator.passed || app.galleryNavigationSegments.selected != 2 ||
+        !separator.lastSnapshot().contains("Preview density: Comfortable")) {
+        return workbenchSmokeFailure("Navigation SegmentedControl separator")
+    }
+    let navigationMouse = runWorkbenchScenario(app, TestScenario()
+        .event(Event.Mouse(MouseEvent(
+            MouseKind.Down, MouseButton.Left, navigationAreas.navSegments.x + 1, navigationAreas.navSegments.y)))
+        .render())
+    if (!navigationMouse.passed || app.galleryNavigationSegments.selectedValue() != Some("Compact") ||
+        !navigationMouse.lastSnapshot().contains("Preview density: Compact")) {
+        return workbenchSmokeFailure("Navigation SegmentedControl mouse value")
+    }
     let overview = runWorkbenchScenario(app, TestScenario()
         .key(KeyEvent(KeyCode.F(3)))
         .render())

@@ -96,6 +96,8 @@ class WorkbenchGalleryAreas {
     var asciiToggle: Rect = Rect(0, 0, 0, 0)
     var layoutSample: Rect = Rect(0, 0, 0, 0)
     var navTabs: Rect = Rect(0, 0, 0, 0)
+    var navSegments: Rect = Rect(0, 0, 0, 0)
+    var navSegmentValue: Rect = Rect(0, 0, 0, 0)
     var navMenu: Rect = Rect(0, 0, 0, 0)
     var navTree: Rect = Rect(0, 0, 0, 0)
     var dataTable: Rect = Rect(0, 0, 0, 0)
@@ -144,7 +146,9 @@ func workbenchGalleryAreas(area: Rect, category: Int64, sample!: Int64 = 0): Wor
         out.switchValue = galleryRect(area, 0, 16, columns[0].width, 1)
     } else if (category == 3) {
         out.navTabs = galleryRect(area, 0, 3, area.width, 1)
-        let halves = galleryColumns(area, 5, max(0, area.height - 5), 2)
+        out.navSegments = galleryRect(area, 0, 4, area.width, 1)
+        out.navSegmentValue = galleryRect(area, 0, 5, area.width, 1)
+        let halves = galleryColumns(area, 6, max(0, area.height - 6), 2)
         out.navMenu = halves[0]
         out.navTree = halves[1]
     } else if (category == 4) {

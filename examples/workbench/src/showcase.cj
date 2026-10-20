@@ -42,7 +42,7 @@ func galleryCategoryTitle(category: Int64): String {
         case 0 => "Overview  /  Graphite + Cyan"
         case 1 => "Layout  /  Borders and surfaces"
         case 2 => "Forms  /  Editable control states"
-        case 3 => "Navigation  /  Tabs, menu, tree"
+        case 3 => "Navigation  /  Segments, tabs, menu, tree"
         case 4 => "Data  /  Table, list, progress"
         case 5 => "Feedback  /  Toast lifecycle"
         case 6 => "Overlays  /  ConfirmDialog and command palette"
@@ -55,7 +55,7 @@ func galleryCategoryDescription(category: Int64): String {
         case 0 => "Semantic colors, comfortable density, and real component previews."
         case 1 => "Rounded Unicode panels, borderless surfaces, and an ASCII fallback toggle."
         case 2 => "Tab to controls; toggle the checkbox or Switch, type in the field, or change the select."
-        case 4 => "Select Table, List, or Progress; rows and viewport state persist between samples."
+        case 3 => "Select a density with Segments; the preview value follows keyboard or mouse input."
         case 5 => "Semantic severity markers use Theme roles and the shared three-second toast lifetime."
         case 6 => "Open a real confirmation; Escape closes it, Tab moves between actions."
         case _ => "Switch dark/light and accent; preview only the terminal's actual or lower color tier."
@@ -137,6 +137,16 @@ func renderGalleryNavigation(app: WorkbenchApp, frame: Frame, areas: WorkbenchGa
     tabs.setTheme(Some(app.theme))
     tabs.setFocused(app.focus.isFocused("gallery-nav-tabs"))
     frame.renderWidget(tabs, areas.navTabs)
+    app.galleryNavigationSegments.setVisualState(
+        focused: app.focus.isFocused("gallery-nav-segments"),
+        theme: Some(app.theme)
+    )
+    frame.renderWidget(app.galleryNavigationSegments, areas.navSegments)
+    let density = match (app.galleryNavigationSegments.selectedValue()) {
+        case Some(value) => value
+        case None => "none"
+    }
+    frame.renderWidget(Paragraph("Preview density: " + density, style: app.secondaryStyle), areas.navSegmentValue)
 
     let menuBlock = galleryBlock(app, "Menu", BorderKind.Rounded, focused: app.focus.isFocused("gallery-nav-menu"))
     let menuArea = menuBlock.inner(areas.navMenu)

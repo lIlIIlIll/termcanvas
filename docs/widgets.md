@@ -35,6 +35,8 @@ from the resulting state.
 - `Block`: border, title, padding, margin, and content area.
 - `Paragraph`: wrapped, aligned, styled text.
 - `Tabs`: tab labels and selected-tab presentation.
+- `SegmentedControl` (EXPERIMENTAL): one-line selected-value presentation with
+  bounded keyboard navigation and visible-text mouse selection.
 - `StatusBar`: left/right status text with an optional progress slot.
 - `StatusBarProgress`: compact progress state used by `StatusBar`.
 - `Viewport`: bounded content viewport and scrolling surface.
@@ -110,6 +112,16 @@ theme's `normal` and `selected` roles. A custom `style` patches the normal role
 after opt-in. Without that opt-in, `style` and `selectedStyle` keep their
 existing rendering even when a theme is set. Passing `None` clears the theme.
 A focused selected tab still adds bold and underline.
+
+`SegmentedControl` is EXPERIMENTAL. It draws the selected value as `[value]`,
+other values as ` value `, and adds one non-hit separator cell between segments.
+Left/Right clamp at the ends; Home/End select the first/last value.
+`selectedValue()` normalizes the public index and returns `None` for an empty
+list; empty controls render blank and reject input. `setVisualState` applies
+normal/selected/disabled Theme roles when `selectedStyle` is `Style.default()`;
+focus adds bold and underline to the selected segment, and disabled controls
+ignore input. Narrow rendering keeps the selected segment visible without
+splitting wide glyphs; mouse hits only visible segment text, never the separator.
 
 `Button` fills its assigned cell rectangle, centers its label, and resolves
 disabled and focused styles through its existing style parameters and optional

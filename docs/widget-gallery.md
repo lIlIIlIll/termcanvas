@@ -25,6 +25,11 @@ visible value synchronized across the supported terminal sizes.
 Its Button row maps Primary to accent, Secondary to surface, Ghost to normal,
 and Danger to error styles. The live editor remains separate from static state
 previews.
+
+Navigation includes an experimental `SegmentedControl` for Compact, Normal,
+and Comfortable density. Left/Right and Home/End update selection; clicking
+visible segment text updates the displayed preview value, while separator clicks
+are inert. T013 exercises the Gallery at `80×24`, `120×36`, and `160×45`.
 Themes switches Dark/Light, the accent, and a color-tier preview capped at
 detected terminal capability; Layout toggles ASCII border fallback. The gallery
 uses ASCII borders automatically when the terminal reports no Unicode support
@@ -77,6 +82,7 @@ demonstration does not promote an experimental declaration.
 | `Button`, `Input`, `List`, `Table`, and stable `Tabs` controls | Implemented | STABLE | Focus preview, visible List-row hit/render, and Tabs keyboard, mouse, and no-theme boundary behavior in the [Workbench tests](../examples/workbench/src/main_test.cj) and [core widget tests](../packages/core/src/widget_render_boundary_test.cj). |
 | `Tabs.setTheme` | Implemented | EXPERIMENTAL | Workbench category, sample, and Navigation selectors use semantic roles; core tests cover opt-in, explicit-style preservation, focus modifiers, Unicode, and clipping. |
 | `Switch` keyboard, pointer, state text, and responsive routing | Implemented | EXPERIMENTAL | Core T012 tests cover input, disabled state, style roles, empty labels, and clipping; Workbench verifies visible values at 80×24, 120×36, and 160×45. |
+| `SegmentedControl` keyboard, pointer, selected-value, theme, and narrow-window behavior | Implemented | EXPERIMENTAL | Core T013 covers bounds, empty/disabled state, theme/focus, wide-glyph clipping, visible-index mapping, separator hits, and clip boundaries; Workbench T013 checks the preview value at 80×24, 120×36, and 160×45. |
 | `Gauge`, `Sparkline`, `FocusManager`, and `ModalFocusState` | Implemented | EXPERIMENTAL | Demonstrated by the Workbench; consult each symbol's inventory entry before depending on it. |
 | `CommandPalette` search, paste, theme, disabled, and empty-state behavior | Implemented | EXPERIMENTAL | Workbench F2 covers case-insensitive search, disabled commands, `No matches`, mouse activation, Escape, and focus restoration; core tests cover case-sensitive defaults, action matching, Unicode paste reset, theme precedence, and full-row clearing. |
 | `Dialog` theme, selection normalization, and `ConfirmDialog` actions | Implemented | EXPERIMENTAL | Core boundary tests cover legacy and themed style precedence, 80×24 No/Yes hits, and invalid clicks; the Workbench test covers visible outcomes, theme refresh, resize, and modal focus restoration. |
