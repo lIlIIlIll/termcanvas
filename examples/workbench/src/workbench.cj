@@ -17,6 +17,7 @@ class WorkbenchApp {
     let galleryInput = Input(value: "", placeholder: "Type to edit this input")
     let galleryCheckbox = Checkbox("Compact density")
     let gallerySwitch = Switch("Auto sync")
+    let galleryDate = DatePicker(year: 2024, month: 2, day: 29, style: Style.default())
     let gallerySelect = Select(["Compact", "Normal", "Comfortable"], selected: 1)
     let galleryCapabilityPreview = Select(["Native", "xterm-256", "ANSI-8", "Monochrome"])
     let galleryNavigationTabs = Tabs(["Overview", "Sources", "Output"])
@@ -428,6 +429,11 @@ class WorkbenchApp {
                     statusMessage = "Auto sync: " + if (gallerySwitch.checked) { "on" } else { "off" }
                 }
                 return Some(UpdateResult.next())
+            case "gallery-date" =>
+                if (galleryDate.handle(key)) {
+                    statusMessage = "Date: " + galleryDate.value()
+                }
+                return Some(UpdateResult.next())
             case "gallery-select" =>
                 match (gallerySelect.handle(key)) {
                     case Some(value) => statusMessage = "Density: " + value
@@ -786,6 +792,20 @@ class WorkbenchApp {
             if (widgetHitTest(mouse, areas.select)) {
                 _ = focus.focus("gallery-select")
                 _ = gallerySelect.handleMouse(mouse, areas.select)
+                return UpdateResult.next()
+            }
+            if (galleryButton(this, "Year -1", 1, "gallery-date-year-down").handleMouse(mouse, areas.datePreviousYear)) {
+                _ = focus.focus("gallery-date")
+                if (galleryDate.handle(KeyEvent(KeyCode.PageDown))) {
+                    statusMessage = "Date: " + galleryDate.value()
+                }
+                return UpdateResult.next()
+            }
+            if (galleryButton(this, "Year +1", 1, "gallery-date-year-up").handleMouse(mouse, areas.dateNextYear)) {
+                _ = focus.focus("gallery-date")
+                if (galleryDate.handle(KeyEvent(KeyCode.PageUp))) {
+                    statusMessage = "Date: " + galleryDate.value()
+                }
                 return UpdateResult.next()
             }
         } else if (category == 3) {
@@ -1465,7 +1485,7 @@ class WorkbenchApp {
             "tabs", "gallery-tabs", "gallery-overview-forms", "gallery-overview-navigation", "gallery-overview-data",
             "gallery-overview-toast", "gallery-overview-dialog", "gallery-ascii-toggle", "gallery-button-primary",
             "gallery-button-secondary", "gallery-button-ghost", "gallery-button-danger", "gallery-button-disabled",
-            "gallery-input", "gallery-checkbox", "gallery-switch", "gallery-select", "gallery-nav-tabs",
+            "gallery-input", "gallery-checkbox", "gallery-switch", "gallery-date", "gallery-select", "gallery-nav-tabs",
             "gallery-nav-segments", "gallery-nav-menu", "gallery-nav-tree", "gallery-data-sample-tabs", "gallery-data-table",
             "gallery-data-list", "gallery-toast-success", "gallery-toast-warning", "gallery-toast-error", "gallery-toast-info",
             "gallery-open-palette", "gallery-open-dialog", "gallery-theme-toggle", "gallery-accent",
@@ -1498,6 +1518,7 @@ class WorkbenchApp {
                         focus.add("gallery-checkbox")
                         focus.add("gallery-select")
                         focus.add("gallery-switch")
+                        focus.add("gallery-date")
                     case 3 =>
                         focus.add("gallery-nav-tabs")
                         focus.add("gallery-nav-segments")

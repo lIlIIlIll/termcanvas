@@ -470,6 +470,48 @@ class WorkbenchGalleryInteractionTest {
     }
 
     @TestCase
+    func datePickerT015GalleryUsesKeyboardAndMappedMouseButtonsAtAllSizes(): Unit {
+        for ((width, height) in [(Int64(80), Int64(24)), (120, 36), (160, 45)]) {
+            let app = WorkbenchApp()
+            let screen = Rect(0, 0, width, height)
+            _ = app.update(Event.Resize(screen))
+            workbenchGalleryKey(app, KeyCode.Tab)
+            workbenchGalleryKey(app, KeyCode.Right)
+            workbenchGalleryKey(app, KeyCode.Right)
+            workbenchGalleryKey(app, KeyCode.Tab)
+            for (_ in 0..8) { workbenchGalleryKey(app, KeyCode.Tab) }
+
+            @Expect(app.focus.current(), Some("gallery-date"))
+            @Expect(app.galleryDate.value(), "2024-02-29")
+            workbenchGalleryKey(app, KeyCode.PageUp)
+            @Expect(app.galleryDate.value(), "2025-02-28")
+            workbenchGalleryKey(app, KeyCode.PageDown)
+            @Expect(app.galleryDate.value(), "2024-02-28")
+
+            let areas = workbenchGalleryAreas(app.layout.galleryContent, 2)
+            @Assert(workbenchRectContained(app.layout.galleryContent, areas.datePicker))
+            @Assert(workbenchRectContained(app.layout.galleryContent, areas.datePreviousYear))
+            @Assert(workbenchRectContained(app.layout.galleryContent, areas.dateNextYear))
+            _ = app.update(Event.Mouse(MouseEvent(
+                MouseKind.Down, MouseButton.Left, areas.dateNextYear.right - 1, areas.dateNextYear.y)))
+            @Expect(app.galleryDate.value(), "2025-02-28")
+            @Expect(app.focus.current(), Some("gallery-date"))
+            _ = app.update(Event.Mouse(MouseEvent(
+                MouseKind.Down, MouseButton.Left, areas.datePreviousYear.right - 1, areas.datePreviousYear.y)))
+            @Expect(app.galleryDate.value(), "2024-02-28")
+
+            let rendered = TestScenario().render().run(
+                { frame => app.render(frame) },
+                { event => app.update(event) },
+                width: width,
+                height: height
+            )
+            @Expect(rendered.passed, true)
+            @Assert(rendered.lastSnapshot().contains("2024-02-28"))
+        }
+    }
+
+    @TestCase
     func galleryCategoryAndCheckboxRespondToMouse(): Unit {
         let app = WorkbenchApp()
         _ = app.update(Event.Mouse(MouseEvent(
@@ -935,6 +977,7 @@ class WorkbenchGalleryInteractionTest {
                         @Assert(workbenchRectContained(app.layout.galleryContent, rect))
                     }
                     for (rect in [
+                        areas.dateLabel, areas.datePicker, areas.datePreviousYear, areas.dateNextYear,
                         areas.checkbox, areas.select, areas.switchControl, areas.switchValue, areas.asciiToggle, areas.layoutSample,
                         areas.navTabs, areas.navSegments, areas.navSegmentValue, areas.navMenu, areas.navTree, areas.dataSampleTabs,
                         areas.dataTable, areas.dataList, areas.dataProgress, areas.toasts,

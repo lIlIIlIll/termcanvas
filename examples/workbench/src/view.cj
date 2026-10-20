@@ -92,6 +92,10 @@ class WorkbenchGalleryAreas {
     var select: Rect = Rect(0, 0, 0, 0)
     var switchControl: Rect = Rect(0, 0, 0, 0)
     var switchValue: Rect = Rect(0, 0, 0, 0)
+    var dateLabel: Rect = Rect(0, 0, 0, 0)
+    var datePicker: Rect = Rect(0, 0, 0, 0)
+    var datePreviousYear: Rect = Rect(0, 0, 0, 0)
+    var dateNextYear: Rect = Rect(0, 0, 0, 0)
     var panels: Array<Rect> = []
     var asciiToggle: Rect = Rect(0, 0, 0, 0)
     var layoutSample: Rect = Rect(0, 0, 0, 0)
@@ -145,6 +149,12 @@ func workbenchGalleryAreas(area: Rect, category: Int64, sample!: Int64 = 0): Wor
         out.select = galleryRect(area, columns[1].x - area.x, 13, columns[1].width, 4)
         out.switchControl = galleryRect(area, 0, 15, columns[0].width, 1)
         out.switchValue = galleryRect(area, 0, 16, columns[0].width, 1)
+        out.dateLabel = galleryRect(area, 0, 17, 5, 1)
+        out.datePicker = galleryRect(area, 5, 17, max(0, columns[0].width - 5), 1)
+        let yearButtonWidth = columns[1].width / 2
+        out.datePreviousYear = galleryRect(area, columns[1].x - area.x, 17, yearButtonWidth, 1)
+        out.dateNextYear = galleryRect(area, columns[1].x - area.x + yearButtonWidth, 17,
+            columns[1].width - yearButtonWidth, 1)
     } else if (category == 3) {
         out.navTabs = galleryRect(area, 0, 3, area.width, 1)
         out.navSegments = galleryRect(area, 0, 4, area.width, 1)

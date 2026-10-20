@@ -51,7 +51,12 @@ from the resulting state.
 - `Switch`: EXPERIMENTAL boolean choice; Space/Enter or a left-button Down on its first visible row toggles the state.
 - `RadioGroup`: one choice from a group.
 - `Select`, `Dropdown`, `MultiSelect`: one or many selectable values. `Dropdown` can opt into transactional preview/commit; legacy behavior remains the default.
-- `DatePicker`: date selection workflow.
+- `DatePicker` (EXPERIMENTAL): displays `year-MM-DD`; Left/Right adjust days,
+  Up/Down months, and PageUp/PageDown years with saturation and day clamping.
+  Supported key operations normalize its public date fields; callers assigning
+  fields directly must keep them valid. Cyan remains the default; use Theme
+  roles with `style: Style.default()` and `theme`, or via `setVisualState`.
+  No calendar grid, parser, locale/timezone, date range, or DatePicker mouse-field editing.
 
 ### Commands and overlays
 

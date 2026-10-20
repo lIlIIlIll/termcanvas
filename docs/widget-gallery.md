@@ -118,7 +118,9 @@ not used as evidence; no metadata has been backfilled.
   paste, undo/redo, folds, decorations, and completion.
 - `Button`, `Checkbox`, `Switch`, and `RadioGroup` cover common choices and actions.
 - `Select`, `Dropdown`, and `MultiSelect` cover one- or many-value selection; Dropdown transactions are opt-in, so the legacy preview behavior remains the default.
-- `DatePicker` supports date selection workflows.
+- `DatePicker` demonstrates PageUp/PageDown year changes with saturation and
+  clamped days; Gallery year buttons route through those key commands. The
+  widget has no calendar grid or mouse field editing.
 
 ## Lists, tables, and navigation
 

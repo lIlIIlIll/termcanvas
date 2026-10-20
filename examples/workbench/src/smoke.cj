@@ -92,6 +92,23 @@ func runWorkbenchHeadlessSmoke(): Int64 {
         !formsSwitch.lastSnapshot().contains("Auto sync: on")) {
         return workbenchSmokeFailure("Forms Switch value")
     }
+    let formsDate = runWorkbenchScenario(app, TestScenario()
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.PageUp))
+        .render())
+    if (!formsDate.passed || app.galleryDate.value() != "2025-02-28" ||
+        !formsDate.lastSnapshot().contains("2025-02-28")) {
+        return workbenchSmokeFailure("Forms DatePicker year keyboard control")
+    }
+    let dateAreas = workbenchGalleryAreas(app.layout.galleryContent, 2)
+    let formsDateMouse = runWorkbenchScenario(app, TestScenario()
+        .event(Event.Mouse(MouseEvent(
+            MouseKind.Down, MouseButton.Left, dateAreas.dateNextYear.right - 1, dateAreas.dateNextYear.y)))
+        .render())
+    if (!formsDateMouse.passed || app.galleryDate.value() != "2026-02-28" ||
+        !formsDateMouse.lastSnapshot().contains("2026-02-28")) {
+        return workbenchSmokeFailure("Forms DatePicker mouse button maps to PageUp")
+    }
     let navigation = runWorkbenchScenario(app, TestScenario()
         .event(Event.Mouse(MouseEvent(
             MouseKind.Down, MouseButton.Left, app.layout.galleryNav.x + 26, app.layout.galleryNav.y)))

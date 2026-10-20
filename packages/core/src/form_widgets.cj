@@ -717,34 +717,87 @@ public class DatePicker <: Widget {
     public var year: Int64
     public var month: Int64
     public var day: Int64
+    private var focused: Bool
+    private var disabled: Bool
+    private let style: Style
+    private var theme: ?Theme
 
-    public init(year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1) {
+    public init(
+        year!: Int64 = 2026,
+        month!: Int64 = 1,
+        day!: Int64 = 1,
+        style!: Style = Style(fg: Color.Cyan),
+        theme!: ?Theme = None
+    ) {
         this.year = max(1, year)
         this.month = clamp(month, 1, 12)
         this.day = clamp(day, 1, datePickerDaysInMonth(this.year, this.month))
+        this.focused = false
+        this.disabled = false
+        this.style = style
+        this.theme = theme
+    }
+
+    /** 设置聚焦、禁用状态及语义主题；禁用时拒绝日期键盘操作。
+     */
+    public func setVisualState(
+        focused!: Bool = false,
+        disabled!: Bool = false,
+        theme!: ?Theme = None
+    ): Unit {
+        this.focused = focused
+        this.disabled = disabled
+        this.theme = theme
+    }
+
+    private func normalizeDate(): Unit {
+        year = max(1, year)
+        month = clamp(month, 1, 12)
+        day = clamp(day, 1, datePickerDaysInMonth(year, month))
     }
 
     public func value(): String { "${year}-${pad2(month)}-${pad2(day)}" }
 
+    /** 左右键调整日，上下键调整月，PageUp/PageDown 调整年；支持的操作先校正公开日期字段。禁用或不支持的按键返回 false 且不修改状态。
+     */
     public func handle(key: KeyEvent): Bool {
+        if (disabled) { return false }
         match (key.code) {
-            case KeyCode.Left => day = max(1, day - 1); true
-            case KeyCode.Right => day = min(datePickerDaysInMonth(year, month), day + 1); true
-            case KeyCode.Up =>
-                month = min(12, month + 1)
-                day = min(day, datePickerDaysInMonth(year, month))
-                true
-            case KeyCode.Down =>
-                month = max(1, month - 1)
-                day = min(day, datePickerDaysInMonth(year, month))
-                true
+            case KeyCode.Left | KeyCode.Right | KeyCode.Up | KeyCode.Down | KeyCode.PageUp | KeyCode.PageDown =>
+                normalizeDate()
+                match (key.code) {
+                    case KeyCode.Left => day = max(1, day - 1); true
+                    case KeyCode.Right => day = min(datePickerDaysInMonth(year, month), day + 1); true
+                    case KeyCode.Up =>
+                        month = min(12, month + 1)
+                        day = min(day, datePickerDaysInMonth(year, month))
+                        true
+                    case KeyCode.Down =>
+                        month = max(1, month - 1)
+                        day = min(day, datePickerDaysInMonth(year, month))
+                        true
+                    case KeyCode.PageUp =>
+                        if (year < Int64.Max) { year += 1 }
+                        day = min(day, datePickerDaysInMonth(year, month))
+                        true
+                    case KeyCode.PageDown =>
+                        if (year > 1) { year -= 1 }
+                        day = min(day, datePickerDaysInMonth(year, month))
+                        true
+                    case _ => false
+                }
             case _ => false
         }
     }
 
+    /** 在非空区域首行绘制截断后的日期文本；样式按视觉状态和主题解析，默认保持青色前景。
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
-        buffer.setString(area.x, area.y, truncate(value(), area.width), style: Style(fg: Color.Cyan))
+        let rowStyle = resolvedStateStyle(style, style, style, focused, disabled, theme)
+        buffer.withCanvasClip(area) { =>
+            buffer.setString(area.x, area.y, truncate(value(), area.width), style: rowStyle)
+        }
     }
 }
 

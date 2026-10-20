@@ -129,6 +129,14 @@ func renderGalleryForms(app: WorkbenchApp, frame: Frame, areas: WorkbenchGallery
     frame.renderWidget(app.gallerySwitch, areas.switchControl)
     let switchState = if (app.gallerySwitch.checked) { "on" } else { "off" }
     frame.renderWidget(Paragraph("Auto sync: ${switchState}", style: app.secondaryStyle), areas.switchValue)
+    frame.renderWidget(Paragraph("Date:", style: app.theme.disabled), areas.dateLabel)
+    app.galleryDate.setVisualState(
+        focused: app.focus.isFocused("gallery-date"),
+        theme: Some(app.theme)
+    )
+    frame.renderWidget(app.galleryDate, areas.datePicker)
+    frame.renderWidget(galleryButton(app, "Year -1", 1, "gallery-date-year-down"), areas.datePreviousYear)
+    frame.renderWidget(galleryButton(app, "Year +1", 1, "gallery-date-year-up"), areas.dateNextYear)
 }
 
 func renderGalleryNavigation(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryAreas): Unit {
