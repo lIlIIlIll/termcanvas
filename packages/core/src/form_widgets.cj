@@ -193,22 +193,29 @@ public class RadioGroup <: Widget {
             let index = offset + i
             let active = index == selected
             let mark = if (active) { "(*) " } else { "( ) " }
-            let rowStyle = if (disabled) {
-                themedDisabled(disabledStyle, theme)
-            } else if (active) {
-                themedSelected(selectedStyle, theme)
-            } else if (focused) {
-                themedFocused(focusedStyle, theme)
-            } else {
-                themedNormal(style, theme)
-            }
+            let rowStyle = resolvedSemanticStateStyle(
+                style,
+                focusedStyle,
+                selectedStyle,
+                disabledStyle,
+                Style.default(),
+                focused,
+                active,
+                disabled,
+                false,
+                theme
+            )
             buffer.setString(target.x, target.y + i, truncate(mark + items[index], target.width), style: rowStyle)
         }
     }
 }
 
+/** 按行绘制选项，当前索引对应的行使用选中样式；可通过按键移动索引并取得选项文字。
+ */
 public class Select <: Widget {
     private let items: Array<String>
+    /** 当前选项的索引；在有效范围内时可用于获取选项文字，并决定绘制时哪一行使用选中样式。
+     */
     public var selected: Int64
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1

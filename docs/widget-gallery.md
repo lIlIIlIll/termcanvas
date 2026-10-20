@@ -20,9 +20,10 @@ navigation; Left/Right changes categories; Tab then reaches the category's real
 controls. Mouse clicks use the same widget hit regions. `F2` opens the existing
 command palette, `F3` changes Workbench pages, and `Esc` closes overlays. The
 Forms page demonstrates normal, focused, error, and disabled control states;
-Themes switches Dark/Light and the accent; Layout toggles ASCII border fallback.
-The gallery remains interactive at `80×24` and adapts panel content to the
-available terminal cells.
+Themes switches Dark/Light, the accent, and a color-tier preview capped at
+detected terminal capability; Layout toggles ASCII border fallback. The gallery
+uses ASCII borders automatically when the terminal reports no Unicode support
+and remains interactive at `80×24`, adapting panel content to available cells.
 
 The data gallery uses task progress in hundredths of a percent (`0..10000`) for
 both its label and `Gauge`; `0.83%` is therefore a small fraction, not 83% of the
@@ -33,6 +34,32 @@ selector. Switching samples preserves separate table/list selections, and only
 visible controls enter the focus order. Table and List viewports expand with
 available height; Progress pairs the weighted gauge with the progress-history
 sparkline.
+
+### Theme and terminal capabilities
+
+`Style.patch` treats `Color.Reset` and `Modifier.none()` as inheritance markers.
+Other foreground/background colors replace their corresponding base colors; a
+non-empty modifier replaces the entire modifier set. The themed state order is
+disabled, error, selected, focused, then normal. A focused selected/error state
+keeps that role's colors and adds focus modifiers; disabled state suppresses
+focus styling.
+
+`Theme.graphite`, `Theme.light`, `Theme.forCapabilities`, and
+`adaptStyleForCapabilities` are EXPERIMENTAL. Capability adaptation preserves
+RGB for true-color terminals, maps RGB to the nearest xterm-256 entry for
+xterm-256, maps RGB/indexed colors to the nearest ANSI-8 color for ANSI-8, and
+resets foreground/background colors for monochrome. Palette ties choose the
+lowest index. Modifiers are preserved. A `colorLevel` of 16 uses ANSI-8
+adaptation; levels below 8 use monochrome unless `trueColor` is true.
+The monochrome preview replaces colored accent swatches with ASCII initials and
+keeps the selected palette value unchanged for later theme changes.
+
+The Themes page previews the detected tier or a lower tier only; a preview
+cannot claim capabilities above the actual `Event.Capabilities` value. The
+Workbench also selects ASCII borders when terminal capabilities report no
+Unicode support. Environment-based detection is an inference, not a native
+low-color terminal test; such terminals remain unverified without exercising
+the real terminal.
 
 ### Capability matrix
 

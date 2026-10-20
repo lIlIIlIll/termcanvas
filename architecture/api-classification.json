@@ -61,6 +61,15 @@
       "consumer_evidence": "Broad core, example, and omp-cj usage."
     },
     {
+      "id": "core-style-capabilities-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Theme.graphite", "Theme.light", "Theme.forCapabilities", "adaptStyleForCapabilities"]},
+      "stability": "EXPERIMENTAL", "subsystem": "style", "owner": "core/style",
+      "reason": "Semantic theme factories and deterministic terminal-tier adaptation add an optional styling policy without changing the stable Theme shape.",
+      "consumer_evidence": "Workbench capability preview and direct palette/adaptation contract tests; no principal consumer adoption.",
+      "promotion_condition": "Independent production consumers validate role colors, deterministic palette mapping, and behavior across true-color, xterm-256, ANSI-8, and monochrome terminals.",
+      "sunset_condition": "Review after Workbench adoption; remove the optional adaptation API if no independent consumer needs capability-aware themes."
+    },
+    {
       "id": "core-style-state-experimental",
       "match": {"package": "core", "symbols": ["StyleState"]},
       "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",

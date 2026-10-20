@@ -21,7 +21,7 @@ func renderShowcase(app: WorkbenchApp, frame: Frame): Unit {
     frame.fill(layout.galleryContent, app.theme.normal)
     let areas = workbenchGalleryAreas(layout.galleryContent, app.galleryTabs.selected, sample: app.galleryDataTabs.selected)
     frame.renderWidget(Paragraph(galleryCategoryTitle(app.galleryTabs.selected), style: app.theme.accent), areas.title)
-    frame.renderWidget(Paragraph(galleryCategoryDescription(app.galleryTabs.selected), style: workbenchSecondaryStyle(app.darkTheme)), areas.description)
+    frame.renderWidget(Paragraph(galleryCategoryDescription(app.galleryTabs.selected), style: app.secondaryStyle), areas.description)
     match (app.galleryTabs.selected) {
         case 0 => renderGalleryOverview(app, frame, areas)
         case 1 => renderGalleryLayout(app, frame, areas)
@@ -46,7 +46,7 @@ func galleryCategoryTitle(category: Int64): String {
         case 4 => "Data  /  Table, list, progress"
         case 5 => "Feedback  /  Toast lifecycle"
         case 6 => "Overlays  /  Dialog and command palette"
-        case _ => "Themes  /  Dark, light, accent"
+        case _ => "Themes  /  palette and terminal color tiers"
     }
 }
 
@@ -58,7 +58,7 @@ func galleryCategoryDescription(category: Int64): String {
         case 4 => "Select Table, List, or Progress; rows and viewport state persist between samples."
         case 5 => "Each severity uses the shared ToastManager and its existing three-second lifetime."
         case 6 => "Open a real modal; Escape closes it, Tab moves between dialog actions."
-        case _ => "Switch the app theme or accent; the preview uses the same semantic tokens."
+        case _ => "Switch dark/light and accent; preview only the terminal's actual or lower color tier."
     }
 }
 
@@ -248,9 +248,23 @@ func renderGalleryThemes(app: WorkbenchApp, frame: Frame, areas: WorkbenchGaller
     frame.renderWidget(galleryButton(app, if (app.darkTheme) { "Switch to Light" } else { "Switch to Graphite" },
         1, "gallery-theme-toggle"), areas.themeToggle)
     frame.renderWidget(Paragraph("Accent", style: app.theme.disabled), areas.themeAccent)
-    frame.renderWidget(app.accentPicker, galleryRect(app.layout.galleryContent, 0, 6, min(36, app.layout.galleryContent.width), 1))
+    renderWorkbenchAccentPicker(app, frame, galleryRect(app.layout.galleryContent, 0, 6, min(36, app.layout.galleryContent.width), 1))
+    frame.renderWidget(
+        Paragraph(
+            "Terminal: ${colorCapabilityLabel(app.actualColorTier())} · preview: ${colorCapabilityLabel(app.effectiveColorTier())}",
+            style: app.secondaryStyle
+        ),
+        areas.themeCapabilityLabel
+    )
+    let capabilityPreview = Select(
+        ["Native", "xterm-256", "ANSI-8", "Monochrome"],
+        selected: app.galleryCapabilityPreview.selected,
+        style: app.theme.normal,
+        selectedStyle: app.theme.selected
+    )
+    frame.renderWidget(capabilityPreview, areas.themeCapabilityPreview)
     let labels = ["Primary text", "Secondary text", "Disabled", "Success", "Warning"]
-    let styles = [app.theme.normal, workbenchSecondaryStyle(app.darkTheme), app.theme.disabled,
+    let styles = [app.theme.normal, app.secondaryStyle, app.theme.disabled,
         app.theme.success, app.theme.warning]
     for (index in 0..min(areas.themeSamples.size, labels.size)) {
         frame.renderWidget(Paragraph(labels[index], style: styles[index]), areas.themeSamples[index])
@@ -266,10 +280,9 @@ func renderGalleryButtonRow(app: WorkbenchApp, frame: Frame, areas: WorkbenchGal
 }
 
 func galleryButton(app: WorkbenchApp, label: String, variant: Int64, id: String, disabled!: Bool = false): Button {
-    let surface = workbenchSurfaceStyle(app.darkTheme)
     let style = match (variant) {
-        case 0 => Style(fg: accentForeground(app.selectedAccentColor()), bg: app.selectedAccentColor())
-        case 1 => surface
+        case 0 => app.accentButtonStyle
+        case 1 => app.surfaceStyle
         case 2 => app.theme.normal
         case 3 => app.theme.error
         case _ => app.theme.disabled
@@ -281,9 +294,9 @@ func galleryButton(app: WorkbenchApp, label: String, variant: Int64, id: String,
 func galleryBlock(app: WorkbenchApp, title: String, border: BorderKind,
     focused!: Bool = false, asciiFallback!: Bool = false): Block {
     Block(BlockOptions(title: title, borderKind: border,
-        backgroundStyle: workbenchSurfaceStyle(app.darkTheme),
-        borderStyle: if (focused) { app.theme.focused } else { workbenchBorderStyle(app.darkTheme) },
+        backgroundStyle: app.surfaceStyle,
+        borderStyle: if (focused) { app.theme.focused } else { app.borderStyle },
         contentStyle: app.theme.normal, titleStyle: app.theme.accent,
         state: if (focused) { BoxState.Focused } else { BoxState.Normal },
-        asciiFallback: asciiFallback))
+        asciiFallback: asciiFallback || !app.capabilities.unicode))
 }

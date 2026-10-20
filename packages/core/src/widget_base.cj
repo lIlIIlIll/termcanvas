@@ -32,45 +32,27 @@ func resolvedStateStyle(
 }
 
 func themedNormal(style: Style, theme: ?Theme): Style {
-    match (theme) {
-        case Some(t) => t.normal.patch(style)
-        case None => style
-    }
+    themeRoleStyle(style, ThemeRole.Normal, theme)
 }
 
 func themedFocused(style: Style, theme: ?Theme): Style {
-    match (theme) {
-        case Some(t) => t.focused.patch(style)
-        case None => style
-    }
+    themeRoleStyle(style, ThemeRole.Focused, theme)
 }
 
 func themedSelected(style: Style, theme: ?Theme): Style {
-    match (theme) {
-        case Some(t) => t.selected.patch(style)
-        case None => style
-    }
+    themeRoleStyle(style, ThemeRole.Selected, theme)
 }
 
 func themedDisabled(style: Style, theme: ?Theme): Style {
-    match (theme) {
-        case Some(t) => t.disabled.patch(style)
-        case None => style
-    }
+    themeRoleStyle(style, ThemeRole.Disabled, theme)
 }
 
 func themedError(style: Style, theme: ?Theme): Style {
-    match (theme) {
-        case Some(t) => t.error.patch(style)
-        case None => style
-    }
+    themeRoleStyle(style, ThemeRole.Error, theme)
 }
 
 func themedAccent(style: Style, theme: ?Theme): Style {
-    match (theme) {
-        case Some(t) => t.accent.patch(style)
-        case None => style
-    }
+    themeRoleStyle(style, ThemeRole.Accent, theme)
 }
 
 func decimalDigits(value: Int64): Int64 {

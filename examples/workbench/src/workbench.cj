@@ -17,6 +17,7 @@ class WorkbenchApp {
     let galleryInput = Input(value: "", placeholder: "Type to edit this input")
     let galleryCheckbox = Checkbox("Compact density")
     let gallerySelect = Select(["Compact", "Normal", "Comfortable"], selected: 1)
+    let galleryCapabilityPreview = Select(["Native", "xterm-256", "ANSI-8", "Monochrome"])
     let galleryNavigationTabs = Tabs(["Overview", "Sources", "Output"])
     let galleryDataTabs = Tabs(["Table", "List", "Progress"])
     let galleryMenu = Menu("Actions", [
@@ -53,7 +54,8 @@ class WorkbenchApp {
     let logScroll = ScrollState()
     let capture = PointerCapture()
     let themeRadio = RadioGroup(["Dark", "Light"], selected: 0, block: Some(Block(title: "Theme")))
-    let accentPicker = ColorPicker(selected: 5)
+    let accentColors = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan]
+    let accentPicker = ColorPicker(colors: accentColors, selected: 5)
     let motionToggle = Checkbox("Motion", checked: true)
     let speedSelect = Select(["0.5x", "1x", "2x"], selected: 1)
     let editorName = Input(value: "", placeholder: "Task name", block: Block(title: "Name"))
@@ -85,8 +87,13 @@ class WorkbenchApp {
     let demoResetDialog = Dialog(title: "Reset local demo", body: "Discard demo progress and restore all 120 tasks?", buttons: ["Cancel", "Reset"], width: 62, height: 9)
 
     var darkTheme: Bool = true
+    var capabilities: TerminalCapabilities = TerminalCapabilities()
     var theme: Theme = Theme.default()
     var motionEnabled: Bool = true
+    var surfaceStyle: Style = Style.default()
+    var secondaryStyle: Style = Style.default()
+    var borderStyle: Style = Style.default()
+    var accentButtonStyle: Style = Style.default()
     var paused: Bool = false
     var statusMessage: String = "Ready"
     var editorError: String = ""
@@ -125,7 +132,7 @@ class WorkbenchApp {
             KeyBinding([KeyEvent(KeyCode.F(5))], "task.start"),
             KeyBinding([KeyEvent(KeyCode.F(6))], "simulation.pause")
         ]))
-        theme = buildWorkbenchTheme(darkTheme, selectedAccent())
+        refreshTheme()
         projects.expandAll()
         _ = projects.selectById("all")
         recordActivity("Local demo initialized: 120 tasks")
@@ -159,7 +166,10 @@ class WorkbenchApp {
                 } else {
                     UpdateResult.unchanged()
                 }
-            case Event.Capabilities(_) => UpdateResult.unchanged()
+            case Event.Capabilities(value) =>
+                capabilities = value
+                refreshTheme()
+                UpdateResult.next()
             case _ => UpdateResult.unchanged()
         }
     }
@@ -463,6 +473,10 @@ class WorkbenchApp {
                 }
             case "gallery-accent" =>
                 if (accentPicker.handle(key)) { applyThemeSelection(); return Some(UpdateResult.next()) }
+            case "gallery-capability-preview" =>
+                _ = galleryCapabilityPreview.handle(key)
+                refreshTheme()
+                return Some(UpdateResult.next())
             case _ => ()
         }
         None
@@ -834,6 +848,12 @@ class WorkbenchApp {
                 return UpdateResult.next()
             }
         } else {
+            if (widgetHitTest(mouse, areas.themeCapabilityPreview)) {
+                _ = focus.focus("gallery-capability-preview")
+                _ = galleryCapabilityPreview.handleMouse(mouse, areas.themeCapabilityPreview)
+                refreshTheme()
+                return UpdateResult.next()
+            }
             if (galleryButton(this, "Theme", 1, "gallery-theme-toggle").handleMouse(mouse, areas.themeToggle)) {
                 _ = focus.focus("gallery-theme-toggle")
                 themeRadio.selected = if (darkTheme) { 1 } else { 0 }
@@ -1417,7 +1437,7 @@ class WorkbenchApp {
     private func syncFocus(preserveCurrent: Bool): Unit {
         let old = focus.current()
         if (preserveCurrent) { rememberCurrentFocus() }
-        for (id in ["tabs", "gallery-tabs", "gallery-overview-forms", "gallery-overview-navigation", "gallery-overview-data", "gallery-overview-toast", "gallery-overview-dialog", "gallery-ascii-toggle", "gallery-button-primary", "gallery-button-secondary", "gallery-button-ghost", "gallery-button-danger", "gallery-button-disabled", "gallery-input", "gallery-checkbox", "gallery-select", "gallery-nav-tabs", "gallery-nav-menu", "gallery-nav-tree", "gallery-data-sample-tabs", "gallery-data-table", "gallery-data-list", "gallery-toast-success", "gallery-toast-warning", "gallery-toast-error", "gallery-toast-info", "gallery-open-palette", "gallery-open-dialog", "gallery-theme-toggle", "gallery-accent", "projects", "log-view", "task-search", "task-filter", "task-run", "task-edit", "task-reset", "task-table", "theme-radio", "accent-picker", "setting-motion", "setting-speed", "setting-pause", "setting-reset"]) {
+        for (id in ["tabs", "gallery-tabs", "gallery-overview-forms", "gallery-overview-navigation", "gallery-overview-data", "gallery-overview-toast", "gallery-overview-dialog", "gallery-ascii-toggle", "gallery-button-primary", "gallery-button-secondary", "gallery-button-ghost", "gallery-button-danger", "gallery-button-disabled", "gallery-input", "gallery-checkbox", "gallery-select", "gallery-nav-tabs", "gallery-nav-menu", "gallery-nav-tree", "gallery-data-sample-tabs", "gallery-data-table", "gallery-data-list", "gallery-toast-success", "gallery-toast-warning", "gallery-toast-error", "gallery-toast-info", "gallery-open-palette", "gallery-open-dialog", "gallery-theme-toggle", "gallery-accent", "gallery-capability-preview", "projects", "log-view", "task-search", "task-filter", "task-run", "task-edit", "task-reset", "task-table", "theme-radio", "accent-picker", "setting-motion", "setting-speed", "setting-pause", "setting-reset"]) {
             focus.remove(id)
         }
         if (!layout.interactive) { return }
@@ -1464,6 +1484,7 @@ class WorkbenchApp {
                     case _ =>
                         focus.add("gallery-theme-toggle")
                         focus.add("gallery-accent")
+                        focus.add("gallery-capability-preview")
                 }
             case WorkbenchPage.Overview =>
                 if (layout.projectTree.width > 0) { focus.add("projects") }
@@ -1708,8 +1729,41 @@ class WorkbenchApp {
 
     private func applyThemeSelection(): Unit {
         darkTheme = themeRadio.selected == 0
-        theme = buildWorkbenchTheme(darkTheme, selectedAccent())
+        refreshTheme()
         statusMessage = if (darkTheme) { "Dark theme" } else { "Light theme" }
+    }
+
+    private func refreshTheme(): Unit {
+        let effective = effectiveCapabilities()
+        let accent = selectedAccent()
+        theme = Theme.forCapabilities(effective, dark: darkTheme, accent: accent)
+        surfaceStyle = adaptStyleForCapabilities(workbenchSurfaceStyle(darkTheme), effective)
+        secondaryStyle = adaptStyleForCapabilities(workbenchSecondaryStyle(darkTheme), effective)
+        borderStyle = adaptStyleForCapabilities(workbenchBorderStyle(darkTheme), effective)
+        accentButtonStyle = adaptStyleForCapabilities(
+            Style(fg: accentForeground(accent), bg: accent),
+            effective
+        )
+    }
+
+    func actualColorTier(): Int64 {
+        colorCapabilityTier(capabilities)
+    }
+
+    func effectiveColorTier(): Int64 {
+        let requested = match (galleryCapabilityPreview.selected) {
+            case 1 => 2
+            case 2 => 1
+            case 3 => 0
+            case _ => 3
+        }
+        min(actualColorTier(), requested)
+    }
+
+    private func effectiveCapabilities(): TerminalCapabilities {
+        let tier = effectiveColorTier()
+        if (tier == actualColorTier()) { return capabilities }
+        capabilitiesForColorTier(capabilities, tier)
     }
 
     private func selectedAccent(): Color {
@@ -1718,7 +1772,6 @@ class WorkbenchApp {
             case None => Color.Cyan
         }
     }
-    func selectedAccentColor(): Color { selectedAccent() }
 
     private func applySpeed(value: String): Unit {
         simulationSpeed = match (value) {
@@ -1814,26 +1867,45 @@ class WorkbenchApp {
     }
 }
 
-func buildWorkbenchTheme(dark: Bool, accent: Color): Theme {
-    let background = if (dark) { Color.Rgb(18, 21, 26) } else { Color.Rgb(247, 249, 252) }
-    let foreground = if (dark) { Color.Rgb(224, 230, 237) } else { Color.Rgb(31, 41, 51) }
-    let selectedBackground = if (dark) { Color.Rgb(26, 43, 50) } else { Color.Rgb(229, 239, 243) }
-    let focusedBackground = if (dark) { Color.Rgb(30, 61, 69) } else { Color.Rgb(213, 238, 243) }
-    let mutedForeground = if (dark) { Color.Rgb(145, 157, 169) } else { Color.Rgb(97, 110, 126) }
-    let semanticError = if (dark) { Color.Rgb(255, 119, 125) } else { Color.Rgb(180, 35, 45) }
-    let semanticSuccess = if (dark) { Color.Rgb(103, 216, 166) } else { Color.Rgb(26, 128, 83) }
-    let semanticWarning = if (dark) { Color.Rgb(255, 200, 105) } else { Color.Rgb(150, 91, 0) }
-    let semanticInfo = if (dark) { Color.Rgb(80, 203, 221) } else { Color.Rgb(0, 109, 129) }
-    Theme(
-        normal: Style(fg: foreground, bg: background),
-        focused: Style(fg: foreground, bg: focusedBackground, modifier: Modifier.strong()),
-        selected: Style(fg: foreground, bg: selectedBackground, modifier: Modifier.strong()),
-        disabled: Style(fg: mutedForeground, bg: background),
-        error: Style(fg: semanticError, bg: background),
-        accent: Style(fg: accent, bg: background),
-        success: Style(fg: semanticSuccess, bg: background),
-        warning: Style(fg: semanticWarning, bg: background),
-        info: Style(fg: semanticInfo, bg: background)
+func colorCapabilityTier(capabilities: TerminalCapabilities): Int64 {
+    if (capabilities.trueColor) { return 3 }
+    if (capabilities.colorLevel >= 256) { return 2 }
+    if (capabilities.colorLevel >= 8) { return 1 }
+    0
+}
+
+func colorCapabilityLabel(tier: Int64): String {
+    match (tier) {
+        case 3 => "true-color"
+        case 2 => "xterm-256"
+        case 1 => "ANSI-8"
+        case _ => "monochrome"
+    }
+}
+
+func capabilitiesForColorTier(source: TerminalCapabilities, tier: Int64): TerminalCapabilities {
+    let trueColor = tier >= 3
+    let colorLevel = if (trueColor) { 24 } else if (tier == 2) { 256 } else if (tier == 1) { 8 } else { 1 }
+    TerminalCapabilities(
+        size: source.size,
+        trueColor: trueColor,
+        colorLevel: colorLevel,
+        mouse: source.mouse,
+        mouseMove: source.mouseMove,
+        focusEvents: source.focusEvents,
+        bracketedPaste: source.bracketedPaste,
+        alternateScreen: source.alternateScreen,
+        unicode: source.unicode,
+        kittyGraphics: source.kittyGraphics,
+        sixel: source.sixel,
+        osc8: source.osc8,
+        keyboardProtocol: source.keyboardProtocol,
+        keyUp: source.keyUp,
+        keyRepeat: source.keyRepeat,
+        recommendedFps: source.recommendedFps,
+        cellWidthPixels: source.cellWidthPixels,
+        cellHeightPixels: source.cellHeightPixels,
+        driverName: source.driverName
     )
 }
 

@@ -105,6 +105,8 @@ class WorkbenchGalleryAreas {
     var dialogButton: Rect = Rect(0, 0, 0, 0)
     var themeToggle: Rect = Rect(0, 0, 0, 0)
     var themeAccent: Rect = Rect(0, 0, 0, 0)
+    var themeCapabilityLabel: Rect = Rect(0, 0, 0, 0)
+    var themeCapabilityPreview: Rect = Rect(0, 0, 0, 0)
     var themeSamples: Array<Rect> = []
 }
 
@@ -162,7 +164,9 @@ func workbenchGalleryAreas(area: Rect, category: Int64, sample!: Int64 = 0): Wor
     } else {
         out.themeToggle = galleryRect(area, 0, 3, min(24, area.width), 1)
         out.themeAccent = galleryRect(area, 0, 5, min(36, area.width), 1)
-        out.themeSamples = galleryColumns(area, 8, 1, 5)
+        out.themeCapabilityLabel = galleryRect(area, 0, 8, area.width, 1)
+        out.themeCapabilityPreview = galleryRect(area, 0, 9, min(40, area.width), 4)
+        out.themeSamples = galleryColumns(area, 13, 1, 5)
     }
     out
 }
@@ -375,7 +379,7 @@ func renderWorkbench(app: WorkbenchApp, frame: Frame): Unit {
         let right = if (layout.status.width < 100) { "Tab focus  F1 help  F2 cmds  Ctrl-C exit" }
             else { "LOCAL DEMO  ${state}  F1 help  F2 palette  F3 page  Tab focus  Ctrl-C exit" }
         frame.renderWidget(StatusBar(left: counts + "  " + app.statusMessage, right: right,
-            style: workbenchSecondaryStyle(app.darkTheme)), layout.status)
+            style: app.secondaryStyle), layout.status)
     }
     let localGalleryToast = app.page == WorkbenchPage.Showcase && app.galleryTabs.selected == 5
     if (app.toastManager.count() > 0 && !localGalleryToast && frame.isDirty(layout.toast)) {
@@ -582,6 +586,35 @@ func renderTaskDetail(app: WorkbenchApp, frame: Frame): Unit {
     }
 }
 
+func workbenchAccentInitial(color: Color): String {
+    match (color) {
+        case Color.Red => "R"
+        case Color.Green => "G"
+        case Color.Yellow => "Y"
+        case Color.Blue => "B"
+        case Color.Magenta => "M"
+        case Color.Cyan => "C"
+        case _ => "?"
+    }
+}
+
+
+func renderWorkbenchAccentPicker(app: WorkbenchApp, frame: Frame, area: Rect): Unit {
+    if (app.effectiveColorTier() > 0) {
+        frame.renderWidget(app.accentPicker, area)
+        return
+    }
+
+    var palette = ""
+    for (i in 0..app.accentColors.size) {
+        palette += workbenchAccentInitial(app.accentColors[i])
+        palette += if (i == app.accentPicker.selected) { "*" } else { " " }
+        palette += " "
+    }
+    frame.renderWidget(Paragraph(palette, style: app.theme.normal), area)
+}
+
+
 func renderSettings(app: WorkbenchApp, frame: Frame): Unit {
     let layout = app.layout
     if (!frame.isDirty(layout.settingsArea)) { return }
@@ -590,7 +623,7 @@ func renderSettings(app: WorkbenchApp, frame: Frame): Unit {
     frame.renderWidget(galleryBlock(app, "Simulation", BorderKind.Rounded), layout.settingsRight)
     frame.renderWidget(app.themeRadio, layout.settingTheme)
     frame.renderWidget(Paragraph("Accent color", style: app.theme.normal), Rect(layout.settingAccent.x, layout.settingAccent.y, layout.settingAccent.width, 1))
-    frame.renderWidget(app.accentPicker, Rect(layout.settingAccent.x, layout.settingAccent.y + min(1, layout.settingAccent.height), layout.settingAccent.width, max(0, layout.settingAccent.height - 1)))
+    renderWorkbenchAccentPicker(app, frame, Rect(layout.settingAccent.x, layout.settingAccent.y + min(1, layout.settingAccent.height), layout.settingAccent.width, max(0, layout.settingAccent.height - 1)))
     frame.renderWidget(Checkbox("Motion", checked: app.motionEnabled, focused: app.focus.isFocused("setting-motion"),
         style: app.theme.normal, focusedStyle: app.selectedStyle(), theme: Some(app.theme)), layout.settingMotion)
     frame.renderWidget(Paragraph("Task speed", style: app.theme.normal), Rect(layout.settingSpeed.x, layout.settingSpeed.y, layout.settingSpeed.width, 1))
@@ -617,7 +650,7 @@ func renderModal(app: WorkbenchApp, frame: Frame): Unit {
                 let dialog = Dialog(title: "Component dialog",
                     body: "This is the real Dialog widget.\nConfirm returns to the gallery.",
                     buttons: ["Cancel", "Confirm"], selected: selected, width: 52, height: 9,
-                    style: workbenchSurfaceStyle(app.darkTheme), selectedStyle: app.theme.selected)
+                    style: app.surfaceStyle, selectedStyle: app.theme.selected)
                 frame.renderWidget(dialog, app.layout.dialog)
             }
         case Some("help") =>

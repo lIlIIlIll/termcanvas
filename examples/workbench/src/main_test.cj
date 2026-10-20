@@ -544,8 +544,8 @@ class WorkbenchGalleryInteractionTest {
                     for (rect in [areas.checkbox, areas.select, areas.asciiToggle, areas.layoutSample,
                         areas.navTabs, areas.navMenu, areas.navTree, areas.dataSampleTabs,
                         areas.dataTable, areas.dataList, areas.dataProgress, areas.toasts,
-                        areas.paletteButton, areas.dialogButton, areas.themeToggle, areas.themeAccent]) {
-                        @Assert(workbenchRectContained(app.layout.galleryContent, rect))
+                        areas.paletteButton, areas.dialogButton, areas.themeToggle, areas.themeAccent,
+                        areas.themeCapabilityLabel, areas.themeCapabilityPreview]) {
                     }
                     if (category == 4) {
                         @Assert(areas.dataSampleTabs.width == app.layout.galleryContent.width)
@@ -575,6 +575,10 @@ class WorkbenchGalleryInteractionTest {
                     @Expect(rendered.passed, true)
                     @Assert(rendered.lastSnapshot().contains(galleryCategoryTitle(category)))
                     @Assert(!rendered.lastSnapshot().contains("Need at least"))
+                    if (category == 7) {
+                        @Assert(rendered.lastSnapshot().contains("Terminal: true-color · preview: true-color"))
+                        @Assert(rendered.lastSnapshot().contains("Monochrome"))
+                    }
                 }
 
             }
@@ -636,7 +640,7 @@ class WorkbenchProgressFormattingTest {
 class WorkbenchThemeTest {
     @TestCase
     func graphiteCyanThemeDefinesSemanticColorRoles(): Unit {
-        let dark = buildWorkbenchTheme(true, Color.Cyan)
+        let dark = Theme.graphite(accent: Color.Cyan)
         @Expect(dark.normal, Style(fg: Color.Rgb(224, 230, 237), bg: Color.Rgb(18, 21, 26)))
         @Expect(dark.focused, Style(fg: Color.Rgb(224, 230, 237), bg: Color.Rgb(30, 61, 69), modifier: Modifier.strong()))
         @Expect(dark.selected, Style(fg: Color.Rgb(224, 230, 237), bg: Color.Rgb(26, 43, 50), modifier: Modifier.strong()))
@@ -646,10 +650,112 @@ class WorkbenchThemeTest {
         @Expect(dark.warning, Style(fg: Color.Rgb(255, 200, 105), bg: Color.Rgb(18, 21, 26)))
         @Expect(dark.info, Style(fg: Color.Rgb(80, 203, 221), bg: Color.Rgb(18, 21, 26)))
 
-        let light = buildWorkbenchTheme(false, Color.Cyan)
+        let light = Theme.light(accent: Color.Cyan)
         @Expect(light.normal, Style(fg: Color.Rgb(31, 41, 51), bg: Color.Rgb(247, 249, 252)))
         @Expect(light.selected, Style(fg: Color.Rgb(31, 41, 51), bg: Color.Rgb(229, 239, 243), modifier: Modifier.strong()))
     }
+}
+
+@Test
+class WorkbenchCapabilityPreviewTest {
+    @TestCase
+    func capabilityEventsAndGalleryPreviewNeverUpgradeTheDetectedTier(): Unit {
+        let app = WorkbenchApp()
+        app.galleryTabs.selected = 7
+        _ = app.update(Event.Resize(Rect(0, 0, 120, 36)))
+        _ = app.focus.focus("gallery-capability-preview")
+        workbenchGalleryKey(app, KeyCode.Down)
+        @Expect(app.galleryCapabilityPreview.selected, 1)
+        @Expect(app.actualColorTier(), 3)
+        @Expect(app.effectiveColorTier(), 2)
+        match (app.theme.normal.fg) {
+            case Color.Indexed(_) => @Expect(true)
+            case _ => @Expect(false)
+        }
+
+        app.accentPicker.selected = 0
+        _ = app.update(Event.Capabilities(TerminalCapabilities(
+            trueColor: false,
+            colorLevel: 16,
+            unicode: false
+        )))
+        @Expect(app.actualColorTier(), 1)
+        @Expect(app.effectiveColorTier(), 1)
+        @Expect(app.accentPicker.selected, 0)
+        @Expect(app.theme.normal, Style(fg: Color.White, bg: Color.Black))
+
+        let blockBuffer = Buffer(Rect(0, 0, 12, 3))
+        galleryBlock(app, "Capabilities", BorderKind.Rounded).render(blockBuffer.area, blockBuffer)
+        @Expect(blockBuffer.getCell(0, 0).symbol, "+")
+
+        workbenchGalleryKey(app, KeyCode.Home)
+        @Expect(app.galleryCapabilityPreview.selected, 0)
+        @Expect(app.effectiveColorTier(), 1)
+        _ = app.update(Event.Capabilities(TerminalCapabilities(
+            trueColor: true,
+            colorLevel: 24,
+            unicode: true
+        )))
+        @Expect(app.actualColorTier(), 3)
+        @Expect(app.effectiveColorTier(), 3)
+        @Expect(app.theme.normal, Style(fg: Color.Rgb(224, 230, 237), bg: Color.Rgb(18, 21, 26)))
+        let previewArea = workbenchGalleryAreas(app.layout.galleryContent, 7).themeCapabilityPreview
+        _ = app.update(Event.Mouse(MouseEvent(
+            MouseKind.Down, MouseButton.Left, previewArea.x + 1, previewArea.y + 3)))
+        @Expect(app.galleryCapabilityPreview.selected, 3)
+        @Expect(app.effectiveColorTier(), 0)
+        @Expect(app.theme.normal, Style.default())
+    }
+
+    @TestCase
+    func monochromePreviewKeepsPaletteValueAndMatchesFullRender(): Unit {
+        let area = Rect(0, 0, 120, 36)
+        let partialApp = WorkbenchApp()
+        let fullApp = WorkbenchApp()
+        partialApp.galleryTabs.selected = 7
+        fullApp.galleryTabs.selected = 7
+        partialApp.accentPicker.selected = 2
+        fullApp.accentPicker.selected = 2
+        _ = partialApp.update(Event.Resize(area))
+        _ = fullApp.update(Event.Resize(area))
+        _ = partialApp.focus.focus("gallery-capability-preview")
+        _ = fullApp.focus.focus("gallery-capability-preview")
+
+        let partialBackend = TestBackend(area: area, captureSnapshots: false)
+        let fullBackend = TestBackend(area: area, captureSnapshots: false)
+        let partial = Terminal(partialBackend, renderMode: RenderMode.Diff)
+        let full = Terminal(fullBackend, renderMode: RenderMode.Full)
+        _ = partial.draw { frame => partialApp.render(frame) }
+        _ = full.draw { frame => fullApp.render(frame) }
+
+        let ansi8 = TerminalCapabilities(trueColor: false, colorLevel: 16, unicode: false)
+        _ = partialApp.update(Event.Capabilities(ansi8))
+        _ = fullApp.update(Event.Capabilities(ansi8))
+        for (_ in 0..3) {
+            workbenchGalleryKey(partialApp, KeyCode.Down)
+            workbenchGalleryKey(fullApp, KeyCode.Down)
+        }
+        @Expect(partialApp.galleryCapabilityPreview.selected, 3)
+        @Expect(partialApp.actualColorTier(), 1)
+        @Expect(partialApp.effectiveColorTier(), 0)
+        @Expect(partialApp.accentPicker.selected, 2)
+
+        _ = partial.draw { frame => partialApp.render(frame) }
+        _ = full.draw { frame => fullApp.render(frame) }
+        let partialBuffer = partialBackend.lastBuffer().getOrThrow()
+        let fullBuffer = fullBackend.lastBuffer().getOrThrow()
+        @Expect(partialBuffer.diff(fullBuffer).size, 0)
+
+        let paletteArea = galleryRect(partialApp.layout.galleryContent, 0, 6, 36, 1)
+        @Expect(partialBuffer.getCell(paletteArea.x + 6, paletteArea.y).symbol, "Y")
+        @Expect(partialBuffer.getCell(paletteArea.x + 7, paletteArea.y).symbol, "*")
+        for (x in paletteArea.x..paletteArea.right) {
+            let style = partialBuffer.getCell(x, paletteArea.y).style
+            @Expect(style, Style.default())
+        }
+    }
+
+
 }
 
 

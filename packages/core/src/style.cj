@@ -122,6 +122,39 @@ public struct Theme {
         Theme()
     }
 
+    /** 返回石墨色语义主题，并将指定颜色用作强调色。
+     */
+    public static func graphite(accent!: Color = Color.Cyan): Theme {
+        semanticTheme(dark: true, accent: accent)
+    }
+
+    /** 返回浅色语义主题，并将指定颜色用作强调色。
+     */
+    public static func light(accent!: Color = Color.Cyan): Theme {
+        semanticTheme(dark: false, accent: accent)
+    }
+
+    /** 按终端支持的颜色能力适配语义主题中的全部样式。
+     */
+    public static func forCapabilities(
+        capabilities: TerminalCapabilities,
+        dark!: Bool = true,
+        accent!: Color = Color.Cyan
+    ): Theme {
+        let base = if (dark) { Theme.graphite(accent: accent) } else { Theme.light(accent: accent) }
+        Theme(
+            normal: adaptStyleForCapabilities(base.normal, capabilities),
+            focused: adaptStyleForCapabilities(base.focused, capabilities),
+            selected: adaptStyleForCapabilities(base.selected, capabilities),
+            disabled: adaptStyleForCapabilities(base.disabled, capabilities),
+            error: adaptStyleForCapabilities(base.error, capabilities),
+            accent: adaptStyleForCapabilities(base.accent, capabilities),
+            success: adaptStyleForCapabilities(base.success, capabilities),
+            warning: adaptStyleForCapabilities(base.warning, capabilities),
+            info: adaptStyleForCapabilities(base.info, capabilities)
+        )
+    }
+
     public func serialize(): String {
         "normal=${styleName(normal)}\nfocused=${styleName(focused)}\nselected=${styleName(selected)}\ndisabled=${styleName(disabled)}\nerror=${styleName(error)}\naccent=${styleName(accent)}\nsuccess=${styleName(success)}\nwarning=${styleName(warning)}\ninfo=${styleName(info)}"
     }
