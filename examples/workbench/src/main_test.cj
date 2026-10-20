@@ -286,15 +286,37 @@ class WorkbenchGalleryInteractionTest {
         let backend = TestBackend(area: app.screen, captureSnapshots: false)
         let terminal = Terminal(backend, renderMode: RenderMode.Full)
         _ = terminal.draw { frame => app.render(frame) }
-        let inputArea = workbenchGalleryAreas(app.layout.galleryContent, 2).formInputs[1]
-        let previewStyle = backend.lastBuffer().getOrThrow().getCell(inputArea.x, inputArea.y).style
-        @Expect(previewStyle == app.theme.normal, true)
+        let galleryAreas = workbenchGalleryAreas(app.layout.galleryContent, 2)
+        let firstBuffer = backend.lastBuffer().getOrThrow()
+        let inputArea = galleryAreas.formInputs[1]
+        let previewStyle = firstBuffer.getCell(inputArea.x, inputArea.y).style
+        @Expect(previewStyle == app.theme.disabled.withBg(app.theme.normal.bg), true)
+        @Expect(firstBuffer.getCell(galleryAreas.formInputs[0].x, galleryAreas.formInputs[0].y).style ==
+            app.theme.normal, true)
+        @Expect(firstBuffer.getCell(galleryAreas.formInputs[2].x, galleryAreas.formInputs[2].y).style ==
+            app.theme.error, true)
+        @Expect(firstBuffer.getCell(galleryAreas.formInputs[3].x, galleryAreas.formInputs[3].y).style ==
+            app.theme.disabled, true)
+        @Expect(firstBuffer.getCell(galleryAreas.buttons[0].x, galleryAreas.buttons[0].y).style ==
+            app.theme.focused, true)
 
         for (_ in 0..4) { workbenchGalleryKey(app, KeyCode.Tab) }
         @Expect(app.focus.current(), Some("gallery-input"))
         _ = terminal.draw { frame => app.render(frame) }
-        let focusedStyle = backend.lastBuffer().getOrThrow().getCell(inputArea.x, inputArea.y).style
-        @Expect(focusedStyle == app.theme.focused, true)
+        let rendered = backend.lastBuffer().getOrThrow()
+        let focusedStyle = rendered.getCell(inputArea.x, inputArea.y).style
+        @Expect(focusedStyle == app.theme.disabled.withBg(app.theme.focused.bg), true)
+        let buttonStyles = [
+            app.accentButtonStyle,
+            app.surfaceStyle,
+            app.theme.normal,
+            app.theme.error,
+            app.theme.disabled
+        ]
+        for (index in 0..min(galleryAreas.buttons.size, buttonStyles.size)) {
+            let area = galleryAreas.buttons[index]
+            @Expect(rendered.getCell(area.x, area.y).style == buttonStyles[index], true)
+        }
     }
     @TestCase
     func keyboardNavigationActivatesControlsAndKeepsInputEditableAfterFocusRestore(): Unit {

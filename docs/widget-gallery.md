@@ -19,7 +19,10 @@ The Workbench opens in the Graphite / Cyan theme. `Tab` enters category
 navigation; Left/Right changes categories; Tab then reaches the category's real
 controls. Mouse clicks use the same widget hit regions. `F2` opens the existing
 command palette, `F3` changes Workbench pages, and `Esc` closes overlays. The
-Forms page demonstrates normal, focused, error, and disabled control states;
+Forms page demonstrates normal, focused, error, and disabled control states.
+Its Button row maps Primary to accent, Secondary to surface, Ghost to normal,
+and Danger to error styles. The live editor remains separate from static state
+previews.
 Themes switches Dark/Light, the accent, and a color-tier preview capped at
 detected terminal capability; Layout toggles ASCII border fallback. The gallery
 uses ASCII borders automatically when the terminal reports no Unicode support

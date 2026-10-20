@@ -87,6 +87,149 @@ class CjTuiComponentPrimitivesTest {
         Panel(BlockOptions(title: "P"), child: Some(Paragraph("body"))).render(panelBuffer.area, panelBuffer)
         @Expect(panelBuffer.getCell(1, 1).symbol, "b")
     }
+    @TestCase
+    func buttonFillsClickableAreaAndCentersLabel(): Unit {
+        let style = Style(fg: Color.Black, bg: Color.Cyan)
+        let button = Button("OK", focused: true, style: style, focusedStyle: style)
+        let area = Rect(2, 1, 8, 3)
+        let buffer = Buffer(Rect(0, 0, 12, 5))
+        button.render(area, buffer)
+        @Expect(buffer.getCell(2, 1).style, style)
+        @Expect(buffer.getCell(9, 3).style, style)
+        @Expect(buffer.getCell(5, 2).symbol, "O")
+        @Expect(buffer.getCell(6, 2).symbol, "K")
+        let snapshot = StringBuilder()
+        for (x in area.x..area.right) { snapshot.append(buffer.getCell(x, area.y + 1).symbol) }
+        @Expect(snapshot.toString(), "   OK   ")
+        @Expect(button.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 9, 3), area))
+        @Expect(!button.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 10, 3), area))
+        @Expect(!Button("Off", disabled: true).handleMouse(
+            MouseEvent(MouseKind.Down, MouseButton.Left, 3, 2), Rect(2, 1, 8, 3)))
+    }
+
+    @TestCase
+    func buttonClipsNarrowUnicodeAndRespectsBlockHitArea(): Unit {
+        let style = Style(fg: Color.Black, bg: Color.Cyan)
+        let buffer = Buffer(Rect(0, 0, 12, 5))
+        buffer.setString(1, 0, "x")
+        Button("A", style: style).render(Rect(1, 0, 0, 1), buffer)
+        @Expect(buffer.getCell(1, 0).symbol, "x")
+
+        Button("AB", style: style).render(Rect(2, 0, 1, 1), buffer)
+        @Expect(buffer.getCell(2, 0).symbol, "A")
+        @Expect(buffer.getCell(2, 0).style, style)
+        Button("界Z", style: style).render(Rect(4, 0, 2, 1), buffer)
+        @Expect(buffer.getCell(4, 0).symbol, "界")
+
+        let borderStyle = Style(fg: Color.Red)
+        let block = Block(BlockOptions(borderKind: BorderKind.Ascii, borderStyle: borderStyle))
+        let area = Rect(2, 1, 8, 3)
+        let inner = block.inner(area)
+        let blockBuffer = Buffer(Rect(0, 0, 12, 5))
+        let button = Button("界", block: Some(block), style: style)
+        button.render(area, blockBuffer)
+        @Expect(blockBuffer.getCell(area.x, area.y).symbol, "+")
+        @Expect(blockBuffer.getCell(area.x, area.y).style, borderStyle)
+        @Expect(blockBuffer.getCell(inner.x, inner.y).style, style)
+        @Expect(blockBuffer.getCell(inner.x + 2, inner.y).symbol, "界")
+        @Expect(!button.handleMouse(MouseEvent(
+            MouseKind.Down, MouseButton.Left, area.x, inner.y), area))
+        @Expect(button.handleMouse(MouseEvent(
+            MouseKind.Down, MouseButton.Left, inner.x, inner.y), area))
+
+        let disabledStyle = Style(fg: Color.White, bg: Color.Red)
+        let disabledButton = Button("Off", focused: true, disabled: true,
+            style: style, focusedStyle: Style(fg: Color.Yellow), disabledStyle: disabledStyle)
+        let disabledBuffer = Buffer(Rect(0, 0, 4, 1))
+        disabledButton.render(disabledBuffer.area, disabledBuffer)
+        @Expect(disabledBuffer.getCell(0, 0).style, disabledStyle)
+        @Expect(!disabledButton.handle(KeyEvent(KeyCode.Enter)))
+        @Expect(!disabledButton.handleMouse(
+            MouseEvent(MouseKind.Down, MouseButton.Left, 1, 0), disabledBuffer.area))
+    }
+
+    @TestCase
+    func inputVisualStatesFillAreaAndDisabledStateRejectsInput(): Unit {
+        let theme = Theme(
+            normal: Style(fg: Color.White, bg: Color.Black),
+            focused: Style(fg: Color.Black, bg: Color.Cyan),
+            disabled: Style(fg: Color.Rgb(145, 157, 169), bg: Color.Black),
+            error: Style(fg: Color.Red, bg: Color.Black)
+        )
+        let input = Input(placeholder: "Name")
+        let area = Rect(0, 0, 5, 2)
+        let buffer = Buffer(area)
+
+        input.setVisualState(focused: true, theme: Some(theme))
+        input.render(area, buffer)
+        @Expect(buffer.getCell(0, 0).symbol, "N")
+        @Expect(buffer.getCell(0, 0).style, Style(fg: Color.Rgb(145, 157, 169), bg: Color.Cyan))
+        @Expect(buffer.getCell(4, 0).style, Style(fg: Color.Black, bg: Color.Cyan))
+        @Expect(buffer.getCell(2, 1).style, Style(fg: Color.Black, bg: Color.Cyan))
+        let legacyInput = Input(placeholder: "Name")
+        let legacyBuffer = Buffer(area)
+        legacyInput.render(area, legacyBuffer)
+        @Expect(legacyBuffer.getCell(0, 0).style, Style(fg: Color.Indexed(8)))
+        let customInput = Input(placeholder: "Name", placeholderStyle: Style(fg: Color.Yellow))
+        customInput.setVisualState(focused: true, theme: Some(theme))
+        let customBuffer = Buffer(area)
+        customInput.render(area, customBuffer)
+        @Expect(customBuffer.getCell(0, 0).style, Style(fg: Color.Yellow, bg: Color.Cyan))
+
+        input.setValue("ab", cursor: 2)
+        input.setVisualState(disabled: true, theme: Some(theme))
+        @Expect(!input.handle(KeyEvent(KeyCode.Char(r'x'))))
+        @Expect(!input.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 2, 0), area))
+        @Expect(input.value, "ab")
+        @Expect(input.cursor, 2)
+        input.render(area, buffer)
+        @Expect(buffer.getCell(0, 0).style, theme.disabled)
+        @Expect(buffer.getCell(4, 0).style, theme.disabled)
+
+        input.setVisualState(error: true, theme: Some(theme))
+        input.render(area, buffer)
+        @Expect(buffer.getCell(0, 0).style, theme.error)
+    }
+
+    @TestCase
+    func inputPasteClampsRuneOffsetsAndLeavesNoOpStatesUntouched(): Unit {
+        let boundary = Input(value: "A界Z", cursor: "A界".size)
+        boundary.paste("🙂")
+        @Expect(boundary.value, "A界🙂Z")
+        @Expect(boundary.cursor, "A界🙂".size)
+
+        let midRune = Input(value: "A界Z")
+        midRune.cursor = 2
+        midRune.paste("🙂")
+        @Expect(midRune.value, "A🙂界Z")
+        @Expect(midRune.cursor, "A🙂".size)
+
+        let beforeStart = Input(value: "A界Z")
+        beforeStart.cursor = -4
+        beforeStart.paste("🙂")
+        @Expect(beforeStart.value, "🙂A界Z")
+        @Expect(beforeStart.cursor, "🙂".size)
+
+        let afterEnd = Input(value: "A界Z")
+        afterEnd.cursor = 99
+        afterEnd.paste("!")
+        @Expect(afterEnd.value, "A界Z!")
+        @Expect(afterEnd.cursor, "A界Z!".size)
+
+        let empty = Input(value: "A界Z", cursor: "A界".size)
+        empty.paste("")
+        @Expect(empty.value, "A界Z")
+        @Expect(empty.cursor, "A界".size)
+
+        let disabled = Input(value: "A界Z", cursor: "A界".size)
+        disabled.setVisualState(disabled: true)
+        disabled.paste("🙂")
+        @Expect(!disabled.handle(KeyEvent(KeyCode.Char(r'x'))))
+        @Expect(!disabled.handleMouse(
+            MouseEvent(MouseKind.Down, MouseButton.Left, 1, 0), Rect(0, 0, 8, 1)))
+        @Expect(disabled.value, "A界Z")
+        @Expect(disabled.cursor, "A界".size)
+    }
 
     @TestCase
     func bufferAndCanvasFillPrimitivesPreserveWideCells(): Unit {

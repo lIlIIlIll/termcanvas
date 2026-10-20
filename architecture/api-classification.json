@@ -276,6 +276,14 @@
       "consumer_evidence": "Recommended examples; core primitives are also used by omp-cj."
     },
     {
+      "id": "core-input-paste-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Input.paste"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Paste insertion is new editing behavior; applications retain ownership of normalization and routing.",
+      "consumer_evidence": "Workbench, Form Studio, TaskPad, and direct cursor-boundary and disabled-state tests.",
+      "promotion_condition": "Independent consumers validate cursor-boundary and normalization responsibilities before this member is stable."
+    },
+    {
       "id": "core-widget-experimental",
       "match": {"package": "core", "symbols": ["ColorPicker", "MultiSelect", "DatePicker", "MenuItem", "Menu", "MenuBar", "CommandPalette", "Toast", "ToastManager", "Spinner", "Dialog", "ConfirmDialog", "MetricCard", "Meter", "LegendItem", "Legend", "TimeSeriesChart", "HeaderBar", "FooterBar", "EmptyState", "ErrorBox", "LoadingOverlay", "Skeleton", "InlineAlert", "Sparkline", "Gauge", "Chart", "LogView"]},
       "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",

@@ -84,6 +84,37 @@ from the resulting state.
 - `HelpView`: renders `KeyMap` bindings.
 - `DebugOverlay`: renders the latest `AppMetrics` frame.
 
+### Shared visual states
+
+`Theme` supplies semantic `normal`, `focused`, `selected`, `disabled`, `error`,
+`accent`, `success`, `warning`, and `info` styles. Prefer those roles over
+component-specific color literals; applications remain responsible for choosing
+the actual palette.
+
+`Button` fills its assigned cell rectangle, centers its label, and resolves
+disabled and focused styles through its existing style parameters and optional
+theme. Workbench maps `Primary` to `accentButtonStyle`, `Secondary` to
+`surfaceStyle`, `Ghost` to `theme.normal`, and `Danger` to `theme.error`. Each
+variant uses `theme.focused` as `focusedStyle`, `theme.disabled` as
+`disabledStyle`, and `theme` for semantic state resolution. The Disabled row
+sets `disabled`; these are style choices, not separate widget classes or an
+enum.
+
+The stable `Input.setVisualState(focused: Bool = false, disabled: Bool = false,
+error: Bool = false, theme: ?Theme = None)` method configures the visual and
+interactive state without changing its editing model. Resolution precedence is
+disabled, error, focused, then normal. Disabled inputs ignore keyboard, mouse,
+and paste editing. `Input.paste(text)` is EXPERIMENTAL. For nonempty text on an
+enabled input, it clamps the cursor to the text bounds and moves any mid-rune
+offset backward to a UTF-8 rune boundary, inserts text without normalization,
+and advances the byte-offset cursor. Empty text and disabled inputs leave
+`value` and `cursor` unchanged. Applications retain control of paste
+normalization and event routing.
+
+The default placeholder color uses the theme's muted `disabled` foreground and
+the input's resolved background; without a theme it keeps the indexed-gray
+fallback. A non-default `placeholderStyle` overrides that derived color.
+
 ## State and data size
 
 Stateful widgets expose small public holders such as `ListState`, `TableState`,

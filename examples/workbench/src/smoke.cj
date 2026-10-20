@@ -34,6 +34,21 @@ func runWorkbenchHeadlessSmoke(): Int64 {
         !forms.lastSnapshot().contains("Disabled")) {
         return workbenchSmokeFailure("gallery navigation and button interaction")
     }
+
+    let formsPaste = runWorkbenchScenario(app, TestScenario()
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.Tab))
+        .key(KeyEvent(KeyCode.Tab))
+        .paste("q界")
+        .render())
+    if (!formsPaste.passed || app.galleryInput.value != "q界" ||
+        app.galleryInput.cursor != "q界".size ||
+        !formsPaste.lastSnapshot().contains("q界") ||
+        !formsPaste.lastSnapshot().contains("Ready") ||
+        !formsPaste.lastSnapshot().contains("Read only")) {
+        return workbenchSmokeFailure("Forms live input paste")
+    }
     let overview = runWorkbenchScenario(app, TestScenario()
         .key(KeyEvent(KeyCode.F(3)))
         .render())

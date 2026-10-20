@@ -730,15 +730,27 @@ public class Scrollbar <: Widget {
     }
 }
 
+/** 保存可编辑文本及光标位置的单行输入控件，可在文本为空时显示占位文本。
+ */
 public class Input <: Widget {
+    /** 输入控件当前保存的文本内容。
+     */
     public var value: String
+    /** 当前光标在输入文本中的偏移量；通过构造器设置时会调整到字符边界。
+     */
     public var cursor: Int64
     private var viewportOffset: Int64 = 0
     private let block: ?Block
     private let style: Style
     private let placeholder: String
     private let placeholderStyle: Style
+    private var focused: Bool = false
+    private var disabled: Bool = false
+    private var error: Bool = false
+    private var theme: ?Theme = None
 
+    /** 建立输入控件并保存文本、边框及显示样式；初始光标位置会调整到文本的字符边界。
+     */
     public init(
         value!: String = "",
         cursor!: Int64 = 0,
@@ -754,8 +766,32 @@ public class Input <: Widget {
         this.placeholder = placeholder
         this.placeholderStyle = placeholderStyle
     }
+    /** 设置聚焦、禁用或错误状态及其语义主题；状态优先级为禁用、错误、聚焦，全部关闭时为普通状态。
+     */
+    public func setVisualState(
+        focused!: Bool = false,
+        disabled!: Bool = false,
+        error!: Bool = false,
+        theme!: ?Theme = None
+    ): Unit {
+        this.focused = focused
+        this.disabled = disabled
+        this.error = error
+        this.theme = theme
+    }
 
+    /** 在当前光标处插入文本；非空文本插入前会将光标限制到文本范围及 UTF-8 字符边界；禁用状态或空文本时不改变文本和光标。
+     */
+    public func paste(text: String): Unit {
+        if (disabled || text.isEmpty()) { return }
+        cursor = clampToRuneBoundary(value, cursor)
+        insert(text)
+    }
+
+    /** 按键事件处理字符输入、退格、向前删除及光标移动等操作；已展示的这些按键分支返回 true。
+     */
     public func handle(key: KeyEvent): Bool {
+        if (disabled) { return false }
         match (key.code) {
             case Char(r) =>
                 insert(match (key.text) {
@@ -803,6 +839,7 @@ public class Input <: Widget {
     }
 
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+        if (disabled) { return false }
         let target = widgetInnerArea(area, block)
         if (!widgetHitTest(mouse, target) || mouse.y != target.y) { return false }
         match ((mouse.kind, mouse.button)) {
@@ -825,14 +862,56 @@ public class Input <: Widget {
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
+        let resolved = visualStyle()
+        buffer.fillRect(target, style: resolved)
         if (value.isEmpty() && !placeholder.isEmpty()) {
-            buffer.setString(target.x, target.y, truncate(placeholder, target.width), style: placeholderStyle)
+            var placeholderColor = placeholderStyle
+            if (placeholderColor == Style(fg: Color.Indexed(8))) {
+                match (theme) {
+                    case Some(value) => placeholderColor = value.disabled
+                    case None => placeholderColor = Style(fg: Color.Indexed(8))
+                }
+            }
+            buffer.setString(target.x, target.y, truncate(placeholder, target.width),
+                style: placeholderColor.withBg(resolved.bg))
             return
         }
         ensureCursorVisible(target.width)
-        buffer.setString(target.x, target.y, truncate(value[viewportOffset..], target.width), style: style)
+        buffer.setString(target.x, target.y, truncate(value[viewportOffset..], target.width), style: resolved)
     }
 
+    private func visualStyle(): Style {
+        match (theme) {
+            case Some(_) =>
+                resolvedSemanticStateStyle(
+                    style,
+                    style,
+                    style,
+                    style,
+                    style,
+                    focused,
+                    false,
+                    disabled,
+                    error,
+                    theme
+                )
+            case None =>
+                if (disabled) {
+                    style.patch(Style(fg: Color.Indexed(8)))
+                } else if (error) {
+                    style.patch(Style(fg: Color.Red))
+                } else if (focused) {
+                    var modifier = style.modifier
+                    modifier.bold = true
+                    style.withModifier(modifier)
+                } else {
+                    style
+                }
+        }
+    }
+
+    /** 按内容区域宽度调整文本视口，并返回光标在该区域首行的显示位置；有外围区块时使用其内部区域。
+     */
     public func cursorPosition(area: Rect): Position {
         var target = area
         if (let Some(b) <- block) {

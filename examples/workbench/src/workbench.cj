@@ -564,8 +564,7 @@ class WorkbenchApp {
             case Some("editor") =>
                 match (interaction.focus().current()) {
                     case Some("editor-name") =>
-                        let cursor = editorName.cursor
-                        editorName.setValue(editorName.value[..cursor] + text + editorName.value[cursor..], cursor: cursor + text.size)
+                        editorName.paste(text)
                         editorError = ""
                     case Some("editor-notes") => editorNotes.paste(text)
                     case _ => ()
@@ -577,13 +576,11 @@ class WorkbenchApp {
             case _ =>
                 match (focus.current()) {
                     case Some("task-search") =>
-                        let cursor = taskSearch.cursor
-                        taskSearch.setValue(taskSearch.value[..cursor] + text + taskSearch.value[cursor..], cursor: cursor + text.size)
+                        taskSearch.paste(text)
                         applyTaskFilters()
                         UpdateResult.next()
                     case Some("gallery-input") =>
-                        let cursor = galleryInput.cursor
-                        galleryInput.setValue(galleryInput.value[..cursor] + text + galleryInput.value[cursor..], cursor: cursor + text.size)
+                        galleryInput.paste(text)
                         UpdateResult.next()
                     case _ => UpdateResult.unchanged()
                 }

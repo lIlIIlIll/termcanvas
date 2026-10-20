@@ -76,8 +76,7 @@ class TaskPad {
                     palette.query += pasted
                     palette.selected = 0
                 } else {
-                    let cursor = clampToRuneBoundary(input.value, input.cursor)
-                    input.setValue(input.value[..cursor] + pasted + input.value[cursor..], cursor: cursor + pasted.size)
+                    input.paste(pasted)
                 }
                 return UpdateResult.next()
             case Event.Tick(_) =>
