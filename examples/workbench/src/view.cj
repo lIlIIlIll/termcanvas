@@ -33,8 +33,6 @@ class WorkbenchLayout {
     var chartPlot: Rect = Rect(0, 0, 0, 0)
     var chartMeters: Rect = Rect(0, 0, 0, 0)
     var sparkPanel: Rect = Rect(0, 0, 0, 0)
-    var sparkText: Rect = Rect(0, 0, 0, 0)
-    var sparkLine: Rect = Rect(0, 0, 0, 0)
     var pipelinePanel: Rect = Rect(0, 0, 0, 0)
     var pipelineCanvas: Rect = Rect(0, 0, 0, 0)
     var logPanel: Rect = Rect(0, 0, 0, 0)
@@ -265,10 +263,6 @@ func workbenchLayout(area: Rect, page: WorkbenchPage): WorkbenchLayout {
             let metersX = out.chartPlot.right + min(2, max(0, chartInner.right - out.chartPlot.right))
             out.chartMeters = Rect(metersX, out.chartPlot.y, max(0, chartInner.right - metersX), out.chartPlot.height)
         }
-        let sparkBlock = Block(title: "Progress history")
-        let sparkInner = sparkBlock.inner(out.sparkPanel)
-        out.sparkText = Rect(sparkInner.x, sparkInner.y, sparkInner.width, min(1, sparkInner.height))
-        out.sparkLine = Rect(sparkInner.x, sparkInner.y + 1, sparkInner.width, max(0, sparkInner.height - 1))
         let pipeBlock = Block(title: "Pipeline")
         out.pipelineCanvas = pipeBlock.inner(out.pipelinePanel)
         let logsY = middleY + middleHeight + if (content.bottom > middleY + middleHeight) { 1 } else { 0 }
@@ -484,10 +478,10 @@ func renderOverview(app: WorkbenchApp, frame: Frame): Unit {
     }
     if (frame.isDirty(layout.sparkPanel)) {
         frame.fill(layout.sparkPanel, app.theme.normal)
-        frame.renderWidget(galleryBlock(app, "Progress history", BorderKind.Rounded), layout.sparkPanel)
         let progress = app.model.totalProgressHundredths()
-        frame.renderWidget(Paragraph("Total ${formatPercent(progress)} | recent peak", style: app.theme.normal), layout.sparkText)
-        frame.renderWidget(Sparkline(app.model.history(), style: app.theme.accent), layout.sparkLine)
+        let historyBlock = galleryBlock(app, "Progress ${formatPercent(progress)} | auto peak", BorderKind.Rounded)
+        frame.renderWidget(Sparkline(app.model.history(), style: app.theme.accent, block: Some(historyBlock)),
+            layout.sparkPanel)
     }
     if (frame.isDirty(layout.pipelinePanel)) {
         frame.fill(layout.pipelinePanel, app.theme.normal)

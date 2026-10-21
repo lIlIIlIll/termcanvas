@@ -201,12 +201,20 @@ func renderGalleryData(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryA
                 Rect(dataProgress.x, dataProgress.y, dataProgress.width, 1))
         }
         if (dataProgress.height > 1) {
-            frame.renderWidget(Paragraph("Weighted progress · all 120 local tasks", style: app.theme.disabled),
+            frame.renderWidget(Paragraph("Weighted progress · all 120 tasks · fixed 0-100% scale", style: app.theme.disabled),
                 Rect(dataProgress.x, dataProgress.y + 1, dataProgress.width, 1))
         }
         if (dataProgress.height > 2) {
-            frame.renderWidget(Sparkline(app.model.history(), style: app.theme.accent),
-                Rect(dataProgress.x, dataProgress.y + 2, dataProgress.width, 1))
+            let chartArea = Rect(dataProgress.x, dataProgress.y + 2, dataProgress.width, dataProgress.height - 2)
+            let scaleWidth = min(5, chartArea.width)
+            if (chartArea.height > 1) {
+                frame.renderWidget(Paragraph("100%", style: app.theme.disabled),
+                    Rect(chartArea.x, chartArea.y, scaleWidth, 1))
+                frame.renderWidget(Paragraph("0%", style: app.theme.disabled),
+                    Rect(chartArea.x, chartArea.bottom - 1, scaleWidth, 1))
+            }
+            let plot = Rect(chartArea.x + scaleWidth, chartArea.y, max(0, chartArea.width - scaleWidth), chartArea.height)
+            frame.renderWidget(Chart(app.model.history(), style: app.theme.accent, maxValue: 10000), plot)
         }
     }
 }

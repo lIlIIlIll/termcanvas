@@ -1074,6 +1074,79 @@ class WorkbenchProgressFormattingTest {
 }
 
 @Test
+class WorkbenchProgressT020Test {
+    @TestCase
+    func fixedScaleGalleryUsesRealHistoryAtSupportedSizes(): Unit {
+        for ((width, height) in [(Int64(80), Int64(24)), (120, 36), (160, 45)]) {
+            let screen = Rect(0, 0, width, height)
+            let app = WorkbenchApp()
+            _ = app.update(Event.Resize(screen))
+            app.galleryTabs.selected = 4
+            app.galleryDataTabs.selected = 2
+            _ = app.update(Event.Tick(TickEvent(deltaMillis: 5000)))
+            _ = app.update(Event.Tick(TickEvent(deltaMillis: 1000)))
+            @Expect(app.model.doneCount, 1)
+            @Expect(app.model.totalProgressHundredths(), 83)
+            @Expect(formatPercent(app.model.totalProgressHundredths()), "0.83%")
+            @Assert(app.model.history().size > 0)
+
+            let areas = workbenchGalleryAreas(app.layout.galleryContent, 4, sample: 2)
+            @Assert(areas.dataProgress.height > 2)
+            let backend = TestBackend(area: screen)
+            let terminal = Terminal(backend, renderMode: RenderMode.Full)
+            _ = terminal.draw { frame => app.render(frame) }
+            let snapshot = backend.snapshot()
+            @Assert(snapshot.contains("0.83%"))
+            @Assert(snapshot.contains("fixed 0-100% scale"))
+            @Assert(snapshot.contains("100%"))
+            @Assert(snapshot.contains("0%"))
+
+            let buffer = backend.lastBuffer().getOrThrow()
+            @Expect(buffer.getCell(areas.dataProgress.x, areas.dataProgress.y).symbol, "-")
+            @Expect(buffer.getCell(areas.dataProgress.right - 1, areas.dataProgress.y).symbol, "-")
+            let chartArea = Rect(
+                areas.dataProgress.x,
+                areas.dataProgress.y + 2,
+                areas.dataProgress.width,
+                areas.dataProgress.height - 2
+            )
+            let scaleWidth = min(5, chartArea.width)
+            let plot = Rect(chartArea.x + scaleWidth, chartArea.y,
+                max(0, chartArea.width - scaleWidth), chartArea.height)
+            @Assert(plot.width > 0)
+            @Assert(plot.height > 1)
+            @Expect(buffer.getCell(plot.x, plot.y).symbol, " ")
+            @Expect(buffer.getCell(plot.x, plot.bottom - 1).symbol, "#")
+        }
+    }
+
+    @TestCase
+    func overviewSparklineLabelsAutoPeakAndUsesModelHistory(): Unit {
+        let screen = Rect(0, 0, 120, 36)
+        let app = WorkbenchApp()
+        _ = app.update(Event.Resize(screen))
+        _ = app.update(Event.Tick(TickEvent(deltaMillis: 5000)))
+        _ = app.update(Event.Tick(TickEvent(deltaMillis: 1000)))
+        @Expect(app.model.totalProgressHundredths(), 83)
+        let history = app.model.history()
+        @Assert(history.size > 1)
+        _ = app.perform("page.overview")
+
+        let backend = TestBackend(area: screen)
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        _ = terminal.draw { frame => app.render(frame) }
+        @Assert(backend.snapshot().contains("Progress 0.83% | auto peak"))
+
+        let block = galleryBlock(app, "Progress ${formatPercent(app.model.totalProgressHundredths())} | auto peak",
+            BorderKind.Rounded)
+        let inner = block.inner(app.layout.sparkPanel)
+        @Assert(history.size <= inner.width)
+        let buffer = backend.lastBuffer().getOrThrow()
+        @Expect(buffer.getCell(inner.x + history.size - 1, inner.y).symbol, "#")
+    }
+}
+
+@Test
 class WorkbenchThemeTest {
     @TestCase
     func graphiteCyanThemeDefinesSemanticColorRoles(): Unit {
@@ -1235,7 +1308,7 @@ class WorkbenchRenderTest {
         )
         @Expect(overview.passed, true)
         @Assert(overview.lastSnapshot().contains("Status distribution"))
-        @Assert(overview.lastSnapshot().contains("Progress history"))
+        @Assert(overview.lastSnapshot().contains("auto peak"))
         @Assert(overview.lastSnapshot().contains("RUNNING"))
         @Assert(overview.lastSnapshot().contains("Active slots"))
         @Assert(overview.lastSnapshot().contains("Ready queue"))

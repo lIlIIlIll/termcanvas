@@ -117,6 +117,14 @@ from the resulting state.
 - `HelpView`: renders `KeyMap` bindings.
 - `DebugOverlay`: renders the latest `AppMetrics` frame.
 
+`Chart` draws bottom-up bars for a sample series. `maxValue <= 0` keeps the
+automatic maximum; a positive `maxValue` fixes the upper scale and saturates
+higher samples. Zero and negative samples retain the one-cell minimum.
+`Sparkline` keeps its five levels (` `, `.`, `-`, `=`, `#`); an optional `Block`
+draws first and the values occupy its first inner row. Empty data can still show
+the block. These new options are EXPERIMENTAL. Use `Gauge` for one value against
+a total, not for a sample series.
+
 ### Shared visual states
 
 `Theme` supplies semantic `normal`, `focused`, `selected`, `disabled`, `error`,

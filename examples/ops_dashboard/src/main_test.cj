@@ -20,6 +20,7 @@ class OpsDashboardTest {
         let terminal = Terminal(backend)
         _ = terminal.draw({ frame => app.render(frame) })
         @Assert(backend.snapshot().contains("Event log"))
+        @Assert(backend.snapshot().contains("Latency"))
     }
 
     @TestCase

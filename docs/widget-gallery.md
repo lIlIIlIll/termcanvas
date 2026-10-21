@@ -35,16 +35,21 @@ detected terminal capability; Layout toggles ASCII border fallback. The gallery
 uses ASCII borders automatically when the terminal reports no Unicode support
 and remains interactive at `80×24`, adapting panel content to available cells.
 
-The data gallery uses task progress in hundredths of a percent (`0..10000`) for
-both its label and `Gauge`; `0.83%` is therefore a small fraction, not 83% of the
-bar. Toast examples use semantic severity kinds and Theme roles; the Workbench's
-existing 3000 ms application clock remains the only lifetime source.
+The Workbench Progress sample uses task progress in hundredths of a percent
+(`0..10000`) for both its label and `Gauge`; `0.83%` is therefore a small
+fraction, not 83% of the bar. Its history `Chart` fixes `maxValue: 10000` and
+labels both ends of the 0–100% scale. The Overview `Sparkline` uses the same
+real model history but is labeled as an auto-scaled recent peak, separate from
+absolute percentage progress. Toast examples show visible queuing, replacement,
+and eviction behavior; the same message in different colors is not treated as a
+distinct deduplication key. Tiny viewports either keep critical actions visible
+or show an explicit layout warning.
 
-The Data category exposes Table, List, and Progress samples through a `Tabs`
-selector. Switching samples preserves separate table/list selections, and only
-visible controls enter the focus order. Table and List viewports expand with
-available height; Progress pairs the weighted gauge with the progress-history
-sparkline.
+At a glance, the gallery covers data widgets and views for charts, tables,
+virtual lists, trees, and cross-widget navigation. Table/List expands and
+collapses rows, and Progress pairs the weighted gauge with a fixed-scale
+history chart.
+
 
 ### Theme and terminal capabilities
 
@@ -84,7 +89,8 @@ demonstration does not promote an experimental declaration.
 | `Switch` keyboard, pointer, state text, and responsive routing | Implemented | EXPERIMENTAL | Core T012 tests cover input, disabled state, style roles, empty labels, and clipping; Workbench verifies visible values at 80×24, 120×36, and 160×45. |
 | `SegmentedControl` keyboard, pointer, selected-value, theme, and narrow-window behavior | Implemented | EXPERIMENTAL | Core T013 covers bounds, empty/disabled state, theme/focus, wide-glyph clipping, visible-index mapping, separator hits, and clip boundaries; Workbench T013 checks the preview value at 80×24, 120×36, and 160×45. |
 | `ColorPicker` keyboard, contrast, visible-window, and mouse behavior | Implemented | EXPERIMENTAL | Core `ColorPickerWindowTest` covers empty, invalid, disabled, boundary, contrast, clipping, and visible-index cases; Workbench `WorkbenchColorPickerT016Test` covers the final accent, resizing, mouse mapping, settings focus, and Themes at 80×24, 120×36, and 160×45. |
-| `Gauge`, `Sparkline`, `FocusManager`, and `ModalFocusState` | Implemented | EXPERIMENTAL | Demonstrated by the Workbench; consult each symbol's inventory entry before depending on it. |
+| `Gauge`, `FocusManager`, and `ModalFocusState` | Implemented | EXPERIMENTAL | Demonstrated by the Workbench; consult each symbol's inventory entry before depending on it. |
+| `Chart.maxValue`, `Sparkline.block`, and fixed-scale progress Gallery | Implemented | EXPERIMENTAL | Core `ChartSparklineT017T018Test` and `ProgressBarT020Test` cover scale boundaries, saturation, overflow, minimum bars, block rendering, empty data, and clipping; Workbench `WorkbenchProgressT020Test` covers real-history rendering and percentage boundaries at 80×24, 120×36, and 160×45; `OpsDashboardTest` verifies the latency block. |
 | `CommandPalette` search, paste, theme, disabled, and empty-state behavior | Implemented | EXPERIMENTAL | Workbench F2 covers case-insensitive search, disabled commands, `No matches`, mouse activation, Escape, and focus restoration; core tests cover case-sensitive defaults, action matching, Unicode paste reset, theme precedence, and full-row clearing. |
 | `Dialog` theme, selection normalization, and `ConfirmDialog` actions | Implemented | EXPERIMENTAL | Core boundary tests cover legacy and themed style precedence, 80×24 No/Yes hits, and invalid clicks; the Workbench test covers visible outcomes, theme refresh, resize, and modal focus restoration. |
 | Sample routing, visible-control focus sets, responsive layout, and modal focus restoration | Application composition required | Application code | Covered by `dataSampleNavigationPreservesFocusAndValuesAcrossResponsiveSizes` and `dataGallerySupportsKeyboardAndMouseSelection`. |
