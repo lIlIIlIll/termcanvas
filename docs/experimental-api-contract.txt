@@ -711,13 +711,13 @@ core|VirtualTranscriptView.dirtyRectForItemRevision|func|public func dirtyRectFo
 core|VirtualTranscriptView.handle|func|public func handle(key: KeyEvent): Bool
 core|VirtualTranscriptView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Sparkline|class|public class Sparkline <: Widget {
-core|Sparkline.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
+core|Sparkline.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None)
 core|Sparkline.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Gauge|class|public class Gauge <: Widget {
 core|Gauge.init|init|public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )
 core|Gauge.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Chart|class|public class Chart <: Widget {
-core|Chart.init|init|public init(values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan))
+core|Chart.init|init|public init( values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan), maxValue!: Int64 = 0 )
 core|Chart.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|LogView|class|public class LogView <: Widget {
 core|LogView.offset|var|public var offset: Int64

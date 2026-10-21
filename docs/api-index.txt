@@ -2369,18 +2369,18 @@ packages/core/src/visual_widgets.cj:44:public class ProgressBar <: Widget {
 packages/core/src/visual_widgets.cj:59:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: Style = Style(fg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0 )
 packages/core/src/visual_widgets.cj:89:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/visual_widgets.cj:203:public class Sparkline <: Widget {
-packages/core/src/visual_widgets.cj:208:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
-packages/core/src/visual_widgets.cj:214:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:226:public class Gauge <: Widget {
-packages/core/src/visual_widgets.cj:233:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )
-packages/core/src/visual_widgets.cj:247:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:252:public class Chart <: Widget {
-packages/core/src/visual_widgets.cj:257:public init(values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan))
-packages/core/src/visual_widgets.cj:263:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:281:public class LogView <: Widget {
-packages/core/src/visual_widgets.cj:283:public var offset: Int64
-packages/core/src/visual_widgets.cj:287:public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
-packages/core/src/visual_widgets.cj:294:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:209:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None)
+packages/core/src/visual_widgets.cj:216:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:233:public class Gauge <: Widget {
+packages/core/src/visual_widgets.cj:240:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )
+packages/core/src/visual_widgets.cj:254:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:259:public class Chart <: Widget {
+packages/core/src/visual_widgets.cj:265:public init( values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan), maxValue!: Int64 = 0 )
+packages/core/src/visual_widgets.cj:277:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:295:public class LogView <: Widget {
+packages/core/src/visual_widgets.cj:297:public var offset: Int64
+packages/core/src/visual_widgets.cj:301:public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
+packages/core/src/visual_widgets.cj:308:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widget_base.cj:5:public interface Widget {
 packages/core/src/widget_base.cj:6:func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widget_base.cj:9:public enum WrapMode {

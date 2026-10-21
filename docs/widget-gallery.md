@@ -105,6 +105,11 @@ records the source revision and digest, responsive TestBackend sizes, observed
 attempt did not expose the Workbench surface, and isolated headless compositor
 startup did not become ready.
 
+The [B13 Progress capture](../examples/workbench/screenshots/b13-progress.png)
+is a real `foot` terminal rendering at `80×24`; its
+[manifest](../examples/workbench/screenshots/b13-capture-manifest.json)
+binds the image to the source digest and records the toolchain and compositor.
+
 Historical PNGs without source-bound provenance are excluded from B00 and are
 not used as evidence; no metadata has been backfilled.
 

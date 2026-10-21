@@ -36,3 +36,4 @@ docs/reviews/*/findings.json
 !architecture/evidence-index.json
 !packages/core/tests/fixtures/file_picker/notes.txt
 !examples/workbench/screenshots/b00-capture-manifest.json
+!examples/workbench/screenshots/b13-capture-manifest.json

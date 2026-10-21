@@ -43098,13 +43098,13 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 208,
+      "line": 209,
       "level": "member",
       "kind": "init",
       "symbol": "init",
       "owner_symbol": "Sparkline",
       "qualified_symbol": "Sparkline.init",
-      "signature": "public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))",
+      "signature": "public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None)",
       "visibility": "public",
       "visibility_origin": "explicit",
       "stability": "EXPERIMENTAL",
@@ -43116,7 +43116,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 214,
+      "line": 216,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -43134,7 +43134,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 226,
+      "line": 233,
       "level": "top_level",
       "kind": "class",
       "symbol": "Gauge",
@@ -43152,7 +43152,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 233,
+      "line": 240,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -43170,7 +43170,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 247,
+      "line": 254,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -43188,7 +43188,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 252,
+      "line": 259,
       "level": "top_level",
       "kind": "class",
       "symbol": "Chart",
@@ -43206,13 +43206,13 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 257,
+      "line": 265,
       "level": "member",
       "kind": "init",
       "symbol": "init",
       "owner_symbol": "Chart",
       "qualified_symbol": "Chart.init",
-      "signature": "public init(values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan))",
+      "signature": "public init( values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan), maxValue!: Int64 = 0 )",
       "visibility": "public",
       "visibility_origin": "explicit",
       "stability": "EXPERIMENTAL",
@@ -43224,7 +43224,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 263,
+      "line": 277,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -43242,7 +43242,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 281,
+      "line": 295,
       "level": "top_level",
       "kind": "class",
       "symbol": "LogView",
@@ -43260,7 +43260,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 283,
+      "line": 297,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -43278,7 +43278,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 287,
+      "line": 301,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -43296,7 +43296,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 294,
+      "line": 308,
       "level": "member",
       "kind": "func",
       "symbol": "render",
