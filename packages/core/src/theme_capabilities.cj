@@ -230,3 +230,18 @@ private func ansi8Rgb(index: Int64): (Int64, Int64, Int64) {
         case _ => (229, 229, 229)
     }
 }
+func colorRgbComponents(color: Color): (Int64, Int64, Int64) {
+    match (color) {
+        case Color.Reset => (0, 0, 0)
+        case Color.Black => ansi8Rgb(0)
+        case Color.Red => ansi8Rgb(1)
+        case Color.Green => ansi8Rgb(2)
+        case Color.Yellow => ansi8Rgb(3)
+        case Color.Blue => ansi8Rgb(4)
+        case Color.Magenta => ansi8Rgb(5)
+        case Color.Cyan => ansi8Rgb(6)
+        case Color.White => ansi8Rgb(7)
+        case Color.Indexed(index) => xtermRgb(Int64(index))
+        case Color.Rgb(r, g, b) => (Int64(r), Int64(g), Int64(b))
+    }
+}

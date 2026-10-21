@@ -57,6 +57,17 @@ from the resulting state.
   fields directly must keep them valid. Cyan remains the default; use Theme
   roles with `style: Style.default()` and `theme`, or via `setVisualState`.
   No calendar grid, parser, locale/timezone, date range, or DatePicker mouse-field editing.
+- `ColorPicker` (EXPERIMENTAL): preserves its candidate palette and
+  `selected`/`selectedColor()` contract; Left/Right clamp, Home/End select the
+  endpoints. Empty palettes return no selection, draw nothing, and reject
+  input. Supported keys and rendering normalize direct invalid indices. Narrow
+  areas keep the selected swatch visible; mouse hits only visible two-cell
+  swatches, never gaps, partial swatches, releases, or outside cells. Selected
+  non-Reset swatches use black foreground only when
+  `2126*r + 7152*g + 722*b > 1,400,000`, otherwise white; Reset uses
+  `theme.normal.fg` or Reset. Focus adds bold and underline; disabled state
+  rejects keyboard and mouse input. Palette adaptation remains application-owned.
+  `setVisualState` is EXPERIMENTAL.
 
 ### Commands and overlays
 

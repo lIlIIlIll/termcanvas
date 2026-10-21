@@ -625,18 +625,21 @@ func workbenchAccentInitial(color: Color): String {
 
 
 func renderWorkbenchAccentPicker(app: WorkbenchApp, frame: Frame, area: Rect): Unit {
+    app.accentPicker.setVisualState(
+        focused: app.focus.isFocused("gallery-accent") || app.focus.isFocused("accent-picker"),
+        theme: Some(app.theme)
+    )
     if (app.effectiveColorTier() > 0) {
         frame.renderWidget(app.accentPicker, area)
-        return
+    } else {
+        var palette = ""
+        for (i in 0..app.accentColors.size) {
+            palette += workbenchAccentInitial(app.accentColors[i])
+            palette += if (i == app.accentPicker.selected) { "*" } else { " " }
+            palette += " "
+        }
+        frame.renderWidget(Paragraph(palette, style: app.theme.normal), area)
     }
-
-    var palette = ""
-    for (i in 0..app.accentColors.size) {
-        palette += workbenchAccentInitial(app.accentColors[i])
-        palette += if (i == app.accentPicker.selected) { "*" } else { " " }
-        palette += " "
-    }
-    frame.renderWidget(Paragraph(palette, style: app.theme.normal), area)
 }
 
 

@@ -593,65 +593,169 @@ public class Dropdown <: Widget {
     }
 }
 
+/** 显示颜色候选项的实验性控件；支持左右键及 Home/End 选择、窄区域可见窗口、鼠标选择、主题对比色与聚焦标记。
+ */
 public class ColorPicker <: Widget {
     private let colors: Array<Color>
+    private var focused: Bool = false
+    private var disabled: Bool = false
+    private var theme: ?Theme = None
+    /** 当前颜色在候选数组中的索引；构造时限制在有效范围内，候选数组为空时为 0。直接赋值的无效索引会在支持的键盘操作或绘制时规范化。
+     */
     public var selected: Int64
 
+    /** 保存候选颜色并限制初始索引；空候选数组的索引为 0，且不会产生选中颜色。
+     */
     public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0) {
         this.colors = colors
         this.selected = clamp(selected, 0, max(0, colors.size - 1))
     }
 
+    /** 设置聚焦、禁用状态和语义主题；禁用时拒绝键盘与鼠标输入。
+     */
+    public func setVisualState(
+        focused!: Bool = false,
+        disabled!: Bool = false,
+        theme!: ?Theme = None
+    ): Unit {
+        this.focused = focused
+        this.disabled = disabled
+        this.theme = theme
+    }
+
+    /** 当前索引有效时返回对应颜色；空候选数组或直接赋值的无效索引返回 None。
+     */
     public func selectedColor(): ?Color {
         if (selected >= 0 && selected < colors.size) { Some(colors[selected]) } else { None }
     }
 
+    /** 左右键在边界处停留，Home/End 选择首尾颜色；支持的按键先规范化索引。禁用、空候选数组或不支持的按键返回 false 且不修改状态。
+     */
     public func handle(key: KeyEvent): Bool {
+        if (disabled || colors.size == 0) { return false }
         match (key.code) {
-            case KeyCode.Left => selected = max(0, selected - 1); true
-            case KeyCode.Right => selected = min(max(0, colors.size - 1), selected + 1); true
+            case KeyCode.Left =>
+                normalizeSelection()
+                selected = max(0, selected - 1)
+                true
+            case KeyCode.Right =>
+                normalizeSelection()
+                selected = min(colors.size - 1, selected + 1)
+                true
+            case KeyCode.Home =>
+                normalizeSelection()
+                selected = 0
+                true
+            case KeyCode.End =>
+                normalizeSelection()
+                selected = colors.size - 1
+                true
             case _ => false
         }
     }
 
+    /** 左键按下仅选择当前可见且两格完整的色块；间隔、释放、区域外、禁用或空候选数组均不修改状态。
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
-        if (!widgetHitTest(mouse, area) || mouse.y != area.y) { return false }
+        if (disabled || colors.size == 0 || !widgetHitTest(mouse, area) || mouse.y != area.y) { return false }
         match ((mouse.kind, mouse.button)) {
             case (MouseKind.Down, MouseButton.Left) =>
+                let (start, visibleCount) = visibleWindow(area)
                 let column = mouse.x - area.x
-                let index = column / 3
-                if (column % 3 == 2 || index >= colors.size) { return false }
+                let slot = column / 3
+                if (column % 3 == 2 || slot >= visibleCount || slot * 3 + 1 >= area.width) { return false }
+                let index = start + slot
+                if (index >= colors.size) { return false }
                 selected = index
                 true
             case _ => false
         }
     }
 
+    /** 在指定区域裁剪绘制颜色候选项；规范化索引并保持选中色块在可见窗口内。
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
 
+    private func normalizeSelection(): Unit {
+        if (colors.size > 0) { selected = clamp(selected, 0, colors.size - 1) }
+    }
+
+    private func visibleWindow(area: Rect): (Int64, Int64) {
+        if (colors.size == 0 || area.width <= 0) { return (0, 0) }
+        let capacity = max(1, area.width / 3 + (if (area.width % 3 == 2) { 1 } else { 0 }))
+        let visibleCount = min(colors.size, capacity)
+        let normalized = clamp(selected, 0, colors.size - 1)
+        let start = clamp(normalized - visibleCount + 1, 0, colors.size - visibleCount)
+        (start, visibleCount)
+    }
+
+    private func swatchStyle(index: Int64): Style {
+        let color = colors[index]
+        if (index != selected) { return Style(fg: color) }
+        let foreground = match (color) {
+            case Color.Reset =>
+                match (theme) {
+                    case Some(value) => value.normal.fg
+                    case None => Color.Reset
+                }
+            case _ => colorPickerContrastForeground(color)
+        }
+        var modifier = Modifier.none()
+        if (focused && !disabled) {
+            modifier.bold = true
+            modifier.underline = true
+        }
+        Style(fg: foreground, bg: color, modifier: modifier)
+    }
+
     private func renderClipped(area: Rect, buffer: Buffer): Unit {
+        if (colors.size == 0) { return }
+        normalizeSelection()
         if (area.width <= 0 || area.height <= 0) { return }
-        var x = area.x
-        for (i in 0..colors.size) {
-            if (x >= area.right) { return }
-            let style = if (i == selected) { Style(fg: Color.Black, bg: colors[i]) } else { Style(fg: colors[i]) }
-            _ = buffer.writeStringClipped(x, area.y, "##", maxWidth: area.right - x, style: style)
-            x += 3
+        let (start, visibleCount) = visibleWindow(area)
+        var slot: Int64 = 0
+        while (slot < visibleCount) {
+            let index = start + slot
+            let x = area.x + slot * 3
+            _ = buffer.writeStringClipped(x, area.y, "##", maxWidth: area.right - x, style: swatchStyle(index))
+            slot++
+        }
+        let trailingIndex = start + visibleCount
+        let trailingX = area.x + visibleCount * 3
+        if (trailingIndex < colors.size && trailingX < area.right) {
+            _ = buffer.writeStringClipped(
+                trailingX,
+                area.y,
+                "##",
+                maxWidth: area.right - trailingX,
+                style: swatchStyle(trailingIndex)
+            )
         }
     }
 }
+private func colorPickerContrastForeground(color: Color): Color {
+    let (r, g, b) = colorRgbComponents(color)
+    let luminance = r * 2126 + g * 7152 + b * 722
+    if (luminance > 1_400_000) { Color.Black } else { Color.White }
+}
 
+/** 按行显示可多选的文本项，以勾选标记表示选中状态，并用单独的样式显示光标所在行。
+ */
 public class MultiSelect <: Widget {
     private let items: Array<String>
     private let selectedItems = ArrayList<Int64>()
+    /** 当前指向的条目索引，用于切换该项的选中状态，并决定绘制时哪一行使用光标样式。
+     */
     public var cursor: Int64
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1
     private let style: Style
     private let selectedStyle: Style
 
+    /** 保存条目与两种绘制样式，将光标限制在 0 到最后一个条目索引之间，并按传入顺序保存初始选中索引；不校验这些选中索引。
+     */
     public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)) {
         this.items = items
         this.cursor = clamp(cursor, 0, max(0, items.size - 1))

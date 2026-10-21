@@ -83,6 +83,7 @@ demonstration does not promote an experimental declaration.
 | `Tabs.setTheme` | Implemented | EXPERIMENTAL | Workbench category, sample, and Navigation selectors use semantic roles; core tests cover opt-in, explicit-style preservation, focus modifiers, Unicode, and clipping. |
 | `Switch` keyboard, pointer, state text, and responsive routing | Implemented | EXPERIMENTAL | Core T012 tests cover input, disabled state, style roles, empty labels, and clipping; Workbench verifies visible values at 80×24, 120×36, and 160×45. |
 | `SegmentedControl` keyboard, pointer, selected-value, theme, and narrow-window behavior | Implemented | EXPERIMENTAL | Core T013 covers bounds, empty/disabled state, theme/focus, wide-glyph clipping, visible-index mapping, separator hits, and clip boundaries; Workbench T013 checks the preview value at 80×24, 120×36, and 160×45. |
+| `ColorPicker` keyboard, contrast, visible-window, and mouse behavior | Implemented | EXPERIMENTAL | Core `ColorPickerWindowTest` covers empty, invalid, disabled, boundary, contrast, clipping, and visible-index cases; Workbench `WorkbenchColorPickerT016Test` covers the final accent, resizing, mouse mapping, settings focus, and Themes at 80×24, 120×36, and 160×45. |
 | `Gauge`, `Sparkline`, `FocusManager`, and `ModalFocusState` | Implemented | EXPERIMENTAL | Demonstrated by the Workbench; consult each symbol's inventory entry before depending on it. |
 | `CommandPalette` search, paste, theme, disabled, and empty-state behavior | Implemented | EXPERIMENTAL | Workbench F2 covers case-insensitive search, disabled commands, `No matches`, mouse activation, Escape, and focus restoration; core tests cover case-sensitive defaults, action matching, Unicode paste reset, theme precedence, and full-row clearing. |
 | `Dialog` theme, selection normalization, and `ConfirmDialog` actions | Implemented | EXPERIMENTAL | Core boundary tests cover legacy and themed style precedence, 80×24 No/Yes hits, and invalid clicks; the Workbench test covers visible outcomes, theme refresh, resize, and modal focus restoration. |
@@ -121,6 +122,10 @@ not used as evidence; no metadata has been backfilled.
 - `DatePicker` demonstrates PageUp/PageDown year changes with saturation and
   clamped days; Gallery year buttons route through those key commands. The
   widget has no calendar grid or mouse field editing.
+- `ColorPicker` keeps candidate selection in application-owned state. The
+  Themes Gallery demonstrates endpoint navigation, responsive rendering, and
+  visible swatch clicks; terminal capability fallback remains app-owned.
+
 
 ## Lists, tables, and navigation
 
@@ -151,8 +156,7 @@ not used as evidence; no metadata has been backfilled.
   input behavior.
 - `Spinner` renders lightweight progress.
 - `Dialog` renders centered overlay content.
-- `FileDialog`, `ConfirmDialog`, and `ColorPicker` support common application
-  workflows.
+- `FileDialog` and `ConfirmDialog` support common application workflows.
 
 ## Documents, logs, and visualizations
 

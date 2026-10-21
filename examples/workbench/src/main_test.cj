@@ -1292,3 +1292,115 @@ class WorkbenchRenderTest {
         @Assert(snapshot.contains("Task speed"))
     }
 }
+@Test
+class WorkbenchColorPickerT016Test {
+    @TestCase
+    func themesGalleryKeepsTheLastAccentVisibleAtResponsiveSizes(): Unit {
+        for ((width, height) in [(Int64(80), Int64(24)), (120, 36), (160, 45)]) {
+            let app = WorkbenchApp()
+            _ = app.update(Event.Resize(Rect(0, 0, width, height)))
+            workbenchGalleryKey(app, KeyCode.Tab)
+            for (_ in 0..7) { workbenchGalleryKey(app, KeyCode.Right) }
+            workbenchGalleryKey(app, KeyCode.Tab)
+            workbenchGalleryKey(app, KeyCode.Tab)
+            @Expect(app.focus.current(), Some("gallery-accent"))
+            _ = app.update(Event.Capabilities(TerminalCapabilities(
+                trueColor: true,
+                colorLevel: 24,
+                unicode: true
+            )))
+            workbenchGalleryKey(app, KeyCode.End)
+            @Expect(app.accentPicker.selected, app.accentColors.size - 1)
+
+            let backend = TestBackend(area: Rect(0, 0, width, height), captureSnapshots: false)
+            let terminal = Terminal(backend, renderMode: RenderMode.Full)
+            _ = terminal.draw { frame => app.render(frame) }
+            let accentArea = galleryRect(
+                app.layout.galleryContent, 0, 6, min(36, app.layout.galleryContent.width), 1)
+            @Expect(accentArea.width >= 18, true)
+            let selectedCell = backend.lastBuffer().getOrThrow().getCell(accentArea.x + 15, accentArea.y)
+            @Expect(Style(bg: selectedCell.style.bg), Style(bg: Color.Cyan))
+            @Expect(selectedCell.style.modifier.bold)
+            @Expect(selectedCell.style.modifier.underline)
+            @Expect(app.accentPicker.selected, app.accentColors.size - 1)
+        }
+    }
+
+    @TestCase
+    func galleryPickerResizesItsWindowAndMapsMouseToTheVisiblePalette(): Unit {
+        let app = WorkbenchApp()
+        let screen = Rect(0, 0, 120, 36)
+        _ = app.update(Event.Resize(screen))
+        workbenchGalleryKey(app, KeyCode.Tab)
+        for (_ in 0..7) { workbenchGalleryKey(app, KeyCode.Right) }
+        workbenchGalleryKey(app, KeyCode.Tab)
+        workbenchGalleryKey(app, KeyCode.Tab)
+        @Expect(app.focus.current(), Some("gallery-accent"))
+        _ = app.update(Event.Capabilities(TerminalCapabilities(
+            trueColor: true,
+            colorLevel: 24,
+            unicode: true
+        )))
+        workbenchGalleryKey(app, KeyCode.End)
+        @Expect(app.accentPicker.selected, app.accentColors.size - 1)
+
+        let backendArea = Rect(0, 0, 24, 4)
+        let backend = TestBackend(area: backendArea, captureSnapshots: false)
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        let narrow = Rect(2, 1, 3, 1)
+        let wide = Rect(2, 1, 18, 1)
+
+        _ = terminal.draw { frame => renderWorkbenchAccentPicker(app, frame, narrow) }
+        let narrowBuffer = backend.lastBuffer().getOrThrow()
+        @Expect(Style(bg: narrowBuffer.getCell(narrow.x, narrow.y).style.bg), Style(bg: Color.Cyan))
+        @Expect(narrowBuffer.getCell(narrow.x, narrow.y).style.modifier.bold)
+        @Expect(narrowBuffer.getCell(narrow.x, narrow.y).style.modifier.underline)
+
+        _ = terminal.draw { frame => renderWorkbenchAccentPicker(app, frame, wide) }
+        let wideBuffer = backend.lastBuffer().getOrThrow()
+        @Expect(Style(bg: wideBuffer.getCell(wide.x + 15, wide.y).style.bg), Style(bg: Color.Cyan))
+        @Expect(wideBuffer.getCell(wide.x + 15, wide.y).style.modifier.bold)
+        _ = terminal.draw { frame => renderWorkbenchAccentPicker(app, frame, narrow) }
+        let resizedBuffer = backend.lastBuffer().getOrThrow()
+        @Expect(Style(bg: resizedBuffer.getCell(narrow.x, narrow.y).style.bg), Style(bg: Color.Cyan))
+        @Expect(app.accentPicker.selected, app.accentColors.size - 1)
+
+        let mouseArea = galleryRect(app.layout.galleryContent, 0, 6, min(36, app.layout.galleryContent.width), 1)
+        _ = app.update(Event.Mouse(MouseEvent(
+            MouseKind.Down, MouseButton.Left, mouseArea.x + 3, mouseArea.y)))
+        @Expect(app.accentPicker.selected, 1)
+        @Expect(app.theme.accent, Theme.graphite(accent: Color.Green).accent)
+        _ = app.update(Event.Mouse(MouseEvent(
+            MouseKind.Down, MouseButton.Left, mouseArea.x + 2, mouseArea.y)))
+        @Expect(app.accentPicker.selected, 1)
+        @Expect(app.theme.accent, Theme.graphite(accent: Color.Green).accent)
+    }
+
+    @TestCase
+    func settingsAccentPickerReceivesFocusAndTheme(): Unit {
+        let app = WorkbenchApp()
+        _ = app.perform("page.settings")
+        _ = app.update(Event.Resize(Rect(0, 0, 120, 36)))
+        _ = app.focus.focus("accent-picker")
+        @Expect(app.focus.current(), Some("accent-picker"))
+        _ = app.update(Event.Capabilities(TerminalCapabilities(
+            trueColor: true,
+            colorLevel: 24,
+            unicode: true
+        )))
+        let backend = TestBackend(area: app.screen, captureSnapshots: false)
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        _ = terminal.draw { frame => app.render(frame) }
+
+        let area = Rect(
+            app.layout.settingAccent.x,
+            app.layout.settingAccent.y + min(1, app.layout.settingAccent.height),
+            app.layout.settingAccent.width,
+            max(0, app.layout.settingAccent.height - 1)
+        )
+        let selectedCell = backend.lastBuffer().getOrThrow().getCell(area.x + 15, area.y)
+        @Expect(Style(bg: selectedCell.style.bg), Style(bg: Color.Cyan))
+        @Expect(selectedCell.style.modifier.bold)
+        @Expect(selectedCell.style.modifier.underline)
+    }
+}
