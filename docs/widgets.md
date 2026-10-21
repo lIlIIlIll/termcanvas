@@ -35,6 +35,8 @@ from the resulting state.
 - `Block`: border, title, padding, margin, and content area.
 - `Paragraph`: wrapped, aligned, styled text.
 - `Tabs`: tab labels and selected-tab presentation.
+- `SegmentedControl` (EXPERIMENTAL): one-line selected-value presentation with
+  bounded keyboard navigation and visible-text mouse selection.
 - `StatusBar`: left/right status text with an optional progress slot.
 - `StatusBarProgress`: compact progress state used by `StatusBar`.
 - `Viewport`: bounded content viewport and scrolling surface.
@@ -46,19 +48,50 @@ from the resulting state.
   completion.
 - `Button`: action-oriented button presentation.
 - `Checkbox`: boolean choice.
+- `Switch`: EXPERIMENTAL boolean choice; Space/Enter or a left-button Down on its first visible row toggles the state.
 - `RadioGroup`: one choice from a group.
-- `Select`, `Dropdown`, `MultiSelect`: one or many selectable values.
-- `DatePicker`: date selection workflow.
+- `Select`, `Dropdown`, `MultiSelect`: one or many selectable values. `Dropdown` can opt into transactional preview/commit; legacy behavior remains the default.
+- `DatePicker` (EXPERIMENTAL): displays `year-MM-DD`; Left/Right adjust days,
+  Up/Down months, and PageUp/PageDown years with saturation and day clamping.
+  Supported key operations normalize its public date fields; callers assigning
+  fields directly must keep them valid. Cyan remains the default; use Theme
+  roles with `style: Style.default()` and `theme`, or via `setVisualState`.
+  No calendar grid, parser, locale/timezone, date range, or DatePicker mouse-field editing.
+- `ColorPicker` (EXPERIMENTAL): preserves its candidate palette and
+  `selected`/`selectedColor()` contract; Left/Right clamp, Home/End select the
+  endpoints. Empty palettes return no selection, draw nothing, and reject
+  input. Supported keys and rendering normalize direct invalid indices. Narrow
+  areas keep the selected swatch visible; mouse hits only visible two-cell
+  swatches, never gaps, partial swatches, releases, or outside cells. Selected
+  non-Reset swatches use black foreground only when
+  `2126*r + 7152*g + 722*b > 1,400,000`, otherwise white; Reset uses
+  `theme.normal.fg` or Reset. Focus adds bold and underline; disabled state
+  rejects keyboard and mouse input. Palette adaptation remains application-owned.
+  `setVisualState` is EXPERIMENTAL.
 
 ### Commands and overlays
 
 - `MenuBar`: horizontal menu navigation.
 - `Menu`: selectable items that return optional action strings.
-- `CommandPalette`: queryable command items that return optional action strings.
-- `ToastManager`: short-lived notifications; `tick()` ages them.
+- `CommandPalette`: substring search across labels and actions, case-sensitive
+  by default; `caseSensitive: false` uses Unicode lowercase matching. `paste(text)`
+  appends and synchronizes selection/offset; `setTheme` enables semantic roles.
+  Explicit selected styles remain authoritative; disabled items use
+  `disabledStyle`; missing results show `No matches` and cannot activate.
+  Without a theme, the default disabled style uses indexed color 8.
+- `ToastManager`: theme-aware semantic notifications; it preserves `kind=None`
+  styles, draws stable markers, and can cap the queue while retaining newest
+  rows. `tick()` advances positive TTL values in tick-count units.
+- `Badge` (EXPERIMENTAL): display-only `[label]`; resolves the normal Theme role
+  and styles visible text cells only.
 - `Spinner`: lightweight progress animation.
-- `Dialog`: centered overlay content.
-- `FileDialog`, `ConfirmDialog`, `ColorPicker`: common application workflows.
+- `Dialog`: centered buttons with optional semantic themes. No-theme rendering
+  remains unchanged; explicit selected styles win, and public selection is
+  clamped before input or rendering.
+- `ConfirmDialog`: No/Yes confirmation; Enter starts on No, Left/Right select,
+  and left-button-down on a rendered label returns its boolean result.
+- `RequestDialog` / `DecisionDialog`: request workflows with optional Dialog
+  styles and themes; risk text and document-detail composition remain separate.
 
 ### Data display
 
@@ -83,6 +116,67 @@ from the resulting state.
 - `Sparkline`, `Gauge`, `Chart`: lightweight terminal visualizations.
 - `HelpView`: renders `KeyMap` bindings.
 - `DebugOverlay`: renders the latest `AppMetrics` frame.
+
+`Chart` draws bottom-up bars for a sample series. `maxValue <= 0` keeps the
+automatic maximum; a positive `maxValue` fixes the upper scale and saturates
+higher samples. Zero and negative samples retain the one-cell minimum.
+`Sparkline` keeps its five levels (` `, `.`, `-`, `=`, `#`); an optional `Block`
+draws first and the values occupy its first inner row. Empty data can still show
+the block. These new options are EXPERIMENTAL. Use `Gauge` for one value against
+a total, not for a sample series.
+
+### Shared visual states
+
+`Theme` supplies semantic `normal`, `focused`, `selected`, `disabled`, `error`,
+`accent`, `success`, `warning`, and `info` styles. Prefer those roles over
+component-specific color literals; applications remain responsible for choosing
+the actual palette.
+
+`Tabs.setTheme(theme: ?Theme)` is EXPERIMENTAL. The default `selectedStyle`
+remains black on white; pass `selectedStyle: Style.default()` to opt into the
+theme's `normal` and `selected` roles. A custom `style` patches the normal role
+after opt-in. Without that opt-in, `style` and `selectedStyle` keep their
+existing rendering even when a theme is set. Passing `None` clears the theme.
+A focused selected tab still adds bold and underline.
+
+`SegmentedControl` is EXPERIMENTAL. It draws the selected value as `[value]`,
+other values as ` value `, and adds one non-hit separator cell between segments.
+Left/Right clamp at the ends; Home/End select the first/last value.
+`selectedValue()` normalizes the public index and returns `None` for an empty
+list; empty controls render blank and reject input. `setVisualState` applies
+normal/selected/disabled Theme roles when `selectedStyle` is `Style.default()`;
+focus adds bold and underline to the selected segment, and disabled controls
+ignore input. Narrow rendering keeps the selected segment visible without
+splitting wide glyphs; mouse hits only visible segment text, never the separator.
+
+`Button` fills its assigned cell rectangle, centers its label, and resolves
+disabled and focused styles through its existing style parameters and optional
+theme. Workbench maps `Primary` to `accentButtonStyle`, `Secondary` to
+`surfaceStyle`, `Ghost` to `theme.normal`, and `Danger` to `theme.error`. Each
+variant uses `theme.focused` as `focusedStyle`, `theme.disabled` as
+`disabledStyle`, and `theme` for semantic state resolution. The Disabled row
+sets `disabled`; these are style choices, not separate widget classes or an
+enum.
+
+`Switch` is EXPERIMENTAL. It renders as `label [off]` or `label [on]`, with only
+the bracketed state for an empty label. Space or Enter toggles; a left-button
+Down on the first visible row toggles once. `setVisualState` selects normal,
+focused, or disabled Theme roles; disabled state rejects input.
+
+The EXPERIMENTAL `Input.setVisualState(focused: Bool = false, disabled: Bool = false,
+error: Bool = false, theme: ?Theme = None)` method configures the visual and
+interactive state without changing its editing model. Resolution precedence is
+disabled, error, focused, then normal. Disabled inputs ignore keyboard, mouse,
+and paste editing. `Input.paste(text)` is EXPERIMENTAL. For nonempty text on an
+enabled input, it clamps the cursor to the text bounds and moves any mid-rune
+offset backward to a UTF-8 rune boundary, inserts text without normalization,
+and advances the byte-offset cursor. Empty text and disabled inputs leave
+`value` and `cursor` unchanged. Applications retain control of paste
+normalization and event routing.
+
+The default placeholder color uses the theme's muted `disabled` foreground and
+the input's resolved background; without a theme it keeps the indexed-gray
+fallback. A non-default `placeholderStyle` overrides that derived color.
 
 ## State and data size
 
@@ -169,8 +263,20 @@ lifecycle host, or overlay stack. `KeyMap` remains STABLE application policy.
 
 `Menu` and `CommandPalette` return action strings from `handle`. Map those
 strings to `Command.Message` (or another command) inside update when using
-`App.runWithCommands()`. Call `ToastManager.tick()` from the application's
-`Event.Tick(TickEvent)` handling when notifications should age.
+`App.runWithCommands()`.
+
+`Toast` retains the legacy `Toast(message, ttl:, style:)` constructor, its
+black/yellow default, and unmarked `kind=None` rendering. Semantic notices use
+`Toast(message, kind: Some(ToastKind.Success))`; the stored message remains
+unchanged. A themed manager renders `+`, `!`, `x`, or `i`, then patches the
+matching Theme role with the toast's explicit style. Without a theme, semantic
+notices use the black/yellow base; `kind=None` always uses stored style.
+`setTheme` updates existing notices. `maxToasts: None` is unbounded; `Some(n)` clamps at
+zero and evicts oldest notices. Notices with `ttl <= 0` are ignored; each
+`tick()` reduces remaining TTL by one tick. The manager fills each displayed
+row, truncates messages to width, and renders only the latest visible rows.
+Call `ToastManager.tick()` from the application's `Event.Tick(TickEvent)`
+handling when notifications should age.
 
 The exact stability tier of each declaration is defined by
 [`api-inventory.json`](api-inventory.json), not by this page or by its package

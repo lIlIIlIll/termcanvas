@@ -20,7 +20,7 @@ import resolve_nightly_sdk as resolver
 
 REQUESTED = "1.1.0-alpha.20260817040003"
 NEWER_PREFIX_MATCH = REQUESTED + ".1"
-STS_VERSION = "1.1.3"
+STS_VERSION = "1.2.0"
 
 
 def candidate(name_version: str) -> dict[str, str]:
@@ -188,7 +188,7 @@ class ResolverArchiveSafetyTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "manifest.json"
             native = candidate(STS_VERSION)
-            cross = dict(native, name="cangjie-sdk-linux-x64-ohos-1.1.3.tar.gz", url="https://example.test/cross")
+            cross = dict(native, name="cangjie-sdk-linux-x64-ohos-1.2.0.tar.gz", url="https://example.test/cross")
             path.write_text(json.dumps([native, cross]), encoding="utf-8")
             self.assertEqual(resolver.load_manifest(path, "linux", "x64", "sts"), resolver.SdkCandidate(STS_VERSION, native["url"], native["name"]))
 

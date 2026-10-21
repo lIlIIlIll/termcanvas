@@ -47,7 +47,7 @@ Tests and examples should use `TestBackend` when terminal behavior is not the su
 ## Reference: verification matrix
 
 The pull-request workflow runs `scripts/native_ci.py` on macOS and Windows,
-with the pinned native Cangjie/cjpm 1.1.3 SDK. Linux retains the complete release
+with the pinned native Cangjie/cjpm 1.2.0 SDK. Linux retains the complete release
 and coverage gates. `scripts/native_terminal_harness.py` builds its own probe
 from `tests/fixtures/native_terminal`; see [downstream testing](downstream-testing.md)
 for the observed input, resize, idle-wakeup and restoration contracts.

@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "batch": "B00",
+  "source": {
+    "commit": "a36f097631911e1f3272d645a450cbbfbbfa9791",
+    "revision_note": "Screenshots were captured from this source commit; the PR follow-up adds screenshot assets, provenance manifests, documentation, and a manifest allowlist.",
+    "digest_algorithm": "SHA-256",
+    "digest_scope": "SHA-256 of the ordered per-file SHA-256 records produced by digest_command",
+    "digest_command": "export LC_ALL=C && sha256sum examples/workbench/cjpm.toml examples/workbench/src/*.cj packages/core/cjpm.toml packages/core/src/*.cj | sha256sum",
+    "digest": "afb5fec45c9a7e4a8f7b41ba40ac0d5612621d460a22ec9c6167497c46e4e707",
+    "inputs": [
+      "examples/workbench/cjpm.toml",
+      "examples/workbench/src/*.cj",
+      "packages/core/cjpm.toml",
+      "packages/core/src/*.cj"
+    ]
+  },
+  "toolchain": {
+    "distribution": "Cangjie STS SDK",
+    "version": "1.2.0",
+    "target": "x86_64-unknown-linux-gnu",
+    "archive_sha256": "8c5fd944cd9cc51ee63d4a240e3ecc4f540345dae1468e8b47c927ecf2ba998f",
+    "cjc_version": "1.2.0",
+    "cjc_sha256": "023be1bb2ded1078906fc91919b3c1175ad14436ad88d23d505f7b8dcd0d7118",
+    "cjpm_version": "1.2.0",
+    "runtime_sha256": "2e32485852cbc8648c1298c23f2d1ff5f90bdb6c0331da20b29ee3d97d03e167"
+  },
+  "capture_environment": {
+    "application": "Termcanvas Workbench",
+    "backend": "headless",
+    "compositor": "SwayFX 0.6 (based on Sway 1.12.0)",
+    "renderer": "SwayFX FX renderer, OpenGL ES 3.2 (Mesa)",
+    "terminal": "Foot 1.28.0",
+    "capture_tool": "grim",
+    "font": "monospace:size=14",
+    "pty_columns": 120,
+    "pty_rows": 36,
+    "image_width": 1320,
+    "image_height": 936,
+    "terminal_color_capability": "true-color",
+    "color_capability_preview": "Monochrome preview remained enabled for subsequent Workbench captures; Light / Cyan were selected but rendered without color.",
+    "ascii_fallback": "Disabled for Gallery Overview; enabled for Gallery Layout and retained for subsequent captures, including all five Workbench captures."
+  },
+  "captures": [
+    {
+      "file": "b00-gallery-overview-120x36.png",
+      "screen": "Gallery / Overview",
+      "theme": "Graphite / Cyan",
+      "state": "Default overview; semantic color samples and category shortcuts.",
+      "widgets": ["Button", "Panel", "Block", "Paragraph", "Gauge"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "8dc19c7973677c8909b46722659a56086a93dd7f8ff6068338a8f67953e03faa"
+    },
+    {
+      "file": "b00-gallery-layout-120x36.png",
+      "screen": "Gallery / Layout",
+      "theme": "Graphite / Cyan",
+      "state": "ASCII fallback enabled; rounded panel, borderless surface, and ASCII panel.",
+      "widgets": ["Panel", "Block", "Paragraph", "Button"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "790187a2ba6d1830425adedd96c64b81dbdb334cc124ea7ac8787289515242c6"
+    },
+    {
+      "file": "b00-gallery-forms-120x36.png",
+      "screen": "Gallery / Forms",
+      "theme": "Graphite / Cyan",
+      "state": "Button variants and editable control states.",
+      "widgets": ["Button", "Input", "Checkbox", "Select", "Switch", "DatePicker"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "e15ddbd6a686712f62900169322ca7b26645a52b64aad5044cbfa33fcd5560fa"
+    },
+    {
+      "file": "b00-gallery-navigation-120x36.png",
+      "screen": "Gallery / Navigation",
+      "theme": "Graphite / Cyan",
+      "state": "Tabs, segmented density selector, menu, and tree.",
+      "widgets": ["Tabs", "SegmentedControl", "Menu", "Tree"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "6c4df0019ef79bfb2beaae24b2637875c123cb0317634f275431c7f0c78c42e8"
+    },
+    {
+      "file": "b00-gallery-data-table-120x36.png",
+      "screen": "Gallery / Data / Table",
+      "theme": "Graphite / Cyan",
+      "state": "Table sample selected.",
+      "widgets": ["Tabs", "Table", "Block"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "790635c1246edf245417efd481e25eb63e87a590510612e0a9772cbca5ed4451"
+    },
+    {
+      "file": "b00-gallery-data-list-120x36.png",
+      "screen": "Gallery / Data / List",
+      "theme": "Graphite / Cyan",
+      "state": "List sample selected.",
+      "widgets": ["Tabs", "List", "Block"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "bd97cad26be600c32c0c0cf804c0113b761fda035241b915bc676e5021ac8b3c"
+    },
+    {
+      "file": "b00-gallery-data-progress-120x36.png",
+      "screen": "Gallery / Data / Progress",
+      "theme": "Graphite / Cyan",
+      "state": "Weighted progress and history chart on a fixed 0–100% scale.",
+      "widgets": ["Tabs", "Gauge", "Chart", "Paragraph"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "68627ff7a2f2ae9d1b28d6b151d523c3e115f7a81ec054f4d3f54cebd2f06feb"
+    },
+    {
+      "file": "b00-gallery-feedback-120x36.png",
+      "screen": "Gallery / Feedback",
+      "theme": "Graphite / Cyan",
+      "state": "Active success toast with Toasts: 1 badge.",
+      "widgets": ["Button", "Badge", "ToastManager", "Toast"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "20ab9d10c50e4359f32e91f6cd6e415875ef1fe0f696fe2cace9da429dab1174"
+    },
+    {
+      "file": "b00-gallery-overlays-palette-120x36.png",
+      "screen": "Gallery / Overlays / CommandPalette",
+      "theme": "Graphite / Cyan",
+      "state": "CommandPalette open with an empty query and available commands.",
+      "widgets": ["CommandPalette"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "f117b36cebd9c465da94ca5597535d9d2764374ccca290cf76a5df123b207a3c"
+    },
+    {
+      "file": "b00-gallery-overlays-dialog-120x36.png",
+      "screen": "Gallery / Overlays / ConfirmDialog",
+      "theme": "Graphite / Cyan",
+      "state": "ConfirmDialog open; No is focused.",
+      "widgets": ["ConfirmDialog"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "9d6fcd626e44f595795374a56dd049cc96ac0e5e6ebe3c1876d97a429fbb5a69"
+    },
+    {
+      "file": "b00-gallery-themes-120x36.png",
+      "screen": "Gallery / Themes",
+      "theme": "Graphite / Cyan",
+      "state": "Native capability preview on a true-color terminal.",
+      "widgets": ["Button", "ColorPicker", "Select", "Paragraph"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "4e539daaf4ce06f58d7b83cbfb087ea36384021d4c29c164d0b88ed9be8f61d6"
+    },
+    {
+      "file": "b00-gallery-themes-light-mono-120x36.png",
+      "screen": "Gallery / Themes",
+      "theme": "Light / Cyan",
+      "state": "Monochrome capability preview; terminal remains true-color.",
+      "widgets": ["Button", "ColorPicker", "Select", "Paragraph"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "498f95e6e9dfbf8538060d761cb861cc6ac6f3a9d3475d56a0d41568292389cb"
+    },
+    {
+      "file": "b00-workbench-overview-120x36.png",
+      "screen": "Workbench / Overview",
+      "theme": "Monochrome preview (Light / Cyan selected)",
+      "state": "Project/status overview, activity log, ready queue, and weighted progress.",
+      "widgets": ["Tree", "MetricCard", "Gauge", "Chart", "LogView", "Table", "ProgressBar"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "5ca4bb905923ef51d88da42ce4b78a3ef52e9075e7225c3e123c70df6dfde113"
+    },
+    {
+      "file": "b00-workbench-task-dropdown-120x36.png",
+      "screen": "Workbench / Tasks / Status Dropdown",
+      "theme": "Monochrome preview (Light / Cyan selected)",
+      "state": "Status dropdown open above the task table.",
+      "widgets": ["Tree", "Input", "Dropdown", "Button", "Table", "ProgressBar"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "75157af98bee936dbca654684a43de4ff13b3ff69ab1f649f9554f96b0f79f18"
+    },
+    {
+      "file": "b00-workbench-task-editor-120x36.png",
+      "screen": "Workbench / Tasks / Editor",
+      "theme": "Monochrome preview (Light / Cyan selected)",
+      "state": "Task editor open with name, priority, notification, tags, notes, and actions.",
+      "widgets": ["Input", "Select", "Checkbox", "MultiSelect", "TextArea", "Button"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "db150f2e1edb70d6a095e8c7751877635d112211c7dd066a28780369c6813f15"
+    },
+    {
+      "file": "b00-workbench-help-dialog-120x36.png",
+      "screen": "Workbench / Help",
+      "theme": "Monochrome preview (Light / Cyan selected)",
+      "state": "Help dialog open above Tasks.",
+      "widgets": ["Dialog", "Button"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "3ef069c094c3fba2bfe9888269e5136915ebe226d6fed41c9e89f1cf11db06f6"
+    },
+    {
+      "file": "b00-workbench-settings-120x36.png",
+      "screen": "Workbench / Settings",
+      "theme": "Monochrome preview (Light / Cyan selected)",
+      "state": "Appearance and simulation settings.",
+      "widgets": ["RadioGroup", "ColorPicker", "Checkbox", "Select", "Button"],
+      "width": 1320,
+      "height": 936,
+      "sha256": "65789c55174c24de6ac0462f63d37523acc0190edfd052705e09a8d355a88307"
+    }
+  ],
+  "verification": [
+    {
+      "command": "Official Linux x86_64 STS 1.2.0 SDK archive SHA-256",
+      "result": "Verified: 8c5fd944cd9cc51ee63d4a240e3ecc4f540345dae1468e8b47c927ecf2ba998f."
+    },
+    {
+      "command": "scripts/check_sdk.sh --report",
+      "result": "Passed: CJC 1.2.0, CJPM 1.2.0, runtime and target hashes recorded above."
+    },
+    {
+      "command": "scripts/cangjie_cmd.sh examples/workbench cjpm build --target-dir <task-temp>/workbench-target",
+      "result": "Passed; existing compiler warnings only."
+    },
+    {
+      "command": "scripts/cangjie_cmd.sh examples/workbench cjpm run --target-dir <task-temp>/workbench-target -- --headless-smoke",
+      "result": "workbench headless smoke ok."
+    },
+    {
+      "command": "Foot + SwayFX headless capture at 120×36",
+      "result": "17 unique Workbench screenshots captured; all PNGs are 1320×936 and their SHA-256 digests are recorded above."
+    },
+    {
+      "command": "scripts/ci_gate.sh (Linux x86_64, canonical Cangjie STS 1.2.0 SDK)",
+      "result": "Passed on the PR source; final output: pressure gate ok; release gate ok."
+    }
+  ]
+}

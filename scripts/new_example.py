@@ -41,7 +41,7 @@ def create_application(name: str, destination: Path, library: Path,
     if script_dir is not None:
         script_dir = script_dir.expanduser().resolve()
         if any(char.isspace() for char in str(script_dir)):
-            raise ValueError("Cangjie 1.1.3 requires --script-dir without spaces")
+            raise ValueError("Cangjie 1.2.0 requires --script-dir without spaces")
         content[Path("cjpm.toml")] = content[Path("cjpm.toml")].replace(
             'script-dir = ""', 'script-dir = ' + json.dumps(script_dir.as_posix())
         )
@@ -71,7 +71,7 @@ def main() -> int:
                         help="termcanvas source checkout providing packages/core and packages/testing")
     parser.add_argument("--dependency-path", choices=("relative", "absolute"), default="relative")
     parser.add_argument("--script-dir", type=Path,
-                        help="build-script output directory; Cangjie 1.1.3 requires a path without spaces")
+                        help="build-script output directory; Cangjie 1.2.0 requires a path without spaces")
     args = parser.parse_args()
     if re.fullmatch(r"[a-z][a-z0-9_]*", args.name) is None:
         parser.error("application name must match [a-z][a-z0-9_]*")

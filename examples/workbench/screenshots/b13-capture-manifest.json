@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "batch": "B13",
+  "source": {
+    "commit": "9ef02dba871b0a0f3bcab8ca632e15db869dd9eb",
+    "digest_algorithm": "SHA-256",
+    "digest_scope": "SHA-256 of the ordered per-file SHA-256 records produced by digest_command",
+    "digest_command": "export LC_ALL=C && sha256sum examples/workbench/cjpm.toml examples/workbench/src/*.cj packages/core/src/visual_widgets.cj packages/core/src/dashboard_widgets.cj | sha256sum",
+    "digest": "25ca0037be2d1cbe40e87f8baf6c29c63a1dec72f6f5a7e88caefc2d4d124545",
+    "inputs": [
+      "examples/workbench/cjpm.toml",
+      "examples/workbench/src/*.cj",
+      "packages/core/src/visual_widgets.cj",
+      "packages/core/src/dashboard_widgets.cj"
+    ]
+  },
+  "toolchain": {
+    "cangjie_compiler": "1.3.0-alpha.20261020001052 (cjnative)"
+  },
+  "capture": {
+    "application": "Termcanvas Workbench",
+    "gallery_path": "Data / Progress",
+    "terminal": "foot 1.28.0",
+    "compositor": "Scroll 1.13-dev",
+    "configuration": {
+      "font": "monospace:size=14",
+      "columns": 80,
+      "rows": 24,
+      "workbench_theme": "Graphite / Cyan"
+    },
+    "image": "b13-progress.png",
+    "image_sha256": "3fa008859b6fc90119e8231d51351921445c11a7a7333d167648c19228f6ea64",
+    "result": "Captured the real Progress Gallery showing weighted progress 0.83%, fixed 0–100% labels, and the real model-history chart."
+  },
+  "verification": {
+    "core_tests": "916 passed, 0 failed",
+    "workbench_tests": "41 passed, 0 failed",
+    "workbench_build": "passed",
+    "workbench_headless_smoke": "passed",
+    "ops_dashboard_tests": "2 passed, 0 failed",
+    "ops_dashboard_build": "passed",
+    "ops_dashboard_pty_run": "exited 0"
+  }
+}

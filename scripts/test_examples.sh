@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EXAMPLES="$ROOT/examples"
+SMOKE_TMP="${TMPDIR:-/tmp}"
 
 expected=(
   arcade
@@ -22,6 +23,7 @@ expected=(
   ops_dashboard
   taskpad
   terminal_lab
+  workbench
 )
 
 for name in "${expected[@]}"; do
@@ -85,7 +87,13 @@ if ! grep -q "media_gallery headless smoke ok" <<<"$media_smoke_output"; then
   exit 1
 fi
 
-game_demo_smoke_output="$(GCOV_PREFIX=/tmp/cj_tui_gcov "$ROOT/scripts/cangjie_cmd.sh" "$EXAMPLES/game_demo" cjpm run -- --headless-smoke --save-path /tmp/cj_tui_game_demo_smoke.save --reset-save 2>&1)"
+workbench_smoke_output="$("$ROOT/scripts/cangjie_cmd.sh" "$EXAMPLES/workbench" cjpm run --target-dir "$SMOKE_TMP/workbench-target" -- --headless-smoke 2>&1)"
+if ! grep -q "workbench headless smoke ok" <<<"$workbench_smoke_output"; then
+  echo "$workbench_smoke_output" >&2
+  exit 1
+fi
+
+game_demo_smoke_output="$(GCOV_PREFIX="${GCOV_PREFIX:-$SMOKE_TMP/gcov}" "$ROOT/scripts/cangjie_cmd.sh" "$EXAMPLES/game_demo" cjpm run -- --headless-smoke --save-path "$SMOKE_TMP/game_demo_smoke.save" --reset-save 2>&1)"
 if ! grep -q "game_demo headless smoke ok" <<<"$game_demo_smoke_output"; then
   echo "$game_demo_smoke_output" >&2
   exit 1

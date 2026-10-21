@@ -746,18 +746,29 @@ public class RequestDialog <: Widget {
     private let risk: String
     private let buttons: Array<String>
     public var selected: Int64
+    private let style: Style
+    private let selectedStyle: Style
+    private var theme: ?Theme = None
 
-    public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0) {
+    public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None) {
         this.title = title
         this.body = body
         this.detail = detail
         this.risk = risk
         this.buttons = buttons
         this.selected = clamp(selected, 0, max(0, buttons.size - 1))
+        this.style = style
+        this.selectedStyle = selectedStyle
+        this.theme = theme
+    }
+    /** 设置请求对话框使用的语义主题；None 清除主题。
+     */
+    public func setTheme(theme: ?Theme): Unit {
+        this.theme = theme
     }
 
     public func handle(key: KeyEvent): ?String {
-        let dialog = Dialog(title: title, body: body, buttons: buttons, selected: selected)
+        let dialog = Dialog(title: title, body: body, buttons: buttons, selected: selected, style: style, selectedStyle: selectedStyle, theme: theme)
         match (dialog.handle(key)) {
             case Some(action) =>
                 selected = dialog.selected
@@ -769,7 +780,7 @@ public class RequestDialog <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
-        Dialog(title: title, body: if (risk.isEmpty()) { body } else { risk + "\n" + body }, buttons: buttons, selected: selected).render(area, buffer)
+        Dialog(title: title, body: if (risk.isEmpty()) { body } else { risk + "\n" + body }, buttons: buttons, selected: selected, style: style, selectedStyle: selectedStyle, theme: theme).render(area, buffer)
         if (detail.lines.size > 0 && area.width > 10 && area.height > 10) {
             let detailArea = Rect(area.x + area.width / 4, area.y + area.height / 2, area.width / 2, max(1, area.height / 3))
             DocumentView(detail).render(detailArea, buffer)

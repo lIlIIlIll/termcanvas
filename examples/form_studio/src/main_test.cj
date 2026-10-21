@@ -33,6 +33,16 @@ class FormStudioTest {
         @Expect(app.name.cursor, Int64(3))
         @Expect(app.status, "pasted into name")
     }
+
+    @TestCase
+    func datePickerYearKeysRemainRoutedThroughFormStudio(): Unit {
+        let app = FormStudio()
+        @Expect(app.focus.focus("date"))
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.PageUp)))
+        @Expect(app.date.value(), "2027-06-30")
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.PageDown)))
+        @Expect(app.date.value(), "2026-06-30")
+    }
     @TestCase
     func modalSaveAndNestedHelpKeepTheFormIsolated(): Unit {
         let app = FormStudio()

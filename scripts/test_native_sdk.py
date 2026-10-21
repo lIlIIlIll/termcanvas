@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from native_sdk import sdk_environment, verify_sdk
+from native_sdk import SDK_VERSION, canonical_target_dir, sdk_environment, verify_sdk
 
 
 class NativeSdkTests(unittest.TestCase):
@@ -16,6 +16,14 @@ class NativeSdkTests(unittest.TestCase):
         # macOS /var aliases and Windows 8.3 temporary paths resolve to the
         # same directory that sdk_environment deliberately canonicalizes.
         self.root = Path(temp.name).resolve()
+
+    def test_canonical_target_is_version_and_workspace_scoped(self):
+        target_root = self.root / "canonical-target"
+        first = canonical_target_dir(str(target_root), self.root / "source")
+        second = canonical_target_dir(str(target_root), self.root / "other-source")
+        self.assertEqual(first.parent.name, SDK_VERSION)
+        self.assertEqual(first.parent.parent, target_root.resolve())
+        self.assertNotEqual(first, second)
 
     def fixture(self, system, arch):
         prefix, extension, executable = {
@@ -58,13 +66,13 @@ class NativeSdkTests(unittest.TestCase):
             sdk_environment(str(self.root), system="Linux", machine="x86_64")
 
     def test_version_comparison_does_not_accept_a_prefix(self):
-        result = subprocess.CompletedProcess([], 0, "Cangjie Compiler: 1.1.30", "")
+        result = subprocess.CompletedProcess([], 0, "Cangjie Compiler: 1.2.00", "")
         with patch("native_sdk.subprocess.run", return_value=result):
             with self.assertRaises(ValueError):
                 verify_sdk(self.root, {})
 
     def test_failed_version_command_cannot_pass_by_printing_version(self):
-        result = subprocess.CompletedProcess([], 1, "1.1.3", "failed")
+        result = subprocess.CompletedProcess([], 1, "1.2.0", "failed")
         with patch("native_sdk.subprocess.run", return_value=result):
             with self.assertRaises(ValueError):
                 verify_sdk(self.root, {})

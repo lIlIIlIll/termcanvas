@@ -115,9 +115,11 @@ main(): Int64 {
 | PTY、终端转录与 diff | [`terminal_lab`](examples/terminal_lab/) |
 | 媒体协议与回退 | [`media_gallery`](examples/media_gallery/) |
 | 压力与规模验证 | [`game_pressure_suite`](examples/game_pressure_suite/) |
+| 本地终端工作台 | [workbench](examples/workbench/) |
 
-完整目录包含 17 个示例：8 个推荐应用、2 个实验应用、6 个功能演示和 1 个
-压力/证明工作负载。查看[示例目录](docs/examples.md)了解每个示例的用途。
+The complete catalog contains 18 examples: 9 recommended applications, 2
+experimental applications, 6 feature demonstrations, and 1 proof workload.
+See the [example catalog](docs/examples.md) for each example's purpose.
 
 从仓库根目录运行单个示例：
 
@@ -132,6 +134,109 @@ CANGJIE_SDK_ROOT=/path/to/cangjie \
 CANGJIE_SDK_ROOT=/path/to/cangjie \
   scripts/build_examples.sh
 ```
+
+## 控件图集
+
+以下 17 张 Workbench 截图来自 Linux x86_64 上实际运行的应用：Cangjie STS 1.2.0、Foot 1.28.0、SwayFX 0.6 headless，终端尺寸为 120×36（每张 PNG 为 1320×936）。源码 revision、源码摘要、工具链哈希和图片 SHA-256 见 [B00 截图清单](examples/workbench/screenshots/b00-capture-manifest.json)。另有一张 [ops_dashboard Sparkline Block 截图](examples/workbench/screenshots/b13-sparkline-block-120x36.png)，其源码和工具链信息见 [B13 截图清单](examples/workbench/screenshots/b13-sparkline-capture-manifest.json)。
+
+Five Workbench captures follow the Gallery's monochrome color preview and ASCII
+fallback. Light/Cyan remain selected in the application, but those images show
+capability-preview output rather than Light/Cyan color rendering; Foot itself
+reported true-color. The B00 manifest records this distinction.
+
+<table>
+  <tr>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-overview-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-overview-120x36.png" alt="Gallery Overview: semantic colors and component previews" width="480"></a><br>
+      <sub>Gallery / Overview</sub>
+    </td>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-layout-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-layout-120x36.png" alt="Gallery Layout: rounded panels, borderless surface, and ASCII fallback" width="480"></a><br>
+      <sub>Gallery / Layout · ASCII fallback enabled</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-forms-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-forms-120x36.png" alt="Gallery Forms: button variants and editable controls" width="480"></a><br>
+      <sub>Gallery / Forms</sub>
+    </td>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-navigation-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-navigation-120x36.png" alt="Gallery Navigation: tabs, segmented control, menu, and tree" width="480"></a><br>
+      <sub>Gallery / Navigation</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-data-table-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-data-table-120x36.png" alt="Gallery Data: table sample" width="480"></a><br>
+      <sub>Gallery / Data · Table</sub>
+    </td>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-data-list-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-data-list-120x36.png" alt="Gallery Data: list sample" width="480"></a><br>
+      <sub>Gallery / Data · List</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-data-progress-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-data-progress-120x36.png" alt="Gallery Data: weighted progress and chart on a fixed zero-to-one-hundred-percent scale" width="480"></a><br>
+      <sub>Gallery / Data · Progress</sub>
+    </td>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b13-sparkline-block-120x36.png"><img src="examples/workbench/screenshots/b13-sparkline-block-120x36.png" alt="ops_dashboard: Sparkline rendered inside the Latency Block with chart, gauge, progress, and log widgets" width="480"></a><br>
+      <sub>ops_dashboard / Sparkline Block · B13</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-overlays-palette-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-overlays-palette-120x36.png" alt="Gallery Overlays: CommandPalette open with available commands" width="480"></a><br>
+      <sub>Gallery / Overlays · CommandPalette</sub>
+    </td>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-overlays-dialog-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-overlays-dialog-120x36.png" alt="Gallery Overlays: ConfirmDialog open with No selected" width="480"></a><br>
+      <sub>Gallery / Overlays · ConfirmDialog</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-themes-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-themes-120x36.png" alt="Gallery Themes: Graphite and Cyan with native terminal color preview" width="480"></a><br>
+      <sub>Gallery / Themes · Graphite / Cyan</sub>
+    </td>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-themes-light-mono-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-themes-light-mono-120x36.png" alt="Gallery Themes: Light theme with Monochrome capability preview on a true-color terminal" width="480"></a><br>
+      <sub>Gallery / Themes · Light / Monochrome preview</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-workbench-overview-120x36.png"><img src="examples/workbench/screenshots/b00-workbench-overview-120x36.png" alt="Workbench Overview: project tree, status distribution, activity log, task queue, and progress" width="480"></a><br>
+      <sub>Workbench / Overview</sub>
+    </td>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-workbench-task-dropdown-120x36.png"><img src="examples/workbench/screenshots/b00-workbench-task-dropdown-120x36.png" alt="Workbench Tasks: task table with status dropdown open" width="480"></a><br>
+      <sub>Workbench / Tasks · Status Dropdown</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-workbench-task-editor-120x36.png"><img src="examples/workbench/screenshots/b00-workbench-task-editor-120x36.png" alt="Workbench Tasks: task editor with input, priority, checkboxes, tags, notes, and actions" width="480"></a><br>
+      <sub>Workbench / Tasks · Editor</sub>
+    </td>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-workbench-settings-120x36.png"><img src="examples/workbench/screenshots/b00-workbench-settings-120x36.png" alt="Workbench Settings: appearance and simulation controls" width="480"></a><br>
+      <sub>Workbench / Settings</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-workbench-help-dialog-120x36.png"><img src="examples/workbench/screenshots/b00-workbench-help-dialog-120x36.png" alt="Workbench Help dialog over the Tasks page" width="480"></a><br>
+      <sub>Workbench / Help</sub>
+    </td>
+    <td width="50%">
+      <a href="examples/workbench/screenshots/b00-gallery-feedback-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-feedback-120x36.png" alt="Gallery Feedback: severity buttons, active success toast, and toast count badge" width="480"></a><br>
+      <sub>Gallery / Feedback · Active toast</sub>
+    </td>
+  </tr>
+</table>
+
 
 ## 包结构
 

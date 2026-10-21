@@ -15,6 +15,12 @@ func renderBoundarySentinels(): Buffer {
     buffer
 }
 
+func renderBoundaryWideSentinels(): Buffer {
+    let buffer = Buffer(Rect(0, 0, 32, 12))
+    for (row in 0..12) { buffer.setString(0, row, "ssssssssssssssssssssssssssssssss") }
+    buffer
+}
+
 func renderBoundaryOutsideChanges(buffer: Buffer, area: Rect): Int64 {
     var changed: Int64 = 0
     for (row in 0..buffer.area.height) {
@@ -70,6 +76,98 @@ class WidgetRenderBoundaryTest {
         dialog.render(Rect(2, 2, 0, 3), unchanged)
         dialog.render(Rect(2, 2, 3, 0), unchanged)
         @Expect(renderBoundaryOutsideChanges(unchanged, Rect(0, 0, 0, 0)), 0)
+    }
+
+    @TestCase
+    func dialogClampsPublicSelectionBeforeActionsAndRendering(): Unit {
+        let area = Rect(0, 0, 40, 7)
+        let dialog = Dialog(buttons: ["No", "Yes"])
+        dialog.selected = 99
+        @Expect(dialog.handle(KeyEvent(KeyCode.Enter)), Some("Yes"))
+        @Expect(dialog.selected, 1)
+        dialog.selected = -5
+        _ = dialog.handle(KeyEvent(KeyCode.Left))
+        @Expect(dialog.selected, 0)
+        dialog.selected = 99
+        dialog.render(area, Buffer(area))
+        @Expect(dialog.selected, 1)
+    }
+
+    @TestCase
+    func dialogThemeIsOptInAndExplicitSelectedStyleWins(): Unit {
+        let area = Rect(0, 0, 40, 7)
+        let normalRole = Style(fg: Color.Blue, bg: Color.Black)
+        let selectedRole = Style(fg: Color.Green, bg: Color.Magenta, modifier: Modifier.strong())
+        let theme = Theme(normal: normalRole, selected: selectedRole)
+        let customNormal = Style(fg: Color.Red)
+        let dialog = Dialog(body: "Body", buttons: ["No", "Yes"], style: customNormal, selectedStyle: Style.default())
+
+        let legacy = Buffer(area)
+        dialog.render(area, legacy)
+        @Expect(legacy.getCell(1, 5).style, Style.default())
+        @Expect(legacy.getCell(1, 1).style, customNormal)
+
+        dialog.setTheme(Some(theme))
+        let themed = Buffer(area)
+        dialog.render(area, themed)
+        @Expect(themed.getCell(1, 1).style, normalRole.patch(customNormal))
+        @Expect(themed.getCell(1, 5).style, selectedRole)
+        @Expect(themed.getCell(6, 5).style, normalRole.patch(customNormal))
+
+        let explicit = Style(fg: Color.Yellow, bg: Color.Red)
+        let overridden = Dialog(buttons: ["No"], selectedStyle: explicit, theme: Some(theme))
+        let explicitBuffer = Buffer(area)
+        overridden.render(area, explicitBuffer)
+        @Expect(explicitBuffer.getCell(1, 5).style, explicit)
+    }
+
+    @TestCase
+    func confirmDialogMapsKeyboardAndRenderedMouseHitsToBooleans(): Unit {
+        let area = Rect(0, 0, 80, 24)
+        let selected = Style(fg: Color.Green, bg: Color.Blue)
+        let confirm = ConfirmDialog("Proceed?", selectedStyle: Style.default(), theme: Some(Theme(selected: selected)))
+        @Expect(confirm.handle(KeyEvent(KeyCode.Enter)), Some(false))
+        @Expect(confirm.confirmed, false)
+        @Expect(confirm.handle(KeyEvent(KeyCode.Right)).isNone())
+        @Expect(confirm.confirmed, true)
+        @Expect(confirm.handle(KeyEvent(KeyCode.Enter)), Some(true))
+
+        confirm.confirmed = false
+        let buffer = Buffer(area)
+        confirm.render(area, buffer)
+        @Expect(buffer.getCell(21, 13).style, selected)
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 27, 13), area), Some(true))
+        @Expect(confirm.confirmed, true)
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 22, 13), area), Some(false))
+        @Expect(confirm.confirmed, false)
+
+        confirm.confirmed = true
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 25, 13), area).isNone())
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 20, 13), area).isNone())
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 22, 10), area).isNone())
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Right, 27, 13), area).isNone())
+        @Expect(confirm.handleMouse(MouseEvent(MouseKind.Up, MouseButton.Left, 27, 13), area).isNone())
+        @Expect(confirm.confirmed, true)
+    }
+
+    @TestCase
+    func requestAndDecisionDialogsForwardThemeOptions(): Unit {
+        let area = Rect(0, 0, 40, 12)
+        let normal = Style(fg: Color.Cyan, bg: Color.Black)
+        let selected = Style(fg: Color.Yellow, bg: Color.Blue)
+        let theme = Theme(normal: normal, selected: selected)
+        let customNormal = Style(fg: Color.Red)
+        let request = RequestDialog(body: "Run?", buttons: ["No", "Yes"], selected: 1, style: customNormal, selectedStyle: Style.default())
+        request.setTheme(Some(theme))
+        let requestBuffer = Buffer(area)
+        request.render(area, requestBuffer)
+        @Expect(requestBuffer.getCell(1, 3).style, normal.patch(customNormal))
+        @Expect(requestBuffer.getCell(6, 7).style, selected)
+
+        let decision = DecisionDialog(body: "Approve?", buttons: ["No", "Yes"], selected: 1, selectedStyle: Style.default(), theme: Some(theme))
+        let decisionBuffer = Buffer(area)
+        decision.render(area, decisionBuffer)
+        @Expect(decisionBuffer.getCell(6, 7).style, selected)
     }
 
     @TestCase
@@ -131,6 +229,155 @@ class WidgetRenderBoundaryTest {
         @Expect(!tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Right, 6, 3), area))
         @Expect(!Tabs([]).handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 3, 3), area))
         @Expect(tabs.selected, 1)
+    }
+    @TestCase
+    func tabsScrollAndTruncateWithMatchingMouseHitAreas(): Unit {
+        let tabs = Tabs(["Overview", "Layout", "Forms", "Long navigation"], selected: 3,
+            style: Style(fg: Color.Indexed(8)), selectedStyle: Style(fg: Color.White, bg: Color.Blue))
+        tabs.setFocused(true)
+        let area = Rect(2, 2, 5, 2)
+        let buffer = renderBoundarySentinels()
+        tabs.render(area, buffer)
+        @Expect(buffer.getCell(2, 2).style.modifier.bold)
+        @Expect(buffer.getCell(2, 2).style.modifier.underline)
+        @Expect(tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 6, 2), area))
+        @Expect(tabs.selected, 3)
+        @Expect(renderBoundaryOutsideChanges(buffer, area), 0)
+
+        tabs.selected = 2
+        let narrow = Rect(3, 4, 1, 1)
+        let narrowBuffer = renderBoundarySentinels()
+        tabs.render(narrow, narrowBuffer)
+        @Expect(tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 3, 4), narrow))
+        @Expect(tabs.selected, 2)
+        @Expect(renderBoundaryOutsideChanges(narrowBuffer, narrow), 0)
+        @Expect(!Tabs([]).handle(KeyEvent(KeyCode.Left)))
+    }
+
+    @TestCase
+    func tabsThemeIsOptInAndFocusedSelectionKeepsModifiers(): Unit {
+        let theme = Theme(
+            normal: Style(fg: Color.Yellow, bg: Color.Blue),
+            selected: Style(fg: Color.White, bg: Color.Green)
+        )
+        let legacyNormal = Style(fg: Color.Red)
+        let legacySelected = Style(fg: Color.White, bg: Color.Magenta)
+        let legacyTabs = Tabs(["A", "B"], selected: 1, style: legacyNormal, selectedStyle: legacySelected)
+        legacyTabs.setTheme(Some(theme))
+        let legacyBuffer = Buffer(Rect(0, 0, 8, 1))
+        legacyTabs.render(legacyBuffer.area, legacyBuffer)
+        @Expect(legacyBuffer.getCell(1, 0).style, legacyNormal)
+        @Expect(legacyBuffer.getCell(4, 0).style, legacySelected)
+
+        let tabs = Tabs(["A", "B"], selected: 1, selectedStyle: Style.default())
+        tabs.setTheme(Some(theme))
+        tabs.setFocused(true)
+        let themedSelectedBase = theme.selected
+        var themedSelectedModifier = themedSelectedBase.modifier
+        themedSelectedModifier.bold = true
+        themedSelectedModifier.underline = true
+        let focusedThemedSelected = themedSelectedBase.withModifier(themedSelectedModifier)
+        let themedBuffer = Buffer(Rect(0, 0, 8, 1))
+        tabs.render(themedBuffer.area, themedBuffer)
+        @Expect(themedBuffer.getCell(1, 0).style, theme.normal)
+        let selectedCell = themedBuffer.getCell(4, 0)
+        @Expect(selectedCell.style, focusedThemedSelected)
+        @Expect(selectedCell.style.modifier.bold)
+        @Expect(selectedCell.style.modifier.underline)
+
+        tabs.setTheme(Option<Theme>.None)
+        let defaultSelectedBase = Style.default()
+        var defaultSelectedModifier = defaultSelectedBase.modifier
+        defaultSelectedModifier.bold = true
+        defaultSelectedModifier.underline = true
+        let focusedDefaultSelected = defaultSelectedBase.withModifier(defaultSelectedModifier)
+        let clearedBuffer = Buffer(Rect(0, 0, 8, 1))
+        tabs.render(clearedBuffer.area, clearedBuffer)
+        @Expect(clearedBuffer.getCell(1, 0).style, Style.default())
+        @Expect(clearedBuffer.getCell(4, 0).style, focusedDefaultSelected)
+        @Expect(clearedBuffer.getCell(4, 0).style.modifier.bold)
+        @Expect(clearedBuffer.getCell(4, 0).style.modifier.underline)
+    }
+
+    @TestCase
+    func tabsNormalizePublicSelectionBeforeKeysAndRender(): Unit {
+        let tabs = Tabs(["A", "B", "C"])
+        tabs.selected = -1
+        @Expect(tabs.handle(KeyEvent(KeyCode.Right)))
+        @Expect(tabs.selected, 1)
+
+        tabs.selected = 9223372036854775807i64
+        @Expect(tabs.handle(KeyEvent(KeyCode.Right)))
+        @Expect(tabs.selected, 2)
+        let tiny = Rect(2, 2, 0, 1)
+        let buffer = renderBoundarySentinels()
+        tabs.selected = 9223372036854775807i64
+        tabs.render(tiny, buffer)
+        @Expect(tabs.selected, 2)
+        tabs.selected = -1
+        tabs.render(tiny, buffer)
+        @Expect(tabs.selected, 0)
+        @Expect(renderBoundaryOutsideChanges(buffer, Rect(0, 0, 0, 0)), 0)
+
+        let empty = Tabs([])
+        empty.selected = 9223372036854775807i64
+        @Expect(!empty.handle(KeyEvent(KeyCode.Right)))
+        @Expect(empty.selected, 0)
+        empty.selected = 9223372036854775807i64
+        empty.render(Rect(0, 0, 0, 0), buffer)
+        @Expect(empty.selected, 0)
+    }
+
+    @TestCase
+    func tabsUnicodeViewportAndHitAreasStayAlignedAcrossResizes(): Unit {
+        let tabs = Tabs(
+            ["界面选择", "😀工作台", "Final"],
+            selected: 2,
+            style: Style(fg: Color.Red),
+            selectedStyle: Style(fg: Color.White, bg: Color.Blue)
+        )
+        tabs.setFocused(true)
+        let selectedBase = Style(fg: Color.White, bg: Color.Blue)
+        var selectedModifier = selectedBase.modifier
+        selectedModifier.bold = true
+        selectedModifier.underline = true
+        let focusedSelectedStyle = selectedBase.withModifier(selectedModifier)
+        for (width in [Int64(1), 5, 28]) {
+            tabs.selected = 2
+            let area = Rect(2, 2, width, 2)
+            let buffer = renderBoundaryWideSentinels()
+            tabs.render(area, buffer)
+            @Expect(tabs.selected, 2)
+            var selectedVisible = false
+            for (column in area.x..area.right) {
+                if (buffer.getCell(column, area.y).style == focusedSelectedStyle) { selectedVisible = true }
+            }
+            @Expect(selectedVisible)
+            @Expect(renderBoundaryOutsideChanges(buffer, area), 0)
+
+            if (width == 28) {
+                var cjkColumn: Int64 = -1
+                var emojiColumn: Int64 = -1
+                var finalColumn: Int64 = -1
+                for (column in area.x..area.right) {
+                    let symbol = buffer.getCell(column, area.y).symbol
+                    if (symbol == "界") { cjkColumn = column }
+                    if (symbol == "😀") { emojiColumn = column }
+                    if (symbol == "F") { finalColumn = column }
+                }
+                @Assert(cjkColumn >= area.x)
+                @Assert(emojiColumn >= area.x)
+                @Assert(finalColumn >= area.x)
+                @Expect(tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, cjkColumn, area.y), area))
+                @Expect(tabs.selected, 0)
+                tabs.selected = 2
+                @Expect(tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, emojiColumn, area.y), area))
+                @Expect(tabs.selected, 1)
+                tabs.selected = 2
+                @Expect(tabs.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, finalColumn, area.y), area))
+                @Expect(tabs.selected, 2)
+            }
+        }
     }
 
     @TestCase
@@ -228,4 +475,75 @@ class WidgetRenderBoundaryTest {
             @Expect(buffer.getCell(0, 0).style, expected)
         }
     }
+    @TestCase
+    func badgeUsesNormalThemeRoleAndPatchesExplicitStyleWithoutFillingArea(): Unit {
+        let area = Rect(3, 2, 7, 2)
+        let buffer = renderBoundarySentinels()
+        let normal = Style(fg: Color.Blue, bg: Color.Indexed(8))
+        let theme = Theme(normal: normal)
+        let patch = Style(fg: Color.Yellow)
+        let expected = normal.patch(patch)
+        Badge("OK", style: patch, theme: Some(theme)).render(area, buffer)
+        @Expect(buffer.getCell(3, 2).symbol, "[")
+        @Expect(buffer.getCell(6, 2).symbol, "]")
+        for (x in 3..7) { @Expect(buffer.getCell(x, 2).style, expected) }
+        for (x in 7..area.right) {
+            @Expect(buffer.getCell(x, 2).symbol, "s")
+            @Expect(buffer.getCell(x, 2).style, Style.default())
+        }
+        for (x in area.x..area.right) { @Expect(buffer.getCell(x, 3).symbol, "s") }
+        @Expect(renderBoundaryOutsideChanges(buffer, area), 0)
+
+        let themed = renderBoundarySentinels()
+        Badge("OK", theme: Some(theme)).render(Rect(2, 1, 4, 1), themed)
+        for (x in 2..6) { @Expect(themed.getCell(x, 1).style, normal) }
+
+        let unthemed = renderBoundarySentinels()
+        Badge("OK", style: patch).render(Rect(2, 1, 4, 1), unthemed)
+        for (x in 2..6) { @Expect(unthemed.getCell(x, 1).style, patch) }
+    }
+
+    @TestCase
+    func badgeHandlesZeroAndOneColumnAreasAndEmptyLabels(): Unit {
+        let buffer = renderBoundarySentinels()
+        let emptyStyle = Style(fg: Color.Green)
+        Badge("OK").render(Rect(2, 2, 0, 1), buffer)
+        @Expect(buffer.getCell(2, 2).symbol, "s")
+
+        Badge("OK").render(Rect(4, 2, 1, 1), buffer)
+        @Expect(buffer.getCell(4, 2).symbol, "[")
+        @Expect(buffer.getCell(5, 2).symbol, "s")
+
+        Badge("", style: emptyStyle).render(Rect(7, 2, 2, 1), buffer)
+        @Expect(buffer.getCell(7, 2).symbol, "[")
+        @Expect(buffer.getCell(8, 2).symbol, "]")
+        @Expect(buffer.getCell(7, 2).style, emptyStyle)
+        @Expect(buffer.getCell(8, 2).style, emptyStyle)
+
+        Badge("skip").render(Rect(11, 2, 3, 0), buffer)
+        @Expect(buffer.getCell(11, 2).symbol, "s")
+        @Expect(renderBoundaryOutsideChanges(buffer, Rect(2, 2, 9, 1)), 0)
+    }
+
+    @TestCase
+    func badgeKeepsUnicodeCellsWholeAndClipsAtAreaEnd(): Unit {
+        let style = Style(fg: Color.Magenta)
+        let buffer = renderBoundarySentinels()
+        let area = Rect(5, 5, 4, 1)
+        Badge("界", style: style).render(area, buffer)
+        @Expect(buffer.getCell(5, 5).symbol, "[")
+        @Expect(buffer.getCell(6, 5), Cell("界", style: style, kind: CellKind.WideLead))
+        @Expect(buffer.getCell(7, 5), Cell("", style: style, kind: CellKind.WideCont))
+        @Expect(buffer.getCell(8, 5).symbol, "]")
+        @Expect(renderBoundaryOutsideChanges(buffer, area), 0)
+
+        let clipped = renderBoundarySentinels()
+        let narrow = Rect(8, 4, 2, 1)
+        Badge("界", style: style).render(narrow, clipped)
+        @Expect(clipped.getCell(8, 4).symbol, "[")
+        @Expect(clipped.getCell(9, 4).symbol, "s")
+        @Expect(clipped.getCell(9, 4).style, Style.default())
+        @Expect(renderBoundaryOutsideChanges(clipped, narrow), 0)
+    }
+
 }

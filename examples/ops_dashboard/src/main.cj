@@ -40,9 +40,11 @@ class OpsDashboard {
         frame.renderWidget(MenuBar(["Ops", "Deploy", "Metrics", "Alerts"], selected: 2), rows[0])
         let top = Layout.horizontal([Constraint.Percent(34), Constraint.Percent(33), Constraint.Min(20)]).withGap(1).split(rows[1])
         frame.renderWidget(Gauge(build, total: 100, label: "deploy"), top[0])
-        let latencyBlock = Block(title: "Latency")
-        frame.renderWidget(latencyBlock, top[1])
-        frame.renderWidget(Sparkline([10, 14, 13, 18, 17, 22, 19, 24, 21, 26], maxValue: 30), latencyBlock.inner(top[1]))
+        frame.renderWidget(Sparkline(
+            [10, 14, 13, 18, 17, 22, 19, 24, 21, 26],
+            maxValue: 30,
+            block: Some(Block(title: "Latency"))
+        ), top[1])
         frame.renderWidget(Chart([queue, queue + 3, queue + 1, queue + 5], block: Block(title: "Queue")), top[2])
 
         let body = Layout.horizontal([Constraint.Percent(52), Constraint.Min(20)]).withGap(1).split(rows[2])

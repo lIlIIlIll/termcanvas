@@ -33,7 +33,7 @@ DEFAULT_CHANNEL = "main"
 DYNAMIC_LATEST_CHANNELS = {"main"}
 DYNAMIC_CHANNEL_PACKAGE_PREFIXES = {"main": "1.1.0-alpha"}
 CHANNEL_PACKAGE_VERSIONS = {
-    "sts": "1.1.3",
+    "sts": "1.2.0",
     "main": "1.1.0-alpha",
     "dev": "1.1.0-alpha.20260527010056",
     "release-1.0": "1.0.5",

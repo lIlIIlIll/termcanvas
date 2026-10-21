@@ -1,0 +1,121 @@
+{
+  "capture_set": "T026",
+  "source": {
+    "commit": "95d87bd34565d3b07e59eead043e988fe38e21e1",
+    "digest": {
+      "algorithm": "SHA-256",
+      "value": "dcb23b4851ce6dc2c48a42648fb0718ce531e97ad275e1e5b03e66b5e39acb04",
+      "inputs": [
+        "examples/workbench/cjpm.toml",
+        "examples/workbench/src/*.cj",
+        "packages/core/src/visual_widgets.cj",
+        "packages/core/src/dashboard_widgets.cj"
+      ],
+      "command": "LC_ALL=C sha256sum examples/workbench/cjpm.toml examples/workbench/src/*.cj packages/core/src/visual_widgets.cj packages/core/src/dashboard_widgets.cj | sha256sum"
+    }
+  },
+  "toolchain": {
+    "channel": "Cangjie STS",
+    "version": "1.2.0",
+    "compiler": "Cangjie Compiler 1.2.0 (cjnative)",
+    "cjpm": "1.2.0",
+    "target": "x86_64-unknown-linux-gnu",
+    "compiler_sha256": "023be1bb2ded1078906fc91919b3c1175ad14436ad88d23d505f7b8dcd0d7118",
+    "runtime_sha256": "2e32485852cbc8648c1298c23f2d1ff5f90bdb6c0331da20b29ee3d97d03e167"
+  },
+  "capture_environment": {
+    "platform": "Linux x86_64",
+    "terminal": "Foot 1.28.0",
+    "compositor": "Scroll 1.13-dev (sway IPC 1.13-dev)",
+    "font": "monospace:size=14",
+    "terminal_color_support": "true-color",
+    "monochrome_note": "The monochrome image is the Workbench preview; the terminal remained true-color."
+  },
+  "captures": [
+    {
+      "file": "t026-overview-80x24.png",
+      "sha256": "f2b81522d8d28832178e1a4719a07c69a2f9a4d7b124a726cb8b3f831db4a5e8",
+      "terminal_cells": "80x24",
+      "image_pixels": "724x580",
+      "theme": "dark",
+      "state": "Workbench overview"
+    },
+    {
+      "file": "t026-forms-focus-120x36.png",
+      "sha256": "d6cf442a99a6e5752731eafbe3efec386752fc9b2b24f56a00de057aff50096d",
+      "terminal_cells": "120x36",
+      "image_pixels": "1084x868",
+      "theme": "dark",
+      "state": "Forms showcase with the focused input visible"
+    },
+    {
+      "file": "t026-data-160x45.png",
+      "sha256": "7502a8e3dc07c730aba7792dd5db6c8666b7b4a5695ed9581b39e21febb65598",
+      "terminal_cells": "160x45",
+      "image_pixels": "1444x1084",
+      "theme": "dark",
+      "state": "Data showcase with task table/list and fixed 0–100% progress chart; live task run reached 1.66% with two completed tasks; visible subtitle: Inspect task tables, lists, and the fixed-scale progress chart."
+    },
+    {
+      "file": "t026-palette-120x36.png",
+      "sha256": "2106560f1e79744e57223277df2c56b07d77f5317e60391d95eda5c31b6afd73",
+      "terminal_cells": "120x36",
+      "image_pixels": "1084x868",
+      "theme": "dark",
+      "state": "Palette interaction"
+    },
+    {
+      "file": "t026-confirm-80x24.png",
+      "sha256": "1c3ae93c6f9c39d15d3f5bb47ccec5ade07e2da2edffcf3bf685d579497ec26f",
+      "terminal_cells": "80x24",
+      "image_pixels": "724x580",
+      "theme": "dark",
+      "state": "Confirmation dialog"
+    },
+    {
+      "file": "t026-light-theme-120x36.png",
+      "sha256": "320e7bbd4e4975b789f651d750677af60be9c6d246b3341f7ed44e8dfc36f730",
+      "terminal_cells": "120x36",
+      "image_pixels": "1084x868",
+      "theme": "light",
+      "state": "Workbench rendered with the light theme"
+    },
+    {
+      "file": "t026-monochrome-80x24.png",
+      "sha256": "a0d4bbe4beb9cf0f29381857b1ffb6ea28ee63b2feca9f0a9ca1c098feb300c9",
+      "terminal_cells": "80x24",
+      "image_pixels": "724x580",
+      "theme": "monochrome preview",
+      "state": "Workbench monochrome palette preview; not a low-color terminal capture"
+    },
+    {
+      "file": "t026-segments-120x36.png",
+      "sha256": "801eb36771376c1d20b0b4c0d85a9c0c648de47ca9de237e3c1e99a06c06f608",
+      "terminal_cells": "120x36",
+      "image_pixels": "1084x868",
+      "theme": "dark",
+      "state": "SegmentedControl with Comfortable selected"
+    }
+  ],
+  "verification": {
+    "command": "scripts/release_gate.sh",
+    "result": "PASS",
+    "sdk": "Cangjie STS 1.2.0; CJC and CJPM 1.2.0",
+    "package_tests": {
+      "core": "916/916 passed",
+      "markdown_adapter": "60/60 passed",
+      "terminal": "14/14 passed",
+      "diff": "11/11 passed",
+      "media": "25/25 passed",
+      "game": "15/15 passed",
+      "testing": "2/2 passed",
+      "workbench": "41/41 passed"
+    },
+    "downstream_app": "Build, test, run and headless smoke passed; its probe test passed 1/1.",
+    "example_smoke_checks": "18 examples passed",
+    "native_terminal_lifecycle": "PASS",
+    "api_version_script_architecture_checks": "PASS",
+    "pressure_gate": "PASS"
+  },
+  "platform_capture_scope": "Actual terminal screenshots were captured only on Linux x86_64 with Foot. Other terminals and OS rendering remain unverified; native CI tests do not establish screenshot equivalence."
+}

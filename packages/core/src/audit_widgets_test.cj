@@ -351,6 +351,105 @@ class CjTuiAuditWidgetsTest {
     }
 
     @TestCase
+    func wd19DatePickerYearOperationsClampLeapDaysAndSaturate(): Unit {
+        let leap = DatePicker(year: 2024, month: 2, day: 29)
+        @Expect(leap.handle(KeyEvent(KeyCode.PageUp)))
+        @Expect(leap.value(), "2025-02-28")
+        @Expect(leap.handle(KeyEvent(KeyCode.PageDown)))
+        @Expect(leap.value(), "2024-02-28")
+
+        let firstYear = DatePicker(year: 1, month: 1, day: 1)
+        @Expect(firstYear.handle(KeyEvent(KeyCode.PageDown)))
+        @Expect(firstYear.value(), "1-01-01")
+        let lastYear = DatePicker(year: Int64.Max, month: 12, day: 31)
+        @Expect(lastYear.handle(KeyEvent(KeyCode.PageUp)))
+        @Expect(lastYear.year, Int64.Max)
+        @Expect(lastYear.value(), "${Int64.Max}-12-31")
+    }
+
+    @TestCase
+    func wd20DatePickerNormalizesOnlyForEnabledSupportedKeys(): Unit {
+        let date = DatePicker()
+        date.year = 0
+        date.month = 13
+        date.day = 99
+        @Expect(!date.handle(KeyEvent(KeyCode.Char(r'?'))))
+        @Expect(date.year, 0)
+        @Expect(date.month, 13)
+        @Expect(date.day, 99)
+        @Expect(date.handle(KeyEvent(KeyCode.PageUp)))
+        @Expect(date.value(), "2-12-31")
+
+        let disabled = DatePicker(year: 2024, month: 2, day: 29)
+        disabled.year = 0
+        disabled.month = 13
+        disabled.day = 99
+        disabled.setVisualState(disabled: true)
+        @Expect(!disabled.handle(KeyEvent(KeyCode.PageUp)))
+        @Expect(disabled.year, 0)
+        @Expect(disabled.month, 13)
+        @Expect(disabled.day, 99)
+    }
+
+    @TestCase
+    func wd21DatePickerThemeStylesAndClipsVisibleText(): Unit {
+        let theme = Theme(
+            normal: Style(fg: Color.White, bg: Color.Black),
+            focused: Style(fg: Color.Blue, bg: Color.Cyan, modifier: Modifier.strong()),
+            disabled: Style(fg: Color.Indexed(8), bg: Color.Red)
+        )
+        let area = Rect(2, 1, 12, 1)
+
+        let cyanDefault = DatePicker(year: 2026, month: 5, day: 28)
+        let cyanBuffer = Buffer(Rect(0, 0, 16, 3))
+        cyanDefault.render(area, cyanBuffer)
+        @Expect(cyanBuffer.getCell(area.x, area.y).style, Style(fg: Color.Cyan))
+
+        let legacy = DatePicker(year: 2026, month: 5, day: 28, theme: Some(theme))
+        let legacyBuffer = Buffer(Rect(0, 0, 16, 3))
+        legacy.render(area, legacyBuffer)
+        @Expect(legacyBuffer.getCell(area.x, area.y).style, theme.normal.patch(Style(fg: Color.Cyan)))
+
+        let themed = DatePicker(year: 2026, month: 5, day: 28, style: Style.default(), theme: Some(theme))
+        let themedBuffer = Buffer(Rect(0, 0, 16, 3))
+        themed.render(area, themedBuffer)
+        @Expect(themedBuffer.getCell(area.x, area.y).style, theme.normal)
+        @Expect(themedBuffer.getCell(area.x + 10, area.y).style, Style.default())
+
+        themed.setVisualState(focused: true, theme: Some(theme))
+        let focusedBuffer = Buffer(Rect(0, 0, 16, 3))
+        themed.render(area, focusedBuffer)
+        @Expect(focusedBuffer.getCell(area.x, area.y).style, theme.focused)
+
+        themed.setVisualState(disabled: true, theme: Some(theme))
+        let disabledBuffer = Buffer(Rect(0, 0, 16, 3))
+        themed.render(area, disabledBuffer)
+        @Expect(disabledBuffer.getCell(area.x, area.y).style, theme.disabled)
+
+        let customStyle = Style(fg: Color.Yellow)
+        let custom = DatePicker(year: 2026, month: 5, day: 28, style: customStyle, theme: Some(theme))
+        let customBuffer = Buffer(Rect(0, 0, 16, 3))
+        custom.render(area, customBuffer)
+        @Expect(customBuffer.getCell(area.x, area.y).style, theme.normal.patch(customStyle))
+
+        let clipped = DatePicker(year: 2026, month: 5, day: 28, style: customStyle)
+        let clippedArea = Rect(3, 1, 5, 1)
+        let clippedBuffer = Buffer(Rect(0, 0, 14, 3))
+        clippedBuffer.setString(2, 1, "L")
+        clippedBuffer.setString(8, 1, "R")
+        clipped.render(clippedArea, clippedBuffer)
+        @Expect(clippedBuffer.getCell(2, 1).symbol, "L")
+        @Expect(clippedBuffer.getCell(3, 1).symbol, "2")
+        @Expect(clippedBuffer.getCell(4, 1).symbol, "0")
+        @Expect(clippedBuffer.getCell(5, 1).symbol, "2")
+        @Expect(clippedBuffer.getCell(6, 1).symbol, "6")
+        @Expect(clippedBuffer.getCell(7, 1).symbol, "-")
+        @Expect(clippedBuffer.getCell(8, 1).symbol, "R")
+        @Expect(clippedBuffer.getCell(3, 1).style, customStyle)
+        @Expect(clippedBuffer.getCell(8, 1).style, Style.default())
+    }
+
+    @TestCase
     func wd14AsciiCardRailReservesItsFullWidth(): Unit {
         let source = AuditWidgetSource()
         let view = VirtualTranscriptView(source)

@@ -61,6 +61,15 @@
       "consumer_evidence": "Broad core, example, and omp-cj usage."
     },
     {
+      "id": "core-style-capabilities-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Theme.graphite", "Theme.light", "Theme.forCapabilities", "adaptStyleForCapabilities"]},
+      "stability": "EXPERIMENTAL", "subsystem": "style", "owner": "core/style",
+      "reason": "Semantic theme factories and deterministic terminal-tier adaptation add an optional styling policy without changing the stable Theme shape.",
+      "consumer_evidence": "Workbench capability preview and direct palette/adaptation contract tests; no principal consumer adoption.",
+      "promotion_condition": "Independent production consumers validate role colors, deterministic palette mapping, and behavior across true-color, xterm-256, ANSI-8, and monochrome terminals.",
+      "sunset_condition": "Review after Workbench adoption; remove the optional adaptation API if no independent consumer needs capability-aware themes."
+    },
+    {
       "id": "core-style-state-experimental",
       "match": {"package": "core", "symbols": ["StyleState"]},
       "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
@@ -267,8 +276,80 @@
       "consumer_evidence": "Recommended examples; core primitives are also used by omp-cj."
     },
     {
+      "id": "core-input-paste-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Input.paste"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Paste insertion is new editing behavior; applications retain ownership of normalization and routing.",
+      "consumer_evidence": "Workbench, Form Studio, TaskPad, and direct cursor-boundary and disabled-state tests.",
+      "promotion_condition": "Independent consumers validate cursor-boundary and normalization responsibilities before this member is stable.",
+      "sunset_condition": "Revisit or remove if consumers cannot safely own paste normalization and cursor-boundary policy."
+    },
+    {
+      "id": "core-input-visual-state-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Input.setVisualState"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Semantic Input visual-state rendering adds opt-in behavior to the stable widget; focus, disabled, error, and theme precedence are not yet frozen across independent consumers.",
+      "consumer_evidence": "Workbench form controls and direct core state/style boundary tests; no independent production adopter.",
+      "promotion_condition": "Independent consumers validate focus/disabled/error precedence, style/theme ownership, and unchanged no-theme output.",
+      "sunset_condition": "Revisit or remove the setter if applications do not need semantic Input states or their precedence cannot remain predictable."
+    },
+    {
+      "id": "core-tabs-theme-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Tabs.setTheme"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Theme-aware Tabs are opt-in so the legacy selectedStyle default and no-theme rendering remain unchanged.",
+      "consumer_evidence": "Workbench category, sample, and Navigation tabs; direct theme and boundary tests.",
+      "promotion_condition": "Independent consumers validate theme opt-in, explicit selected-style ownership, and Unicode/windowing behavior without changing no-theme output.",
+      "sunset_condition": "Revisit or remove if consumers do not need semantic Tabs themes or cannot keep selected-style ownership predictable."
+    },
+    {
+      "id": "core-tabs-focus-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Tabs.setFocused"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Focus-modifier rendering adds opt-in behavior to the stable Tabs widget; focus and selected-style precedence are not yet frozen across independent consumers.",
+      "consumer_evidence": "Workbench gallery selectors and direct core focus-modifier rendering tests; no independent production adopter.",
+      "promotion_condition": "Independent consumers validate focused styling with selected-style precedence, Unicode clipping, and unchanged no-theme output.",
+      "sunset_condition": "Revisit or remove the setter if semantic focus styling is not needed or cannot remain orthogonal to selection and theme behavior."
+    },
+    {
+      "id": "core-dialog-theme-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Dialog.setTheme", "ConfirmDialog.setTheme"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Optional semantic dialog themes preserve no-theme rendering and explicit selected-style precedence.",
+      "consumer_evidence": "Workbench confirmation, help, and reset dialogs; direct core theme, selection-clamp, and mouse-hit tests.",
+      "promotion_condition": "Independent consumers validate theme opt-in, legacy rendering, selected-style ownership, and rendered hit behavior.",
+      "sunset_condition": "Revisit the setters if consumers do not need semantic dialog themes or selected-style ownership becomes unpredictable."
+    },
+    {
+      "id": "core-request-dialog-theme-experimental",
+      "match": {"package": "core", "qualified_symbols": ["RequestDialog.setTheme"]},
+      "stability": "EXPERIMENTAL", "subsystem": "document_editor", "owner": "core/editor",
+      "reason": "Optional request themes forward Dialog styling without changing risk or document-detail composition.",
+      "consumer_evidence": "assistant_console and example_smoke consumers; direct RequestDialog and DecisionDialog theme tests.",
+      "promotion_condition": "Independent document-workflow consumers validate theme forwarding while retaining document-detail composition.",
+      "sunset_condition": "Revisit or remove the setter if request workflows do not need semantic themes or detail rendering cannot remain independently owned."
+    },
+    {
+      "id": "core-command-palette-search-experimental",
+      "match": {"package": "core", "qualified_symbols": ["CommandPalette.setTheme", "CommandPalette.paste"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Optional case-aware palette search, paste synchronization, and theme roles extend the existing immediate command selector without changing its defaults.",
+      "consumer_evidence": "Workbench F2 search and mouse routing plus TaskPad and oh_my_pi_skin paste consumers; direct core filtering, Unicode synchronization, disabled/empty, and style-precedence tests.",
+      "promotion_condition": "Independent applications validate case configuration, paste synchronization, theme ownership, empty results, and disabled activation behavior.",
+      "sunset_condition": "Revisit the optional palette behaviors if independent consumers do not need search, paste, or semantic disabled styling."
+    },
+    {
+      "id": "core-dropdown-state-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Dropdown.setVisualState", "Dropdown.setTransactionalSelection", "Dropdown.cancelSelection"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Opt-in semantic visual state and transactional selection add theme, disabled-input, preview, and rollback behavior without changing the stable Dropdown constructor or legacy defaults.",
+      "consumer_evidence": "Workbench Tasks status filter plus direct core commit/cancel, resize, theme, selected-style-precedence, and disabled-input tests.",
+      "promotion_condition": "Independent consumers validate commit/cancel lifecycle, explicit selected-style ownership, disabled behavior, and viewport resizing.",
+      "sunset_condition": "Revisit or remove the optional state contract if consumers do not need transactional Dropdown behavior."
+    },
+    {
       "id": "core-widget-experimental",
-      "match": {"package": "core", "symbols": ["ColorPicker", "MultiSelect", "DatePicker", "MenuItem", "Menu", "MenuBar", "CommandPalette", "Toast", "ToastManager", "Spinner", "Dialog", "ConfirmDialog", "MetricCard", "Meter", "LegendItem", "Legend", "TimeSeriesChart", "HeaderBar", "FooterBar", "EmptyState", "ErrorBox", "LoadingOverlay", "Skeleton", "InlineAlert", "Sparkline", "Gauge", "Chart", "LogView"]},
+      "match": {"package": "core", "symbols": ["ColorPicker", "MultiSelect", "DatePicker", "MenuItem", "Menu", "MenuBar", "CommandPalette", "Toast", "ToastKind", "ToastManager", "Spinner", "Dialog", "ConfirmDialog", "Badge", "MetricCard", "Meter", "LegendItem", "Legend", "TimeSeriesChart", "HeaderBar", "FooterBar", "EmptyState", "ErrorBox", "LoadingOverlay", "Skeleton", "InlineAlert", "Sparkline", "Gauge", "Chart", "LogView", "Switch", "SegmentedControl"]},
       "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
       "reason": "Advanced widget families have examples but insufficient independent real-consumer evidence for a stable promise.",
       "consumer_evidence": "Examples/tests primarily.",

@@ -277,6 +277,36 @@ public class InlineAlert <: Widget {
     }
 }
 
+/** 绘制单行方括号标签；空标签显示为“[]”，仅为可见文本设置样式。 */
+public class Badge <: Widget {
+    private let label: String
+    private let style: Style
+    private let theme: ?Theme
+
+    /** 保存标签及绘制样式；提供主题时，显式样式会修补 normal 角色。 */
+    public init(label: String, style!: Style = Style.default(), theme!: ?Theme = None) {
+        this.label = label
+        this.style = style
+        this.theme = theme
+    }
+
+    /** 只在区域首行绘制可见的 [label] 文本，并裁剪到指定区域。 */
+    public func render(area: Rect, buffer: Buffer): Unit {
+        if (area.width <= 0 || area.height <= 0) { return }
+        let resolvedStyle = themedNormal(style, theme)
+        buffer.withCanvasClip(Rect(area.x, area.y, area.width, 1)) { =>
+            buffer.setString(area.x, area.y, "[", style: resolvedStyle)
+            if (area.width > 1) {
+                buffer.setString(area.x + 1, area.y, label, style: resolvedStyle)
+                let labelWidth = displayWidthFast(label)
+                if (labelWidth < area.width - 1) {
+                    buffer.setString(area.x + 1 + labelWidth, area.y, "]", style: resolvedStyle)
+                }
+            }
+        }
+    }
+}
+
 func renderBar(area: Rect, buffer: Buffer, left: String, center: String, right: String, style: Style): Unit {
     if (area.width <= 0 || area.height <= 0) { return }
     buffer.fillLine(area.y, area.x, area.width, style: style)

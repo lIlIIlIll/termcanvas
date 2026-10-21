@@ -12,10 +12,12 @@ class OhMyPiSkinTest {
 
         _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'/'))))
         _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'z'))))
+        let composerBeforePaste = app.composer.area.value
+        _ = app.update(Event.Paste("中"))
 
         @Expect(app.paletteOpen, true)
-        @Expect(app.palette.query, "z")
-        @Expect(app.composer.area.value, "/review runtime#1441 --multi-round")
+        @Expect(app.palette.query, "z中")
+        @Expect(app.composer.area.value, composerBeforePaste)
     }
 
     @TestCase

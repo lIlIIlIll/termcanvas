@@ -14,10 +14,37 @@ height, keeping the selected item visible after a resize. `Up`, `Down`, `Home`,
 content height, excluding borders, titles, and the palette query/dropdown header.
 Before the first render, page size is one row.
 
-A palette query change resets the selected filtered-result row and offset to zero.
-Rendering or accepting a choice also validates directly assigned query/selection
-values. `MultiSelect.selectedIndices()` and selection return values still identify
-the complete original item list, independent of the visible window.
+`Dropdown` refreshes its list viewport on every valid open render using the
+available height below its header. A one-row area draws only the header and has
+no selectable list row; page navigation still advances by at least one option.
+
+By default, a Dropdown remains non-transactional: navigation and wheel input
+change `selected`, and Escape closes without restoring it. The experimental
+`setTransactionalSelection(enabled: true)` mode snapshots the selection on open;
+keyboard and wheel navigation preview, while Enter, Space, or a visible-row
+click commits. Escape, clicking the open header, or `cancelSelection()` restores
+the snapshot. Applications retain outside-click, focus-loss, reset, and
+page-dismissal policy; call `cancelSelection()` at those boundaries and before
+resetting `selected`. Because `open` remains public, direct writes are observed
+at the next render or input handler; call `cancelSelection()` for immediate
+rollback.
+
+`setVisualState(...)` applies focused, disabled, and theme roles; disabled
+Dropdowns reject keyboard and mouse input. The legacy `selectedStyle` default
+remains unchanged and takes precedence over the theme's selected role. Pass
+`selectedStyle: Style.default()` to opt into the theme's selected role.
+Workbench's Tasks status filter uses transactional mode and applies the filter
+only after a commit or reset.
+
+Palette filtering recomputes against the current item list; query changes reset
+the selected filtered-result row and offset to zero. `paste(text)` appends text
+and synchronizes both values immediately. `caseSensitive: false` enables Unicode
+lowercase substring matching across labels and actions. `setTheme(theme)` applies
+normal/selected/disabled roles; an explicit non-default `selectedStyle` wins,
+while `Style.default()` opts into the selected role. A missing result renders
+`No matches`; disabled rows and empty results cannot activate. `MultiSelect.selectedIndices()`
+and selection return values still identify the complete original item list,
+independent of the visible window.
 
 Keep a widget instance or its explicit state alive when its scroll position should
 survive updates. Recreating a widget preserves only values supplied by the caller.
@@ -37,6 +64,16 @@ report whether they handled the input. Wheel navigation need not return a choice
 construction. A display-only instance without a supplied state ignores mouse
 selection. `Input` maps a content click to the visible text cursor. `Tabs`,
 `MenuBar`, `ColorPicker`, and `Dialog` expose their own geometry-aware mouse helpers.
+
+`SegmentedControl.handleMouse` accepts only left-button Down on visible first-row
+segment text; the one-cell separator is inert. Left/Right clamp and Home/End jump.
+Empty and disabled controls reject input; `selectedValue()` returns `None` for
+an empty list.
+
+`Dialog` normalizes its public `selected` index before keyboard, mouse, and render
+work. `ConfirmDialog` starts on No; only a left-button-down hit on the rendered
+`[No]` or `[Yes]` label returns `Some(false)` or `Some(true)`. Gaps, borders,
+body clicks, releases, and right-button clicks return `None`.
 
 The shared functions are deliberately small:
 

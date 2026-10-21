@@ -48,11 +48,7 @@ class FormStudio {
         match (focus.current()) {
             case Some("name") =>
                 let inserted = text.trimAscii()
-                let cursor = name.cursor
-                name.setValue(
-                    name.value[..cursor] + inserted + name.value[cursor..],
-                    cursor: cursor + inserted.size
-                )
+                name.paste(inserted)
                 status = "pasted into name"
             case Some("notes") =>
                 notes.paste(text)

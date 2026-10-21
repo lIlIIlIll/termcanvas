@@ -59,4 +59,26 @@ class InteractionViewportTest {
         selector.render(small.area, small)
         @Expect(interactionRow(small, 0).startsWith("one"))
     }
+
+    @TestCase
+    func dropdownViewportRefreshesAfterResizeAndKeepsHeaderOnlyAreasEmpty(): Unit {
+        let values = ["zero", "one", "two", "three", "four", "five"]
+        let dropdown = Dropdown(values, open: true)
+        dropdown.render(Rect(0, 0, 16, 5), Buffer(Rect(0, 0, 16, 5)))
+
+        let headerOnly = Buffer(Rect(0, 0, 16, 1))
+        dropdown.render(headerOnly.area, headerOnly)
+        @Expect(interactionRow(headerOnly, 0).startsWith("v zero"))
+        _ = dropdown.handle(KeyEvent(KeyCode.PageDown))
+        @Expect(dropdown.selected, 1)
+
+        dropdown.render(Rect(0, 0, 16, 5), Buffer(Rect(0, 0, 16, 5)))
+        dropdown.render(Rect(0, 0, 16, 2), Buffer(Rect(0, 0, 16, 2)))
+        _ = dropdown.handle(KeyEvent(KeyCode.PageDown))
+        @Expect(dropdown.selected, 2)
+
+        dropdown.selected = 99
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        @Expect(dropdown.selected, 5)
+    }
 }

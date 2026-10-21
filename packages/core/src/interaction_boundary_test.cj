@@ -57,6 +57,145 @@ class InteractionBoundaryTest {
         @Expect(palette.query, "")
         @Expect(palette.handle(KeyEvent(KeyCode.Esc)).isNone())
     }
+    @TestCase
+    func commandPaletteCaseSensitivityAndActionMatchingAreExplicit(): Unit {
+        let sensitive = CommandPalette(
+            [MenuItem("Open File", action: "file.open")],
+            query: "OPEN",
+            block: None
+        )
+        @Expect(sensitive.handle(KeyEvent(KeyCode.Enter)).isNone())
+
+        let insensitiveLabel = CommandPalette(
+            [MenuItem("Open File", action: "file.open")],
+            query: "OPEN",
+            block: None,
+            caseSensitive: false
+        )
+        @Expect(insensitiveLabel.handle(KeyEvent(KeyCode.Enter)), Some("file.open"))
+
+        let insensitiveAction = CommandPalette(
+            [MenuItem("Help", action: "system.help")],
+            query: "SYSTEM",
+            block: None,
+            caseSensitive: false
+        )
+        @Expect(insensitiveAction.handle(KeyEvent(KeyCode.Enter)), Some("system.help"))
+        let unicodeInsensitive = CommandPalette(
+            [MenuItem("Éclair", action: "dessert")],
+            query: "ÉCLAIR",
+            block: None,
+            caseSensitive: false
+        )
+        @Expect(unicodeInsensitive.handle(KeyEvent(KeyCode.Enter)), Some("dessert"))
+    }
+
+    @TestCase
+    func commandPalettePasteAppendsUnicodeAndResetsSelectionViewport(): Unit {
+        let palette = CommandPalette(
+            [MenuItem("zero"), MenuItem("one"), MenuItem("two"), MenuItem("中文")],
+            query: "find",
+            block: None
+        )
+        palette.selected = 3
+        palette.offset = 6
+
+        palette.paste("中")
+
+        @Expect(palette.query, "find中")
+        @Expect(palette.selected, 0)
+        @Expect(palette.offset, 0)
+    }
+
+    @TestCase
+    func commandPaletteEmptyAndDisabledRowsCannotActivateAndFillCells(): Unit {
+        let customNormal = Style(fg: Color.Red)
+        let customSelected = Style(fg: Color.Green, bg: Color.Blue)
+        let theme = Theme(
+            normal: Style(fg: Color.White, bg: Color.Black),
+            selected: Style(fg: Color.White, bg: Color.Magenta),
+            disabled: Style(fg: Color.Indexed(8), bg: Color.Black)
+        )
+        let area = Rect(0, 0, 12, 4)
+        let palette = CommandPalette(
+            [MenuItem("chosen"), MenuItem("blocked", enabled: false)],
+            block: None,
+            style: customNormal,
+            selectedStyle: customSelected,
+            disabledStyle: Style.default(),
+            theme: Some(theme)
+        )
+        let buffer = Buffer(area)
+        buffer.fill(area, Cell("x"))
+        palette.render(area, buffer)
+
+        @Expect(buffer.getCell(0, 0).style, theme.normal.patch(customNormal))
+        @Expect(buffer.getCell(11, 0).symbol, " ")
+        @Expect(buffer.getCell(0, 1).style, customSelected)
+        @Expect(buffer.getCell(11, 1).symbol, " ")
+        @Expect(buffer.getCell(0, 2).style, theme.disabled)
+        @Expect(buffer.getCell(11, 2).symbol, " ")
+        let explicitDisabledStyle = Style(fg: Color.Yellow)
+        let explicitDisabled = CommandPalette(
+            [MenuItem("blocked", enabled: false)],
+            block: None,
+            disabledStyle: explicitDisabledStyle,
+            theme: Some(theme)
+        )
+        let explicitDisabledBuffer = Buffer(area)
+        explicitDisabled.render(area, explicitDisabledBuffer)
+        @Expect(
+            explicitDisabledBuffer.getCell(0, 1).style,
+            theme.disabled.patch(explicitDisabledStyle)
+        )
+        explicitDisabled.setTheme(Option<Theme>.None)
+        let unthemedDisabledBuffer = Buffer(area)
+        explicitDisabled.render(area, unthemedDisabledBuffer)
+        @Expect(unthemedDisabledBuffer.getCell(0, 1).style, explicitDisabledStyle)
+
+        let legacyPalette = CommandPalette([MenuItem("legacy")], block: None)
+        let legacyBuffer = Buffer(area)
+        legacyPalette.render(area, legacyBuffer)
+        @Expect(legacyBuffer.getCell(0, 0).style, Style.default())
+        @Expect(
+            legacyBuffer.getCell(0, 1).style,
+            Style(fg: Color.Black, bg: Color.White)
+        )
+
+        let themedSelectedPalette = CommandPalette(
+            [MenuItem("selected")],
+            block: None,
+            selectedStyle: Style.default(),
+            theme: Some(theme)
+        )
+        let themedSelectedBuffer = Buffer(area)
+        themedSelectedPalette.render(area, themedSelectedBuffer)
+        @Expect(themedSelectedBuffer.getCell(0, 1).style, theme.selected)
+
+        let defaultDisabled = CommandPalette([MenuItem("blocked", enabled: false)], block: None)
+        let defaultDisabledBuffer = Buffer(area)
+        defaultDisabled.render(area, defaultDisabledBuffer)
+        @Expect(defaultDisabledBuffer.getCell(0, 1).style, Style(fg: Color.Indexed(8)))
+        palette.selected = 1
+        @Expect(palette.handle(KeyEvent(KeyCode.Enter)).isNone())
+        @Expect(palette.handleMouse(
+            MouseEvent(MouseKind.Down, MouseButton.Left, 0, 2), area
+        ).isNone())
+
+        palette.query = "missing"
+        let emptyBuffer = Buffer(area)
+        emptyBuffer.fill(area, Cell("x"))
+        palette.render(area, emptyBuffer)
+        @Expect(emptyBuffer.getCell(0, 1).symbol, "N")
+        @Expect(emptyBuffer.getCell(11, 1).symbol, " ")
+        @Expect(emptyBuffer.getCell(0, 1).style, theme.disabled)
+        @Expect(emptyBuffer.getCell(0, 2).symbol, " ")
+        @Expect(emptyBuffer.getCell(0, 2).style, theme.normal.patch(customNormal))
+        @Expect(palette.handle(KeyEvent(KeyCode.Enter)).isNone())
+        @Expect(palette.handleMouse(
+            MouseEvent(MouseKind.Down, MouseButton.Left, 0, 1), area
+        ).isNone())
+    }
 
     @TestCase
     func dropdownOpenCloseScrollAndEmptyStatesKeepTheirContracts(): Unit {
@@ -75,6 +214,7 @@ class InteractionBoundaryTest {
         @Expect(dropdown.open)
         _ = dropdown.handle(KeyEvent(KeyCode.Esc))
         @Expect(!dropdown.open)
+        @Expect(dropdown.selected, 1)
         _ = dropdown.handle(KeyEvent(KeyCode.Enter))
         @Expect(dropdown.handle(KeyEvent(KeyCode.Enter)), Some("one"))
         @Expect(!dropdown.open)
@@ -85,6 +225,62 @@ class InteractionBoundaryTest {
         @Expect(interactionRow(buffer, 0).startsWith("v empty"))
         @Expect(empty.handle(KeyEvent(KeyCode.Enter)).isNone())
         @Expect(!empty.open)
+    }
+
+    @TestCase
+    func transactionalDropdownSeparatesPreviewCommitAndCancellation(): Unit {
+        let area = Rect(1, 1, 12, 4)
+        let dropdown = Dropdown(["zero", "one", "two", "three"], selected: 1)
+        dropdown.setTransactionalSelection(enabled: true)
+        _ = dropdown.handle(KeyEvent(KeyCode.Enter))
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        @Expect(dropdown.selected, 3)
+        @Expect(dropdown.handle(KeyEvent(KeyCode.Esc)).isNone())
+        @Expect(dropdown.selected, 1)
+        @Expect(!dropdown.open)
+
+        _ = dropdown.handle(KeyEvent(KeyCode.Enter))
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        @Expect(dropdown.handle(KeyEvent(KeyCode.Enter)), Some("two"))
+        @Expect(dropdown.selected, 2)
+        @Expect(!dropdown.open)
+
+        dropdown.selected = 0
+        _ = dropdown.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, area.x + 1, area.y), area)
+        _ = dropdown.handleMouse(MouseEvent(MouseKind.Scroll, MouseButton.WheelDown, area.x + 1, area.y + 1), area)
+        @Expect(dropdown.selected, 1)
+        @Expect(dropdown.open)
+        @Expect(
+            dropdown.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, area.x + 1, area.y + 2), area),
+            Some("one")
+        )
+        @Expect(!dropdown.open)
+
+        dropdown.selected = 2
+        _ = dropdown.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, area.x + 1, area.y), area)
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        _ = dropdown.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, area.x + 1, area.y), area)
+        @Expect(dropdown.selected, 2)
+        @Expect(!dropdown.open)
+
+        dropdown.selected = 1
+        _ = dropdown.handle(KeyEvent(KeyCode.Enter))
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        dropdown.cancelSelection()
+        @Expect(dropdown.selected, 1)
+        @Expect(!dropdown.open)
+        dropdown.selected = 3
+        dropdown.cancelSelection()
+        @Expect(dropdown.selected, 3)
+        dropdown.selected = 0
+        dropdown.open = true
+        _ = dropdown.handle(KeyEvent(KeyCode.Down))
+        @Expect(dropdown.selected, 1)
+        dropdown.open = false
+        dropdown.render(area, Buffer(area))
+        @Expect(dropdown.selected, 0)
+        @Expect(!dropdown.open)
     }
 
     @TestCase
@@ -162,5 +358,126 @@ class InteractionBoundaryTest {
         @Expect(widgetRowAt(down, area, 10, 10).isNone())
         @Expect(widgetRowAt(down, area, 9, 10).isNone())
         @Expect(widgetRowAt(down, area, 8, 10), Some(9))
+    }
+
+    @TestCase
+    func semanticToastsPatchThemeRolesAndPreserveLegacyStyles(): Unit {
+        let theme = Theme(
+            success: Style(fg: Color.Green),
+            warning: Style(fg: Color.Yellow),
+            error: Style(fg: Color.Red),
+            info: Style(fg: Color.Cyan)
+        )
+        let success = Toast("saved", kind: Some(ToastKind.Success))
+        let warning = Toast("review", kind: Some(ToastKind.Warning), style: Style(bg: Color.Blue))
+        let error = Toast("failed", kind: Some(ToastKind.Error))
+        let info = Toast("ready", kind: Some(ToastKind.Info))
+        @Expect(success.message, "saved")
+        @Expect(success.kind.isSome(), true)
+
+        let area = Rect(0, 0, 12, 4)
+        let buffer = Buffer(area)
+        buffer.fill(area, Cell("q", style: Style(fg: Color.White, bg: Color.Black)))
+        let manager = ToastManager(
+            toasts: [success, warning, error, info],
+            theme: Some(theme)
+        )
+        manager.render(area, buffer)
+        @Expect(buffer.getCell(0, 0).symbol, "+")
+        @Expect(buffer.getCell(2, 0).symbol, "s")
+        @Expect(buffer.getCell(0, 0).style, theme.success)
+        @Expect(buffer.getCell(0, 1).symbol, "!")
+        @Expect(buffer.getCell(0, 1).style, theme.warning.patch(Style(bg: Color.Blue)))
+        @Expect(buffer.getCell(0, 2).symbol, "x")
+        @Expect(buffer.getCell(0, 2).style, theme.error)
+        @Expect(buffer.getCell(0, 3).symbol, "i")
+        @Expect(buffer.getCell(0, 3).style, theme.info)
+        @Expect(buffer.getCell(11, 0).symbol, " ")
+        @Expect(buffer.getCell(11, 0).style, theme.success)
+
+        manager.setTheme(Some(Theme(success: Style(fg: Color.Blue))))
+        let rethemed = Buffer(area)
+        manager.render(area, rethemed)
+        @Expect(rethemed.getCell(0, 0).style, Style(fg: Color.Blue))
+
+        let legacy = Toast("legacy")
+        @Expect(legacy.kind.isNone(), true)
+        let legacyBuffer = Buffer(Rect(0, 0, 10, 1))
+        ToastManager(toasts: [legacy], theme: Some(theme)).render(legacyBuffer.area, legacyBuffer)
+        @Expect(legacyBuffer.getCell(0, 0).symbol, "l")
+        @Expect(
+            legacyBuffer.getCell(0, 0).style,
+            Style(fg: Color.Black, bg: Color.Yellow)
+        )
+    }
+
+    @TestCase
+    func toastCapacityKeepsNewestRowsAndTickPreservesSemanticState(): Unit {
+        let theme = Theme(
+            warning: Style(fg: Color.Yellow),
+            error: Style(fg: Color.Red)
+        )
+        let manager = ToastManager(maxToasts: Some(2), theme: Some(theme))
+        manager.push(Toast("A", ttl: 4))
+        manager.push(Toast("B", kind: Some(ToastKind.Warning), ttl: 2))
+        manager.push(Toast("Charlie", kind: Some(ToastKind.Error), ttl: 2))
+        @Expect(manager.count(), 2)
+
+        let area = Rect(0, 0, 5, 2)
+        let buffer = Buffer(area)
+        buffer.fill(area, Cell("q"))
+        manager.render(area, buffer)
+        @Expect(buffer.getCell(0, 0).symbol, "!")
+        @Expect(buffer.getCell(2, 0).symbol, "B")
+        @Expect(buffer.getCell(4, 0).symbol, " ")
+        @Expect(buffer.getCell(4, 0).style, theme.warning)
+        @Expect(buffer.getCell(0, 1).symbol, "x")
+        @Expect(buffer.getCell(4, 1).symbol, "a")
+
+        manager.tick()
+        @Expect(manager.count(), 2)
+        let afterOneTick = Buffer(area)
+        manager.render(area, afterOneTick)
+        @Expect(afterOneTick.getCell(0, 0).symbol, "!")
+        @Expect(afterOneTick.getCell(0, 1).symbol, "x")
+        manager.tick()
+        @Expect(manager.count(), 0)
+    }
+
+    @TestCase
+    func toastIgnoresExpiredEntriesAndClampsCapacityToZero(): Unit {
+        let expired = ToastManager(toasts: [Toast("zero", ttl: 0), Toast("negative", ttl: -1)])
+        @Expect(expired.count(), 0)
+        expired.push(Toast("also expired", ttl: 0))
+        @Expect(expired.count(), 0)
+
+        let zeroCapacity = ToastManager(
+            toasts: [Toast("initial", ttl: 2)],
+            maxToasts: Some(-3)
+        )
+        zeroCapacity.push(Toast("capacity", ttl: 2))
+        @Expect(zeroCapacity.count(), 0)
+        let blank = Buffer(Rect(0, 0, 8, 1))
+        zeroCapacity.render(blank.area, blank)
+        @Expect(blank.getCell(0, 0).symbol, " ")
+
+        let preloaded = ToastManager(
+            toasts: [
+                Toast("expired", ttl: 0),
+                Toast("A"),
+                Toast("B"),
+                Toast("C")
+            ],
+            maxToasts: Some(2)
+        )
+        @Expect(preloaded.count(), 2)
+        let retainedRows = Buffer(Rect(0, 0, 4, 2))
+        preloaded.render(retainedRows.area, retainedRows)
+        @Expect(retainedRows.getCell(0, 0).symbol, "B")
+        @Expect(retainedRows.getCell(0, 1).symbol, "C")
+
+        let unbounded = ToastManager()
+        for (index in 0..4) { unbounded.push(Toast("item-${index}")) }
+        @Expect(unbounded.count(), 4)
     }
 }

@@ -204,21 +204,28 @@ public class Sparkline <: Widget {
     private let values: Array<Int64>
     private let maxValue: Int64
     private let style: Style
+    private let block: ?Block
 
-    public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan)) {
+    public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None) {
         this.values = values
         this.maxValue = max(0, maxValue)
         this.style = style
+        this.block = block
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
-        if (area.width <= 0 || area.height <= 0 || values.size == 0) { return }
+        var target = area
+        if (let Some(b) <- block) {
+            b.render(area, buffer)
+            target = b.inner(area)
+        }
+        if (target.width <= 0 || target.height <= 0 || values.size == 0) { return }
         let maxV = if (maxValue > 0) { maxValue } else { maxArray(values) }
         let bars = [" ", ".", "-", "=", "#"]
-        let count = min(area.width, values.size)
+        let count = min(target.width, values.size)
         for (i in 0..count) {
             let level = if (maxV <= 0) { 0 } else { scaledChartHeight(clamp(values[i], 0, maxV), bars.size - 1, maxV) }
-            buffer.setString(area.x + i, area.y, bars[level], style: style)
+            buffer.setString(target.x + i, target.y, bars[level], style: style)
         }
     }
 }
@@ -253,11 +260,18 @@ public class Chart <: Widget {
     private let values: Array<Int64>
     private let block: ?Block
     private let style: Style
+    private let maxValue: Int64
 
-    public init(values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan)) {
+    public init(
+        values: Array<Int64>,
+        block!: ?Block = None,
+        style!: Style = Style(fg: Color.Cyan),
+        maxValue!: Int64 = 0
+    ) {
         this.values = values
         this.block = block
         this.style = style
+        this.maxValue = max(0, maxValue)
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
@@ -267,7 +281,7 @@ public class Chart <: Widget {
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0 || values.size == 0) { return }
-        let maxV = max(1, maxArray(values))
+        let maxV = max(1, if (maxValue > 0) { maxValue } else { maxArray(values) })
         let count = min(target.width, values.size)
         for (i in 0..count) {
             let height = max(1, scaledChartHeight(clamp(values[i], 0, maxV), target.height, maxV))

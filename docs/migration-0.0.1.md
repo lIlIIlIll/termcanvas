@@ -75,7 +75,7 @@ the core package's internal/test-only headless implementation types.
 See [downstream testing](downstream-testing.md) for generating and verifying an
 independent application, and [platforms](platforms.md) for the native matrix.
 `scripts/native_sdk.py` provides one argv-safe command entry point on Linux,
-macOS and Windows; it still requires the pinned Cangjie/cjpm 1.1.3 toolchain.
+macOS and Windows; it still requires the pinned Cangjie/cjpm 1.2.0 toolchain.
 
 POSIX consumers now also need `cc` and `ar`. The core package's automatic
 `cjpm` build hook compiles a small native launcher that keeps the entire

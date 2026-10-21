@@ -107,19 +107,29 @@ core|CommandPalette|class|public class CommandPalette <: Widget {
 core|CommandPalette.query|var|public var query: String
 core|CommandPalette.selected|var|public var selected: Int64
 core|CommandPalette.offset|var|public var offset: Int64 = 0
-core|CommandPalette.init|init|public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|CommandPalette.init|init|public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style.default(), theme!: ?Theme = None, caseSensitive!: Bool = true )
+core|CommandPalette.setTheme|func|public func setTheme(theme: ?Theme): Unit
+core|CommandPalette.paste|func|public func paste(text: String): Unit
 core|CommandPalette.handle|func|public func handle(key: KeyEvent): ?String
 core|CommandPalette.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|CommandPalette.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|ToastKind|enum|public enum ToastKind {
+core|ToastKind.Success|enum_constructor|Success
+core|ToastKind.Warning|enum_constructor|Warning
+core|ToastKind.Error|enum_constructor|Error
+core|ToastKind.Info|enum_constructor|Info
 core|Toast|class|public class Toast {
 core|Toast.message|let|public let message: String
 core|Toast.ttl|let|public let ttl: Int64
 core|Toast.style|let|public let style: Style
+core|Toast.kind|let|public let kind: ?ToastKind
 core|Toast.init|init|public init(message: String, ttl!: Int64 = 3, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+core|Toast.init|init|public init( message: String, kind!: ?ToastKind, ttl!: Int64 = 3, style!: Style = Style.default() )
 core|ToastManager|class|public class ToastManager <: Widget {
-core|ToastManager.init|init|public init(toasts!: Array<Toast> = [])
+core|ToastManager.init|init|public init( toasts!: Array<Toast> = [], maxToasts!: ?Int64 = None, theme!: ?Theme = None )
 core|ToastManager.push|func|public func push(toast: Toast): Unit
 core|ToastManager.count|func|public func count(): Int64
+core|ToastManager.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|ToastManager.tick|func|public func tick(): Unit
 core|ToastManager.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Spinner|class|public class Spinner <: Widget {
@@ -127,14 +137,17 @@ core|Spinner.init|init|public init(label!: String = "", frame!: Int64 = 0, style
 core|Spinner.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Dialog|class|public class Dialog <: Widget {
 core|Dialog.selected|var|public var selected: Int64
-core|Dialog.init|init|public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Dialog.init|init|public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+core|Dialog.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|Dialog.handle|func|public func handle(key: KeyEvent): ?String
 core|Dialog.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|Dialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ConfirmDialog|class|public class ConfirmDialog <: Widget {
 core|ConfirmDialog.confirmed|var|public var confirmed: Bool = false
-core|ConfirmDialog.init|init|public init(message: String)
+core|ConfirmDialog.init|init|public init( message: String, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+core|ConfirmDialog.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|ConfirmDialog.handle|func|public func handle(key: KeyEvent): ?Bool
+core|ConfirmDialog.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
 core|ConfirmDialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|TranscriptItemKind|enum|public enum TranscriptItemKind {
 core|TranscriptItemKind.Text|enum_constructor|Text
@@ -213,7 +226,8 @@ core|ActivityTimeline.init|init|public init(steps: Array<ActivityStep>, block!: 
 core|ActivityTimeline.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|RequestDialog|class|public class RequestDialog <: Widget {
 core|RequestDialog.selected|var|public var selected: Int64
-core|RequestDialog.init|init|public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0)
+core|RequestDialog.init|init|public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None)
+core|RequestDialog.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|RequestDialog.handle|func|public func handle(key: KeyEvent): ?String
 core|RequestDialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|DecisionDialog|type|public type DecisionDialog = RequestDialog
@@ -259,6 +273,9 @@ core|Skeleton.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|InlineAlert|class|public class InlineAlert <: Widget {
 core|InlineAlert.init|init|public init(message: String, state!: StyleState = StyleState.Accent)
 core|InlineAlert.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Badge|class|public class Badge <: Widget {
+core|Badge.init|init|public init(label: String, style!: Style = Style.default(), theme!: ?Theme = None)
+core|Badge.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Paginator|class|public class Paginator {
 core|Paginator.page|var|public var page: Int64
 core|Paginator.pageSize|var|public var pageSize: Int64
@@ -337,9 +354,20 @@ core|Tree.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): 
 core|Tree.expandSelected|func|public func expandSelected(): Unit
 core|Tree.collapseSelected|func|public func collapseSelected(): Unit
 core|Tree.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Switch|class|public class Switch <: Widget {
+core|Switch.checked|var|public var checked: Bool
+core|Switch.init|init|public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+core|Switch.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+core|Switch.handle|func|public func handle(key: KeyEvent): Bool
+core|Switch.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+core|Switch.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Dropdown.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+core|Dropdown.setTransactionalSelection|func|public func setTransactionalSelection(enabled!: Bool): Unit
+core|Dropdown.cancelSelection|func|public func cancelSelection(): Unit
 core|ColorPicker|class|public class ColorPicker <: Widget {
 core|ColorPicker.selected|var|public var selected: Int64
 core|ColorPicker.init|init|public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)
+core|ColorPicker.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
 core|ColorPicker.selectedColor|func|public func selectedColor(): ?Color
 core|ColorPicker.handle|func|public func handle(key: KeyEvent): Bool
 core|ColorPicker.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
@@ -357,7 +385,8 @@ core|DatePicker|class|public class DatePicker <: Widget {
 core|DatePicker.year|var|public var year: Int64
 core|DatePicker.month|var|public var month: Int64
 core|DatePicker.day|var|public var day: Int64
-core|DatePicker.init|init|public init(year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1)
+core|DatePicker.init|init|public init( year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1, style!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None )
+core|DatePicker.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
 core|DatePicker.value|func|public func value(): String
 core|DatePicker.handle|func|public func handle(key: KeyEvent): Bool
 core|DatePicker.render|func|public func render(area: Rect, buffer: Buffer): Unit
@@ -389,6 +418,16 @@ core|LazyTreeModel.setExpanded|func|public func setExpanded(id: String, expanded
 core|LazyTreeModel.toggleSelected|func|public func toggleSelected(): Bool
 core|LazyTreeModel.collapseAll|func|public func collapseAll(): Unit
 core|LazyTreeModel.refresh|func|public func refresh(): Unit
+core|Tabs.setFocused|func|public func setFocused(focused: Bool): Unit
+core|Tabs.setTheme|func|public func setTheme(theme: ?Theme): Unit
+core|SegmentedControl|class|public class SegmentedControl <: Widget {
+core|SegmentedControl.selected|var|public var selected: Int64
+core|SegmentedControl.init|init|public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: Style = Style(fg: Color.Indexed(8)), focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )
+core|SegmentedControl.selectedValue|func|public func selectedValue(): ?String
+core|SegmentedControl.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+core|SegmentedControl.handle|func|public func handle(key: KeyEvent): Bool
+core|SegmentedControl.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+core|SegmentedControl.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ModalFocusState|class|public class ModalFocusState {
 core|ModalFocusState.init|init|public init(base: FocusManager, keymap!: KeyMap = KeyMap())
 core|ModalFocusState.open|func|public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
@@ -518,6 +557,9 @@ core|ExternalPort.fullCount|func|public func fullCount(): Int64
 core|ExternalPort.closedCount|func|public func closedCount(): Int64
 core|ExternalPort.wakeSignals|func|public func wakeSignals(): Int64
 core|ExternalPort.wakeCoalesced|func|public func wakeCoalesced(): Int64
+core|Theme.graphite|func|public static func graphite(accent!: Color = Color.Cyan): Theme
+core|Theme.light|func|public static func light(accent!: Color = Color.Cyan): Theme
+core|Theme.forCapabilities|func|public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: Color = Color.Cyan ): Theme
 core|StyleState|enum|public enum StyleState {
 core|StyleState.Normal|enum_constructor|Normal
 core|StyleState.Focused|enum_constructor|Focused
@@ -578,6 +620,7 @@ core|TestBackend.setCursorShape|func|public func setCursorShape(shape: ?CursorSh
 core|DebugOverlay|class|public class DebugOverlay <: Widget {
 core|DebugOverlay.init|init|public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
 core|DebugOverlay.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|adaptStyleForCapabilities|func|public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style
 core|VimMode|enum|public enum VimMode {
 core|VimMode.Normal|enum_constructor|Normal
 core|VimMode.Insert|enum_constructor|Insert
@@ -669,18 +712,20 @@ core|VirtualTranscriptView.dirtyRectForItemRevision|func|public func dirtyRectFo
 core|VirtualTranscriptView.handle|func|public func handle(key: KeyEvent): Bool
 core|VirtualTranscriptView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Sparkline|class|public class Sparkline <: Widget {
-core|Sparkline.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
+core|Sparkline.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None)
 core|Sparkline.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Gauge|class|public class Gauge <: Widget {
 core|Gauge.init|init|public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )
 core|Gauge.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Chart|class|public class Chart <: Widget {
-core|Chart.init|init|public init(values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan))
+core|Chart.init|init|public init( values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan), maxValue!: Int64 = 0 )
 core|Chart.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|LogView|class|public class LogView <: Widget {
 core|LogView.offset|var|public var offset: Int64
 core|LogView.init|init|public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
 core|LogView.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Input.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
+core|Input.paste|func|public func paste(text: String): Unit
 diff|DiffLineKind|enum|public enum DiffLineKind {
 diff|DiffLineKind.Context|enum_constructor|Context
 diff|DiffLineKind.Add|enum_constructor|Add

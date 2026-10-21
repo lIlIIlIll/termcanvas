@@ -49,6 +49,17 @@ let report = TestScenario()
 @Expect(report.lastSnapshot().contains("hello 世界"))
 ```
 
+## In-repository downstream example
+
+[`examples/workbench`](../examples/workbench/) is an application-level consumer
+with explicit `core` and `cjtui_testing` path dependencies. Its tests combine
+`TestScenario` workflows with `TestBackend` assertions. They verify that Data
+sample changes preserve selection and focus at `80×24`, `120×36`, and `160×45`,
+that a clicked visible List row matches the rendered selection, and that the
+progress tick's partial frame matches a full render. These headless assertions
+do not establish native terminal behavior; see the [Gallery capture
+record](widget-gallery.md#capture-evidence).
+
 Snapshot tests exercise application state and rendering. They do not verify
 native terminal mode, OS input delivery, clipboard availability, PTY process
 creation, or a real terminal's image support. For deterministic asynchronous
@@ -137,13 +148,15 @@ The native CI job preserves the JSON report as an artifact, and each package
 validation command has a 15-minute deadline so a blocked process produces a
 bounded failure rather than consuming the entire platform job.
 
-With Cangjie/cjpm 1.1.3, a project directory containing spaces needs
-`package.script-dir` set to a build-script output directory without spaces:
-the SDK currently fails to quote its default build-script cache path on both
-Windows and Linux. Use the same setting on macOS for portable projects. The
-downstream fixture retains its `standalone app` directory and uses an isolated
-sibling script cache; build hooks, compilation, tests and execution all run.
-The generator exposes this setting through its public `--script-dir` option.
+With Cangjie/cjpm STS `1.2.0`, a generated application directory containing
+spaces still fails on Linux when `package.script-dir` is empty: `cjpm test`
+reports `invalid file or directory 'root'` during the core build-hook invocation.
+Set `package.script-dir` to a build-script output directory without spaces.
+STS `1.1.3` was also observed to fail on Linux and Windows. Under STS
+`1.2.0`, this fixture passed the Linux release gate and the native macOS 15 /
+Windows 2025 jobs in CI run `39532522996`. It retains its `standalone app`
+directory and sibling script cache; the generator exposes the workaround
+through `--script-dir`.
 For Windows:
 
 ```powershell
@@ -164,5 +177,5 @@ cjpm test --target-dir /tmp/my-app-target
 /tmp/my-app-target/release/bin/main --headless-smoke
 ```
 
-Keep the library checkout and both output directories free of spaces with
-this SDK. The application directory itself is covered by the native test.
+Keep the library checkout, script cache and target directories free of spaces
+with this SDK. The application directory itself is covered by the native test.
