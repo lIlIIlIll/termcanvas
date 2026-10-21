@@ -367,6 +367,7 @@ core|Dropdown.cancelSelection|func|public func cancelSelection(): Unit
 core|ColorPicker|class|public class ColorPicker <: Widget {
 core|ColorPicker.selected|var|public var selected: Int64
 core|ColorPicker.init|init|public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)
+core|ColorPicker.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
 core|ColorPicker.selectedColor|func|public func selectedColor(): ?Color
 core|ColorPicker.handle|func|public func handle(key: KeyEvent): Bool
 core|ColorPicker.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
