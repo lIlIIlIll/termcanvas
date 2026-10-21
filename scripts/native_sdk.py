@@ -76,6 +76,11 @@ def digest(path: Path) -> str:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+def canonical_target_dir(root: str, workdir: Path) -> Path:
+    key = hashlib.sha256(str(workdir).encode()).hexdigest()[:16]
+    return native_path(root) / SDK_VERSION / key
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--report", action="store_true")
@@ -101,8 +106,7 @@ def main() -> int:
                 command[0] = str(root / ("tools/bin" if name == "cjpm" else "bin") / (name + suffix))
             if (name == "cjpm" and len(command) > 1 and command[1] in ("bench", "build", "run", "test")
                     and env.get("CJ_TUI_CANONICAL_TARGET_ROOT") and "--target-dir" not in command):
-                key = hashlib.sha256(str(workdir).encode()).hexdigest()[:16]
-                target = native_path(env["CJ_TUI_CANONICAL_TARGET_ROOT"]) / key
+                target = canonical_target_dir(env["CJ_TUI_CANONICAL_TARGET_ROOT"], workdir)
                 target.mkdir(parents=True, exist_ok=True)
                 command += ["--target-dir", str(target)]
             return subprocess.run(command, cwd=workdir, env=env, check=False).returncode

@@ -113,9 +113,10 @@ declaration; the checker enforces the exact version.
 
 A mutable `daily` SDK may be used for local exploratory commands only and is not
 acceptance authority. `scripts/release_gate.sh` requires `CANGJIE_SDK_ROOT`,
-rejects any version other than the canonical compiler before building, and puts
-every cjpm invocation in a target namespace containing the validated toolchain
-identity. This prevents objects produced by another compiler from satisfying
+rejects any version other than the canonical compiler before building, and
+uses a namespace derived from the validated toolchain version and workspace
+for `cjpm` build/test/run/bench commands that do not specify `--target-dir`.
+This prevents artifacts produced by another compiler or workspace from satisfying
 the canonical gate.
 
 Cangjie `1.1.0-alpha.20260803040049` is not a valid verification compiler for

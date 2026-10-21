@@ -163,7 +163,7 @@ the bracketed state for an empty label. Space or Enter toggles; a left-button
 Down on the first visible row toggles once. `setVisualState` selects normal,
 focused, or disabled Theme roles; disabled state rejects input.
 
-The stable `Input.setVisualState(focused: Bool = false, disabled: Bool = false,
+The EXPERIMENTAL `Input.setVisualState(focused: Bool = false, disabled: Bool = false,
 error: Bool = false, theme: ?Theme = None)` method configures the visual and
 interactive state without changing its editing model. Resolution precedence is
 disabled, error, focused, then normal. Disabled inputs ignore keyboard, mouse,
