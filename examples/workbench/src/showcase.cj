@@ -56,6 +56,7 @@ func galleryCategoryDescription(category: Int64): String {
         case 1 => "Rounded Unicode panels, borderless surfaces, and an ASCII fallback toggle."
         case 2 => "Tab to controls; toggle the checkbox or Switch, type in the field, or change the select."
         case 3 => "Select a density with Segments; the preview value follows keyboard or mouse input."
+        case 4 => "Inspect task tables, lists, and the fixed-scale progress chart."
         case 5 => "Semantic severity markers use Theme roles and the shared three-second toast lifetime."
         case 6 => "Open a real confirmation; Escape closes it, Tab moves between actions."
         case _ => "Switch dark/light and accent; preview only the terminal's actual or lower color tier."
