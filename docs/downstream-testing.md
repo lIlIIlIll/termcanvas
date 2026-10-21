@@ -152,11 +152,11 @@ With Cangjie/cjpm STS `1.2.0`, a generated application directory containing
 spaces still fails on Linux when `package.script-dir` is empty: `cjpm test`
 reports `invalid file or directory 'root'` during the core build-hook invocation.
 Set `package.script-dir` to a build-script output directory without spaces.
-STS `1.1.3` was also observed to fail on Linux and Windows; Windows behavior
-has not been rechecked under `1.2.0`. The downstream fixture retains its
-`standalone app` directory and uses a sibling script cache; build hooks,
-compilation, tests and execution pass under `1.2.0`. The generator exposes this
-setting through `--script-dir`.
+STS `1.1.3` was also observed to fail on Linux and Windows. Under STS
+`1.2.0`, this fixture passed the Linux release gate and the native macOS 15 /
+Windows 2025 jobs in CI run `39532522996`. It retains its `standalone app`
+directory and sibling script cache; the generator exposes the workaround
+through `--script-dir`.
 For Windows:
 
 ```powershell

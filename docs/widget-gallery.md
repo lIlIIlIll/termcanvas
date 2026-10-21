@@ -94,8 +94,9 @@ demonstration does not promote an experimental declaration.
 | `CommandPalette` search, paste, theme, disabled, and empty-state behavior | Implemented | EXPERIMENTAL | Workbench F2 covers case-insensitive search, disabled commands, `No matches`, mouse activation, Escape, and focus restoration; core tests cover case-sensitive defaults, action matching, Unicode paste reset, theme precedence, and full-row clearing. |
 | `Dialog` theme, selection normalization, and `ConfirmDialog` actions | Implemented | EXPERIMENTAL | Core boundary tests cover legacy and themed style precedence, 80×24 No/Yes hits, and invalid clicks; the Workbench test covers visible outcomes, theme refresh, resize, and modal focus restoration. |
 | Sample routing, visible-control focus sets, responsive layout, and modal focus restoration | Application composition required | Application code | Covered by `dataSampleNavigationPreservesFocusAndValuesAcrossResponsiveSizes` and `dataGallerySupportsKeyboardAndMouseSelection`. |
-| Remaining gallery scope in tracking issue #16 | Planned | Varies; inventory is authoritative | Later issue batches add coverage without changing the library's API tier by demonstration alone. |
-| Native captures on other terminals and Windows/macOS | Unverified | N/A | Not established by B00; see capture record below. |
+| Issue #16 Gallery acceptance (B00–B13) | Implemented | Varies; inventory is authoritative | Batch evidence is in the linked child issues; current STS 1.2.0 verification and T026 captures are recorded below and in the manifest. |
+| Deferred features outside the first #16 scope | Planned (requires a separate consumer issue) | N/A | Breadcrumb, Slider, Tooltip, full ContextMenu/ComboBox, full charting, language services, and a full IDE shell are excluded in #16. |
+| Native captures beyond Foot on Linux | Unverified | N/A | T026 captures use Foot on Linux; platform CI checks do not establish rendering on other terminals or OSes. |
 
 ### Capture evidence
 
@@ -106,9 +107,27 @@ attempt did not expose the Workbench surface, and isolated headless compositor
 startup did not become ready.
 
 The [B13 Progress capture](../examples/workbench/screenshots/b13-progress.png)
-is a real `foot` terminal rendering at `80×24`; its
-[manifest](../examples/workbench/screenshots/b13-capture-manifest.json)
-binds the image to the source digest and records the toolchain and compositor.
+is a real `foot` terminal rendering at `80×24`; its [manifest](../examples/workbench/screenshots/b13-capture-manifest.json)
+binds the image to its source digest and records toolchain/compositor metadata.
+It is historical evidence captured with Cangjie 1.3.0-alpha.20261020001052.
+The current STS 1.2.0 capture set is T026 below.
+
+The [T026 capture manifest](../examples/workbench/screenshots/t026-capture-manifest.json)
+binds eight current-run captures to a source revision and digest:
+
+- [Overview, 80×24](../examples/workbench/screenshots/t026-overview-80x24.png)
+- [Forms focus, 120×36](../examples/workbench/screenshots/t026-forms-focus-120x36.png)
+- [Data / Progress, 160×45](../examples/workbench/screenshots/t026-data-160x45.png)
+- [Command palette, 120×36](../examples/workbench/screenshots/t026-palette-120x36.png)
+- [Confirm dialog, 80×24](../examples/workbench/screenshots/t026-confirm-80x24.png)
+- [Light theme, 120×36](../examples/workbench/screenshots/t026-light-theme-120x36.png)
+- [Monochrome capability preview, 80×24](../examples/workbench/screenshots/t026-monochrome-80x24.png)
+- [SegmentedControl, 120×36](../examples/workbench/screenshots/t026-segments-120x36.png)
+
+The manifest records STS 1.2.0, the compiler/runtime hashes, `foot` version,
+compositor, font, terminal capability, theme, cell dimensions, and image hashes.
+The Monochrome view is a Gallery preview only; the real terminal reported
+true-color capability.
 
 Historical PNGs without source-bound provenance are excluded from B00 and are
 not used as evidence; no metadata has been backfilled.
