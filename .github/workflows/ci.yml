@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CANGJIE_SDK_CHANNEL: sts
-      CANGJIE_SDK_VERSION: 1.1.3
+      CANGJIE_SDK_VERSION: 1.2.0
     steps:
       - uses: actions/checkout@v7
         with:
@@ -92,7 +92,7 @@ jobs:
         uses: Zxilly/setup-cangjie@91463316b1c359f216c2ac49e35900f9341c1571
         with:
           channel: sts
-          version: 1.1.3
+          version: 1.2.0
           cjv-version: v0.2.21
       - name: Export native SDK and isolated build root
         shell: python {0}

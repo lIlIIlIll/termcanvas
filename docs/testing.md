@@ -95,7 +95,7 @@ they must not become release pass/fail thresholds. The core benchmark entrypoint
 is:
 
 ```bash
-CANGJIE_SDK_ROOT=/path/to/cangjie-sts-1.1.3 \
+CANGJIE_SDK_ROOT=/path/to/cangjie-sts-1.2.0 \
   scripts/cangjie_cmd.sh packages/core cjpm bench --filter=CjTuiPerformanceBench
 ```
 
@@ -105,7 +105,7 @@ invariant instead of adding a wall-clock threshold.
 
 ## Use the accepted compiler and scripts
 
-Canonical verification uses Cangjie STS `1.1.3` with cjpm `1.1.3`. The SDK
+Canonical verification uses Cangjie STS `1.2.0` with cjpm `1.2.0`. The SDK
 root must include `cjc`, `cjpm`, and the Cangjie runtime library. This repository
 does not import stdx, so `scripts/check_sdk.sh` does not require it. Package
 manifests retain `cjc-version = "1.1.0"` as their language compatibility

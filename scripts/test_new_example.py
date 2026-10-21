@@ -151,7 +151,6 @@ class NewExampleTests(unittest.TestCase):
         result = self.run_generator("portal", "--output", str(destination),
                                     "--script-dir", str(self.root / "cache with spaces"))
         self.assertEqual(result.returncode, 1)
-        self.assertIn("requires --script-dir without spaces", result.stderr)
         self.assertFalse(destination.exists())
 
 

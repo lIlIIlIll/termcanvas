@@ -58,13 +58,13 @@ class NativeSdkTests(unittest.TestCase):
             sdk_environment(str(self.root), system="Linux", machine="x86_64")
 
     def test_version_comparison_does_not_accept_a_prefix(self):
-        result = subprocess.CompletedProcess([], 0, "Cangjie Compiler: 1.1.30", "")
+        result = subprocess.CompletedProcess([], 0, "Cangjie Compiler: 1.2.00", "")
         with patch("native_sdk.subprocess.run", return_value=result):
             with self.assertRaises(ValueError):
                 verify_sdk(self.root, {})
 
     def test_failed_version_command_cannot_pass_by_printing_version(self):
-        result = subprocess.CompletedProcess([], 1, "1.1.3", "failed")
+        result = subprocess.CompletedProcess([], 1, "1.2.0", "failed")
         with patch("native_sdk.subprocess.run", return_value=result):
             with self.assertRaises(ValueError):
                 verify_sdk(self.root, {})

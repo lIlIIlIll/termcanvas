@@ -10,7 +10,7 @@ import re
 import subprocess
 import sys
 
-SDK_VERSION = "1.1.3"
+SDK_VERSION = "1.2.0"
 
 
 def native_path(value: str) -> Path:

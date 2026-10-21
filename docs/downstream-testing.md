@@ -148,13 +148,15 @@ The native CI job preserves the JSON report as an artifact, and each package
 validation command has a 15-minute deadline so a blocked process produces a
 bounded failure rather than consuming the entire platform job.
 
-With Cangjie/cjpm 1.1.3, a project directory containing spaces needs
-`package.script-dir` set to a build-script output directory without spaces:
-the SDK currently fails to quote its default build-script cache path on both
-Windows and Linux. Use the same setting on macOS for portable projects. The
-downstream fixture retains its `standalone app` directory and uses an isolated
-sibling script cache; build hooks, compilation, tests and execution all run.
-The generator exposes this setting through its public `--script-dir` option.
+With Cangjie/cjpm STS `1.2.0`, a generated application directory containing
+spaces still fails on Linux when `package.script-dir` is empty: `cjpm test`
+reports `invalid file or directory 'root'` during the core build-hook invocation.
+Set `package.script-dir` to a build-script output directory without spaces.
+STS `1.1.3` was also observed to fail on Linux and Windows; Windows behavior
+has not been rechecked under `1.2.0`. The downstream fixture retains its
+`standalone app` directory and uses a sibling script cache; build hooks,
+compilation, tests and execution pass under `1.2.0`. The generator exposes this
+setting through `--script-dir`.
 For Windows:
 
 ```powershell
@@ -175,5 +177,5 @@ cjpm test --target-dir /tmp/my-app-target
 /tmp/my-app-target/release/bin/main --headless-smoke
 ```
 
-Keep the library checkout and both output directories free of spaces with
-this SDK. The application directory itself is covered by the native test.
+Keep the library checkout, script cache and target directories free of spaces
+with this SDK. The application directory itself is covered by the native test.

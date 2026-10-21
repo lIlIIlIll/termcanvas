@@ -24,8 +24,8 @@ set -euo pipefail
 repo="$1"
 cangjie_root="$2"
 sdkroot="$3"
-expected_cjc_version='1.1.3'
-expected_cjpm_version='1.1.3'
+expected_cjc_version='1.2.0'
+expected_cjpm_version='1.2.0'
 if [[ ! -d "$repo" ]]; then
     echo "macOS checkout not found: $repo" >&2
     exit 2

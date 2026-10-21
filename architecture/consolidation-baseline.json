@@ -333,9 +333,9 @@
     "phase": "5B",
     "review_status": "closed",
     "inventory_source": "docs/api-inventory.json plus architecture/api-classification.json",
-    "top_level_total": 148,
-    "contract_entry_total": 941,
-    "family_total": 25,
+    "top_level_total": 153,
+    "contract_entry_total": 984,
+    "family_total": 26,
     "coverage": "Every EXPERIMENTAL top-level declaration has exactly one primary family; classification-rule subsets below resolve mixed rules without changing API classification.",
     "selected_next_family": null,
     "selected_next_phase": null,
@@ -523,21 +523,26 @@
       {
         "id": "interactive_command_widgets",
         "rules": [
-          "core-widget-experimental"
+          "core-widget-experimental",
+          "core-command-palette-search-experimental",
+          "core-dialog-theme-experimental",
+          "core-tabs-theme-experimental"
         ],
         "symbols": [
           "MenuItem",
           "Menu",
           "MenuBar",
+          "Tabs",
           "CommandPalette",
           "Toast",
+          "ToastKind",
           "ToastManager",
           "Spinner",
           "Dialog",
           "ConfirmDialog"
         ],
-        "top_level": 9,
-        "contract_entries": 51,
+        "top_level": 10,
+        "contract_entries": 65,
         "owner": "core/widgets",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "seven recommended examples, terminal_lab, and core tests",
@@ -552,6 +557,7 @@
         ],
         "symbols": [
           "StyleState",
+          "Badge",
           "MetricCard",
           "Meter",
           "LegendItem",
@@ -565,8 +571,8 @@
           "Skeleton",
           "InlineAlert"
         ],
-        "top_level": 13,
-        "contract_entries": 45,
+        "top_level": 14,
+        "contract_entries": 48,
         "owner": "core/widgets",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "experimental btm_clone uses Meter, HeaderBar, and FooterBar; core tests cover the broader family; no principal, production, or recommended-example adopter",
@@ -574,17 +580,40 @@
         "revisit": "Revisit after an independent production dashboard adopter freezes a smaller coherent contract."
       },
       {
+        "id": "theme_capability_adaptation",
+        "rules": [
+          "core-style-capabilities-experimental"
+        ],
+        "symbols": [
+          "Theme",
+          "adaptStyleForCapabilities"
+        ],
+        "top_level": 1,
+        "contract_entries": 4,
+        "owner": "core/style",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "Workbench capability preview and direct palette/adaptation contract tests; no principal consumer adoption.",
+        "reason": "Semantic theme factories and deterministic terminal-tier adaptation add an optional styling policy without changing the stable Theme shape.",
+        "revisit": "Promote only after independent production consumers validate role colors, deterministic palette mapping, and behavior across true-color, xterm-256, ANSI-8, and monochrome terminals; review after Workbench adoption and remove the optional API if no independent consumer needs capability-aware themes."
+      },
+      {
         "id": "advanced_form_inputs",
         "rules": [
-          "core-widget-experimental"
+          "core-widget-experimental",
+          "core-dropdown-state-experimental",
+          "core-input-paste-experimental"
         ],
         "symbols": [
           "ColorPicker",
           "MultiSelect",
-          "DatePicker"
+          "DatePicker",
+          "Input",
+          "Dropdown",
+          "Switch",
+          "SegmentedControl"
         ],
-        "top_level": 3,
-        "contract_entries": 24,
+        "top_level": 5,
+        "contract_entries": 45,
         "owner": "core/widgets",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "recommended form_studio and core tests",
@@ -746,7 +775,8 @@
       {
         "id": "activity_dialog_ui",
         "rules": [
-          "core-editor-experimental"
+          "core-editor-experimental",
+          "core-request-dialog-theme-experimental"
         ],
         "symbols": [
           "ActivityStep",
@@ -755,7 +785,7 @@
           "DecisionDialog"
         ],
         "top_level": 4,
-        "contract_entries": 15,
+        "contract_entries": 16,
         "owner": "core/editor",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "recommended assistant_console and one combined core test",
@@ -1054,8 +1084,8 @@
     ],
     "distribution": {
       "KEEP_EXPERIMENTAL": {
-        "families": 25,
-        "top_level": 148
+        "families": 26,
+        "top_level": 153
       }
     },
     "priority": []
