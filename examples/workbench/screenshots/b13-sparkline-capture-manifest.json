@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "batch": "B13",
+  "source": {
+    "commit": "a36f097631911e1f3272d645a450cbbfbbfa9791",
+    "revision_note": "The screenshot was captured from this source revision; the PR follow-up adds screenshot assets, provenance manifests, documentation, and a manifest allowlist.",
+    "digest_algorithm": "SHA-256",
+    "digest_scope": "SHA-256 of the ordered per-file SHA-256 records produced by digest_command",
+    "digest_command": "export LC_ALL=C && sha256sum examples/ops_dashboard/cjpm.toml examples/ops_dashboard/src/*.cj packages/core/cjpm.toml packages/core/src/*.cj | sha256sum",
+    "digest": "f0573ecce0b83d1864ad69dde35fe3a629903dc54978c790d8e7765cf701704f",
+    "inputs": [
+      "examples/ops_dashboard/cjpm.toml",
+      "examples/ops_dashboard/src/*.cj",
+      "packages/core/cjpm.toml",
+      "packages/core/src/*.cj"
+    ]
+  },
+  "toolchain": {
+    "distribution": "Cangjie STS SDK",
+    "version": "1.2.0",
+    "target": "x86_64-unknown-linux-gnu",
+    "archive_sha256": "8c5fd944cd9cc51ee63d4a240e3ecc4f540345dae1468e8b47c927ecf2ba998f",
+    "cjc_version": "1.2.0",
+    "cjc_sha256": "023be1bb2ded1078906fc91919b3c1175ad14436ad88d23d505f7b8dcd0d7118",
+    "cjpm_version": "1.2.0",
+    "runtime_sha256": "2e32485852cbc8648c1298c23f2d1ff5f90bdb6c0331da20b29ee3d97d03e167"
+  },
+  "capture_environment": {
+    "application": "ops_dashboard metrics example",
+    "backend": "SwayFX headless",
+    "compositor": "SwayFX 0.6 (based on Sway 1.12.0)",
+    "renderer": "SwayFX FX renderer, OpenGL ES 3.2 (Mesa)",
+    "terminal": "Foot 1.28.0",
+    "capture_tool": "grim",
+    "font": "monospace:size=14",
+    "pty_columns": 120,
+    "pty_rows": 36,
+    "image_width": 1080,
+    "image_height": 864,
+    "terminal_color_capability": "true-color"
+  },
+  "captures": [
+    {
+      "file": "b13-sparkline-block-120x36.png",
+      "screen": "ops_dashboard / Metrics",
+      "state": "Live dashboard frame; Latency Sparkline in a titled Block beside the Queue Chart, with Gauge, Release progress, Event log, and status visible.",
+      "widgets": ["MenuBar", "Gauge", "Block", "Sparkline", "Chart", "ProgressBar", "LogView", "StatusBar"],
+      "width": 1080,
+      "height": 864,
+      "sha256": "b3df81ad879502b7cb182a0e2bbe85f066c81727e0dd33851ec470d7fba3c628"
+    }
+  ],
+  "verification": [
+    {
+      "command": "scripts/cangjie_cmd.sh examples/ops_dashboard cjpm build --target-dir <task-temp>/ops-dashboard-target",
+      "result": "Passed; cjpm build success."
+    },
+    {
+      "command": "scripts/cangjie_cmd.sh examples/ops_dashboard cjpm run --target-dir <task-temp>/ops-dashboard-target, displayed in Foot on SwayFX headless at 120x36",
+      "result": "Rendered the Metrics dashboard and Latency Sparkline in a real PTY; the app exited after the q key was sent."
+    },
+    {
+      "command": "scripts/ci_gate.sh (Linux x86_64, canonical Cangjie STS 1.2.0 SDK)",
+      "result": "Passed; final output: pressure gate ok; release gate ok. See the B00 capture manifest for the shared release-gate result."
+    }
+  ]
+}
