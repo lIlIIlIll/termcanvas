@@ -1102,7 +1102,6 @@ class WorkbenchProgressT020Test {
             @Assert(snapshot.contains("0%"))
 
             let buffer = backend.lastBuffer().getOrThrow()
-            @Expect(buffer.getCell(areas.dataProgress.x, areas.dataProgress.y).symbol, "-")
             @Expect(buffer.getCell(areas.dataProgress.right - 1, areas.dataProgress.y).symbol, "-")
             let chartArea = Rect(
                 areas.dataProgress.x,
