@@ -285,6 +285,15 @@
       "sunset_condition": "Revisit or remove if consumers cannot safely own paste normalization and cursor-boundary policy."
     },
     {
+      "id": "core-input-visual-state-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Input.setVisualState"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Semantic Input visual-state rendering adds opt-in behavior to the stable widget; focus, disabled, error, and theme precedence are not yet frozen across independent consumers.",
+      "consumer_evidence": "Workbench form controls and direct core state/style boundary tests; no independent production adopter.",
+      "promotion_condition": "Independent consumers validate focus/disabled/error precedence, style/theme ownership, and unchanged no-theme output.",
+      "sunset_condition": "Revisit or remove the setter if applications do not need semantic Input states or their precedence cannot remain predictable."
+    },
+    {
       "id": "core-tabs-theme-experimental",
       "match": {"package": "core", "qualified_symbols": ["Tabs.setTheme"]},
       "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
@@ -292,6 +301,15 @@
       "consumer_evidence": "Workbench category, sample, and Navigation tabs; direct theme and boundary tests.",
       "promotion_condition": "Independent consumers validate theme opt-in, explicit selected-style ownership, and Unicode/windowing behavior without changing no-theme output.",
       "sunset_condition": "Revisit or remove if consumers do not need semantic Tabs themes or cannot keep selected-style ownership predictable."
+    },
+    {
+      "id": "core-tabs-focus-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Tabs.setFocused"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Focus-modifier rendering adds opt-in behavior to the stable Tabs widget; focus and selected-style precedence are not yet frozen across independent consumers.",
+      "consumer_evidence": "Workbench gallery selectors and direct core focus-modifier rendering tests; no independent production adopter.",
+      "promotion_condition": "Independent consumers validate focused styling with selected-style precedence, Unicode clipping, and unchanged no-theme output.",
+      "sunset_condition": "Revisit or remove the setter if semantic focus styling is not needed or cannot remain orthogonal to selection and theme behavior."
     },
     {
       "id": "core-dialog-theme-experimental",

@@ -40,15 +40,15 @@ The Workbench Progress sample uses task progress in hundredths of a percent
 fraction, not 83% of the bar. Its history `Chart` fixes `maxValue: 10000` and
 labels both ends of the 0–100% scale. The Overview `Sparkline` uses the same
 real model history but is labeled as an auto-scaled recent peak, separate from
-absolute percentage progress. Toast examples show visible queuing, replacement,
-and eviction behavior; the same message in different colors is not treated as a
-distinct deduplication key. Tiny viewports either keep critical actions visible
-or show an explicit layout warning.
+absolute percentage progress. Toast examples show FIFO queuing and oldest-item
+eviction at the configured capacity; ToastManager does not deduplicate
+or replace toasts by message or color. Tiny viewports either keep critical actions
+visible or show an explicit layout warning.
 
 At a glance, the gallery covers data widgets and views for charts, tables,
-virtual lists, trees, and cross-widget navigation. Table/List expands and
-collapses rows, and Progress pairs the weighted gauge with a fixed-scale
-history chart.
+virtual lists, trees, and cross-widget navigation. Table/List demonstrate row
+selection; Tree owns expand/collapse. Progress pairs the weighted gauge with a
+fixed-scale history chart.
 
 
 ### Theme and terminal capabilities
@@ -105,6 +105,11 @@ binds 17 Workbench screenshots to the exact source revision and digest. They
 were captured from the running application with Cangjie STS 1.2.0, Foot 1.28.0,
 and SwayFX 0.6 in headless mode. The PTY was `120×36`; each PNG is `1320×936`.
 The README gallery displays all captures with links to the original images.
+
+The five Workbench captures follow the Gallery's monochrome color preview and
+ASCII fallback. Light/Cyan remain selected in the application, but those images
+show capability-preview output rather than Light/Cyan color rendering; Foot
+itself remained true-color. The manifest records this distinction.
 
 The [B13 Sparkline Block capture](../examples/workbench/screenshots/b13-sparkline-block-120x36.png)
 shows the `ops_dashboard` example's `Latency` Sparkline inside a `Block`. Its

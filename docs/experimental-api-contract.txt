@@ -418,6 +418,7 @@ core|LazyTreeModel.setExpanded|func|public func setExpanded(id: String, expanded
 core|LazyTreeModel.toggleSelected|func|public func toggleSelected(): Bool
 core|LazyTreeModel.collapseAll|func|public func collapseAll(): Unit
 core|LazyTreeModel.refresh|func|public func refresh(): Unit
+core|Tabs.setFocused|func|public func setFocused(focused: Bool): Unit
 core|Tabs.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|SegmentedControl|class|public class SegmentedControl <: Widget {
 core|SegmentedControl.selected|var|public var selected: Int64
@@ -723,6 +724,7 @@ core|LogView|class|public class LogView <: Widget {
 core|LogView.offset|var|public var offset: Int64
 core|LogView.init|init|public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
 core|LogView.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Input.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
 core|Input.paste|func|public func paste(text: String): Unit
 diff|DiffLineKind|enum|public enum DiffLineKind {
 diff|DiffLineKind.Context|enum_constructor|Context

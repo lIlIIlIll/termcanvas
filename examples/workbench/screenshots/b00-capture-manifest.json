@@ -38,7 +38,8 @@
     "image_width": 1320,
     "image_height": 936,
     "terminal_color_capability": "true-color",
-    "ascii_fallback": "Disabled for Gallery Overview; enabled in Gallery Layout and retained for subsequent captures."
+    "color_capability_preview": "Monochrome preview remained enabled for subsequent Workbench captures; Light / Cyan were selected but rendered without color.",
+    "ascii_fallback": "Disabled for Gallery Overview; enabled for Gallery Layout and retained for subsequent captures, including all five Workbench captures."
   },
   "captures": [
     {
@@ -164,7 +165,7 @@
     {
       "file": "b00-workbench-overview-120x36.png",
       "screen": "Workbench / Overview",
-      "theme": "Light / Cyan",
+      "theme": "Monochrome preview (Light / Cyan selected)",
       "state": "Project/status overview, activity log, ready queue, and weighted progress.",
       "widgets": ["Tree", "MetricCard", "Gauge", "Chart", "LogView", "Table", "ProgressBar"],
       "width": 1320,
@@ -174,7 +175,7 @@
     {
       "file": "b00-workbench-task-dropdown-120x36.png",
       "screen": "Workbench / Tasks / Status Dropdown",
-      "theme": "Light / Cyan",
+      "theme": "Monochrome preview (Light / Cyan selected)",
       "state": "Status dropdown open above the task table.",
       "widgets": ["Tree", "Input", "Dropdown", "Button", "Table", "ProgressBar"],
       "width": 1320,
@@ -184,7 +185,7 @@
     {
       "file": "b00-workbench-task-editor-120x36.png",
       "screen": "Workbench / Tasks / Editor",
-      "theme": "Light / Cyan",
+      "theme": "Monochrome preview (Light / Cyan selected)",
       "state": "Task editor open with name, priority, notification, tags, notes, and actions.",
       "widgets": ["Input", "Select", "Checkbox", "MultiSelect", "TextArea", "Button"],
       "width": 1320,
@@ -194,7 +195,7 @@
     {
       "file": "b00-workbench-help-dialog-120x36.png",
       "screen": "Workbench / Help",
-      "theme": "Light / Cyan",
+      "theme": "Monochrome preview (Light / Cyan selected)",
       "state": "Help dialog open above Tasks.",
       "widgets": ["Dialog", "Button"],
       "width": 1320,
@@ -204,7 +205,7 @@
     {
       "file": "b00-workbench-settings-120x36.png",
       "screen": "Workbench / Settings",
-      "theme": "Light / Cyan",
+      "theme": "Monochrome preview (Light / Cyan selected)",
       "state": "Appearance and simulation settings.",
       "widgets": ["RadioGroup", "ColorPicker", "Checkbox", "Select", "Button"],
       "width": 1320,

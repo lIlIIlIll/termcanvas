@@ -139,6 +139,11 @@ CANGJIE_SDK_ROOT=/path/to/cangjie \
 
 以下 17 张 Workbench 截图来自 Linux x86_64 上实际运行的应用：Cangjie STS 1.2.0、Foot 1.28.0、SwayFX 0.6 headless，终端尺寸为 120×36（每张 PNG 为 1320×936）。源码 revision、源码摘要、工具链哈希和图片 SHA-256 见 [B00 截图清单](examples/workbench/screenshots/b00-capture-manifest.json)。另有一张 [ops_dashboard Sparkline Block 截图](examples/workbench/screenshots/b13-sparkline-block-120x36.png)，其源码和工具链信息见 [B13 截图清单](examples/workbench/screenshots/b13-sparkline-capture-manifest.json)。
 
+Five Workbench captures follow the Gallery's monochrome color preview and ASCII
+fallback. Light/Cyan remain selected in the application, but those images show
+capability-preview output rather than Light/Cyan color rendering; Foot itself
+reported true-color. The B00 manifest records this distinction.
+
 <table>
   <tr>
     <td width="50%">

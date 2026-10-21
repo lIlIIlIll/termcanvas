@@ -18,9 +18,9 @@
     "production_public_top_level": 423,
     "test_source_public_declarations_excluded": 1,
     "by_stability": {
-      "EXPERIMENTAL": 984,
+      "EXPERIMENTAL": 986,
       "INTERNAL": 227,
-      "STABLE": 1458,
+      "STABLE": 1456,
       "TEST_ONLY": 124
     },
     "top_level_by_stability": {
@@ -22624,8 +22624,8 @@
       "signature": "public func setFocused(focused: Bool): Unit",
       "visibility": "public",
       "visibility_origin": "explicit",
-      "stability": "STABLE",
-      "classification_rule": "core-navigation-stable",
+      "stability": "EXPERIMENTAL",
+      "classification_rule": "core-tabs-focus-experimental",
       "subsystem": "widgets",
       "architecture_owner": "core/widgets",
       "disposition": "keep"
@@ -45142,8 +45142,8 @@
       "signature": "public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit",
       "visibility": "public",
       "visibility_origin": "explicit",
-      "stability": "STABLE",
-      "classification_rule": "core-primitive-widgets-stable",
+      "stability": "EXPERIMENTAL",
+      "classification_rule": "core-input-visual-state-experimental",
       "subsystem": "widgets",
       "architecture_owner": "core/widgets",
       "disposition": "keep"

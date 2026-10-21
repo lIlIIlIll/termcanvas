@@ -334,7 +334,7 @@
     "review_status": "closed",
     "inventory_source": "docs/api-inventory.json plus architecture/api-classification.json",
     "top_level_total": 153,
-    "contract_entry_total": 984,
+    "contract_entry_total": 986,
     "family_total": 26,
     "coverage": "Every EXPERIMENTAL top-level declaration has exactly one primary family; classification-rule subsets below resolve mixed rules without changing API classification.",
     "selected_next_family": null,
@@ -526,7 +526,8 @@
           "core-widget-experimental",
           "core-command-palette-search-experimental",
           "core-dialog-theme-experimental",
-          "core-tabs-theme-experimental"
+          "core-tabs-theme-experimental",
+          "core-tabs-focus-experimental"
         ],
         "symbols": [
           "MenuItem",
@@ -542,7 +543,7 @@
           "ConfirmDialog"
         ],
         "top_level": 10,
-        "contract_entries": 65,
+        "contract_entries": 66,
         "owner": "core/widgets",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "seven recommended examples, terminal_lab, and core tests",
@@ -601,7 +602,8 @@
         "rules": [
           "core-widget-experimental",
           "core-dropdown-state-experimental",
-          "core-input-paste-experimental"
+          "core-input-paste-experimental",
+          "core-input-visual-state-experimental"
         ],
         "symbols": [
           "ColorPicker",
@@ -613,7 +615,7 @@
           "SegmentedControl"
         ],
         "top_level": 5,
-        "contract_entries": 45,
+        "contract_entries": 46,
         "owner": "core/widgets",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "recommended form_studio and core tests",
@@ -1464,14 +1466,14 @@
     "verification": "Canonical 20260817 guard passed; deterministic API generation/check passed at 2449 declarations; architecture validation passed with 383 production top-level declarations, stable=212, experimental=123, internal=34, test_only=14, and unclassified=0; full core passed 528/528; the official release gate exited 0 with 17 official example builds and the pressure gate; agent_tui passed 65/65; and the fully compiled agent_app canonical test binary passed 15/15 from an isolated empty working directory. The STABLE contract remained byte-identical, no current source caller or replacement was introduced, and the only remaining lifecycle-review family is debug_overlay for Phase 5R."
   },
   "canonical_toolchain_update": {
-    "phase": "5O-T-I",
+    "phase": "B13-STS-1.2.0",
     "status": "IMPLEMENTED",
-    "previous_canonical": {"date": "20260803", "version": "1.1.0-alpha.20260803040049", "disposition": "REJECTED_FOR_CANONICAL_VERIFICATION", "defect": "PROVEN std.unittest.testmacro @Bench code-generation SIGSEGV during generated suite enumeration"},
-    "current_canonical": {"date": "20260817", "version": "1.1.0-alpha.20260817040003", "cjpm": "1.1.3"},
-    "authority": "Canonical verification requires an explicit CANGJIE_SDK_ROOT whose cjc version exactly matches 1.1.0-alpha.20260817040003. Manifest cjc-version 1.1.0 remains the package/language compatibility declaration; mutable daily remains only a noncanonical local convenience.",
+    "previous_canonical": {"date": "20260817", "version": "1.1.0-alpha.20260817040003", "cjpm": "1.1.3", "disposition": "SUPERSEDED_BY_STS_1.2.0"},
+    "current_canonical": {"date": "20261021", "channel": "STS", "version": "1.2.0", "cjpm": "1.2.0", "archive_sha256": "8c5fd944cd9cc51ee63d4a240e3ecc4f540345dae1468e8b47c927ecf2ba998f"},
+    "authority": "Canonical verification requires Cangjie STS 1.2.0 with cjpm 1.2.0 from one explicit SDK root. The manifest cjc-version 1.1.0 remains the package/language compatibility declaration; local gates and native CI reject compiler or cjpm mismatches.",
     "provenance": "Canonical gates validate compiler, cjpm, runtime, and stdx from one complete SDK root, replace inherited SDK paths, and use a version- plus workspace-specific isolated target namespace so artifacts produced by another compiler cannot satisfy verification.",
-    "qualification": "The frozen @Bench reproducer, core 528/528, API fixtures 14/14, architecture, fitness, all release packages, 17 example builds and smokes, six scripted workflows, pressure, agent_tui 65/65, agent_app 15/15, and the current official release gate passed. The old 20260803 SDK is rejected before compilation.",
-    "compatibility": "Forward canonical verification-toolchain update with zero cj_tui production migration, zero consumer production migration, zero API delta, and no ABI claim. External build systems using the repository's canonical verification path must supply the new exact SDK."
+    "qualification": "The clean Linux scripts/release_gate.sh passed locally under STS 1.2.0. Hosted macOS-15 and Windows-2025 jobs passed; hosted Linux currently fails compiling markdown in markdown_adapter because the SDK-bundled llc exits 139. The same SDK/compiler/runtime passed the local Linux release gate; hosted coverage was not reached and no hosted coverage result is claimed.",
+    "compatibility": "Forward canonical verification-toolchain update with zero production API delta and no ABI claim. External build systems using the repository's canonical verification path must supply STS 1.2.0 with cjpm 1.2.0."
   },
   "external_delivery_stability_review": {
     "phase": "5C-I",
