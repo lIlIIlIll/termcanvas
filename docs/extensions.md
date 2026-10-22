@@ -177,7 +177,9 @@ applications.
 - [`widgets.md`](widgets.md): `DocumentView`, editor primitives, and widget
   composition.
 - [`events.md`](events.md): input and completion events entering update.
-- [Upstream markdown v0.9.0](https://github.com/lIlIIlIll/markdown/releases/tag/v0.9.0):
-  parser API, source ranges, profiles, and release artifacts.
+- [Upstream markdown v0.9.1](https://github.com/lIlIIlIll/markdown/releases/tag/v0.9.1):
+  parser API, source ranges, profiles, and release artifacts. The
+  [v0.9.1 migration notes](https://github.com/lIlIIlIll/markdown/blob/v0.9.1/docs/migration-0.9.1.md)
+  document removed aliases, including `gfm()`; use `gfmModernV1()` instead.
 - [`api.md`](api.md) and generated [`api-inventory.json`](api-inventory.json):
   current ownership and stability tiers.
