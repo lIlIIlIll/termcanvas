@@ -258,7 +258,7 @@ class MarkdownStudio {
         let revision = editor.editRevision()
         if (revision == renderedRevision) { return }
         discardArmed = false
-        let parsed = Markdown.parse(editor.value, profile: MarkdownProfile.gfm())
+        let parsed = Markdown.parse(editor.value, profile: MarkdownProfile.gfmModernV1())
         let presentation = markdownAstToPresentation(parsed, syntax: syntax)
         doc = presentation.document
         editor.setDecorations(presentation.decorations)
