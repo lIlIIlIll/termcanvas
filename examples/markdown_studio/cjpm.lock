@@ -1,4 +1,4 @@
 version = 0
 
 [requires]
-  markdown = {git = "https://github.com/lIlIIlIll/markdown.git", commitId = "db4f9527944b589db8436669f1d255192388cee2", tag = "v0.9.0", output-type = "static"}
+  markdown = {git = "https://github.com/lIlIIlIll/markdown.git", commitId = "d631474326328490e3821a173de2fb112c37601c", tag = "v0.9.1", output-type = "static"}
