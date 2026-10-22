@@ -237,13 +237,12 @@ reported true-color. The B00 manifest records this distinction.
   </tr>
 </table>
 
-
 ## 包结构
 
 | 包 | 用途 |
 | --- | --- |
 | `packages/core` | 运行时、事件、终端会话、布局、Widget、富文档和编辑原语 |
-| [markdown v0.9.0](https://github.com/lIlIIlIll/markdown/releases/tag/v0.9.0) | 独立的上游 Markdown 解析器，按 tag 固定依赖 |
+| [markdown v0.9.1](https://github.com/lIlIIlIll/markdown/tree/v0.9.1) | 独立的上游 Markdown 解析器，固定到含 STS 1.2 修复的最新 tag |
 | `packages/markdown_adapter` | 把上游 Markdown AST 转换为 `core.Document` |
 | `packages/terminal` | ANSI 输出解析、终端转录和 `TerminalView` |
 | `packages/diff` | 统一 diff 解析和 `DiffView` |

@@ -78,7 +78,7 @@ Current families include:
 
 - `packages/core` owns the primary runtime, immediate rendering, common widgets, rich document model, and stable compatibility surfaces.
 - `packages/core` owns the stable editor primitives. The former advanced editor shell and the `packages/editor` and `packages/document` alias facades are retired.
-- `packages/markdown_adapter` converts [markdown v0.9.0](https://github.com/lIlIIlIll/markdown/releases/tag/v0.9.0) parse results into the core document model; the external parser owns diagnostics and source positions.
+- `packages/markdown_adapter` converts [markdown v0.9.1](https://github.com/lIlIIlIll/markdown/tree/v0.9.1) parse results into the core document model; the external parser owns diagnostics and source positions.
 - `packages/terminal`, `packages/diff`, `packages/media`, and `packages/game` provide specialized extension capabilities without owning application state.
 - `packages/testing` owns the stable downstream test facade, declared as package `cjtui_testing`.
 

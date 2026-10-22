@@ -45,9 +45,10 @@ parsing policy.
 ### Markdown
 
 The `markdown_adapter` package maps the AST from
-[markdown v0.9.0](https://github.com/lIlIIlIll/markdown/releases/tag/v0.9.0)
-into `core.Document`. This upstream release is a pre-GA preview; the adapter
-pins its Git tag and `cjpm.lock` records the resolved commit.
+[markdown v0.9.1](https://github.com/lIlIIlIll/markdown/tree/v0.9.1)
+into `core.Document`. This upstream package is a pre-GA preview; the adapter
+pins the latest upstream tag, whose history includes the range-removal rollback
+fix for the STS 1.2.0 LLVM instruction-selection crash.
 The parser remains independent of cjtui. Import `markdown.core.Markdown`
 to parse directly, or call `markdownDocument(text)` to parse with the GFM
 profile and convert for `DocumentView`.
@@ -85,7 +86,7 @@ editor String can supply editor decorations.
 
 For a runnable dependency declaration, see
 [`examples/markdown_studio/cjpm.toml`](../examples/markdown_studio/cjpm.toml).
-It declares both the local `markdown_adapter` and upstream `markdown` v0.9.0.
+It declares both the local `markdown_adapter` and upstream `markdown` v0.9.1.
 
 ### Terminal output
 

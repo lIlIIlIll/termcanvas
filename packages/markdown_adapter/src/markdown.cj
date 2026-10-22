@@ -4,15 +4,19 @@ import markdown.core.{DiagnosticSeverity, ListKind, Markdown, MarkdownProfile, N
 import core.{Document, DocumentLine, DocumentLineKind, DocumentTheme, DocumentView, MediaKind, MediaSource, RichSpan, Style, TextDecoration, displayWidth}
 import std.collection.*
 
+/** 按 GFM 配置解析 Markdown 文本，并将解析结果转换为文档。
+ */
 public func markdownDocument(
     text: String,
     theme!: DocumentTheme = DocumentTheme(),
     preserveSoftBreaks!: Bool = false
 ): Document {
-    markdownAstToDocument(Markdown.parse(text, profile: MarkdownProfile.gfm()), theme: theme,
+    markdownAstToDocument(Markdown.parse(text, profile: MarkdownProfile.gfmModernV1()), theme: theme,
         preserveSoftBreaks: preserveSoftBreaks)
 }
 
+/** 将已有的 Markdown 解析结果转换为文档，不启用语法高亮配置。
+ */
 public func markdownAstToDocument(
     result: ParseResult,
     theme!: DocumentTheme = DocumentTheme(),
