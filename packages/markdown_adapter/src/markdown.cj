@@ -9,7 +9,7 @@ public func markdownDocument(
     theme!: DocumentTheme = DocumentTheme(),
     preserveSoftBreaks!: Bool = false
 ): Document {
-    markdownAstToDocument(Markdown.parse(text, profile: MarkdownProfile.gfm()), theme: theme,
+    markdownAstToDocument(Markdown.parse(text, profile: MarkdownProfile.gfmModernV1()), theme: theme,
         preserveSoftBreaks: preserveSoftBreaks)
 }
 
