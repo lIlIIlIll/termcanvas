@@ -14,7 +14,7 @@ class WorkbenchApp {
     let interaction: ModalFocusState
     let tabs = Tabs(["Gallery", "Overview", "Tasks", "Settings"])
     let galleryTabs = Tabs(["Overview", "Layout", "Forms", "Navigation", "Data", "Feedback", "Overlays", "Themes"])
-    let galleryInput = Input(value: "", placeholder: "Type to edit this input")
+    let galleryInput = Input(value: "", placeholder: "Type to edit this input", showBoundary: false)
     let galleryCheckbox = Checkbox("Compact density")
     let gallerySwitch = Switch("Auto sync")
     let galleryDate = DatePicker(year: 2024, month: 2, day: 29, style: Style.default())
@@ -44,12 +44,13 @@ class WorkbenchApp {
     let galleryListState = ListState(selected: Some(0))
     let galleryDialog = ConfirmDialog("This is a real confirmation dialog.\nYes confirms; No declines.", selectedStyle: Style.default())
     var galleryAsciiFallback: Bool = false
-    let projects = Tree([
+    let projectNodes = [
         TreeNode("all", "All projects"),
         TreeNode("project-alpha", "Alpha"),
         TreeNode("project-beta", "Beta"),
         TreeNode("project-gamma", "Gamma")
-    ], selected: 0, block: Some(Block(title: "Projects")))
+    ]
+    let projects: Tree
     let taskSearch = Input(value: "", placeholder: "Search by task name, ID, or text", block: Block(title: "Search"))
     let taskFilter = Dropdown(["All", "Queued", "Running", "Done"], placeholder: "Status", selectedStyle: Style.default())
     let taskState = TableState(selectedRow: Some(0))
@@ -61,11 +62,11 @@ class WorkbenchApp {
     let accentPicker = ColorPicker(colors: accentColors, selected: 5)
     let motionToggle = Checkbox("Motion", checked: true)
     let speedSelect = Select(["0.5x", "1x", "2x"], selected: 1)
-    let editorName = Input(value: "", placeholder: "Task name", block: Block(title: "Name"))
+    let editorName = Input(value: "", placeholder: "Task name", showBoundary: false)
     let editorPrioritySelect = Select(["Low", "Normal", "High", "Critical"])
     let editorNotify = Checkbox("Notify on completion", checked: true)
     var editorTags = MultiSelect(["build", "test", "docs", "release"])
-    let editorNotes = TextArea(value: "", block: Block(title: "Notes"), lineNumbers: true)
+    let editorNotes = TextArea(value: "", lineNumbers: true)
     let palette = CommandPalette([
         MenuItem("Component gallery", action: "page.showcase"),
         MenuItem("Overview page", action: "page.overview"),
@@ -104,6 +105,7 @@ class WorkbenchApp {
     var paused: Bool = false
     var statusMessage: String = "Ready"
     var editorError: String = ""
+    var hovered: ?String = None
     var selectedId: ?Int64 = Some(1)
     var projectFilter: ?String = None
     var editingId: ?Int64 = None
@@ -131,6 +133,7 @@ class WorkbenchApp {
     var toastManager: ToastManager = ToastManager(maxToasts: Some(8))
 
     init() {
+        projects = Tree(projectNodes, selected: 0)
         interaction = ModalFocusState(focus, keymap: KeyMap(bindings: [
             KeyBinding([KeyEvent(KeyCode.F(1))], "help"),
             KeyBinding([KeyEvent(KeyCode.F(2))], "palette"),
@@ -151,18 +154,31 @@ class WorkbenchApp {
 
     func update(event: Event): UpdateResult {
         match (event) {
-            case Event.KeyDown(key) => updateKey(key)
+            case Event.KeyDown(key) =>
+                let hadHover = hovered.isSome()
+                hovered = None
+                let result = updateKey(key)
+                if (hadHover && !result.renderRequested) {
+                    UpdateResult(flow: result.flow, command: result.command)
+                } else { result }
             case Event.KeyUp(_) => UpdateResult.unchanged()
             case Event.Paste(text) => updatePaste(text)
-            case Event.Mouse(mouse) => updateMouse(mouse)
+            case Event.Mouse(mouse) =>
+                let hadHover = hovered.isSome()
+                let result = updateMouse(mouse)
+                if (hadHover && hovered.isNone() && !result.renderRequested) {
+                    UpdateResult(flow: result.flow, command: result.command)
+                } else { result }
             case Event.Tick(tick) => updateTick(tick)
             case Event.Resize(area) =>
+                hovered = None
                 cancelPointerCapture()
                 screen = area
                 layout = workbenchLayout(screen, page)
                 syncFocus(true)
                 UpdateResult.next()
             case Event.FocusOut =>
+                hovered = None
                 cancelPointerCapture()
                 taskFilter.cancelSelection()
                 statusMessage = "Terminal focus lost"
@@ -177,7 +193,7 @@ class WorkbenchApp {
             case Event.Capabilities(value) =>
                 capabilities = value
                 refreshTheme()
-                UpdateResult.next()
+                if (galleryCapabilityPreview.selected == 0) { UpdateResult.next() } else { capabilityPreviewResult() }
             case _ => UpdateResult.unchanged()
         }
     }
@@ -273,12 +289,13 @@ class WorkbenchApp {
     func isSuccess(id: Int64): Bool { successId == Some(id) && successRemaining > 0 }
 
     func layoutTableWidths(): Array<Int64> {
-        let available = max(0, layout.taskTable.width - 4)
+        // Reserve four separators and the table's two-cell selection marker.
+        let available = max(0, layout.taskTable.width - 6)
         let idWidth = min(8, available)
-        let nameWidth = min(20, max(0, available - idWidth))
-        let projectWidth = min(14, max(0, available - idWidth - nameWidth))
-        let statusWidth = min(10, max(0, available - idWidth - nameWidth - projectWidth))
-        let progressWidth = max(0, available - idWidth - nameWidth - projectWidth - statusWidth)
+        let progressWidth = min(8, max(0, available - idWidth))
+        let statusWidth = min(10, max(0, available - idWidth - progressWidth))
+        let projectWidth = min(14, max(0, available - idWidth - progressWidth - statusWidth))
+        let nameWidth = min(20, max(0, available - idWidth - progressWidth - statusWidth - projectWidth))
         [idWidth, nameWidth, projectWidth, statusWidth, progressWidth]
     }
 
@@ -330,7 +347,7 @@ class WorkbenchApp {
                     return UpdateResult.next()
                 }
             case Some("projects") =>
-                if (projects.handle(key, layout.projectTree.height)) {
+                if (projects.handle(key, workbenchProjectRows(layout.projectTree).height)) {
                     applyTreeProject()
                     return UpdateResult.next()
                 }
@@ -352,7 +369,7 @@ class WorkbenchApp {
                 if (Button("Reset").handle(key)) { return perform("task.reset") }
             case Some("task-table") => return handleTableKey(key)
             case Some("log-view") =>
-                if (logScroll.handle(key, model.logs().size, max(0, layout.logView.height - 2))) {
+                if (logScroll.handle(key, model.logs().size, layout.logView.height)) {
                     syncLogFollowTail()
                     return UpdateResult.next()
                 }
@@ -497,7 +514,7 @@ class WorkbenchApp {
             case "gallery-capability-preview" =>
                 _ = galleryCapabilityPreview.handle(key)
                 refreshTheme()
-                return Some(UpdateResult.next())
+                return Some(capabilityPreviewResult())
             case _ => ()
         }
         None
@@ -603,6 +620,12 @@ class WorkbenchApp {
     }
 
     private func updateMouse(mouse: MouseEvent): UpdateResult {
+        match (mouse.kind) {
+            case MouseKind.Move =>
+                if (capture.activeOwner().isSome()) { return routeCapturedMouse(mouse) }
+                return updateHover(mouse)
+            case _ => hovered = None
+        }
         if (interaction.active().isSome()) { return updateModalMouse(mouse) }
         if (!layout.interactive) { return UpdateResult.unchanged() }
         if (capture.activeOwner().isSome()) { return routeCapturedMouse(mouse) }
@@ -620,7 +643,7 @@ class WorkbenchApp {
         }
         if (mouseScrollDelta(mouse) != 0) {
             if (widgetHitTest(mouse, layout.logPanel)) {
-                logScroll.scroll(mouseScrollDelta(mouse) * 3, model.logs().size, max(0, layout.logView.height - 2))
+                logScroll.scroll(mouseScrollDelta(mouse) * 3, model.logs().size, layout.logView.height)
                 syncLogFollowTail()
                 return UpdateResult.next()
             }
@@ -642,7 +665,7 @@ class WorkbenchApp {
         if (page == WorkbenchPage.Showcase) { return updateGalleryMouse(mouse) }
         if (page == WorkbenchPage.Overview || page == WorkbenchPage.Tasks) {
             if (widgetHitTest(mouse, layout.projectTree)) {
-                if (projects.handle(mouse, layout.projectTree)) {
+                if (projects.handle(mouse, workbenchProjectRows(layout.projectTree))) {
                     applyTreeProject()
                     _ = focus.focus("projects")
                     return UpdateResult.next()
@@ -727,6 +750,34 @@ class WorkbenchApp {
             if (activateButton(mouse, layout.settingReset, "setting-reset", "Reset demo")) { _ = focus.focus("setting-reset"); return perform("demo.reset") }
         }
         UpdateResult.unchanged()
+    }
+
+    private func updateHover(mouse: MouseEvent): UpdateResult {
+        var next: ?String = None
+        if (interaction.active() == Some("editor")) {
+            let ids = ["editor-name", "editor-priority", "editor-notify", "editor-tags", "editor-notes", "editor-cancel", "editor-save"]
+            let areas = [layout.editorName, layout.editorPriority, layout.editorNotify, layout.editorTags,
+                layout.editorNotes, layout.editorCancel, layout.editorSave]
+            for (index in 0..ids.size) {
+                if (widgetHitTest(mouse, areas[index])) { next = Some(ids[index]); break }
+            }
+        } else if (interaction.active().isNone() && page == WorkbenchPage.Showcase && galleryTabs.selected == 2) {
+            let areas = workbenchGalleryAreas(layout.galleryContent, 2)
+            let ids = ["gallery-button-primary", "gallery-button-secondary", "gallery-button-ghost", "gallery-button-danger"]
+            for (index in 0..ids.size) {
+                if (widgetHitTest(mouse, areas.buttons[index])) { next = Some(ids[index]); break }
+            }
+            if (widgetHitTest(mouse, areas.formInputs[1])) { next = Some("gallery-input") }
+            if (widgetHitTest(mouse, areas.checkbox)) { next = Some("gallery-checkbox") }
+            if (widgetHitTest(mouse, areas.switchControl)) { next = Some("gallery-switch") }
+            if (widgetHitTest(mouse, areas.select)) { next = Some("gallery-select") }
+            if (widgetHitTest(mouse, areas.datePicker)) { next = Some("gallery-date") }
+            if (widgetHitTest(mouse, areas.datePreviousYear)) { next = Some("gallery-date-year-down") }
+            if (widgetHitTest(mouse, areas.dateNextYear)) { next = Some("gallery-date-year-up") }
+        }
+        if (hovered == next) { return UpdateResult.unchanged() }
+        hovered = next
+        UpdateResult.next()
     }
 
     private func updateGalleryMouse(mouse: MouseEvent): UpdateResult {
@@ -895,7 +946,7 @@ class WorkbenchApp {
                 _ = focus.focus("gallery-capability-preview")
                 _ = galleryCapabilityPreview.handleMouse(mouse, areas.themeCapabilityPreview)
                 refreshTheme()
-                return UpdateResult.next()
+                return capabilityPreviewResult()
             }
             if (galleryButton(this, "Theme", 1, "gallery-theme-toggle").handleMouse(mouse, areas.themeToggle)) {
                 _ = focus.focus("gallery-theme-toggle")
@@ -1144,6 +1195,9 @@ class WorkbenchApp {
                 case WorkbenchPage.Overview =>
                     result = addDirty(result, layout.overviewTop)
                     result = addDirty(result, layout.sparkPanel)
+                    if (containsId(tickChangedIds, selectedId)) {
+                        result = addDirty(result, layout.overviewTask)
+                    }
                 case WorkbenchPage.Tasks =>
                     if (visibleChanged(tickChangedIds)) {
                         result = addDirty(result, layout.taskTableBlock)
@@ -1448,6 +1502,7 @@ class WorkbenchApp {
     }
 
     private func switchPage(next: WorkbenchPage): Unit {
+        hovered = None
         taskFilter.cancelSelection()
         rememberCurrentFocus()
         page = next
@@ -1772,7 +1827,7 @@ class WorkbenchApp {
 
     private func logScrollbar(): Scrollbar {
         Scrollbar(model.logs().size, offset: logScroll.offset,
-            viewport: max(0, layout.logView.height - 2), style: theme.disabled, thumbStyle: theme.accent)
+            viewport: layout.logView.height, style: theme.disabled, thumbStyle: theme.accent)
     }
 
     private func activateButton(mouse: MouseEvent, area: Rect, id: String, label: String): Bool {
@@ -1793,11 +1848,15 @@ class WorkbenchApp {
 
     private func refreshTheme(): Unit {
         let effective = effectiveCapabilities()
-        let accent = selectedAccent()
-        theme = Theme.forCapabilities(effective, dark: darkTheme, accent: accent)
-        surfaceStyle = adaptStyleForCapabilities(workbenchSurfaceStyle(darkTheme), effective)
-        secondaryStyle = adaptStyleForCapabilities(workbenchSecondaryStyle(darkTheme), effective)
-        borderStyle = adaptStyleForCapabilities(workbenchBorderStyle(darkTheme), effective)
+        let selected = selectedAccent()
+        theme = match (selected) {
+            case Color.Cyan => Theme.forCapabilities(effective, dark: darkTheme)
+            case _ => Theme.forCapabilities(effective, dark: darkTheme, accent: selected)
+        }
+        let accent = theme.accent.fg
+        surfaceStyle = theme.surface
+        secondaryStyle = theme.secondary
+        borderStyle = theme.border
         accentButtonStyle = adaptStyleForCapabilities(
             Style(fg: accentForeground(accent), bg: accent),
             effective
@@ -1828,6 +1887,15 @@ class WorkbenchApp {
         let tier = effectiveColorTier()
         if (tier == actualColorTier()) { return capabilities }
         capabilitiesForColorTier(capabilities, tier)
+    }
+
+    private func capabilityPreviewResult(): UpdateResult {
+        let requestedCapabilities: ?TerminalCapabilities = if (galleryCapabilityPreview.selected == 0) {
+            None
+        } else {
+            Some(effectiveCapabilities())
+        }
+        UpdateResult.withCommand(Command.SetCapabilitiesOverride(requestedCapabilities))
     }
 
     private func selectedAccent(): Color {
@@ -1910,13 +1978,13 @@ class WorkbenchApp {
     private func recordActivity(message: String): Unit {
         model.recordLog(message)
         if (logFollowTail) {
-            let viewport = max(0, layout.logView.height - 2)
+            let viewport = layout.logView.height
             logScroll.offset = max(0, model.logs().size - viewport)
         }
     }
 
     private func syncLogFollowTail(): Unit {
-        let viewport = max(0, layout.logView.height - 2)
+        let viewport = layout.logView.height
         let total = model.logs().size
         let end = max(0, total - viewport)
         logScroll.offset = max(0, min(logScroll.offset, end))
@@ -1970,30 +2038,6 @@ func capabilitiesForColorTier(source: TerminalCapabilities, tier: Int64): Termin
         cellHeightPixels: source.cellHeightPixels,
         driverName: source.driverName
     )
-}
-
-func workbenchSurfaceStyle(dark: Bool): Style {
-    if (dark) {
-        Style(fg: Color.Rgb(224, 230, 237), bg: Color.Rgb(27, 32, 38))
-    } else {
-        Style(fg: Color.Rgb(31, 41, 51), bg: Color.Rgb(255, 255, 255))
-    }
-}
-
-func workbenchSecondaryStyle(dark: Bool): Style {
-    if (dark) {
-        Style(fg: Color.Rgb(169, 180, 191), bg: Color.Rgb(18, 21, 26))
-    } else {
-        Style(fg: Color.Rgb(78, 91, 106), bg: Color.Rgb(247, 249, 252))
-    }
-}
-
-func workbenchBorderStyle(dark: Bool): Style {
-    if (dark) {
-        Style(fg: Color.Rgb(62, 76, 88), bg: Color.Rgb(18, 21, 26))
-    } else {
-        Style(fg: Color.Rgb(186, 198, 209), bg: Color.Rgb(247, 249, 252))
-    }
 }
 
 func accentForeground(color: Color): Color {

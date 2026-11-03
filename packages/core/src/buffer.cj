@@ -30,6 +30,7 @@ public class Buffer {
     public let area: Rect
     private let cells: Array<Cell>
     private let media = ArrayList<MediaPlacement>()
+    private var capabilitiesValue: TerminalCapabilities = TerminalCapabilities()
     private var writeClip: ?DirtyRects = None
     private var canvasClip: ?Rect = None
     // Step-0 diagnostics are opt-in and reset for each render closure. These
@@ -42,6 +43,10 @@ public class Buffer {
         this.area = area
         this.cells = Array<Cell>(area.width * area.height, repeat: Cell())
     }
+
+    public func capabilities(): TerminalCapabilities { capabilitiesValue }
+
+    public func setCapabilities(capabilities: TerminalCapabilities): Unit { capabilitiesValue = capabilities }
 
     public func clear(style!: Style = Style.default()): Unit {
         let blank = Cell(" ", style: style)
@@ -407,6 +412,7 @@ public class Buffer {
 
     public func resize(area: Rect): Buffer {
         let next = Buffer(area)
+        next.setCapabilities(capabilitiesValue)
         let overlap = intersect(this.area, area)
         next.blitFrom(this, overlap, overlap.x, overlap.y)
         next
@@ -414,6 +420,7 @@ public class Buffer {
 
     public func copy(): Buffer {
         let next = Buffer(area)
+        next.setCapabilities(capabilitiesValue)
         for (y in area.y..area.bottom) {
             for (x in area.x..area.right) {
                 next.setCell(x, y, getCell(x, y))

@@ -10,15 +10,30 @@ let ORANGE = Color.Rgb(255, 169, 108)
 class CiActivity {
     var elapsed: Int64 = 0
     var paused = false
+    var offset: Int64 = 0
+    var iconSet = IconSet.Unicode
+    var unicodeSupported = true
 
     func update(event: Event): UpdateResult {
         match (event) {
             case Event.KeyDown(key) => match (key.code) {
                 case KeyCode.CtrlC | KeyCode.Char(r'q') => UpdateResult.exit()
                 case KeyCode.Char(r' ') => paused = !paused; UpdateResult.next()
-                case KeyCode.Char(r'r') => elapsed = 0; paused = false; UpdateResult.next()
+                case KeyCode.Char(r'r') => elapsed = 0; paused = false; offset = 0; UpdateResult.next()
+                case KeyCode.Char(r'n') =>
+                    iconSet = match (iconSet) {
+                        case IconSet.Unicode => IconSet.NerdFont
+                        case IconSet.NerdFont => IconSet.Ascii
+                        case IconSet.Ascii => IconSet.Unicode
+                    }
+                    UpdateResult.next()
+                case KeyCode.Up => offset = max(0, offset - 1); UpdateResult.next()
+                case KeyCode.Down => offset = min(2, offset + 1); UpdateResult.next()
                 case _ => UpdateResult.next()
             }
+            case Event.Capabilities(value) =>
+                unicodeSupported = value.unicode
+                UpdateResult.next()
             case Event.Tick(tick) =>
                 if (!paused) { elapsed += tick.deltaMillis }
                 UpdateResult.next()
@@ -39,17 +54,25 @@ class CiActivity {
         let seconds = elapsed / 1000
         let duration = "${seconds / 60}m${seconds % 60}s"
 
-        canvas.drawText(x, y, "CI ACTIVITY  ·  SIMULATION", dim)
+        let useUnicode = unicodeSupported && match (iconSet) {
+            case IconSet.Ascii => false
+            case _ => true
+        }
+        let separator = if (useUnicode) { "  ·  " } else { "  |  " }
+        let prefix = if (useUnicode) { "⟨bash⟩" } else { "[bash]" }
+        let completedDetail = if (useUnicode) { "✓ All jobs completed" } else { "+ All jobs completed" }
+        canvas.drawText(x, y, "CI ACTIVITY" + separator + "SIMULATION", dim)
         canvas.drawText(x, y + 2, if (finished) { "All simulated checks finished" } else { "Waiting for active CI" }, strong)
 
         let width = max(0, area.width - 2)
-        let theme = Theme(normal: strong, disabled: dim, accent: Style(fg: ORANGE), success: Style(fg: GREEN))
+        let theme = Theme(normal: strong, disabled: dim, accent: Style(fg: ORANGE), success: Style(fg: GREEN),
+            iconSet: iconSet)
         let watched = TaskActivity("bg_202", status: TaskStatus.Done, duration: duration,
             detail: "gh run watch 123456 --repo example/project")
-        let cross = TaskActivity("Cross-platform CI", id: "bg_201", prefix: "⟨bash⟩", duration: duration,
+        let cross = TaskActivity("Cross-platform CI", id: "bg_201", prefix: prefix, duration: duration,
             status: if (crossDone) { TaskStatus.Done } else { TaskStatus.Running },
             progressLabel: "CI jobs", progress: Some(TaskProgress.Counts(if (crossDone) { 5 } else { 2 }, 5)),
-            detail: if (crossDone) { "✓ All jobs completed" } else { "* Post Check out source" })
+            detail: if (crossDone) { completedDetail } else { "* Post Check out source" })
         let showcaseStatuses = if (finished) {
             [TaskStatus.Done, TaskStatus.Done, TaskStatus.Done, TaskStatus.Done, TaskStatus.Done, TaskStatus.Done, TaskStatus.Done, TaskStatus.Done]
         } else if (crossDone) {
@@ -57,24 +80,41 @@ class CiActivity {
         } else {
             [TaskStatus.Done, TaskStatus.Done, TaskStatus.Pending, TaskStatus.Done, TaskStatus.Done, TaskStatus.Pending, TaskStatus.Done, TaskStatus.Pending]
         }
-        let showcase = TaskActivity("Showcase acceptance · CI jobs", id: "bg_203", prefix: "⟨bash⟩", duration: duration,
+        let showcase = TaskActivity(if (useUnicode) { "Showcase acceptance · CI jobs" } else { "Showcase acceptance - CI jobs" }, id: "bg_203", prefix: prefix, duration: duration,
             status: if (finished) { TaskStatus.Done } else { TaskStatus.Running }, progressLabel: "Jobs",
             progress: Some(TaskProgress.Items(showcaseStatuses)),
-            detail: if (finished) { "✓ All jobs completed" } else { "* Post Check out source" })
-        frame.renderWidget(TaskActivityView(watched, layout: TaskActivityLayout.Compact, theme: theme), Rect(x, y + 4, width, 1))
-        frame.renderWidget(TaskActivityView(cross, activityFrame: elapsed / 100, theme: theme), Rect(x, y + 5, width, 3))
-        frame.renderWidget(TaskActivityView(showcase, activityFrame: elapsed / 100, theme: theme), Rect(x, y + 8, width, 3))
-        canvas.drawText(x + 2, y + 11, if (finished) { "0 still running" } else if (crossDone) { "1 still running" } else { "2 still running" }, dim)
-
-        canvas.drawText(x, y + 13, "demo  ·  ${duration} elapsed  ·  simulated CI data", dim)
-        canvas.drawText(x, y + 15, if (paused) { "paused  ·  space resume  ·  r restart  ·  q quit" } else { "space pause  ·  r restart  ·  q quit" }, normal)
+            detail: if (finished) { completedDetail } else { "* Post Check out source" })
+        let entries = [TaskActivityListEntry(watched, layout: TaskActivityLayout.Compact),
+            TaskActivityListEntry(cross), TaskActivityListEntry(showcase)]
+        let listHeight = max(0, min(7, area.height - 9))
+        let unicodeOverride: ?Bool = if (unicodeSupported) { None } else { Some(false) }
+        frame.renderWidget(TaskActivityList(entries, offset: offset, activityFrame: elapsed / 100, theme: theme,
+            unicode: unicodeOverride),
+            Rect(x, y + 4, width, listHeight))
+        let summaryY = y + 4 + listHeight
+        canvas.drawText(x + 2, summaryY,
+            if (finished) { "0 still running" } else if (crossDone) { "1 still running" } else { "2 still running" }, dim)
+        let legendY = if (summaryY + 4 < area.bottom) { summaryY + 2 } else { summaryY + 1 }
+        canvas.drawText(x, legendY, if (useUnicode) { "●" } else { "+" }, theme.success)
+        canvas.drawText(x + 1, legendY, " done  ", dim)
+        canvas.drawText(x + 8, legendY, if (useUnicode) { "◌" } else { "o" }, theme.normal)
+        canvas.drawText(x + 9, legendY, " waiting", dim)
+        let iconName = match (iconSet) {
+            case IconSet.Unicode => "Unicode"
+            case IconSet.NerdFont => "Nerd Font"
+            case IconSet.Ascii => "ASCII"
+        }
+        canvas.drawText(x, legendY + 1, "demo" + separator + "${duration} elapsed" + separator + "icons: ${iconName}", dim)
+        let pauseHint = if (paused) { "paused" + separator + "space resume" } else { "space pause" }
+        canvas.drawText(x, legendY + 2, "n icons" + separator + pauseHint + separator + "arrows scroll" +
+            separator + "r restart" + separator + "q quit", normal)
     }
 
 }
 
 main(): Int64 {
     let app = CiActivity()
-    App(targetFps: 10).runWithCommands(
+    App(targetFps: 10, hideCursor: true).runWithCommands(
         { frame => app.render(frame) },
         { event => app.update(event) }
     )

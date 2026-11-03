@@ -36,6 +36,7 @@ class WorkbenchLayout {
     var pipelinePanel: Rect = Rect(0, 0, 0, 0)
     var pipelineCanvas: Rect = Rect(0, 0, 0, 0)
     var logPanel: Rect = Rect(0, 0, 0, 0)
+    var overviewTask: Rect = Rect(0, 0, 0, 0)
     var queuePanel: Rect = Rect(0, 0, 0, 0)
     var galleryNav: Rect = Rect(0, 0, 0, 0)
     var galleryContent: Rect = Rect(0, 0, 0, 0)
@@ -130,28 +131,30 @@ func workbenchGalleryAreas(area: Rect, category: Int64, sample!: Int64 = 0): Wor
         out.asciiToggle = galleryRect(area, 0, 11, min(26, area.width), 1)
         out.layoutSample = galleryRect(area, 0, 13, area.width, max(0, area.height - 13))
     } else if (category == 2) {
-        let columns = galleryColumns(area, 5, 2, 2)
+        let formArea = workbenchFormsArea(area)
+        out.buttons = galleryColumns(formArea, 3, 1, 5)
+        let columns = galleryColumns(formArea, 5, 2, 2)
         out.formLabels = [
-            galleryRect(area, 0, 5, columns[0].width, 1),
-            galleryRect(area, columns[1].x - area.x, 5, columns[1].width, 1),
-            galleryRect(area, 0, 9, columns[0].width, 1),
-            galleryRect(area, columns[1].x - area.x, 9, columns[1].width, 1)
+            galleryRect(formArea, 0, 5, columns[0].width, 1),
+            galleryRect(formArea, columns[1].x - formArea.x, 5, columns[1].width, 1),
+            galleryRect(formArea, 0, 9, columns[0].width, 1),
+            galleryRect(formArea, columns[1].x - formArea.x, 9, columns[1].width, 1)
         ]
         out.formInputs = [
-            galleryRect(area, 0, 6, columns[0].width, 2),
-            galleryRect(area, columns[1].x - area.x, 6, columns[1].width, 2),
-            galleryRect(area, 0, 10, columns[0].width, 2),
-            galleryRect(area, columns[1].x - area.x, 10, columns[1].width, 2)
+            galleryRect(formArea, 1, 7, max(0, columns[0].width - 2), 1),
+            galleryRect(formArea, columns[1].x - formArea.x + 1, 7, max(0, columns[1].width - 2), 1),
+            galleryRect(formArea, 1, 11, max(0, columns[0].width - 2), 1),
+            galleryRect(formArea, columns[1].x - formArea.x + 1, 11, max(0, columns[1].width - 2), 1)
         ]
-        out.checkbox = galleryRect(area, 0, 13, columns[0].width, 1)
-        out.select = galleryRect(area, columns[1].x - area.x, 13, columns[1].width, 4)
-        out.switchControl = galleryRect(area, 0, 15, columns[0].width, 1)
-        out.switchValue = galleryRect(area, 0, 16, columns[0].width, 1)
-        out.dateLabel = galleryRect(area, 0, 17, 5, 1)
-        out.datePicker = galleryRect(area, 5, 17, max(0, columns[0].width - 5), 1)
+        out.checkbox = galleryRect(formArea, 0, 13, columns[0].width, 1)
+        out.select = galleryRect(formArea, columns[1].x - formArea.x, 13, columns[1].width, 4)
+        out.switchControl = galleryRect(formArea, 0, 15, columns[0].width, 1)
+        out.switchValue = galleryRect(formArea, 0, 16, columns[0].width, 1)
+        out.dateLabel = galleryRect(formArea, 0, 17, 5, 1)
+        out.datePicker = galleryRect(formArea, 5, 17, max(0, columns[0].width - 5), 1)
         let yearButtonWidth = columns[1].width / 2
-        out.datePreviousYear = galleryRect(area, columns[1].x - area.x, 17, yearButtonWidth, 1)
-        out.dateNextYear = galleryRect(area, columns[1].x - area.x + yearButtonWidth, 17,
+        out.datePreviousYear = galleryRect(formArea, columns[1].x - formArea.x, 17, yearButtonWidth, 1)
+        out.dateNextYear = galleryRect(formArea, columns[1].x - formArea.x + yearButtonWidth, 17,
             columns[1].width - yearButtonWidth, 1)
     } else if (category == 3) {
         out.navTabs = galleryRect(area, 0, 3, area.width, 1)
@@ -187,6 +190,11 @@ func workbenchGalleryAreas(area: Rect, category: Int64, sample!: Int64 = 0): Wor
         out.themeSamples = galleryColumns(area, 13, 1, 5)
     }
     out
+}
+
+func workbenchFormsArea(area: Rect): Rect {
+    let width = min(120, area.width)
+    Rect(area.x + max(0, (area.width - width) / 2), area.y, width, area.height)
 }
 
 func galleryRect(area: Rect, x: Int64, y: Int64, width: Int64, height: Int64): Rect {
@@ -225,6 +233,15 @@ func workbenchLayout(area: Rect, page: WorkbenchPage): WorkbenchLayout {
     out.status = Rect(area.x + marginX, area.y + marginY + max(0, innerHeight - 1), innerWidth, if (innerHeight > 0) { 1 } else { 0 })
     out.toast = Rect(out.body.right - min(48, out.body.width), out.body.bottom - min(3, out.body.height), min(48, out.body.width), min(3, out.body.height))
 
+    if (page == WorkbenchPage.Overview && out.body.width > 140) {
+        let shift = (out.body.width - 140) / 2
+        out.body = Rect(out.body.x + shift, out.body.y, 140, out.body.height)
+        out.title = Rect(out.title.x + shift, out.title.y, 140, out.title.height)
+        out.tabs = Rect(out.tabs.x + shift, out.tabs.y, 140, out.tabs.height)
+        out.status = Rect(out.status.x + shift, out.status.y, 140, out.status.height)
+        out.toast = Rect(out.body.right - min(48, out.body.width), out.body.bottom - min(3, out.body.height),
+            min(48, out.body.width), min(3, out.body.height))
+    }
     var content = out.body
     if (out.complete && (page == WorkbenchPage.Overview || page == WorkbenchPage.Tasks)) {
         out.projectTree = Rect(out.body.x, out.body.y, min(18, out.body.width), out.body.height)
@@ -233,9 +250,9 @@ func workbenchLayout(area: Rect, page: WorkbenchPage): WorkbenchLayout {
 
     if (page == WorkbenchPage.Overview) {
         out.overviewArea = content
-        let topHeight = min(if (out.complete) { 6 } else { 4 }, content.height)
+        let topHeight = min(4, content.height)
         out.overviewTop = Rect(content.x, content.y, content.width, topHeight)
-        let gap = if (content.height > topHeight) { 1 } else { 0 }
+        let gap = if (out.complete && content.height > topHeight) { 1 } else { 0 }
         let metricGap = if (content.width >= 4) { 1 } else { 0 }
         let metricWidth = max(0, (content.width - metricGap * 3) / 4)
         let cards = ArrayList<Rect>()
@@ -246,36 +263,43 @@ func workbenchLayout(area: Rect, page: WorkbenchPage): WorkbenchLayout {
         }
         out.metricCards = cards.toArray()
         let middleY = content.y + topHeight + gap
-        let middleHeight = min(if (out.complete) { 9 } else { 7 }, max(0, content.bottom - middleY))
+        let middleHeight = min(if (out.complete) { 9 } else { 8 }, max(0, content.bottom - middleY))
         out.overviewMiddle = Rect(content.x, middleY, content.width, middleHeight)
         let middleGap = if (content.width > 1) { 1 } else { 0 }
         let halfWidth = max(0, (content.width - middleGap) / 2)
         out.chartPanel = Rect(content.x, middleY, halfWidth, middleHeight)
-        out.sparkPanel = Rect(content.x + halfWidth + middleGap, middleY, max(0, content.right - (content.x + halfWidth + middleGap)), min(if (out.complete) { 4 } else { 3 }, middleHeight))
-        let pipelineOffset = if (out.complete) { 5 } else { 4 }
+        out.sparkPanel = Rect(content.x + halfWidth + middleGap, middleY, max(0, content.right - (content.x + halfWidth + middleGap)), min(4, middleHeight))
+        let pipelineOffset = Int64(5)
         out.pipelinePanel = Rect(out.sparkPanel.x, middleY + min(middleHeight, pipelineOffset), out.sparkPanel.width, max(0, middleHeight - pipelineOffset))
         let chartBlock = Block(title: "Status distribution")
         let chartInner = chartBlock.inner(out.chartPanel)
         out.chartLegend = Rect(chartInner.x, chartInner.y, chartInner.width, min(1, chartInner.height))
-        let chartWidth = if (out.complete) { min(10, chartInner.width) } else { chartInner.width }
-        out.chartPlot = Rect(chartInner.x, chartInner.y + 1, chartWidth, max(0, chartInner.height - 1))
-        if (out.complete) {
-            let metersX = out.chartPlot.right + min(2, max(0, chartInner.right - out.chartPlot.right))
-            out.chartMeters = Rect(metersX, out.chartPlot.y, max(0, chartInner.right - metersX), out.chartPlot.height)
-        }
+        out.chartMeters = Rect(chartInner.x, chartInner.y + min(1, chartInner.height),
+            chartInner.width, max(0, chartInner.height - 1))
         let pipeBlock = Block(title: "Pipeline")
         out.pipelineCanvas = pipeBlock.inner(out.pipelinePanel)
         let logsY = middleY + middleHeight + if (content.bottom > middleY + middleHeight) { 1 } else { 0 }
         let bottomHeight = max(0, content.bottom - logsY)
         out.overviewBottom = Rect(content.x, logsY, content.width, bottomHeight)
-        let bottomGap = if (out.complete && content.width > 60) { 1 } else { 0 }
+        let bottomGap = if (content.width >= 70) { 1 } else { 0 }
         let activityWidth = if (bottomGap > 0) { (content.width - bottomGap) * 3 / 5 } else { content.width }
-        out.logPanel = Rect(content.x, logsY, activityWidth, bottomHeight)
-        if (bottomGap > 0) {
-            out.queuePanel = Rect(out.logPanel.right + bottomGap, logsY, max(0, content.right - (out.logPanel.right + bottomGap)), bottomHeight)
+        out.logPanel = Rect(content.x, logsY, activityWidth, min(7, bottomHeight))
+        let remaining = max(0, bottomHeight - out.logPanel.height - 1)
+        if (remaining >= 6) {
+            let extraDetail = min(3, max(0, area.height - 36) / 3)
+            out.overviewTask = Rect(content.x, out.logPanel.bottom + 1, activityWidth, min(7 + extraDetail, remaining))
         }
-        out.logScrollbar = Rect(out.logPanel.right - min(1, out.logPanel.width), out.logPanel.y, min(1, out.logPanel.width), out.logPanel.height)
-        out.logView = Rect(out.logPanel.x, out.logPanel.y, max(0, out.logPanel.width - 1), out.logPanel.height)
+        if (bottomGap > 0) {
+            let queueHeight = if (out.overviewTask.height > 0) {
+                min(bottomHeight, out.overviewTask.bottom - logsY)
+            } else { bottomHeight }
+            out.queuePanel = Rect(out.logPanel.right + bottomGap, logsY,
+                max(0, content.right - (out.logPanel.right + bottomGap)), queueHeight)
+        }
+        let logInner = Block(title: "").inner(out.logPanel)
+        let logY = logInner.y + min(1, logInner.height)
+        out.logScrollbar = Rect(logInner.right - min(1, logInner.width), logY, min(1, logInner.width), max(0, logInner.bottom - logY))
+        out.logView = Rect(logInner.x, logY, max(0, logInner.width - 1), max(0, logInner.bottom - logY))
     } else if (page == WorkbenchPage.Tasks) {
         out.tasksArea = out.body
         out.tasksMain = content
@@ -328,15 +352,16 @@ func workbenchLayout(area: Rect, page: WorkbenchPage): WorkbenchLayout {
     let editorWidth = min(88, max(0, area.width - 4))
     let editorHeight = min(22, max(0, area.height - 2))
     out.editor = centered(area, editorWidth, editorHeight)
-    let editInner = Block(title: "Edit local demo task").inner(out.editor)
-    out.editorName = Rect(editInner.x, editInner.y, editInner.width, min(3, editInner.height))
-    let formY = editInner.y + min(4, editInner.height)
-    let formHeight = min(14, max(0, editInner.bottom - formY - 2))
-    let leftWidth = max(0, (editInner.width - 1) / 2)
-    out.editorPriority = Rect(editInner.x, formY, leftWidth, min(3, formHeight))
-    out.editorNotify = Rect(editInner.x, formY + min(4, formHeight), leftWidth, min(2, max(0, formHeight - 4)))
-    out.editorTags = Rect(editInner.x, formY + min(7, formHeight), leftWidth, max(0, formHeight - min(7, formHeight)))
-    out.editorNotes = Rect(editInner.x + leftWidth + min(1, editInner.width), formY, max(0, editInner.right - (editInner.x + leftWidth + 1)), formHeight)
+    let editInner = Block(title: "").inner(out.editor)
+    out.editorName = Rect(editInner.x + 2, editInner.y + 4, max(0, editInner.width - 4), 1)
+    let formY = editInner.y + min(7, editInner.height)
+    let formHeight = min(10, max(0, editInner.bottom - formY - 2))
+    let leftWidth = max(0, (editInner.width - 3) / 2)
+    out.editorPriority = Rect(editInner.x + 1, formY, leftWidth, min(3, formHeight))
+    out.editorNotify = Rect(editInner.x + 1, formY + min(4, formHeight), leftWidth, min(1, max(0, formHeight - 4)))
+    out.editorTags = Rect(editInner.x + 1, formY + min(6, formHeight), leftWidth, max(0, formHeight - min(6, formHeight)))
+    out.editorNotes = Rect(editInner.x + leftWidth + 3, formY + min(2, formHeight),
+        max(0, editInner.width - leftWidth - 5), max(0, formHeight - 3))
     let buttonsY = max(editInner.y, editInner.bottom - 1)
     out.editorCancel = Rect(max(editInner.x, editInner.right - 26), buttonsY, min(12, editInner.width), min(1, editInner.height))
     out.editorSave = Rect(max(editInner.x, editInner.right - 12), buttonsY, min(12, editInner.width), min(1, editInner.height))
@@ -356,6 +381,9 @@ func centered(area: Rect, width: Int64, height: Int64): Rect {
 
 func renderWorkbench(app: WorkbenchApp, frame: Frame): Unit {
     let layout = app.layout
+    // Paint the canvas as well as the content. Box-drawing glyphs occupy whole
+    // cells, so a different terminal background would show around their strokes.
+    frame.fill(frame.area, app.theme.normal)
     if (!layout.interactive) {
         if (frame.isDirty(layout.guardText)) {
             frame.fill(layout.guardText, app.theme.normal)
@@ -368,12 +396,11 @@ func renderWorkbench(app: WorkbenchApp, frame: Frame): Unit {
         let title = "Termcanvas Workbench"
         let titleStyle = app.theme.accent.withModifier(Modifier.strong())
         frame.renderWidget(Paragraph(title, style: titleStyle), layout.title)
-        let spinnerArea = Rect(max(layout.title.x, layout.title.right - 20), layout.title.y, min(20, layout.title.width), layout.title.height)
-        frame.renderWidget(Spinner(label: "LOCAL DEMO", frame: app.spinnerFrame, style: app.theme.accent), spinnerArea)
+        let labelArea = Rect(max(layout.title.x, layout.title.right - 20), layout.title.y, min(20, layout.title.width), layout.title.height)
+        frame.renderWidget(Paragraph("LOCAL DEMO", style: app.secondaryStyle), labelArea)
     }
     if (frame.isDirty(layout.tabs)) {
-        let pageTabs = Tabs(["Gallery", "Overview", "Tasks", "Settings"], selected: app.tabs.selected,
-            selectedStyle: Style.default())
+        let pageTabs = Tabs(["Gallery", "Overview", "Tasks", "Settings"], selected: app.tabs.selected)
         pageTabs.setTheme(Some(app.theme))
         pageTabs.setFocused(app.focus.isFocused("tabs"))
         frame.renderWidget(pageTabs, layout.tabs)
@@ -404,88 +431,99 @@ func renderWorkbench(app: WorkbenchApp, frame: Frame): Unit {
     renderModal(app, frame)
 }
 
+func workbenchProjectRows(area: Rect): Rect {
+    Rect(area.x + min(1, area.width), area.y + min(1, area.height),
+        max(0, area.width - 1), max(0, area.height - 1))
+}
+
+func renderProjectSidebar(app: WorkbenchApp, frame: Frame, area: Rect): Unit {
+    frame.fill(area, app.theme.normal)
+    frame.renderWidget(Paragraph("PROJECTS", style: app.secondaryStyle),
+        Rect(area.x + 1, area.y, max(0, area.width - 1), 1))
+    let rows = workbenchProjectRows(area)
+    let tree = Tree(app.projectNodes, selected: app.projects.selected, offset: app.projects.offset,
+        style: app.theme.normal, focused: app.focus.isFocused("projects"), theme: Some(app.theme))
+    frame.renderWidget(tree, rows)
+}
+
+func renderStatusMeter(app: WorkbenchApp, frame: Frame, area: Rect, label: String,
+    value: Int64, total: Int64, fillStyle: Style): Unit {
+    if (area.width <= 0 || area.height <= 0) { return }
+    let labelWidth = min(14, max(0, area.width - 8))
+    frame.renderWidget(Paragraph(label, style: app.secondaryStyle), Rect(area.x, area.y, labelWidth, 1))
+    frame.renderWidget(ProgressBar(value, total: total, style: app.borderStyle, fillStyle: fillStyle,
+        labelMode: ProgressBarLabelMode.Percent, labelStyle: app.theme.normal),
+        Rect(area.x + labelWidth, area.y, max(0, area.width - labelWidth), 1))
+}
+
 func renderOverview(app: WorkbenchApp, frame: Frame): Unit {
     let layout = app.layout
     if (layout.projectTree.width > 0 && frame.isDirty(layout.projectTree)) {
-        frame.fill(layout.projectTree, app.theme.normal)
-        frame.renderWidget(app.projects, layout.projectTree)
+        renderProjectSidebar(app, frame, layout.projectTree)
     }
     if (frame.isDirty(layout.overviewTop)) {
         frame.fill(layout.overviewTop, app.theme.normal)
         let counts = [app.model.runningCount, app.model.queuedCount, app.model.doneCount]
-        if (layout.complete) {
-            let titles = ["RUNNING", "QUEUED", "COMPLETED"]
-            let summaries = ["Active slots", "Ready to start", "Finished this run"]
-            let details = ["concurrent jobs", "tasks waiting", "local tasks finished"]
-            let styles = [app.theme.info, app.theme.warning, app.theme.success]
-            for (i in 0..3) {
-                let area = layout.metricCards[i]
-                let card = galleryBlock(app, titles[i], BorderKind.Rounded)
-                let value = if (i == 0) { "${counts[i]} / 4" } else { counts[i].toString() }
-                let trend = if (i == 0) { if (app.paused) { "PAUSED" } else { "SIMULATION LIVE" } }
-                    else if (i == 1) { "LOCAL QUEUE" } else { "LOCAL ONLY" }
-                frame.renderWidget(card, area)
-                frame.renderWidget(MetricCard(summaries[i], value, detail: details[i], trend: trend,
-                    style: app.theme.normal, valueStyle: styles[i].withModifier(Modifier.strong())), card.inner(area))
-            }
-            let area = layout.metricCards[3]
-            let card = galleryBlock(app, "TOTAL PROGRESS", BorderKind.Rounded)
-            let inner = card.inner(area)
-            let progress = app.model.totalProgressHundredths()
-            frame.renderWidget(card, area)
-            frame.renderWidget(MetricCard("Weighted average", formatPercent(progress),
-                detail: "Across all 120 tasks", style: app.theme.normal,
-                valueStyle: app.theme.info.withModifier(Modifier.strong())),
-                Rect(inner.x, inner.y, inner.width, min(3, inner.height)))
-            if (inner.height > 3) {
-                frame.renderWidget(Gauge(progress, total: 10000, label: formatPercent(progress),
-                    style: app.theme.normal, fillStyle: app.theme.accent),
-                    Rect(inner.x, inner.y + 3, inner.width, 1))
-            }
-        } else {
-            let titles = ["RUNNING", "QUEUED", "COMPLETED"]
-            for (i in 0..3) {
-                frame.renderWidget(MetricCard(titles[i], counts[i].toString(), detail: "Local demo tasks",
-                    style: app.theme.normal, valueStyle: app.theme.accent), layout.metricCards[i])
-            }
-            let progress = app.model.totalProgressHundredths()
-            frame.renderWidget(Gauge(progress, total: 10000, label: formatPercent(progress),
-                style: app.theme.normal, fillStyle: app.theme.accent), layout.metricCards[3])
+        let titles = ["RUNNING", "QUEUED", "COMPLETED"]
+        let runningSummary = if (app.paused) { "PAUSED: ${counts[0]} held" } else { "Active slots" }
+        let summaries = [runningSummary, "Ready to start", "Finished this run"]
+        for (i in 0..3) {
+            let area = layout.metricCards[i]
+            let value = if (i == 0) { "${counts[i]} / 4" } else { counts[i].toString() }
+            frame.renderWidget(MetricCard(titles[i], value, detail: summaries[i],
+                style: app.secondaryStyle,
+                valueStyle: if (i == 0) { app.theme.accent.withModifier(Modifier.strong()) } else { app.theme.normal.withModifier(Modifier.strong()) }), area)
+        }
+        let progress = app.model.totalProgressHundredths()
+        let area = layout.metricCards[3]
+        frame.renderWidget(MetricCard("TOTAL PROGRESS", formatPercent(progress), detail: "Across all 120 tasks",
+            style: app.secondaryStyle, valueStyle: app.theme.normal.withModifier(Modifier.strong())), area)
+        if (area.height > 3) {
+            frame.renderWidget(ProgressBar(progress, total: 10000, style: app.borderStyle,
+                fillStyle: app.theme.accent), Rect(area.x, area.y + 3, area.width, 1))
         }
     }
     if (frame.isDirty(layout.chartPanel)) {
         frame.fill(layout.chartPanel, app.theme.normal)
-        frame.renderWidget(galleryBlock(app, "Status distribution", BorderKind.Rounded), layout.chartPanel)
-        frame.renderWidget(Legend([
-            LegendItem("Queued", symbol: "o", style: app.theme.warning),
-            LegendItem("Running", symbol: "o", style: app.theme.info),
-            LegendItem("Done", symbol: "o", style: app.theme.success)
-        ], gap: "  "), layout.chartLegend)
-        frame.renderWidget(Chart([app.model.queuedCount, app.model.runningCount, app.model.doneCount],
-            style: app.theme.accent), layout.chartPlot)
-        if (layout.chartMeters.width > 0 && layout.chartMeters.height >= 5) {
-            let meters = layout.chartMeters
-            frame.renderWidget(Meter("Queued ${app.model.queuedCount}", app.model.queuedCount,
-                total: 120, style: app.theme.warning, fillStyle: app.theme.warning),
-                Rect(meters.x, meters.y, meters.width, 1))
-            frame.renderWidget(Meter("Running ${app.model.runningCount}", app.model.runningCount,
-                total: 120, style: app.theme.info, fillStyle: app.theme.info),
-                Rect(meters.x, meters.y + 2, meters.width, 1))
-            frame.renderWidget(Meter("Done ${app.model.doneCount}", app.model.doneCount,
-                total: 120, style: app.theme.success, fillStyle: app.theme.success),
-                Rect(meters.x, meters.y + 4, meters.width, 1))
+        frame.renderWidget(galleryBlock(app, "", BorderKind.Rounded), layout.chartPanel)
+        frame.renderWidget(Paragraph("Status distribution", style: app.secondaryStyle), layout.chartLegend)
+        let meters = layout.chartMeters
+        let spacing = if (meters.height >= 5) { Int64(2) } else { Int64(1) }
+        if (meters.height >= 3) {
+            let total = app.model.jobs.size
+            renderStatusMeter(app, frame, Rect(meters.x, meters.y, meters.width, 1),
+                "Queued ${app.model.queuedCount}", app.model.queuedCount, total, app.secondaryStyle)
+            renderStatusMeter(app, frame, Rect(meters.x, meters.y + spacing, meters.width, 1),
+                "Running ${app.model.runningCount}", app.model.runningCount, total, app.theme.accent)
+            renderStatusMeter(app, frame, Rect(meters.x, meters.y + spacing * 2, meters.width, 1),
+                "Done ${app.model.doneCount}", app.model.doneCount, total, app.theme.success)
         }
     }
     if (frame.isDirty(layout.sparkPanel)) {
         frame.fill(layout.sparkPanel, app.theme.normal)
-        let progress = app.model.totalProgressHundredths()
-        let historyBlock = galleryBlock(app, "Progress ${formatPercent(progress)} | auto peak", BorderKind.Rounded)
-        frame.renderWidget(Sparkline(app.model.history(), style: app.theme.accent, block: Some(historyBlock)),
-            layout.sparkPanel)
+        let historyBlock = galleryBlock(app, "", BorderKind.Rounded)
+        frame.renderWidget(historyBlock, layout.sparkPanel)
+        let inner = historyBlock.inner(layout.sparkPanel)
+        let allHistory = app.model.history()
+        let visibleHistory = ArrayList<Int64>()
+        var peak: Int64 = 0
+        for (index in max(0, allHistory.size - inner.width)..allHistory.size) {
+            let value = allHistory[index]
+            visibleHistory.add(value)
+            peak = max(peak, value)
+        }
+        let fullTitle = "Rel. trend peak ${formatPercent(peak)} | ${visibleHistory.size} samples, 250ms apart"
+        let shortTitle = "Rel peak ${formatPercent(peak)} | ${visibleHistory.size} pts, 250ms apart"
+        let title = if (visibleHistory.size < 2) { "Relative trend | collecting samples" }
+            else if (displayWidth(fullTitle) <= inner.width) { fullTitle } else { shortTitle }
+        frame.renderWidget(Paragraph(title, style: app.secondaryStyle),
+            Rect(inner.x, inner.y, inner.width, min(1, inner.height)))
+        frame.renderWidget(Sparkline(visibleHistory.toArray(), maxValue: peak, style: app.theme.accent),
+            Rect(inner.x, inner.y + min(1, inner.height), inner.width, max(0, inner.height - 1)))
     }
     if (frame.isDirty(layout.pipelinePanel)) {
         frame.fill(layout.pipelinePanel, app.theme.normal)
-        frame.renderWidget(galleryBlock(app, "Task pipeline", BorderKind.Rounded), layout.pipelinePanel)
+        frame.renderWidget(galleryBlock(app, "", BorderKind.Rounded), layout.pipelinePanel)
         let canvas = frame.canvas(area: layout.pipelineCanvas)
         let text = "QUEUED -> RUNNING -> DONE"
         if (layout.complete && layout.pipelineCanvas.width >= 25) {
@@ -506,43 +544,85 @@ func renderOverview(app: WorkbenchApp, frame: Frame): Unit {
     if (frame.isDirty(layout.overviewBottom)) {
         frame.fill(layout.overviewBottom, app.theme.normal)
         let lines = app.model.logs()
-        let viewport = max(0, layout.logView.height - 2)
+        let viewport = layout.logView.height
         let total = lines.size
         app.logScroll.offset = max(0, min(app.logScroll.offset, max(0, total - viewport)))
-        frame.renderWidget(LogView(lines, offset: app.logScroll.offset,
-            block: Some(galleryBlock(app, "Activity log", BorderKind.Rounded)), style: app.theme.normal), layout.logView)
+        let block = galleryBlock(app, "", BorderKind.Rounded)
+        frame.renderWidget(block, layout.logPanel)
+        let inner = block.inner(layout.logPanel)
+        frame.renderWidget(Paragraph("Activity log", style: app.secondaryStyle),
+            Rect(inner.x, inner.y, inner.width, min(1, inner.height)))
+        frame.renderWidget(LogView(lines, offset: app.logScroll.offset, style: app.theme.normal), layout.logView)
         frame.renderWidget(Scrollbar(total, offset: app.logScroll.offset, viewport: viewport,
             style: app.theme.disabled, thumbStyle: app.theme.accent), layout.logScrollbar)
         renderQueuePreview(app, frame)
+        renderOverviewTask(app, frame)
+    }
+}
+
+func renderOverviewTask(app: WorkbenchApp, frame: Frame): Unit {
+    let area = app.layout.overviewTask
+    if (area.width <= 0 || area.height <= 0) { return }
+    let block = galleryBlock(app, "", BorderKind.Rounded)
+    frame.renderWidget(block, area)
+    let inner = block.inner(area)
+    frame.renderWidget(Paragraph("Selected task", style: app.secondaryStyle),
+        Rect(inner.x, inner.y, inner.width, min(1, inner.height)))
+    let body = Rect(inner.x, inner.y + min(1, inner.height), inner.width, max(0, inner.height - 1))
+    match (app.selectedId) {
+        case Some(id) =>
+            match (app.model.job(id)) {
+                case Some(task) =>
+                    let progress = if (body.height >= 5) { "\nProgress: ${task.progressPercent}%" } else { "" }
+                    let tags = if (body.height >= 6) { "\nTags: ${joinText(task.tags, ", ")}" } else { "" }
+                    let notify = if (body.height >= 7) { "\nNotify: ${if (task.notify) { "yes" } else { "no" }}" } else { "" }
+                    let lines = "${task.label()}  ${task.name}\n${task.project} / ${task.priority} / ${statusLabel(task.status)}" +
+                        progress + tags + notify + "\nF4 edit task"
+                    frame.renderWidget(Paragraph(lines, style: app.theme.normal), body)
+                case None => frame.renderWidget(Paragraph("No task selected", style: app.secondaryStyle), body)
+            }
+        case None => frame.renderWidget(Paragraph("No task selected", style: app.secondaryStyle), body)
     }
 }
 
 func renderQueuePreview(app: WorkbenchApp, frame: Frame): Unit {
     let area = app.layout.queuePanel
     if (area.width <= 0 || area.height <= 0) { return }
-    let block = galleryBlock(app, "Ready queue", BorderKind.Rounded)
+    let block = galleryBlock(app, "", BorderKind.Rounded)
     frame.renderWidget(block, area)
-    let inner = block.inner(area)
+    let panelInner = block.inner(area)
+    let inner = Rect(panelInner.x, panelInner.y + min(1, panelInner.height), panelInner.width, max(0, panelInner.height - 1))
     let rows = app.model.queuePreviewRows()
+    let compact = inner.width < 38 || inner.height < 4
+    let visible = min(rows.size, if (compact) { inner.height } else { max(0, inner.height - 2) })
+    let title = if (panelInner.width >= 34) { "Ready queue ${visible}/${app.model.queuedCount}  |  F3: Tasks" }
+        else { "Ready queue ${visible}/${app.model.queuedCount}" }
+    frame.renderWidget(Paragraph(title, style: app.secondaryStyle),
+        Rect(panelInner.x, panelInner.y, panelInner.width, min(1, panelInner.height)))
     if (rows.isEmpty()) {
         frame.renderWidget(Paragraph("Queue is clear", style: app.theme.success), inner)
         return
     }
-    frame.renderWidget(Table(["ID", "TASK", "PROJECT", "PRIORITY"], rows,
-        widths: [8, 10, 8, 8], style: app.theme.normal, headerStyle: app.theme.accent), inner)
+    if (compact) {
+        let lines = ArrayList<String>()
+        for (row in rows) { lines.add(row[0] + "  " + row[1] + "  " + row[2]) }
+        frame.renderWidget(Paragraph(joinText(lines.toArray(), "\n"), style: app.theme.normal), inner)
+    } else {
+        frame.renderWidget(Table(["ID", "TASK", "PROJECT", "PRIORITY"], rows,
+            widths: [8, 10, 8, 8], style: app.theme.normal, headerStyle: app.theme.accent), inner)
+    }
 }
 
 func renderTasks(app: WorkbenchApp, frame: Frame): Unit {
     let layout = app.layout
     if (layout.projectTree.width > 0 && frame.isDirty(layout.projectTree)) {
-        frame.fill(layout.projectTree, app.theme.normal)
-        frame.renderWidget(app.projects, layout.projectTree)
+        renderProjectSidebar(app, frame, layout.projectTree)
     }
     if (frame.isDirty(layout.taskQuery)) {
         frame.fill(layout.taskQuery, app.theme.normal)
         frame.renderWidget(app.taskSearch, layout.taskSearch)
     }
-    if (frame.isDirty(layout.taskSearch) && app.focus.isFocused("task-search")) {
+    if (app.interaction.active().isNone() && app.focus.isFocused("task-search")) {
         frame.setCursor(app.taskSearch.cursorPosition(layout.taskSearch))
     }
     if (frame.isDirty(layout.taskActions)) {
@@ -692,28 +772,62 @@ func renderModal(app: WorkbenchApp, frame: Frame): Unit {
 
 func renderEditor(app: WorkbenchApp, frame: Frame): Unit {
     let layout = app.layout
+    if (app.interaction.active() == Some("editor")) {
+        match (app.interaction.focus().current()) {
+            case Some("editor-name") => frame.setCursor(app.editorName.cursorPosition(layout.editorName))
+            case Some("editor-notes") => frame.setCursor(app.editorNotes.cursorPosition(layout.editorNotes))
+            case _ => ()
+        }
+    }
     if (!frame.isDirty(layout.editor)) { return }
     frame.fill(layout.editor, app.theme.normal)
-    frame.renderWidget(galleryBlock(app, "Edit local demo task", BorderKind.Rounded), layout.editor)
+    frame.renderWidget(galleryBlock(app, "", BorderKind.Rounded), layout.editor)
+    let inner = Block(title: "").inner(layout.editor)
+    frame.renderWidget(Paragraph("EDIT TASK  /  Local demo", style: app.theme.normal.withModifier(Modifier.strong())),
+        Rect(inner.x + 1, inner.y, max(0, inner.width - 2), 1))
+    let nameMarker = if (app.interaction.focus().isFocused("editor-name")) { "> " }
+        else if (app.hovered == Some("editor-name")) { "~ " } else { "" }
+    frame.renderWidget(Paragraph(nameMarker + "Name", style: app.secondaryStyle),
+        Rect(layout.editorName.x, layout.editorName.y - 2, layout.editorName.width, 1))
+    let nameFrame = Rect(layout.editorName.x - 1, layout.editorName.y - 1, layout.editorName.width + 2, 3)
+    frame.renderWidget(galleryBlock(app, "", BorderKind.Rounded,
+        focused: app.interaction.focus().isFocused("editor-name")), nameFrame)
+    app.editorName.setVisualState(focused: app.interaction.focus().isFocused("editor-name"),
+        error: !app.editorError.isEmpty(), theme: Some(app.theme))
     frame.renderWidget(app.editorName, layout.editorName)
-    frame.renderWidget(Paragraph("Priority", style: app.theme.normal), Rect(layout.editorPriority.x, layout.editorPriority.y, layout.editorPriority.width, 1))
+    let priorityMarker = if (app.interaction.focus().isFocused("editor-priority")) { "> " }
+        else if (app.hovered == Some("editor-priority")) { "~ " } else { "" }
+    frame.renderWidget(Paragraph(priorityMarker + "Priority", style: app.secondaryStyle), Rect(layout.editorPriority.x, layout.editorPriority.y, layout.editorPriority.width, 1))
     frame.renderWidget(app.editorPrioritySelect, Rect(layout.editorPriority.x, layout.editorPriority.y + min(1, layout.editorPriority.height), layout.editorPriority.width, max(0, layout.editorPriority.height - 1)))
-    frame.renderWidget(Checkbox("Notify on completion", checked: app.editorNotify.checked, focused: app.interaction.focus().isFocused("editor-notify"),
+    let notifyMarker = if (app.interaction.focus().isFocused("editor-notify")) { "> " }
+        else if (app.hovered == Some("editor-notify")) { "~ " } else { "" }
+    frame.renderWidget(Checkbox(notifyMarker + "Notify on completion", checked: app.editorNotify.checked, focused: app.interaction.focus().isFocused("editor-notify"),
         style: app.theme.normal, focusedStyle: app.selectedStyle(), theme: Some(app.theme)), layout.editorNotify)
+    let tagsMarker = if (app.interaction.focus().isFocused("editor-tags")) { "> " }
+        else if (app.hovered == Some("editor-tags")) { "~ " } else { "" }
+    frame.renderWidget(Paragraph(tagsMarker + "Tags", style: app.secondaryStyle),
+        Rect(layout.editorTags.x, layout.editorTags.y - 1, layout.editorTags.width, 1))
     frame.renderWidget(app.editorTags, layout.editorTags)
+    let notesMarker = if (app.interaction.focus().isFocused("editor-notes")) { "> " }
+        else if (app.hovered == Some("editor-notes")) { "~ " } else { "" }
+    frame.renderWidget(Paragraph(notesMarker + "Notes", style: app.secondaryStyle),
+        Rect(layout.editorNotes.x, layout.editorNotes.y - 2, layout.editorNotes.width, 1))
+    let notesFrame = Rect(layout.editorNotes.x - 1, layout.editorNotes.y - 1,
+        layout.editorNotes.width + 2, layout.editorNotes.height + 2)
+    frame.renderWidget(galleryBlock(app, "", BorderKind.Rounded,
+        focused: app.interaction.focus().isFocused("editor-notes")), notesFrame)
     frame.renderWidget(app.editorNotes, layout.editorNotes)
-    frame.renderWidget(Button("Cancel", focused: app.interaction.focus().isFocused("editor-cancel"),
+    let cancelMarker = if (app.interaction.focus().isFocused("editor-cancel")) { "> " }
+        else if (app.hovered == Some("editor-cancel")) { "~ " } else { "" }
+    let saveMarker = if (app.interaction.focus().isFocused("editor-save")) { "> " }
+        else if (app.hovered == Some("editor-save")) { "~ " } else { "" }
+    frame.renderWidget(Button(cancelMarker + "Cancel", focused: app.interaction.focus().isFocused("editor-cancel"),
         style: app.theme.normal, focusedStyle: app.selectedStyle()), layout.editorCancel)
-    frame.renderWidget(Button("Save", focused: app.interaction.focus().isFocused("editor-save"),
+    frame.renderWidget(Button(saveMarker + "Save", focused: app.interaction.focus().isFocused("editor-save"),
         style: app.theme.normal, focusedStyle: app.selectedStyle()), layout.editorSave)
     if (!app.editorError.isEmpty()) {
-        let errorArea = Rect(layout.editorName.x, layout.editorName.y + max(0, layout.editorName.height - 1), layout.editorName.width, 1)
+        let errorArea = Rect(layout.editorName.x, layout.editorName.y + 2, layout.editorName.width, 1)
         frame.renderWidget(Paragraph(app.editorError, style: app.theme.error), errorArea)
-    }
-    match (app.interaction.focus().current()) {
-        case Some("editor-name") => frame.setCursor(app.editorName.cursorPosition(layout.editorName))
-        case Some("editor-notes") => frame.setCursor(app.editorNotes.cursorPosition(layout.editorNotes))
-        case _ => ()
     }
 }
 

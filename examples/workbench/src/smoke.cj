@@ -143,7 +143,7 @@ func runWorkbenchHeadlessSmoke(): Int64 {
         .render())
     if (!overview.passed || app.page != WorkbenchPage.Overview ||
         !overview.lastSnapshot().contains("Status distribution") ||
-        !overview.lastSnapshot().contains("auto peak")) {
+        !overview.lastSnapshot().contains("trend")) {
         return workbenchSmokeFailure("overview rendering")
     }
 

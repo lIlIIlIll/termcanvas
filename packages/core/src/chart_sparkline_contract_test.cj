@@ -43,7 +43,7 @@ func chartSparklineContractOutsideChanges(buffer: Buffer, area: Rect): Int64 {
 func progressBarContractFilled(buffer: Buffer, area: Rect): Int64 {
     var filled: Int64 = 0
     for (x in area.x..area.right) {
-        if (buffer.getCell(x, area.y).symbol == "#") { filled++ }
+        if (buffer.getCell(x, area.y).symbol == "━") { filled++ }
     }
     filled
 }
@@ -108,9 +108,9 @@ class ChartSparklineT017T018Test {
         Sparkline([1, 3, 2], maxValue: 3, block: Some(block)).render(area, buffer)
         let inner = block.inner(area)
         @Assert(chartSparklineContractRow(buffer, area.y).contains("Trend"))
-        @Expect(buffer.getCell(inner.x, inner.y).symbol, ".")
-        @Expect(buffer.getCell(inner.x + 1, inner.y).symbol, "#")
-        @Expect(buffer.getCell(inner.x + 2, inner.y).symbol, "-")
+        @Expect(buffer.getCell(inner.x, inner.y).symbol, "▂")
+        @Expect(buffer.getCell(inner.x + 1, inner.y).symbol, "█")
+        @Expect(buffer.getCell(inner.x + 2, inner.y).symbol, "▅")
         @Expect(buffer.getCell(inner.x + 3, inner.y).symbol, ".")
         @Expect(buffer.getCell(inner.x, inner.y + 1).symbol, ".")
         @Expect(chartSparklineContractOutsideChanges(buffer, area), 0)
@@ -126,9 +126,13 @@ class ChartSparklineT017T018Test {
         }
         @Expect(chartSparklineContractOutsideChanges(emptyBuffer, area), 0)
 
-        let legacy = Buffer(Rect(0, 0, 5, 1))
-        Sparkline([0, 1, 2, 3, 4], maxValue: 4).render(legacy.area, legacy)
-        @Expect(chartSparklineContractRow(legacy, 0), " .-=#")
+        let unicode = Buffer(Rect(0, 0, 5, 1))
+        Sparkline([0, 1, 2, 3, 4], maxValue: 4).render(unicode.area, unicode)
+        @Expect(chartSparklineContractRow(unicode, 0), " ▂▄▆█")
+        let ascii = Buffer(unicode.area)
+        ascii.setCapabilities(TerminalCapabilities(unicode: false))
+        Sparkline([0, 1, 2, 3, 4], maxValue: 4).render(ascii.area, ascii)
+        @Expect(chartSparklineContractRow(ascii, 0), " .-=#")
     }
 }
 

@@ -39,6 +39,7 @@ packages/core/src/app.cj:RestartTimer(TimerSpec)
 packages/core/src/app.cj:Exec(String)
 packages/core/src/app.cj:ExecArgs(String, String, Array<String>)
 packages/core/src/app.cj:ResetTerminal
+packages/core/src/app.cj:SetCapabilitiesOverride(?TerminalCapabilities)
 packages/core/src/app.cj:Suspend
 packages/core/src/app.cj:Batch(Array<Command>)
 packages/core/src/app.cj:public struct FrameMetrics {
@@ -270,6 +271,8 @@ packages/core/src/buffer.cj:public operator func ==(other: Cell): Bool
 packages/core/src/buffer.cj:public class Buffer {
 packages/core/src/buffer.cj:public let area: Rect
 packages/core/src/buffer.cj:public init(area: Rect)
+packages/core/src/buffer.cj:public func capabilities(): TerminalCapabilities
+packages/core/src/buffer.cj:public func setCapabilities(capabilities: TerminalCapabilities): Unit
 packages/core/src/buffer.cj:public func clear(style!: Style = Style.default()): Unit
 packages/core/src/buffer.cj:public func indexOf(x: Int64, y: Int64): ?Int64
 packages/core/src/buffer.cj:public func setCell(x: Int64, y: Int64, cell: Cell): Unit
@@ -702,8 +705,10 @@ packages/core/src/data_widgets.cj:public func childNodes(): Array<TreeNode>
 packages/core/src/data_widgets.cj:public class Tree <: Widget {
 packages/core/src/data_widgets.cj:public var selected: Int64
 packages/core/src/data_widgets.cj:public var offset: Int64
-packages/core/src/data_widgets.cj:public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), dataModel!: ?LazyTreeModel = None )
-packages/core/src/data_widgets.cj:public init(model: LazyTreeModel, block!: ?Block = None)
+packages/core/src/data_widgets.cj:public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, dataModel!: ?LazyTreeModel = None, focused!: Bool = false, focusedStyle!: ?Style = None, theme!: ?Theme = None )
+packages/core/src/data_widgets.cj:public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None)
+packages/core/src/data_widgets.cj:public func setFocused(value: Bool): Unit
+packages/core/src/data_widgets.cj:public func setTheme(value: ?Theme): Unit
 packages/core/src/data_widgets.cj:public func handle(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/data_widgets.cj:public func toggleSelected(): Unit
 packages/core/src/data_widgets.cj:public func selectedId(): ?String
@@ -1239,7 +1244,7 @@ packages/core/src/media.cj:public func mediaFallbackText(source: MediaSource): S
 packages/core/src/media.cj:public func mediaProtocolName(protocol: MediaProtocol): String
 packages/core/src/navigation.cj:public class Tabs <: Widget {
 packages/core/src/navigation.cj:public var selected: Int64
-packages/core/src/navigation.cj:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/navigation.cj:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: ?Style = None )
 packages/core/src/navigation.cj:public func setFocused(focused: Bool): Unit
 packages/core/src/navigation.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/navigation.cj:public func handle(key: KeyEvent): Bool
@@ -1712,6 +1717,10 @@ packages/core/src/style.cj:public func withBg(color: Color): Style
 packages/core/src/style.cj:public func withModifier(modifier: Modifier): Style
 packages/core/src/style.cj:public func patch(other: Style): Style
 packages/core/src/style.cj:public operator func ==(other: Style): Bool
+packages/core/src/style.cj:public enum IconSet {
+packages/core/src/style.cj:Unicode
+packages/core/src/style.cj:NerdFont
+packages/core/src/style.cj:Ascii
 packages/core/src/style.cj:public struct Theme {
 packages/core/src/style.cj:public let normal: Style
 packages/core/src/style.cj:public let focused: Style
@@ -1722,11 +1731,22 @@ packages/core/src/style.cj:public let accent: Style
 packages/core/src/style.cj:public let success: Style
 packages/core/src/style.cj:public let warning: Style
 packages/core/src/style.cj:public let info: Style
-packages/core/src/style.cj:public init( normal!: Style = Style.default(), focused!: Style = Style(fg: Color.Black, bg: Color.White), selected!: Style = Style(fg: Color.Black, bg: Color.White), disabled!: Style = Style(fg: Color.Indexed(8)), error!: Style = Style(fg: Color.Red), accent!: Style = Style(fg: Color.Cyan), success!: Style = Style(fg: Color.Green), warning!: Style = Style(fg: Color.Yellow), info!: Style = Style(fg: Color.Cyan) )
+packages/core/src/style.cj:public let canvas: Style
+packages/core/src/style.cj:public let surface: Style
+packages/core/src/style.cj:public let raisedSurface: Style
+packages/core/src/style.cj:public let heading: Style
+packages/core/src/style.cj:public let secondary: Style
+packages/core/src/style.cj:public let border: Style
+packages/core/src/style.cj:public let strongBorder: Style
+packages/core/src/style.cj:public let iconSet: IconSet
+packages/core/src/style.cj:public init( normal!: Style = Style.default(), focused!: Style = Style(modifier: focusModifier()), selected!: Style = Style(bg: Color.Indexed(8), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Indexed(8)), error!: Style = Style(fg: Color.Red), accent!: Style = Style(fg: Color.Cyan), success!: Style = Style(fg: Color.Green), warning!: Style = Style(fg: Color.Yellow), info!: Style = Style(fg: Color.Cyan), canvas!: Style = Style.default(), surface!: Style = Style.default(), raisedSurface!: Style = Style.default(), heading!: Style = Style(modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Indexed(8)), border!: Style = Style(fg: Color.Indexed(8)), strongBorder!: Style = Style.default(), iconSet!: IconSet = IconSet.Unicode )
 packages/core/src/style.cj:public static func default(): Theme
+packages/core/src/style.cj:public func withIconSet(value: IconSet): Theme
 packages/core/src/style.cj:public static func graphite(accent!: Color = Color.Cyan): Theme
-packages/core/src/style.cj:public static func light(accent!: Color = Color.Cyan): Theme
-packages/core/src/style.cj:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: Color = Color.Cyan ): Theme
+packages/core/src/style.cj:public static func light(): Theme
+packages/core/src/style.cj:public static func light(accent!: Color): Theme
+packages/core/src/style.cj:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: ?Color = None ): Theme
+packages/core/src/style.cj:public func adapted(capabilities: TerminalCapabilities): Theme
 packages/core/src/style.cj:public func serialize(): String
 packages/core/src/style.cj:public enum StyleState {
 packages/core/src/style.cj:Normal
@@ -1759,7 +1779,14 @@ packages/core/src/task_activity.cj:public let detail: String
 packages/core/src/task_activity.cj:public let progressLabel: String
 packages/core/src/task_activity.cj:public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
 packages/core/src/task_activity.cj:public class TaskActivityView <: Widget {
-packages/core/src/task_activity.cj:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: Bool = true )
+packages/core/src/task_activity.cj:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
+packages/core/src/task_activity.cj:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/task_activity.cj:public class TaskActivityListEntry {
+packages/core/src/task_activity.cj:public let activity: TaskActivity
+packages/core/src/task_activity.cj:public let layout: TaskActivityLayout
+packages/core/src/task_activity.cj:public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded)
+packages/core/src/task_activity.cj:public class TaskActivityList <: Widget {
+packages/core/src/task_activity.cj:public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
 packages/core/src/task_activity.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/terminal.cj:public enum CursorShape {
 packages/core/src/terminal.cj:Block
@@ -1813,6 +1840,7 @@ packages/core/src/terminal.cj:Diff
 packages/core/src/terminal.cj:Full
 packages/core/src/terminal.cj:public class Terminal {
 packages/core/src/terminal.cj:public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )
+packages/core/src/terminal.cj:public func setCapabilities(capabilities: TerminalCapabilities): Unit
 packages/core/src/terminal.cj:public func draw(render: (Frame) -> Unit): RenderMetrics
 packages/core/src/terminal.cj:public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
 packages/core/src/terminal.cj:public func clear(): Unit
@@ -2392,10 +2420,10 @@ packages/core/src/visual_widgets.cj:public let style: Style
 packages/core/src/visual_widgets.cj:public let symbol: String
 packages/core/src/visual_widgets.cj:public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#")
 packages/core/src/visual_widgets.cj:public class ProgressBar <: Widget {
-packages/core/src/visual_widgets.cj:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: Style = Style(fg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0 )
+packages/core/src/visual_widgets.cj:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: Style = Style(fg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0 )
 packages/core/src/visual_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/visual_widgets.cj:public class Sparkline <: Widget {
-packages/core/src/visual_widgets.cj:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None)
+packages/core/src/visual_widgets.cj:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
 packages/core/src/visual_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/visual_widgets.cj:public class Gauge <: Widget {
 packages/core/src/visual_widgets.cj:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )
@@ -2418,6 +2446,7 @@ packages/core/src/widget_base.cj:Left
 packages/core/src/widget_base.cj:Center
 packages/core/src/widget_base.cj:Right
 packages/core/src/widgets.cj:public enum BorderKind {
+packages/core/src/widgets.cj:Auto
 packages/core/src/widgets.cj:Ascii
 packages/core/src/widgets.cj:Unicode
 packages/core/src/widgets.cj:Rounded
@@ -2457,7 +2486,7 @@ packages/core/src/widgets.cj:public let titleStyle: Style
 packages/core/src/widgets.cj:public let state: BoxState
 packages/core/src/widgets.cj:public let asciiFallback: Bool
 packages/core/src/widgets.cj:public let theme: ?Theme
-packages/core/src/widgets.cj:public init( title!: String = "", borderKind!: BorderKind = BorderKind.Ascii, border!: BorderSet = BorderSet.ascii(), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: Style = Style.default(), borderStyle!: Style = Style.default(), contentStyle!: Style = Style.default(), titleStyle!: Style = Style.default(), state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )
+packages/core/src/widgets.cj:public init( title!: String = "", borderKind!: BorderKind = BorderKind.Auto, border!: BorderSet = BorderSet(horizontal: "", vertical: "", topLeft: "", topRight: "", bottomLeft: "", bottomRight: ""), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: ?Style = None, borderStyle!: ?Style = None, contentStyle!: ?Style = None, titleStyle!: ?Style = None, state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )
 packages/core/src/widgets.cj:public class Block <: Widget {
 packages/core/src/widgets.cj:public init(title!: String = "", style!: Style = Style.default())
 packages/core/src/widgets.cj:public init(options: BlockOptions)
@@ -2473,7 +2502,7 @@ packages/core/src/widgets.cj:public class Paragraph <: Widget {
 packages/core/src/widgets.cj:public init( text: String, block!: ?Block = None, style!: Style = Style.default(), scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class List <: Widget {
-packages/core/src/widgets.cj:public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/widgets.cj:public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
 packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class ListState {
@@ -2487,7 +2516,7 @@ packages/core/src/widgets.cj:public func moveWithDirty(delta: Int64, total: Int6
 packages/core/src/widgets.cj:public func previous(total: Int64): Unit
 packages/core/src/widgets.cj:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
 packages/core/src/widgets.cj:public class Table <: Widget {
-packages/core/src/widgets.cj:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: Style = Style.default(), headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/widgets.cj:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: Style = Style.default(), headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
 packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class TableState {
@@ -2506,7 +2535,7 @@ packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Uni
 packages/core/src/widgets.cj:public class Input <: Widget {
 packages/core/src/widgets.cj:public var value: String
 packages/core/src/widgets.cj:public var cursor: Int64
-packages/core/src/widgets.cj:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)) )
+packages/core/src/widgets.cj:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), showBoundary!: Bool = true )
 packages/core/src/widgets.cj:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
 packages/core/src/widgets.cj:public func paste(text: String): Unit
 packages/core/src/widgets.cj:public func handle(key: KeyEvent): Bool

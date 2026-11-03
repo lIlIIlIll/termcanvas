@@ -18,7 +18,7 @@ main(args: Array<String>): Int64 {
         focusEvents: true,
         targetFps: 30,
         metrics: Some(metrics),
-        hideCursor: false
+        hideCursor: true
     ).runWithCommands(
         { frame => app.render(frame) },
         { event => app.update(event) }

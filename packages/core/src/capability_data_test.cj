@@ -254,7 +254,7 @@ class CapabilityDataTest {
         let model = LazyTreeModel(source)
         let tree = Tree(model)
         let area = Rect(0, 0, 24, 8)
-        @Expect(tree.handle(MouseEvent(MouseKind.Down, MouseButton.Left, 0, 0), area))
+        @Expect(tree.handle(MouseEvent(MouseKind.Down, MouseButton.Left, 2, 0), area))
         @Expect(model.visibleCount(), 1000001)
         @Expect(tree.handle(MouseEvent(MouseKind.Down, MouseButton.Left, 8, 2), area))
         @Expect(tree.selectedId(), Some("node-1"))

@@ -162,19 +162,19 @@ class CjTuiComponentPrimitivesTest {
 
         input.setVisualState(focused: true, theme: Some(theme))
         input.render(area, buffer)
-        @Expect(buffer.getCell(0, 0).symbol, "N")
-        @Expect(buffer.getCell(0, 0).style, Style(fg: Color.Rgb(145, 157, 169), bg: Color.Cyan))
+        @Expect(buffer.getCell(1, 0).symbol, "N")
+        @Expect(buffer.getCell(1, 0).style, Style(fg: Color.Rgb(145, 157, 169), bg: Color.Cyan))
         @Expect(buffer.getCell(4, 0).style, Style(fg: Color.Black, bg: Color.Cyan))
         @Expect(buffer.getCell(2, 1).style, Style(fg: Color.Black, bg: Color.Cyan))
         let legacyInput = Input(placeholder: "Name")
         let legacyBuffer = Buffer(area)
         legacyInput.render(area, legacyBuffer)
-        @Expect(legacyBuffer.getCell(0, 0).style, Style(fg: Color.Indexed(8)))
+        @Expect(legacyBuffer.getCell(1, 0).style, Style(fg: Color.Indexed(8)))
         let customInput = Input(placeholder: "Name", placeholderStyle: Style(fg: Color.Yellow))
         customInput.setVisualState(focused: true, theme: Some(theme))
         let customBuffer = Buffer(area)
         customInput.render(area, customBuffer)
-        @Expect(customBuffer.getCell(0, 0).style, Style(fg: Color.Yellow, bg: Color.Cyan))
+        @Expect(customBuffer.getCell(1, 0).style, Style(fg: Color.Yellow, bg: Color.Cyan))
 
         input.setValue("ab", cursor: 2)
         input.setVisualState(disabled: true, theme: Some(theme))
@@ -231,6 +231,29 @@ class CjTuiComponentPrimitivesTest {
         @Expect(disabled.cursor, "A界".size)
     }
 
+    @TestCase
+    func toastRowsUseSemanticBackgroundAndKeepLifecycle(): Unit {
+        let success = Style(fg: Color.White, bg: Color.Green)
+        let error = Style(fg: Color.White, bg: Color.Red)
+        let manager = ToastManager(toasts: [
+            Toast("+ Saved", ttl: 2, style: success),
+            Toast("ERROR details", ttl: 2, style: error)
+        ])
+        let buffer = Buffer(Rect(0, 0, 8, 4))
+        for (row in 0..4) { buffer.setString(0, row, "xxxxxxxx") }
+        let area = Rect(2, 1, 4, 2)
+        manager.render(area, buffer)
+        @Expect(buffer.getCell(2, 1).symbol, "+")
+        @Expect(buffer.getCell(5, 1).style, success)
+        @Expect(buffer.getCell(2, 2).symbol, "E")
+        @Expect(buffer.getCell(5, 2).style, error)
+        @Expect(buffer.getCell(1, 1).symbol, "x")
+        @Expect(manager.count(), 2)
+        manager.tick()
+        @Expect(manager.count(), 2)
+        manager.tick()
+        @Expect(manager.count(), 0)
+    }
     @TestCase
     func bufferAndCanvasFillPrimitivesPreserveWideCells(): Unit {
         let buffer = Buffer(Rect(0, 0, 8, 3))

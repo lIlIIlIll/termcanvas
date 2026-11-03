@@ -268,6 +268,7 @@ public class Terminal {
     private var previousMedia: Array<MediaPlacement> = []
     private var cursorVisible: Bool = false
     private var cursorStateKnown: Bool = true
+    private var capabilitiesValue: TerminalCapabilities = TerminalCapabilities()
 
     public init(
         backend: Backend,
@@ -278,6 +279,12 @@ public class Terminal {
         this.renderMode = renderMode
         this.instrumentationEnabled = instrumentationEnabled
         backend.setInstrumentationEnabled(instrumentationEnabled)
+    }
+
+    public func setCapabilities(capabilities: TerminalCapabilities): Unit {
+        capabilitiesValue = capabilities
+        front = None
+        back = None
     }
 
     public func draw(render: (Frame) -> Unit): RenderMetrics {
@@ -328,6 +335,7 @@ public class Terminal {
             copiedCells = area.width * area.height
             fresh
         }
+        buffer.setCapabilities(capabilitiesValue)
         let frameDirty: ?DirtyRects = if (partialRender) { Some(effectiveDirty) } else { None }
         let frame = Frame(area, buffer, dirty: frameDirty)
         buffer.beginWorkMetrics(instrumentationEnabled)
@@ -1273,13 +1281,18 @@ public class AnsiBackend <: Backend {
     public func draw(buffer: Buffer): Unit {
         let batch = StringBuilder()
         var current = Style.default()
+        var logical = Style.default()
         for (y in buffer.area.y..buffer.area.bottom) {
             batch.append("${ESC}[${y + 1};${buffer.area.x + 1}H")
             for (x in buffer.area.x..buffer.area.right) {
                 let cell = buffer.getCell(x, y)
-                if (cell.style != current) {
-                    batch.append(styleToAnsi(cell.style))
-                    current = cell.style
+                if (cell.style != logical) {
+                    let style = adaptStyleForCapabilities(cell.style, buffer.capabilities())
+                    if (style != current) {
+                        batch.append(styleToAnsi(style))
+                        current = style
+                    }
+                    logical = cell.style
                 }
                 batch.append(cell.symbol)
             }
@@ -1299,9 +1312,10 @@ public class AnsiBackend <: Backend {
         var current = Style.default()
         for (span in plan.spans) {
             batch.append("${ESC}[${span.y + 1};${span.x + 1}H")
-            if (span.style != current) {
-                batch.append(styleToAnsi(span.style))
-                current = span.style
+            let style = adaptStyleForCapabilities(span.style, next.capabilities())
+            if (style != current) {
+                batch.append(styleToAnsi(style))
+                current = style
             }
             batch.append(span.text)
         }

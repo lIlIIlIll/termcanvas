@@ -49,9 +49,21 @@ public class Button <: Widget {
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
-        let rowStyle = resolvedStateStyle(style, focusedStyle, disabledStyle, focused, disabled, theme)
+        var rowStyle = resolvedStateStyle(style, focusedStyle, disabledStyle, focused, disabled, theme)
+        // Add a non-colour cue for the built-in states without altering explicit styles.
+        if (disabled && disabledStyle == Style(fg: Color.Indexed(8))) {
+            var modifier = rowStyle.modifier
+            modifier.italic = true
+            rowStyle = rowStyle.withModifier(modifier)
+        } else if (focused && focusedStyle == Style(fg: Color.Black, bg: Color.White)) {
+            var modifier = rowStyle.modifier
+            modifier.bold = true
+            modifier.underline = true
+            rowStyle = rowStyle.withModifier(modifier)
+        }
         buffer.fillRect(target, style: rowStyle)
-        let text = truncate(label, target.width)
+        let textWidth = if (displayWidth(label) <= target.width - 2) { target.width - 2 } else { target.width }
+        let text = truncate(label, textWidth)
         let x = alignedX(target, displayWidth(text), TextAlign.Center)
         let y = target.y + (target.height - 1) / 2
         buffer.setString(x, y, text, style: rowStyle)
@@ -532,7 +544,6 @@ public class Dropdown <: Widget {
             }
         }
     }
-
     /** 标题点击切换展开状态；事务模式下可见选项点击提交，滚轮只预览当前选项。
      */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
@@ -565,6 +576,7 @@ public class Dropdown <: Widget {
         }
         None
     }
+
 
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }

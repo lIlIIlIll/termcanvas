@@ -30,6 +30,7 @@ core|Command.RestartTimer|enum_constructor|RestartTimer(TimerSpec)
 core|Command.Exec|enum_constructor|Exec(String)
 core|Command.ExecArgs|enum_constructor|ExecArgs(String, String, Array<String>)
 core|Command.ResetTerminal|enum_constructor|ResetTerminal
+core|Command.SetCapabilitiesOverride|enum_constructor|SetCapabilitiesOverride(?TerminalCapabilities)
 core|Command.Suspend|enum_constructor|Suspend
 core|Command.Batch|enum_constructor|Batch(Array<Command>)
 core|FrameMetrics|struct|public struct FrameMetrics {
@@ -109,6 +110,8 @@ core|Cell.operator_==|operator|public operator func ==(other: Cell): Bool
 core|Buffer|class|public class Buffer {
 core|Buffer.area|let|public let area: Rect
 core|Buffer.init|init|public init(area: Rect)
+core|Buffer.capabilities|func|public func capabilities(): TerminalCapabilities
+core|Buffer.setCapabilities|func|public func setCapabilities(capabilities: TerminalCapabilities): Unit
 core|Buffer.clear|func|public func clear(style!: Style = Style.default()): Unit
 core|Buffer.indexOf|func|public func indexOf(x: Int64, y: Int64): ?Int64
 core|Buffer.setCell|func|public func setCell(x: Int64, y: Int64, cell: Cell): Unit
@@ -686,7 +689,7 @@ core|mediaFallbackText|func|public func mediaFallbackText(source: MediaSource): 
 core|mediaProtocolName|func|public func mediaProtocolName(protocol: MediaProtocol): String
 core|Tabs|class|public class Tabs <: Widget {
 core|Tabs.selected|var|public var selected: Int64
-core|Tabs.init|init|public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Tabs.init|init|public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: ?Style = None )
 core|Tabs.handle|func|public func handle(key: KeyEvent): Bool
 core|Tabs.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|Tabs.render|func|public func render(area: Rect, buffer: Buffer): Unit
@@ -847,6 +850,10 @@ core|Style.withBg|func|public func withBg(color: Color): Style
 core|Style.withModifier|func|public func withModifier(modifier: Modifier): Style
 core|Style.patch|func|public func patch(other: Style): Style
 core|Style.operator_==|operator|public operator func ==(other: Style): Bool
+core|IconSet|enum|public enum IconSet {
+core|IconSet.Unicode|enum_constructor|Unicode
+core|IconSet.NerdFont|enum_constructor|NerdFont
+core|IconSet.Ascii|enum_constructor|Ascii
 core|Theme|struct|public struct Theme {
 core|Theme.normal|let|public let normal: Style
 core|Theme.focused|let|public let focused: Style
@@ -857,8 +864,18 @@ core|Theme.accent|let|public let accent: Style
 core|Theme.success|let|public let success: Style
 core|Theme.warning|let|public let warning: Style
 core|Theme.info|let|public let info: Style
-core|Theme.init|init|public init( normal!: Style = Style.default(), focused!: Style = Style(fg: Color.Black, bg: Color.White), selected!: Style = Style(fg: Color.Black, bg: Color.White), disabled!: Style = Style(fg: Color.Indexed(8)), error!: Style = Style(fg: Color.Red), accent!: Style = Style(fg: Color.Cyan), success!: Style = Style(fg: Color.Green), warning!: Style = Style(fg: Color.Yellow), info!: Style = Style(fg: Color.Cyan) )
+core|Theme.canvas|let|public let canvas: Style
+core|Theme.surface|let|public let surface: Style
+core|Theme.raisedSurface|let|public let raisedSurface: Style
+core|Theme.heading|let|public let heading: Style
+core|Theme.secondary|let|public let secondary: Style
+core|Theme.border|let|public let border: Style
+core|Theme.strongBorder|let|public let strongBorder: Style
+core|Theme.iconSet|let|public let iconSet: IconSet
+core|Theme.init|init|public init( normal!: Style = Style.default(), focused!: Style = Style(modifier: focusModifier()), selected!: Style = Style(bg: Color.Indexed(8), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Indexed(8)), error!: Style = Style(fg: Color.Red), accent!: Style = Style(fg: Color.Cyan), success!: Style = Style(fg: Color.Green), warning!: Style = Style(fg: Color.Yellow), info!: Style = Style(fg: Color.Cyan), canvas!: Style = Style.default(), surface!: Style = Style.default(), raisedSurface!: Style = Style.default(), heading!: Style = Style(modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Indexed(8)), border!: Style = Style(fg: Color.Indexed(8)), strongBorder!: Style = Style.default(), iconSet!: IconSet = IconSet.Unicode )
 core|Theme.default|func|public static func default(): Theme
+core|Theme.withIconSet|func|public func withIconSet(value: IconSet): Theme
+core|Theme.adapted|func|public func adapted(capabilities: TerminalCapabilities): Theme
 core|Theme.serialize|func|public func serialize(): String
 core|Backend|interface|public interface Backend {
 core|Backend.clear|func|func clear(): Unit
@@ -907,6 +924,7 @@ core|RenderMode.Diff|enum_constructor|Diff
 core|RenderMode.Full|enum_constructor|Full
 core|Terminal|class|public class Terminal {
 core|Terminal.init|init|public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )
+core|Terminal.setCapabilities|func|public func setCapabilities(capabilities: TerminalCapabilities): Unit
 core|Terminal.draw|func|public func draw(render: (Frame) -> Unit): RenderMetrics
 core|Terminal.draw|func|public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
 core|Terminal.clear|func|public func clear(): Unit
@@ -1302,7 +1320,7 @@ core|ProgressBarSegment.style|let|public let style: Style
 core|ProgressBarSegment.symbol|let|public let symbol: String
 core|ProgressBarSegment.init|init|public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#")
 core|ProgressBar|class|public class ProgressBar <: Widget {
-core|ProgressBar.init|init|public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: Style = Style(fg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0 )
+core|ProgressBar.init|init|public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: Style = Style(fg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0 )
 core|ProgressBar.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Widget|interface|public interface Widget {
 core|Widget.render|func|func render(area: Rect, buffer: Buffer): Unit
@@ -1315,6 +1333,7 @@ core|TextAlign.Left|enum_constructor|Left
 core|TextAlign.Center|enum_constructor|Center
 core|TextAlign.Right|enum_constructor|Right
 core|BorderKind|enum|public enum BorderKind {
+core|BorderKind.Auto|enum_constructor|Auto
 core|BorderKind.Ascii|enum_constructor|Ascii
 core|BorderKind.Unicode|enum_constructor|Unicode
 core|BorderKind.Rounded|enum_constructor|Rounded
@@ -1354,7 +1373,7 @@ core|BlockOptions.titleStyle|let|public let titleStyle: Style
 core|BlockOptions.state|let|public let state: BoxState
 core|BlockOptions.asciiFallback|let|public let asciiFallback: Bool
 core|BlockOptions.theme|let|public let theme: ?Theme
-core|BlockOptions.init|init|public init( title!: String = "", borderKind!: BorderKind = BorderKind.Ascii, border!: BorderSet = BorderSet.ascii(), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: Style = Style.default(), borderStyle!: Style = Style.default(), contentStyle!: Style = Style.default(), titleStyle!: Style = Style.default(), state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )
+core|BlockOptions.init|init|public init( title!: String = "", borderKind!: BorderKind = BorderKind.Auto, border!: BorderSet = BorderSet(horizontal: "", vertical: "", topLeft: "", topRight: "", bottomLeft: "", bottomRight: ""), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: ?Style = None, borderStyle!: ?Style = None, contentStyle!: ?Style = None, titleStyle!: ?Style = None, state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )
 core|Block|class|public class Block <: Widget {
 core|Block.init|init|public init(title!: String = "", style!: Style = Style.default())
 core|Block.init|init|public init(options: BlockOptions)
@@ -1370,7 +1389,7 @@ core|Paragraph|class|public class Paragraph <: Widget {
 core|Paragraph.init|init|public init( text: String, block!: ?Block = None, style!: Style = Style.default(), scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
 core|Paragraph.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|List|class|public class List <: Widget {
-core|List.init|init|public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|List.init|init|public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
 core|List.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|List.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ListState|class|public class ListState {
@@ -1384,7 +1403,7 @@ core|ListState.moveWithDirty|func|public func moveWithDirty(delta: Int64, total:
 core|ListState.previous|func|public func previous(total: Int64): Unit
 core|ListState.scrollToVisible|func|public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
 core|Table|class|public class Table <: Widget {
-core|Table.init|init|public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: Style = Style.default(), headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Table.init|init|public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: Style = Style.default(), headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
 core|Table.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|Table.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|TableState|class|public class TableState {
@@ -1403,7 +1422,7 @@ core|Scrollbar.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Input|class|public class Input <: Widget {
 core|Input.value|var|public var value: String
 core|Input.cursor|var|public var cursor: Int64
-core|Input.init|init|public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)) )
+core|Input.init|init|public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), showBoundary!: Bool = true )
 core|Input.handle|func|public func handle(key: KeyEvent): Bool
 core|Input.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
 core|Input.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool

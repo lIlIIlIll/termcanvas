@@ -236,6 +236,42 @@ class WorkbenchInteractionTest {
 @Test
 class WorkbenchMotionRenderingTest {
     @TestCase
+    func cursorSurvivesPartialFramesAndIsHiddenBehindModals(): Unit {
+        let app = WorkbenchApp()
+        let area = Rect(0, 0, 120, 36)
+        _ = app.update(Event.Resize(area))
+        _ = app.perform("page.tasks")
+        _ = app.focus.focus("task-search")
+        let dirty = DirtyRects([Rect(0, 0, 1, 1)])
+        let searchFrame = Frame(area, Buffer(area), dirty: Some(dirty))
+        app.render(searchFrame)
+        @Expect(searchFrame.getCursor().isSome(), true)
+        _ = app.perform("task.edit")
+        let editorFrame = Frame(area, Buffer(area), dirty: Some(dirty))
+        app.render(editorFrame)
+        @Expect(editorFrame.getCursor().isSome(), true)
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.F(1))))
+        let helpFrame = Frame(area, Buffer(area), dirty: Some(dirty))
+        app.render(helpFrame)
+        @Expect(helpFrame.getCursor().isNone(), true)
+
+        let galleryApp = WorkbenchApp()
+        _ = galleryApp.update(Event.Resize(area))
+        workbenchGalleryKey(galleryApp, KeyCode.Tab)
+        workbenchGalleryKey(galleryApp, KeyCode.Right)
+        workbenchGalleryKey(galleryApp, KeyCode.Right)
+        workbenchGalleryKey(galleryApp, KeyCode.Tab)
+        for (_ in 0..4) { workbenchGalleryKey(galleryApp, KeyCode.Tab) }
+        let galleryFrame = Frame(area, Buffer(area), dirty: Some(dirty))
+        galleryApp.render(galleryFrame)
+        @Expect(galleryFrame.getCursor().isSome(), true)
+        _ = galleryApp.update(Event.KeyDown(KeyEvent(KeyCode.F(1))))
+        let galleryHelpFrame = Frame(area, Buffer(area), dirty: Some(dirty))
+        galleryApp.render(galleryHelpFrame)
+        @Expect(galleryHelpFrame.getCursor().isNone(), true)
+    }
+
+    @TestCase
     func longTicksRetainIntermediateSamplesAndDirtyOnlyVisibleOverview(): Unit {
         let app = WorkbenchApp()
         _ = app.perform("page.overview")
@@ -653,7 +689,7 @@ class WorkbenchGalleryInteractionTest {
         let terminal = Terminal(backend, renderMode: RenderMode.Full)
         _ = terminal.draw { frame => app.render(frame) }
         let selectedRow = backend.lastBuffer().getOrThrow().getCell(listArea.x, listArea.y + 5)
-        @Expect(selectedRow.symbol, ">")
+        @Expect(selectedRow.symbol, "●")
         @Expect(selectedRow.style == app.theme.selected, true)
         @Expect(backend.lastBuffer().getOrThrow().getCell(listArea.x + 2, listArea.y + 5).symbol, "B")
         for (_ in 0..14) { workbenchGalleryKey(app, KeyCode.Down) }
@@ -1063,13 +1099,13 @@ class WorkbenchProgressFormattingTest {
         let lowResolution = Buffer(Rect(0, 0, 120, 1))
         Gauge(progress, total: 10000, label: formatPercent(progress)).render(
             lowResolution.area, lowResolution)
-        @Expect(lowResolution.getCell(0, 0).symbol, "-")
-        @Expect(lowResolution.getCell(119, 0).symbol, "-")
+        @Expect(lowResolution.getCell(0, 0).symbol, "╺")
+        @Expect(lowResolution.getCell(119, 0).symbol, "%")
 
         let saturated = Buffer(Rect(0, 0, 10, 1))
         Gauge(10001, total: 10000).render(saturated.area, saturated)
-        @Expect(saturated.getCell(0, 0).symbol, "#")
-        @Expect(saturated.getCell(9, 0).symbol, "#")
+        @Expect(saturated.getCell(0, 0).symbol, "━")
+        @Expect(saturated.getCell(9, 0).symbol, "━")
     }
 }
 
@@ -1102,7 +1138,7 @@ class WorkbenchProgressT020Test {
             @Assert(snapshot.contains("0%"))
 
             let buffer = backend.lastBuffer().getOrThrow()
-            @Expect(buffer.getCell(areas.dataProgress.right - 1, areas.dataProgress.y).symbol, "-")
+            @Expect(buffer.getCell(areas.dataProgress.right - 1, areas.dataProgress.y).symbol, "%")
             let chartArea = Rect(
                 areas.dataProgress.x,
                 areas.dataProgress.y + 2,
@@ -1134,14 +1170,13 @@ class WorkbenchProgressT020Test {
         let backend = TestBackend(area: screen)
         let terminal = Terminal(backend, renderMode: RenderMode.Full)
         _ = terminal.draw { frame => app.render(frame) }
-        @Assert(backend.snapshot().contains("Progress 0.83% | auto peak"))
+        @Assert(backend.snapshot().contains("peak 0.83%"))
 
-        let block = galleryBlock(app, "Progress ${formatPercent(app.model.totalProgressHundredths())} | auto peak",
-            BorderKind.Rounded)
+        let block = galleryBlock(app, "", BorderKind.Rounded)
         let inner = block.inner(app.layout.sparkPanel)
         @Assert(history.size <= inner.width)
         let buffer = backend.lastBuffer().getOrThrow()
-        @Expect(buffer.getCell(inner.x + history.size - 1, inner.y).symbol, "#")
+        @Expect(buffer.getCell(inner.x + history.size - 1, inner.y + 1).symbol, "█")
     }
 }
 
@@ -1307,7 +1342,7 @@ class WorkbenchRenderTest {
         )
         @Expect(overview.passed, true)
         @Assert(overview.lastSnapshot().contains("Status distribution"))
-        @Assert(overview.lastSnapshot().contains("auto peak"))
+        @Assert(overview.lastSnapshot().contains("trend"))
         @Assert(overview.lastSnapshot().contains("RUNNING"))
         @Assert(overview.lastSnapshot().contains("Active slots"))
         @Assert(overview.lastSnapshot().contains("Ready queue"))
@@ -1474,5 +1509,245 @@ class WorkbenchColorPickerT016Test {
         @Expect(Style(bg: selectedCell.style.bg), Style(bg: Color.Cyan))
         @Expect(selectedCell.style.modifier.bold)
         @Expect(selectedCell.style.modifier.underline)
+    }
+}
+
+@Test
+class WorkbenchVisualPrototypeTest {
+    @TestCase
+    func formsBordersAndHoverRespectCapabilitiesAtResponsiveSizes(): Unit {
+        for (screen in [Rect(0, 0, 80, 24), Rect(0, 0, 120, 36), Rect(0, 0, 160, 45)]) {
+            let app = WorkbenchApp()
+            _ = app.update(Event.Resize(screen))
+            workbenchGalleryKey(app, KeyCode.Tab)
+            workbenchGalleryKey(app, KeyCode.Right)
+            workbenchGalleryKey(app, KeyCode.Right)
+            let areas = workbenchGalleryAreas(app.layout.galleryContent, 2)
+            let field = areas.formInputs[1]
+            let backend = TestBackend(area: screen)
+            let terminal = Terminal(backend, renderMode: RenderMode.Full)
+            _ = terminal.draw { frame => app.render(frame) }
+            let unicode = backend.lastBuffer().getOrThrow()
+            @Expect(unicode.getCell(field.x - 1, field.y - 1).symbol, "╭")
+            @Expect(unicode.getCell(field.x, field.y - 1).symbol, "─")
+            @Expect(unicode.getCell(field.right, field.y).symbol, "│")
+
+            let oldFocus = app.focus.current()
+            _ = app.update(Event.Mouse(MouseEvent(MouseKind.Move, MouseButton.None, field.x, field.y)))
+            @Expect(app.hovered, Some("gallery-input"))
+            @Expect(app.focus.current(), oldFocus)
+            @Expect(app.galleryInput.value, "")
+            for ((id, area) in [("gallery-checkbox", areas.checkbox), ("gallery-switch", areas.switchControl),
+                ("gallery-select", areas.select), ("gallery-date", areas.datePicker)]) {
+                _ = app.update(Event.Mouse(MouseEvent(MouseKind.Move, MouseButton.None, area.x, area.y)))
+                @Expect(app.hovered, Some(id))
+                @Expect(app.focus.current(), oldFocus)
+            }
+            _ = app.update(Event.Mouse(MouseEvent(MouseKind.Move, MouseButton.None, screen.x, screen.y)))
+            @Expect(app.hovered.isNone(), true)
+            _ = app.update(Event.Mouse(MouseEvent(MouseKind.Move, MouseButton.None,
+                areas.buttons[4].x, areas.buttons[4].y)))
+            @Expect(app.hovered.isNone(), true)
+
+            let asciiCapabilities = TerminalCapabilities(unicode: false)
+            _ = app.update(Event.Capabilities(asciiCapabilities))
+            terminal.setCapabilities(asciiCapabilities)
+            _ = terminal.draw { frame => app.render(frame) }
+            let ascii = backend.lastBuffer().getOrThrow()
+            @Expect(ascii.getCell(field.x - 1, field.y - 1).symbol, "+")
+            @Expect(ascii.getCell(field.x, field.y - 1).symbol, "-")
+        }
+    }
+
+    @TestCase
+    func overviewStatusMetersKeepAccurateLabelsOutsideTheTrack(): Unit {
+        for (screen in [Rect(0, 0, 80, 24), Rect(0, 0, 120, 36), Rect(0, 0, 160, 45)]) {
+            let app = WorkbenchApp()
+            _ = app.update(Event.Resize(screen))
+            _ = app.perform("page.overview")
+            let backend = TestBackend(area: screen)
+            let terminal = Terminal(backend, renderMode: RenderMode.Full)
+            _ = terminal.draw { frame => app.render(frame) }
+            let snapshot = backend.snapshot()
+            @Assert(snapshot.contains("99.17%"))
+            @Assert(snapshot.contains("0.83%"))
+            @Assert(snapshot.contains("0.00%"))
+            let meter = app.layout.chartMeters
+            let buffer = backend.lastBuffer().getOrThrow()
+            let percentageX = meter.right - displayWidth("99.17%")
+            @Expect(buffer.getCell(percentageX, meter.y).symbol, "9")
+            @Expect(Style(bg: buffer.getCell(percentageX, meter.y).style.bg), Style(bg: app.theme.normal.bg))
+            @Expect(buffer.getCell(meter.x + 14, meter.y).symbol, "━")
+            let spacing = if (meter.height >= 5) { Int64(2) } else { Int64(1) }
+            @Expect(buffer.getCell(meter.x + 14, meter.y + spacing).symbol, "╺")
+            @Expect(buffer.getCell(meter.x + 14, meter.y + spacing * 2).symbol, "─")
+            @Assert(snapshot.contains("Ready queue"))
+            @Assert(snapshot.contains("/119"))
+            if (screen.width == 80) { @Assert(snapshot.contains("Ready queue 3/119")) }
+            if (screen.width >= 120) {
+                @Assert(snapshot.contains("Selected task"))
+                @Assert(snapshot.contains("F4 edit task"))
+            }
+            if (screen.height >= 45) {
+                @Assert(snapshot.contains("Ready queue 13/119"))
+                @Assert(snapshot.contains("Tags: build"))
+                @Expect(app.layout.queuePanel.bottom, app.layout.overviewTask.bottom)
+            }
+            _ = app.perform("simulation.pause")
+            _ = terminal.draw { frame => app.render(frame) }
+            @Assert(backend.snapshot().contains("PAUSED: 1 held"))
+
+            let asciiCapabilities = TerminalCapabilities(unicode: false)
+            _ = app.update(Event.Capabilities(asciiCapabilities))
+            terminal.setCapabilities(asciiCapabilities)
+            _ = terminal.draw { frame => app.render(frame) }
+            let ascii = backend.lastBuffer().getOrThrow()
+            @Expect(ascii.getCell(meter.x + 14, meter.y).symbol, "=")
+            @Expect(ascii.getCell(meter.x + 14, meter.y + spacing).symbol, "=")
+            @Expect(ascii.getCell(meter.x + 14, meter.y + spacing * 2).symbol, "-")
+            @Expect(ascii.getCell(percentageX, meter.y).symbol, "9")
+        }
+    }
+
+    @TestCase
+    func projectSelectionUsesThemeAndPreservesKeyboardAndMouseFiltering(): Unit {
+        let app = WorkbenchApp()
+        let screen = Rect(0, 0, 120, 36)
+        _ = app.update(Event.Resize(screen))
+        _ = app.perform("page.overview")
+        let backend = TestBackend(area: screen)
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        _ = terminal.draw { frame => app.render(frame) }
+        let rows = workbenchProjectRows(app.layout.projectTree)
+        let selected = backend.lastBuffer().getOrThrow().getCell(rows.x, rows.y)
+        @Expect(selected.symbol, "●")
+        @Expect(Style(bg: selected.style.bg), Style(bg: app.theme.selected.bg))
+
+        _ = app.focus.focus("projects")
+        _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+        @Expect(app.projectFilter, Some("Alpha"))
+        _ = terminal.draw { frame => app.render(frame) }
+        let focused = backend.lastBuffer().getOrThrow().getCell(rows.x, rows.y + 1)
+        @Expect(focused.symbol, "●")
+        @Expect(Style(bg: focused.style.bg), Style(bg: app.theme.focused.bg))
+        _ = app.update(Event.Mouse(MouseEvent(MouseKind.Down, MouseButton.Left, rows.x + 2, rows.y + 2)))
+        @Expect(app.projectFilter, Some("Beta"))
+        @Expect(app.model.visibleIds().size, 40)
+
+        _ = app.update(Event.Capabilities(TerminalCapabilities(trueColor: false, colorLevel: 1, unicode: false)))
+        _ = terminal.draw { frame => app.render(frame) }
+        @Expect(backend.lastBuffer().getOrThrow().getCell(rows.x, rows.y + 2).symbol, "*")
+    }
+
+    @TestCase
+    func panelAndFocusedFieldBordersBlendIntoTheCanvas(): Unit {
+        for (light in [false, true]) {
+            for (capabilities in [TerminalCapabilities(), TerminalCapabilities(trueColor: false, colorLevel: 8),
+                TerminalCapabilities(trueColor: false, colorLevel: 1)]) {
+                let app = WorkbenchApp()
+                let screen = Rect(0, 0, 120, 36)
+                _ = app.update(Event.Resize(screen))
+                _ = app.update(Event.Capabilities(capabilities))
+                if (light) {
+                    _ = app.perform("page.settings")
+                    _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Down)))
+                }
+                _ = app.perform("page.overview")
+                let backend = TestBackend(area: screen)
+                let terminal = Terminal(backend, renderMode: RenderMode.Full)
+                _ = terminal.draw { frame => app.render(frame) }
+                let overview = backend.lastBuffer().getOrThrow()
+                let panel = app.layout.chartPanel
+                let border = overview.getCell(panel.x + 2, panel.y)
+                let outside = overview.getCell(panel.x + 2, panel.y - 1)
+                @Expect(Style(bg: border.style.bg), Style(bg: outside.style.bg))
+                @Expect(Style(bg: overview.getCell(screen.x, screen.y).style.bg), Style(bg: app.theme.normal.bg))
+
+                _ = app.perform("page.showcase")
+                workbenchGalleryKey(app, KeyCode.Tab)
+                workbenchGalleryKey(app, KeyCode.Right)
+                workbenchGalleryKey(app, KeyCode.Right)
+                _ = app.focus.focus("gallery-input")
+                _ = terminal.draw { frame => app.render(frame) }
+                let forms = backend.lastBuffer().getOrThrow()
+                let field = workbenchGalleryAreas(app.layout.galleryContent, 2).formInputs[1]
+                let focusedBorder = forms.getCell(field.x, field.y - 1)
+                @Expect(focusedBorder.symbol, "─")
+                @Expect(Style(bg: focusedBorder.style.bg), Style(bg: app.theme.normal.bg))
+                @Expect(Style(bg: forms.getCell(field.x, field.y).style.bg), Style(bg: app.theme.focused.bg))
+            }
+        }
+    }
+
+    @TestCase
+    func compactTrendShowsTheLatestSamplesAndTheirScale(): Unit {
+        let screen = Rect(0, 0, 80, 24)
+        let app = WorkbenchApp()
+        _ = app.update(Event.Resize(screen))
+        for (index in 0..60) {
+            app.model.sampleHistory(if (index == 0) { 9000 } else { index })
+        }
+        _ = app.perform("page.overview")
+        let backend = TestBackend(area: screen)
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        _ = terminal.draw { frame => app.render(frame) }
+        let snapshot = backend.snapshot()
+        @Assert(snapshot.contains("Rel peak 0.59%"))
+        @Assert(snapshot.contains("pts, 250ms apart"))
+        @Assert(snapshot.contains("job-2"))
+        let panel = app.layout.sparkPanel
+        let inner = galleryBlock(app, "", BorderKind.Rounded).inner(panel)
+        let buffer = backend.lastBuffer().getOrThrow()
+        @Expect(buffer.getCell(inner.right - 1, inner.y + 1).symbol, "█")
+    }
+
+    @TestCase
+    func overviewTickMatchesFullRedrawAtEachSize(): Unit {
+        for (screen in [Rect(0, 0, 80, 24), Rect(0, 0, 120, 36), Rect(0, 0, 160, 45)]) {
+            let partialApp = WorkbenchApp()
+            let fullApp = WorkbenchApp()
+            _ = partialApp.update(Event.Resize(screen))
+            _ = fullApp.update(Event.Resize(screen))
+            _ = partialApp.perform("page.overview")
+            _ = fullApp.perform("page.overview")
+            let partialBackend = TestBackend(area: screen, captureSnapshots: false)
+            let fullBackend = TestBackend(area: screen, captureSnapshots: false)
+            let partial = Terminal(partialBackend, renderMode: RenderMode.Diff)
+            let full = Terminal(fullBackend, renderMode: RenderMode.Full)
+            _ = partial.draw { frame => partialApp.render(frame) }
+            _ = full.draw { frame => fullApp.render(frame) }
+            let changed = partialApp.update(Event.Tick(TickEvent(deltaMillis: 1000)))
+            _ = fullApp.update(Event.Tick(TickEvent(deltaMillis: 1000)))
+            _ = partial.draw({ frame => partialApp.render(frame) }, dirtyRects: changed.dirtyRects)
+            _ = full.draw { frame => fullApp.render(frame) }
+            @Expect(partialBackend.lastBuffer().getOrThrow().diff(fullBackend.lastBuffer().getOrThrow()).size, 0)
+        }
+    }
+
+    @TestCase
+    func editorKeepsFieldsAndActionsVisibleAtResponsiveSizes(): Unit {
+        for (screen in [Rect(0, 0, 80, 24), Rect(0, 0, 120, 36), Rect(0, 0, 160, 45)]) {
+            let app = WorkbenchApp()
+            _ = app.update(Event.Resize(screen))
+            _ = app.perform("page.tasks")
+            _ = app.perform("task.edit")
+            let backend = TestBackend(area: screen)
+            let terminal = Terminal(backend, renderMode: RenderMode.Full)
+            _ = terminal.draw { frame => app.render(frame) }
+            let snapshot = backend.snapshot()
+            @Assert(snapshot.contains("EDIT TASK"))
+            @Assert(snapshot.contains("Name"))
+            @Assert(snapshot.contains("Notes"))
+            @Assert(snapshot.contains("Cancel"))
+            @Assert(snapshot.contains("Save"))
+            let field = app.layout.editorName
+            let buffer = backend.lastBuffer().getOrThrow()
+            @Expect(buffer.getCell(field.x - 1, field.y - 1).symbol, "╭")
+            @Expect(buffer.getCell(field.x, field.y - 1).symbol, "─")
+            _ = app.update(Event.Mouse(MouseEvent(MouseKind.Move, MouseButton.None,
+                app.layout.editorSave.x, app.layout.editorSave.y)))
+            @Expect(app.interaction.focus().current(), Some("editor-name"))
+            @Expect(app.hovered, Some("editor-save"))
+        }
     }
 }
