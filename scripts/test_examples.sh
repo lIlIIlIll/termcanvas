@@ -9,6 +9,7 @@ expected=(
   arcade
   assistant_console
   btm_clone
+  ci_activity
   command_center
   crystal_caves
   data_browser
@@ -65,6 +66,7 @@ if grep -q -- "retained_view_experimental\|ViewNode\|StyleSheet\|StyleDeclaratio
 fi
 check_source "$EXAMPLES/oh_my_pi_skin/src/main.cj" "TerminalCapabilities" "CommandPalette" "Composer" "TimerSpec" "Event.Timer" "DirtyRects" "Color.Rgb" "Canvas"
 check_source "$EXAMPLES/command_center/src/main.cj" "AsyncTask" "StartTimer" "Dialog"
+check_source "$EXAMPLES/ci_activity/src/main.cj" "TaskActivityView" "TaskProgress.Counts" "TaskProgress.Items"
 check_source "$EXAMPLES/assistant_console/src/main.cj" "TranscriptView" "Composer" "RequestDialog"
 check_source "$EXAMPLES/btm_clone/src/main.cj" "Canvas" "drawGraph" "Event.Tick" "sortMode" "Command.AsyncTask" "Event.AsyncCompleted" "DebugOverlay"
 if grep -q -- "component_experimental" "$EXAMPLES/btm_clone/cjpm.toml" "$EXAMPLES/btm_clone/src/main.cj"; then

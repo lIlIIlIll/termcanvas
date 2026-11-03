@@ -1,6 +1,6 @@
 # Examples
 
-This index sits beside the 18 example directories. Use
+This index sits beside the 19 example directories. Use
 [`docs/examples.md`](../docs/examples.md) to choose an example by learning goal;
 use this page when you are already working in `examples/`.
 
@@ -51,8 +51,9 @@ The runnable starter application is also available at
 - [`media_gallery`](media_gallery/): direct media placement, `DocumentLine.image`,
   protocol fallback, and terminal capability reporting.
 
-## Feature demonstrations (6)
+## Feature demonstrations (7)
 
+- [`ci_activity`](ci_activity/): animated simulated tasks using `TaskActivityView`.
 - [`arcade`](arcade/): held-key/tick-driven `Canvas` app with resize fallback and metrics.
 - [`crystal_caves`](crystal_caves/): side-scrolling game with tiles, sensors, physics, and animation.
 - [`debug_lab`](debug_lab/): terminal capabilities, keyboard options, mouse/focus events, and metrics.

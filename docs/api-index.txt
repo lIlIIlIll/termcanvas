@@ -1735,6 +1735,32 @@ packages/core/src/style.cj:167:Selected
 packages/core/src/style.cj:168:Disabled
 packages/core/src/style.cj:169:Error
 packages/core/src/style.cj:170:Accent
+packages/core/src/task_activity.cj:5:public enum TaskStatus {
+packages/core/src/task_activity.cj:7:Pending
+packages/core/src/task_activity.cj:9:Queued
+packages/core/src/task_activity.cj:11:Running
+packages/core/src/task_activity.cj:13:Done
+packages/core/src/task_activity.cj:15:Failed
+packages/core/src/task_activity.cj:17:Cancelled
+packages/core/src/task_activity.cj:22:public enum TaskProgress {
+packages/core/src/task_activity.cj:25:Items(Array<TaskStatus>)
+packages/core/src/task_activity.cj:28:Counts(Int64, Int64)
+packages/core/src/task_activity.cj:33:public enum TaskActivityLayout {
+packages/core/src/task_activity.cj:36:Compact
+packages/core/src/task_activity.cj:39:Expanded
+packages/core/src/task_activity.cj:44:public class TaskActivity {
+packages/core/src/task_activity.cj:47:public let title: String
+packages/core/src/task_activity.cj:50:public let status: TaskStatus
+packages/core/src/task_activity.cj:53:public let id: String
+packages/core/src/task_activity.cj:56:public let prefix: String
+packages/core/src/task_activity.cj:59:public let statusText: String
+packages/core/src/task_activity.cj:62:public let duration: String
+packages/core/src/task_activity.cj:65:public let detail: String
+packages/core/src/task_activity.cj:68:public let progressLabel: String
+packages/core/src/task_activity.cj:73:public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
+packages/core/src/task_activity.cj:107:public class TaskActivityView <: Widget {
+packages/core/src/task_activity.cj:116:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: Bool = true )
+packages/core/src/task_activity.cj:132:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/terminal.cj:122:public enum CursorShape {
 packages/core/src/terminal.cj:123:Block
 packages/core/src/terminal.cj:124:Bar

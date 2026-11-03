@@ -276,6 +276,7 @@
     {"path": "examples/btm_clone", "classification": "experimental", "architecture": "App/update plus application-owned state and immediate regional rendering"},
     {"path": "examples/media_gallery", "classification": "experimental", "architecture": "optional direct and Document media paths"},
     {"path": "examples/arcade", "classification": "feature_demo", "architecture": "optional game package"},
+    {"path": "examples/ci_activity", "classification": "feature_demo", "architecture": "App/update plus immediate task activity widgets"},
     {"path": "examples/crystal_caves", "classification": "feature_demo", "architecture": "optional game package"},
     {"path": "examples/debug_lab", "classification": "feature_demo", "architecture": "observability demo"},
     {"path": "examples/game_demo", "classification": "feature_demo", "architecture": "optional game package"},
@@ -333,8 +334,8 @@
     "phase": "5B",
     "review_status": "closed",
     "inventory_source": "docs/api-inventory.json plus architecture/api-classification.json",
-    "top_level_total": 153,
-    "contract_entry_total": 986,
+    "top_level_total": 158,
+    "contract_entry_total": 1012,
     "family_total": 26,
     "coverage": "Every EXPERIMENTAL top-level declaration has exactly one primary family; classification-rule subsets below resolve mixed rules without changing API classification.",
     "selected_next_family": null,
@@ -778,20 +779,26 @@
         "id": "activity_dialog_ui",
         "rules": [
           "core-editor-experimental",
-          "core-request-dialog-theme-experimental"
+          "core-request-dialog-theme-experimental",
+          "core-task-activity"
         ],
         "symbols": [
           "ActivityStep",
           "ActivityTimeline",
           "RequestDialog",
-          "DecisionDialog"
+          "DecisionDialog",
+          "TaskStatus",
+          "TaskProgress",
+          "TaskActivityLayout",
+          "TaskActivity",
+          "TaskActivityView"
         ],
-        "top_level": 4,
-        "contract_entries": 16,
+        "top_level": 9,
+        "contract_entries": 42,
         "owner": "core/editor",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "recommended assistant_console and one combined core test",
-        "reason": "The request/activity widgets are usable but application-specific and have no production adopter or independent semantic tests.",
+        "reason": "The request and activity widgets remain experimental; the task activity widget has focused behavior tests and an example but no independent production adopter.",
         "revisit": "Revisit after real workflow adoption freezes decision, selection, and activity-state semantics."
       },
       {
@@ -1087,7 +1094,7 @@
     "distribution": {
       "KEEP_EXPERIMENTAL": {
         "families": 26,
-        "top_level": 153
+        "top_level": 158
       }
     },
     "priority": []

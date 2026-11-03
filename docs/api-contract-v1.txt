@@ -1735,6 +1735,32 @@ packages/core/src/style.cj:Selected
 packages/core/src/style.cj:Disabled
 packages/core/src/style.cj:Error
 packages/core/src/style.cj:Accent
+packages/core/src/task_activity.cj:public enum TaskStatus {
+packages/core/src/task_activity.cj:Pending
+packages/core/src/task_activity.cj:Queued
+packages/core/src/task_activity.cj:Running
+packages/core/src/task_activity.cj:Done
+packages/core/src/task_activity.cj:Failed
+packages/core/src/task_activity.cj:Cancelled
+packages/core/src/task_activity.cj:public enum TaskProgress {
+packages/core/src/task_activity.cj:Items(Array<TaskStatus>)
+packages/core/src/task_activity.cj:Counts(Int64, Int64)
+packages/core/src/task_activity.cj:public enum TaskActivityLayout {
+packages/core/src/task_activity.cj:Compact
+packages/core/src/task_activity.cj:Expanded
+packages/core/src/task_activity.cj:public class TaskActivity {
+packages/core/src/task_activity.cj:public let title: String
+packages/core/src/task_activity.cj:public let status: TaskStatus
+packages/core/src/task_activity.cj:public let id: String
+packages/core/src/task_activity.cj:public let prefix: String
+packages/core/src/task_activity.cj:public let statusText: String
+packages/core/src/task_activity.cj:public let duration: String
+packages/core/src/task_activity.cj:public let detail: String
+packages/core/src/task_activity.cj:public let progressLabel: String
+packages/core/src/task_activity.cj:public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
+packages/core/src/task_activity.cj:public class TaskActivityView <: Widget {
+packages/core/src/task_activity.cj:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: Bool = true )
+packages/core/src/task_activity.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/terminal.cj:public enum CursorShape {
 packages/core/src/terminal.cj:Block
 packages/core/src/terminal.cj:Bar

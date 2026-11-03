@@ -1,7 +1,7 @@
 # Examples
 
 Use this page to choose an example by the part of `cjtui` you want to learn. All
-18 current examples are grouped by support and purpose; the links open their
+19 current examples are grouped by support and purpose; the links open their
 source directories. For the directory-local index and commands, see
 [`examples/README.md`](../examples/README.md).
 
@@ -60,11 +60,13 @@ These applications exercise capabilities whose compatibility tier is
 - [`media_gallery`](../examples/media_gallery/): direct terminal media placement,
   `DocumentLine.image` integration, protocol fallback, and capability reporting.
 
-## Feature demonstrations (6)
+## Feature demonstrations (7)
 
 Use these when a specific input, rendering, game, or terminal extension is the
 next concept you need.
 
+- [`ci_activity`](../examples/ci_activity/): animated simulated tasks using
+  compact and expanded `TaskActivityView` widgets.
 - [`arcade`](../examples/arcade/): held-key and tick-driven `Canvas` application
   with resize fallback and metrics.
 - [`crystal_caves`](../examples/crystal_caves/): side-scrolling game with tile

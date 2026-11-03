@@ -104,6 +104,52 @@ from the resulting state.
 - `ProgressBar`: determinate progress and label modes.
 - `Scrollbar`: visible-range indication.
 - `Paginator`: page and page-size state with keyboard navigation.
+- `TaskActivityView` (EXPERIMENTAL): one compact or expanded task with status,
+  elapsed text, details, and individual or count-based subtask progress.
+
+### Show task activity
+
+Create a `TaskActivity` from application state and pass it to
+`TaskActivityView`. This complete application shows three subtask states; press
+`q` or Ctrl-C to exit:
+
+```cangjie
+import core.*
+
+main(): Int64 {
+    let task = TaskActivity("Build", status: TaskStatus.Running, id: "job-1",
+        duration: "12s", progressLabel: "Jobs", detail: "Compiling",
+        progress: Some(TaskProgress.Items([TaskStatus.Done, TaskStatus.Running, TaskStatus.Pending])))
+    App().runWithCommands(
+        { frame => frame.renderWidget(TaskActivityView(task), frame.area) },
+        { event =>
+            match (event) {
+                case Event.KeyDown(key) => match (key.code) {
+                    case KeyCode.Char(r'q') | KeyCode.CtrlC => UpdateResult.exit()
+                    case _ => UpdateResult.next()
+                }
+                case _ => UpdateResult.next()
+            }
+        }
+    )
+    0
+}
+```
+
+The first line shows the task and elapsed text, followed by a `Jobs` line and a
+detail line. Use `TaskProgress.Counts(completed, total)` for aggregate progress;
+counts are clamped to `0 <= completed <= total` and negative totals become
+zero. `Items` copies its array when `TaskActivity` is created. The component
+draws only the progress marks that fit its area.
+
+Use `layout: TaskActivityLayout.Compact` for a single line. Pass a new
+`activityFrame` when the application receives a tick to animate a running
+task. Set `unicode: false` for ASCII marks and pass a `Theme` to change colors.
+The widget owns no timer or task state. It clips text to its assigned area;
+expanded layout hides the right-aligned duration if the area is too narrow.
+The [`ci_activity`](../examples/ci_activity/) example demonstrates both progress
+forms and the tick/update loop.
+
 
 ### Documents, logs, and visuals
 

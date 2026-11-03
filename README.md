@@ -117,8 +117,8 @@ main(): Int64 {
 | 压力与规模验证 | [`game_pressure_suite`](examples/game_pressure_suite/) |
 | 本地终端工作台 | [workbench](examples/workbench/) |
 
-The complete catalog contains 18 examples: 9 recommended applications, 2
-experimental applications, 6 feature demonstrations, and 1 proof workload.
+The complete catalog contains 19 examples: 9 recommended applications, 2
+experimental applications, 7 feature demonstrations, and 1 proof workload.
 See the [example catalog](docs/examples.md) for each example's purpose.
 
 从仓库根目录运行单个示例：
@@ -321,6 +321,6 @@ Codecov 覆盖率目标为：生产包行覆盖率 90%、分支覆盖率 80%；�
 | [Events](docs/events.md) | 键盘、鼠标、粘贴、焦点和终端事件 |
 | [Extensions](docs/extensions.md) | Markdown、终端、diff、媒体和游戏扩展 |
 | [Testing](docs/testing.md) | 测试工具、快照、性能和发布验证 |
-| [Examples](docs/examples.md) | 17 个示例的分类和运行命令 |
+| [Examples](docs/examples.md) | 示例的分类和运行命令 |
 | [API Overview](docs/api.md) | 面向应用的 API 地图 |
 | [Versioning](docs/versioning.md) | 稳定性等级与兼容性规则 |
