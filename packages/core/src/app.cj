@@ -1305,6 +1305,7 @@ public class HeadlessRunResult {
 class HeadlessCapabilitiesContext {
     var detected: TerminalCapabilities = TerminalCapabilities()
     var overrideValue: ?TerminalCapabilities = None
+    let lifecycle = TerminalLifecycleRequests()
 
     func observe(event: Event, terminal: Terminal): Unit {
         match (event) {
@@ -1410,7 +1411,7 @@ public class AppTestRunner {
         if (!App.applyUpdateResult(observeUpdate(event), commandQueue)) {
             return ControlFlow.Exit
         }
-        let lifecycle = TerminalLifecycleRequests()
+        let lifecycle = capabilityContext.lifecycle
         lifecycle.detectedCapabilities = capabilityContext.detected
         lifecycle.capabilitiesOverride = capabilityContext.overrideValue
         for (timerEvent in timerRuntime.drain()) { commandQueue.add(Command.Emit(timerEvent)) }
@@ -1422,6 +1423,7 @@ public class AppTestRunner {
                 case Some(value) => value
                 case None => capabilityContext.detected
             })
+            lifecycle.capabilitiesOverridePending = false
         }
         if (!running) {
             return ControlFlow.Exit

@@ -2,6 +2,8 @@ package core
 
 import std.collection.ArrayList
 import std.io.*
+import std.sync.*
+import std.time.*
 import std.unittest.*
 import std.unittest.testmacro.*
 
@@ -170,4 +172,56 @@ class CapabilitiesRenderTest {
             )
         @Expect(backend.assertCell(0, 0, "●"))
     }
+    @TestCase
+    func headlessRetainsAsyncCompletionsAcrossSourceTurns(): Unit {
+        let total: Int64 = 130
+        let gate = Semaphore(1)
+        let ready = Semaphore(total)
+        gate.acquire()
+        ready.acquire(amount: total)
+        let completed = ArrayList<String>()
+        let finished = ArrayList<Int64>()
+        let script = HeadlessScript().message("start").message("settle").tick(count: 3)
+        for (_ in 0..8) { _ = script.waitMillis(25) }
+        let result = AppTestRunner.run(script, { _ => }, { event =>
+            match (event) {
+                case Event.Message("start") =>
+                    let commands = ArrayList<Command>()
+                    for (index in 0..total) {
+                        commands.add(Command.AsyncTask("task-${index}", { =>
+                            gate.acquire()
+                            gate.release()
+                            ready.release()
+                            Event.Message("done")
+                        }))
+                    }
+                    UpdateResult.withCommand(Command.Batch(commands.toArray()))
+                case Event.Message("settle") =>
+                    gate.release()
+                    var count: Int64 = 0
+                    let deadline = MonoTime.now() + Duration.second * 10
+                    while (count < total && MonoTime.now() < deadline) {
+                        if (ready.tryAcquire()) { count++ } else { sleep(Duration.millisecond) }
+                    }
+                    finished.add(count)
+                    // Let the released task closures finish before importing their events.
+                    sleep(Duration.millisecond * 100)
+                    UpdateResult.unchanged()
+                case Event.AsyncCompleted(id, Event.Message("done")) =>
+                    completed.add(id)
+                    UpdateResult.unchanged()
+                case _ => UpdateResult.unchanged()
+            }
+        }, options: HeadlessRunOptions(area: Rect(0, 0, 1, 1), captureBuffers: false, captureSnapshots: false))
+        @Expect(result.passed())
+        @Assert(finished.size, 1)
+        @Expect(finished[0], total)
+        @Expect(completed.size, total)
+        for (index in 0..total) {
+            var occurrences: Int64 = 0
+            for (id in completed) { if (id == "task-${index}") { occurrences++ } }
+            @Expect(occurrences, 1)
+        }
+    }
+
 }
