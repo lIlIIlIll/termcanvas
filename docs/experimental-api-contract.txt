@@ -567,6 +567,32 @@ core|StyleState.Selected|enum_constructor|Selected
 core|StyleState.Disabled|enum_constructor|Disabled
 core|StyleState.Error|enum_constructor|Error
 core|StyleState.Accent|enum_constructor|Accent
+core|TaskStatus|enum|public enum TaskStatus {
+core|TaskStatus.Pending|enum_constructor|Pending
+core|TaskStatus.Queued|enum_constructor|Queued
+core|TaskStatus.Running|enum_constructor|Running
+core|TaskStatus.Done|enum_constructor|Done
+core|TaskStatus.Failed|enum_constructor|Failed
+core|TaskStatus.Cancelled|enum_constructor|Cancelled
+core|TaskProgress|enum|public enum TaskProgress {
+core|TaskProgress.Items|enum_constructor|Items(Array<TaskStatus>)
+core|TaskProgress.Counts|enum_constructor|Counts(Int64, Int64)
+core|TaskActivityLayout|enum|public enum TaskActivityLayout {
+core|TaskActivityLayout.Compact|enum_constructor|Compact
+core|TaskActivityLayout.Expanded|enum_constructor|Expanded
+core|TaskActivity|class|public class TaskActivity {
+core|TaskActivity.title|let|public let title: String
+core|TaskActivity.status|let|public let status: TaskStatus
+core|TaskActivity.id|let|public let id: String
+core|TaskActivity.prefix|let|public let prefix: String
+core|TaskActivity.statusText|let|public let statusText: String
+core|TaskActivity.duration|let|public let duration: String
+core|TaskActivity.detail|let|public let detail: String
+core|TaskActivity.progressLabel|let|public let progressLabel: String
+core|TaskActivity.init|init|public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
+core|TaskActivityView|class|public class TaskActivityView <: Widget {
+core|TaskActivityView.init|init|public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: Bool = true )
+core|TaskActivityView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|CursorShape|enum|public enum CursorShape {
 core|CursorShape.Block|enum_constructor|Block
 core|CursorShape.Bar|enum_constructor|Bar
