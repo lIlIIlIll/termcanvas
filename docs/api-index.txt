@@ -39,223 +39,224 @@ packages/core/src/app.cj:144:RestartTimer(TimerSpec)
 packages/core/src/app.cj:145:Exec(String)
 packages/core/src/app.cj:146:ExecArgs(String, String, Array<String>)
 packages/core/src/app.cj:147:ResetTerminal
-packages/core/src/app.cj:148:Suspend
-packages/core/src/app.cj:149:Batch(Array<Command>)
-packages/core/src/app.cj:216:public struct FrameMetrics {
-packages/core/src/app.cj:217:public let frameIndex: Int64
-packages/core/src/app.cj:218:public let fps: Int64
-packages/core/src/app.cj:219:public let renderMillis: Int64
-packages/core/src/app.cj:220:public let drawMillis: Int64
-packages/core/src/app.cj:221:public let totalMillis: Int64
-packages/core/src/app.cj:222:public let eventQueueLength: Int64
-packages/core/src/app.cj:223:public let dirtyCells: Int64
-packages/core/src/app.cj:224:public let diffWrites: Int64
-packages/core/src/app.cj:225:public let terminalSize: Rect
-packages/core/src/app.cj:226:public let droppedTicks: Int64
-packages/core/src/app.cj:227:public let tickDeltaMillis: Int64
-packages/core/src/app.cj:228:public let renderedCells: Int64
-packages/core/src/app.cj:229:public let dirtyRects: Int64
-packages/core/src/app.cj:230:public let bufferCellAttempts: Int64
-packages/core/src/app.cj:231:public let bufferCellWrites: Int64
-packages/core/src/app.cj:232:public let diffNanos: Int64
-packages/core/src/app.cj:233:public let writeNanos: Int64
-packages/core/src/app.cj:234:public let ansiBytes: Int64
-packages/core/src/app.cj:236:public init( frameIndex!: Int64 = 0, fps!: Int64 = 0, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, eventQueueLength!: Int64 = 0, dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, terminalSize!: Rect = Rect(0, 0, 0, 0), droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
-packages/core/src/app.cj:277:public class AppMetrics {
-packages/core/src/app.cj:290:public init(maxFrames!: ?Int64 = Some(600))
-packages/core/src/app.cj:297:public func record(frame: FrameMetrics): Unit
-packages/core/src/app.cj:310:public func record( render: RenderMetrics, frameIndex!: Int64 = 0, eventQueueLength!: Int64 = 0, droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0 ): Unit
-packages/core/src/app.cj:340:public func lastFrame(): ?FrameMetrics
-packages/core/src/app.cj:351:public func frames(): Array<FrameMetrics>
-packages/core/src/app.cj:371:public func averageFps(): Int64
-packages/core/src/app.cj:384:public func droppedTicks(): Int64
-packages/core/src/app.cj:391:public func reset(): Unit
-packages/core/src/app.cj:420:public func runtime(): RuntimeMetricsSnapshot
-packages/core/src/app.cj:433:public struct RuntimeMetricsSnapshot {
-packages/core/src/app.cj:434:public let queueEnqueued: Int64
-packages/core/src/app.cj:435:public let queueProcessed: Int64
-packages/core/src/app.cj:436:public let maxQueueDepth: Int64
-packages/core/src/app.cj:437:public let maxUpdateDepth: Int64
-packages/core/src/app.cj:438:public let yieldedTurns: Int64
-packages/core/src/app.cj:439:public let queueOverflows: Int64
-packages/core/src/app.cj:440:public let scheduling: FrameSchedulingSnapshot
-packages/core/src/app.cj:442:public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, yieldedTurns!: Int64 = 0, queueOverflows!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )
-packages/core/src/app.cj:474:public class TimerRuntime {
-packages/core/src/app.cj:479:public init(clock!: RuntimeClock = MonotonicRuntimeClock())
-packages/core/src/app.cj:606:public class AsyncRuntime {
-packages/core/src/app.cj:613:public init(maxPendingTasks!: Int64 = 256)
-packages/core/src/app.cj:618:public func start(id: String, task: () -> Event): Event
-packages/core/src/app.cj:640:public func startExec(id: String, commandLine: String): Event
-packages/core/src/app.cj:644:public func startExecArgs(id: String, program: String, args: Array<String>): Event
-packages/core/src/app.cj:648:public func cancel(id: String): Bool
-packages/core/src/app.cj:665:public func drain(): Array<Event>
-packages/core/src/app.cj:697:public func pendingCount(): Int64
-packages/core/src/app.cj:701:public func eventSource(): EventSource
-packages/core/src/app.cj:723:public class Subscription {
-packages/core/src/app.cj:724:public let interval: Int64
-packages/core/src/app.cj:725:public let event: Event
-packages/core/src/app.cj:728:public init(interval: Int64, event: Event)
-packages/core/src/app.cj:733:public func poll(step!: Int64 = 1): ?Event
-packages/core/src/app.cj:744:public interface EventWaiter {
-packages/core/src/app.cj:745:func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit
-packages/core/src/app.cj:746:func close(): Unit
-packages/core/src/app.cj:749:public class NoopEventWaiter <: EventWaiter {
-packages/core/src/app.cj:750:public init()
-packages/core/src/app.cj:752:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit
-packages/core/src/app.cj:756:public func close(): Unit
-packages/core/src/app.cj:760:public func defaultEventWaiter(): EventWaiter
-packages/core/src/app.cj:765:public func defaultEventWaiter(): EventWaiter
-packages/core/src/app.cj:770:public func defaultEventWaiter(): EventWaiter
-packages/core/src/app.cj:775:public class WindowsConsoleEventWaiter <: EventWaiter {
-packages/core/src/app.cj:778:public init()
-packages/core/src/app.cj:780:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
-packages/core/src/app.cj:803:public func close(): Unit
-packages/core/src/app.cj:808:public struct UpdateResult {
-packages/core/src/app.cj:809:public let flow: ControlFlow
-packages/core/src/app.cj:810:public let command: Command
-packages/core/src/app.cj:811:public let dirtyRects: ?DirtyRects
-packages/core/src/app.cj:816:public let renderRequested: Bool
-packages/core/src/app.cj:818:public init( flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop, dirtyRects!: ?DirtyRects = None, renderRequested!: Bool = true )
-packages/core/src/app.cj:830:public static func next(): UpdateResult
-packages/core/src/app.cj:834:public static func unchanged(): UpdateResult
-packages/core/src/app.cj:838:public static func exit(): UpdateResult
-packages/core/src/app.cj:842:public static func withCommand(command: Command): UpdateResult
-packages/core/src/app.cj:846:public static func dirty(area: Rect): UpdateResult
-packages/core/src/app.cj:850:public func withDirty(area: Rect): UpdateResult
-packages/core/src/app.cj:860:public struct HandleResult {
-packages/core/src/app.cj:861:public let handled: Bool
-packages/core/src/app.cj:862:public let flow: ControlFlow
-packages/core/src/app.cj:863:public let command: Command
-packages/core/src/app.cj:865:public init(handled!: Bool = false, flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop)
-packages/core/src/app.cj:871:public static func ignored(): HandleResult
-packages/core/src/app.cj:875:public static func consumed(command!: Command = Command.Noop): HandleResult
-packages/core/src/app.cj:879:public static func exit(): HandleResult
-packages/core/src/app.cj:883:public static func withCommand(command: Command): HandleResult
-packages/core/src/app.cj:887:public func toUpdateResult(): UpdateResult
-packages/core/src/app.cj:898:public class EventScript {
-packages/core/src/app.cj:901:public init(events!: Array<Event> = [])
-packages/core/src/app.cj:907:public func add(event: Event): EventScript
-packages/core/src/app.cj:912:public func key(key: KeyEvent): EventScript
-packages/core/src/app.cj:916:public func paste(text: String): EventScript
-packages/core/src/app.cj:920:public func message(text: String): EventScript
-packages/core/src/app.cj:924:public func tick(): EventScript
-packages/core/src/app.cj:928:public func resize(area: Rect): EventScript
-packages/core/src/app.cj:932:public func size(): Int64
-packages/core/src/app.cj:936:public static func fromText(text: String): EventScript
-packages/core/src/app.cj:964:public func run(update: (Event) -> ControlFlow): ControlFlow
-packages/core/src/app.cj:974:public func runWithCommands(update: (Event) -> UpdateResult): ControlFlow
-packages/core/src/app.cj:997:public enum ScenarioStep {
-packages/core/src/app.cj:998:Input(Event)
-packages/core/src/app.cj:999:ExpectFlow(ControlFlow)
-packages/core/src/app.cj:1000:ExpectSnapshot(String)
-packages/core/src/app.cj:1001:ExpectCell(Int64, Int64, String)
-packages/core/src/app.cj:1004:public class ScenarioResult {
-packages/core/src/app.cj:1005:public let name: String
-packages/core/src/app.cj:1006:public let passed: Bool
-packages/core/src/app.cj:1007:public let failures: Array<String>
-packages/core/src/app.cj:1008:public let flow: ControlFlow
-packages/core/src/app.cj:1010:public init(name: String, passed: Bool, failures: Array<String>, flow: ControlFlow)
-packages/core/src/app.cj:1018:public struct SnapshotDiffResult {
-packages/core/src/app.cj:1019:public let passed: Bool
-packages/core/src/app.cj:1020:public let line: Int64
-packages/core/src/app.cj:1021:public let column: Int64
-packages/core/src/app.cj:1022:public let expectedLine: String
-packages/core/src/app.cj:1023:public let actualLine: String
-packages/core/src/app.cj:1024:public let message: String
-packages/core/src/app.cj:1026:public init( passed: Bool, line!: Int64 = -1, column!: Int64 = -1, expectedLine!: String = "", actualLine!: String = "", message!: String = "" )
-packages/core/src/app.cj:1043:public class SnapshotDiff {
-packages/core/src/app.cj:1044:public static func text(expected: String, actual: String): SnapshotDiffResult
-packages/core/src/app.cj:1069:public static func buffer(expected: Buffer, actual: Buffer): SnapshotDiffResult
-packages/core/src/app.cj:1084:public class EventScenario {
-packages/core/src/app.cj:1085:public let name: String
-packages/core/src/app.cj:1088:public init(name!: String = "scenario")
-packages/core/src/app.cj:1092:public func add(step: ScenarioStep): EventScenario
-packages/core/src/app.cj:1097:public func event(event: Event): EventScenario
-packages/core/src/app.cj:1101:public func key(key: KeyEvent): EventScenario
-packages/core/src/app.cj:1105:public func paste(text: String): EventScenario
-packages/core/src/app.cj:1109:public func message(text: String): EventScenario
-packages/core/src/app.cj:1113:public func tick(): EventScenario
-packages/core/src/app.cj:1117:public func expectFlow(flow: ControlFlow): EventScenario
-packages/core/src/app.cj:1121:public func expectSnapshot(snapshot: String): EventScenario
-packages/core/src/app.cj:1125:public func expectCell(x: Int64, y: Int64, symbol: String): EventScenario
-packages/core/src/app.cj:1129:public func size(): Int64
-packages/core/src/app.cj:1133:public static func fromText(text: String): EventScenario
-packages/core/src/app.cj:1175:public func run(backend: TestBackend, render: (Frame) -> Unit, update: (Event) -> UpdateResult): ScenarioResult
-packages/core/src/app.cj:1216:public enum HeadlessStep {
-packages/core/src/app.cj:1217:Input(Event)
-packages/core/src/app.cj:1218:Tick(Int64)
-packages/core/src/app.cj:1219:WaitMillis(Int64)
-packages/core/src/app.cj:1220:Resize(Rect)
-packages/core/src/app.cj:1221:Render
-packages/core/src/app.cj:1222:ExpectSnapshot(String)
-packages/core/src/app.cj:1223:ExpectCell(Int64, Int64, String)
-packages/core/src/app.cj:1226:public class HeadlessScript {
-packages/core/src/app.cj:1229:public init(steps!: Array<HeadlessStep> = [])
-packages/core/src/app.cj:1235:public func add(step: HeadlessStep): HeadlessScript
-packages/core/src/app.cj:1240:public func event(event: Event): HeadlessScript
-packages/core/src/app.cj:1241:public func key(key: KeyEvent): HeadlessScript
-packages/core/src/app.cj:1242:public func mouse(event: MouseEvent): HeadlessScript
-packages/core/src/app.cj:1243:public func paste(text: String): HeadlessScript
-packages/core/src/app.cj:1244:public func message(text: String): HeadlessScript
-packages/core/src/app.cj:1245:public func resize(area: Rect): HeadlessScript
-packages/core/src/app.cj:1246:public func tick(count!: Int64 = 1): HeadlessScript
-packages/core/src/app.cj:1247:public func waitMillis(milliseconds: Int64): HeadlessScript
-packages/core/src/app.cj:1250:public func render(): HeadlessScript
-packages/core/src/app.cj:1251:public func expectSnapshot(snapshot: String): HeadlessScript
-packages/core/src/app.cj:1252:public func expectCell(x: Int64, y: Int64, symbol: String): HeadlessScript
-packages/core/src/app.cj:1254:public func steps(): Array<HeadlessStep>
-packages/core/src/app.cj:1259:public struct HeadlessRunOptions {
-packages/core/src/app.cj:1260:public let area: Rect
-packages/core/src/app.cj:1261:public let ticks: Int64
-packages/core/src/app.cj:1262:public let tickDeltaMillis: Int64
-packages/core/src/app.cj:1263:public let captureBuffers: Bool
-packages/core/src/app.cj:1264:public let captureSnapshots: Bool
-packages/core/src/app.cj:1266:public init( area!: Rect = Rect(0, 0, 80, 24), ticks!: Int64 = 0, tickDeltaMillis!: Int64 = 16, captureBuffers!: Bool = true, captureSnapshots!: Bool = true )
-packages/core/src/app.cj:1281:public class HeadlessRunResult {
-packages/core/src/app.cj:1282:public let flow: ControlFlow
-packages/core/src/app.cj:1283:public let frames: Array<Buffer>
-packages/core/src/app.cj:1284:public let snapshots: Array<String>
-packages/core/src/app.cj:1285:public let metrics: AppMetrics
-packages/core/src/app.cj:1286:public let failures: Array<String>
-packages/core/src/app.cj:1288:public init(flow: ControlFlow, frames: Array<Buffer>, snapshots: Array<String>, metrics: AppMetrics, failures: Array<String>)
-packages/core/src/app.cj:1296:public func passed(): Bool
-packages/core/src/app.cj:1301:public class AppTestRunner {
-packages/core/src/app.cj:1302:public static func run(script: HeadlessScript, render: (Frame) -> Unit, update: (Event) -> UpdateResult, options!: HeadlessRunOptions = HeadlessRunOptions()): HeadlessRunResult
-packages/core/src/app.cj:1512:public class App {
-packages/core/src/app.cj:1539:public init( inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
-packages/core/src/app.cj:1589:public init( backend!: Backend, inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
-packages/core/src/app.cj:1694:public func attachTraceSink(traceSink: AppTraceSink): Unit
-packages/core/src/app.cj:1703:public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit
-packages/core/src/app.cj:1708:public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit
-packages/core/src/app.cj:1715:public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
-packages/core/src/app.cj:1719:public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit
-packages/core/src/app.cj:1726:public func runWithExternalPort( port: ExternalPort<Event>, render: (Frame) -> Unit, update: (Event) -> UpdateResult ): Unit
-packages/core/src/app.cj:2332:public static func applyUpdateResult(result: UpdateResult, commandQueue: ArrayList<Command>, dirtySink!: ?DirtyRects = None): Bool
-packages/core/src/app.cj:2344:public static func processCommands( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(), timerRuntime!: TimerRuntime = TimerRuntime() ): Bool
-packages/core/src/app.cj:2356:public static func processCommandsWithEvents( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(), timerRuntime!: TimerRuntime = TimerRuntime(), dirtySink!: ?DirtyRects = None ): (Bool, Bool)
-packages/core/src/app.cj:2585:public static func executeCommand(commandLine: String): Event
-packages/core/src/app.cj:2593:public static func executeCommandArgs(id: String, program: String, args: Array<String>): Event
-packages/core/src/app.cj:2660:public func defaultApp(): App
-packages/core/src/app.cj:2664:public func runApp(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
-packages/core/src/app.cj:2668:public func runAppWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit
-packages/core/src/app.cj:2673:public class LinuxEpollEventWaiter <: EventWaiter {
-packages/core/src/app.cj:2679:public init()
-packages/core/src/app.cj:2705:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
-packages/core/src/app.cj:2841:public func close(): Unit
-packages/core/src/app.cj:2877:public class MacOSPollEventWaiter <: EventWaiter {
-packages/core/src/app.cj:2880:public init()
-packages/core/src/app.cj:2882:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
-packages/core/src/app.cj:2919:public func close(): Unit
-packages/core/src/app.cj:3041:public class FocusManager {
-packages/core/src/app.cj:3046:public init()
-packages/core/src/app.cj:3048:public func add(id: String, enabled!: Bool = true): Unit
-packages/core/src/app.cj:3056:public func remove(id: String): Unit
-packages/core/src/app.cj:3070:public func focus(id: String): Bool
-packages/core/src/app.cj:3077:public func current(): ?String
-packages/core/src/app.cj:3082:public func isFocused(id: String): Bool
-packages/core/src/app.cj:3089:public func next(): ?String
-packages/core/src/app.cj:3093:public func previous(): ?String
-packages/core/src/app.cj:3097:public func handle(key: KeyEvent): Bool
+packages/core/src/app.cj:148:SetCapabilitiesOverride(?TerminalCapabilities)
+packages/core/src/app.cj:149:Suspend
+packages/core/src/app.cj:150:Batch(Array<Command>)
+packages/core/src/app.cj:220:public struct FrameMetrics {
+packages/core/src/app.cj:221:public let frameIndex: Int64
+packages/core/src/app.cj:222:public let fps: Int64
+packages/core/src/app.cj:223:public let renderMillis: Int64
+packages/core/src/app.cj:224:public let drawMillis: Int64
+packages/core/src/app.cj:225:public let totalMillis: Int64
+packages/core/src/app.cj:226:public let eventQueueLength: Int64
+packages/core/src/app.cj:227:public let dirtyCells: Int64
+packages/core/src/app.cj:228:public let diffWrites: Int64
+packages/core/src/app.cj:229:public let terminalSize: Rect
+packages/core/src/app.cj:230:public let droppedTicks: Int64
+packages/core/src/app.cj:231:public let tickDeltaMillis: Int64
+packages/core/src/app.cj:232:public let renderedCells: Int64
+packages/core/src/app.cj:233:public let dirtyRects: Int64
+packages/core/src/app.cj:234:public let bufferCellAttempts: Int64
+packages/core/src/app.cj:235:public let bufferCellWrites: Int64
+packages/core/src/app.cj:236:public let diffNanos: Int64
+packages/core/src/app.cj:237:public let writeNanos: Int64
+packages/core/src/app.cj:238:public let ansiBytes: Int64
+packages/core/src/app.cj:240:public init( frameIndex!: Int64 = 0, fps!: Int64 = 0, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, eventQueueLength!: Int64 = 0, dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, terminalSize!: Rect = Rect(0, 0, 0, 0), droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
+packages/core/src/app.cj:281:public class AppMetrics {
+packages/core/src/app.cj:294:public init(maxFrames!: ?Int64 = Some(600))
+packages/core/src/app.cj:301:public func record(frame: FrameMetrics): Unit
+packages/core/src/app.cj:314:public func record( render: RenderMetrics, frameIndex!: Int64 = 0, eventQueueLength!: Int64 = 0, droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0 ): Unit
+packages/core/src/app.cj:344:public func lastFrame(): ?FrameMetrics
+packages/core/src/app.cj:355:public func frames(): Array<FrameMetrics>
+packages/core/src/app.cj:375:public func averageFps(): Int64
+packages/core/src/app.cj:388:public func droppedTicks(): Int64
+packages/core/src/app.cj:395:public func reset(): Unit
+packages/core/src/app.cj:424:public func runtime(): RuntimeMetricsSnapshot
+packages/core/src/app.cj:437:public struct RuntimeMetricsSnapshot {
+packages/core/src/app.cj:438:public let queueEnqueued: Int64
+packages/core/src/app.cj:439:public let queueProcessed: Int64
+packages/core/src/app.cj:440:public let maxQueueDepth: Int64
+packages/core/src/app.cj:441:public let maxUpdateDepth: Int64
+packages/core/src/app.cj:442:public let yieldedTurns: Int64
+packages/core/src/app.cj:443:public let queueOverflows: Int64
+packages/core/src/app.cj:444:public let scheduling: FrameSchedulingSnapshot
+packages/core/src/app.cj:446:public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, yieldedTurns!: Int64 = 0, queueOverflows!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )
+packages/core/src/app.cj:478:public class TimerRuntime {
+packages/core/src/app.cj:483:public init(clock!: RuntimeClock = MonotonicRuntimeClock())
+packages/core/src/app.cj:610:public class AsyncRuntime {
+packages/core/src/app.cj:617:public init(maxPendingTasks!: Int64 = 256)
+packages/core/src/app.cj:622:public func start(id: String, task: () -> Event): Event
+packages/core/src/app.cj:644:public func startExec(id: String, commandLine: String): Event
+packages/core/src/app.cj:648:public func startExecArgs(id: String, program: String, args: Array<String>): Event
+packages/core/src/app.cj:652:public func cancel(id: String): Bool
+packages/core/src/app.cj:669:public func drain(): Array<Event>
+packages/core/src/app.cj:701:public func pendingCount(): Int64
+packages/core/src/app.cj:705:public func eventSource(): EventSource
+packages/core/src/app.cj:727:public class Subscription {
+packages/core/src/app.cj:728:public let interval: Int64
+packages/core/src/app.cj:729:public let event: Event
+packages/core/src/app.cj:732:public init(interval: Int64, event: Event)
+packages/core/src/app.cj:737:public func poll(step!: Int64 = 1): ?Event
+packages/core/src/app.cj:748:public interface EventWaiter {
+packages/core/src/app.cj:749:func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit
+packages/core/src/app.cj:750:func close(): Unit
+packages/core/src/app.cj:753:public class NoopEventWaiter <: EventWaiter {
+packages/core/src/app.cj:754:public init()
+packages/core/src/app.cj:756:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit
+packages/core/src/app.cj:760:public func close(): Unit
+packages/core/src/app.cj:764:public func defaultEventWaiter(): EventWaiter
+packages/core/src/app.cj:769:public func defaultEventWaiter(): EventWaiter
+packages/core/src/app.cj:774:public func defaultEventWaiter(): EventWaiter
+packages/core/src/app.cj:779:public class WindowsConsoleEventWaiter <: EventWaiter {
+packages/core/src/app.cj:782:public init()
+packages/core/src/app.cj:784:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
+packages/core/src/app.cj:807:public func close(): Unit
+packages/core/src/app.cj:812:public struct UpdateResult {
+packages/core/src/app.cj:813:public let flow: ControlFlow
+packages/core/src/app.cj:814:public let command: Command
+packages/core/src/app.cj:815:public let dirtyRects: ?DirtyRects
+packages/core/src/app.cj:820:public let renderRequested: Bool
+packages/core/src/app.cj:822:public init( flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop, dirtyRects!: ?DirtyRects = None, renderRequested!: Bool = true )
+packages/core/src/app.cj:834:public static func next(): UpdateResult
+packages/core/src/app.cj:838:public static func unchanged(): UpdateResult
+packages/core/src/app.cj:842:public static func exit(): UpdateResult
+packages/core/src/app.cj:846:public static func withCommand(command: Command): UpdateResult
+packages/core/src/app.cj:850:public static func dirty(area: Rect): UpdateResult
+packages/core/src/app.cj:854:public func withDirty(area: Rect): UpdateResult
+packages/core/src/app.cj:864:public struct HandleResult {
+packages/core/src/app.cj:865:public let handled: Bool
+packages/core/src/app.cj:866:public let flow: ControlFlow
+packages/core/src/app.cj:867:public let command: Command
+packages/core/src/app.cj:869:public init(handled!: Bool = false, flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop)
+packages/core/src/app.cj:875:public static func ignored(): HandleResult
+packages/core/src/app.cj:879:public static func consumed(command!: Command = Command.Noop): HandleResult
+packages/core/src/app.cj:883:public static func exit(): HandleResult
+packages/core/src/app.cj:887:public static func withCommand(command: Command): HandleResult
+packages/core/src/app.cj:891:public func toUpdateResult(): UpdateResult
+packages/core/src/app.cj:902:public class EventScript {
+packages/core/src/app.cj:905:public init(events!: Array<Event> = [])
+packages/core/src/app.cj:911:public func add(event: Event): EventScript
+packages/core/src/app.cj:916:public func key(key: KeyEvent): EventScript
+packages/core/src/app.cj:920:public func paste(text: String): EventScript
+packages/core/src/app.cj:924:public func message(text: String): EventScript
+packages/core/src/app.cj:928:public func tick(): EventScript
+packages/core/src/app.cj:932:public func resize(area: Rect): EventScript
+packages/core/src/app.cj:936:public func size(): Int64
+packages/core/src/app.cj:940:public static func fromText(text: String): EventScript
+packages/core/src/app.cj:968:public func run(update: (Event) -> ControlFlow): ControlFlow
+packages/core/src/app.cj:978:public func runWithCommands(update: (Event) -> UpdateResult): ControlFlow
+packages/core/src/app.cj:1001:public enum ScenarioStep {
+packages/core/src/app.cj:1002:Input(Event)
+packages/core/src/app.cj:1003:ExpectFlow(ControlFlow)
+packages/core/src/app.cj:1004:ExpectSnapshot(String)
+packages/core/src/app.cj:1005:ExpectCell(Int64, Int64, String)
+packages/core/src/app.cj:1008:public class ScenarioResult {
+packages/core/src/app.cj:1009:public let name: String
+packages/core/src/app.cj:1010:public let passed: Bool
+packages/core/src/app.cj:1011:public let failures: Array<String>
+packages/core/src/app.cj:1012:public let flow: ControlFlow
+packages/core/src/app.cj:1014:public init(name: String, passed: Bool, failures: Array<String>, flow: ControlFlow)
+packages/core/src/app.cj:1022:public struct SnapshotDiffResult {
+packages/core/src/app.cj:1023:public let passed: Bool
+packages/core/src/app.cj:1024:public let line: Int64
+packages/core/src/app.cj:1025:public let column: Int64
+packages/core/src/app.cj:1026:public let expectedLine: String
+packages/core/src/app.cj:1027:public let actualLine: String
+packages/core/src/app.cj:1028:public let message: String
+packages/core/src/app.cj:1030:public init( passed: Bool, line!: Int64 = -1, column!: Int64 = -1, expectedLine!: String = "", actualLine!: String = "", message!: String = "" )
+packages/core/src/app.cj:1047:public class SnapshotDiff {
+packages/core/src/app.cj:1048:public static func text(expected: String, actual: String): SnapshotDiffResult
+packages/core/src/app.cj:1073:public static func buffer(expected: Buffer, actual: Buffer): SnapshotDiffResult
+packages/core/src/app.cj:1088:public class EventScenario {
+packages/core/src/app.cj:1089:public let name: String
+packages/core/src/app.cj:1092:public init(name!: String = "scenario")
+packages/core/src/app.cj:1096:public func add(step: ScenarioStep): EventScenario
+packages/core/src/app.cj:1101:public func event(event: Event): EventScenario
+packages/core/src/app.cj:1105:public func key(key: KeyEvent): EventScenario
+packages/core/src/app.cj:1109:public func paste(text: String): EventScenario
+packages/core/src/app.cj:1113:public func message(text: String): EventScenario
+packages/core/src/app.cj:1117:public func tick(): EventScenario
+packages/core/src/app.cj:1121:public func expectFlow(flow: ControlFlow): EventScenario
+packages/core/src/app.cj:1125:public func expectSnapshot(snapshot: String): EventScenario
+packages/core/src/app.cj:1129:public func expectCell(x: Int64, y: Int64, symbol: String): EventScenario
+packages/core/src/app.cj:1133:public func size(): Int64
+packages/core/src/app.cj:1137:public static func fromText(text: String): EventScenario
+packages/core/src/app.cj:1179:public func run(backend: TestBackend, render: (Frame) -> Unit, update: (Event) -> UpdateResult): ScenarioResult
+packages/core/src/app.cj:1220:public enum HeadlessStep {
+packages/core/src/app.cj:1221:Input(Event)
+packages/core/src/app.cj:1222:Tick(Int64)
+packages/core/src/app.cj:1223:WaitMillis(Int64)
+packages/core/src/app.cj:1224:Resize(Rect)
+packages/core/src/app.cj:1225:Render
+packages/core/src/app.cj:1226:ExpectSnapshot(String)
+packages/core/src/app.cj:1227:ExpectCell(Int64, Int64, String)
+packages/core/src/app.cj:1230:public class HeadlessScript {
+packages/core/src/app.cj:1233:public init(steps!: Array<HeadlessStep> = [])
+packages/core/src/app.cj:1239:public func add(step: HeadlessStep): HeadlessScript
+packages/core/src/app.cj:1244:public func event(event: Event): HeadlessScript
+packages/core/src/app.cj:1245:public func key(key: KeyEvent): HeadlessScript
+packages/core/src/app.cj:1246:public func mouse(event: MouseEvent): HeadlessScript
+packages/core/src/app.cj:1247:public func paste(text: String): HeadlessScript
+packages/core/src/app.cj:1248:public func message(text: String): HeadlessScript
+packages/core/src/app.cj:1249:public func resize(area: Rect): HeadlessScript
+packages/core/src/app.cj:1250:public func tick(count!: Int64 = 1): HeadlessScript
+packages/core/src/app.cj:1251:public func waitMillis(milliseconds: Int64): HeadlessScript
+packages/core/src/app.cj:1254:public func render(): HeadlessScript
+packages/core/src/app.cj:1255:public func expectSnapshot(snapshot: String): HeadlessScript
+packages/core/src/app.cj:1256:public func expectCell(x: Int64, y: Int64, symbol: String): HeadlessScript
+packages/core/src/app.cj:1258:public func steps(): Array<HeadlessStep>
+packages/core/src/app.cj:1263:public struct HeadlessRunOptions {
+packages/core/src/app.cj:1264:public let area: Rect
+packages/core/src/app.cj:1265:public let ticks: Int64
+packages/core/src/app.cj:1266:public let tickDeltaMillis: Int64
+packages/core/src/app.cj:1267:public let captureBuffers: Bool
+packages/core/src/app.cj:1268:public let captureSnapshots: Bool
+packages/core/src/app.cj:1270:public init( area!: Rect = Rect(0, 0, 80, 24), ticks!: Int64 = 0, tickDeltaMillis!: Int64 = 16, captureBuffers!: Bool = true, captureSnapshots!: Bool = true )
+packages/core/src/app.cj:1285:public class HeadlessRunResult {
+packages/core/src/app.cj:1286:public let flow: ControlFlow
+packages/core/src/app.cj:1287:public let frames: Array<Buffer>
+packages/core/src/app.cj:1288:public let snapshots: Array<String>
+packages/core/src/app.cj:1289:public let metrics: AppMetrics
+packages/core/src/app.cj:1290:public let failures: Array<String>
+packages/core/src/app.cj:1292:public init(flow: ControlFlow, frames: Array<Buffer>, snapshots: Array<String>, metrics: AppMetrics, failures: Array<String>)
+packages/core/src/app.cj:1300:public func passed(): Bool
+packages/core/src/app.cj:1320:public class AppTestRunner {
+packages/core/src/app.cj:1321:public static func run(script: HeadlessScript, render: (Frame) -> Unit, update: (Event) -> UpdateResult, options!: HeadlessRunOptions = HeadlessRunOptions()): HeadlessRunResult
+packages/core/src/app.cj:1552:public class App {
+packages/core/src/app.cj:1579:public init( inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
+packages/core/src/app.cj:1629:public init( backend!: Backend, inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
+packages/core/src/app.cj:1734:public func attachTraceSink(traceSink: AppTraceSink): Unit
+packages/core/src/app.cj:1743:public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit
+packages/core/src/app.cj:1748:public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit
+packages/core/src/app.cj:1755:public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
+packages/core/src/app.cj:1759:public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit
+packages/core/src/app.cj:1766:public func runWithExternalPort( port: ExternalPort<Event>, render: (Frame) -> Unit, update: (Event) -> UpdateResult ): Unit
+packages/core/src/app.cj:2383:public static func applyUpdateResult(result: UpdateResult, commandQueue: ArrayList<Command>, dirtySink!: ?DirtyRects = None): Bool
+packages/core/src/app.cj:2395:public static func processCommands( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(), timerRuntime!: TimerRuntime = TimerRuntime() ): Bool
+packages/core/src/app.cj:2407:public static func processCommandsWithEvents( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(), timerRuntime!: TimerRuntime = TimerRuntime(), dirtySink!: ?DirtyRects = None ): (Bool, Bool)
+packages/core/src/app.cj:2655:public static func executeCommand(commandLine: String): Event
+packages/core/src/app.cj:2663:public static func executeCommandArgs(id: String, program: String, args: Array<String>): Event
+packages/core/src/app.cj:2730:public func defaultApp(): App
+packages/core/src/app.cj:2734:public func runApp(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
+packages/core/src/app.cj:2738:public func runAppWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit
+packages/core/src/app.cj:2743:public class LinuxEpollEventWaiter <: EventWaiter {
+packages/core/src/app.cj:2749:public init()
+packages/core/src/app.cj:2775:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
+packages/core/src/app.cj:2911:public func close(): Unit
+packages/core/src/app.cj:2947:public class MacOSPollEventWaiter <: EventWaiter {
+packages/core/src/app.cj:2950:public init()
+packages/core/src/app.cj:2952:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
+packages/core/src/app.cj:2989:public func close(): Unit
+packages/core/src/app.cj:3111:public class FocusManager {
+packages/core/src/app.cj:3116:public init()
+packages/core/src/app.cj:3118:public func add(id: String, enabled!: Bool = true): Unit
+packages/core/src/app.cj:3126:public func remove(id: String): Unit
+packages/core/src/app.cj:3140:public func focus(id: String): Bool
+packages/core/src/app.cj:3147:public func current(): ?String
+packages/core/src/app.cj:3152:public func isFocused(id: String): Bool
+packages/core/src/app.cj:3159:public func next(): ?String
+packages/core/src/app.cj:3163:public func previous(): ?String
+packages/core/src/app.cj:3167:public func handle(key: KeyEvent): Bool
 packages/core/src/buffer.cj:5:public enum CellKind {
 packages/core/src/buffer.cj:6:Normal
 packages/core/src/buffer.cj:7:WideLead
@@ -269,35 +270,37 @@ packages/core/src/buffer.cj:18:public init(symbol: String, style!: Style = Style
 packages/core/src/buffer.cj:24:public operator func ==(other: Cell): Bool
 packages/core/src/buffer.cj:29:public class Buffer {
 packages/core/src/buffer.cj:30:public let area: Rect
-packages/core/src/buffer.cj:41:public init(area: Rect)
-packages/core/src/buffer.cj:46:public func clear(style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:108:public func indexOf(x: Int64, y: Int64): ?Int64
-packages/core/src/buffer.cj:115:public func setCell(x: Int64, y: Int64, cell: Cell): Unit
-packages/core/src/buffer.cj:142:public func getCell(x: Int64, y: Int64): Cell
-packages/core/src/buffer.cj:149:public func fill(area: Rect, cell: Cell): Unit
-packages/core/src/buffer.cj:193:public func fill(area: Rect, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:198:public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:202:public func fillLine(y: Int64, x: Int64, width: Int64, cell: Cell): Unit
-packages/core/src/buffer.cj:207:public func fillLine(y: Int64, x: Int64, width: Int64, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:211:public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit
-packages/core/src/buffer.cj:236:public func hline(x: Int64, y: Int64, width: Int64, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:240:public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit
-packages/core/src/buffer.cj:264:public func vline(x: Int64, y: Int64, height: Int64, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:268:public func writeAsciiSpan(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Bool
-packages/core/src/buffer.cj:277:public func writeAsciiSpanUnchecked(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:286:public func setString(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:408:public func resize(area: Rect): Buffer
-packages/core/src/buffer.cj:415:public func copy(): Buffer
-packages/core/src/buffer.cj:432:public func blitFrom(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit
-packages/core/src/buffer.cj:438:public func blitFromUnchecked(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit
-packages/core/src/buffer.cj:495:public func diff(previous: Buffer): Array<DrawOp>
-packages/core/src/buffer.cj:508:public func addMedia(placement: MediaPlacement): Unit
-packages/core/src/buffer.cj:512:public func mediaPlacements(): Array<MediaPlacement>
-packages/core/src/buffer.cj:585:public struct DrawOp {
-packages/core/src/buffer.cj:586:public let x: Int64
-packages/core/src/buffer.cj:587:public let y: Int64
-packages/core/src/buffer.cj:588:public let cell: Cell
-packages/core/src/buffer.cj:590:public init(x: Int64, y: Int64, cell: Cell)
+packages/core/src/buffer.cj:42:public init(area: Rect)
+packages/core/src/buffer.cj:47:public func capabilities(): TerminalCapabilities
+packages/core/src/buffer.cj:49:public func setCapabilities(capabilities: TerminalCapabilities): Unit
+packages/core/src/buffer.cj:51:public func clear(style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:113:public func indexOf(x: Int64, y: Int64): ?Int64
+packages/core/src/buffer.cj:120:public func setCell(x: Int64, y: Int64, cell: Cell): Unit
+packages/core/src/buffer.cj:147:public func getCell(x: Int64, y: Int64): Cell
+packages/core/src/buffer.cj:154:public func fill(area: Rect, cell: Cell): Unit
+packages/core/src/buffer.cj:198:public func fill(area: Rect, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:203:public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:207:public func fillLine(y: Int64, x: Int64, width: Int64, cell: Cell): Unit
+packages/core/src/buffer.cj:212:public func fillLine(y: Int64, x: Int64, width: Int64, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:216:public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit
+packages/core/src/buffer.cj:241:public func hline(x: Int64, y: Int64, width: Int64, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:245:public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit
+packages/core/src/buffer.cj:269:public func vline(x: Int64, y: Int64, height: Int64, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:273:public func writeAsciiSpan(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Bool
+packages/core/src/buffer.cj:282:public func writeAsciiSpanUnchecked(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:291:public func setString(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:413:public func resize(area: Rect): Buffer
+packages/core/src/buffer.cj:421:public func copy(): Buffer
+packages/core/src/buffer.cj:439:public func blitFrom(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit
+packages/core/src/buffer.cj:445:public func blitFromUnchecked(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit
+packages/core/src/buffer.cj:502:public func diff(previous: Buffer): Array<DrawOp>
+packages/core/src/buffer.cj:515:public func addMedia(placement: MediaPlacement): Unit
+packages/core/src/buffer.cj:519:public func mediaPlacements(): Array<MediaPlacement>
+packages/core/src/buffer.cj:592:public struct DrawOp {
+packages/core/src/buffer.cj:593:public let x: Int64
+packages/core/src/buffer.cj:594:public let y: Int64
+packages/core/src/buffer.cj:595:public let cell: Cell
+packages/core/src/buffer.cj:597:public init(x: Int64, y: Int64, cell: Cell)
 packages/core/src/canvas.cj:5:public enum ResizePolicy {
 packages/core/src/canvas.cj:6:Stretch
 packages/core/src/canvas.cj:7:Letterbox
@@ -702,40 +705,42 @@ packages/core/src/data_widgets.cj:768:public func childNodes(): Array<TreeNode>
 packages/core/src/data_widgets.cj:773:public class Tree <: Widget {
 packages/core/src/data_widgets.cj:778:public var selected: Int64
 packages/core/src/data_widgets.cj:779:public var offset: Int64
-packages/core/src/data_widgets.cj:784:public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), dataModel!: ?LazyTreeModel = None )
-packages/core/src/data_widgets.cj:802:public init(model: LazyTreeModel, block!: ?Block = None)
-packages/core/src/data_widgets.cj:807:public func handle(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/data_widgets.cj:830:public func toggleSelected(): Unit
-packages/core/src/data_widgets.cj:838:public func selectedId(): ?String
-packages/core/src/data_widgets.cj:844:public func selectById(id: String): Bool
-packages/core/src/data_widgets.cj:861:public func findById(id: String): ?TreeNode
-packages/core/src/data_widgets.cj:872:public func expandAll(): Unit
-packages/core/src/data_widgets.cj:879:public func collapseAll(): Unit
-packages/core/src/data_widgets.cj:888:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/data_widgets.cj:919:public func expandSelected(): Unit
-packages/core/src/data_widgets.cj:930:public func collapseSelected(): Unit
-packages/core/src/data_widgets.cj:941:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/data_widgets.cj:1043:public class FilePicker <: Widget {
-packages/core/src/data_widgets.cj:1044:public var path: String
-packages/core/src/data_widgets.cj:1048:public var searchText: String = ""
-packages/core/src/data_widgets.cj:1049:public var showHidden: Bool = false
-packages/core/src/data_widgets.cj:1051:public init(path!: String = ".", extension!: String = "", showHidden!: Bool = false)
-packages/core/src/data_widgets.cj:1058:public func refresh(): Unit
-packages/core/src/data_widgets.cj:1081:public func selectedEntry(): ?String
-packages/core/src/data_widgets.cj:1089:public func selectedPath(): ?String
-packages/core/src/data_widgets.cj:1096:public func chooseSelected(): ?String
-packages/core/src/data_widgets.cj:1100:public func setSearch(text: String): Unit
-packages/core/src/data_widgets.cj:1107:public func toggleHidden(): Unit
-packages/core/src/data_widgets.cj:1112:public func selectedInfo(): ?FileEntryInfo
-packages/core/src/data_widgets.cj:1121:public func enterSelected(): Bool
-packages/core/src/data_widgets.cj:1136:public func parent(): Bool
-packages/core/src/data_widgets.cj:1146:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/data_widgets.cj:1174:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/data_widgets.cj:1179:public class FileEntryInfo {
-packages/core/src/data_widgets.cj:1180:public let name: String
-packages/core/src/data_widgets.cj:1181:public let path: String
-packages/core/src/data_widgets.cj:1182:public let isDir: Bool
-packages/core/src/data_widgets.cj:1184:public init(name: String, path: String, isDir: Bool)
+packages/core/src/data_widgets.cj:787:public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, dataModel!: ?LazyTreeModel = None, focused!: Bool = false, focusedStyle!: ?Style = None, theme!: ?Theme = None )
+packages/core/src/data_widgets.cj:811:public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None)
+packages/core/src/data_widgets.cj:816:public func setFocused(value: Bool): Unit
+packages/core/src/data_widgets.cj:818:public func setTheme(value: ?Theme): Unit
+packages/core/src/data_widgets.cj:820:public func handle(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/data_widgets.cj:844:public func toggleSelected(): Unit
+packages/core/src/data_widgets.cj:852:public func selectedId(): ?String
+packages/core/src/data_widgets.cj:858:public func selectById(id: String): Bool
+packages/core/src/data_widgets.cj:875:public func findById(id: String): ?TreeNode
+packages/core/src/data_widgets.cj:886:public func expandAll(): Unit
+packages/core/src/data_widgets.cj:893:public func collapseAll(): Unit
+packages/core/src/data_widgets.cj:902:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/data_widgets.cj:933:public func expandSelected(): Unit
+packages/core/src/data_widgets.cj:944:public func collapseSelected(): Unit
+packages/core/src/data_widgets.cj:955:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/data_widgets.cj:1077:public class FilePicker <: Widget {
+packages/core/src/data_widgets.cj:1078:public var path: String
+packages/core/src/data_widgets.cj:1082:public var searchText: String = ""
+packages/core/src/data_widgets.cj:1083:public var showHidden: Bool = false
+packages/core/src/data_widgets.cj:1085:public init(path!: String = ".", extension!: String = "", showHidden!: Bool = false)
+packages/core/src/data_widgets.cj:1092:public func refresh(): Unit
+packages/core/src/data_widgets.cj:1115:public func selectedEntry(): ?String
+packages/core/src/data_widgets.cj:1123:public func selectedPath(): ?String
+packages/core/src/data_widgets.cj:1130:public func chooseSelected(): ?String
+packages/core/src/data_widgets.cj:1134:public func setSearch(text: String): Unit
+packages/core/src/data_widgets.cj:1141:public func toggleHidden(): Unit
+packages/core/src/data_widgets.cj:1146:public func selectedInfo(): ?FileEntryInfo
+packages/core/src/data_widgets.cj:1155:public func enterSelected(): Bool
+packages/core/src/data_widgets.cj:1170:public func parent(): Bool
+packages/core/src/data_widgets.cj:1180:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/data_widgets.cj:1208:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/data_widgets.cj:1213:public class FileEntryInfo {
+packages/core/src/data_widgets.cj:1214:public let name: String
+packages/core/src/data_widgets.cj:1215:public let path: String
+packages/core/src/data_widgets.cj:1216:public let isDir: Bool
+packages/core/src/data_widgets.cj:1218:public init(name: String, path: String, isDir: Bool)
 packages/core/src/dirty_rects.cj:5:public class DirtyRects {
 packages/core/src/dirty_rects.cj:8:public init()
 packages/core/src/dirty_rects.cj:10:public init(rects: Array<Rect>)
@@ -999,72 +1004,72 @@ packages/core/src/form_widgets.cj:15:public init( label: String, focused!: Bool 
 packages/core/src/form_widgets.cj:35:public func handle(key: KeyEvent): Bool
 packages/core/src/form_widgets.cj:40:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/form_widgets.cj:45:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:61:public class Checkbox <: Widget {
-packages/core/src/form_widgets.cj:62:public var checked: Bool
-packages/core/src/form_widgets.cj:71:public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
-packages/core/src/form_widgets.cj:91:public func handle(key: KeyEvent): Bool
-packages/core/src/form_widgets.cj:101:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/form_widgets.cj:109:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:119:public class Switch <: Widget {
-packages/core/src/form_widgets.cj:122:public var checked: Bool
-packages/core/src/form_widgets.cj:133:public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
-packages/core/src/form_widgets.cj:155:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/form_widgets.cj:167:public func handle(key: KeyEvent): Bool
-packages/core/src/form_widgets.cj:179:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/form_widgets.cj:190:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:200:public class RadioGroup <: Widget {
-packages/core/src/form_widgets.cj:201:public var selected: Int64
-packages/core/src/form_widgets.cj:202:public var offset: Int64 = 0
-packages/core/src/form_widgets.cj:214:public init( items: Array<String>, selected!: Int64 = 0, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Cyan), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
-packages/core/src/form_widgets.cj:238:public func handle(key: KeyEvent): Bool
-packages/core/src/form_widgets.cj:256:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/form_widgets.cj:267:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:300:public class Select <: Widget {
-packages/core/src/form_widgets.cj:304:public var selected: Int64
-packages/core/src/form_widgets.cj:305:public var offset: Int64 = 0
-packages/core/src/form_widgets.cj:311:public init( items: Array<String>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
-packages/core/src/form_widgets.cj:325:public func selectedValue(): ?String
-packages/core/src/form_widgets.cj:329:public func handle(key: KeyEvent): ?String
-packages/core/src/form_widgets.cj:353:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
-packages/core/src/form_widgets.cj:363:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:384:public class Dropdown <: Widget {
-packages/core/src/form_widgets.cj:386:public var selected: Int64
-packages/core/src/form_widgets.cj:387:public var offset: Int64 = 0
-packages/core/src/form_widgets.cj:389:public var open: Bool
-packages/core/src/form_widgets.cj:400:public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
-packages/core/src/form_widgets.cj:418:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/form_widgets.cj:430:public func setTransactionalSelection(enabled!: Bool): Unit
-packages/core/src/form_widgets.cj:444:public func cancelSelection(): Unit
-packages/core/src/form_widgets.cj:501:public func selectedValue(): ?String
-packages/core/src/form_widgets.cj:507:public func handle(key: KeyEvent): ?String
-packages/core/src/form_widgets.cj:538:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
-packages/core/src/form_widgets.cj:569:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:598:public class ColorPicker <: Widget {
-packages/core/src/form_widgets.cj:605:public var selected: Int64
-packages/core/src/form_widgets.cj:609:public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)
-packages/core/src/form_widgets.cj:616:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/form_widgets.cj:628:public func selectedColor(): ?Color
-packages/core/src/form_widgets.cj:634:public func handle(key: KeyEvent): Bool
-packages/core/src/form_widgets.cj:659:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/form_widgets.cj:677:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:746:public class MultiSelect <: Widget {
-packages/core/src/form_widgets.cj:751:public var cursor: Int64
-packages/core/src/form_widgets.cj:752:public var offset: Int64 = 0
-packages/core/src/form_widgets.cj:759:public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White))
-packages/core/src/form_widgets.cj:771:public func selectedIndices(): Array<Int64>
-packages/core/src/form_widgets.cj:773:public func toggle(): Unit
-packages/core/src/form_widgets.cj:784:public func handle(key: KeyEvent): Bool
-packages/core/src/form_widgets.cj:797:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/form_widgets.cj:807:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:820:public class DatePicker <: Widget {
-packages/core/src/form_widgets.cj:821:public var year: Int64
-packages/core/src/form_widgets.cj:822:public var month: Int64
-packages/core/src/form_widgets.cj:823:public var day: Int64
-packages/core/src/form_widgets.cj:829:public init( year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1, style!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None )
-packages/core/src/form_widgets.cj:847:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/form_widgets.cj:863:public func value(): String
-packages/core/src/form_widgets.cj:867:public func handle(key: KeyEvent): Bool
-packages/core/src/form_widgets.cj:899:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:73:public class Checkbox <: Widget {
+packages/core/src/form_widgets.cj:74:public var checked: Bool
+packages/core/src/form_widgets.cj:83:public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:103:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:113:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/form_widgets.cj:121:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:131:public class Switch <: Widget {
+packages/core/src/form_widgets.cj:134:public var checked: Bool
+packages/core/src/form_widgets.cj:145:public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:167:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/form_widgets.cj:179:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:191:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/form_widgets.cj:202:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:212:public class RadioGroup <: Widget {
+packages/core/src/form_widgets.cj:213:public var selected: Int64
+packages/core/src/form_widgets.cj:214:public var offset: Int64 = 0
+packages/core/src/form_widgets.cj:226:public init( items: Array<String>, selected!: Int64 = 0, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Cyan), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:250:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:268:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/form_widgets.cj:279:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:312:public class Select <: Widget {
+packages/core/src/form_widgets.cj:316:public var selected: Int64
+packages/core/src/form_widgets.cj:317:public var offset: Int64 = 0
+packages/core/src/form_widgets.cj:323:public init( items: Array<String>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/form_widgets.cj:337:public func selectedValue(): ?String
+packages/core/src/form_widgets.cj:341:public func handle(key: KeyEvent): ?String
+packages/core/src/form_widgets.cj:365:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
+packages/core/src/form_widgets.cj:375:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:396:public class Dropdown <: Widget {
+packages/core/src/form_widgets.cj:398:public var selected: Int64
+packages/core/src/form_widgets.cj:399:public var offset: Int64 = 0
+packages/core/src/form_widgets.cj:401:public var open: Bool
+packages/core/src/form_widgets.cj:412:public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/form_widgets.cj:430:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/form_widgets.cj:442:public func setTransactionalSelection(enabled!: Bool): Unit
+packages/core/src/form_widgets.cj:456:public func cancelSelection(): Unit
+packages/core/src/form_widgets.cj:513:public func selectedValue(): ?String
+packages/core/src/form_widgets.cj:519:public func handle(key: KeyEvent): ?String
+packages/core/src/form_widgets.cj:549:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
+packages/core/src/form_widgets.cj:581:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:610:public class ColorPicker <: Widget {
+packages/core/src/form_widgets.cj:617:public var selected: Int64
+packages/core/src/form_widgets.cj:621:public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)
+packages/core/src/form_widgets.cj:628:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/form_widgets.cj:640:public func selectedColor(): ?Color
+packages/core/src/form_widgets.cj:646:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:671:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/form_widgets.cj:689:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:758:public class MultiSelect <: Widget {
+packages/core/src/form_widgets.cj:763:public var cursor: Int64
+packages/core/src/form_widgets.cj:764:public var offset: Int64 = 0
+packages/core/src/form_widgets.cj:771:public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White))
+packages/core/src/form_widgets.cj:783:public func selectedIndices(): Array<Int64>
+packages/core/src/form_widgets.cj:785:public func toggle(): Unit
+packages/core/src/form_widgets.cj:796:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:809:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/form_widgets.cj:819:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:832:public class DatePicker <: Widget {
+packages/core/src/form_widgets.cj:833:public var year: Int64
+packages/core/src/form_widgets.cj:834:public var month: Int64
+packages/core/src/form_widgets.cj:835:public var day: Int64
+packages/core/src/form_widgets.cj:841:public init( year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1, style!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:859:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/form_widgets.cj:875:public func value(): String
+packages/core/src/form_widgets.cj:879:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:911:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/geometry.cj:5:public struct Rect <: Equatable<Rect> {
 packages/core/src/geometry.cj:6:public var x: Int64
 packages/core/src/geometry.cj:7:public var y: Int64
@@ -1239,60 +1244,60 @@ packages/core/src/media.cj:148:public func mediaFallbackText(source: MediaSource
 packages/core/src/media.cj:154:public func mediaProtocolName(protocol: MediaProtocol): String
 packages/core/src/navigation.cj:34:public class Tabs <: Widget {
 packages/core/src/navigation.cj:38:public var selected: Int64
-packages/core/src/navigation.cj:46:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/navigation.cj:46:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: ?Style = None )
 packages/core/src/navigation.cj:59:public func setFocused(focused: Bool): Unit
-packages/core/src/navigation.cj:65:public func setTheme(theme: ?Theme): Unit
-packages/core/src/navigation.cj:71:public func handle(key: KeyEvent): Bool
-packages/core/src/navigation.cj:87:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/navigation.cj:113:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:162:public class SegmentedControl <: Widget {
-packages/core/src/navigation.cj:166:public var selected: Int64
-packages/core/src/navigation.cj:176:public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: Style = Style(fg: Color.Indexed(8)), focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )
-packages/core/src/navigation.cj:198:public func selectedValue(): ?String
-packages/core/src/navigation.cj:206:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/navigation.cj:218:public func handle(key: KeyEvent): Bool
-packages/core/src/navigation.cj:240:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/navigation.cj:268:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:335:public class StatusBarProgress {
-packages/core/src/navigation.cj:336:public let value: Int64
-packages/core/src/navigation.cj:337:public let total: Int64
-packages/core/src/navigation.cj:338:public let width: Int64
-packages/core/src/navigation.cj:339:public let label: String
-packages/core/src/navigation.cj:340:public let labelMode: ProgressBarLabelMode
-packages/core/src/navigation.cj:341:public let style: Style
-packages/core/src/navigation.cj:342:public let fillStyle: Style
-packages/core/src/navigation.cj:343:public let labelStyle: Style
-packages/core/src/navigation.cj:344:public let symbols: ProgressBarSymbols
-packages/core/src/navigation.cj:346:public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = "", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: Style = Style(fg: Color.Indexed(8), bg: Color.White), fillStyle!: Style = Style(fg: Color.Cyan, bg: Color.White), labelStyle!: Style = Style(fg: Color.Black, bg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols(filled: "=", empty: "-", head: ">", indeterminate: ">") )
-packages/core/src/navigation.cj:369:public class StatusBar <: Widget {
-packages/core/src/navigation.cj:375:public init( left!: String = "", right!: String = "", style!: Style = Style(fg: Color.Black, bg: Color.White), progress!: ?StatusBarProgress = None )
-packages/core/src/navigation.cj:387:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:427:public class Viewport <: Widget {
-packages/core/src/navigation.cj:429:public var offset: Int64
-packages/core/src/navigation.cj:433:public init(lines: Array<String>, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default())
-packages/core/src/navigation.cj:440:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/navigation.cj:452:public func scroll(delta: Int64, viewportHeight: Int64): Unit
-packages/core/src/navigation.cj:456:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:476:public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/navigation.cj:481:public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64
-packages/core/src/navigation.cj:487:public func mouseScrollDelta(mouse: MouseEvent): Int64
-packages/core/src/navigation.cj:498:public class PointerCapture {
-packages/core/src/navigation.cj:503:public init()
-packages/core/src/navigation.cj:505:public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool
-packages/core/src/navigation.cj:517:public func owns(owner: String): Bool
-packages/core/src/navigation.cj:518:public func activeOwner(): ?String
-packages/core/src/navigation.cj:519:public func origin(): Position
-packages/core/src/navigation.cj:520:public func initialValue(): Int64
-packages/core/src/navigation.cj:522:public func release(owner: String, mouse: MouseEvent): Bool
-packages/core/src/navigation.cj:530:public func cancel(): Unit
-packages/core/src/navigation.cj:548:public class ModalFocusState {
-packages/core/src/navigation.cj:553:public init(base: FocusManager, keymap!: KeyMap = KeyMap())
-packages/core/src/navigation.cj:558:public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
-packages/core/src/navigation.cj:565:public func active(): ?String
-packages/core/src/navigation.cj:569:public func focus(): FocusManager
-packages/core/src/navigation.cj:573:public func close(): ?String
-packages/core/src/navigation.cj:584:public func handle(key: KeyEvent): Bool
-packages/core/src/navigation.cj:592:public func actionFor(key: KeyEvent): ?String
+packages/core/src/navigation.cj:63:public func setTheme(theme: ?Theme): Unit
+packages/core/src/navigation.cj:69:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:85:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:111:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:159:public class SegmentedControl <: Widget {
+packages/core/src/navigation.cj:163:public var selected: Int64
+packages/core/src/navigation.cj:173:public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: Style = Style(fg: Color.Indexed(8)), focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )
+packages/core/src/navigation.cj:195:public func selectedValue(): ?String
+packages/core/src/navigation.cj:203:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/navigation.cj:215:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:237:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:265:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:332:public class StatusBarProgress {
+packages/core/src/navigation.cj:333:public let value: Int64
+packages/core/src/navigation.cj:334:public let total: Int64
+packages/core/src/navigation.cj:335:public let width: Int64
+packages/core/src/navigation.cj:336:public let label: String
+packages/core/src/navigation.cj:337:public let labelMode: ProgressBarLabelMode
+packages/core/src/navigation.cj:338:public let style: Style
+packages/core/src/navigation.cj:339:public let fillStyle: Style
+packages/core/src/navigation.cj:340:public let labelStyle: Style
+packages/core/src/navigation.cj:341:public let symbols: ProgressBarSymbols
+packages/core/src/navigation.cj:343:public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = "", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: Style = Style(fg: Color.Indexed(8), bg: Color.White), fillStyle!: Style = Style(fg: Color.Cyan, bg: Color.White), labelStyle!: Style = Style(fg: Color.Black, bg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols(filled: "=", empty: "-", head: ">", indeterminate: ">") )
+packages/core/src/navigation.cj:366:public class StatusBar <: Widget {
+packages/core/src/navigation.cj:372:public init( left!: String = "", right!: String = "", style!: Style = Style(fg: Color.Black, bg: Color.White), progress!: ?StatusBarProgress = None )
+packages/core/src/navigation.cj:384:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:424:public class Viewport <: Widget {
+packages/core/src/navigation.cj:426:public var offset: Int64
+packages/core/src/navigation.cj:430:public init(lines: Array<String>, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default())
+packages/core/src/navigation.cj:437:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/navigation.cj:449:public func scroll(delta: Int64, viewportHeight: Int64): Unit
+packages/core/src/navigation.cj:453:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:473:public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:478:public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64
+packages/core/src/navigation.cj:484:public func mouseScrollDelta(mouse: MouseEvent): Int64
+packages/core/src/navigation.cj:495:public class PointerCapture {
+packages/core/src/navigation.cj:500:public init()
+packages/core/src/navigation.cj:502:public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool
+packages/core/src/navigation.cj:514:public func owns(owner: String): Bool
+packages/core/src/navigation.cj:515:public func activeOwner(): ?String
+packages/core/src/navigation.cj:516:public func origin(): Position
+packages/core/src/navigation.cj:517:public func initialValue(): Int64
+packages/core/src/navigation.cj:519:public func release(owner: String, mouse: MouseEvent): Bool
+packages/core/src/navigation.cj:527:public func cancel(): Unit
+packages/core/src/navigation.cj:545:public class ModalFocusState {
+packages/core/src/navigation.cj:550:public init(base: FocusManager, keymap!: KeyMap = KeyMap())
+packages/core/src/navigation.cj:555:public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
+packages/core/src/navigation.cj:562:public func active(): ?String
+packages/core/src/navigation.cj:566:public func focus(): FocusManager
+packages/core/src/navigation.cj:570:public func close(): ?String
+packages/core/src/navigation.cj:581:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:589:public func actionFor(key: KeyEvent): ?String
 packages/core/src/paged_table.cj:5:public class TableDataRow {
 packages/core/src/paged_table.cj:6:public let id: String
 packages/core/src/paged_table.cj:7:public let cells: Array<String>
@@ -1712,29 +1717,44 @@ packages/core/src/style.cj:57:public func withBg(color: Color): Style
 packages/core/src/style.cj:63:public func withModifier(modifier: Modifier): Style
 packages/core/src/style.cj:69:public func patch(other: Style): Style
 packages/core/src/style.cj:83:public operator func ==(other: Style): Bool
-packages/core/src/style.cj:88:public struct Theme {
-packages/core/src/style.cj:89:public let normal: Style
-packages/core/src/style.cj:90:public let focused: Style
-packages/core/src/style.cj:91:public let selected: Style
-packages/core/src/style.cj:92:public let disabled: Style
-packages/core/src/style.cj:93:public let error: Style
-packages/core/src/style.cj:94:public let accent: Style
-packages/core/src/style.cj:95:public let success: Style
-packages/core/src/style.cj:96:public let warning: Style
-packages/core/src/style.cj:97:public let info: Style
-packages/core/src/style.cj:99:public init( normal!: Style = Style.default(), focused!: Style = Style(fg: Color.Black, bg: Color.White), selected!: Style = Style(fg: Color.Black, bg: Color.White), disabled!: Style = Style(fg: Color.Indexed(8)), error!: Style = Style(fg: Color.Red), accent!: Style = Style(fg: Color.Cyan), success!: Style = Style(fg: Color.Green), warning!: Style = Style(fg: Color.Yellow), info!: Style = Style(fg: Color.Cyan) )
-packages/core/src/style.cj:121:public static func default(): Theme
-packages/core/src/style.cj:127:public static func graphite(accent!: Color = Color.Cyan): Theme
-packages/core/src/style.cj:133:public static func light(accent!: Color = Color.Cyan): Theme
-packages/core/src/style.cj:139:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: Color = Color.Cyan ): Theme
-packages/core/src/style.cj:158:public func serialize(): String
-packages/core/src/style.cj:164:public enum StyleState {
-packages/core/src/style.cj:165:Normal
-packages/core/src/style.cj:166:Focused
-packages/core/src/style.cj:167:Selected
-packages/core/src/style.cj:168:Disabled
-packages/core/src/style.cj:169:Error
-packages/core/src/style.cj:170:Accent
+packages/core/src/style.cj:88:public enum IconSet {
+packages/core/src/style.cj:89:Unicode
+packages/core/src/style.cj:90:NerdFont
+packages/core/src/style.cj:91:Ascii
+packages/core/src/style.cj:94:public struct Theme {
+packages/core/src/style.cj:95:public let normal: Style
+packages/core/src/style.cj:96:public let focused: Style
+packages/core/src/style.cj:97:public let selected: Style
+packages/core/src/style.cj:98:public let disabled: Style
+packages/core/src/style.cj:99:public let error: Style
+packages/core/src/style.cj:100:public let accent: Style
+packages/core/src/style.cj:101:public let success: Style
+packages/core/src/style.cj:102:public let warning: Style
+packages/core/src/style.cj:103:public let info: Style
+packages/core/src/style.cj:104:public let canvas: Style
+packages/core/src/style.cj:105:public let surface: Style
+packages/core/src/style.cj:106:public let raisedSurface: Style
+packages/core/src/style.cj:107:public let heading: Style
+packages/core/src/style.cj:108:public let secondary: Style
+packages/core/src/style.cj:109:public let border: Style
+packages/core/src/style.cj:110:public let strongBorder: Style
+packages/core/src/style.cj:111:public let iconSet: IconSet
+packages/core/src/style.cj:113:public init( normal!: Style = Style.default(), focused!: Style = Style(modifier: focusModifier()), selected!: Style = Style(bg: Color.Indexed(8), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Indexed(8)), error!: Style = Style(fg: Color.Red), accent!: Style = Style(fg: Color.Cyan), success!: Style = Style(fg: Color.Green), warning!: Style = Style(fg: Color.Yellow), info!: Style = Style(fg: Color.Cyan), canvas!: Style = Style.default(), surface!: Style = Style.default(), raisedSurface!: Style = Style.default(), heading!: Style = Style(modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Indexed(8)), border!: Style = Style(fg: Color.Indexed(8)), strongBorder!: Style = Style.default(), iconSet!: IconSet = IconSet.Unicode )
+packages/core/src/style.cj:151:public static func default(): Theme
+packages/core/src/style.cj:155:public func withIconSet(value: IconSet): Theme
+packages/core/src/style.cj:164:public static func graphite(accent!: Color = Color.Cyan): Theme
+packages/core/src/style.cj:170:public static func light(): Theme
+packages/core/src/style.cj:174:public static func light(accent!: Color): Theme
+packages/core/src/style.cj:180:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: ?Color = None ): Theme
+packages/core/src/style.cj:192:public func adapted(capabilities: TerminalCapabilities): Theme
+packages/core/src/style.cj:218:public func serialize(): String
+packages/core/src/style.cj:229:public enum StyleState {
+packages/core/src/style.cj:230:Normal
+packages/core/src/style.cj:231:Focused
+packages/core/src/style.cj:232:Selected
+packages/core/src/style.cj:233:Disabled
+packages/core/src/style.cj:234:Error
+packages/core/src/style.cj:235:Accent
 packages/core/src/task_activity.cj:5:public enum TaskStatus {
 packages/core/src/task_activity.cj:7:Pending
 packages/core/src/task_activity.cj:9:Queued
@@ -1759,8 +1779,15 @@ packages/core/src/task_activity.cj:65:public let detail: String
 packages/core/src/task_activity.cj:68:public let progressLabel: String
 packages/core/src/task_activity.cj:73:public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
 packages/core/src/task_activity.cj:107:public class TaskActivityView <: Widget {
-packages/core/src/task_activity.cj:116:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: Bool = true )
-packages/core/src/task_activity.cj:132:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/task_activity.cj:119:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
+packages/core/src/task_activity.cj:137:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/task_activity.cj:283:public class TaskActivityListEntry {
+packages/core/src/task_activity.cj:284:public let activity: TaskActivity
+packages/core/src/task_activity.cj:285:public let layout: TaskActivityLayout
+packages/core/src/task_activity.cj:287:public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded)
+packages/core/src/task_activity.cj:307:public class TaskActivityList <: Widget {
+packages/core/src/task_activity.cj:315:public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
+packages/core/src/task_activity.cj:325:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/terminal.cj:122:public enum CursorShape {
 packages/core/src/terminal.cj:123:Block
 packages/core/src/terminal.cj:124:Bar
@@ -1812,209 +1839,210 @@ packages/core/src/terminal.cj:257:public enum RenderMode {
 packages/core/src/terminal.cj:258:Diff
 packages/core/src/terminal.cj:259:Full
 packages/core/src/terminal.cj:262:public class Terminal {
-packages/core/src/terminal.cj:272:public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )
-packages/core/src/terminal.cj:283:public func draw(render: (Frame) -> Unit): RenderMetrics
-packages/core/src/terminal.cj:287:public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
-packages/core/src/terminal.cj:438:public func clear(): Unit
-packages/core/src/terminal.cj:599:public enum KeyboardProtocolMode {
-packages/core/src/terminal.cj:600:Basic
-packages/core/src/terminal.cj:601:ModifyOtherKeys
-packages/core/src/terminal.cj:602:Kitty
-packages/core/src/terminal.cj:603:Auto
-packages/core/src/terminal.cj:606:public enum TerminalProbeMode {
-packages/core/src/terminal.cj:607:Disabled
-packages/core/src/terminal.cj:608:EnvOnly
-packages/core/src/terminal.cj:609:Active
-packages/core/src/terminal.cj:612:public struct KeyboardOptions {
-packages/core/src/terminal.cj:613:public let mode: KeyboardProtocolMode
-packages/core/src/terminal.cj:614:public let probe: TerminalProbeMode
-packages/core/src/terminal.cj:615:public let probeBudgetMillis: Int64
-packages/core/src/terminal.cj:616:public let escDelayMillis: Int64
-packages/core/src/terminal.cj:617:public let repeatHeldMillis: Int64
-packages/core/src/terminal.cj:619:public init( mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic, probe!: TerminalProbeMode = TerminalProbeMode.Disabled, probeBudgetMillis!: Int64 = 100, escDelayMillis!: Int64 = 25, repeatHeldMillis!: Int64 = 120 )
-packages/core/src/terminal.cj:634:public struct TerminalProbeResult {
-packages/core/src/terminal.cj:635:public let capabilities: TerminalCapabilities
-packages/core/src/terminal.cj:638:public let consumedBytes: Array<Byte>
-packages/core/src/terminal.cj:639:public let budgetMillis: Int64
-packages/core/src/terminal.cj:640:public let elapsedMillis: Int64
-packages/core/src/terminal.cj:642:public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64)
-packages/core/src/terminal.cj:650:public class TerminalProbe {
-packages/core/src/terminal.cj:651:public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult
-packages/core/src/terminal.cj:700:public class TerminalSession {
-packages/core/src/terminal.cj:725:public prop rawModeEnabled: Bool { get() { rawActive } }
-packages/core/src/terminal.cj:727:public init( backend: Backend, driver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions() )
-packages/core/src/terminal.cj:753:public func probeResult(): ?TerminalProbeResult
-packages/core/src/terminal.cj:768:public func start(): Bool
-packages/core/src/terminal.cj:811:public func stop(): Unit
-packages/core/src/terminal.cj:819:public func run(action: () -> Unit): Unit
-packages/core/src/terminal.cj:1090:public interface TerminalDriver {
-packages/core/src/terminal.cj:1091:func name(): String
-packages/core/src/terminal.cj:1092:func enterRawMode(): Bool
-packages/core/src/terminal.cj:1093:func restore(): Unit
-packages/core/src/terminal.cj:1094:func size(): ?Rect
-packages/core/src/terminal.cj:1095:func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1099:public class LinuxTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1100:public init()
-packages/core/src/terminal.cj:1102:public func name(): String
-packages/core/src/terminal.cj:1103:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1104:public func restore(): Unit
-packages/core/src/terminal.cj:1105:public func size(): ?Rect
-packages/core/src/terminal.cj:1106:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1111:public class FallbackTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1113:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1117:public func name(): String
-packages/core/src/terminal.cj:1118:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1119:public func restore(): Unit
-packages/core/src/terminal.cj:1120:public func size(): ?Rect
-packages/core/src/terminal.cj:1121:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1135:public class MacOSTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1138:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1142:public func name(): String
-packages/core/src/terminal.cj:1143:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1144:public func restore(): Unit
-packages/core/src/terminal.cj:1145:public func size(): ?Rect
-packages/core/src/terminal.cj:1146:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1160:public class MacOSTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1161:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1165:public func name(): String
-packages/core/src/terminal.cj:1166:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1167:public func restore(): Unit
-packages/core/src/terminal.cj:1168:public func size(): ?Rect
-packages/core/src/terminal.cj:1169:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1175:public class WindowsTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1178:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1182:public func name(): String
-packages/core/src/terminal.cj:1183:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1184:public func restore(): Unit
-packages/core/src/terminal.cj:1185:public func size(): ?Rect
-packages/core/src/terminal.cj:1186:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1200:public class WindowsTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1201:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1205:public func name(): String
-packages/core/src/terminal.cj:1206:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1207:public func restore(): Unit
-packages/core/src/terminal.cj:1208:public func size(): ?Rect
-packages/core/src/terminal.cj:1209:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1215:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1220:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1225:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1229:public class AnsiBackend <: Backend {
-packages/core/src/terminal.cj:1237:public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1243:public func clear(): Unit
-packages/core/src/terminal.cj:1247:public func moveTo(x: Int64, y: Int64): Unit
-packages/core/src/terminal.cj:1251:public func enterAlternateScreen(): Unit
-packages/core/src/terminal.cj:1252:public func leaveAlternateScreen(): Unit
-packages/core/src/terminal.cj:1253:public func hideCursor(): Unit
-packages/core/src/terminal.cj:1254:public func showCursor(): Unit
-packages/core/src/terminal.cj:1255:public func setCursorShape(shape: ?CursorShape): Unit
-packages/core/src/terminal.cj:1261:public func enableMouse(): Unit
-packages/core/src/terminal.cj:1262:public func disableMouse(): Unit
-packages/core/src/terminal.cj:1263:public func enableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1264:public func disableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1266:public func size(): Rect
-packages/core/src/terminal.cj:1273:public func draw(buffer: Buffer): Unit
-packages/core/src/terminal.cj:1292:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
-packages/core/src/terminal.cj:1313:public func drawMedia(ops: Array<MediaOp>): Unit
-packages/core/src/terminal.cj:1323:public func write(text: String): Unit
-packages/core/src/terminal.cj:1329:public func setInstrumentationEnabled(enabled: Bool): Unit
-packages/core/src/terminal.cj:1333:public func diagnosticByteCount(): Int64
-packages/core/src/terminal.cj:1337:public func flush(): Unit
-packages/core/src/terminal.cj:1365:public class TestBackend <: Backend {
-packages/core/src/terminal.cj:1379:public init( area!: Rect = Rect(0, 0, 80, 24), captureSnapshots!: Bool = true )
-packages/core/src/terminal.cj:1387:public func clear(): Unit
-packages/core/src/terminal.cj:1391:public func moveTo(x: Int64, y: Int64): Unit
-packages/core/src/terminal.cj:1395:public func enterAlternateScreen(): Unit
-packages/core/src/terminal.cj:1396:public func leaveAlternateScreen(): Unit
-packages/core/src/terminal.cj:1397:public func hideCursor(): Unit
-packages/core/src/terminal.cj:1398:public func showCursor(): Unit
-packages/core/src/terminal.cj:1399:public func setCursorShape(shape: ?CursorShape): Unit
-packages/core/src/terminal.cj:1405:public func enableMouse(): Unit
-packages/core/src/terminal.cj:1406:public func disableMouse(): Unit
-packages/core/src/terminal.cj:1407:public func enableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1408:public func disableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1410:public func size(): Rect
-packages/core/src/terminal.cj:1414:public func setSize(area: Rect): Unit
-packages/core/src/terminal.cj:1418:public func draw(buffer: Buffer): Unit
-packages/core/src/terminal.cj:1428:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
-packages/core/src/terminal.cj:1438:public func drawMedia(ops: Array<MediaOp>): Unit
-packages/core/src/terminal.cj:1445:public func write(text: String): Unit
-packages/core/src/terminal.cj:1451:public func flush(): Unit
-packages/core/src/terminal.cj:1453:public func output(): String
-packages/core/src/terminal.cj:1457:public func clearOutput(): Unit
-packages/core/src/terminal.cj:1463:public func lastBuffer(): ?Buffer
-packages/core/src/terminal.cj:1467:public func lastDiffOps(): Int64
-packages/core/src/terminal.cj:1471:public func lastDiffWrites(): Int64
-packages/core/src/terminal.cj:1475:public func lastMediaOps(): Array<MediaOp>
-packages/core/src/terminal.cj:1480:public func mediaFrameCount(): Int64
-packages/core/src/terminal.cj:1484:public func snapshot(): String
-packages/core/src/terminal.cj:1491:public func snapshots(): Array<String>
-packages/core/src/terminal.cj:1495:public func snapshotAt(index: Int64): String
-packages/core/src/terminal.cj:1500:public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool
-packages/core/src/terminal.cj:1509:public func assertSnapshot(expected: String): Bool
-packages/core/src/terminal.cj:1513:public func assertSnapshotAt(index: Int64, expected: String): Bool
-packages/core/src/terminal.cj:1517:public func assertLastMediaOpCount(expected: Int64): Bool
-packages/core/src/terminal.cj:1530:public struct TerminalCapabilities {
-packages/core/src/terminal.cj:1531:public let size: Rect
-packages/core/src/terminal.cj:1532:public let trueColor: Bool
-packages/core/src/terminal.cj:1533:public let colorLevel: Int64
-packages/core/src/terminal.cj:1534:public let mouse: Bool
-packages/core/src/terminal.cj:1535:public let mouseMove: Bool
-packages/core/src/terminal.cj:1536:public let focusEvents: Bool
-packages/core/src/terminal.cj:1537:public let bracketedPaste: Bool
-packages/core/src/terminal.cj:1538:public let alternateScreen: Bool
-packages/core/src/terminal.cj:1539:public let unicode: Bool
-packages/core/src/terminal.cj:1540:public let kittyGraphics: Bool
-packages/core/src/terminal.cj:1541:public let sixel: Bool
-packages/core/src/terminal.cj:1542:public let osc8: Bool
-packages/core/src/terminal.cj:1543:public let keyboardProtocol: KeyProtocol
-packages/core/src/terminal.cj:1544:public let keyUp: Bool
-packages/core/src/terminal.cj:1545:public let keyRepeat: Bool
-packages/core/src/terminal.cj:1546:public let recommendedFps: Int64
-packages/core/src/terminal.cj:1547:public let cellWidthPixels: Int64
-packages/core/src/terminal.cj:1548:public let cellHeightPixels: Int64
-packages/core/src/terminal.cj:1549:public let driverName: String
-packages/core/src/terminal.cj:1551:public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = "linux-glibc" )
-packages/core/src/terminal.cj:1593:public static func detect(backend!: Backend = AnsiBackend(), driverName!: String = "linux-glibc"): TerminalCapabilities
-packages/core/src/terminal.cj:1703:public struct RenderMetrics {
-packages/core/src/terminal.cj:1704:public let size: Rect
-packages/core/src/terminal.cj:1705:public let dirtyCells: Int64
-packages/core/src/terminal.cj:1706:public let diffWrites: Int64
-packages/core/src/terminal.cj:1707:public let mediaOps: Int64
-packages/core/src/terminal.cj:1708:public let fullRedraw: Bool
-packages/core/src/terminal.cj:1709:public let renderMillis: Int64
-packages/core/src/terminal.cj:1710:public let drawMillis: Int64
-packages/core/src/terminal.cj:1711:public let totalMillis: Int64
-packages/core/src/terminal.cj:1712:public let renderedCells: Int64
-packages/core/src/terminal.cj:1713:public let dirtyRects: Int64
-packages/core/src/terminal.cj:1714:public let copiedCells: Int64
-packages/core/src/terminal.cj:1715:public let bufferCellAttempts: Int64
-packages/core/src/terminal.cj:1716:public let bufferCellWrites: Int64
-packages/core/src/terminal.cj:1717:public let diffCells: Int64
-packages/core/src/terminal.cj:1718:public let diffSpans: Int64
-packages/core/src/terminal.cj:1719:public let renderNanos: Int64
-packages/core/src/terminal.cj:1720:public let diffNanos: Int64
-packages/core/src/terminal.cj:1721:public let writeNanos: Int64
-packages/core/src/terminal.cj:1722:public let totalNanos: Int64
-packages/core/src/terminal.cj:1723:public let ansiBytes: Int64
-packages/core/src/terminal.cj:1725:public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
-packages/core/src/terminal.cj:1768:public class DebugOverlay <: Widget {
-packages/core/src/terminal.cj:1772:public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
-packages/core/src/terminal.cj:1777:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/terminal.cj:1802:public class TerminalMode {
-packages/core/src/terminal.cj:1808:public static func lastError(): ?String
-packages/core/src/terminal.cj:1812:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:1852:public static func restore(): Unit
-packages/core/src/terminal.cj:1870:public static func size(): ?Rect
-packages/core/src/terminal.cj:1908:public class MacOSTerminalMode {
-packages/core/src/terminal.cj:1915:public static func lastError(): ?String
-packages/core/src/terminal.cj:1919:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:1965:public static func restore(): Unit
-packages/core/src/terminal.cj:1983:public static func size(): ?Rect
-packages/core/src/terminal.cj:2004:public class WindowsConsoleMode {
-packages/core/src/terminal.cj:2011:public static func lastError(): ?String
-packages/core/src/terminal.cj:2015:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:2055:public static func restore(): Unit
-packages/core/src/terminal.cj:2073:public static func size(): ?Rect
+packages/core/src/terminal.cj:273:public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )
+packages/core/src/terminal.cj:284:public func setCapabilities(capabilities: TerminalCapabilities): Unit
+packages/core/src/terminal.cj:290:public func draw(render: (Frame) -> Unit): RenderMetrics
+packages/core/src/terminal.cj:294:public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
+packages/core/src/terminal.cj:446:public func clear(): Unit
+packages/core/src/terminal.cj:607:public enum KeyboardProtocolMode {
+packages/core/src/terminal.cj:608:Basic
+packages/core/src/terminal.cj:609:ModifyOtherKeys
+packages/core/src/terminal.cj:610:Kitty
+packages/core/src/terminal.cj:611:Auto
+packages/core/src/terminal.cj:614:public enum TerminalProbeMode {
+packages/core/src/terminal.cj:615:Disabled
+packages/core/src/terminal.cj:616:EnvOnly
+packages/core/src/terminal.cj:617:Active
+packages/core/src/terminal.cj:620:public struct KeyboardOptions {
+packages/core/src/terminal.cj:621:public let mode: KeyboardProtocolMode
+packages/core/src/terminal.cj:622:public let probe: TerminalProbeMode
+packages/core/src/terminal.cj:623:public let probeBudgetMillis: Int64
+packages/core/src/terminal.cj:624:public let escDelayMillis: Int64
+packages/core/src/terminal.cj:625:public let repeatHeldMillis: Int64
+packages/core/src/terminal.cj:627:public init( mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic, probe!: TerminalProbeMode = TerminalProbeMode.Disabled, probeBudgetMillis!: Int64 = 100, escDelayMillis!: Int64 = 25, repeatHeldMillis!: Int64 = 120 )
+packages/core/src/terminal.cj:642:public struct TerminalProbeResult {
+packages/core/src/terminal.cj:643:public let capabilities: TerminalCapabilities
+packages/core/src/terminal.cj:646:public let consumedBytes: Array<Byte>
+packages/core/src/terminal.cj:647:public let budgetMillis: Int64
+packages/core/src/terminal.cj:648:public let elapsedMillis: Int64
+packages/core/src/terminal.cj:650:public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64)
+packages/core/src/terminal.cj:658:public class TerminalProbe {
+packages/core/src/terminal.cj:659:public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult
+packages/core/src/terminal.cj:708:public class TerminalSession {
+packages/core/src/terminal.cj:733:public prop rawModeEnabled: Bool { get() { rawActive } }
+packages/core/src/terminal.cj:735:public init( backend: Backend, driver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions() )
+packages/core/src/terminal.cj:761:public func probeResult(): ?TerminalProbeResult
+packages/core/src/terminal.cj:776:public func start(): Bool
+packages/core/src/terminal.cj:819:public func stop(): Unit
+packages/core/src/terminal.cj:827:public func run(action: () -> Unit): Unit
+packages/core/src/terminal.cj:1098:public interface TerminalDriver {
+packages/core/src/terminal.cj:1099:func name(): String
+packages/core/src/terminal.cj:1100:func enterRawMode(): Bool
+packages/core/src/terminal.cj:1101:func restore(): Unit
+packages/core/src/terminal.cj:1102:func size(): ?Rect
+packages/core/src/terminal.cj:1103:func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1107:public class LinuxTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1108:public init()
+packages/core/src/terminal.cj:1110:public func name(): String
+packages/core/src/terminal.cj:1111:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1112:public func restore(): Unit
+packages/core/src/terminal.cj:1113:public func size(): ?Rect
+packages/core/src/terminal.cj:1114:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1119:public class FallbackTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1121:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1125:public func name(): String
+packages/core/src/terminal.cj:1126:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1127:public func restore(): Unit
+packages/core/src/terminal.cj:1128:public func size(): ?Rect
+packages/core/src/terminal.cj:1129:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1143:public class MacOSTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1146:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1150:public func name(): String
+packages/core/src/terminal.cj:1151:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1152:public func restore(): Unit
+packages/core/src/terminal.cj:1153:public func size(): ?Rect
+packages/core/src/terminal.cj:1154:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1168:public class MacOSTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1169:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1173:public func name(): String
+packages/core/src/terminal.cj:1174:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1175:public func restore(): Unit
+packages/core/src/terminal.cj:1176:public func size(): ?Rect
+packages/core/src/terminal.cj:1177:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1183:public class WindowsTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1186:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1190:public func name(): String
+packages/core/src/terminal.cj:1191:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1192:public func restore(): Unit
+packages/core/src/terminal.cj:1193:public func size(): ?Rect
+packages/core/src/terminal.cj:1194:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1208:public class WindowsTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1209:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1213:public func name(): String
+packages/core/src/terminal.cj:1214:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1215:public func restore(): Unit
+packages/core/src/terminal.cj:1216:public func size(): ?Rect
+packages/core/src/terminal.cj:1217:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1223:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1228:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1233:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1237:public class AnsiBackend <: Backend {
+packages/core/src/terminal.cj:1245:public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1251:public func clear(): Unit
+packages/core/src/terminal.cj:1255:public func moveTo(x: Int64, y: Int64): Unit
+packages/core/src/terminal.cj:1259:public func enterAlternateScreen(): Unit
+packages/core/src/terminal.cj:1260:public func leaveAlternateScreen(): Unit
+packages/core/src/terminal.cj:1261:public func hideCursor(): Unit
+packages/core/src/terminal.cj:1262:public func showCursor(): Unit
+packages/core/src/terminal.cj:1263:public func setCursorShape(shape: ?CursorShape): Unit
+packages/core/src/terminal.cj:1269:public func enableMouse(): Unit
+packages/core/src/terminal.cj:1270:public func disableMouse(): Unit
+packages/core/src/terminal.cj:1271:public func enableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1272:public func disableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1274:public func size(): Rect
+packages/core/src/terminal.cj:1281:public func draw(buffer: Buffer): Unit
+packages/core/src/terminal.cj:1305:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+packages/core/src/terminal.cj:1327:public func drawMedia(ops: Array<MediaOp>): Unit
+packages/core/src/terminal.cj:1337:public func write(text: String): Unit
+packages/core/src/terminal.cj:1343:public func setInstrumentationEnabled(enabled: Bool): Unit
+packages/core/src/terminal.cj:1347:public func diagnosticByteCount(): Int64
+packages/core/src/terminal.cj:1351:public func flush(): Unit
+packages/core/src/terminal.cj:1379:public class TestBackend <: Backend {
+packages/core/src/terminal.cj:1393:public init( area!: Rect = Rect(0, 0, 80, 24), captureSnapshots!: Bool = true )
+packages/core/src/terminal.cj:1401:public func clear(): Unit
+packages/core/src/terminal.cj:1405:public func moveTo(x: Int64, y: Int64): Unit
+packages/core/src/terminal.cj:1409:public func enterAlternateScreen(): Unit
+packages/core/src/terminal.cj:1410:public func leaveAlternateScreen(): Unit
+packages/core/src/terminal.cj:1411:public func hideCursor(): Unit
+packages/core/src/terminal.cj:1412:public func showCursor(): Unit
+packages/core/src/terminal.cj:1413:public func setCursorShape(shape: ?CursorShape): Unit
+packages/core/src/terminal.cj:1419:public func enableMouse(): Unit
+packages/core/src/terminal.cj:1420:public func disableMouse(): Unit
+packages/core/src/terminal.cj:1421:public func enableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1422:public func disableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1424:public func size(): Rect
+packages/core/src/terminal.cj:1428:public func setSize(area: Rect): Unit
+packages/core/src/terminal.cj:1432:public func draw(buffer: Buffer): Unit
+packages/core/src/terminal.cj:1442:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+packages/core/src/terminal.cj:1452:public func drawMedia(ops: Array<MediaOp>): Unit
+packages/core/src/terminal.cj:1459:public func write(text: String): Unit
+packages/core/src/terminal.cj:1465:public func flush(): Unit
+packages/core/src/terminal.cj:1467:public func output(): String
+packages/core/src/terminal.cj:1471:public func clearOutput(): Unit
+packages/core/src/terminal.cj:1477:public func lastBuffer(): ?Buffer
+packages/core/src/terminal.cj:1481:public func lastDiffOps(): Int64
+packages/core/src/terminal.cj:1485:public func lastDiffWrites(): Int64
+packages/core/src/terminal.cj:1489:public func lastMediaOps(): Array<MediaOp>
+packages/core/src/terminal.cj:1494:public func mediaFrameCount(): Int64
+packages/core/src/terminal.cj:1498:public func snapshot(): String
+packages/core/src/terminal.cj:1505:public func snapshots(): Array<String>
+packages/core/src/terminal.cj:1509:public func snapshotAt(index: Int64): String
+packages/core/src/terminal.cj:1514:public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool
+packages/core/src/terminal.cj:1523:public func assertSnapshot(expected: String): Bool
+packages/core/src/terminal.cj:1527:public func assertSnapshotAt(index: Int64, expected: String): Bool
+packages/core/src/terminal.cj:1531:public func assertLastMediaOpCount(expected: Int64): Bool
+packages/core/src/terminal.cj:1544:public struct TerminalCapabilities {
+packages/core/src/terminal.cj:1545:public let size: Rect
+packages/core/src/terminal.cj:1546:public let trueColor: Bool
+packages/core/src/terminal.cj:1547:public let colorLevel: Int64
+packages/core/src/terminal.cj:1548:public let mouse: Bool
+packages/core/src/terminal.cj:1549:public let mouseMove: Bool
+packages/core/src/terminal.cj:1550:public let focusEvents: Bool
+packages/core/src/terminal.cj:1551:public let bracketedPaste: Bool
+packages/core/src/terminal.cj:1552:public let alternateScreen: Bool
+packages/core/src/terminal.cj:1553:public let unicode: Bool
+packages/core/src/terminal.cj:1554:public let kittyGraphics: Bool
+packages/core/src/terminal.cj:1555:public let sixel: Bool
+packages/core/src/terminal.cj:1556:public let osc8: Bool
+packages/core/src/terminal.cj:1557:public let keyboardProtocol: KeyProtocol
+packages/core/src/terminal.cj:1558:public let keyUp: Bool
+packages/core/src/terminal.cj:1559:public let keyRepeat: Bool
+packages/core/src/terminal.cj:1560:public let recommendedFps: Int64
+packages/core/src/terminal.cj:1561:public let cellWidthPixels: Int64
+packages/core/src/terminal.cj:1562:public let cellHeightPixels: Int64
+packages/core/src/terminal.cj:1563:public let driverName: String
+packages/core/src/terminal.cj:1565:public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = "linux-glibc" )
+packages/core/src/terminal.cj:1607:public static func detect(backend!: Backend = AnsiBackend(), driverName!: String = "linux-glibc"): TerminalCapabilities
+packages/core/src/terminal.cj:1717:public struct RenderMetrics {
+packages/core/src/terminal.cj:1718:public let size: Rect
+packages/core/src/terminal.cj:1719:public let dirtyCells: Int64
+packages/core/src/terminal.cj:1720:public let diffWrites: Int64
+packages/core/src/terminal.cj:1721:public let mediaOps: Int64
+packages/core/src/terminal.cj:1722:public let fullRedraw: Bool
+packages/core/src/terminal.cj:1723:public let renderMillis: Int64
+packages/core/src/terminal.cj:1724:public let drawMillis: Int64
+packages/core/src/terminal.cj:1725:public let totalMillis: Int64
+packages/core/src/terminal.cj:1726:public let renderedCells: Int64
+packages/core/src/terminal.cj:1727:public let dirtyRects: Int64
+packages/core/src/terminal.cj:1728:public let copiedCells: Int64
+packages/core/src/terminal.cj:1729:public let bufferCellAttempts: Int64
+packages/core/src/terminal.cj:1730:public let bufferCellWrites: Int64
+packages/core/src/terminal.cj:1731:public let diffCells: Int64
+packages/core/src/terminal.cj:1732:public let diffSpans: Int64
+packages/core/src/terminal.cj:1733:public let renderNanos: Int64
+packages/core/src/terminal.cj:1734:public let diffNanos: Int64
+packages/core/src/terminal.cj:1735:public let writeNanos: Int64
+packages/core/src/terminal.cj:1736:public let totalNanos: Int64
+packages/core/src/terminal.cj:1737:public let ansiBytes: Int64
+packages/core/src/terminal.cj:1739:public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
+packages/core/src/terminal.cj:1782:public class DebugOverlay <: Widget {
+packages/core/src/terminal.cj:1786:public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+packages/core/src/terminal.cj:1791:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/terminal.cj:1816:public class TerminalMode {
+packages/core/src/terminal.cj:1822:public static func lastError(): ?String
+packages/core/src/terminal.cj:1826:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:1866:public static func restore(): Unit
+packages/core/src/terminal.cj:1884:public static func size(): ?Rect
+packages/core/src/terminal.cj:1922:public class MacOSTerminalMode {
+packages/core/src/terminal.cj:1929:public static func lastError(): ?String
+packages/core/src/terminal.cj:1933:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:1979:public static func restore(): Unit
+packages/core/src/terminal.cj:1997:public static func size(): ?Rect
+packages/core/src/terminal.cj:2018:public class WindowsConsoleMode {
+packages/core/src/terminal.cj:2025:public static func lastError(): ?String
+packages/core/src/terminal.cj:2029:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:2069:public static func restore(): Unit
+packages/core/src/terminal.cj:2087:public static func size(): ?Rect
 packages/core/src/text.cj:7:public enum AmbiguousWidth {
 packages/core/src/text.cj:8:Narrow
 packages/core/src/text.cj:9:Wide
@@ -2268,7 +2296,7 @@ packages/core/src/text_model.cj:256:public func endUndoGroup(): Unit
 packages/core/src/text_model.cj:262:public func undo(): Bool
 packages/core/src/text_model.cj:271:public func redo(): Bool
 packages/core/src/text_model.cj:280:public func clearHistory(): Unit
-packages/core/src/theme_capabilities.cj:95:public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style
+packages/core/src/theme_capabilities.cj:118:public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style
 packages/core/src/vim_editor.cj:5:public enum VimMode {
 packages/core/src/vim_editor.cj:6:Normal
 packages/core/src/vim_editor.cj:7:Insert
@@ -2381,32 +2409,32 @@ packages/core/src/visual_widgets.cj:13:Value
 packages/core/src/visual_widgets.cj:14:Ratio
 packages/core/src/visual_widgets.cj:15:Text(String)
 packages/core/src/visual_widgets.cj:18:public class ProgressBarSymbols {
-packages/core/src/visual_widgets.cj:19:public let filled: String
-packages/core/src/visual_widgets.cj:20:public let empty: String
-packages/core/src/visual_widgets.cj:21:public let head: String
-packages/core/src/visual_widgets.cj:22:public let indeterminate: String
-packages/core/src/visual_widgets.cj:24:public init(filled!: String = "#", empty!: String = "-", head!: String = "#", indeterminate!: String = "#")
-packages/core/src/visual_widgets.cj:32:public class ProgressBarSegment {
-packages/core/src/visual_widgets.cj:33:public let value: Int64
-packages/core/src/visual_widgets.cj:34:public let style: Style
-packages/core/src/visual_widgets.cj:35:public let symbol: String
-packages/core/src/visual_widgets.cj:37:public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#")
-packages/core/src/visual_widgets.cj:44:public class ProgressBar <: Widget {
-packages/core/src/visual_widgets.cj:59:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: Style = Style(fg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0 )
-packages/core/src/visual_widgets.cj:89:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:203:public class Sparkline <: Widget {
-packages/core/src/visual_widgets.cj:209:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None)
-packages/core/src/visual_widgets.cj:216:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:233:public class Gauge <: Widget {
-packages/core/src/visual_widgets.cj:240:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )
-packages/core/src/visual_widgets.cj:254:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:259:public class Chart <: Widget {
-packages/core/src/visual_widgets.cj:265:public init( values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan), maxValue!: Int64 = 0 )
-packages/core/src/visual_widgets.cj:277:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:295:public class LogView <: Widget {
-packages/core/src/visual_widgets.cj:297:public var offset: Int64
-packages/core/src/visual_widgets.cj:301:public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
-packages/core/src/visual_widgets.cj:308:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:20:public let filled: String
+packages/core/src/visual_widgets.cj:21:public let empty: String
+packages/core/src/visual_widgets.cj:22:public let head: String
+packages/core/src/visual_widgets.cj:23:public let indeterminate: String
+packages/core/src/visual_widgets.cj:25:public init(filled!: String = "#", empty!: String = "-", head!: String = "#", indeterminate!: String = "#")
+packages/core/src/visual_widgets.cj:47:public class ProgressBarSegment {
+packages/core/src/visual_widgets.cj:48:public let value: Int64
+packages/core/src/visual_widgets.cj:49:public let style: Style
+packages/core/src/visual_widgets.cj:50:public let symbol: String
+packages/core/src/visual_widgets.cj:52:public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#")
+packages/core/src/visual_widgets.cj:59:public class ProgressBar <: Widget {
+packages/core/src/visual_widgets.cj:74:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: Style = Style(fg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0 )
+packages/core/src/visual_widgets.cj:104:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:239:public class Sparkline <: Widget {
+packages/core/src/visual_widgets.cj:247:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
+packages/core/src/visual_widgets.cj:257:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:283:public class Gauge <: Widget {
+packages/core/src/visual_widgets.cj:290:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )
+packages/core/src/visual_widgets.cj:304:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:309:public class Chart <: Widget {
+packages/core/src/visual_widgets.cj:315:public init( values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan), maxValue!: Int64 = 0 )
+packages/core/src/visual_widgets.cj:327:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:345:public class LogView <: Widget {
+packages/core/src/visual_widgets.cj:347:public var offset: Int64
+packages/core/src/visual_widgets.cj:351:public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
+packages/core/src/visual_widgets.cj:358:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widget_base.cj:5:public interface Widget {
 packages/core/src/widget_base.cj:6:func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widget_base.cj:9:public enum WrapMode {
@@ -2418,112 +2446,113 @@ packages/core/src/widget_base.cj:16:Left
 packages/core/src/widget_base.cj:17:Center
 packages/core/src/widget_base.cj:18:Right
 packages/core/src/widgets.cj:5:public enum BorderKind {
-packages/core/src/widgets.cj:6:Ascii
-packages/core/src/widgets.cj:7:Unicode
-packages/core/src/widgets.cj:8:Rounded
-packages/core/src/widgets.cj:9:NoBorder
-packages/core/src/widgets.cj:12:public enum TitleAlign {
-packages/core/src/widgets.cj:13:Left
-packages/core/src/widgets.cj:14:Center
-packages/core/src/widgets.cj:15:Right
-packages/core/src/widgets.cj:18:public enum BoxState {
-packages/core/src/widgets.cj:19:Normal
-packages/core/src/widgets.cj:20:Focused
-packages/core/src/widgets.cj:21:Active
-packages/core/src/widgets.cj:22:Error
-packages/core/src/widgets.cj:23:Disabled
-packages/core/src/widgets.cj:26:public class BorderSet {
-packages/core/src/widgets.cj:27:public let horizontal: String
-packages/core/src/widgets.cj:28:public let vertical: String
-packages/core/src/widgets.cj:29:public let topLeft: String
-packages/core/src/widgets.cj:30:public let topRight: String
-packages/core/src/widgets.cj:31:public let bottomLeft: String
-packages/core/src/widgets.cj:32:public let bottomRight: String
-packages/core/src/widgets.cj:34:public init( horizontal!: String = "-", vertical!: String = "|", topLeft!: String = "+", topRight!: String = "+", bottomLeft!: String = "+", bottomRight!: String = "+" )
-packages/core/src/widgets.cj:50:public static func ascii(): BorderSet
-packages/core/src/widgets.cj:54:public static func unicode(): BorderSet
-packages/core/src/widgets.cj:58:public static func rounded(): BorderSet
-packages/core/src/widgets.cj:63:public class BlockOptions {
-packages/core/src/widgets.cj:64:public let title: String
-packages/core/src/widgets.cj:65:public let borderKind: BorderKind
-packages/core/src/widgets.cj:66:public let border: BorderSet
-packages/core/src/widgets.cj:67:public let titleAlign: TitleAlign
-packages/core/src/widgets.cj:68:public let padding: Spacing
-packages/core/src/widgets.cj:69:public let margin: Spacing
-packages/core/src/widgets.cj:70:public let backgroundStyle: Style
-packages/core/src/widgets.cj:71:public let borderStyle: Style
-packages/core/src/widgets.cj:72:public let contentStyle: Style
-packages/core/src/widgets.cj:73:public let titleStyle: Style
-packages/core/src/widgets.cj:74:public let state: BoxState
-packages/core/src/widgets.cj:75:public let asciiFallback: Bool
-packages/core/src/widgets.cj:76:public let theme: ?Theme
-packages/core/src/widgets.cj:78:public init( title!: String = "", borderKind!: BorderKind = BorderKind.Ascii, border!: BorderSet = BorderSet.ascii(), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: Style = Style.default(), borderStyle!: Style = Style.default(), contentStyle!: Style = Style.default(), titleStyle!: Style = Style.default(), state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )
-packages/core/src/widgets.cj:109:public class Block <: Widget {
-packages/core/src/widgets.cj:112:public init(title!: String = "", style!: Style = Style.default())
-packages/core/src/widgets.cj:116:public init(options: BlockOptions)
-packages/core/src/widgets.cj:120:public func inner(area: Rect): Rect
-packages/core/src/widgets.cj:124:public func renderInner(area: Rect, buffer: Buffer): Rect
-packages/core/src/widgets.cj:146:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:228:public class Panel <: Widget {
-packages/core/src/widgets.cj:232:public init(block!: Block = Block(), child!: ?Widget = None)
-packages/core/src/widgets.cj:237:public init(options: BlockOptions, child!: ?Widget = None)
-packages/core/src/widgets.cj:242:public func renderInner(area: Rect, buffer: Buffer): Rect
-packages/core/src/widgets.cj:251:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:256:public class Paragraph <: Widget {
-packages/core/src/widgets.cj:264:public init( text: String, block!: ?Block = None, style!: Style = Style.default(), scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
-packages/core/src/widgets.cj:280:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:302:public class List <: Widget {
-packages/core/src/widgets.cj:311:public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
-packages/core/src/widgets.cj:329:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/widgets.cj:344:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:383:public class ListState {
-packages/core/src/widgets.cj:384:public var selected: ?Int64
-packages/core/src/widgets.cj:385:public var offset: Int64
-packages/core/src/widgets.cj:387:public init(selected!: ?Int64 = None, offset!: Int64 = 0)
-packages/core/src/widgets.cj:392:public func select(index: ?Int64): Unit
-packages/core/src/widgets.cj:396:public func next(total: Int64): Unit
-packages/core/src/widgets.cj:409:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
-packages/core/src/widgets.cj:425:public func moveWithDirty(delta: Int64, total: Int64, viewportHeight: Int64, area: Rect): DirtyRects
-packages/core/src/widgets.cj:439:public func previous(total: Int64): Unit
-packages/core/src/widgets.cj:452:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
-packages/core/src/widgets.cj:470:public class Table <: Widget {
-packages/core/src/widgets.cj:480:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: Style = Style.default(), headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
-packages/core/src/widgets.cj:500:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/widgets.cj:516:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:587:public class TableState {
-packages/core/src/widgets.cj:588:public var selectedRow: ?Int64
-packages/core/src/widgets.cj:589:public var offset: Int64
-packages/core/src/widgets.cj:591:public init(selectedRow!: ?Int64 = None, offset!: Int64 = 0)
-packages/core/src/widgets.cj:596:public func select(index: ?Int64): Unit
-packages/core/src/widgets.cj:600:public func next(total: Int64): Unit
-packages/core/src/widgets.cj:613:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
-packages/core/src/widgets.cj:629:public func previous(total: Int64): Unit
-packages/core/src/widgets.cj:642:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
-packages/core/src/widgets.cj:660:public class Scrollbar <: Widget {
-packages/core/src/widgets.cj:667:public init( total: Int64, offset!: Int64 = 0, viewport!: Int64 = 0, style!: Style = Style(fg: Color.Indexed(8)), thumbStyle!: Style = Style(fg: Color.White) )
-packages/core/src/widgets.cj:681:public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool
-packages/core/src/widgets.cj:715:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:735:public class Input <: Widget {
-packages/core/src/widgets.cj:738:public var value: String
-packages/core/src/widgets.cj:741:public var cursor: Int64
-packages/core/src/widgets.cj:754:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)) )
-packages/core/src/widgets.cj:771:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/widgets.cj:785:public func paste(text: String): Unit
-packages/core/src/widgets.cj:793:public func handle(key: KeyEvent): Bool
-packages/core/src/widgets.cj:824:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
-packages/core/src/widgets.cj:841:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/widgets.cj:854:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:915:public func cursorPosition(area: Rect): Position
-packages/core/src/widgets.cj:924:public func setValue(value: String, cursor!: Int64 = -1): Unit
-packages/core/src/widgets.cj:930:public func clear(): Unit
-packages/core/src/widgets.cj:936:public func moveToStart(): Unit
-packages/core/src/widgets.cj:941:public func moveToEnd(): Unit
-packages/core/src/widgets.cj:993:public class FileDialog <: Widget {
-packages/core/src/widgets.cj:994:public let picker: FilePicker
-packages/core/src/widgets.cj:996:public init(path!: String = ".", extension!: String = "", title!: String = "Files")
-packages/core/src/widgets.cj:1000:public func selectedPath(): ?String
-packages/core/src/widgets.cj:1001:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/widgets.cj:1002:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:6:Auto
+packages/core/src/widgets.cj:7:Ascii
+packages/core/src/widgets.cj:8:Unicode
+packages/core/src/widgets.cj:9:Rounded
+packages/core/src/widgets.cj:10:NoBorder
+packages/core/src/widgets.cj:13:public enum TitleAlign {
+packages/core/src/widgets.cj:14:Left
+packages/core/src/widgets.cj:15:Center
+packages/core/src/widgets.cj:16:Right
+packages/core/src/widgets.cj:19:public enum BoxState {
+packages/core/src/widgets.cj:20:Normal
+packages/core/src/widgets.cj:21:Focused
+packages/core/src/widgets.cj:22:Active
+packages/core/src/widgets.cj:23:Error
+packages/core/src/widgets.cj:24:Disabled
+packages/core/src/widgets.cj:27:public class BorderSet {
+packages/core/src/widgets.cj:28:public let horizontal: String
+packages/core/src/widgets.cj:29:public let vertical: String
+packages/core/src/widgets.cj:30:public let topLeft: String
+packages/core/src/widgets.cj:31:public let topRight: String
+packages/core/src/widgets.cj:32:public let bottomLeft: String
+packages/core/src/widgets.cj:33:public let bottomRight: String
+packages/core/src/widgets.cj:35:public init( horizontal!: String = "-", vertical!: String = "|", topLeft!: String = "+", topRight!: String = "+", bottomLeft!: String = "+", bottomRight!: String = "+" )
+packages/core/src/widgets.cj:51:public static func ascii(): BorderSet
+packages/core/src/widgets.cj:55:public static func unicode(): BorderSet
+packages/core/src/widgets.cj:59:public static func rounded(): BorderSet
+packages/core/src/widgets.cj:64:public class BlockOptions {
+packages/core/src/widgets.cj:65:public let title: String
+packages/core/src/widgets.cj:66:public let borderKind: BorderKind
+packages/core/src/widgets.cj:67:public let border: BorderSet
+packages/core/src/widgets.cj:68:public let titleAlign: TitleAlign
+packages/core/src/widgets.cj:69:public let padding: Spacing
+packages/core/src/widgets.cj:70:public let margin: Spacing
+packages/core/src/widgets.cj:71:public let backgroundStyle: Style
+packages/core/src/widgets.cj:72:public let borderStyle: Style
+packages/core/src/widgets.cj:73:public let contentStyle: Style
+packages/core/src/widgets.cj:74:public let titleStyle: Style
+packages/core/src/widgets.cj:79:public let state: BoxState
+packages/core/src/widgets.cj:80:public let asciiFallback: Bool
+packages/core/src/widgets.cj:81:public let theme: ?Theme
+packages/core/src/widgets.cj:83:public init( title!: String = "", borderKind!: BorderKind = BorderKind.Auto, border!: BorderSet = BorderSet(horizontal: "", vertical: "", topLeft: "", topRight: "", bottomLeft: "", bottomRight: ""), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: ?Style = None, borderStyle!: ?Style = None, contentStyle!: ?Style = None, titleStyle!: ?Style = None, state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )
+packages/core/src/widgets.cj:118:public class Block <: Widget {
+packages/core/src/widgets.cj:121:public init(title!: String = "", style!: Style = Style.default())
+packages/core/src/widgets.cj:125:public init(options: BlockOptions)
+packages/core/src/widgets.cj:129:public func inner(area: Rect): Rect
+packages/core/src/widgets.cj:133:public func renderInner(area: Rect, buffer: Buffer): Rect
+packages/core/src/widgets.cj:155:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:249:public class Panel <: Widget {
+packages/core/src/widgets.cj:253:public init(block!: Block = Block(), child!: ?Widget = None)
+packages/core/src/widgets.cj:258:public init(options: BlockOptions, child!: ?Widget = None)
+packages/core/src/widgets.cj:263:public func renderInner(area: Rect, buffer: Buffer): Rect
+packages/core/src/widgets.cj:272:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:277:public class Paragraph <: Widget {
+packages/core/src/widgets.cj:285:public init( text: String, block!: ?Block = None, style!: Style = Style.default(), scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
+packages/core/src/widgets.cj:301:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:323:public class List <: Widget {
+packages/core/src/widgets.cj:335:public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
+packages/core/src/widgets.cj:359:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:374:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:423:public class ListState {
+packages/core/src/widgets.cj:424:public var selected: ?Int64
+packages/core/src/widgets.cj:425:public var offset: Int64
+packages/core/src/widgets.cj:427:public init(selected!: ?Int64 = None, offset!: Int64 = 0)
+packages/core/src/widgets.cj:432:public func select(index: ?Int64): Unit
+packages/core/src/widgets.cj:436:public func next(total: Int64): Unit
+packages/core/src/widgets.cj:449:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
+packages/core/src/widgets.cj:465:public func moveWithDirty(delta: Int64, total: Int64, viewportHeight: Int64, area: Rect): DirtyRects
+packages/core/src/widgets.cj:479:public func previous(total: Int64): Unit
+packages/core/src/widgets.cj:492:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
+packages/core/src/widgets.cj:510:public class Table <: Widget {
+packages/core/src/widgets.cj:523:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: Style = Style.default(), headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
+packages/core/src/widgets.cj:549:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:565:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:677:public class TableState {
+packages/core/src/widgets.cj:678:public var selectedRow: ?Int64
+packages/core/src/widgets.cj:679:public var offset: Int64
+packages/core/src/widgets.cj:681:public init(selectedRow!: ?Int64 = None, offset!: Int64 = 0)
+packages/core/src/widgets.cj:686:public func select(index: ?Int64): Unit
+packages/core/src/widgets.cj:690:public func next(total: Int64): Unit
+packages/core/src/widgets.cj:703:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
+packages/core/src/widgets.cj:719:public func previous(total: Int64): Unit
+packages/core/src/widgets.cj:732:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
+packages/core/src/widgets.cj:750:public class Scrollbar <: Widget {
+packages/core/src/widgets.cj:757:public init( total: Int64, offset!: Int64 = 0, viewport!: Int64 = 0, style!: Style = Style(fg: Color.Indexed(8)), thumbStyle!: Style = Style(fg: Color.White) )
+packages/core/src/widgets.cj:771:public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool
+packages/core/src/widgets.cj:805:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:825:public class Input <: Widget {
+packages/core/src/widgets.cj:828:public var value: String
+packages/core/src/widgets.cj:831:public var cursor: Int64
+packages/core/src/widgets.cj:845:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), showBoundary!: Bool = true )
+packages/core/src/widgets.cj:864:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/widgets.cj:878:public func paste(text: String): Unit
+packages/core/src/widgets.cj:886:public func handle(key: KeyEvent): Bool
+packages/core/src/widgets.cj:917:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+packages/core/src/widgets.cj:931:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:945:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:1013:public func cursorPosition(area: Rect): Position
+packages/core/src/widgets.cj:1033:public func setValue(value: String, cursor!: Int64 = -1): Unit
+packages/core/src/widgets.cj:1039:public func clear(): Unit
+packages/core/src/widgets.cj:1045:public func moveToStart(): Unit
+packages/core/src/widgets.cj:1050:public func moveToEnd(): Unit
+packages/core/src/widgets.cj:1102:public class FileDialog <: Widget {
+packages/core/src/widgets.cj:1103:public let picker: FilePicker
+packages/core/src/widgets.cj:1105:public init(path!: String = ".", extension!: String = "", title!: String = "Files")
+packages/core/src/widgets.cj:1109:public func selectedPath(): ?String
+packages/core/src/widgets.cj:1110:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/widgets.cj:1111:public func render(area: Rect, buffer: Buffer): Unit
 packages/diff/src/diff.cj:6:public enum DiffLineKind {
 packages/diff/src/diff.cj:7:Context
 packages/diff/src/diff.cj:8:Add

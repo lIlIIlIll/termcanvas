@@ -266,10 +266,10 @@ class WidgetRenderBoundaryTest {
         legacyTabs.setTheme(Some(theme))
         let legacyBuffer = Buffer(Rect(0, 0, 8, 1))
         legacyTabs.render(legacyBuffer.area, legacyBuffer)
-        @Expect(legacyBuffer.getCell(1, 0).style, legacyNormal)
+        @Expect(legacyBuffer.getCell(1, 0).style, theme.normal.patch(legacyNormal))
         @Expect(legacyBuffer.getCell(4, 0).style, legacySelected)
 
-        let tabs = Tabs(["A", "B"], selected: 1, selectedStyle: Style.default())
+        let tabs = Tabs(["A", "B"], selected: 1)
         tabs.setTheme(Some(theme))
         tabs.setFocused(true)
         let themedSelectedBase = theme.selected
@@ -286,7 +286,7 @@ class WidgetRenderBoundaryTest {
         @Expect(selectedCell.style.modifier.underline)
 
         tabs.setTheme(Option<Theme>.None)
-        let defaultSelectedBase = Style.default()
+        let defaultSelectedBase = Theme.default().selected
         var defaultSelectedModifier = defaultSelectedBase.modifier
         defaultSelectedModifier.bold = true
         defaultSelectedModifier.underline = true
@@ -297,6 +297,12 @@ class WidgetRenderBoundaryTest {
         @Expect(clearedBuffer.getCell(4, 0).style, focusedDefaultSelected)
         @Expect(clearedBuffer.getCell(4, 0).style.modifier.bold)
         @Expect(clearedBuffer.getCell(4, 0).style.modifier.underline)
+
+        let explicitDefault = Tabs(["A", "B"], selected: 1, selectedStyle: Style.default())
+        explicitDefault.setTheme(Some(theme))
+        let explicitBuffer = Buffer(Rect(0, 0, 8, 1))
+        explicitDefault.render(explicitBuffer.area, explicitBuffer)
+        @Expect(explicitBuffer.getCell(4, 0).style, Style.default())
     }
 
     @TestCase
@@ -399,20 +405,20 @@ class WidgetRenderBoundaryTest {
         }
         let narrow = Buffer(Rect(0, 0, 1, 1))
         ProgressBar(0, direction: ProgressBarDirection.Vertical, indeterminate: true, phase: 1).render(narrow.area, narrow)
-        @Expect(narrow.getCell(0, 0).symbol, "-")
+        @Expect(narrow.getCell(0, 0).symbol, "─")
     }
 
     @TestCase
     func progressLabelsClampValuesAndOverrideGeneratedText(): Unit {
         for ((mode, expected) in [(ProgressBarLabelMode.Value, "7"), (ProgressBarLabelMode.Ratio, "7/10"),
-            (ProgressBarLabelMode.Percent, "70%"), (ProgressBarLabelMode.Text("ready"), "ready")]) {
+            (ProgressBarLabelMode.Percent, "70.00%"), (ProgressBarLabelMode.Text("ready"), "ready")]) {
             for (direction in [ProgressBarDirection.Horizontal, ProgressBarDirection.Vertical]) {
                 let buffer = Buffer(Rect(0, 0, 12, 5))
                 let labelStyle = Style(fg: Color.Red)
                 ProgressBar(7, total: 10, direction: direction, labelMode: mode, labelStyle: labelStyle).render(buffer.area, buffer)
-                let row = match (direction) { case ProgressBarDirection.Horizontal => Int64(0); case ProgressBarDirection.Vertical => Int64(2) }
-                @Expect(renderBoundaryRow(buffer, row).contains(expected))
-                @Expect(buffer.getCell((12 - expected.size) / 2, row).style, labelStyle)
+                let x = match (direction) { case ProgressBarDirection.Horizontal => 12 - displayWidth(expected); case ProgressBarDirection.Vertical => Int64(0) }
+                @Expect(renderBoundaryRow(buffer, 0).contains(expected))
+                @Expect(buffer.getCell(x, 0).style, labelStyle)
             }
         }
         let capped = Buffer(Rect(0, 0, 8, 1))
@@ -431,10 +437,10 @@ class WidgetRenderBoundaryTest {
     func zeroWidthSegmentsFallBackToValueAndOversizedSegmentsStop(): Unit {
         let tiny = Buffer(Rect(0, 0, 5, 1))
         ProgressBar(1, total: 100, segments: [ProgressBarSegment(0), ProgressBarSegment(1)]).render(tiny.area, tiny)
-        @Expect(renderBoundaryRow(tiny, 0), "#----")
+        @Expect(renderBoundaryRow(tiny, 0), "╺────")
         let empty = Buffer(Rect(0, 0, 5, 1))
         ProgressBar(0, total: 100, segments: [ProgressBarSegment(0)]).render(empty.area, empty)
-        @Expect(renderBoundaryRow(empty, 0), "-----")
+        @Expect(renderBoundaryRow(empty, 0), "─────")
         let full = Buffer(Rect(0, 0, 5, 1))
         ProgressBar(0, total: 10, segments: [ProgressBarSegment(10, symbol: "A"), ProgressBarSegment(10, symbol: "B")]).render(full.area, full)
         @Expect(renderBoundaryRow(full, 0), "AAAAA")

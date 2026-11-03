@@ -34,6 +34,18 @@ func combineModifiers(base: Modifier, added: Modifier): Modifier {
     result
 }
 
+func focusModifier(): Modifier {
+    var modifier = Modifier()
+    modifier.underline = true
+    modifier
+}
+
+func selectedModifier(): Modifier {
+    var modifier = Modifier()
+    modifier.reversed = true
+    modifier
+}
+
 func addFocusedModifiers(style: Style, focusedStyle: Style, theme: ?Theme): Style {
     match (theme) {
         case Some(value) =>
@@ -78,6 +90,10 @@ func semanticTheme(dark!: Bool, accent!: Color): Theme {
     let semanticSuccess = if (dark) { Color.Rgb(103, 216, 166) } else { Color.Rgb(26, 128, 83) }
     let semanticWarning = if (dark) { Color.Rgb(255, 200, 105) } else { Color.Rgb(150, 91, 0) }
     let semanticInfo = if (dark) { Color.Rgb(80, 203, 221) } else { Color.Rgb(0, 109, 129) }
+    let surface = if (dark) { Color.Rgb(25, 29, 36) } else { Color.Rgb(255, 255, 255) }
+    let raised = if (dark) { Color.Rgb(35, 41, 50) } else { Color.Rgb(235, 240, 245) }
+    let border = if (dark) { Color.Rgb(85, 100, 114) } else { Color.Rgb(151, 165, 177) }
+    let strongBorder = if (dark) { Color.Rgb(145, 157, 169) } else { Color.Rgb(97, 110, 126) }
     Theme(
         normal: Style(fg: foreground, bg: background),
         focused: Style(fg: foreground, bg: focusedBackground, modifier: Modifier.strong()),
@@ -87,7 +103,14 @@ func semanticTheme(dark!: Bool, accent!: Color): Theme {
         accent: Style(fg: accent, bg: background),
         success: Style(fg: semanticSuccess, bg: background),
         warning: Style(fg: semanticWarning, bg: background),
-        info: Style(fg: semanticInfo, bg: background)
+        info: Style(fg: semanticInfo, bg: background),
+        canvas: Style(fg: foreground, bg: background),
+        surface: Style(fg: foreground, bg: surface),
+        raisedSurface: Style(fg: foreground, bg: raised),
+        heading: Style(fg: foreground, bg: background, modifier: Modifier.strong()),
+        secondary: Style(fg: mutedForeground, bg: background),
+        border: Style(fg: border, bg: background),
+        strongBorder: Style(fg: strongBorder, bg: background)
     )
 }
 

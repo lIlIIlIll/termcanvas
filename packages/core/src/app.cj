@@ -145,6 +145,7 @@ public enum Command {
     | Exec(String)
     | ExecArgs(String, String, Array<String>)
     | ResetTerminal
+    | SetCapabilitiesOverride(?TerminalCapabilities)
     | Suspend
     | Batch(Array<Command>)
 }
@@ -155,6 +156,9 @@ class TerminalLifecycleRequests {
     // Full invalidation dominates every partial update until presentation.
     // An empty DirtyRects alone cannot represent that state after merging.
     var fullRedrawRequested: Bool = true
+    var capabilitiesOverridePending: Bool = false
+    var capabilitiesOverride: ?TerminalCapabilities = None
+    var detectedCapabilities: TerminalCapabilities = TerminalCapabilities()
     private let ownedPtys = ArrayList<String>()
     let asyncEvents = RuntimeEventBatch()
     let ptyEvents = RuntimeEventBatch()
@@ -1298,6 +1302,21 @@ public class HeadlessRunResult {
     }
 }
 
+class HeadlessCapabilitiesContext {
+    var detected: TerminalCapabilities = TerminalCapabilities()
+    var overrideValue: ?TerminalCapabilities = None
+    let lifecycle = TerminalLifecycleRequests()
+
+    func observe(event: Event, terminal: Terminal): Unit {
+        match (event) {
+            case Event.Capabilities(value) =>
+                detected = value
+                if (overrideValue.isNone()) { terminal.setCapabilities(value) }
+            case _ => ()
+        }
+    }
+}
+
 public class AppTestRunner {
     public static func run(script: HeadlessScript, render: (Frame) -> Unit, update: (Event) -> UpdateResult, options!: HeadlessRunOptions = HeadlessRunOptions()): HeadlessRunResult {
         let backend = TestBackend(
@@ -1305,6 +1324,7 @@ public class AppTestRunner {
             captureSnapshots: options.captureSnapshots
         )
         let terminal = Terminal(backend)
+        let capabilityContext = HeadlessCapabilitiesContext()
         let commandQueue = ArrayList<Command>()
         let asyncRuntime = AsyncRuntime()
         let clock = TestClock()
@@ -1323,7 +1343,7 @@ public class AppTestRunner {
             for (step in script.steps()) {
                 match (step) {
                     case HeadlessStep.Input(event) =>
-                        flow = AppTestRunner.dispatch(event, update, commandQueue, asyncRuntime, timerRuntime, flow)
+                        flow = AppTestRunner.dispatch(event, update, commandQueue, asyncRuntime, timerRuntime, flow, terminal, capabilityContext)
                         frameIndex++
                         AppTestRunner.capture(terminal, backend, render, options, frames, snapshots, metrics, frameIndex, commandQueue.size, droppedTicks, lastTickDelta)
                     case HeadlessStep.Tick(count) =>
@@ -1331,7 +1351,7 @@ public class AppTestRunner {
                             frameIndex++
                             clock.advanceMillis(options.tickDeltaMillis)
                             lastTickDelta = options.tickDeltaMillis
-                            flow = AppTestRunner.dispatch(Event.Tick(TickEvent(deltaMillis: options.tickDeltaMillis, elapsedMillis: clock.nowMillis(), frameIndex: frameIndex)), update, commandQueue, asyncRuntime, timerRuntime, flow)
+                            flow = AppTestRunner.dispatch(Event.Tick(TickEvent(deltaMillis: options.tickDeltaMillis, elapsedMillis: clock.nowMillis(), frameIndex: frameIndex)), update, commandQueue, asyncRuntime, timerRuntime, flow, terminal, capabilityContext)
                             AppTestRunner.capture(terminal, backend, render, options, frames, snapshots, metrics, frameIndex, commandQueue.size, droppedTicks, lastTickDelta)
                         }
                     case HeadlessStep.WaitMillis(milliseconds) =>
@@ -1349,13 +1369,15 @@ public class AppTestRunner {
                             commandQueue,
                             asyncRuntime,
                             timerRuntime,
-                            flow
+                            flow,
+                            terminal,
+                            capabilityContext
                         )
                         AppTestRunner.capture(terminal, backend, render, options, frames, snapshots, metrics, frameIndex, commandQueue.size, droppedTicks, lastTickDelta)
                     case HeadlessStep.Resize(area) =>
                         backend.setSize(area)
                         frameIndex++
-                        flow = AppTestRunner.dispatch(Event.Resize(area), update, commandQueue, asyncRuntime, timerRuntime, flow)
+                        flow = AppTestRunner.dispatch(Event.Resize(area), update, commandQueue, asyncRuntime, timerRuntime, flow, terminal, capabilityContext)
                         AppTestRunner.capture(terminal, backend, render, options, frames, snapshots, metrics, frameIndex, commandQueue.size, droppedTicks, lastTickDelta)
                     case HeadlessStep.Render =>
                         frameIndex++
@@ -1373,19 +1395,37 @@ public class AppTestRunner {
                 frameIndex++
                 clock.advanceMillis(options.tickDeltaMillis)
                 lastTickDelta = options.tickDeltaMillis
-                flow = AppTestRunner.dispatch(Event.Tick(TickEvent(deltaMillis: options.tickDeltaMillis, elapsedMillis: clock.nowMillis(), frameIndex: frameIndex)), update, commandQueue, asyncRuntime, timerRuntime, flow)
+                flow = AppTestRunner.dispatch(Event.Tick(TickEvent(deltaMillis: options.tickDeltaMillis, elapsedMillis: clock.nowMillis(), frameIndex: frameIndex)), update, commandQueue, asyncRuntime, timerRuntime, flow, terminal, capabilityContext)
                 AppTestRunner.capture(terminal, backend, render, options, frames, snapshots, metrics, frameIndex, commandQueue.size, droppedTicks, lastTickDelta)
             }
             HeadlessRunResult(flow, frames.toArray(), snapshots.toArray(), metrics, failures.toArray())
         } finally { asyncRuntime.cancelAll(); timerRuntime.clear() }
     }
 
-    private static func dispatch(event: Event, update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime: AsyncRuntime, timerRuntime: TimerRuntime, flow: ControlFlow): ControlFlow {
+    private static func dispatch(event: Event, update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime: AsyncRuntime, timerRuntime: TimerRuntime, flow: ControlFlow, terminal: Terminal, capabilityContext: HeadlessCapabilitiesContext): ControlFlow {
         if (!isContinue(flow)) { return flow }
-        if (!App.applyUpdateResult(update(event), commandQueue)) {
+        let observeUpdate = { event: Event =>
+            capabilityContext.observe(event, terminal)
+            update(event)
+        }
+        if (!App.applyUpdateResult(observeUpdate(event), commandQueue)) {
             return ControlFlow.Exit
         }
-        if (!App.processCommands(update, commandQueue, asyncRuntime: asyncRuntime, timerRuntime: timerRuntime)) {
+        let lifecycle = capabilityContext.lifecycle
+        lifecycle.detectedCapabilities = capabilityContext.detected
+        lifecycle.capabilitiesOverride = capabilityContext.overrideValue
+        for (timerEvent in timerRuntime.drain()) { commandQueue.add(Command.Emit(timerEvent)) }
+        let (running, _) = App.processCommandsWithLifecycle(observeUpdate, commandQueue, asyncRuntime,
+            UnsupportedPtyRuntime(), timerRuntime, None, Some(lifecycle))
+        if (lifecycle.capabilitiesOverridePending) {
+            capabilityContext.overrideValue = lifecycle.capabilitiesOverride
+            terminal.setCapabilities(match (lifecycle.capabilitiesOverride) {
+                case Some(value) => value
+                case None => capabilityContext.detected
+            })
+            lifecycle.capabilitiesOverridePending = false
+        }
+        if (!running) {
             return ControlFlow.Exit
         }
         ControlFlow.Continue
@@ -1784,11 +1824,14 @@ public class App {
                     case Some(every) => Some(startedAt + every)
                     case None => None
                 }
-                let (initialRunning, initialChanged) = enqueueAndProcess(
-                    Event.Capabilities(match (session.probeResult()) {
+                let detectedCapabilities = match (session.probeResult()) {
                         case Some(result) => result.capabilities
                         case None => terminalDriver.capabilities(backend)
-                    }),
+                    }
+                lifecycle.detectedCapabilities = detectedCapabilities
+                terminal.setCapabilities(detectedCapabilities)
+                let (initialRunning, initialChanged) = enqueueAndProcess(
+                    Event.Capabilities(detectedCapabilities),
                     update,
                     runtimeQueue,
                     commandQueue,
@@ -1913,6 +1956,14 @@ public class App {
                         }
                     }
                     if (dirty && frameSchedule.readyToPresent()) {
+                        if (lifecycle.capabilitiesOverridePending) {
+                            terminal.setCapabilities(match (lifecycle.capabilitiesOverride) {
+                                case Some(value) => value
+                                case None => lifecycle.detectedCapabilities
+                            })
+                            lifecycle.capabilitiesOverridePending = false
+                            lifecycle.fullRedrawRequested = true
+                        }
                         match (traceSink) {
                             case Some(trace) => trace.renderStarted()
                             case None => ()
@@ -2379,7 +2430,7 @@ public class App {
         }
     }
 
-    private static func processCommandsWithLifecycle(
+    static func processCommandsWithLifecycle(
         update: (Event) -> UpdateResult,
         commandQueue: ArrayList<Command>,
         asyncRuntime: AsyncRuntime,
@@ -2467,6 +2518,15 @@ public class App {
                             requests.resetRequested = true
                         case None => ()
                     }
+                    case Command.SetCapabilitiesOverride(value) =>
+                        changed = true
+                        match (lifecycle) {
+                        case Some(requests) =>
+                            requests.capabilitiesOverride = value
+                            requests.capabilitiesOverridePending = true
+                            requests.fullRedrawRequested = true
+                        case None => ()
+                    }
                     case Command.Suspend =>
                         changed = true
                         match (lifecycle) {
@@ -2499,6 +2559,16 @@ public class App {
             match (queue.dequeue()) {
                 case Some(item) => match (item.envelope) {
                     case RuntimeEnvelope<Unit>.EventItem(event) =>
+                        match ((event, lifecycle)) {
+                            case (Event.Capabilities(value), Some(requests)) =>
+                                requests.detectedCapabilities = value
+                                if (requests.capabilitiesOverride.isNone()) {
+                                    requests.capabilitiesOverridePending = true
+                                    requests.fullRedrawRequested = true
+                                    changed = true
+                                }
+                            case _ => ()
+                        }
                         queue.enterUpdate()
                         let result = try { update(event) } finally { queue.leaveUpdate() }
                         changed = changed || result.renderRequested

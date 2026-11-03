@@ -779,7 +779,10 @@ public class Tree <: Widget {
     public var offset: Int64
     private let block: ?Block
     private let style: Style
-    private let selectedStyle: Style
+    private let selectedStyle: ?Style
+    private let focusedStyle: ?Style
+    private var focused: Bool
+    private var theme: ?Theme
 
     public init(
         roots: Array<TreeNode>,
@@ -787,8 +790,11 @@ public class Tree <: Widget {
         offset!: Int64 = 0,
         block!: ?Block = None,
         style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
-        dataModel!: ?LazyTreeModel = None
+        selectedStyle!: ?Style = None,
+        dataModel!: ?LazyTreeModel = None,
+        focused!: Bool = false,
+        focusedStyle!: ?Style = None,
+        theme!: ?Theme = None
     ) {
         this.roots = roots
         this.dataModel = dataModel
@@ -797,12 +803,19 @@ public class Tree <: Widget {
         this.block = block
         this.style = style
         this.selectedStyle = selectedStyle
+        this.focusedStyle = focusedStyle
+        this.focused = focused
+        this.theme = theme
     }
 
-    public init(model: LazyTreeModel, block!: ?Block = None) {
-        this([], block: block, dataModel: Some(model))
+    public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None) {
+        this([], block: block, dataModel: Some(model), focused: focused, theme: theme)
         if (model.selectedId().isNone()) { _ = model.selectIndex(0) }
     }
+
+    public func setFocused(value: Bool): Unit { focused = value }
+
+    public func setTheme(value: ?Theme): Unit { theme = value }
 
     public func handle(mouse: MouseEvent, area: Rect): Bool {
         let target = match (block) { case Some(b) => b.inner(area); case None => area }
@@ -821,7 +834,8 @@ public class Tree <: Widget {
                 let rows = visibleRows()
                 stableId = Some(rows[index][0].id); rememberedIndex = index; depth = rows[index][1]
             }
-            if (mouse.x >= target.x + depth * 2 && mouse.x < target.x + depth * 2 + 2) { toggleSelected() }
+            let disclosure = target.x + 2 + depth * 2
+            if (mouse.x >= disclosure && mouse.x < disclosure + 2) { toggleSelected() }
             return true
         }
         false
@@ -945,25 +959,45 @@ public class Tree <: Widget {
             target = b.inner(area)
         }
         if (let Some(model) <- dataModel) {
-            let canvas = Canvas(buffer, target)
             for (row in model.rows(offset, target.height)) {
                 let marker = if (row.node.childCount > 0) { if (row.expanded) { "- " } else { "+ " } } else { "  " }
-                canvas.drawText(target.x, target.y + row.index - offset, repeat("  ", row.depth) + marker + row.node.label,
-                    if (model.selectedId() == Some(row.node.id)) { selectedStyle } else { style })
+                renderTreeRow(buffer, target, target.y + row.index - offset, row.depth, marker, row.node.label,
+                    model.selectedId() == Some(row.node.id))
             }
             if (let Some(index) <- model.selectedIndex()) { selected = index }
             return
         }
         let nodes = visibleRows()
-        let canvas = Canvas(buffer, target)
         for (row in 0..target.height) {
             let index = offset + row
             if (index >= nodes.size) { return }
             let (node, depth) = nodes[index]
             let marker = if (node.childNodes().size > 0) { if (node.expanded) { "- " } else { "+ " } } else { "  " }
-            let text = repeat("  ", depth) + marker + node.label
-            canvas.drawText(target.x, target.y + row, text, if (index == selected) { selectedStyle } else { style })
+            renderTreeRow(buffer, target, target.y + row, depth, marker, node.label, index == selected)
         }
+    }
+
+    private func renderTreeRow(buffer: Buffer, area: Rect, y: Int64, depth: Int64,
+        disclosure: String, label: String, selected: Bool): Unit {
+        let palette = match (theme) { case Some(value) => value; case None => Theme.default() }
+        let rowStyle = if (!selected) {
+            themeRoleStyle(style, ThemeRole.Normal, theme)
+        } else if (focused) {
+            match (focusedStyle) {
+                case Some(value) => value
+                case None => match (selectedStyle) {
+                    case Some(value) => value.withModifier(combineModifiers(value.modifier, palette.focused.modifier))
+                    case None => palette.focused
+                }
+            }
+        } else {
+            match (selectedStyle) { case Some(value) => value; case None => palette.selected }
+        }
+        let canvas = Canvas(buffer, area)
+        if (selected) { canvas.fillRect(Rect(area.x, y, area.width, 1), rowStyle) }
+        let selectedMark = if (!selected) { " " } else if (!buffer.capabilities().unicode) { "*" }
+            else { match (palette.iconSet) { case IconSet.Ascii => "*"; case IconSet.NerdFont => "\u{F111}"; case IconSet.Unicode => "●" } }
+        canvas.drawText(area.x, y, selectedMark + " " + repeat("  ", depth) + disclosure + label, rowStyle)
     }
 
     private func ensureVisible(total: Int64, viewportHeight: Int64): Unit {

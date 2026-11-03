@@ -334,8 +334,8 @@
     "phase": "5B",
     "review_status": "closed",
     "inventory_source": "docs/api-inventory.json plus architecture/api-classification.json",
-    "top_level_total": 158,
-    "contract_entry_total": 1012,
+    "top_level_total": 160,
+    "contract_entry_total": 1022,
     "family_total": 26,
     "coverage": "Every EXPERIMENTAL top-level declaration has exactly one primary family; classification-rule subsets below resolve mixed rules without changing API classification.",
     "selected_next_family": null,
@@ -591,11 +591,11 @@
           "adaptStyleForCapabilities"
         ],
         "top_level": 1,
-        "contract_entries": 4,
+        "contract_entries": 5,
         "owner": "core/style",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "Workbench capability preview and direct palette/adaptation contract tests; no principal consumer adoption.",
-        "reason": "Semantic theme factories and deterministic terminal-tier adaptation add an optional styling policy without changing the stable Theme shape.",
+        "reason": "Semantic theme factories and deterministic terminal-tier adaptation provide styling policy across terminal capabilities.",
         "revisit": "Promote only after independent production consumers validate role colors, deterministic palette mapping, and behavior across true-color, xterm-256, ANSI-8, and monochrome terminals; review after Workbench adoption and remove the optional API if no independent consumer needs capability-aware themes."
       },
       {
@@ -648,7 +648,7 @@
           "core-data-experimental"
         ],
         "top_level": 6,
-        "contract_entries": 78,
+        "contract_entries": 80,
         "owner": "core/widgets",
         "decision": "KEEP_EXPERIMENTAL",
         "review_phase": "5F",
@@ -791,10 +791,12 @@
           "TaskProgress",
           "TaskActivityLayout",
           "TaskActivity",
-          "TaskActivityView"
+          "TaskActivityView",
+          "TaskActivityListEntry",
+          "TaskActivityList"
         ],
-        "top_level": 9,
-        "contract_entries": 42,
+        "top_level": 11,
+        "contract_entries": 49,
         "owner": "core/editor",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "recommended assistant_console and one combined core test",
@@ -1094,7 +1096,7 @@
     "distribution": {
       "KEEP_EXPERIMENTAL": {
         "families": 26,
-        "top_level": 158
+        "top_level": 160
       }
     },
     "priority": []

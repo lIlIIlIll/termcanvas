@@ -341,8 +341,10 @@ core|TreeNode.childNodes|func|public func childNodes(): Array<TreeNode>
 core|Tree|class|public class Tree <: Widget {
 core|Tree.selected|var|public var selected: Int64
 core|Tree.offset|var|public var offset: Int64
-core|Tree.init|init|public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), dataModel!: ?LazyTreeModel = None )
-core|Tree.init|init|public init(model: LazyTreeModel, block!: ?Block = None)
+core|Tree.init|init|public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, dataModel!: ?LazyTreeModel = None, focused!: Bool = false, focusedStyle!: ?Style = None, theme!: ?Theme = None )
+core|Tree.init|init|public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None)
+core|Tree.setFocused|func|public func setFocused(value: Bool): Unit
+core|Tree.setTheme|func|public func setTheme(value: ?Theme): Unit
 core|Tree.handle|func|public func handle(mouse: MouseEvent, area: Rect): Bool
 core|Tree.toggleSelected|func|public func toggleSelected(): Unit
 core|Tree.selectedId|func|public func selectedId(): ?String
@@ -558,8 +560,9 @@ core|ExternalPort.closedCount|func|public func closedCount(): Int64
 core|ExternalPort.wakeSignals|func|public func wakeSignals(): Int64
 core|ExternalPort.wakeCoalesced|func|public func wakeCoalesced(): Int64
 core|Theme.graphite|func|public static func graphite(accent!: Color = Color.Cyan): Theme
-core|Theme.light|func|public static func light(accent!: Color = Color.Cyan): Theme
-core|Theme.forCapabilities|func|public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: Color = Color.Cyan ): Theme
+core|Theme.light|func|public static func light(): Theme
+core|Theme.light|func|public static func light(accent!: Color): Theme
+core|Theme.forCapabilities|func|public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: ?Color = None ): Theme
 core|StyleState|enum|public enum StyleState {
 core|StyleState.Normal|enum_constructor|Normal
 core|StyleState.Focused|enum_constructor|Focused
@@ -591,8 +594,15 @@ core|TaskActivity.detail|let|public let detail: String
 core|TaskActivity.progressLabel|let|public let progressLabel: String
 core|TaskActivity.init|init|public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
 core|TaskActivityView|class|public class TaskActivityView <: Widget {
-core|TaskActivityView.init|init|public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: Bool = true )
+core|TaskActivityView.init|init|public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
 core|TaskActivityView.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|TaskActivityListEntry|class|public class TaskActivityListEntry {
+core|TaskActivityListEntry.activity|let|public let activity: TaskActivity
+core|TaskActivityListEntry.layout|let|public let layout: TaskActivityLayout
+core|TaskActivityListEntry.init|init|public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded)
+core|TaskActivityList|class|public class TaskActivityList <: Widget {
+core|TaskActivityList.init|init|public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
+core|TaskActivityList.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|CursorShape|enum|public enum CursorShape {
 core|CursorShape.Block|enum_constructor|Block
 core|CursorShape.Bar|enum_constructor|Bar
@@ -738,7 +748,7 @@ core|VirtualTranscriptView.dirtyRectForItemRevision|func|public func dirtyRectFo
 core|VirtualTranscriptView.handle|func|public func handle(key: KeyEvent): Bool
 core|VirtualTranscriptView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Sparkline|class|public class Sparkline <: Widget {
-core|Sparkline.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None)
+core|Sparkline.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
 core|Sparkline.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Gauge|class|public class Gauge <: Widget {
 core|Gauge.init|init|public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )

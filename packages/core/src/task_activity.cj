@@ -109,22 +109,27 @@ public class TaskActivityView <: Widget {
     private let layout: TaskActivityLayout
     private let activityFrame: Int64
     private let theme: Theme
-    private let unicode: Bool
+    private let unicode: ?Bool
+    private let maxHeaderWidth: Int64
 
-    /** 创建任务 Widget；负帧序号按零处理，默认使用展开布局与 Unicode 标记。
+    /** 创建任务 Widget；负帧序号按零处理，默认使用展开布局，根据终端能力和主题选择标记；显式 unicode 参数覆盖自动选择。
+     * 展开布局将耗时对齐到最多 88 列的标题行，maxHeaderWidth 为零时使用整个宽度；
+     * 长标题需要更多空间时会扩展该宽度，空间不足时优先显示标题。
      */
     public init(
         activity: TaskActivity,
         layout!: TaskActivityLayout = TaskActivityLayout.Expanded,
         activityFrame!: Int64 = 0,
         theme!: Theme = Theme(),
-        unicode!: Bool = true
+        unicode!: ?Bool = None,
+        maxHeaderWidth!: Int64 = 88
     ) {
         this.activity = activity
         this.layout = layout
         this.activityFrame = max(0, activityFrame)
         this.theme = theme
         this.unicode = unicode
+        this.maxHeaderWidth = max(0, maxHeaderWidth)
     }
 
     /** 在指定区域绘制任务；空区域不绘制，超出区域的内容按单元格宽度裁剪。
@@ -132,14 +137,19 @@ public class TaskActivityView <: Widget {
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let canvas = Canvas(buffer, area)
+        let icons = match (unicode) {
+            case Some(true) => IconSet.Unicode
+            case Some(false) => IconSet.Ascii
+            case None => if (buffer.capabilities().unicode) { theme.iconSet } else { IconSet.Ascii }
+        }
         match (layout) {
-            case TaskActivityLayout.Compact => renderCompact(canvas, area)
-            case TaskActivityLayout.Expanded => renderExpanded(canvas, area)
+            case TaskActivityLayout.Compact => renderCompact(canvas, area, icons)
+            case TaskActivityLayout.Expanded => renderExpanded(canvas, area, icons)
         }
     }
 
-    private func renderCompact(canvas: Canvas, area: Rect): Unit {
-        var x = drawPart(canvas, area.x, area.y, area.right, marker(activity.status), statusStyle(activity.status))
+    private func renderCompact(canvas: Canvas, area: Rect, icons: IconSet): Unit {
+        var x = drawMarker(canvas, area.x, area.y, area.right, marker(activity.status, icons), statusStyle(activity.status))
         x = drawPart(canvas, x, area.y, area.right, activity.prefix, theme.accent)
         x = drawPart(canvas, x, area.y, area.right, activity.title, theme.normal)
         x = drawPart(canvas, x, area.y, area.right, activity.id, theme.disabled)
@@ -149,21 +159,29 @@ public class TaskActivityView <: Widget {
         _ = drawPart(canvas, x, area.y, area.right, activity.detail, theme.disabled)
     }
 
-    private func renderExpanded(canvas: Canvas, area: Rect): Unit {
+    private func renderExpanded(canvas: Canvas, area: Rect, icons: IconSet): Unit {
         let durationWidth = displayWidth(activity.duration)
-        let showDuration = !activity.duration.isEmpty() && durationWidth <= area.width - 14
-        let textRight = if (showDuration) { area.right - durationWidth - 1 } else { area.right }
+        let markerText = marker(activity.status, icons)
+        var contentWidth = displayWidth(markerText) + 2
+        if (!activity.prefix.isEmpty()) { contentWidth += displayWidth(activity.prefix) + 1 }
+        contentWidth += displayWidth(activity.title)
+        if (!activity.id.isEmpty()) { contentWidth += 1 + displayWidth(activity.id) }
+        let showDuration = !activity.duration.isEmpty() && contentWidth + 1 + durationWidth <= area.width
+        let preferredWidth = if (maxHeaderWidth == 0) { area.width } else { min(maxHeaderWidth, area.width) }
+        let headerWidth = if (showDuration) { max(preferredWidth, contentWidth + 1 + durationWidth) } else { area.width }
+        let headerRight = area.x + headerWidth
+        let textRight = if (showDuration) { headerRight - durationWidth - 1 } else { area.right }
         let header = canvas.withClip(Rect(area.x, area.y, max(0, textRight - area.x), 1))
-        var x = drawPart(header, area.x, area.y, textRight, marker(activity.status), statusStyle(activity.status))
+        var x = drawMarker(header, area.x, area.y, textRight, markerText, statusStyle(activity.status))
         x = drawPart(header, x, area.y, textRight, activity.prefix, theme.accent)
         x = drawPart(header, x, area.y, textRight, activity.title, theme.normal)
         _ = drawPart(header, x, area.y, textRight, activity.id, theme.disabled)
-        if (showDuration) { canvas.drawText(area.right - durationWidth, area.y, activity.duration, theme.disabled) }
+        if (showDuration) { canvas.drawText(headerRight - durationWidth, area.y, activity.duration, theme.disabled) }
 
         var y = area.y + 1
         match (activity.renderProgress()) {
             case Some(progress) =>
-                if (y < area.bottom) { renderProgress(canvas, area, y, progress) }
+                if (y < area.bottom) { renderProgress(canvas, area, y, progress, icons) }
                 y++
             case None => ()
         }
@@ -172,7 +190,7 @@ public class TaskActivityView <: Widget {
         }
     }
 
-    private func renderProgress(canvas: Canvas, area: Rect, y: Int64, progress: TaskProgress): Unit {
+    private func renderProgress(canvas: Canvas, area: Rect, y: Int64, progress: TaskProgress, icons: IconSet): Unit {
         let start = min(area.right, area.x + 2)
         let x = drawPart(canvas, start, y, area.right, activity.progressLabel, theme.disabled)
         let available = max(0, area.right - x)
@@ -180,25 +198,45 @@ public class TaskActivityView <: Widget {
         match (progress) {
             case TaskProgress.Items(items) =>
                 for (i in 0..min(visible, items.size)) {
-                    canvas.drawText(x + i * 2, y, progressMarker(items[i]), statusStyle(items[i]))
+                    canvas.drawText(x + i * 2, y, progressMarker(items[i], icons), progressStyle(items[i]))
                 }
             case TaskProgress.Counts(completed, total) =>
                 for (i in 0..min(visible, total)) {
                     let status = if (i < completed) { TaskStatus.Done } else { TaskStatus.Pending }
-                    canvas.drawText(x + i * 2, y, progressMarker(status), statusStyle(status))
+                    canvas.drawText(x + i * 2, y, progressMarker(status, icons), progressStyle(status))
                 }
         }
     }
 
-    // Returns the next cell, with one separating space after each nonempty part.
+    private func drawMarker(canvas: Canvas, x: Int64, y: Int64, right: Int64, text: String, style: Style): Int64 {
+        let next = drawPart(canvas, x, y, right, text, style)
+        if (next >= right || next == x) { return next }
+        canvas.drawText(next, y, " ", theme.normal)
+        next + 1
+    }
+
+    // Returns the next cell, explicitly clearing the separator after each nonempty part.
     private func drawPart(canvas: Canvas, x: Int64, y: Int64, right: Int64, text: String, style: Style): Int64 {
         if (text.isEmpty() || x >= right) { return x }
         canvas.drawText(x, y, text, style)
         let occupied = min(right - x, displayWidth(text))
-        min(right, x + occupied + min(1, right - x - occupied))
+        let end = x + occupied
+        if (end < right) { canvas.drawText(end, y, " ", style) }
+        min(right, end + min(1, right - end))
     }
 
-    private func marker(status: TaskStatus): String {
+    private func marker(status: TaskStatus, icons: IconSet): String {
+        let unicode = match (icons) { case IconSet.Ascii => false; case _ => true }
+        if (match (icons) { case IconSet.NerdFont => true; case _ => false }) {
+            return match (status) {
+                case TaskStatus.Pending => "\u{f10c}"
+                case TaskStatus.Queued => "\u{f252}"
+                case TaskStatus.Running => "\u{f110}"
+                case TaskStatus.Done => "\u{f058}"
+                case TaskStatus.Failed => "\u{f057}"
+                case TaskStatus.Cancelled => "\u{f068}"
+            }
+        }
         match (status) {
             case TaskStatus.Pending => if (unicode) { "○" } else { "o" }
             case TaskStatus.Queued => if (unicode) { "…" } else { "-" }
@@ -214,11 +252,19 @@ public class TaskActivityView <: Widget {
         }
     }
 
-    private func progressMarker(status: TaskStatus): String {
+    private func progressMarker(status: TaskStatus, icons: IconSet): String {
+        let unicode = match (icons) { case IconSet.Ascii => false; case _ => true }
         match (status) {
             case TaskStatus.Pending | TaskStatus.Queued => if (unicode) { "◌" } else { "o" }
             case TaskStatus.Done => if (unicode) { "●" } else { "+" }
-            case _ => marker(status)
+            case _ => marker(status, icons)
+        }
+    }
+
+    private func progressStyle(status: TaskStatus): Style {
+        match (status) {
+            case TaskStatus.Pending | TaskStatus.Queued => theme.normal
+            case _ => statusStyle(status)
         }
     }
 
@@ -229,6 +275,102 @@ public class TaskActivityView <: Widget {
             case TaskStatus.Done => theme.success
             case TaskStatus.Failed => theme.error
             case TaskStatus.Cancelled => theme.warning
+        }
+    }
+}
+
+/** 一个任务及其紧凑或展开显示方式。 */
+public class TaskActivityListEntry {
+    public let activity: TaskActivity
+    public let layout: TaskActivityLayout
+
+    public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded) {
+        this.activity = activity
+        this.layout = layout
+    }
+
+    func height(): Int64 {
+        match (layout) {
+            case TaskActivityLayout.Compact => 1
+            case TaskActivityLayout.Expanded =>
+                let progressHeight = match (activity.renderProgress()) { case Some(_) => 1; case None => 0 }
+                1 + progressHeight + if (activity.detail.isEmpty()) { 0 } else { 1 }
+        }
+    }
+}
+
+/**
+ * 按任务索引滚动的只读活动列表。调用方管理数据、偏移、动画与输入。
+ * 当内容被裁剪或偏移时，在末行显示隐藏或不完整任务的数量；单行区域优先显示任务标题。
+ * maxHeaderWidth 控制展开项耗时的对齐宽度，默认为 88，设为 0 使用整个宽度。
+ */
+public class TaskActivityList <: Widget {
+    private let entries: Array<TaskActivityListEntry>
+    private let offset: Int64
+    private let activityFrame: Int64
+    private let theme: Theme
+    private let unicode: ?Bool
+    private let maxHeaderWidth: Int64
+
+    public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0,
+        theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88) {
+        this.entries = Array<TaskActivityListEntry>(entries.size, { i => entries[i] })
+        this.offset = max(0, min(offset, max(0, entries.size - 1)))
+        this.activityFrame = activityFrame
+        this.theme = theme
+        this.unicode = unicode
+        this.maxHeaderWidth = max(0, maxHeaderWidth)
+    }
+
+    public func render(area: Rect, buffer: Buffer): Unit {
+        if (area.width <= 0 || area.height <= 0 || entries.size == 0) { return }
+        if (area.height == 1) {
+            let entry = entries[offset]
+            let above = if (offset > 0) { "${offset} above" } else { "" }
+            let belowCount = entries.size - offset - 1
+            let below = if (belowCount > 0) { "${belowCount} more" } else { "" }
+            let separator = if (!above.isEmpty() && !below.isEmpty()) { " | " } else { "" }
+            let indicator = above + separator + below
+            let requiredTitle = 3 + displayWidth(entry.activity.prefix) +
+                (if (entry.activity.prefix.isEmpty()) { 0 } else { 1 }) + displayWidth(entry.activity.title)
+            let indicatorWidth = displayWidth(indicator)
+            let showIndicator = !indicator.isEmpty() && requiredTitle + 1 + indicatorWidth <= area.width
+            let itemWidth = if (showIndicator) { area.width - indicatorWidth - 1 } else { area.width }
+            TaskActivityView(entry.activity, layout: entry.layout, activityFrame: activityFrame,
+                theme: theme, unicode: unicode, maxHeaderWidth: maxHeaderWidth).render(Rect(area.x, area.y, itemWidth, 1), buffer)
+            if (showIndicator) {
+                Canvas(buffer, area).drawText(area.right - indicatorWidth, area.y, indicator, theme.disabled)
+            }
+            return
+        }
+        var remaining = area.height
+        var index = offset
+        while (index < entries.size && entries[index].height() <= remaining) {
+            remaining -= entries[index].height()
+            index++
+        }
+        let needsIndicator = offset > 0 || index < entries.size
+        let contentHeight = if (needsIndicator) { max(0, area.height - 1) } else { area.height }
+        var y = area.y
+        index = offset
+        var partial = false
+        while (index < entries.size && y - area.y < contentHeight) {
+            let entry = entries[index]
+            let height = min(entry.height(), contentHeight - (y - area.y))
+            TaskActivityView(entry.activity, layout: entry.layout, activityFrame: activityFrame,
+                theme: theme, unicode: unicode, maxHeaderWidth: maxHeaderWidth).render(Rect(area.x, y, area.width, height), buffer)
+            y += height
+            if (height < entry.height()) { partial = true; break }
+            index++
+        }
+        if (needsIndicator) {
+            let hidden = entries.size - index
+            let earlier = if (offset > 0) { "${offset} above" } else { "" }
+            let later = if (hidden > 0) {
+                if (partial) { "${hidden} more/partial" } else { "${hidden} more" }
+            } else { "" }
+            let separator = if (!earlier.isEmpty() && !later.isEmpty()) { " | " } else { "" }
+            Canvas(buffer, area).drawText(area.x, area.bottom - 1, earlier + separator + later, theme.disabled)
         }
     }
 }

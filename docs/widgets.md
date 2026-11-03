@@ -106,26 +106,48 @@ from the resulting state.
 - `Paginator`: page and page-size state with keyboard navigation.
 - `TaskActivityView` (EXPERIMENTAL): one compact or expanded task with status,
   elapsed text, details, and individual or count-based subtask progress.
+- `TaskActivityList` (EXPERIMENTAL): mixed compact and expanded tasks with
+  task-index scrolling and an indicator for hidden or partially visible tasks.
 
 ### Show task activity
 
-Create a `TaskActivity` from application state and pass it to
-`TaskActivityView`. This complete application shows three subtask states; press
-`q` or Ctrl-C to exit:
+Create `TaskActivity` values from application state and pass them to a
+`TaskActivityList`. The following app displays a compact completed task and an
+expanded running task, alongside a progress bar, a trend, and a tree. Press
+`a` to force ASCII with eight colors, `u` to restore detected capabilities,
+and `q` or Ctrl-C to exit:
 
 ```cangjie
 import core.*
 
 main(): Int64 {
-    let task = TaskActivity("Build", status: TaskStatus.Running, id: "job-1",
-        duration: "12s", progressLabel: "Jobs", detail: "Compiling",
+    let theme = Theme.graphite().withIconSet(IconSet.Unicode)
+    let done = TaskActivity("Checkout", status: TaskStatus.Done, duration: "2s")
+    let build = TaskActivity("Build", status: TaskStatus.Running, id: "job-1",
+        duration: "12s", progressLabel: "Jobs", detail: "Compiling source",
         progress: Some(TaskProgress.Items([TaskStatus.Done, TaskStatus.Running, TaskStatus.Pending])))
+    let entries = [TaskActivityListEntry(done, layout: TaskActivityLayout.Compact),
+        TaskActivityListEntry(build)]
+    let tree = Tree([TreeNode("root", "project", expanded: true,
+        children: [TreeNode("src", "src")])], focused: true, theme: Some(theme))
     App().runWithCommands(
-        { frame => frame.renderWidget(TaskActivityView(task), frame.area) },
+        { frame =>
+            let area = frame.area
+            frame.fill(area, theme.canvas)
+            frame.renderWidget(TaskActivityList(entries, theme: theme), Rect(area.x, area.y, area.width, 4))
+            frame.renderWidget(ProgressBar(2, total: 3, labelMode: ProgressBarLabelMode.Percent),
+                Rect(area.x, area.y + 5, area.width, 1))
+            frame.renderWidget(Sparkline([1, 2, 3, 2, 4]), Rect(area.x, area.y + 7, area.width, 1))
+            frame.renderWidget(tree, Rect(area.x, area.y + 9, area.width, 3))
+        },
         { event =>
             match (event) {
                 case Event.KeyDown(key) => match (key.code) {
                     case KeyCode.Char(r'q') | KeyCode.CtrlC => UpdateResult.exit()
+                    case KeyCode.Char(r'a') => UpdateResult.withCommand(Command.SetCapabilitiesOverride(
+                        Some(TerminalCapabilities(unicode: false, trueColor: false, colorLevel: 8))))
+                    case KeyCode.Char(r'u') => UpdateResult.withCommand(Command.SetCapabilitiesOverride(
+                        Option<TerminalCapabilities>.None))
                     case _ => UpdateResult.next()
                 }
                 case _ => UpdateResult.next()
@@ -136,20 +158,44 @@ main(): Int64 {
 }
 ```
 
-The first line shows the task and elapsed text, followed by a `Jobs` line and a
-detail line. Use `TaskProgress.Counts(completed, total)` for aggregate progress;
+The first task occupies one line. The second task displays its title, a `Jobs`
+line, and a detail line. Use `TaskProgress.Counts(completed, total)` for aggregate progress;
 counts are clamped to `0 <= completed <= total` and negative totals become
 zero. `Items` copies its array when `TaskActivity` is created. The component
 draws only the progress marks that fit its area.
 
-Use `layout: TaskActivityLayout.Compact` for a single line. Pass a new
-`activityFrame` when the application receives a tick to animate a running
-task. Set `unicode: false` for ASCII marks and pass a `Theme` to change colors.
-The widget owns no timer or task state. It clips text to its assigned area;
-expanded layout hides the right-aligned duration if the area is too narrow.
+`TaskActivityList` uses `offset` as a task index. Set `layout` on each entry to
+mix compact and expanded tasks, and pass a new `activityFrame` on each tick to
+animate running tasks. The application owns the task data, offset, and timer.
+The list displays the number of hidden or partially visible tasks when space
+allows. `TaskActivityView` renders one task; its expanded layout hides the
+right-aligned duration if the area is too narrow. Both widgets accept a `Theme`
+and an optional `unicode` override.
 The [`ci_activity`](../examples/ci_activity/) example demonstrates both progress
 forms and the tick/update loop.
 
+### Migrate existing widget layouts
+
+- Default `Block` borders now use rounded Unicode lines when Unicode is
+  available and ASCII otherwise. Use `BlockOptions.borderKind`, `border`, or
+  `asciiFallback` to select a specific appearance. An `Input` without a block
+  now draws `[` and `]`; pass `showBoundary: false` to omit them.
+- Default selection and focus styles have changed. `List`,
+  `Table`, and `Tree` have a separate selection marker; selected tree rows use
+  the full row width. Provide `selectedStyle` and, where available,
+  `selectionMarker` or `focusedStyle` to preserve a custom appearance. Review
+  layouts and mouse coordinates that assumed the old tree indentation.
+- `ProgressBar` and `Sparkline` choose their default symbols from terminal
+  capabilities. Percentage labels, when enabled, appear outside the progress
+  track. `Sparkline` now shows the latest fitting samples and scales to their
+  visible maximum by default. Pass explicit symbols or `latest: false` to
+  choose the older presentation. The optional `unicode` argument on task
+  widgets overrides automatic icon selection; `unicode: true` selects Unicode
+  rather than the theme's Nerd Font icons.
+- Expanded `TaskActivityView` and `TaskActivityList` align durations within a
+  preferred header width of 88 columns. The width grows when needed to fit a
+  title and duration. Pass `maxHeaderWidth: 0` to align against the full
+  available width.
 
 ### Documents, logs, and visuals
 
@@ -166,24 +212,52 @@ forms and the tick/update loop.
 `Chart` draws bottom-up bars for a sample series. `maxValue <= 0` keeps the
 automatic maximum; a positive `maxValue` fixes the upper scale and saturates
 higher samples. Zero and negative samples retain the one-cell minimum.
-`Sparkline` keeps its five levels (` `, `.`, `-`, `=`, `#`); an optional `Block`
-draws first and the values occupy its first inner row. Empty data can still show
-the block. These new options are EXPERIMENTAL. Use `Gauge` for one value against
-a total, not for a sample series.
+`Sparkline` uses Unicode levels when supported and ASCII levels (` `, `.`, `-`,
+`=`, `#`) otherwise. It displays the latest samples that fit and scales them
+to their visible maximum. Set `maxValue` to a positive value for a fixed scale,
+`latest: false` to show the earliest samples, or `symbols` to supply custom
+levels. An optional `Block` draws first; empty data can still show the block.
+These options are EXPERIMENTAL. Use `Gauge` for one value against a total.
+
+`ProgressBar` chooses its track symbols from terminal capabilities. Its label
+is hidden by default; `labelMode: ProgressBarLabelMode.Percent` shows a
+two-decimal percentage outside the track. A nonzero value below 0.01% displays
+`<0.01%`, and a nonzero value smaller than one track cell still receives a
+visible mark. Narrow areas replace a label that does not fit with an ellipsis.
+Pass `ProgressBarSymbols` to supply your own track characters.
 
 ### Shared visual states
 
-`Theme` supplies semantic `normal`, `focused`, `selected`, `disabled`, `error`,
-`accent`, `success`, `warning`, and `info` styles. Prefer those roles over
-component-specific color literals; applications remain responsible for choosing
-the actual palette.
+`Theme()` uses the terminal's foreground and background for its normal and
+canvas styles. It supplies semantic `normal`, `focused`, `selected`, `disabled`,
+`error`, `accent`, `success`, `warning`, and `info` styles, plus `canvas`,
+`surface`, `raisedSurface`, `heading`, `secondary`, `border`, and
+`strongBorder` roles. `Theme.graphite()` and `Theme.light()` provide dark and
+light palettes. Use `Theme.light(accent: Color.Red)` to choose an accent; an
+explicit accent is preserved.
 
-`Tabs.setTheme(theme: ?Theme)` is EXPERIMENTAL. The default `selectedStyle`
-remains black on white; pass `selectedStyle: Style.default()` to opt into the
-theme's `normal` and `selected` roles. A custom `style` patches the normal role
-after opt-in. Without that opt-in, `style` and `selectedStyle` keep their
-existing rendering even when a theme is set. Passing `None` clears the theme.
-A focused selected tab still adds bold and underline.
+`Theme.withIconSet(IconSet.Unicode)`, `IconSet.Ascii`, and `IconSet.NerdFont`
+select the icon set used by participating widgets. Nerd Font is opt-in and
+requires a compatible terminal font. Default `Block` borders and the progress
+and trend symbols choose Unicode or ASCII from terminal capabilities. Explicit
+progress and trend symbols take precedence. For `Block`, `asciiFallback: true`
+overrides a custom border.
+
+`Theme.serialize()` appends the new visual roles and icon set after the existing
+role entries. Consumers that parse this text should allow the additional lines.
+
+The runtime passes terminal capabilities to widget rendering and adapts output
+colors to the detected color tier. `Command.SetCapabilitiesOverride(Some(caps))`
+replaces those capabilities and requests a full redraw; pass
+`Option<TerminalCapabilities>.None` to restore detection. Use
+`theme.adapted(caps)` when you need a separately adapted theme value. Adapt the
+original theme again when capabilities change, because downgraded colors and
+icon sets cannot recover their original values.
+
+`Tabs.setTheme(theme: ?Theme)` is EXPERIMENTAL. The default selected style uses
+the theme's selected role when a theme is set. A custom `selectedStyle` takes
+precedence. Passing `None` clears the theme. A focused selected tab adds bold
+and underline.
 
 `SegmentedControl` is EXPERIMENTAL. It draws the selected value as `[value]`,
 other values as ` value `, and adds one non-hit separator cell between segments.
@@ -223,6 +297,14 @@ normalization and event routing.
 The default placeholder color uses the theme's muted `disabled` foreground and
 the input's resolved background; without a theme it keeps the indexed-gray
 fallback. A non-default `placeholderStyle` overrides that derived color.
+
+The stable `Tabs.setFocused(focused: Bool)` method lets the application report
+real focus. A focused selected tab adds a bold underline; selection remains
+independent of focus. `Block` already supports rounded or absent borders,
+background/content styles, padding, focus state, and ASCII border fallback.
+
+These additions extend existing stable widgets; exact signatures are maintained
+in the generated stable API contract.
 
 ## State and data size
 
@@ -276,9 +358,13 @@ regional helpers include `dirtyHeader`, `dirtyBody`, `dirtyRows`,
 application-owned dirty rendering.
 
 `Tree` supports ID-based lookup, selection by ID, and expansion/collapse
-helpers. `FilePicker` exposes selected paths, parent navigation, directory
-entry, search text, hidden-file toggling, directory-first sorting, selected
-metadata, and extension filtering that keeps directories visible.
+helpers. The selected marker is separate from the disclosure marker, and the
+selected style covers the full row. Use `setFocused` to report keyboard focus;
+`selectedStyle` and `focusedStyle` override the theme styles. The same
+presentation applies to a tree backed by `LazyTreeModel`. `FilePicker` exposes
+selected paths, parent navigation, directory entry, search text, hidden-file
+toggling, directory-first sorting, selected metadata, and extension filtering
+that keeps directories visible.
 
 `DocumentView` renders `Document` nodes built from `RichSpan` and
 `DocumentLine`: paragraphs, level-aware headings, lists, task items, quotes,

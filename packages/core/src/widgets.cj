@@ -3,6 +3,7 @@ package core
 import std.collection.*
 
 public enum BorderKind {
+    | Auto
     | Ascii
     | Unicode
     | Rounded
@@ -71,21 +72,25 @@ public class BlockOptions {
     public let borderStyle: Style
     public let contentStyle: Style
     public let titleStyle: Style
+    let hasBackgroundStyle: Bool
+    let hasBorderStyle: Bool
+    let hasContentStyle: Bool
+    let hasTitleStyle: Bool
     public let state: BoxState
     public let asciiFallback: Bool
     public let theme: ?Theme
 
     public init(
         title!: String = "",
-        borderKind!: BorderKind = BorderKind.Ascii,
-        border!: BorderSet = BorderSet.ascii(),
+        borderKind!: BorderKind = BorderKind.Auto,
+        border!: BorderSet = BorderSet(horizontal: "", vertical: "", topLeft: "", topRight: "", bottomLeft: "", bottomRight: ""),
         titleAlign!: TitleAlign = TitleAlign.Left,
         padding!: Spacing = Spacing.zero(),
         margin!: Spacing = Spacing.zero(),
-        backgroundStyle!: Style = Style.default(),
-        borderStyle!: Style = Style.default(),
-        contentStyle!: Style = Style.default(),
-        titleStyle!: Style = Style.default(),
+        backgroundStyle!: ?Style = None,
+        borderStyle!: ?Style = None,
+        contentStyle!: ?Style = None,
+        titleStyle!: ?Style = None,
         state!: BoxState = BoxState.Normal,
         asciiFallback!: Bool = false,
         theme!: ?Theme = None
@@ -96,10 +101,14 @@ public class BlockOptions {
         this.titleAlign = titleAlign
         this.padding = padding
         this.margin = margin
-        this.backgroundStyle = backgroundStyle
-        this.borderStyle = borderStyle
-        this.contentStyle = contentStyle
-        this.titleStyle = titleStyle
+        this.hasBackgroundStyle = backgroundStyle.isSome()
+        this.hasBorderStyle = borderStyle.isSome()
+        this.hasContentStyle = contentStyle.isSome()
+        this.hasTitleStyle = titleStyle.isSome()
+        this.backgroundStyle = match (backgroundStyle) { case Some(value) => value; case None => Style.default() }
+        this.borderStyle = match (borderStyle) { case Some(value) => value; case None => Style.default() }
+        this.contentStyle = match (contentStyle) { case Some(value) => value; case None => Style.default() }
+        this.titleStyle = match (titleStyle) { case Some(value) => value; case None => Style.default() }
         this.state = state
         this.asciiFallback = asciiFallback
         this.theme = theme
@@ -129,8 +138,8 @@ public class Block <: Widget {
     }
 
     private func renderFrame(frame: Rect, buffer: Buffer): Unit {
-        let background = resolveBoxStyle(options.backgroundStyle)
-        if (background != Style.default()) {
+        let background = resolvedBoxBackground()
+        if (options.hasBackgroundStyle || background != Style.default()) {
             buffer.fill(frame, style: background)
         }
         if (!isBorderNone(options.borderKind)) {
@@ -138,8 +147,8 @@ public class Block <: Widget {
             renderTitle(frame, buffer)
         }
         let content = contentArea(frame)
-        if (content.width > 0 && content.height > 0 && options.contentStyle != Style.default()) {
-            buffer.fill(content, style: resolveBoxStyle(options.contentStyle))
+        if (content.width > 0 && content.height > 0 && options.hasContentStyle) {
+            buffer.fill(content, style: options.contentStyle)
         }
     }
 
@@ -163,8 +172,8 @@ public class Block <: Widget {
 
     private func renderBorder(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
-        let border = resolvedBorder()
-        let style = resolveBoxStyle(options.borderStyle)
+        let border = resolvedBorder(buffer)
+        let style = resolvedBoxBorder()
         if (area.height == 1) {
             _ = buffer.writeStringClipped(area.x, area.y, repeat(border.horizontal, area.width), maxWidth: area.width, style: style)
             return
@@ -192,20 +201,19 @@ public class Block <: Widget {
             case TitleAlign.Center => area.x + max(1, (area.width - width) / 2)
             case TitleAlign.Right => area.right - width - 2
         }
-        buffer.setString(max(area.x + 1, min(x, area.right - width - 1)), area.y, text, style: resolveBoxStyle(options.titleStyle))
+        buffer.setString(max(area.x + 1, min(x, area.right - width - 1)), area.y, text, style: resolvedBoxTitle())
     }
 
-    private func resolvedBorder(): BorderSet {
+    private func resolvedBorder(buffer: Buffer): BorderSet {
         if (options.asciiFallback) { return BorderSet.ascii() }
-        // A non-default character set overrides the built-in kind. Keep the
-        // default ASCII value from masking Unicode/Rounded kind selections.
         let border = options.border
-        if (border.horizontal != "-" || border.vertical != "|" ||
-            border.topLeft != "+" || border.topRight != "+" ||
-            border.bottomLeft != "+" || border.bottomRight != "+") {
+        if (!border.horizontal.isEmpty() || !border.vertical.isEmpty() ||
+            !border.topLeft.isEmpty() || !border.topRight.isEmpty() ||
+            !border.bottomLeft.isEmpty() || !border.bottomRight.isEmpty()) {
             return border
         }
         match (options.borderKind) {
+            case BorderKind.Auto => if (buffer.capabilities().unicode) { BorderSet.rounded() } else { BorderSet.ascii() }
             case BorderKind.Ascii => BorderSet.ascii()
             case BorderKind.Unicode => BorderSet.unicode()
             case BorderKind.Rounded => BorderSet.rounded()
@@ -213,16 +221,29 @@ public class Block <: Widget {
         }
     }
 
-    private func resolveBoxStyle(style: Style): Style {
-        let base = match (options.state) {
-            case BoxState.Normal => themedNormal(style, options.theme)
-            case BoxState.Focused => themedFocused(style, options.theme)
-            case BoxState.Active => themedSelected(style, options.theme)
-            case BoxState.Error => themedError(style, options.theme)
-            case BoxState.Disabled => themedDisabled(style, options.theme)
-        }
-        base
+    private func resolvedBoxBackground(): Style {
+        if (options.hasBackgroundStyle) { return options.backgroundStyle }
+        match (options.theme) { case Some(theme) => theme.canvas; case None => Style.default() }
     }
+
+    private func resolvedBoxBorder(): Style {
+        if (options.hasBorderStyle) { return options.borderStyle }
+        match (options.theme) {
+            case Some(theme) => match (options.state) {
+                case BoxState.Normal => theme.border
+                case BoxState.Focused | BoxState.Active => theme.strongBorder
+                case BoxState.Error => theme.error
+                case BoxState.Disabled => theme.disabled
+            }
+            case None => Style.default()
+        }
+    }
+
+    private func resolvedBoxTitle(): Style {
+        if (options.hasTitleStyle) { return options.titleStyle }
+        match (options.theme) { case Some(theme) => theme.heading; case None => Style.default() }
+    }
+
 }
 
 public class Panel <: Widget {
@@ -306,7 +327,10 @@ public class List <: Widget {
     private let state: ?ListState
     private let block: ?Block
     private let style: Style
-    private let selectedStyle: Style
+    private let selectedStyle: ?Style
+    private let focused: Bool
+    private let theme: ?Theme
+    private let selectionMarker: ?String
 
     public init(
         items: Array<String>,
@@ -315,7 +339,10 @@ public class List <: Widget {
         state!: ?ListState = None,
         block!: ?Block = None,
         style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        selectedStyle!: ?Style = None,
+        focused!: Bool = false,
+        theme!: ?Theme = None,
+        selectionMarker!: ?String = None
     ) {
         this.items = items
         this.selected = selected
@@ -324,6 +351,9 @@ public class List <: Widget {
         this.block = block
         this.style = style
         this.selectedStyle = selectedStyle
+        this.focused = focused
+        this.theme = theme
+        this.selectionMarker = selectionMarker
     }
 
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
@@ -366,6 +396,9 @@ public class List <: Widget {
             case Some(s) => s.selected
             case None => selected
         }
+        let marker = resolvedSelectionMarker(selectionMarker, theme, buffer.capabilities())
+        let markerColumns = min(target.width, displayWidth(marker))
+        let gap = if (markerColumns > 0) { Int64(1) } else { Int64(0) }
         for (i in 0..rows) {
             let itemIndex = i + renderOffset
             if (itemIndex >= items.size) { return }
@@ -373,8 +406,15 @@ public class List <: Widget {
                 case Some(v) => v == itemIndex
                 case None => false
             }
-            let prefix = if (active) { "> " } else { "  " }
-            let rowStyle = if (active) { selectedStyle } else { style }
+            let prefix = if (active) { truncate(marker, markerColumns) + repeat(" ", gap) } else { repeat(" ", markerColumns + gap) }
+            var rowStyle = if (active) { listSelectionStyle(selectedStyle, theme) } else { themedNormal(style, theme) }
+            if (active && focused) {
+                var modifier = rowStyle.modifier
+                modifier.bold = true
+                modifier.underline = true
+                rowStyle = rowStyle.withModifier(modifier)
+            }
+            buffer.fillRect(Rect(target.x, target.y + i, target.width, 1), style: rowStyle)
             _ = buffer.writeStringClipped(target.x, target.y + i, prefix + items[itemIndex], maxWidth: target.width, style: rowStyle)
         }
     }
@@ -475,7 +515,10 @@ public class Table <: Widget {
     private let block: ?Block
     private let style: Style
     private let headerStyle: Style
-    private let selectedStyle: Style
+    private let selectedStyle: ?Style
+    private let focused: Bool
+    private let theme: ?Theme
+    private let selectionMarker: ?String
 
     public init(
         headers: Array<String>,
@@ -485,7 +528,10 @@ public class Table <: Widget {
         block!: ?Block = None,
         style!: Style = Style.default(),
         headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        selectedStyle!: ?Style = None,
+        focused!: Bool = false,
+        theme!: ?Theme = None,
+        selectionMarker!: ?String = None
     ) {
         this.headers = headers
         this.rows = rows
@@ -495,6 +541,9 @@ public class Table <: Widget {
         this.style = style
         this.headerStyle = headerStyle
         this.selectedStyle = selectedStyle
+        this.focused = focused
+        this.theme = theme
+        this.selectionMarker = selectionMarker
     }
 
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
@@ -529,10 +578,14 @@ public class Table <: Widget {
     }
 
     private func renderRows(target: Rect, buffer: Buffer): Unit {
-        let colWidths = resolvedWidths(target.width)
-        renderRow(target.x, target.y, target.right, headers, colWidths, headerStyle, buffer)
+        let marker = resolvedSelectionMarker(selectionMarker, theme, buffer.capabilities())
+        let markerColumns = min(max(0, target.width - 1), displayWidth(marker))
+        let markerWidth: Int64 = if (state.isSome() && markerColumns > 0 && markerColumns + 1 < target.width) { markerColumns + 1 } else { 0 }
+        let colWidths = resolvedWidths(target.width - markerWidth)
+        renderRow(target.x + markerWidth, target.y, target.right, headers, colWidths, headerStyle, buffer)
         if (target.height > 1) {
-            buffer.setString(target.x, target.y + 1, repeat("-", target.width), style: headerStyle)
+            let line = if (buffer.capabilities().unicode) { "─" } else { "-" }
+            buffer.setString(target.x, target.y + 1, repeat(line, target.width), style: headerStyle)
         }
         let rowLimit = min(rows.size, max(0, target.height - 2))
         let renderOffset = match (state) {
@@ -550,8 +603,18 @@ public class Table <: Widget {
                 case Some(v) => v == rowIndex
                 case None => false
             }
-            let rowStyle = if (active) { selectedStyle } else { style }
-            renderRow(target.x, target.y + 2 + i, target.right, rows[rowIndex], colWidths, rowStyle, buffer)
+            var rowStyle = if (active) { listSelectionStyle(selectedStyle, theme) } else { themedNormal(style, theme) }
+            if (active && focused) {
+                var modifier = rowStyle.modifier
+                modifier.bold = true
+                modifier.underline = true
+                rowStyle = rowStyle.withModifier(modifier)
+            }
+            buffer.fillRect(Rect(target.x, target.y + 2 + i, target.width, 1), style: rowStyle)
+            if (active && markerWidth > 0) {
+                _ = buffer.writeStringClipped(target.x, target.y + 2 + i, marker, maxWidth: markerWidth - 1, style: rowStyle)
+            }
+            renderRow(target.x + markerWidth, target.y + 2 + i, target.right, rows[rowIndex], colWidths, rowStyle, buffer)
         }
     }
 
@@ -580,6 +643,33 @@ public class Table <: Widget {
             let width = max(0, widths[i])
             _ = buffer.writeStringClipped(cx, y, cols[i], maxWidth: min(width, right - cx), style: style)
             cx += width + 1
+        }
+    }
+}
+
+// Explicit markers are application-owned. Built-in markers follow both the
+// selected icon set and the terminal's Unicode capability.
+func resolvedSelectionMarker(marker: ?String, theme: ?Theme, capabilities: TerminalCapabilities): String {
+    match (marker) {
+        case Some(value) => value
+        case None =>
+            if (!capabilities.unicode) { return "*" }
+            let iconSet = match (theme) { case Some(value) => value.iconSet; case None => IconSet.Unicode }
+            match (iconSet) {
+                case IconSet.Ascii => "*"
+                case IconSet.Unicode => "●"
+                case IconSet.NerdFont => "\u{F111}"
+            }
+    }
+}
+
+// Preserve explicit selection styles while providing a visible default without a theme.
+func listSelectionStyle(style: ?Style, theme: ?Theme): Style {
+    match (style) {
+        case Some(value) => value
+        case None => match (theme) {
+            case Some(value) => value.selected
+            case None => Theme.default().selected
         }
     }
 }
@@ -744,6 +834,7 @@ public class Input <: Widget {
     private let style: Style
     private let placeholder: String
     private let placeholderStyle: Style
+    private let showBoundary: Bool
     private var focused: Bool = false
     private var disabled: Bool = false
     private var error: Bool = false
@@ -757,7 +848,8 @@ public class Input <: Widget {
         block!: ?Block = None,
         style!: Style = Style.default(),
         placeholder!: String = "",
-        placeholderStyle!: Style = Style(fg: Color.Indexed(8))
+        placeholderStyle!: Style = Style(fg: Color.Indexed(8)),
+        showBoundary!: Bool = true
     ) {
         this.value = value
         this.cursor = clampToRuneBoundary(value, cursor)
@@ -765,6 +857,7 @@ public class Input <: Widget {
         this.style = style
         this.placeholder = placeholder
         this.placeholderStyle = placeholderStyle
+        this.showBoundary = showBoundary
     }
     /** 设置聚焦、禁用或错误状态及其语义主题；状态优先级为禁用、错误、聚焦，全部关闭时为普通状态。
      */
@@ -829,10 +922,7 @@ public class Input <: Widget {
         if (beforeViewport != viewportOffset || beforeEmpty != value.isEmpty()) {
             dirty.add(area)
         } else {
-            let target = match (block) {
-                case Some(b) => b.inner(area)
-                case None => area
-            }
+            let target = widgetInnerArea(area, block)
             dirty.add(Rect(target.x, target.y, target.width, min(Int64(1), target.height)))
         }
         Some(dirty)
@@ -840,12 +930,13 @@ public class Input <: Widget {
 
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         if (disabled) { return false }
-        let target = widgetInnerArea(area, block)
-        if (!widgetHitTest(mouse, target) || mouse.y != target.y) { return false }
+        let outer = widgetInnerArea(area, block)
+        if (!widgetHitTest(mouse, outer) || mouse.y != outer.y) { return false }
+        let target = inputContentArea(outer)
         match ((mouse.kind, mouse.button)) {
             case (MouseKind.Down, MouseButton.Left) =>
                 ensureCursorVisible(target.width)
-                cursor = viewportOffset + offsetAtLineColumn(value[viewportOffset..], 0, mouse.x - target.x)
+                cursor = viewportOffset + offsetAtLineColumn(value[viewportOffset..], 0, max(0, mouse.x - target.x))
                 true
             case _ => false
         }
@@ -864,6 +955,13 @@ public class Input <: Widget {
         if (target.width <= 0 || target.height <= 0) { return }
         let resolved = visualStyle()
         buffer.fillRect(target, style: resolved)
+        let content = inputContentArea(target)
+        if (showBoundary && block.isNone()) {
+            buffer.setString(target.x, target.y, "[", style: resolved)
+            if (target.width > 1) { buffer.setString(target.right - 1, target.y, "]", style: resolved) }
+        }
+        target = content
+        if (target.width <= 0) { return }
         if (value.isEmpty() && !placeholder.isEmpty()) {
             var placeholderColor = placeholderStyle
             if (placeholderColor == Style(fg: Color.Indexed(8))) {
@@ -917,8 +1015,19 @@ public class Input <: Widget {
         if (let Some(b) <- block) {
             target = b.inner(area)
         }
+        let outer = target
+        target = inputContentArea(target)
+        if (target.width <= 0) { return Position(outer.x, outer.y) }
         ensureCursorVisible(target.width)
-        Position(target.x + min(displayWidth(value[viewportOffset..cursor]), target.width), target.y)
+        Position(target.x + min(displayWidth(value[viewportOffset..cursor]), target.width - 1), target.y)
+    }
+
+    private func inputContentArea(area: Rect): Rect {
+        if (showBoundary && block.isNone()) {
+            Rect(area.x + min(Int64(1), max(Int64(0), area.width)), area.y, max(0, area.width - 2), area.height)
+        } else {
+            area
+        }
     }
 
     public func setValue(value: String, cursor!: Int64 = -1): Unit {
@@ -970,7 +1079,7 @@ public class Input <: Widget {
         if (cursor < viewportOffset) {
             viewportOffset = cursor
         }
-        while (displayWidth(value[viewportOffset..cursor]) > width && viewportOffset < cursor) {
+        while (displayWidth(value[viewportOffset..cursor]) >= width && viewportOffset < cursor) {
             viewportOffset = nextRuneOffset(value, viewportOffset)
         }
         if (viewportOffset > value.size) {

@@ -2368,35 +2368,35 @@ class CjTuiExpandedContractTest {
     func listSelectedRenderCase0(): Unit {
         let buffer = Buffer(Rect(0, 0, 12, 3))
         List(["zero", "one", "two"], selected: Some(0)).render(buffer.area, buffer)
-        @Expect(buffer.getCell(0, 0).symbol, ">")
+        @Expect(buffer.getCell(0, 0).symbol, "●")
     }
 
     @TestCase
     func listSelectedRenderCase1(): Unit {
         let buffer = Buffer(Rect(0, 0, 12, 3))
         List(["zero", "one", "two"], selected: Some(1)).render(buffer.area, buffer)
-        @Expect(buffer.getCell(0, 1).symbol, ">")
+        @Expect(buffer.getCell(0, 1).symbol, "●")
     }
 
     @TestCase
     func listSelectedRenderCase2(): Unit {
         let buffer = Buffer(Rect(0, 0, 12, 3))
         List(["zero", "one", "two"], selected: Some(2)).render(buffer.area, buffer)
-        @Expect(buffer.getCell(0, 2).symbol, ">")
+        @Expect(buffer.getCell(0, 2).symbol, "●")
     }
 
     @TestCase
     func listSelectedRenderCase3(): Unit {
         let buffer = Buffer(Rect(0, 0, 12, 3))
         List(["zero", "one", "two"], selected: Some(0)).render(buffer.area, buffer)
-        @Expect(buffer.getCell(0, 0).symbol, ">")
+        @Expect(buffer.getCell(0, 0).symbol, "●")
     }
 
     @TestCase
     func listSelectedRenderCase4(): Unit {
         let buffer = Buffer(Rect(0, 0, 12, 3))
         List(["zero", "one", "two"], selected: Some(1)).render(buffer.area, buffer)
-        @Expect(buffer.getCell(0, 1).symbol, ">")
+        @Expect(buffer.getCell(0, 1).symbol, "●")
     }
 
 }

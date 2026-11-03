@@ -171,7 +171,7 @@ class DataWidgetBoundaryTest {
         @Expect(!tree.handle(MouseEvent(MouseKind.Up, MouseButton.Left, 4, 2), rect))
         @Expect(tree.handle(MouseEvent(MouseKind.Down, MouseButton.Left, 6, 2), rect))
         @Expect(!root.expanded)
-        @Expect(tree.handle(MouseEvent(MouseKind.Down, MouseButton.Left, 2, 2), rect))
+        @Expect(tree.handle(MouseEvent(MouseKind.Down, MouseButton.Left, 4, 2), rect))
         @Expect(root.expanded)
         @Expect(tree.handle(MouseEvent(MouseKind.Scroll, MouseButton.WheelDown, 4, 2), rect))
         @Expect(tree.offset, 2)

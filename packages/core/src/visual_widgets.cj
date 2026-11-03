@@ -16,6 +16,7 @@ public enum ProgressBarLabelMode {
 }
 
 public class ProgressBarSymbols {
+    private var autoSelect: Bool = false
     public let filled: String
     public let empty: String
     public let head: String
@@ -27,6 +28,20 @@ public class ProgressBarSymbols {
         this.head = head
         this.indeterminate = indeterminate
     }
+
+    static func automatic(): ProgressBarSymbols {
+        let result = ProgressBarSymbols()
+        result.autoSelect = true
+        result
+    }
+
+    func resolve(unicode: Bool): ProgressBarSymbols {
+        if (!autoSelect) { return this }
+        if (unicode) { ProgressBarSymbols(filled: "━", empty: "─", head: "━", indeterminate: "━") }
+        else { ProgressBarSymbols(filled: "=", empty: "-", head: "=", indeterminate: "=") }
+    }
+
+    func isAutomatic(): Bool { autoSelect }
 }
 
 public class ProgressBarSegment {
@@ -66,7 +81,7 @@ public class ProgressBar <: Widget {
         direction!: ProgressBarDirection = ProgressBarDirection.Horizontal,
         labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden,
         labelStyle!: Style = Style(fg: Color.White),
-        symbols!: ProgressBarSymbols = ProgressBarSymbols(),
+        symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(),
         segments!: Array<ProgressBarSegment> = [],
         indeterminate!: Bool = false,
         phase!: Int64 = 0
@@ -89,32 +104,46 @@ public class ProgressBar <: Widget {
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         buffer.withCanvasClip(area) { =>
+            let resolved = symbols.resolve(buffer.capabilities().unicode)
             match (direction) {
-                case ProgressBarDirection.Horizontal => renderHorizontal(area, buffer)
-                case ProgressBarDirection.Vertical => renderVertical(area, buffer)
+                case ProgressBarDirection.Horizontal => renderHorizontal(area, buffer, resolved)
+                case ProgressBarDirection.Vertical => renderVertical(area, buffer, resolved)
             }
         }
     }
 
-    private func renderHorizontal(area: Rect, buffer: Buffer): Unit {
-        buffer.setString(area.x, area.y, repeat(symbols.empty, area.width), style: themedNormal(style, theme))
+    private func renderHorizontal(area: Rect, buffer: Buffer, symbols: ProgressBarSymbols): Unit {
+        let text = progressLabel()
+        let textWidth = displayWidth(text)
+        let labelWidth = min(area.width, textWidth)
+        let trackWidth = if (textWidth == 0) { area.width } else { max(0, area.width - textWidth - 1) }
+        let track = Rect(area.x, area.y, trackWidth, 1)
+        buffer.setString(track.x, track.y, repeat(symbols.empty, track.width), style: themedNormal(style, theme))
         if (indeterminate) {
-            renderHorizontalIndeterminate(area, buffer)
+            renderHorizontalIndeterminate(track, buffer, symbols)
         } else if (segments.size > 0) {
-            renderHorizontalSegments(area, buffer)
+            renderHorizontalSegments(track, buffer, symbols)
         } else {
-            let filled = scaledChartHeight(clamp(value, 0, total), area.width, total)
+            let filled = scaledChartHeight(clamp(value, 0, total), track.width, total)
             if (filled > 0) {
-                _ = buffer.writeStringClipped(area.x, area.y, repeat(symbols.filled, filled), maxWidth: filled, style: themedAccent(fillStyle, theme))
-                if (filled < area.width && !symbols.head.isEmpty()) {
-                    _ = buffer.writeStringClipped(area.x + filled - 1, area.y, symbols.head, maxWidth: 1, style: themedAccent(fillStyle, theme))
+                _ = buffer.writeStringClipped(track.x, track.y, repeat(symbols.filled, filled), maxWidth: filled, style: themedAccent(fillStyle, theme))
+                if (filled < track.width && !symbols.head.isEmpty()) {
+                    _ = buffer.writeStringClipped(track.x + filled - 1, track.y, symbols.head, maxWidth: 1, style: themedAccent(fillStyle, theme))
                 }
+            } else if (value > 0 && track.width > 0) {
+                let mark = if (this.symbols.isAutomatic() && buffer.capabilities().unicode) { "╺" } else { symbols.filled }
+                _ = buffer.writeStringClipped(track.x, track.y, mark, maxWidth: 1, style: themedAccent(fillStyle, theme))
             }
         }
-        renderHorizontalLabel(area, buffer)
+        if (labelWidth > 0) {
+            let displayed = progressClippedLabel(text, area.width, buffer.capabilities().unicode)
+            let x = area.right - displayWidth(displayed)
+            buffer.setString(x, area.y, displayed, style: themedNormal(labelStyle, theme))
+        }
     }
 
-    private func renderHorizontalIndeterminate(area: Rect, buffer: Buffer): Unit {
+    private func renderHorizontalIndeterminate(area: Rect, buffer: Buffer, symbols: ProgressBarSymbols): Unit {
+        if (area.width <= 0) { return }
         let window = max(1, area.width / 3)
         let span = area.width + window
         let start = phase % span
@@ -126,7 +155,7 @@ public class ProgressBar <: Widget {
         }
     }
 
-    private func renderHorizontalSegments(area: Rect, buffer: Buffer): Unit {
+    private func renderHorizontalSegments(area: Rect, buffer: Buffer, symbols: ProgressBarSymbols): Unit {
         var x = area.x
         var used = 0
         for (segment in segments) {
@@ -140,12 +169,20 @@ public class ProgressBar <: Widget {
             }
         }
         if (used == 0 && value > 0) {
-            let filled = max(1, scaledChartHeight(clamp(value, 0, total), area.width, total))
-            _ = buffer.writeStringClipped(area.x, area.y, repeat(symbols.filled, min(area.width, filled)), maxWidth: min(area.width, filled), style: themedAccent(fillStyle, theme))
+            let scaled = scaledChartHeight(clamp(value, 0, total), area.width, total)
+            let filled = min(area.width, max(1, scaled))
+            let mark = if (scaled == 0 && this.symbols.isAutomatic() && buffer.capabilities().unicode) { "╺" } else { symbols.filled }
+            _ = buffer.writeStringClipped(area.x, area.y, repeat(mark, filled), maxWidth: filled, style: themedAccent(fillStyle, theme))
         }
     }
 
-    private func renderVertical(area: Rect, buffer: Buffer): Unit {
+    private func renderVertical(original: Rect, buffer: Buffer, symbols: ProgressBarSymbols): Unit {
+        let text = progressLabel()
+        let area = if (text.isEmpty()) { original } else { Rect(original.x, original.y + 1, original.width, max(0, original.height - 1)) }
+        if (!text.isEmpty()) {
+            buffer.setString(original.x, original.y, progressClippedLabel(text, original.width, buffer.capabilities().unicode), style: themedNormal(labelStyle, theme))
+        }
+        if (area.height <= 0) { return }
         for (row in 0..area.height) {
             buffer.setString(area.x, area.y + row, repeat(symbols.empty, area.width), style: themedNormal(style, theme))
         }
@@ -165,26 +202,10 @@ public class ProgressBar <: Widget {
                 let y = area.bottom - 1 - row
                 buffer.setString(area.x, y, repeat(symbols.filled, area.width), style: themedAccent(fillStyle, theme))
             }
-        }
-        renderVerticalLabel(area, buffer)
-    }
-
-    private func renderHorizontalLabel(area: Rect, buffer: Buffer): Unit {
-        let text = progressLabel()
-        if (!text.isEmpty()) {
-            let clipped = truncate(text, area.width)
-            let x = alignedX(area, displayWidth(clipped), TextAlign.Center)
-            buffer.setString(x, area.y, clipped, style: themedFocused(labelStyle, theme))
-        }
-    }
-
-    private func renderVerticalLabel(area: Rect, buffer: Buffer): Unit {
-        let text = progressLabel()
-        if (!text.isEmpty()) {
-            let clipped = truncate(text, area.width)
-            let y = area.y + area.height / 2
-            let x = alignedX(Rect(area.x, y, area.width, 1), displayWidth(clipped), TextAlign.Center)
-            buffer.setString(x, y, clipped, style: themedFocused(labelStyle, theme))
+            if (filled == 0 && value > 0) {
+                let mark = if (this.symbols.isAutomatic() && buffer.capabilities().unicode) { "▁" } else { symbols.filled }
+                _ = buffer.writeStringClipped(area.x, area.bottom - 1, repeat(mark, area.width), maxWidth: area.width, style: themedAccent(fillStyle, theme))
+            }
         }
     }
 
@@ -192,7 +213,7 @@ public class ProgressBar <: Widget {
         if (!label.isEmpty()) { return label }
         match (labelMode) {
             case ProgressBarLabelMode.Hidden => ""
-            case ProgressBarLabelMode.Percent => "${scaledChartHeight(clamp(value, 0, total), 100, total)}%"
+            case ProgressBarLabelMode.Percent => progressPercent(clamp(value, 0, total), total)
             case ProgressBarLabelMode.Value => "${clamp(value, 0, total)}"
             case ProgressBarLabelMode.Ratio => "${clamp(value, 0, total)}/${total}"
             case ProgressBarLabelMode.Text(text) => text
@@ -200,17 +221,37 @@ public class ProgressBar <: Widget {
     }
 }
 
+func progressPercent(value: Int64, total: Int64): String {
+    let hundredths = scaledChartHeight(value, 10000, total)
+    if (value > 0 && hundredths == 0) { return "<0.01%" }
+    let rounded = (scaledChartHeight(value, 100000, total) + 5) / 10
+    let fraction = rounded % 100
+    "${rounded / 100}.${if (fraction < 10) { "0" } else { "" }}${fraction}%"
+}
+
+func progressClippedLabel(text: String, width: Int64, unicode: Bool): String {
+    if (displayWidth(text) <= width) { return text }
+    if (width <= 0) { return "" }
+    let ellipsis = if (unicode) { "…" } else { "." }
+    ellipsis
+}
+
 public class Sparkline <: Widget {
     private let values: Array<Int64>
     private let maxValue: Int64
     private let style: Style
     private let block: ?Block
+    private let latest: Bool
+    private let symbols: ?Array<String>
 
-    public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None) {
+    public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None,
+        latest!: Bool = true, symbols!: ?Array<String> = None) {
         this.values = values
         this.maxValue = max(0, maxValue)
         this.style = style
         this.block = block
+        this.latest = latest
+        this.symbols = symbols
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
@@ -220,12 +261,21 @@ public class Sparkline <: Widget {
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0 || values.size == 0) { return }
-        let maxV = if (maxValue > 0) { maxValue } else { maxArray(values) }
-        let bars = [" ", ".", "-", "=", "#"]
+        let bars = match (symbols) {
+            case Some(custom) => if (custom.size > 0) { custom } else { [" "] }
+            case None => if (buffer.capabilities().unicode) { [" ", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"] } else { [" ", ".", "-", "=", "#"] }
+        }
         let count = min(target.width, values.size)
+        let start = if (latest) { values.size - count } else { 0 }
+        var maxV = maxValue
+        if (maxV <= 0) {
+            for (i in 0..count) { maxV = max(maxV, values[start + i]) }
+        }
         for (i in 0..count) {
-            let level = if (maxV <= 0) { 0 } else { scaledChartHeight(clamp(values[i], 0, maxV), bars.size - 1, maxV) }
-            buffer.setString(target.x + i, target.y, bars[level], style: style)
+            let sample = clamp(values[start + i], 0, maxV)
+            let scaled = if (maxV <= 0) { 0 } else { scaledChartHeight(sample, bars.size - 1, maxV) }
+            let level = if (sample > 0 && bars.size > 1) { max(1, scaled) } else { scaled }
+            _ = buffer.writeStringClipped(target.x + i, target.y, bars[level], maxWidth: 1, style: style)
         }
     }
 }

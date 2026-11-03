@@ -37,7 +37,7 @@ public class Tabs <: Widget {
      */
     public var selected: Int64
     private let style: Style
-    private let selectedStyle: Style
+    private let selectedStyle: ?Style
     private var theme: ?Theme = None
 
     private var focused: Bool = false
@@ -47,7 +47,7 @@ public class Tabs <: Widget {
         titles: Array<String>,
         selected!: Int64 = 0,
         style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        selectedStyle!: ?Style = None
     ) {
         this.titles = titles
         this.selected = clamp(selected, 0, max(0, titles.size - 1))
@@ -60,8 +60,6 @@ public class Tabs <: Widget {
         this.focused = focused
     }
 
-    /** 设置标签栏使用的语义主题；只有 selectedStyle 为 Style.default() 时才应用 normal/selected 角色；None 清除主题。
-     */
     public func setTheme(theme: ?Theme): Unit {
         this.theme = theme
     }
@@ -119,16 +117,15 @@ public class Tabs <: Widget {
         if (area.width <= 0 || area.height <= 0 || titles.isEmpty()) { return }
         var x = area.x
         let first = ensureSelectionVisible(area.width)
-        let useTheme = selectedStyle == Style.default()
         for (i in first..titles.size) {
             if (x >= area.right) { return }
             let full = " " + titles[i] + " "
             let text = truncate(full, area.right - x)
             let visibleWidth = displayWidth(text)
-            var itemStyle = if (useTheme) {
-                if (i == selected) { themedSelected(selectedStyle, theme) } else { themedNormal(style, theme) }
+            var itemStyle = if (i == selected) {
+                listSelectionStyle(selectedStyle, theme)
             } else {
-                if (i == selected) { selectedStyle } else { style }
+                themedNormal(style, theme)
             }
             if (i == selected && focused) {
                 var modifier = itemStyle.modifier

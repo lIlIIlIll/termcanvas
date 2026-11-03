@@ -9,14 +9,14 @@ class Audit20261003WidgetsTest {
     func progressScalingAcceptsLargeCounters(): Unit {
         let horizontal = Buffer(Rect(0, 0, 10, 1))
         ProgressBar(Int64.Max, total: Int64.Max).render(horizontal.area, horizontal)
-        @Expect(auditWidgetRow(horizontal, 0), "##########")
+        @Expect(auditWidgetRow(horizontal, 0), "━━━━━━━━━━")
         let vertical = Buffer(Rect(0, 0, 1, 4))
         ProgressBar(Int64.Max / 2, total: Int64.Max, direction: ProgressBarDirection.Vertical).render(vertical.area, vertical)
-        @Expect(vertical.getCell(0, 2).symbol, "-")
-        @Expect(vertical.getCell(0, 3).symbol, "#")
+        @Expect(vertical.getCell(0, 2).symbol, "─")
+        @Expect(vertical.getCell(0, 3).symbol, "━")
         let label = Buffer(Rect(0, 0, 10, 1))
         ProgressBar(Int64.Max, total: Int64.Max, labelMode: ProgressBarLabelMode.Percent).render(label.area, label)
-        @Expect(auditWidgetRow(label, 0).contains("100%"))
+        @Expect(auditWidgetRow(label, 0).contains("100.00%"))
     }
 
     @TestCase
@@ -50,7 +50,7 @@ class Audit20261003WidgetsTest {
         @Expect(chart.getCell(2, 2).symbol, "#")
         let sparkline = Buffer(Rect(0, 0, 3, 1))
         Sparkline([Int64.Max, Int64.Max / 2, Int64.Min]).render(sparkline.area, sparkline)
-        @Expect(auditWidgetRow(sparkline, 0), "#. ")
+        @Expect(auditWidgetRow(sparkline, 0), "█▃ ")
     }
 
     @TestCase

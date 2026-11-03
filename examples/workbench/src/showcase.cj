@@ -10,16 +10,19 @@ func renderShowcase(app: WorkbenchApp, frame: Frame): Unit {
         frame.fill(layout.galleryNav, app.theme.normal)
         let categories = Tabs(
             ["Overview", "Layout", "Forms", "Navigation", "Data", "Feedback", "Overlays", "Themes"],
-            selected: app.galleryTabs.selected,
-            selectedStyle: Style.default()
+            selected: app.galleryTabs.selected
         )
         categories.setTheme(Some(app.theme))
         categories.setFocused(app.focus.isFocused("gallery-tabs"))
         frame.renderWidget(categories, layout.galleryNav)
     }
-    if (!frame.isDirty(layout.galleryContent) || layout.galleryContent.width <= 0 || layout.galleryContent.height <= 0) { return }
-    frame.fill(layout.galleryContent, app.theme.normal)
+    if (layout.galleryContent.width <= 0 || layout.galleryContent.height <= 0) { return }
     let areas = workbenchGalleryAreas(layout.galleryContent, app.galleryTabs.selected, sample: app.galleryDataTabs.selected)
+    if (app.interaction.active().isNone() && app.galleryTabs.selected == 2 && app.focus.current() == Some("gallery-input")) {
+        frame.setCursor(app.galleryInput.cursorPosition(areas.formInputs[1]))
+    }
+    if (!frame.isDirty(layout.galleryContent)) { return }
+    frame.fill(layout.galleryContent, app.theme.normal)
     frame.renderWidget(Paragraph(galleryCategoryTitle(app.galleryTabs.selected), style: app.theme.accent), areas.title)
     frame.renderWidget(Paragraph(galleryCategoryDescription(app.galleryTabs.selected), style: app.secondaryStyle), areas.description)
     match (app.galleryTabs.selected) {
@@ -31,9 +34,6 @@ func renderShowcase(app: WorkbenchApp, frame: Frame): Unit {
         case 5 => renderGalleryFeedback(app, frame, areas)
         case 6 => renderGalleryOverlays(app, frame, areas)
         case _ => renderGalleryThemes(app, frame, areas)
-    }
-    if (app.galleryTabs.selected == 2 && app.focus.current() == Some("gallery-input")) {
-        frame.setCursor(app.galleryInput.cursorPosition(areas.formInputs[1]))
     }
 }
 
@@ -54,7 +54,7 @@ func galleryCategoryDescription(category: Int64): String {
     match (category) {
         case 0 => "Semantic colors, comfortable density, and real component previews."
         case 1 => "Rounded Unicode panels, borderless surfaces, and an ASCII fallback toggle."
-        case 2 => "Tab to controls; toggle the checkbox or Switch, type in the field, or change the select."
+        case 2 => "Tab to focus; Enter or Space activates; type or change values."
         case 3 => "Select a density with Segments; the preview value follows keyboard or mouse input."
         case 4 => "Inspect task tables, lists, and the fixed-scale progress chart."
         case 5 => "Semantic severity markers use Theme roles and the shared three-second toast lifetime."
@@ -102,35 +102,55 @@ func renderGalleryLayout(app: WorkbenchApp, frame: Frame, areas: WorkbenchGaller
 func renderGalleryForms(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryAreas): Unit {
     renderGalleryButtonRow(app, frame, areas, ["Primary", "Secondary", "Ghost", "Danger", "Disabled"],
         ["gallery-button-primary", "gallery-button-secondary", "gallery-button-ghost", "gallery-button-danger", "gallery-button-disabled"], [0, 1, 2, 3, 4])
-    let labels = ["Normal · preview", "Focused · editable", "Error · preview", "Disabled · preview"]
+    for (index in 0..areas.formInputs.size) {
+        let field = areas.formInputs[index]
+        let frameArea = Rect(field.x - 1, field.y - 1, field.width + 2, 3)
+        frame.renderWidget(galleryBlock(app, "", BorderKind.Rounded,
+            focused: index == 1 && app.focus.isFocused("gallery-input")), frameArea)
+    }
+    let inputPrefix = if (app.focus.isFocused("gallery-input")) { "> " }
+        else if (app.hovered == Some("gallery-input")) { "~ " } else { "" }
+    let labels = ["Normal · preview", inputPrefix + "Focused · editable", "Error · preview", "Disabled · preview"]
     for (index in 0..min(labels.size, areas.formLabels.size)) {
         frame.renderWidget(Paragraph(labels[index], style: app.theme.disabled), areas.formLabels[index])
     }
-    let normalInput = Input(value: "Ready", placeholder: "Normal")
+    let normalInput = Input(value: "Ready", placeholder: "Normal", showBoundary: false)
     normalInput.setVisualState(theme: Some(app.theme))
     frame.renderWidget(normalInput, areas.formInputs[0])
 
     app.galleryInput.setVisualState(focused: app.focus.isFocused("gallery-input"), theme: Some(app.theme))
     frame.renderWidget(app.galleryInput, areas.formInputs[1])
 
-    let errorInput = Input(value: "Check this value", placeholder: "Error")
+    let errorInput = Input(value: "Check this value", placeholder: "Error", showBoundary: false)
     errorInput.setVisualState(error: true, theme: Some(app.theme))
     frame.renderWidget(errorInput, areas.formInputs[2])
 
-    let disabledInput = Input(value: "Read only", placeholder: "Disabled")
+    let disabledInput = Input(value: "Read only", placeholder: "Disabled", showBoundary: false)
     disabledInput.setVisualState(disabled: true, theme: Some(app.theme))
     frame.renderWidget(disabledInput, areas.formInputs[3])
-    frame.renderWidget(Checkbox("Compact density", checked: app.galleryCheckbox.checked,
+    let checkboxMarker = if (app.focus.isFocused("gallery-checkbox")) { "> " }
+        else if (app.hovered == Some("gallery-checkbox")) { "~ " } else { "" }
+    frame.renderWidget(Checkbox(checkboxMarker + "Compact density", checked: app.galleryCheckbox.checked,
         focused: app.focus.isFocused("gallery-checkbox"), style: app.theme.normal,
         focusedStyle: app.theme.focused, disabledStyle: app.theme.disabled, theme: Some(app.theme)), areas.checkbox)
     let select = Select(["Compact", "Normal", "Comfortable"], selected: app.gallerySelect.selected,
         style: app.theme.normal, selectedStyle: app.theme.selected)
     frame.renderWidget(select, areas.select)
+    let selectMarker = if (app.focus.isFocused("gallery-select")) { ">" }
+        else if (app.hovered == Some("gallery-select")) { "~" } else { "" }
+    if (!selectMarker.isEmpty() && areas.select.x > app.layout.galleryContent.x) {
+        frame.renderWidget(Paragraph(selectMarker, style: app.theme.normal),
+            Rect(areas.select.x - 1, areas.select.y, 1, 1))
+    }
     app.gallerySwitch.setVisualState(focused: app.focus.isFocused("gallery-switch"), theme: Some(app.theme))
     frame.renderWidget(app.gallerySwitch, areas.switchControl)
     let switchState = if (app.gallerySwitch.checked) { "on" } else { "off" }
-    frame.renderWidget(Paragraph("Auto sync: ${switchState}", style: app.secondaryStyle), areas.switchValue)
-    frame.renderWidget(Paragraph("Date:", style: app.theme.disabled), areas.dateLabel)
+    let switchMarker = if (app.focus.isFocused("gallery-switch")) { "> " }
+        else if (app.hovered == Some("gallery-switch")) { "~ " } else { "" }
+    frame.renderWidget(Paragraph(switchMarker + "Auto sync: ${switchState}", style: app.secondaryStyle), areas.switchValue)
+    let dateLabel = if (app.focus.isFocused("gallery-date")) { ">Date" }
+        else if (app.hovered == Some("gallery-date")) { "~Date" } else { "Date:" }
+    frame.renderWidget(Paragraph(dateLabel, style: app.theme.disabled), areas.dateLabel)
     app.galleryDate.setVisualState(
         focused: app.focus.isFocused("gallery-date"),
         theme: Some(app.theme)
@@ -138,11 +158,20 @@ func renderGalleryForms(app: WorkbenchApp, frame: Frame, areas: WorkbenchGallery
     frame.renderWidget(app.galleryDate, areas.datePicker)
     frame.renderWidget(galleryButton(app, "Year -1", 1, "gallery-date-year-down"), areas.datePreviousYear)
     frame.renderWidget(galleryButton(app, "Year +1", 1, "gallery-date-year-up"), areas.dateNextYear)
+    let formArea = workbenchFormsArea(app.layout.galleryContent)
+    let guide = galleryRect(formArea, 0, 19, formArea.width,
+        min(6, max(0, formArea.height - 19)))
+    if (guide.height >= 5) {
+        let block = galleryBlock(app, "", BorderKind.Rounded)
+        frame.renderWidget(block, guide)
+        let inner = block.inner(guide)
+        frame.renderWidget(Paragraph("INTERACTION GUIDE\nTab moves focus  ·  Enter / Space activates controls\nClick to select  ·  Page Up / Down changes the year",
+            style: app.secondaryStyle), inner)
+    }
 }
 
 func renderGalleryNavigation(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryAreas): Unit {
-    let tabs = Tabs(["Overview", "Sources", "Output"], selected: app.galleryNavigationTabs.selected,
-        selectedStyle: Style.default())
+    let tabs = Tabs(["Overview", "Sources", "Output"], selected: app.galleryNavigationTabs.selected)
     tabs.setTheme(Some(app.theme))
     tabs.setFocused(app.focus.isFocused("gallery-nav-tabs"))
     frame.renderWidget(tabs, areas.navTabs)
@@ -175,8 +204,7 @@ func renderGalleryNavigation(app: WorkbenchApp, frame: Frame, areas: WorkbenchGa
 }
 
 func renderGalleryData(app: WorkbenchApp, frame: Frame, areas: WorkbenchGalleryAreas): Unit {
-    let sampleTabs = Tabs(["Table", "List", "Progress"], selected: app.galleryDataTabs.selected,
-        selectedStyle: Style.default())
+    let sampleTabs = Tabs(["Table", "List", "Progress"], selected: app.galleryDataTabs.selected)
     sampleTabs.setTheme(Some(app.theme))
     sampleTabs.setFocused(app.focus.isFocused("gallery-data-sample-tabs"))
     frame.renderWidget(sampleTabs, areas.dataSampleTabs)
@@ -326,16 +354,15 @@ func galleryButton(app: WorkbenchApp, label: String, variant: Int64, id: String,
         case 3 => app.theme.error
         case _ => app.theme.disabled
     }
-    Button(label, focused: app.focus.isFocused(id), disabled: disabled || variant == 4, style: style,
+    let marker = if (app.focus.isFocused(id)) { "> " } else if (app.hovered == Some(id)) { "~ " } else { "" }
+    Button(marker + label, focused: app.focus.isFocused(id), disabled: disabled || variant == 4, style: style,
         focusedStyle: app.theme.focused, disabledStyle: app.theme.disabled, theme: Some(app.theme))
 }
 
 func galleryBlock(app: WorkbenchApp, title: String, border: BorderKind,
     focused!: Bool = false, asciiFallback!: Bool = false): Block {
     Block(BlockOptions(title: title, borderKind: border,
-        backgroundStyle: app.surfaceStyle,
-        borderStyle: if (focused) { app.theme.focused } else { app.borderStyle },
-        contentStyle: app.theme.normal, titleStyle: app.theme.accent,
         state: if (focused) { BoxState.Focused } else { BoxState.Normal },
+        theme: Some(app.theme),
         asciiFallback: asciiFallback || !app.capabilities.unicode))
 }

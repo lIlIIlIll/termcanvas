@@ -191,7 +191,7 @@ class CjTuiAuditWidgetsTest {
         VirtualTable([TableColumn("HEAD", width: 12)], 1, { _ => ["abcdefghijk"] }, block: Some(Block(title: "T"))).render(outer, framed)
         @Expect(auditWidgetOutsideChanges(framed, outer), 0)
         @Expect(framed.getCell(3, 3).symbol, "a")
-        @Expect(framed.getCell(outer.right - 1, 3).symbol, "|")
+        @Expect(framed.getCell(outer.right - 1, 3).symbol, "│")
     }
 
     @TestCase

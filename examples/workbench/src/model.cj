@@ -301,7 +301,7 @@ class WorkbenchModel {
         for (task in jobs) {
             if (task.status != WorkbenchJobStatus.Queued) { continue }
             rows.add([task.label(), task.name, task.project, task.priority])
-            if (rows.size >= 8) { break }
+            if (rows.size >= 60) { break }
         }
         queuedPreviewCache = rows.toArray()
     }

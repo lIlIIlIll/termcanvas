@@ -1000,23 +1000,23 @@ class CjTuiCoreTest {
         @Expect(input.cursor, 4)
         input.handle(KeyEvent(KeyCode.Backspace))
         @Expect(input.value, "ab")
-        @Expect(input.cursorPosition(Rect(0, 0, 10, 1)).x, 1)
+        @Expect(input.cursorPosition(Rect(0, 0, 10, 1)).x, 2)
     }
 
     @TestCase
     func inputKeepsCursorVisibleAndSupportsValueHelpers(): Unit {
         let input = Input(value: "abcdef", cursor: 6, placeholder: "type")
-        let buffer = Buffer(Rect(0, 0, 3, 1))
+        let buffer = Buffer(Rect(0, 0, 6, 1))
         input.render(buffer.area, buffer)
-        @Expect(buffer.getCell(0, 0).symbol, "d")
-        @Expect(input.cursorPosition(buffer.area).x, 3)
+        @Expect(buffer.getCell(1, 0).symbol, "d")
+        @Expect(input.cursorPosition(buffer.area).x, 4)
 
         input.moveToStart()
         @Expect(input.cursor, 0)
         input.moveToEnd()
         @Expect(input.cursor, input.value.size)
         input.setValue("界abc", cursor: 3)
-        @Expect(input.cursorPosition(Rect(0, 0, 4, 1)).x, 2)
+        @Expect(input.cursorPosition(Rect(0, 0, 6, 1)).x, 3)
         input.clear()
         @Expect(input.value, "")
     }
@@ -1414,15 +1414,15 @@ class CjTuiCoreTest {
         let listState = ListState(selected: Some(2), offset: 1)
         List(["zero", "one", "two"], state: Some(listState)).render(listBuffer.area, listBuffer)
         @Expect(listBuffer.getCell(2, 0).symbol, "o")
-        @Expect(listBuffer.getCell(0, 1).symbol, ">")
-        @Expect(listBuffer.getCell(0, 1).style, Style(fg: Color.Black, bg: Color.White))
+        @Expect(listBuffer.getCell(0, 1).symbol, "●")
+        @Expect(listBuffer.getCell(0, 1).style, Theme.default().selected)
 
         let tableBuffer = Buffer(Rect(0, 0, 14, 4))
         let tableState = TableState(selectedRow: Some(2), offset: 1)
         Table(["A"], [["r0"], ["r1"], ["r2"]], widths: [4], state: Some(tableState)).render(tableBuffer.area, tableBuffer)
-        @Expect(tableBuffer.getCell(0, 2).symbol, "r")
-        @Expect(tableBuffer.getCell(1, 2).symbol, "1")
-        @Expect(tableBuffer.getCell(0, 3).style, Style(fg: Color.Black, bg: Color.White))
+        @Expect(tableBuffer.getCell(2, 2).symbol, "r")
+        @Expect(tableBuffer.getCell(3, 2).symbol, "1")
+        @Expect(tableBuffer.getCell(0, 3).style, Theme.default().selected)
 
         let scrollBuffer = Buffer(Rect(0, 0, 1, 5))
         Scrollbar(10, offset: 5, viewport: 5).render(scrollBuffer.area, scrollBuffer)
@@ -1653,12 +1653,13 @@ class CjTuiCoreTest {
         @Expect(buffer.getCell(1, 3).symbol, "*")
 
         ProgressBar(5, total: 10, label: "50%").render(Rect(0, 4, 10, 1), buffer)
-        @Expect(buffer.getCell(0, 4).symbol, "#")
-        @Expect(buffer.getCell(9, 4).symbol, "-")
+        @Expect(buffer.getCell(0, 4).symbol, "━")
+        @Expect(buffer.getCell(3, 4).symbol, "─")
+        @Expect(buffer.getCell(9, 4).symbol, "%")
 
         ProgressBar(25, total: 100, labelMode: ProgressBarLabelMode.Percent).render(Rect(0, 5, 8, 1), buffer)
         @Expect(buffer.getCell(2, 5).symbol, "2")
-        @Expect(buffer.getCell(4, 5).symbol, "%")
+        @Expect(buffer.getCell(7, 5).symbol, "%")
 
         ProgressBar(
             0,
@@ -1684,9 +1685,9 @@ class CjTuiCoreTest {
         @Expect(buffer.getCell(4, 7).symbol, "Y")
 
         ProgressBar(2, total: 4, direction: ProgressBarDirection.Vertical).render(Rect(12, 4, 2, 4), buffer)
-        @Expect(buffer.getCell(12, 7).symbol, "#")
-        @Expect(buffer.getCell(12, 6).symbol, "#")
-        @Expect(buffer.getCell(12, 5).symbol, "-")
+        @Expect(buffer.getCell(12, 7).symbol, "━")
+        @Expect(buffer.getCell(12, 6).symbol, "━")
+        @Expect(buffer.getCell(12, 5).symbol, "─")
     }
 
     @TestCase
@@ -2629,9 +2630,9 @@ class CjTuiCoreTest {
             progress: Some(StatusBarProgress(5, total: 10, width: 10))
         ).render(statusBuffer.area, statusBuffer)
         @Expect(statusBuffer.getCell(0, 0).symbol, "n")
-        @Expect(statusBuffer.getCell(16, 0).symbol, "=")
-        @Expect(statusBuffer.getCell(19, 0).symbol, "5")
-        @Expect(statusBuffer.getCell(21, 0).symbol, "%")
+        @Expect(statusBuffer.getCell(16, 0).symbol, ">")
+        @Expect(statusBuffer.getCell(20, 0).symbol, "5")
+        @Expect(statusBuffer.getCell(25, 0).symbol, "%")
         @Expect(statusBuffer.getCell(27, 0).symbol, "r")
     }
 
@@ -2664,7 +2665,7 @@ class CjTuiCoreTest {
         let picker = FilePicker(path: "tests/fixtures/file_picker", extension: ".cj")
         let pickerBuffer = Buffer(Rect(0, 0, 20, 2))
         picker.render(pickerBuffer.area, pickerBuffer)
-        @Expect(pickerBuffer.getCell(1, 0).symbol, "-")
+        @Expect(pickerBuffer.getCell(1, 0).symbol, "─")
     }
 
     @TestCase
