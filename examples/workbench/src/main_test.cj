@@ -1515,6 +1515,30 @@ class WorkbenchColorPickerT016Test {
 @Test
 class WorkbenchVisualPrototypeTest {
     @TestCase
+    func formsDescribeFocusAndKeepSelectionAndDateControlsLegible(): Unit {
+        let screen = Rect(0, 0, 120, 36)
+        let app = WorkbenchApp()
+        _ = app.update(Event.Resize(screen))
+        workbenchGalleryKey(app, KeyCode.Tab)
+        workbenchGalleryKey(app, KeyCode.Right)
+        workbenchGalleryKey(app, KeyCode.Right)
+        let areas = workbenchGalleryAreas(app.layout.galleryContent, 2)
+        let backend = TestBackend(area: screen)
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        _ = terminal.draw { frame => app.render(frame) }
+        let initial = backend.snapshot()
+        @Assert(initial.contains("Editable"))
+        @Assert(!initial.contains("Focused · editable"))
+        @Assert(initial.contains("(*) Normal"))
+        @Assert(initial.contains("Date: 2024-02-29"))
+        @Expect(areas.datePreviousYear.x, areas.datePicker.right + 1)
+        @Expect(areas.dateNextYear.x, areas.datePreviousYear.right)
+        _ = app.focus.focus("gallery-input")
+        _ = terminal.draw { frame => app.render(frame) }
+        @Assert(backend.snapshot().contains("Focused · editable"))
+    }
+
+    @TestCase
     func formsBordersAndHoverRespectCapabilitiesAtResponsiveSizes(): Unit {
         for (screen in [Rect(0, 0, 80, 24), Rect(0, 0, 120, 36), Rect(0, 0, 160, 45)]) {
             let app = WorkbenchApp()
@@ -1692,7 +1716,7 @@ class WorkbenchVisualPrototypeTest {
         let terminal = Terminal(backend, renderMode: RenderMode.Full)
         _ = terminal.draw { frame => app.render(frame) }
         let snapshot = backend.snapshot()
-        @Assert(snapshot.contains("Rel peak 0.59%"))
+        @Assert(snapshot.contains("Rel. peak 0.59%"))
         @Assert(snapshot.contains("pts, 250ms apart"))
         @Assert(snapshot.contains("job-2"))
         let panel = app.layout.sparkPanel

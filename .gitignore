@@ -39,3 +39,5 @@ docs/reviews/*/findings.json
 !examples/workbench/screenshots/b13-capture-manifest.json
 !examples/workbench/screenshots/b13-sparkline-capture-manifest.json
 !examples/workbench/screenshots/t026-capture-manifest.json
+!examples/workbench/screenshots/showcase-capture-manifest.json
+!examples/ci_activity/screenshots/ci-showcase-capture-manifest.json

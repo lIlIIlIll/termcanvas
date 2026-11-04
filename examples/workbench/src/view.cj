@@ -150,12 +150,11 @@ func workbenchGalleryAreas(area: Rect, category: Int64, sample!: Int64 = 0): Wor
         out.select = galleryRect(formArea, columns[1].x - formArea.x, 13, columns[1].width, 4)
         out.switchControl = galleryRect(formArea, 0, 15, columns[0].width, 1)
         out.switchValue = galleryRect(formArea, 0, 16, columns[0].width, 1)
-        out.dateLabel = galleryRect(formArea, 0, 17, 5, 1)
-        out.datePicker = galleryRect(formArea, 5, 17, max(0, columns[0].width - 5), 1)
-        let yearButtonWidth = columns[1].width / 2
-        out.datePreviousYear = galleryRect(formArea, columns[1].x - formArea.x, 17, yearButtonWidth, 1)
-        out.dateNextYear = galleryRect(formArea, columns[1].x - formArea.x + yearButtonWidth, 17,
-            columns[1].width - yearButtonWidth, 1)
+        out.dateLabel = galleryRect(formArea, 0, 17, 6, 1)
+        out.datePicker = galleryRect(formArea, 6, 17, min(10, max(0, columns[0].width - 6)), 1)
+        let yearButtonWidth = min(10, max(0, (formArea.width - 17) / 2))
+        out.datePreviousYear = galleryRect(formArea, 17, 17, yearButtonWidth, 1)
+        out.dateNextYear = galleryRect(formArea, 17 + yearButtonWidth, 17, yearButtonWidth, 1)
     } else if (category == 3) {
         out.navTabs = galleryRect(area, 0, 3, area.width, 1)
         out.navSegments = galleryRect(area, 0, 4, area.width, 1)
@@ -512,10 +511,12 @@ func renderOverview(app: WorkbenchApp, frame: Frame): Unit {
             visibleHistory.add(value)
             peak = max(peak, value)
         }
-        let fullTitle = "Rel. trend peak ${formatPercent(peak)} | ${visibleHistory.size} samples, 250ms apart"
-        let shortTitle = "Rel peak ${formatPercent(peak)} | ${visibleHistory.size} pts, 250ms apart"
+        let fullTitle = "Relative | sample peak ${formatPercent(peak)} | ${visibleHistory.size} samples, 250ms apart"
+        let mediumTitle = "Rel. peak ${formatPercent(peak)} | ${visibleHistory.size} samples, 250ms apart"
+        let shortTitle = "Rel. peak ${formatPercent(peak)} | ${visibleHistory.size}pts, 250ms apart"
         let title = if (visibleHistory.size < 2) { "Relative trend | collecting samples" }
-            else if (displayWidth(fullTitle) <= inner.width) { fullTitle } else { shortTitle }
+            else if (displayWidth(fullTitle) <= inner.width) { fullTitle }
+            else if (displayWidth(mediumTitle) <= inner.width) { mediumTitle } else { shortTitle }
         frame.renderWidget(Paragraph(title, style: app.secondaryStyle),
             Rect(inner.x, inner.y, inner.width, min(1, inner.height)))
         frame.renderWidget(Sparkline(visibleHistory.toArray(), maxValue: peak, style: app.theme.accent),
@@ -536,9 +537,8 @@ func renderOverview(app: WorkbenchApp, frame: Frame): Unit {
             canvas.drawText(layout.pipelineCanvas.x, layout.pipelineCanvas.y, text, app.theme.normal)
         }
         if (app.model.runningCount > 0 && !app.paused && layout.pipelineCanvas.width > 0 && layout.pipelineCanvas.height > 1) {
-            let span = max(1, min(layout.pipelineCanvas.width, displayWidth(text)))
-            let x = layout.pipelineCanvas.x + app.pipelineOffset % span
-            canvas.drawText(x, layout.pipelineCanvas.y + 1, "o", app.theme.accent)
+            let spinner = ["|", "/", "-", "\\"][app.spinnerFrame % 4]
+            canvas.drawText(layout.pipelineCanvas.x, layout.pipelineCanvas.y + 1, "Running: " + spinner, app.theme.accent)
         }
     }
     if (frame.isDirty(layout.overviewBottom)) {

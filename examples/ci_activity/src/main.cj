@@ -67,9 +67,10 @@ class CiActivity {
         let width = max(0, area.width - 2)
         let theme = Theme(normal: strong, disabled: dim, accent: Style(fg: ORANGE), success: Style(fg: GREEN),
             iconSet: iconSet)
-        let watched = TaskActivity("bg_202", status: TaskStatus.Done, duration: duration,
+        let watched = TaskActivity("bg_202", status: TaskStatus.Done, duration: "0m1s",
             detail: "gh run watch 123456 --repo example/project")
-        let cross = TaskActivity("Cross-platform CI", id: "bg_201", prefix: prefix, duration: duration,
+        let cross = TaskActivity("Cross-platform CI", id: "bg_201", prefix: prefix,
+            duration: if (crossDone) { "0m18s" } else { duration },
             status: if (crossDone) { TaskStatus.Done } else { TaskStatus.Running },
             progressLabel: "CI jobs", progress: Some(TaskProgress.Counts(if (crossDone) { 5 } else { 2 }, 5)),
             detail: if (crossDone) { completedDetail } else { "* Post Check out source" })
@@ -80,7 +81,8 @@ class CiActivity {
         } else {
             [TaskStatus.Done, TaskStatus.Done, TaskStatus.Pending, TaskStatus.Done, TaskStatus.Done, TaskStatus.Pending, TaskStatus.Done, TaskStatus.Pending]
         }
-        let showcase = TaskActivity(if (useUnicode) { "Showcase acceptance · CI jobs" } else { "Showcase acceptance - CI jobs" }, id: "bg_203", prefix: prefix, duration: duration,
+        let showcase = TaskActivity(if (useUnicode) { "Showcase acceptance · CI jobs" } else { "Showcase acceptance - CI jobs" }, id: "bg_203", prefix: prefix,
+            duration: if (finished) { "0m30s" } else { duration },
             status: if (finished) { TaskStatus.Done } else { TaskStatus.Running }, progressLabel: "Jobs",
             progress: Some(TaskProgress.Items(showcaseStatuses)),
             detail: if (finished) { completedDetail } else { "* Post Check out source" })
@@ -99,6 +101,15 @@ class CiActivity {
         canvas.drawText(x + 1, legendY, " done  ", dim)
         canvas.drawText(x + 8, legendY, if (useUnicode) { "◌" } else { "o" }, theme.normal)
         canvas.drawText(x + 9, legendY, " waiting", dim)
+        let runningMarker = if (!useUnicode) {
+            ["|", "/", "-", "\\"][elapsed / 100 % 4]
+        } else if (match (iconSet) { case IconSet.NerdFont => true; case _ => false }) {
+            "\u{f110}"
+        } else {
+            ["◐", "◓", "◑", "◒"][elapsed / 100 % 4]
+        }
+        canvas.drawText(x + 19, legendY, runningMarker, theme.accent)
+        canvas.drawText(x + 20, legendY, " running", dim)
         let iconName = match (iconSet) {
             case IconSet.Unicode => "Unicode"
             case IconSet.NerdFont => "Nerd Font"

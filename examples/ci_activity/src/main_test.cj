@@ -7,6 +7,20 @@ import std.unittest.testmacro.*
 @Test
 class CiActivityTest {
     @TestCase
+    func completedTasksKeepTheirDurations(): Unit {
+        let app = CiActivity()
+        let backend = TestBackend(area: Rect(0, 0, 120, 18))
+        let terminal = Terminal(backend)
+        _ = app.update(Event.Tick(TickEvent(deltaMillis: 60000)))
+        _ = terminal.draw { frame => app.render(frame) }
+        let snapshot = backend.snapshot()
+        @Expect(snapshot.contains("bg_202 done 0m1s"))
+        @Expect(snapshot.contains("0m18s"))
+        @Expect(snapshot.contains("0m30s"))
+        @Expect(snapshot.contains("1m0s"))
+    }
+
+    @TestCase
     func simulationTransitionsAndControls(): Unit {
         let app = CiActivity()
         let backend = TestBackend(area: Rect(0, 0, 100, 24))
@@ -47,6 +61,7 @@ class CiActivityTest {
         let backend = TestBackend(area: area)
         backend.draw(unicode)
         @Expect(backend.snapshot().contains("icons: Unicode"))
+        @Expect(backend.snapshot().contains("◐ running"))
         @Expect(backend.snapshot().contains("n icons"))
 
         _ = app.update(Event.KeyDown(KeyEvent(KeyCode.Char(r'n'))))
@@ -55,6 +70,7 @@ class CiActivityTest {
         @Expect(nerd.getCell(1, 5).symbol, "\u{f058}")
         backend.draw(nerd)
         @Expect(backend.snapshot().contains("icons: Nerd Font"))
+        @Expect(backend.snapshot().contains("\u{f110} running"))
         _ = app.update(Event.Capabilities(TerminalCapabilities(unicode: false)))
         let asciiTerminal = Buffer(area)
         asciiTerminal.setCapabilities(TerminalCapabilities(unicode: false))
@@ -63,6 +79,7 @@ class CiActivityTest {
         backend.draw(asciiTerminal)
         @Expect(backend.snapshot().contains("icons: Nerd Font"))
         let fallbackText = backend.snapshot()
+        @Expect(fallbackText.contains("| running"))
         let fallbackBytes = unsafe { fallbackText.rawData() }
         for (b in fallbackBytes) { @Expect(b < 128) }
 

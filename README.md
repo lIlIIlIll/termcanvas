@@ -135,7 +135,28 @@ CANGJIE_SDK_ROOT=/path/to/cangjie \
   scripts/build_examples.sh
 ```
 
+## 应用展示
+
+这些示例展示如何组合 core 中的任务、进度、列表和主题能力：
+
+CI 任务活动示例使用模拟数据，并在真实终端中运行：
+
+![CI 任务活动模拟，120×18](examples/ci_activity/screenshots/ci-unicode-120x18.png)
+
+[CI 截图清单](examples/ci_activity/screenshots/ci-showcase-capture-manifest.json)记录源码提交、终端尺寸与 SHA-256。
+
+Workbench 的 Overview 和 Forms 在真实终端中运行，展示任务概览、清晰的输入焦点与选择状态：
+
+![Workbench Overview，120×36](examples/workbench/screenshots/showcase-overview-120x36.png)
+
+![Workbench Forms，120×36](examples/workbench/screenshots/showcase-forms-120x36.png)
+
+另见 [80×24](examples/workbench/screenshots/showcase-overview-80x24.png) 和 [160×45](examples/workbench/screenshots/showcase-overview-160x45.png) 布局。[截图清单](examples/workbench/screenshots/showcase-capture-manifest.json)记录源码提交、终端尺寸与 SHA-256。
+
 ## 控件图集
+
+<details>
+<summary>查看历史 B00 控件图集与终端降级预览</summary>
 
 以下 17 张 Workbench 截图来自 Linux x86_64 上实际运行的应用：Cangjie STS 1.2.0、Foot 1.28.0、SwayFX 0.6 headless，终端尺寸为 120×36（每张 PNG 为 1320×936）。源码 revision、源码摘要、工具链哈希和图片 SHA-256 见 [B00 截图清单](examples/workbench/screenshots/b00-capture-manifest.json)。另有一张 [ops_dashboard Sparkline Block 截图](examples/workbench/screenshots/b13-sparkline-block-120x36.png)，其源码和工具链信息见 [B13 截图清单](examples/workbench/screenshots/b13-sparkline-capture-manifest.json)。
 
@@ -236,6 +257,8 @@ reported true-color. The B00 manifest records this distinction.
     </td>
   </tr>
 </table>
+
+</details>
 
 ## 包结构
 
