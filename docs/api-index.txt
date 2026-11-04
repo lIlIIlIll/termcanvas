@@ -2059,15 +2059,15 @@ packages/core/src/text.cj:34:public func displayWidth(text: String): Int64
 packages/core/src/text.cj:38:public func displayWidth(text: String, options!: TextWidthOptions): Int64
 packages/core/src/text.cj:57:public func displayWidth(r: Rune): Int64
 packages/core/src/text.cj:61:public func displayWidth(r: Rune, options!: TextWidthOptions): Int64
-packages/core/src/text.cj:96:public func graphemeClusters(text: String): Array<GraphemeCluster>
-packages/core/src/text.cj:108:public func graphemeDisplayWidth(text: String): Int64
-packages/core/src/text.cj:115:public func cut(text: String, width: Int64): String
-packages/core/src/text.cj:128:public func graphemePrefix(text: String, maxWidth: Int64): String
-packages/core/src/text.cj:144:public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64
-packages/core/src/text.cj:168:public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String>
-packages/core/src/text.cj:362:public func clampToRuneBoundary(text: String, offset: Int64): Int64
-packages/core/src/text.cj:375:public func previousGraphemeOffset(text: String, offset: Int64): Int64
-packages/core/src/text.cj:391:public func nextGraphemeOffset(text: String, offset: Int64): Int64
+packages/core/src/text.cj:102:public func graphemeClusters(text: String): Array<GraphemeCluster>
+packages/core/src/text.cj:114:public func graphemeDisplayWidth(text: String): Int64
+packages/core/src/text.cj:121:public func cut(text: String, width: Int64): String
+packages/core/src/text.cj:134:public func graphemePrefix(text: String, maxWidth: Int64): String
+packages/core/src/text.cj:150:public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64
+packages/core/src/text.cj:174:public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String>
+packages/core/src/text.cj:368:public func clampToRuneBoundary(text: String, offset: Int64): Int64
+packages/core/src/text.cj:381:public func previousGraphemeOffset(text: String, offset: Int64): Int64
+packages/core/src/text.cj:397:public func nextGraphemeOffset(text: String, offset: Int64): Int64
 packages/core/src/text_area.cj:35:public class TextAreaCaret {
 packages/core/src/text_area.cj:36:public let offset: Int64
 packages/core/src/text_area.cj:37:public let anchor: ?Int64
