@@ -67,9 +67,10 @@ class CiActivity {
         let width = max(0, area.width - 2)
         let theme = Theme(normal: strong, disabled: dim, accent: Style(fg: ORANGE), success: Style(fg: GREEN),
             iconSet: iconSet)
-        let watched = TaskActivity("bg_202", status: TaskStatus.Done, duration: duration,
+        let watched = TaskActivity("bg_202", status: TaskStatus.Done, duration: "0m1s",
             detail: "gh run watch 123456 --repo example/project")
-        let cross = TaskActivity("Cross-platform CI", id: "bg_201", prefix: prefix, duration: duration,
+        let cross = TaskActivity("Cross-platform CI", id: "bg_201", prefix: prefix,
+            duration: if (crossDone) { "0m18s" } else { duration },
             status: if (crossDone) { TaskStatus.Done } else { TaskStatus.Running },
             progressLabel: "CI jobs", progress: Some(TaskProgress.Counts(if (crossDone) { 5 } else { 2 }, 5)),
             detail: if (crossDone) { completedDetail } else { "* Post Check out source" })
@@ -80,7 +81,8 @@ class CiActivity {
         } else {
             [TaskStatus.Done, TaskStatus.Done, TaskStatus.Pending, TaskStatus.Done, TaskStatus.Done, TaskStatus.Pending, TaskStatus.Done, TaskStatus.Pending]
         }
-        let showcase = TaskActivity(if (useUnicode) { "Showcase acceptance · CI jobs" } else { "Showcase acceptance - CI jobs" }, id: "bg_203", prefix: prefix, duration: duration,
+        let showcase = TaskActivity(if (useUnicode) { "Showcase acceptance · CI jobs" } else { "Showcase acceptance - CI jobs" }, id: "bg_203", prefix: prefix,
+            duration: if (finished) { "0m30s" } else { duration },
             status: if (finished) { TaskStatus.Done } else { TaskStatus.Running }, progressLabel: "Jobs",
             progress: Some(TaskProgress.Items(showcaseStatuses)),
             detail: if (finished) { completedDetail } else { "* Post Check out source" })

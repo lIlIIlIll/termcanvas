@@ -7,6 +7,20 @@ import std.unittest.testmacro.*
 @Test
 class CiActivityTest {
     @TestCase
+    func completedTasksKeepTheirDurations(): Unit {
+        let app = CiActivity()
+        let backend = TestBackend(area: Rect(0, 0, 120, 18))
+        let terminal = Terminal(backend)
+        _ = app.update(Event.Tick(TickEvent(deltaMillis: 60000)))
+        _ = terminal.draw { frame => app.render(frame) }
+        let snapshot = backend.snapshot()
+        @Expect(snapshot.contains("bg_202 done 0m1s"))
+        @Expect(snapshot.contains("0m18s"))
+        @Expect(snapshot.contains("0m30s"))
+        @Expect(snapshot.contains("1m0s"))
+    }
+
+    @TestCase
     func simulationTransitionsAndControls(): Unit {
         let app = CiActivity()
         let backend = TestBackend(area: Rect(0, 0, 100, 24))
