@@ -69,6 +69,16 @@ public class TaskActivity {
     private let progressSnapshot: ?TaskProgress
 
     /** 创建任务显示数据；省略进度时不绘制进度行。
+     *
+     * @param title 任务标题
+     * @param status 当前状态
+     * @param id 可选任务标识
+     * @param prefix 标题前缀
+     * @param statusText 紧凑布局的自定义状态文字
+     * @param duration 显示的耗时文字
+     * @param detail 可选详情
+     * @param progressLabel 进度行标题
+     * @param progress 子任务进度
      */
     public init(
         title: String,
