@@ -1,6 +1,8 @@
 import contextlib
 import importlib.util
 import io
+import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -45,6 +47,57 @@ class LongGateAuditTest(unittest.TestCase):
             "tui long transcript gates configured=10 transcript_expected=11 transcript_actual=11 "
             "content_preserved=true documents_expected<=3 documents_actual=3\n"
         ), 0)
+
+
+class ScratchBuildTest(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix="termcanvas-scratch-test-")
+        self.addCleanup(self.temporary.cleanup)
+        self.root = Path(self.temporary.name)
+        self.toolkit = self.root / "toolkit"
+        self.consumer = self.root / "consumer"
+        self.sdk = self.root / "sdk"
+        self.default = self.root / "default"
+        self.explicit = self.root / "explicit"
+        for path in (self.toolkit / "packages/core", self.toolkit / "packages/markdown_adapter",
+                     self.consumer / "agent_tui", self.consumer / "scripts", self.sdk,
+                     self.default, self.explicit):
+            path.mkdir(parents=True)
+        pinned = self.consumer / "scripts/pinned_cangjie"
+        pinned.write_text(
+            '#!/bin/sh\nif [ "$1" = cjpm ]; then mkdir -p target/release/bin; '
+            'printf fake > target/release/bin/agent_app; else echo fake-compiler; fi\n',
+            encoding="utf-8",
+        )
+        pinned.chmod(0o755)
+
+    def run_build(self, name, extra):
+        output = self.root / name
+        env = os.environ.copy()
+        env.update({"TMPDIR": str(self.default), "TMP": str(self.default), "TEMP": str(self.default)})
+        command = [sys.executable, str(Path(__file__).with_name("architecture_proof_step05_build.py")),
+                   "--cj-tui-root", str(self.toolkit), "--consumer-root", str(self.consumer),
+                   "--sdk-root", str(self.sdk), "--output", str(output), *extra]
+        result = subprocess.run(command, env=env, capture_output=True, text=True)
+        return result, output
+
+    def test_default_uses_tmpdir(self):
+        result, output = self.run_build("default-output", [])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        provenance = json.loads((output / "provenance.json").read_text())
+        self.assertEqual(Path(provenance["build_root"]).parent, self.default)
+
+    def test_explicit_directory_overrides_tmpdir(self):
+        result, output = self.run_build("explicit-output", ["--scratch-dir", str(self.explicit)])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        provenance = json.loads((output / "provenance.json").read_text())
+        self.assertEqual(Path(provenance["build_root"]).parent, self.explicit)
+
+    def test_missing_explicit_directory_does_not_fall_back(self):
+        result, output = self.run_build("missing-output", ["--scratch-dir", str(self.root / "missing")])
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((output / "provenance.json").exists())
+        self.assertEqual(list(self.default.iterdir()), [])
 
 
 if __name__ == "__main__":

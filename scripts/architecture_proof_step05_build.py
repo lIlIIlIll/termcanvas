@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build a provenance-locked real omp-cj consumer for Step 0.5.
 
-The consumer is copied to an isolated /tmp tree with no target directory. Its
+The consumer is copied to an isolated temporary tree with no target directory. Its
 `../../cj_tui` sibling is a symlink to the live workspace, so cjpm must compile
 the exact instrumented core while leaving both source workspaces untouched.
 """
@@ -97,6 +97,8 @@ def main() -> int:
     parser.add_argument("--consumer-root", type=Path, required=True)
     parser.add_argument("--sdk-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--scratch-dir", type=Path,
+                        help="parent for the retained build tree (default: TMPDIR or system temp)")
     args = parser.parse_args()
     cj_tui = args.cj_tui_root.resolve()
     consumer = args.consumer_root.resolve()
@@ -105,7 +107,8 @@ def main() -> int:
 
     cj_state = repo_state(cj_tui)
     consumer_state = repo_state(consumer)
-    build_root = Path(tempfile.mkdtemp(prefix="cj-tui-step05-build-", dir="/tmp"))
+    scratch_dir = args.scratch_dir.resolve() if args.scratch_dir else None
+    build_root = Path(tempfile.mkdtemp(prefix="cj-tui-step05-build-", dir=scratch_dir))
     snapshot_consumer = build_root / "learn_agent_cj"
     shutil.copytree(consumer, snapshot_consumer, ignore=ignored, symlinks=True)
     snapshot_cj_tui = build_root / "cj_tui"
