@@ -142,7 +142,7 @@ The repository's additional workflow commands are:
 - `scripts/run_macos_smoke.sh` provides macOS package smoke and game pressure build coverage from an already-present remote checkout.
 - `scripts/run_regression_matrix.sh`
 - `scripts/run_pressure.sh`
-- `scripts/coverage.sh [output-dir]` runs Cangjie package/example tests with coverage instrumentation and writes a `coverage.xml` report for Codecov. The enforced 90% line / 80% branch scope contains production package sources; test files, demo applications, and the OS-specific terminal lifecycle files (`packages/core/src/{app,event,pty,terminal}.cj`) are excluded from the aggregate. Example tests still run in the same command as regression coverage.
+- `scripts/coverage.sh [output-dir]` runs package/example tests with coverage instrumentation. `coverage-cjcov.xml` preserves the original cjcov report, while `coverage.xml` reports all observed production package files for Codecov. The separate `coverage-gate.xml` enforces the existing 90% line / 80% branch thresholds with the four legacy exclusions (`packages/core/src/{app,event,pty,terminal}.cj`). Test files and demo applications are not production coverage; example tests still run as regression coverage. `coverage-scope.json` records both file sets and the excluded files' counters.
 
 Full unittest execution may need permission to create the local test runner TCP
 socket.
