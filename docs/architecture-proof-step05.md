@@ -1,5 +1,11 @@
 # Architecture Proof Step 0.5: Consumer Attribution Bridge
 
+
+The isolated consumer build keeps its build tree for provenance. By default,
+`scripts/architecture_proof_step05_build.py` uses `TMPDIR` or the system
+temporary directory. Pass `--scratch-dir <existing-directory>` to select a
+specific parent, such as a disk-backed directory when `/tmp` uses tmpfs. A
+missing explicit parent fails rather than falling back to another location.
 ## Status and applicability
 
 Step 0.5 is measurement-only. It connects the existing `cj_tui` metrics to
