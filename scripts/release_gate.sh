@@ -33,6 +33,9 @@ run_cjpm_test "$ROOT/packages/media" "media tests"
 run_cjpm_test "$ROOT/packages/game" "game tests"
 run_cjpm_test "$ROOT/packages/testing" "downstream testing API"
 
+echo "==> coverage accounting fixtures"
+python3 "$ROOT/scripts/test_coverage_report.py"
+
 echo "==> release version"
 python3 "$ROOT/scripts/check_version.py"
 
