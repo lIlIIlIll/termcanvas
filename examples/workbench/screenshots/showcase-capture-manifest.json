@@ -1,0 +1,49 @@
+{
+  "source": {
+    "commit": "824dc5d1c594e8be8426fad6ea1510be9bade5b2",
+    "description": "Workbench source commit before adding screenshot assets"
+  },
+  "build": {
+    "toolchain": "Cangjie STS 1.2.0",
+    "target": "x86_64-unknown-linux-gnu",
+    "binary_sha256": "c173bff7d4579aadbdedf847977d92dcc901f8aa53e9bf0f5db2c9fc93c84d86"
+  },
+  "capture_environment": {
+    "platform": "Linux x86_64",
+    "terminal": "Foot 1.28.0",
+    "compositor": "Sway 1.12 headless",
+    "font": "Sarasa Mono SC:size=14",
+    "color_support": "true-color",
+    "tmux_status_line": "disabled"
+  },
+  "captures": [
+    {
+      "file": "showcase-overview-80x24.png",
+      "sha256": "ae14f5c94750a476ef1677bd39b251159059cf74bfcaa49e0b909e2a7da3a6f0",
+      "terminal_cells": "80x24",
+      "image_pixels": "720x576",
+      "state": "Workbench Overview"
+    },
+    {
+      "file": "showcase-overview-120x36.png",
+      "sha256": "7de21ba491b7ce5a9c59ab7b3f25fd391e5cdc7337a7b5b424f9fab43eef4a60",
+      "terminal_cells": "120x36",
+      "image_pixels": "1080x864",
+      "state": "Workbench Overview"
+    },
+    {
+      "file": "showcase-overview-160x45.png",
+      "sha256": "8c3008b0381bb037eb187e8f43d5cae28db03fdd1e16c9a444060ab108c2db41",
+      "terminal_cells": "160x45",
+      "image_pixels": "1440x1080",
+      "state": "Workbench Overview"
+    },
+    {
+      "file": "showcase-forms-120x36.png",
+      "sha256": "5c90b6a0322e7fc7152afa97eadc5e8317b7cb7560dca90e799b54a72ba05751",
+      "terminal_cells": "120x36",
+      "image_pixels": "1080x864",
+      "state": "Gallery Forms, editable input focused"
+    }
+  ]
+}
