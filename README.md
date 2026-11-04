@@ -139,7 +139,11 @@ CANGJIE_SDK_ROOT=/path/to/cangjie \
 
 这些示例展示如何组合 core 中的任务、进度、列表和主题能力：
 
-![CI 任务活动示例](examples/ci_activity/screenshots/ci-unicode-120x36.png)
+CI 任务活动示例使用模拟数据，并在真实终端中运行：
+
+![CI 任务活动模拟，120×18](examples/ci_activity/screenshots/ci-unicode-120x18.png)
+
+[CI 截图清单](examples/ci_activity/screenshots/ci-showcase-capture-manifest.json)记录源码提交、终端尺寸与 SHA-256。
 
 Workbench 的 Overview 和 Forms 在真实终端中运行，展示任务概览、清晰的输入焦点与选择状态：
 

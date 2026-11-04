@@ -1,0 +1,28 @@
+{
+  "source": {
+    "commit": "b8a45adcfd05eddd1b3d968dc397b779daae8ff0",
+    "description": "CI activity example source commit before adding the capture"
+  },
+  "build": {
+    "toolchain": "Cangjie STS 1.2.0",
+    "target": "x86_64-unknown-linux-gnu",
+    "binary_sha256": "df54188c7c80e9a8e1ef9b7b5dc06c82b37413361e50164d8dc2c98c3b3167d8"
+  },
+  "capture_environment": {
+    "platform": "Linux x86_64",
+    "terminal": "Foot 1.28.0",
+    "compositor": "Sway 1.12 headless",
+    "font": "Sarasa Mono SC:size=14",
+    "color_support": "true-color",
+    "tmux_status_line": "disabled"
+  },
+  "captures": [
+    {
+      "file": "ci-unicode-120x18.png",
+      "sha256": "aede3b30f9207397020a5c171362eb7cc6d84753b5e2b40859476c9cb98cc14f",
+      "terminal_cells": "120x18",
+      "image_pixels": "1080x432",
+      "state": "CI activity simulation"
+    }
+  ]
+}
