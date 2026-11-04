@@ -37492,7 +37492,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 96,
+      "line": 102,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemeClusters",
@@ -37510,7 +37510,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 108,
+      "line": 114,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemeDisplayWidth",
@@ -37528,7 +37528,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 115,
+      "line": 121,
       "level": "top_level",
       "kind": "func",
       "symbol": "cut",
@@ -37546,7 +37546,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 128,
+      "line": 134,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemePrefix",
@@ -37564,7 +37564,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 144,
+      "line": 150,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemeDisplayWidth",
@@ -37582,7 +37582,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 168,
+      "line": 174,
       "level": "top_level",
       "kind": "func",
       "symbol": "wrapText",
@@ -37600,7 +37600,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 362,
+      "line": 368,
       "level": "top_level",
       "kind": "func",
       "symbol": "clampToRuneBoundary",
@@ -37618,7 +37618,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 375,
+      "line": 381,
       "level": "top_level",
       "kind": "func",
       "symbol": "previousGraphemeOffset",
@@ -37636,7 +37636,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 391,
+      "line": 397,
       "level": "top_level",
       "kind": "func",
       "symbol": "nextGraphemeOffset",
