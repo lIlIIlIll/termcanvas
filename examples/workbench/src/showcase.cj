@@ -110,7 +110,8 @@ func renderGalleryForms(app: WorkbenchApp, frame: Frame, areas: WorkbenchGallery
     }
     let inputPrefix = if (app.focus.isFocused("gallery-input")) { "> " }
         else if (app.hovered == Some("gallery-input")) { "~ " } else { "" }
-    let labels = ["Normal · preview", inputPrefix + "Focused · editable", "Error · preview", "Disabled · preview"]
+    let editableLabel = if (app.focus.isFocused("gallery-input")) { "Focused · editable" } else { "Editable" }
+    let labels = ["Normal · preview", inputPrefix + editableLabel, "Error · preview", "Disabled · preview"]
     for (index in 0..min(labels.size, areas.formLabels.size)) {
         frame.renderWidget(Paragraph(labels[index], style: app.theme.disabled), areas.formLabels[index])
     }
@@ -133,8 +134,9 @@ func renderGalleryForms(app: WorkbenchApp, frame: Frame, areas: WorkbenchGallery
     frame.renderWidget(Checkbox(checkboxMarker + "Compact density", checked: app.galleryCheckbox.checked,
         focused: app.focus.isFocused("gallery-checkbox"), style: app.theme.normal,
         focusedStyle: app.theme.focused, disabledStyle: app.theme.disabled, theme: Some(app.theme)), areas.checkbox)
-    let select = Select(["Compact", "Normal", "Comfortable"], selected: app.gallerySelect.selected,
-        style: app.theme.normal, selectedStyle: app.theme.selected)
+    let select = RadioGroup(["Compact", "Normal", "Comfortable"], selected: app.gallerySelect.selected,
+        focused: app.focus.isFocused("gallery-select"), style: app.theme.normal,
+        selectedStyle: app.theme.selected, theme: Some(app.theme))
     frame.renderWidget(select, areas.select)
     let selectMarker = if (app.focus.isFocused("gallery-select")) { ">" }
         else if (app.hovered == Some("gallery-select")) { "~" } else { "" }

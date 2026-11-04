@@ -111,7 +111,6 @@ class WorkbenchApp {
     var editingId: ?Int64 = None
     var pendingResetId: ?Int64 = None
     var spinnerFrame: Int64 = 0
-    var pipelineOffset: Int64 = 0
     private var overviewFocus: ?String = None
     private var showcaseFocus: ?String = None
     private var tasksFocus: ?String = Some("task-table")
@@ -1163,7 +1162,6 @@ class WorkbenchApp {
             if (frames > 0) {
                 visualRemainder %= 120
                 spinnerFrame = (spinnerFrame + frames) % 4
-                pipelineOffset = (pipelineOffset + frames) % max(1, layout.pipelineCanvas.width)
                 if (page == WorkbenchPage.Overview && model.runningCount > 0 && !paused && interaction.active().isNone()) {
                     result = addDirty(result, layout.pipelinePanel)
                 }
