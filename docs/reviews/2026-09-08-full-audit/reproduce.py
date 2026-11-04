@@ -12,8 +12,6 @@ import tempfile
 HERE = Path(__file__).resolve().parent
 EVIDENCE = HERE / 'evidence'
 ORIGINAL = '/tmp/cjtui-audit-20260908-3klxuhqr'
-ORIGINAL_ROOT = '/home/elliot/playground/cj_tui'
-ORIGINAL_SDK = '/home/elliot/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie'
 
 
 def main():
@@ -24,6 +22,8 @@ def main():
     selection.add_argument('--all', action='store_true')
     parser.add_argument('--sdk', default=os.environ.get('CANGJIE_SDK_ROOT'))
     parser.add_argument('--repo', type=Path, default=HERE.parents[2])
+    parser.add_argument('--recorded-repo', help='Original repository path recorded in the evidence')
+    parser.add_argument('--recorded-sdk', help='Original SDK path recorded in the evidence')
     parser.add_argument('--targets', type=Path, help='Existing canonical target root')
     parser.add_argument('--skip-build', action='store_true')
     args = parser.parse_args()
@@ -65,8 +65,9 @@ def main():
 
     def relocated(name):
         source = (EVIDENCE / name).read_text()
-        for old, new in [(ORIGINAL, str(out)), (ORIGINAL_ROOT, str(root)), (ORIGINAL_SDK, str(sdk))]:
-            source = source.replace(repr(old), repr(new))
+        for old, new in [(ORIGINAL, str(out)), (args.recorded_repo, str(root)), (args.recorded_sdk, str(sdk))]:
+            if old:
+                source = source.replace(repr(old), repr(new))
         return source.replace("a/'targets'/key", "Path(" + repr(str(targets)) + ")/key")
 
     compiler = relocated('compile_probes.py')

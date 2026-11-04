@@ -58,6 +58,8 @@ python3 "$ROOT/scripts/test_new_example.py"
 
 echo "==> Windows smoke wrapper local fixtures"
 python3 "$ROOT/scripts/test_windows_smoke.py"
+echo "==> macOS smoke wrapper local fixtures"
+python3 "$ROOT/scripts/test_macos_smoke.py"
 
 echo "==> coverage output ownership fixtures"
 python3 "$ROOT/scripts/test_coverage_output.py"

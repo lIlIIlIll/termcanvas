@@ -287,7 +287,7 @@
       "compile_exit_code": 0,
       "exit_code": 0,
       "elapsed_seconds": 0.47517394,
-      "sdk": "/home/elliot/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
+      "sdk": "$HOME/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
       "core_library": "/tmp/cjtui-fix-20260908/runtime-targets/73b7fc68eda9b257/release/core/libcore.a",
       "runner": "scripts/cangjie_cmd.sh /tmp cjc / scripts/cangjie_cmd.sh /tmp ./cjtui-rereview-input-probe",
       "interpretation": "退出 0 仅表示独立观察程序正常结束；各项结论以实际输出和对照结果判定。"
@@ -350,7 +350,7 @@
       "compile_exit_code": 0,
       "exit_code": 0,
       "elapsed_seconds": 0.47517394,
-      "sdk": "/home/elliot/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
+      "sdk": "$HOME/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
       "core_library": "/tmp/cjtui-fix-20260908/runtime-targets/73b7fc68eda9b257/release/core/libcore.a",
       "runner": "scripts/cangjie_cmd.sh /tmp cjc / scripts/cangjie_cmd.sh /tmp ./cjtui-rereview-input-probe",
       "interpretation": "退出 0 仅表示独立观察程序正常结束；各项结论以实际输出和对照结果判定。"
@@ -416,7 +416,7 @@
       "compile_exit_code": 0,
       "exit_code": 0,
       "elapsed_seconds": 0.47517394,
-      "sdk": "/home/elliot/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
+      "sdk": "$HOME/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
       "core_library": "/tmp/cjtui-fix-20260908/runtime-targets/73b7fc68eda9b257/release/core/libcore.a",
       "runner": "scripts/cangjie_cmd.sh /tmp cjc / scripts/cangjie_cmd.sh /tmp ./cjtui-rereview-input-probe",
       "interpretation": "退出 0 仅表示独立观察程序正常结束；各项结论以实际输出和对照结果判定。"
@@ -482,7 +482,7 @@
       "compile_exit_code": 0,
       "exit_code": 0,
       "elapsed_seconds": 0.47517394,
-      "sdk": "/home/elliot/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
+      "sdk": "$HOME/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
       "core_library": "/tmp/cjtui-fix-20260908/runtime-targets/73b7fc68eda9b257/release/core/libcore.a",
       "runner": "scripts/cangjie_cmd.sh /tmp cjc / scripts/cangjie_cmd.sh /tmp ./cjtui-rereview-input-probe",
       "interpretation": "退出 0 仅表示独立观察程序正常结束；各项结论以实际输出和对照结果判定。"

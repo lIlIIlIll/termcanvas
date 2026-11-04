@@ -1,6 +1,6 @@
 {
   "source_sha": "ab76bc1b39ed3a9261487beb71b4d1967accc2a2",
-  "sdk": "/home/elliot/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
+  "sdk": "$HOME/cangjie_sdk/main/linux_x64/vanilla/20260817/cangjie",
   "cjc_version": "1.1.0-alpha.20260817040003",
   "cjpm_version": "1.1.3",
   "cjc_sha256": "02c01c8b90f5228c380306cd661d33a2d1c05262be34019128d2a37946e57d3e",
@@ -37,7 +37,7 @@
         "cjpm",
         "build"
       ],
-      "cwd": "/home/elliot/playground/cj_tui",
+      "cwd": "$HOME/playground/cj_tui",
       "returncode": 0,
       "elapsed_seconds": 14.187,
       "log": "/tmp/cjtui-audit-20260908-3klxuhqr/logs/template-build.log"

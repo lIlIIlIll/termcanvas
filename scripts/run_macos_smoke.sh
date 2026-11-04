@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-HOST="${MACOS_HOST:-cjlibs@10.0.0.10}"
+HOST="${MACOS_HOST:-}"
 REPO="${MACOS_REPO:-}"
 SSH_CONFIG="${MACOS_SSH_CONFIG:-/dev/null}"
 MACOS_CANGJIE_ROOT="${MACOS_CANGJIE_ROOT:-}"
 MACOS_SDKROOT="${MACOS_SDKROOT:-}"
 
-if [[ -z "$REPO" ]]; then
+if [[ -z "$REPO" || -z "$HOST" ]]; then
     cat >&2 <<'EOF'
-usage: MACOS_REPO=/path/to/cj_tui [MACOS_CANGJIE_ROOT=/path/to/cangjie] [MACOS_SDKROOT=/path/to/MacOSX.sdk] [MACOS_HOST=user@host] scripts/run_macos_smoke.sh
+usage: MACOS_HOST=user@example-host MACOS_REPO=/path/to/cj_tui [MACOS_CANGJIE_ROOT=/path/to/cangjie] [MACOS_SDKROOT=/path/to/MacOSX.sdk] scripts/run_macos_smoke.sh
 
 Runs packages/example_smoke and builds examples/game_pressure_suite from a
 checkout that already exists on the

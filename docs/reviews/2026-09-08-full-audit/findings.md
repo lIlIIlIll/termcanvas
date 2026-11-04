@@ -1344,7 +1344,7 @@
 
 位置：[README.md:61](../../../README.md#L61)、[docs/examples.md:3](../../../docs/examples.md#L3)、[docs/examples.md:59](../../../docs/examples.md#L59)。
 
-**原因：** README 与 examples 文档把 /home/elliot/.codex/scripts/codex_cangjie_env 写成主要入口，该脚本不属于仓库发布内容。
+**原因：** README 与 examples 文档把 $HOME/.codex/scripts/codex_cangjie_env 写成主要入口，该脚本不属于仓库发布内容。
 
 **观察：** 绝对路径脚本不在 tracked 发布树，仓库另有可用的 scripts/cangjie_cmd.sh。
 

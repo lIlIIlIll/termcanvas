@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SHARE="${SHARE:-/home/elliot/share}"
+SHARE="${SHARE:-$HOME/share}"
 BACKEND="${BACKEND:-libvirt}"
 RUNNER="${RUN_VBOX_CJ_TESTS:-run-vbox-cj-tests}"
 

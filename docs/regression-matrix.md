@@ -32,7 +32,7 @@ scripts/run_regression_matrix.sh
 | Example package tests | Every `examples/*/src/*_test.cj` package discovered by `scripts/release_gate.sh` |
 | Pressure gate | `scripts/run_pressure.sh` |
 | Windows VM smoke | `scripts/run_windows_smoke.sh` |
-| macOS smoke | `MACOS_REPO=/path/to/cj_tui scripts/run_macos_smoke.sh` |
+| macOS smoke | `MACOS_HOST=user@example-host MACOS_REPO=/path/to/cj_tui scripts/run_macos_smoke.sh` |
 
 Application behavior is checked by each discovered
 `examples/*/src/*_test.cj` package. The component-composition package does not
@@ -97,7 +97,7 @@ scripts/run_windows_smoke.sh
 ```
 
 The Windows smoke wrapper expects the local VM share layout used by
-`run-vbox-cj-tests`: `SHARE` defaults to `/home/elliot/share`, with the Windows
+`run-vbox-cj-tests`: `SHARE` defaults to `$HOME/share`, with the Windows
 SDK under `$SHARE/sdk`. Override `BACKEND`, `SHARE`, or `RUN_VBOX_CJ_TESTS` when
 needed.
 
@@ -113,12 +113,12 @@ checkout already present on the macOS host or from an explicitly approved source
 transfer to that host:
 
 ```bash
-MACOS_REPO=/path/to/cj_tui scripts/run_macos_smoke.sh
+MACOS_HOST=user@example-host MACOS_REPO=/path/to/cj_tui scripts/run_macos_smoke.sh
 ```
 
-`MACOS_HOST` defaults to `cjlibs@10.0.0.10`. Set `MACOS_CANGJIE_ROOT` when the
-remote shell does not already expose `cjc` and `cjpm`; set `MACOS_SDKROOT` when
-the remote linker cannot infer a macOS SDK.
+Set `MACOS_HOST` to the SSH destination. Set `MACOS_CANGJIE_ROOT` when the remote shell does
+not already expose `cjc` and `cjpm`; set `MACOS_SDKROOT` when the remote
+linker cannot infer a macOS SDK.
 
 The wrapper checks the canonical compiler and cjpm versions, validates the
 Darwin library layout when an SDK root is supplied, runs `packages/example_smoke`,
