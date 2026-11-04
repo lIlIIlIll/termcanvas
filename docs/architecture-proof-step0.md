@@ -72,8 +72,8 @@ manifest's complete core matrix:
 
 ```bash
 cd benchmarks/architecture-proof-step0/fixture
-OMP_CJ_SDK_ROOT=/home/elliot/cangjie_sdk/daily \
-  /home/elliot/playground/learn_agent_cj/scripts/pinned_cangjie cjpm build
+OMP_CJ_SDK_ROOT=$HOME/cangjie_sdk/daily \
+  $HOME/playground/learn_agent_cj/scripts/pinned_cangjie cjpm build
 cd ../../..
 
 python3 scripts/architecture_proof_step0.py \
@@ -84,7 +84,7 @@ Run real PTY samples against an explicitly identified omp-cj candidate:
 
 ```bash
 python3 scripts/architecture_proof_step0_pty.py \
-  --harness /home/elliot/playground/learn_agent_cj/scripts/tui_pty_bench.py \
+  --harness $HOME/playground/learn_agent_cj/scripts/tui_pty_bench.py \
   --candidate '/absolute/path/to/agent_app --fixture' \
   --candidate-root /absolute/path/to/learn_agent_cj \
   --output benchmarks/architecture-proof-step0/results/<run-id>/pty

@@ -23,6 +23,7 @@ class WindowsSmokeWrapperTest(unittest.TestCase):
         runner_exit: int,
         *,
         fail_install: bool = False,
+        use_default_share: bool = False,
     ) -> tuple[subprocess.CompletedProcess[str], str]:
         directory = tempfile.TemporaryDirectory(prefix="cj-windows-smoke-")
         self.addCleanup(directory.cleanup)
@@ -91,6 +92,9 @@ class WindowsSmokeWrapperTest(unittest.TestCase):
             "CAPTURE_PATH": str(capture),
             "FAKE_RUNNER_RC": str(runner_exit),
         })
+        if use_default_share:
+            env.pop("SHARE", None)
+            env["HOME"] = str(work)
         result = subprocess.run(
             ["bash", str(WRAPPER)],
             cwd=ROOT,
@@ -122,6 +126,11 @@ class WindowsSmokeWrapperTest(unittest.TestCase):
 
     def test_generated_runner_keeps_param_first_and_uses_unique_stage(self):
         result, generated = self.run_wrapper(0)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assert_runner_shape(generated)
+
+    def test_default_share_is_relative_to_home(self):
+        result, generated = self.run_wrapper(0, use_default_share=True)
         self.assertEqual(result.returncode, 0, result.stdout)
         self.assert_runner_shape(generated)
 
