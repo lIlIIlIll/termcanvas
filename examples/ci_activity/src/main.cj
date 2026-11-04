@@ -99,6 +99,15 @@ class CiActivity {
         canvas.drawText(x + 1, legendY, " done  ", dim)
         canvas.drawText(x + 8, legendY, if (useUnicode) { "◌" } else { "o" }, theme.normal)
         canvas.drawText(x + 9, legendY, " waiting", dim)
+        let runningMarker = if (!useUnicode) {
+            ["|", "/", "-", "\\"][elapsed / 100 % 4]
+        } else if (match (iconSet) { case IconSet.NerdFont => true; case _ => false }) {
+            "\u{f110}"
+        } else {
+            ["◐", "◓", "◑", "◒"][elapsed / 100 % 4]
+        }
+        canvas.drawText(x + 19, legendY, runningMarker, theme.accent)
+        canvas.drawText(x + 20, legendY, " running", dim)
         let iconName = match (iconSet) {
             case IconSet.Unicode => "Unicode"
             case IconSet.NerdFont => "Nerd Font"
