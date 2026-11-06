@@ -20,6 +20,19 @@ class MatrixBuildTests(unittest.TestCase):
         (self.root / 'vendor/markdown').mkdir(parents=True)
         (self.root / 'vendor/markdown/cjpm.toml').write_text('[dependencies]\n')
 
+    def test_repository_sample_survives_controlled_source_copy(self):
+        fixture = Path(__file__).resolve().parents[1] / 'examples/visual_matrix'
+        sample = fixture / 'sample/README.md'
+        self.assertTrue(sample.is_file(), 'the committed fixture sample must exist')
+        self.assertTrue(sample.read_text(encoding='utf-8').strip())
+        files = build.walk(fixture, 'examples/visual_matrix')
+        key = 'examples/visual_matrix/sample/README.md'
+        self.assertIn(key, files)
+        copied = self.root / key
+        copied.parent.mkdir(parents=True, exist_ok=True)
+        copied.write_bytes(sample.read_bytes())
+        self.assertEqual(build.sha_file(copied), files[key])
+
     def test_dependency_must_stay_in_snapshot_and_not_use_git(self):
         matrix = self.root / 'examples/visual_matrix/cjpm.toml'
         matrix.write_text('[dependencies]\ncore = { path = "../../packages/core" }\n')
