@@ -478,6 +478,8 @@ def execute(args):
                                               'sha256': run_identity['local_build_record_sha256'],
                                               'independently_verified': False}
         evidence['reviews'], stale_reviews = collect_review_reports(evidence, root)
+        from visual_evidence import collect_resolution_reports
+        evidence['resolutions'], _ = collect_resolution_reports(evidence, root, evidence['reviews'])
         write_json(root / 'evidence.json', evidence)
         from visual_evidence import GEOMETRY_SOURCE, target_coverage
         report = {**target_coverage(cases, set(good)), 'geometry_check': GEOMETRY_SOURCE,

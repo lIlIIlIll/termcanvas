@@ -273,6 +273,126 @@ def read_png(path):
 LEGACY_REVIEW_KEYS = ('case_id', 'kind', 'image_sha256', 'source_sha', 'reviewer', 'verdict', 'findings')
 REVIEW_KEYS = (*LEGACY_REVIEW_KEYS, 'run_identity_sha256')
 
+# A resolution never changes a review. Both review references identify the
+# content-addressed report and the exact canonical entry in that report.
+RESOLUTION_KEYS = ('case_id', 'image_sha256', 'source_sha', 'run_identity_sha256',
+                   'decision', 'reviewer', 'model_report_sha256', 'model_entry_sha256',
+                   'independent_report_sha256', 'independent_entry_sha256', 'findings')
+
+
+def review_entry_sha256(review):
+    return digest(canonical({key: review[key] for key in REVIEW_KEYS}))
+
+
+def validate_resolution_entry(entry, capture, source, run_id, reviews, root, report_cache=None):
+    require(isinstance(entry, dict) and set(entry) == set(RESOLUTION_KEYS), 'invalid resolution fields')
+    case_id = entry['case_id']
+    require(isinstance(case_id, str) and HEX.fullmatch(case_id), 'invalid resolution case')
+    require(capture is not None and capture['case_id'] == case_id and
+            entry['image_sha256'] == capture['sha256'] and entry['source_sha'] == source and
+            entry['run_identity_sha256'] == run_id, 'resolution does not match current capture')
+    require(entry['decision'] == 'false_positive', 'invalid resolution decision')
+    model = reviews.get((case_id, 'model'))
+    independent = reviews.get((case_id, 'independent'))
+    require(model is not None and independent is not None, 'resolution requires both original reviews')
+    for review in (model, independent):
+        require(all(key in review for key in REVIEW_KEYS), 'resolution requires complete original reviews')
+        validate_review_entry({key: review[key] for key in REVIEW_KEYS})
+    require(model['verdict'] == 'fail' and model['findings'], 'resolution requires model failure findings')
+    require(independent['verdict'] == 'pass' and independent['findings'] == [],
+            'resolution requires a passing independent review')
+    require(independent['reviewer'] != model['reviewer'] and entry['reviewer'] == independent['reviewer'],
+            'resolution requires a different independent reviewer')
+    if report_cache is None:
+        report_cache = {}
+    directory = root / 'reviews' / 'reports'
+    require(not (root / 'reviews').is_symlink() and not directory.is_symlink(), 'invalid review report directory')
+    for prefix, review in (('model', model), ('independent', independent)):
+        report_sha = entry[prefix + '_report_sha256']
+        require(isinstance(report_sha, str) and HEX.fullmatch(report_sha), 'invalid resolution review report hash')
+        if report_sha not in report_cache:
+            path = directory / (report_sha + '.json')
+            require(not path.is_symlink() and path.is_file(), 'resolution review report missing')
+            data = path.read_bytes()
+            require(digest(data) == report_sha, 'resolution review report hash mismatch')
+            report = json.loads(data)
+            require(isinstance(report, dict) and isinstance(report.get('reviews'), list), 'invalid review report')
+            indexed = {}
+            for original in report['reviews']:
+                validate_review_entry(original, allow_legacy=True)
+                key = (original['case_id'], original['kind'])
+                require(key not in indexed, 'duplicate review in referenced report')
+                indexed[key] = original
+            report_cache[report_sha] = indexed
+        original = report_cache[report_sha].get((case_id, prefix))
+        expected = {key: review[key] for key in REVIEW_KEYS}
+        require(original == expected and entry[prefix + '_entry_sha256'] == review_entry_sha256(review),
+                'resolution review reference mismatch')
+    findings = entry['findings']
+    require(isinstance(findings, list) and len(findings) == len(model['findings']),
+            'resolution must address every finding')
+    indexes = set()
+    for finding in findings:
+        require(isinstance(finding, dict) and set(finding) == {'index', 'sha256', 'reason'},
+                'invalid resolution finding')
+        index = finding['index']
+        require(type(index) is int and 0 <= index < len(model['findings']) and index not in indexes,
+                'invalid or duplicate resolution finding index')
+        indexes.add(index)
+        require(finding['sha256'] == digest(model['findings'][index].encode('utf-8')) and
+                isinstance(finding['reason'], str) and bool(finding['reason'].strip()),
+                'resolution finding hash or reason mismatch')
+    require(indexes == set(range(len(model['findings']))), 'resolution must address every finding')
+
+
+def collect_resolution_reports(evidence, root, reviews=None, *, captures=None):
+    """Read current immutable resolutions; report stale records without deleting them."""
+    root = root.resolve(strict=True)
+    directory = root / 'reviews' / 'resolutions'
+    if not directory.exists():
+        return [], 0
+    require(not (root / 'reviews').is_symlink() and not directory.is_symlink() and directory.is_dir(),
+            'invalid resolution report directory')
+    if captures is None:
+        captures = review_captures(evidence, root)
+    if reviews is None:
+        reviews, _ = collect_review_reports(evidence, root, captures=captures)
+    review_map = {(r['case_id'], r['kind']): r for r in reviews}
+    selected = {}
+    stale = 0
+    report_cache = {}
+    for path in sorted(directory.iterdir()):
+        require(not path.is_symlink() and path.is_file() and path.suffix == '.json' and HEX.fullmatch(path.stem),
+                'invalid resolution report artifact')
+        data = path.read_bytes()
+        require(digest(data) == path.stem, 'resolution report hash mismatch')
+        report = json.loads(data)
+        require(isinstance(report, dict) and isinstance(report.get('resolutions'), list) and report['resolutions'],
+                'invalid resolution report')
+        seen = set()
+        for entry in report['resolutions']:
+            require(isinstance(entry, dict) and set(entry) == set(RESOLUTION_KEYS), 'invalid resolution fields')
+            case_id = entry['case_id']
+            require(isinstance(case_id, str) and HEX.fullmatch(case_id) and case_id not in seen,
+                    'invalid or duplicate resolution case')
+            seen.add(case_id)
+            capture = captures.get(case_id)
+            if (capture is None or entry['source_sha'] != evidence['source_sha'] or
+                    entry['run_identity_sha256'] != evidence['run_identity']['identity_sha256'] or
+                    entry['image_sha256'] != capture['sha256']):
+                stale += 1
+                continue
+            validate_resolution_entry(entry, capture, evidence['source_sha'],
+                                      evidence['run_identity']['identity_sha256'], review_map, root, report_cache)
+            result = {**entry, 'report_file': path.relative_to(root).as_posix(), 'report_sha256': path.stem}
+            if case_id in selected:
+                require({k: selected[case_id][k] for k in RESOLUTION_KEYS} == entry,
+                        'conflicting current resolution records')
+            else:
+                selected[case_id] = result
+    return [selected[key] for key in sorted(selected)], stale
+
+
 
 def verify_run_identity(evidence, root, *, required=False):
     binding = evidence.get('run_identity')
@@ -416,7 +536,7 @@ def validate_review_entry(entry, *, allow_legacy=False):
     require(entry['verdict'] != 'pass' or not entry['findings'], 'passing review cannot contain findings')
 
 
-def collect_review_reports(evidence, root):
+def collect_review_reports(evidence, root, *, captures=None):
     """Return current records and stale count; never assert reviewer authenticity."""
     root = root.resolve(strict=True)
     directory = root / 'reviews' / 'reports'
@@ -424,7 +544,8 @@ def collect_review_reports(evidence, root):
         return [], 0
     require(not (root / 'reviews').is_symlink() and not directory.is_symlink() and directory.is_dir(),
             'invalid review report directory')
-    captures = review_captures(evidence, root)
+    if captures is None:
+        captures = review_captures(evidence, root)
     source = evidence['source_sha']
     selected = {}
     stale = 0
@@ -487,8 +608,11 @@ def current_review_summary(evidence, root):
             invalid.append(case_id)
             del captures[case_id]
     filtered = {**evidence, 'captures': list(captures.values())}
-    reviews, stale = collect_review_reports(filtered, root)
-    return {'scope': 'current-evidence-capture-records-only', 'delivery_ready': False,
+    reviews, stale = collect_review_reports(filtered, root, captures=captures)
+    resolutions, stale_resolutions = collect_resolution_reports(filtered, root, reviews, captures=captures)
+    resolved_ids = {resolution['case_id'] for resolution in resolutions}
+    return {'resolved_model_failures': len(resolutions), 'stale_resolutions': stale_resolutions,
+            'scope': 'current-evidence-capture-records-only', 'delivery_ready': False,
             'unexported_attempts_not_audited': True,
             'project_coverage_verified': False, 'visual_audit': 'not_performed',
             'review_identity_and_observation_verified': False,
@@ -499,6 +623,8 @@ def current_review_summary(evidence, root):
             'model_review_records': sum(r['kind'] == 'model' for r in reviews),
             'independent_review_records': sum(r['kind'] == 'independent' for r in reviews),
             'failure_case_ids': sorted({r['case_id'] for r in reviews if r['verdict'] == 'fail'}),
+            'unresolved_failure_case_ids': sorted({r['case_id'] for r in reviews if r['verdict'] == 'fail' and
+                                                   (r['kind'] != 'model' or r['case_id'] not in resolved_ids)}),
             'source_sha': evidence['source_sha'],
             'run_identity_sha256': evidence['run_identity']['identity_sha256']}
 
@@ -511,13 +637,15 @@ def review_summary(root):
         summary = current_review_summary(json.loads(raw), root)
         return {**summary, 'evidence_sha256': digest(raw)}
 
-def import_review_report(evidence, root, report):
+def import_review_report(evidence, root, report, *, captures=None, current=None):
     """Validate and store reported judgments, without asserting who performed them."""
     root = root.resolve(strict=True)
     require(isinstance(report, dict) and isinstance(report.get('reviews'), list) and report['reviews'],
             'invalid review report')
-    captures = review_captures(evidence, root)
-    current, _ = collect_review_reports(evidence, root)
+    if captures is None:
+        captures = review_captures(evidence, root)
+    if current is None:
+        current, _ = collect_review_reports(evidence, root, captures=captures)
     selected = {(entry['case_id'], entry['kind']): {name: entry[name] for name in REVIEW_KEYS}
                 for entry in current}
     incoming = {}
@@ -540,7 +668,8 @@ def import_review_report(evidence, root, report):
     require(not (root / 'reviews').is_symlink() and not directory.is_symlink(), 'invalid review report directory')
     directory.mkdir(parents=True, exist_ok=True)
     path = directory / (report_sha + '.json')
-    if path.exists():
+    created = not path.exists()
+    if not created:
         require(not path.is_symlink() and path.read_bytes() == data, 'review report hash collision or corruption')
     else:
         fd, tmp = tempfile.mkstemp(prefix='.review-', dir=directory)
@@ -553,32 +682,166 @@ def import_review_report(evidence, root, report):
         finally:
             if os.path.exists(tmp):
                 os.unlink(tmp)
-    return path.relative_to(root).as_posix(), report_sha
+    return path.relative_to(root).as_posix(), report_sha, created
+
+
+def unreferenced_after_failed_update(evidence_path, report_file, report_sha, field, original_identity):
+    """Remove only when the original index still exists and proves the report unused."""
+    try:
+        stat = evidence_path.stat()
+        if (stat.st_dev, stat.st_ino) != original_identity:
+            return False
+        evidence = json.loads(evidence_path.read_text(encoding='utf-8'))
+        if not isinstance(evidence, dict):
+            return False
+        references = evidence.get(field, [])
+        if not isinstance(references, list) or any(not isinstance(item, dict) for item in references):
+            return False
+        return not any(item.get('report_file') == report_file or item.get('report_sha256') == report_sha
+                       for item in references)
+    except (OSError, ValueError, TypeError):
+        return False
 
 
 def update_reviews(root, report):
-    """Persist an explicit report then atomically regenerate current references."""
+    """Persist a batch under the capture lock and roll back on exceptions."""
     with review_lock(root) as root:
         evidence_path = root / 'evidence.json'
+        original_stat = evidence_path.stat()
+        original_identity = (original_stat.st_dev, original_stat.st_ino)
         evidence = json.loads(evidence_path.read_text(encoding='utf-8'))
-        name, report_sha = import_review_report(evidence, root, report)
-        evidence['reviews'], stale = collect_review_reports(evidence, root)
-        fd, tmp = tempfile.mkstemp(prefix='.review-evidence-', dir=root)
+        captures = review_captures(evidence, root)
+        current, _ = collect_review_reports(evidence, root, captures=captures)
+        # Do not persist a new report when existing resolutions are invalid.
+        collect_resolution_reports(evidence, root, current, captures=captures)
+        reports_dir = root / 'reviews' / 'reports'
+        parent_existed, directory_existed = reports_dir.parent.exists(), reports_dir.exists()
         try:
-            with os.fdopen(fd, 'w', encoding='utf-8') as stream:
-                json.dump(evidence, stream, indent=2, ensure_ascii=False, sort_keys=True)
-                stream.write('\n')
-                stream.flush()
-                os.fsync(stream.fileno())
-            os.replace(tmp, evidence_path)
-        finally:
-            if os.path.exists(tmp):
-                os.unlink(tmp)
+            name, report_sha, created = import_review_report(evidence, root, report, captures=captures, current=current)
+        except BaseException:
+            for directory, existed in ((reports_dir, directory_existed), (reports_dir.parent, parent_existed)):
+                if not existed:
+                    try:
+                        directory.rmdir()
+                    except OSError:
+                        pass
+            raise
+        try:
+            evidence['reviews'], stale = collect_review_reports(evidence, root, captures=captures)
+            evidence['resolutions'], _ = collect_resolution_reports(evidence, root, evidence['reviews'], captures=captures)
+            fd, tmp = tempfile.mkstemp(prefix='.review-evidence-', dir=root)
+            try:
+                with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+                    json.dump(evidence, stream, indent=2, ensure_ascii=False, sort_keys=True)
+                    stream.write('\n')
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                os.replace(tmp, evidence_path)
+            finally:
+                if os.path.exists(tmp):
+                    os.unlink(tmp)
+        except BaseException:
+            if created and unreferenced_after_failed_update(evidence_path, name, report_sha, 'reviews', original_identity):
+                (root / name).unlink(missing_ok=True)
+            for directory, existed in ((reports_dir, directory_existed), (reports_dir.parent, parent_existed)):
+                if not existed:
+                    try:
+                        directory.rmdir()
+                    except OSError:
+                        pass
+            raise
         return {'report_file': name, 'report_sha256': report_sha, 'current_reviews': len(evidence['reviews']),
                 'stale_reviews': stale, 'identity_and_image_observation_verified': False}
 
 
+def update_resolutions(root, report):
+    """Append independently justified dismissals and atomically refresh references."""
+    with review_lock(root) as root:
+        evidence_path = root / 'evidence.json'
+        original_stat = evidence_path.stat()
+        original_identity = (original_stat.st_dev, original_stat.st_ino)
+        evidence = json.loads(evidence_path.read_text(encoding='utf-8'))
+        captures = review_captures(evidence, root)
+        reviews, _ = collect_review_reports(evidence, root, captures=captures)
+        review_map = {(r['case_id'], r['kind']): r for r in reviews}
+        current, _ = collect_resolution_reports(evidence, root, reviews, captures=captures)
+        selected = {r['case_id']: {key: r[key] for key in RESOLUTION_KEYS} for r in current}
+        require(isinstance(report, dict) and isinstance(report.get('resolutions'), list) and report['resolutions'],
+                'invalid resolution report')
+        incoming = {}
+        report_cache = {}
+        for entry in report['resolutions']:
+            require(isinstance(entry, dict), 'invalid resolution entry')
+            case_id = entry.get('case_id')
+            require(isinstance(case_id, str) and case_id not in incoming, 'invalid or duplicate resolution case')
+            validate_resolution_entry(entry, captures.get(case_id), evidence['source_sha'],
+                                      evidence['run_identity']['identity_sha256'], review_map, root, report_cache)
+            require(case_id not in selected or selected[case_id] == entry, 'conflicting current resolution records')
+            incoming[case_id] = entry
+        normalized = {'resolutions': [incoming[key] for key in sorted(incoming)],
+                      'verification': 'reviewer identity and image observation not independently verified'}
+        data = canonical(normalized) + b'\n'
+        report_sha = digest(data)
+        directory = root / 'reviews' / 'resolutions'
+        require(not (root / 'reviews').is_symlink() and not directory.is_symlink(), 'invalid resolution report directory')
+        directory_existed = directory.exists()
+        directory.mkdir(parents=True, exist_ok=True)
+        path = directory / (report_sha + '.json')
+        created = not path.exists()
+        if not created:
+            require(not path.is_symlink() and path.read_bytes() == data, 'resolution report hash collision or corruption')
+        else:
+            fd, tmp = tempfile.mkstemp(prefix='.resolution-', dir=directory)
+            try:
+                with os.fdopen(fd, 'wb') as stream:
+                    stream.write(data)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                os.replace(tmp, path)
+            finally:
+                if os.path.exists(tmp):
+                    os.unlink(tmp)
+        try:
+            evidence['reviews'] = reviews
+            evidence['resolutions'], stale = collect_resolution_reports(evidence, root, reviews, captures=captures)
+            fd, tmp = tempfile.mkstemp(prefix='.review-evidence-', dir=root)
+            try:
+                with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+                    json.dump(evidence, stream, indent=2, ensure_ascii=False, sort_keys=True)
+                    stream.write('\n')
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                os.replace(tmp, evidence_path)
+            finally:
+                if os.path.exists(tmp):
+                    os.unlink(tmp)
+        except BaseException:
+            if created and unreferenced_after_failed_update(evidence_path, path.relative_to(root).as_posix(),
+                                                            report_sha, 'resolutions', original_identity):
+                path.unlink(missing_ok=True)
+            if not directory_existed:
+                try:
+                    directory.rmdir()
+                except OSError:
+                    pass
+            raise
+        return {'report_file': path.relative_to(root).as_posix(), 'report_sha256': report_sha,
+                'current_resolutions': len(evidence['resolutions']), 'stale_resolutions': stale,
+                'identity_and_image_observation_verified': False}
+
+
 def audit(matrix, evidence, artifact_dir, *, require_local_build_record=False):
+    # Legacy artifacts without a run identity cannot pass a strict audit and
+    # predate the runner lock; keep their historical read-only behavior.
+    if isinstance(evidence, dict) and evidence.get('run_identity') is None:
+        return _audit_locked(matrix, evidence, artifact_dir, require_local_build_record=require_local_build_record)
+    # Capture and review writers hold this same lock. In particular, a report
+    # persisted just before a crash must be visible to the following audit.
+    with review_lock(artifact_dir) as root:
+        return _audit_locked(matrix, evidence, root, require_local_build_record=require_local_build_record)
+
+
+def _audit_locked(matrix, evidence, artifact_dir, *, require_local_build_record=False):
     require(isinstance(matrix, dict) and matrix.get('version') in (1, 2) and
             matrix.get('scope') == 'declared-inventory-only', 'invalid matrix header')
     cases = matrix.get('cases')
@@ -688,6 +951,29 @@ def audit(matrix, evidence, artifact_dir, *, require_local_build_record=False):
                 f'{case_id}: image too small for declared terminal cells')
         found[case_id] = capture
     require(set(found) == set(expected), f'missing captures: {len(set(expected) - set(found))} of {len(expected)}')
+    if run_identity is not None:
+        # The on-disk immutable reports are authoritative for current records.
+        # Reject an out-of-date evidence index instead of silently auditing a
+        # subset that omits a just-persisted failure. Comparing logical entries
+        # preserves compatibility with duplicate reports in different batches.
+        captures_by_id = review_captures(evidence, root)
+        disk_reviews, _ = collect_review_reports(evidence, root, captures=captures_by_id)
+        indexed_reviews = {(review.get('case_id'), review.get('kind')): review for review in reviews
+                           if isinstance(review, dict)}
+        for disk_review in disk_reviews:
+            key = (disk_review['case_id'], disk_review['kind'])
+            indexed = indexed_reviews.get(key)
+            require(indexed is not None and all(indexed.get(k) == disk_review[k] for k in REVIEW_KEYS),
+                    f'{key[0]}: unindexed or mismatched current review report')
+        disk_resolutions, _ = collect_resolution_reports(evidence, root, disk_reviews, captures=captures_by_id)
+        indexed_resolutions = evidence.get('resolutions', [])
+        require(isinstance(indexed_resolutions, list), 'resolutions must be a list')
+        indexed_resolutions = {resolution.get('case_id'): resolution for resolution in indexed_resolutions
+                               if isinstance(resolution, dict)}
+        for disk_resolution in disk_resolutions:
+            indexed = indexed_resolutions.get(disk_resolution['case_id'])
+            require(indexed is not None and all(indexed.get(k) == disk_resolution[k] for k in RESOLUTION_KEYS),
+                    f"{disk_resolution['case_id']}: unindexed or mismatched current resolution report")
     reviewed = {}
     report_cache = {}
     for review in reviews:
@@ -718,14 +1004,48 @@ def audit(matrix, evidence, artifact_dir, *, require_local_build_record=False):
         report_entry = {key: review.get(key) for key in (REVIEW_KEYS if run_identity is not None else LEGACY_REVIEW_KEYS)}
         require(report_cache[(report_file, report_sha)].get(key) == report_entry,
                 f'{case_id}: report does not contain review')
-        require(review.get('verdict') == 'pass' and review.get('findings') == [], f'{case_id}: review not clear')
+        require(review.get('verdict') in ('pass', 'fail') and isinstance(review.get('findings'), list),
+                f'{case_id}: invalid review verdict or findings')
         reviewed[key] = review
+    resolutions = evidence.get('resolutions', [])
+    require(isinstance(resolutions, list), 'resolutions must be a list')
+    resolved = {}
+    resolution_cache = {}
+    original_review_cache = {}
+    for resolution in resolutions:
+        require(isinstance(resolution, dict), 'invalid resolution')
+        case_id = resolution.get('case_id')
+        require(case_id in expected and case_id not in resolved, 'unknown or duplicate resolution')
+        report_file, report_sha = resolution.get('report_file'), resolution.get('report_sha256')
+        if (report_file, report_sha) not in resolution_cache:
+            verify_file(report_file, report_sha, f'{case_id}: resolution report')
+            report = json.loads((root / report_file).read_text(encoding='utf-8'))
+            require(isinstance(report, dict) and isinstance(report.get('resolutions'), list), 'invalid resolution report')
+            entries = {}
+            for entry in report['resolutions']:
+                require(isinstance(entry, dict) and entry.get('case_id') not in entries, 'duplicate resolution report entry')
+                entries[entry.get('case_id')] = entry
+            resolution_cache[(report_file, report_sha)] = entries
+        entry = {key: resolution.get(key) for key in RESOLUTION_KEYS}
+        require(resolution_cache[(report_file, report_sha)].get(case_id) == entry,
+                f'{case_id}: report does not contain resolution')
+        require(run_identity is not None, 'resolution requires run identity')
+        validate_resolution_entry(entry, found[case_id], source,
+                                  evidence['run_identity']['identity_sha256'], reviewed, root, original_review_cache)
+        resolved[case_id] = entry
     for case_id, case in expected.items():
         require((case_id, 'model') in reviewed, f'{case_id}: missing model review')
+        model = reviewed[(case_id, 'model')]
+        if model['verdict'] == 'pass':
+            require(model['findings'] == [] and case_id not in resolved, f'{case_id}: review not clear')
+        else:
+            require(case_id in resolved, f'{case_id}: review not clear')
+        independent = reviewed.get((case_id, 'independent'))
+        if independent is not None:
+            require(independent['verdict'] == 'pass' and independent['findings'] == [], f'{case_id}: review not clear')
         if case['high_risk']:
-            require((case_id, 'independent') in reviewed, f'{case_id}: missing independent review')
-            require(reviewed[(case_id, 'model')]['reviewer'] != reviewed[(case_id, 'independent')]['reviewer'],
-                    f'{case_id}: reviewer labels must differ')
+            require(independent is not None, f'{case_id}: missing independent review')
+            require(model['reviewer'] != independent['reviewer'], f'{case_id}: reviewer labels must differ')
     geometry = target_coverage(cases, set(found)) if matrix['version'] == 2 else {}
     return {**geometry, 'geometry_check': GEOMETRY_SOURCE if matrix['version'] == 2 else 'legacy-unverified',
             'cases': len(expected), 'captures': len(found), 'reviews': len(reviewed),
@@ -767,6 +1087,9 @@ def main():
     importer = commands.add_parser('review-import', help='import an explicit report bound to current screenshots')
     importer.add_argument('artifact_dir', type=Path)
     importer.add_argument('report', type=Path)
+    resolutions = commands.add_parser('resolution-import', help='import independent false-positive decisions')
+    resolutions.add_argument('artifact_dir', type=Path)
+    resolutions.add_argument('report', type=Path)
     args = parser.parse_args()
     try:
         if args.command == 'expand':
@@ -791,6 +1114,10 @@ def main():
             return 0
         if args.command == 'review-import':
             print(json.dumps(update_reviews(args.artifact_dir, json.loads(args.report.read_text(encoding='utf-8'))),
+                             ensure_ascii=False))
+            return 0
+        if args.command == 'resolution-import':
+            print(json.dumps(update_resolutions(args.artifact_dir, json.loads(args.report.read_text(encoding='utf-8'))),
                              ensure_ascii=False))
             return 0
         inventory = json.loads(args.inventory.read_text(encoding='utf-8'))

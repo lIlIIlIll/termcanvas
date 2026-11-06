@@ -207,6 +207,455 @@ class MatrixRunnerTests(unittest.TestCase):
         self.assertEqual(third['current_review_records'], 0)
         self.assertTrue(stored.is_file())
 
+    def resolution_fixture(self, model_findings=None, independent_verdict='pass', same_reviewer=False):
+        with patch.object(runner, 'capture', side_effect=self.captured):
+            first = runner.execute(self.args)
+        root = self.args.output
+        evidence = json.loads((root / 'evidence.json').read_text())
+        capture = evidence['captures'][0]
+        model = {'case_id': capture['case_id'], 'kind': 'model', 'image_sha256': capture['sha256'],
+                 'source_sha': evidence['source_sha'], 'reviewer': 'model-a', 'verdict': 'fail',
+                 'findings': ['first concern', 'second concern'] if model_findings is None else model_findings,
+                 'run_identity_sha256': evidence['run_identity']['identity_sha256']}
+        independent = dict(model, kind='independent', reviewer='model-a' if same_reviewer else 'reviewer-b',
+                           verdict=independent_verdict,
+                           findings=[] if independent_verdict == 'pass' else ['confirmed problem'])
+        visual.update_reviews(root, {'reviews': [model, independent]})
+        evidence = json.loads((root / 'evidence.json').read_text())
+        reviews = {r['kind']: r for r in evidence['reviews']}
+        entry = {'case_id': model['case_id'], 'image_sha256': model['image_sha256'],
+                 'source_sha': model['source_sha'], 'run_identity_sha256': model['run_identity_sha256'],
+                 'decision': 'false_positive', 'reviewer': independent['reviewer'],
+                 'model_report_sha256': reviews['model']['report_sha256'],
+                 'model_entry_sha256': visual.review_entry_sha256(reviews['model']),
+                 'independent_report_sha256': reviews['independent']['report_sha256'],
+                 'independent_entry_sha256': visual.review_entry_sha256(reviews['independent']),
+                 'findings': [{'index': i, 'sha256': visual.digest(f.encode('utf-8')),
+                               'reason': 'The complete image shows the reported clipping does not occur.'}
+                              for i, f in enumerate(model['findings'])]}
+        matrix = visual.matrix_from_inventory(self.inventory)
+        matrix['cases'] = [case for case in matrix['cases'] if case['id'] == capture['case_id']]
+        return root, matrix, entry, first
+
+    def test_false_positive_resolution_preserves_model_fail_and_survives_resume(self):
+        root, matrix, entry, _ = self.resolution_fixture()
+        evidence_path = root / 'evidence.json'
+        evidence = json.loads(evidence_path.read_text())
+        original_reviews = evidence['reviews']
+        with self.assertRaisesRegex(ValueError, 'review not clear'):
+            visual.audit(matrix, evidence, root)
+        with patch.object(visual, 'read_png', wraps=visual.read_png) as read:
+            saved = visual.update_resolutions(root, {'resolutions': [entry]})
+        self.assertEqual(read.call_count, len(evidence['captures']))
+        self.assertEqual(saved['report_sha256'], visual.update_resolutions(root, {'resolutions': [entry]})['report_sha256'])
+        evidence = json.loads(evidence_path.read_text())
+        self.assertEqual(evidence['reviews'], original_reviews)
+        self.assertEqual(next(r for r in evidence['reviews'] if r['kind'] == 'model')['verdict'], 'fail')
+        self.assertEqual(visual.audit(matrix, evidence, root)['reviews'], 2)
+        summary = visual.review_summary(root)
+        self.assertEqual(summary['resolved_model_failures'], 1)
+        self.assertEqual(summary['failure_case_ids'], [entry['case_id']])
+        self.assertEqual(summary['unresolved_failure_case_ids'], [])
+        # An interruption after persisting a report can recover its reference.
+        evidence['resolutions'] = []
+        runner.write_json(evidence_path, evidence)
+        self.assertEqual(visual.review_summary(root)['resolved_model_failures'], 1)
+        with patch.object(runner, 'capture', side_effect=self.captured):
+            runner.execute(self.args)
+        evidence = json.loads(evidence_path.read_text())
+        self.assertEqual(len(evidence['resolutions']), 1)
+        self.assertEqual(evidence['reviews'], original_reviews)
+        self.assertTrue((root / saved['report_file']).is_file())
+
+    def test_resolution_requires_complete_and_exact_independent_reasons(self):
+        root, matrix, entry, _ = self.resolution_fixture()
+        for mutate in (
+            lambda e: e.pop('decision'),
+            lambda e: e.update(decision='uncertain'),
+            lambda e: e.update(image_sha256='f' * 64),
+            lambda e: e.update(run_identity_sha256='f' * 64),
+            lambda e: e.update(model_entry_sha256='f' * 64),
+            lambda e: e.update(independent_report_sha256='f' * 64),
+            lambda e: e.update(reviewer='model-a'),
+            lambda e: e['findings'].pop(),
+            lambda e: e['findings'][1].update(index=0),
+            lambda e: e['findings'][0].update(sha256='f' * 64),
+            lambda e: e['findings'][0].update(reason='  '),
+        ):
+            trial = json.loads(json.dumps(entry))
+            mutate(trial)
+            with self.subTest(trial=trial), self.assertRaises(ValueError):
+                visual.update_resolutions(root, {'resolutions': [trial]})
+        self.assertEqual(json.loads((root / 'evidence.json').read_text()).get('resolutions', []), [])
+        with self.assertRaisesRegex(ValueError, 'review not clear'):
+            visual.audit(matrix, json.loads((root / 'evidence.json').read_text()), root)
+        visual.update_resolutions(root, {'resolutions': [entry]})
+        changed = json.loads(json.dumps(entry))
+        changed['findings'][0]['reason'] = 'A conflicting explanation.'
+        with self.assertRaisesRegex(ValueError, 'conflicting current resolution'):
+            visual.update_resolutions(root, {'resolutions': [changed]})
+
+    @unittest.skipUnless(hasattr(signal, 'SIGKILL'), 'requires POSIX SIGKILL')
+    def test_audit_rejects_unindexed_orphan_failure_and_recovers_it(self):
+        self.inventory['subjects'][0]['high_risk'] = False
+        self.inventory_path.write_text(json.dumps(self.inventory))
+        with patch.object(runner, 'capture', side_effect=self.captured):
+            runner.execute(self.args)
+        root = self.args.output
+        evidence_path = root / 'evidence.json'
+        evidence = json.loads(evidence_path.read_text())
+        capture = evidence['captures'][0]
+        model = {'case_id': capture['case_id'], 'kind': 'model', 'image_sha256': capture['sha256'],
+                 'source_sha': evidence['source_sha'], 'reviewer': 'model-a', 'verdict': 'pass', 'findings': [],
+                 'run_identity_sha256': evidence['run_identity']['identity_sha256']}
+        visual.update_reviews(root, {'reviews': [model]})
+        evidence = json.loads(evidence_path.read_text())
+        old_evidence = evidence_path.read_bytes()
+        matrix = visual.matrix_from_inventory(self.inventory)
+        matrix['cases'] = [case for case in matrix['cases'] if case['id'] == capture['case_id']]
+        self.assertEqual(visual.audit(matrix, evidence, root)['reviews'], 1)
+        stale = dict(model, kind='independent', reviewer='old', verdict='fail', findings=['old result'],
+                     run_identity_sha256='f' * 64)
+        stale_data = visual.canonical({'reviews': [stale]}) + b'\n'
+        stale_path = root / 'reviews' / 'reports' / (visual.digest(stale_data) + '.json')
+        stale_path.write_bytes(stale_data)
+        self.assertEqual(visual.audit(matrix, evidence, root)['reviews'], 1)
+        orphan = dict(model, kind='independent', reviewer='reviewer-b', verdict='fail', findings=['visible issue'])
+        data = visual.canonical({'reviews': [orphan],
+                'verification': 'reviewer identity and image observation not independently verified'}) + b'\n'
+        path = root / 'reviews' / 'reports' / (visual.digest(data) + '.json')
+        child = r'''import json, os, signal, sys
+import visual_evidence as visual
+from pathlib import Path
+replace = os.replace
+def kill_before_index(src, dst):
+    if os.path.basename(dst) == 'evidence.json':
+        os.kill(os.getpid(), signal.SIGKILL)
+    return replace(src, dst)
+os.replace = kill_before_index
+visual.update_reviews(Path(sys.argv[1]), {'reviews': [json.load(sys.stdin)]})
+'''
+        process = subprocess.run([sys.executable, '-c', child, str(root)], input=json.dumps(orphan),
+                                 text=True, capture_output=True, cwd=runner.ROOT / 'scripts', timeout=15)
+        self.assertEqual(process.returncode, -signal.SIGKILL, process.stderr)
+        self.assertEqual(path.read_bytes(), data)
+        self.assertEqual(evidence_path.read_bytes(), old_evidence)
+        with self.assertRaisesRegex(ValueError, 'unindexed or mismatched current review'):
+            visual.audit(matrix, evidence, root)
+        with visual.review_lock(root):
+            with self.assertRaisesRegex(ValueError, 'another runner or review'):
+                visual.audit(matrix, evidence, root)
+        self.args.subject = ['no-such-subject']
+        with patch.object(runner, 'capture'):
+            runner.execute(self.args)
+        recovered = json.loads(evidence_path.read_text())
+        self.assertIn(('independent', 'fail'), {(r['kind'], r['verdict']) for r in recovered['reviews']})
+        with self.assertRaisesRegex(ValueError, 'review not clear'):
+            visual.audit(matrix, recovered, root)
+        self.assertTrue(path.is_file())
+
+    def test_audit_rejects_conflicting_orphan_report(self):
+        self.inventory['subjects'][0]['high_risk'] = False
+        self.inventory_path.write_text(json.dumps(self.inventory))
+        with patch.object(runner, 'capture', side_effect=self.captured):
+            runner.execute(self.args)
+        root = self.args.output
+        evidence = json.loads((root / 'evidence.json').read_text())
+        capture = evidence['captures'][0]
+        model = {'case_id': capture['case_id'], 'kind': 'model', 'image_sha256': capture['sha256'],
+                 'source_sha': evidence['source_sha'], 'reviewer': 'model-a', 'verdict': 'pass', 'findings': [],
+                 'run_identity_sha256': evidence['run_identity']['identity_sha256']}
+        visual.update_reviews(root, {'reviews': [model]})
+        evidence = json.loads((root / 'evidence.json').read_text())
+        conflict = dict(model, verdict='fail', findings=['conflicting result'])
+        data = visual.canonical({'reviews': [conflict]}) + b'\n'
+        (root / 'reviews' / 'reports' / (visual.digest(data) + '.json')).write_bytes(data)
+        matrix = visual.matrix_from_inventory(self.inventory)
+        matrix['cases'] = [case for case in matrix['cases'] if case['id'] == capture['case_id']]
+        with self.assertRaisesRegex(ValueError, 'conflicting current review records'):
+            visual.audit(matrix, evidence, root)
+
+    def test_audit_requires_resolution_index_after_interrupted_write(self):
+        root, matrix, entry, _ = self.resolution_fixture()
+        visual.update_resolutions(root, {'resolutions': [entry]})
+        evidence = json.loads((root / 'evidence.json').read_text())
+        evidence['resolutions'] = []
+        runner.write_json(root / 'evidence.json', evidence)
+        with self.assertRaisesRegex(ValueError, 'unindexed or mismatched current resolution'):
+            visual.audit(matrix, evidence, root)
+        self.args.subject = ['no-such-subject']
+        with patch.object(runner, 'capture'):
+            runner.execute(self.args)
+        recovered = json.loads((root / 'evidence.json').read_text())
+        self.assertEqual(len(recovered['resolutions']), 1)
+        self.assertEqual(visual.audit(matrix, recovered, root)['reviews'], 2)
+
+    def test_grouped_duplicate_review_keeps_original_resolution_reference(self):
+        root, matrix, resolution, _ = self.resolution_fixture()
+        saved = visual.update_resolutions(root, {'resolutions': [resolution]})
+        original_report = resolution['model_report_sha256']
+        with patch.object(runner, 'capture', side_effect=self.captured):
+            runner.execute(self.args)
+        evidence = json.loads((root / 'evidence.json').read_text())
+        model = next(r for r in evidence['reviews'] if r['kind'] == 'model')
+        model = {key: model[key] for key in visual.REVIEW_KEYS}
+        independent = next(r for r in evidence['reviews'] if r['kind'] == 'independent')
+        independent = {key: independent[key] for key in visual.REVIEW_KEYS}
+        other = next(c for c in evidence['captures'] if c['case_id'] != model['case_id'])
+        other_entry = dict(model, case_id=other['case_id'], image_sha256=other['sha256'],
+                           verdict='pass', findings=[])
+        # Force the new duplicate's report to sort before the one referenced
+        # by the existing resolution, independent of random run identity.
+        for i in range(65536):
+            other_entry['reviewer'] = f'other-{i}'
+            entries = sorted([model, independent, other_entry], key=lambda x: (x['case_id'], x['kind']))
+            data = visual.canonical({'reviews': entries,
+                'verification': 'reviewer identity and image observation not independently verified'}) + b'\n'
+            if visual.digest(data) < original_report:
+                break
+        else:
+            self.fail('could not build an earlier content-addressed duplicate report')
+        with patch.object(visual, 'read_png', wraps=visual.read_png) as read:
+            imported = visual.update_reviews(root, {'reviews': [model, independent, other_entry]})
+        self.assertEqual(read.call_count, len(evidence['captures']))
+        self.assertLess(imported['report_sha256'], original_report)
+        evidence = json.loads((root / 'evidence.json').read_text())
+        new_rep = next(r for r in evidence['reviews'] if r['case_id'] == model['case_id'] and r['kind'] == 'model')
+        self.assertEqual(new_rep['report_sha256'], imported['report_sha256'])
+        independent_rep = next(r for r in evidence['reviews'] if r['case_id'] == model['case_id'] and r['kind'] == 'independent')
+        self.assertEqual(independent_rep['report_sha256'], imported['report_sha256'])
+        self.assertEqual(evidence['resolutions'][0]['model_report_sha256'], original_report)
+        self.assertEqual(evidence['resolutions'][0]['independent_report_sha256'], original_report)
+        # Audit a one-case subset; unrelated capture/review belong to another case.
+        case_id = model['case_id']
+        subset = dict(evidence, captures=[c for c in evidence['captures'] if c['case_id'] == case_id],
+                      reviews=[r for r in evidence['reviews'] if r['case_id'] == case_id])
+        self.assertEqual(visual.audit(matrix, subset, root)['reviews'], 2)
+        original_path = root / 'reviews' / 'reports' / (original_report + '.json')
+        original_data = original_path.read_bytes()
+        original_path.unlink()
+        with self.assertRaisesRegex(ValueError, 'resolution review report missing'):
+            visual.audit(matrix, subset, root)
+        original_path.write_bytes(original_data)
+        with patch.object(runner, 'capture', side_effect=self.captured):
+            runner.execute(self.args)
+        self.assertTrue((root / saved['report_file']).is_file())
+        self.assertEqual(visual.review_summary(root)['resolved_model_failures'], 1)
+
+    def test_failed_review_import_leaves_no_new_report_or_index(self):
+        root, _, resolution, _ = self.resolution_fixture()
+        visual.update_resolutions(root, {'resolutions': [resolution]})
+        with patch.object(runner, 'capture', side_effect=self.captured):
+            runner.execute(self.args)
+        evidence_path = root / 'evidence.json'
+        before = evidence_path.read_bytes()
+        evidence = json.loads(before)
+        other = next(c for c in evidence['captures'] if c['case_id'] != resolution['case_id'])
+        entry = {'case_id': other['case_id'], 'kind': 'model', 'image_sha256': other['sha256'],
+                 'source_sha': evidence['source_sha'], 'reviewer': 'other', 'verdict': 'pass', 'findings': [],
+                 'run_identity_sha256': evidence['run_identity']['identity_sha256']}
+        directory = root / 'reviews' / 'reports'
+        names_before = {p.name for p in directory.iterdir()}
+        original = visual.collect_review_reports
+        calls = 0
+        def fail_after_write(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise ValueError('simulated post-write failure')
+            return original(*args, **kwargs)
+        with patch.object(visual, 'collect_review_reports', side_effect=fail_after_write):
+            with self.assertRaisesRegex(ValueError, 'simulated post-write failure'):
+                visual.update_reviews(root, {'reviews': [entry]})
+        self.assertEqual(evidence_path.read_bytes(), before)
+        self.assertEqual({p.name for p in directory.iterdir()}, names_before)
+        self.assertEqual(visual.review_summary(root)['resolved_model_failures'], 1)
+        visual.update_reviews(root, {'reviews': [entry]})
+
+    def test_failed_first_review_import_leaves_no_review_directory(self):
+        with patch.object(runner, 'capture', side_effect=self.captured):
+            runner.execute(self.args)
+        root = self.args.output
+        evidence_path = root / 'evidence.json'
+        before = evidence_path.read_bytes()
+        evidence = json.loads(before)
+        capture = evidence['captures'][0]
+        entry = {'case_id': capture['case_id'], 'kind': 'model', 'image_sha256': capture['sha256'],
+                 'source_sha': evidence['source_sha'], 'reviewer': 'first', 'verdict': 'pass', 'findings': [],
+                 'run_identity_sha256': evidence['run_identity']['identity_sha256']}
+        original = visual.collect_review_reports
+        calls = 0
+        def fail_after_write(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise ValueError('simulated post-write failure')
+            return original(*args, **kwargs)
+        with patch.object(visual, 'collect_review_reports', side_effect=fail_after_write):
+            with self.assertRaisesRegex(ValueError, 'simulated post-write failure'):
+                visual.update_reviews(root, {'reviews': [entry]})
+        self.assertEqual(evidence_path.read_bytes(), before)
+        self.assertFalse((root / 'reviews').exists())
+        visual.update_reviews(root, {'reviews': [entry]})
+
+    def test_interrupt_after_review_index_replace_preserves_committed_report(self):
+        self.inventory['subjects'][0]['high_risk'] = False
+        self.inventory_path.write_text(json.dumps(self.inventory))
+        with patch.object(runner, 'capture', side_effect=self.captured):
+            runner.execute(self.args)
+        root = self.args.output
+        before = json.loads((root / 'evidence.json').read_text())
+        capture = before['captures'][0]
+        entry = {'case_id': capture['case_id'], 'kind': 'model', 'image_sha256': capture['sha256'],
+                 'source_sha': before['source_sha'], 'reviewer': 'model-a', 'verdict': 'pass', 'findings': [],
+                 'run_identity_sha256': before['run_identity']['identity_sha256']}
+        replace = os.replace
+        def interrupt_after_replace(src, dst):
+            replace(src, dst)
+            if Path(dst).name == 'evidence.json':
+                raise KeyboardInterrupt('after successful evidence replace')
+        with patch.object(visual.os, 'replace', side_effect=interrupt_after_replace):
+            with self.assertRaises(KeyboardInterrupt):
+                visual.update_reviews(root, {'reviews': [entry]})
+        published = json.loads((root / 'evidence.json').read_text())
+        self.assertEqual(len(published['reviews']), 1)
+        report = published['reviews'][0]
+        path = root / report['report_file']
+        self.assertTrue(path.is_file())
+        self.assertEqual(visual.digest(path.read_bytes()), report['report_sha256'])
+        matrix = visual.matrix_from_inventory(self.inventory)
+        matrix['cases'] = [case for case in matrix['cases'] if case['id'] == capture['case_id']]
+        self.assertEqual(visual.audit(matrix, published, root)['reviews'], 1)
+        self.assertEqual(visual.update_reviews(root, {'reviews': [entry]})['report_sha256'], report['report_sha256'])
+
+    def test_interrupt_after_resolution_index_replace_preserves_committed_report(self):
+        root, matrix, entry, _ = self.resolution_fixture()
+        replace = os.replace
+        def interrupt_after_replace(src, dst):
+            replace(src, dst)
+            if Path(dst).name == 'evidence.json':
+                raise KeyboardInterrupt('after successful evidence replace')
+        with patch.object(visual.os, 'replace', side_effect=interrupt_after_replace):
+            with self.assertRaises(KeyboardInterrupt):
+                visual.update_resolutions(root, {'resolutions': [entry]})
+        published = json.loads((root / 'evidence.json').read_text())
+        self.assertEqual(len(published['resolutions']), 1)
+        report = published['resolutions'][0]
+        path = root / report['report_file']
+        self.assertTrue(path.is_file())
+        self.assertEqual(visual.digest(path.read_bytes()), report['report_sha256'])
+        self.assertEqual(visual.audit(matrix, published, root)['reviews'], 2)
+        self.assertEqual(visual.update_resolutions(root, {'resolutions': [entry]})['report_sha256'], report['report_sha256'])
+
+    def test_identical_index_replacement_never_discards_a_new_report(self):
+        path = self.root / 'evidence.json'
+        path.write_text('{"reviews": []}\n')
+        original = path.stat()
+        identity = (original.st_dev, original.st_ino)
+        self.assertTrue(visual.unreferenced_after_failed_update(path, 'reviews/reports/x.json', 'a' * 64,
+                                                               'reviews', identity))
+        replacement = self.root / 'replacement.json'
+        replacement.write_bytes(path.read_bytes())
+        os.replace(replacement, path)
+        self.assertFalse(visual.unreferenced_after_failed_update(path, 'reviews/reports/x.json', 'a' * 64,
+                                                                'reviews', identity))
+
+    def test_failed_idempotent_retry_keeps_existing_reports(self):
+        root, _, entry, _ = self.resolution_fixture()
+        saved = visual.update_resolutions(root, {'resolutions': [entry]})
+        evidence_path = root / 'evidence.json'
+        before = evidence_path.read_bytes()
+        evidence = json.loads(before)
+        original_reviews = [{key: review[key] for key in visual.REVIEW_KEYS} for review in evidence['reviews']]
+        review_path = root / evidence['reviews'][0]['report_file']
+        resolution_path = root / saved['report_file']
+        for helper, callback in (
+                ('collect_review_reports', lambda: visual.update_reviews(root, {'reviews': original_reviews})),
+                ('collect_resolution_reports', lambda: visual.update_resolutions(root, {'resolutions': [entry]}))):
+            original = getattr(visual, helper)
+            calls = 0
+            def fail_after_write(*args, **kwargs):
+                nonlocal calls
+                calls += 1
+                if calls == 2:
+                    raise ValueError('simulated retry failure')
+                return original(*args, **kwargs)
+            with self.subTest(helper=helper), patch.object(visual, helper, side_effect=fail_after_write):
+                with self.assertRaisesRegex(ValueError, 'simulated retry failure'):
+                    callback()
+            self.assertTrue(review_path.is_file())
+            self.assertTrue(resolution_path.is_file())
+            self.assertEqual(evidence_path.read_bytes(), before)
+        self.assertEqual(visual.review_summary(root)['resolved_model_failures'], 1)
+
+    def test_failed_resolution_import_leaves_no_new_report_or_index(self):
+        root, _, entry, _ = self.resolution_fixture()
+        evidence_path = root / 'evidence.json'
+        before = evidence_path.read_bytes()
+        original = visual.collect_resolution_reports
+        calls = 0
+        def fail_after_write(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise ValueError('simulated post-write failure')
+            return original(*args, **kwargs)
+        with patch.object(visual, 'collect_resolution_reports', side_effect=fail_after_write):
+            with self.assertRaisesRegex(ValueError, 'simulated post-write failure'):
+                visual.update_resolutions(root, {'resolutions': [entry]})
+        self.assertEqual(evidence_path.read_bytes(), before)
+        directory = root / 'reviews' / 'resolutions'
+        self.assertFalse(directory.exists())
+        visual.update_resolutions(root, {'resolutions': [entry]})
+
+    def test_resolution_import_cli_accepts_a_bound_report(self):
+        root, matrix, entry, _ = self.resolution_fixture()
+        report = self.root / 'resolution.json'
+        report.write_text(json.dumps({'resolutions': [entry]}))
+        command = [sys.executable, str(runner.ROOT / 'scripts/visual_evidence.py'),
+                   'resolution-import', str(root), str(report)]
+        result = subprocess.run(command, capture_output=True, text=True, check=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)['current_resolutions'], 1)
+        self.assertEqual(visual.audit(matrix, json.loads((root / 'evidence.json').read_text()), root)['reviews'], 2)
+
+    def test_resolution_missing_or_tampered_reports_fail_closed(self):
+        root, matrix, entry, _ = self.resolution_fixture()
+        result = visual.update_resolutions(root, {'resolutions': [entry]})
+        evidence = json.loads((root / 'evidence.json').read_text())
+        report_path = root / result['report_file']
+        original = report_path.read_bytes()
+        report_path.write_bytes(original + b' ')
+        with self.assertRaisesRegex(ValueError, 'resolution report hash mismatch'):
+            visual.audit(matrix, evidence, root)
+        report_path.unlink()
+        with self.assertRaises((OSError, ValueError)):
+            visual.audit(matrix, evidence, root)
+        report_path.write_bytes(original)
+        model = next(r for r in evidence['reviews'] if r['kind'] == 'model')
+        original_review = (root / model['report_file']).read_bytes()
+        (root / model['report_file']).unlink()
+        with self.assertRaises((OSError, ValueError)):
+            visual.audit(matrix, evidence, root)
+        (root / model['report_file']).write_bytes(original_review)
+        evidence['resolutions'] = []
+        with self.assertRaisesRegex(ValueError, 'unindexed or mismatched current resolution'):
+            visual.audit(matrix, evidence, root)
+
+    def test_empty_failure_and_independent_disagreement_cannot_be_resolved(self):
+        root, _, entry, _ = self.resolution_fixture(model_findings=[])
+        with self.assertRaisesRegex(ValueError, 'model failure findings'):
+            visual.update_resolutions(root, {'resolutions': [entry]})
+        # Separate runs avoid replacing any original report.
+        self.args.output = self.root / 'disagreement'
+        root, _, entry, _ = self.resolution_fixture(independent_verdict='fail')
+        with self.assertRaisesRegex(ValueError, 'passing independent'):
+            visual.update_resolutions(root, {'resolutions': [entry]})
+        self.args.output = self.root / 'same-reviewer'
+        root, _, entry, _ = self.resolution_fixture(same_reviewer=True)
+        with self.assertRaisesRegex(ValueError, 'different independent'):
+            visual.update_resolutions(root, {'resolutions': [entry]})
+
     def test_review_summary_is_fresh_fail_closed_and_recovers_reports(self):
         with patch.object(runner, 'capture', side_effect=self.captured):
             runner.execute(self.args)

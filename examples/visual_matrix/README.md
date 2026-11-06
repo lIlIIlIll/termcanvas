@@ -97,6 +97,91 @@ arguments. The JSON object has a nonempty `reviews` list. Each entry contains
 `findings`, and `run_identity_sha256`. Imported reports must match the current
 image, source, and run.
 
+### Resolve a model false positive
+
+A model refusal, incomplete response, or missing judgment is unreviewed. Do not
+record it as a pass or use a resolution to replace it. Record a model `fail`
+with its findings only after the model has reviewed the image. An independent
+reviewer must inspect the same image before recording an `independent` pass.
+The independent reviewer label must differ from the model label.
+
+If the independent reviewer determines that **every** model finding is a false
+positive and has not yet recorded a pass, record that judgment first:
+
+```sh
+python3 "$BUNDLE/source/scripts/visual_evidence.py" review-create "$RUN" \
+  --case "$CASE_ID" --kind independent --reviewer independent-label --verdict pass
+```
+
+Use the reviewer's label in place of `independent-label`. Create a JSON file
+containing one resolution per case. A resolution requires at least one model
+finding, and each finding needs its own explanation. Copy the case, image,
+source, and run identities from the corresponding review entries in
+`$RUN/evidence.json`:
+
+```json
+{
+  "resolutions": [{
+    "case_id": "<case_id>",
+    "image_sha256": "<image_sha256>",
+    "source_sha": "<source_sha>",
+    "run_identity_sha256": "<run_identity_sha256>",
+    "decision": "false_positive",
+    "reviewer": "<independent_reviewer>",
+    "model_report_sha256": "<model_report_sha256>",
+    "model_entry_sha256": "<model_entry_sha256>",
+    "independent_report_sha256": "<independent_report_sha256>",
+    "independent_entry_sha256": "<independent_entry_sha256>",
+    "findings": [{
+      "index": 0,
+      "sha256": "<finding_sha256>",
+      "reason": "<explain why this specific finding is a false positive>"
+    }]
+  }]
+}
+```
+
+Replace every placeholder. Add one `findings` entry for each model finding,
+using its zero-based index and the SHA-256 of the finding's UTF-8 text. The
+following command prints the report and entry hashes for the two current
+reviews and the hash of each model finding:
+
+```sh
+PYTHONPATH="$BUNDLE/source/scripts" python3 - "$RUN/evidence.json" "$CASE_ID" <<'PY'
+import json
+import sys
+from visual_evidence import digest, review_entry_sha256
+
+evidence = json.load(open(sys.argv[1], encoding="utf-8"))
+reviews = {r["kind"]: r for r in evidence["reviews"] if r["case_id"] == sys.argv[2]}
+for kind in ("model", "independent"):
+    review = reviews[kind]
+    print(kind, "report", review["report_sha256"], "entry", review_entry_sha256(review))
+for index, finding in enumerate(reviews["model"]["findings"]):
+    print("finding", index, digest(finding.encode("utf-8")), finding)
+PY
+```
+
+Save the completed JSON as `$VISUAL_ROOT/resolution.json` and import it:
+
+```sh
+python3 "$BUNDLE/source/scripts/visual_evidence.py" resolution-import \
+  "$RUN" "$VISUAL_ROOT/resolution.json"
+python3 "$BUNDLE/source/scripts/visual_evidence.py" review-summary "$RUN"
+```
+
+The import retains the original model `fail` and the independent review. A
+missing finding, mismatched hash, independent `fail`, or disagreement blocks
+resolution. The summary counts the original failure separately from resolved
+model failures. Reviewer labels and local report hashes do not authenticate the
+reviewer or prove that the model observed the image.
+
+For a run with an identity, `check` takes the capture lock and checks current
+reports on disk against the evidence index. An unindexed current report or a
+conflict blocks the audit. Resuming capture rebuilds the index from valid
+reports; investigate conflicts before retrying. Report files from earlier runs
+remain on disk and do not apply to a different run identity.
+
 The runner retains current review records when it resumes and excludes stale
 ones. `report.json` contains a snapshot from the last capture run; use
 `review-summary` for current counts. The summary is not a visual audit and
