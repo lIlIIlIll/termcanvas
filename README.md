@@ -1,349 +1,218 @@
-# cjtui
+# termcanvas
 
-> 用 Cangjie 构建终端应用的即时模式 TUI 库。
-[![CI](https://github.com/lIlIIlIll/termcanvas/actions/workflows/ci.yml/badge.svg)](https://github.com/lIlIIlIll/termcanvas/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/lIlIIlIll/termcanvas)](LICENSE) [![codecov](https://codecov.io/gh/lIlIIlIll/termcanvas/branch/main/graph/badge.svg)](https://codecov.io/gh/lIlIIlIll/termcanvas)
+用 Cangjie 构建终端应用：从任务状态和表单，到可交互的数据工作台。
 
-`cjtui` 以 Linux/glibc 为首要验证平台。应用持有自己的状态，在一个
-`App` 更新循环中处理 `Event`，通过 `Command` 返回副作用，再由即时模式
-`Widget` 把状态渲染到终端。
+[快速开始](#快速开始) · [运行示例](#运行示例) · [组件与扩展](#组件与扩展) · [文档](#文档)
 
-<p align="center">
-  <a href="docs/getting-started.md">快速开始</a> ·
-  <a href="docs/examples.md">示例目录</a> ·
-  <a href="docs/api.md">API 总览</a> ·
-  <a href="docs/versioning.md">版本与兼容性</a>
-</p>
+![CI 任务工作台：任务、状态和活动日志](docs/assets/ci-workbench-120x36.png)
 
-## 核心模型
+上图是离线运行的 CI 工作台示例。任务、日志和进度均为模拟数据；它展示了如何将 `core` 中的布局、主题和组件组合成完整应用。
 
-```text
-应用状态
-   ↓
-App / update / Event / Command
-   ↓
-有序、按轮预算推进的运行时
-   ↓
-DirtyRects 与帧合并
-   ↓
-即时 Widget 渲染
-   ↓
-Frame / Buffer / Backend
-```
+![CI 工作台从总览切换到任务列表](docs/assets/ci-workbench.gif)
 
-这条路径有三个明确边界：
+图片来自 Linux 上运行的终端应用；尺寸、字体、构建摘要和验证范围见[采集记录](docs/assets/capture-provenance.json)。
 
-- 应用负责业务状态、交互策略、选择状态和相关 ID。
-- `update` 是应用状态的唯一更新入口。后台任务只返回不可变的完成事件。
-- `Widget` 负责当前状态的渲染，不负责第二套生命周期或事件循环。
+## 运行示例
 
-## 主要能力
-
-| 方向 | 能力 |
-| --- | --- |
-| 运行时 | 有序命令、消息、定时器、有界异步任务、流式进程、PTY 数据事件、区域重绘 |
-| 渲染 | 即时 Widget、布局、样式、主题、`Frame`、`Buffer`、差分刷新 |
-| 输入 | 键盘、鼠标、粘贴、弹窗焦点策略、系统/OSC 52 剪贴板、终端能力探测 |
-| 内容 | 富文档、Markdown 适配、索引文本模型、范围装饰、Unicode 字素与单元格宽度 |
-| 数据 | 异步分页、外部排序/过滤、稳定行 ID、有界缓存和惰性树 |
-| 扩展 | ANSI 终端输出、统一 diff、媒体、游戏和下游测试支持包 |
-| 验证 | 独立应用构建、真实终端夹具、快照、API 契约、压力场景和发布闸门 |
-
-## 5 分钟运行第一个应用
-
-### 前置条件
-
-- 已检出本仓库。
-- 本地安装 Cangjie SDK，并设置 `CANGJIE_SDK_ROOT`。
-- 使用可运行交互式终端应用的终端。
-
-仓库脚本会检查 SDK 版本并设置编译、运行时和动态库路径。包清单声明的
-语言兼容版本是 `cjc-version = "1.1.0"`；发布验证使用的精确工具链见
-[版本与兼容性](docs/versioning.md)。
-
-### 运行基础模板
-
-基础模板位于 [`templates/basic_app`](templates/basic_app)。从仓库根目录执行：
+先检出本仓库，准备 Cangjie STS 1.2.0，并将 `CANGJIE_SDK_ROOT` 指向 SDK 目录。从仓库根目录运行：
 
 ```bash
-CANGJIE_SDK_ROOT=/path/to/cangjie \
-  scripts/cangjie_cmd.sh templates/basic_app cjpm build
-
-CANGJIE_SDK_ROOT=/path/to/cangjie \
-  scripts/cangjie_cmd.sh templates/basic_app cjpm run
+export CANGJIE_SDK_ROOT=/path/to/cangjie
+scripts/cangjie_cmd.sh examples/workbench cjpm run -- --ci
 ```
 
-运行后按 `+` 增加计数，按 `q` 或 `Ctrl-C` 退出。完整步骤和事件脚本验证
-见[快速开始](docs/getting-started.md)。
+工作台中的 `F3` 切换页面，`Tab` 切换焦点，`F1` 打开帮助，`Ctrl-C` 退出。不带 `--ci` 参数启动 Workbench 会进入组件 Gallery。
 
-### 最小渲染路径
+[CI 任务活动示例](examples/ci_activity/README.md)展示另一种任务视图；原有的 [CI 截图记录](examples/ci_activity/screenshots/ci-showcase-capture-manifest.json)和 [Workbench 截图记录](examples/workbench/screenshots/showcase-capture-manifest.json)也可查阅。
 
-下面的程序只渲染一个即时 Widget，适合先确认 API 入口：
+另外两个示例同样只使用内存中的数据，不会读写用户文件：
 
+```bash
+scripts/cangjie_cmd.sh examples/showcase_data cjpm run
+scripts/cangjie_cmd.sh examples/showcase_editor cjpm run
+```
+
+| 数据浏览器：文件树、筛选、排序和编辑 | 编辑器：编辑与差异视图 |
+| --- | --- |
+| ![数据浏览器](docs/assets/data-explorer-120x36.png) | ![编辑器](docs/assets/editor-120x36.png) |
+
+数据浏览器使用 `Tab` 切换焦点，`q` 退出；编辑器使用 `F2` 查看差异，`Ctrl-C` 退出。退出后示例中的更改不会保存。
+
+## 快速开始
+
+下面从源码检出创建一个独立的应用包。在仓库根目录创建目录：
+
+```bash
+mkdir -p hello-termcanvas/src
+```
+
+将以下内容保存为 `hello-termcanvas/cjpm.toml`：
+
+<!-- termcanvas-quickstart-manifest:start -->
+```toml
+[package]
+name = "readme_quickstart"
+version = "0.0.1"
+cjc-version = "1.2.0"
+output-type = "executable"
+
+[dependencies]
+"core" = { path = "../packages/core", output-type = "static" }
+```
+<!-- termcanvas-quickstart-manifest:end -->
+
+将下面的程序保存为 `hello-termcanvas/src/main.cj`。它显示模拟任务和自动更新的进度，按 `q` 或 `Ctrl-C` 退出。
+
+<!-- termcanvas-quickstart:start -->
 ```cangjie
+package readme_quickstart
+
 import core.*
 
+class Demo {
+    var value: Int64 = 0
+    let theme = Theme.indigo().withIconSet(IconSet.NerdFont)
+
+    func update(event: Event): UpdateResult {
+        match (event) {
+            case Event.KeyDown(key) => match (key.code) {
+                case KeyCode.Char(r'q') | KeyCode.CtrlC => UpdateResult.exit()
+                case _ => UpdateResult.next()
+            }
+            case Event.Tick(_) =>
+                value = (value + 5) % 101
+                UpdateResult.next()
+            case _ => UpdateResult.next()
+        }
+    }
+
+    func render(frame: Frame): Unit {
+        frame.fill(frame.area, theme.canvas)
+        frame.canvas().drawText(2, 1, "Simulated build · q to quit", theme.heading)
+        frame.renderWidget(TaskActivityView(TaskActivity("Build", status: TaskStatus.Running),
+            layout: TaskActivityLayout.Compact, theme: theme), Rect(2, 3, 40, 1))
+        frame.renderWidget(ProgressBar(value, total: 100, labelMode: ProgressBarLabelMode.Percent,
+            theme: theme), Rect(2, 5, 40, 1))
+    }
+}
+
 main(): Int64 {
-    runAppWithCommands(
-        { frame =>
-            frame.renderWidget(
-                Paragraph("Hello, cjtui", block: Block(title: "Demo")),
-                frame.area
-            )
-        },
-        { _ => UpdateResult.next() }
-    )
+    let demo = Demo()
+    App(targetFps: 10).runWithCommands({ frame => demo.render(frame) }, { event => demo.update(event) })
     0
 }
 ```
-
-需要保存状态、处理输入或执行副作用时，使用
-`App(...).runWithCommands(...)`，让 `update` 处理事件，让 `render` 根据当前
-状态绘制界面。
-
-## 从示例开始
-
-先运行 [`taskpad`](examples/taskpad/)，再按目标选择示例：
-
-| 目标 | 示例 |
-| --- | --- |
-| 表单与焦点 | [`form_studio`](examples/form_studio/) |
-| 定时器、异步任务与命令 | [`command_center`](examples/command_center/) |
-| 大数据集与文件浏览 | [`data_browser`](examples/data_browser/) |
-| Markdown 编辑与预览 | [`markdown_studio`](examples/markdown_studio/) |
-| 终端能力与诊断 | [`debug_lab`](examples/debug_lab/) |
-| PTY、终端转录与 diff | [`terminal_lab`](examples/terminal_lab/) |
-| 媒体协议与回退 | [`media_gallery`](examples/media_gallery/) |
-| 压力与规模验证 | [`game_pressure_suite`](examples/game_pressure_suite/) |
-| 本地终端工作台 | [workbench](examples/workbench/) |
-
-The complete catalog contains 19 examples: 9 recommended applications, 2
-experimental applications, 7 feature demonstrations, and 1 proof workload.
-See the [example catalog](docs/examples.md) for each example's purpose.
-
-从仓库根目录运行单个示例：
+<!-- termcanvas-quickstart:end -->
 
 ```bash
-CANGJIE_SDK_ROOT=/path/to/cangjie \
-  scripts/cangjie_cmd.sh examples/taskpad cjpm run
+scripts/cangjie_cmd.sh hello-termcanvas cjpm run
 ```
 
-构建全部示例：
+![快速开始程序：模拟任务与进度条](docs/assets/quickstart.png)
 
-```bash
-CANGJIE_SDK_ROOT=/path/to/cangjie \
-  scripts/build_examples.sh
-```
+示例显式选择 `IconSet.NerdFont`；终端还需要安装并选用包含相应字形的 Nerd Font。若不使用 Nerd Font，将其改为 `IconSet.Unicode`；需要 ASCII 时使用 `IconSet.Ascii`。设置图标集不会替终端安装字体。
 
-## 应用展示
+## 组件与扩展
 
-这些示例展示如何组合 core 中的任务、进度、列表和主题能力：
+应用持有状态，在 `App` 的更新循环中处理 `Event`，再以 `Widget` 将当前状态绘制到 `Frame`。`core` 包提供任务活动、进度条、表单、列表、表格、树、弹窗、文本编辑、布局和主题；应用也可以直接使用 `Canvas` 与 `Buffer` 绘制。
 
-CI 任务活动示例使用模拟数据，并在真实终端中运行：
+主题为画布、文字、边框和交互状态提供语义样式；组件可以使用应用主题或显式指定自己的主题。`StyledWidget` 支持逐属性覆盖组件写入的单元格样式。更多控件及其状态可在 [Workbench 控件图集](docs/gallery.md) 中查看。
 
-![CI 任务活动模拟，120×18](examples/ci_activity/screenshots/ci-unicode-120x18.png)
-
-[CI 截图清单](examples/ci_activity/screenshots/ci-showcase-capture-manifest.json)记录源码提交、终端尺寸与 SHA-256。
-
-Workbench 的 Overview 和 Forms 在真实终端中运行，展示任务概览、清晰的输入焦点与选择状态：
-
-![Workbench Overview，120×36](examples/workbench/screenshots/showcase-overview-120x36.png)
-
-![Workbench Forms，120×36](examples/workbench/screenshots/showcase-forms-120x36.png)
-
-另见 [80×24](examples/workbench/screenshots/showcase-overview-80x24.png) 和 [160×45](examples/workbench/screenshots/showcase-overview-160x45.png) 布局。[截图清单](examples/workbench/screenshots/showcase-capture-manifest.json)记录源码提交、终端尺寸与 SHA-256。
-
-## 控件图集
+下面是 Workbench 的代码片段；`app`、`frame` 和 `layout` 由示例应用提供。它们展示组件的组合方式，完整应用包含状态、事件处理和布局。
 
 <details>
-<summary>查看历史 B00 控件图集与终端降级预览</summary>
+<summary>导航：页面标签</summary>
 
-以下 17 张 Workbench 截图来自 Linux x86_64 上实际运行的应用：Cangjie STS 1.2.0、Foot 1.28.0、SwayFX 0.6 headless，终端尺寸为 120×36（每张 PNG 为 1320×936）。源码 revision、源码摘要、工具链哈希和图片 SHA-256 见 [B00 截图清单](examples/workbench/screenshots/b00-capture-manifest.json)。另有一张 [ops_dashboard Sparkline Block 截图](examples/workbench/screenshots/b13-sparkline-block-120x36.png)，其源码和工具链信息见 [B13 截图清单](examples/workbench/screenshots/b13-sparkline-capture-manifest.json)。
+Workbench 根据应用状态设置当前页面和焦点，再绘制标签栏。完整上下文见 [Workbench 视图](examples/workbench/src/view.cj)。
 
-Five Workbench captures follow the Gallery's monochrome color preview and ASCII
-fallback. Light/Cyan remain selected in the application, but those images show
-capability-preview output rather than Light/Cyan color rendering; Foot itself
-reported true-color. The B00 manifest records this distinction.
-
-<table>
-  <tr>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-overview-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-overview-120x36.png" alt="Gallery Overview: semantic colors and component previews" width="480"></a><br>
-      <sub>Gallery / Overview</sub>
-    </td>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-layout-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-layout-120x36.png" alt="Gallery Layout: rounded panels, borderless surface, and ASCII fallback" width="480"></a><br>
-      <sub>Gallery / Layout · ASCII fallback enabled</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-forms-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-forms-120x36.png" alt="Gallery Forms: button variants and editable controls" width="480"></a><br>
-      <sub>Gallery / Forms</sub>
-    </td>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-navigation-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-navigation-120x36.png" alt="Gallery Navigation: tabs, segmented control, menu, and tree" width="480"></a><br>
-      <sub>Gallery / Navigation</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-data-table-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-data-table-120x36.png" alt="Gallery Data: table sample" width="480"></a><br>
-      <sub>Gallery / Data · Table</sub>
-    </td>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-data-list-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-data-list-120x36.png" alt="Gallery Data: list sample" width="480"></a><br>
-      <sub>Gallery / Data · List</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-data-progress-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-data-progress-120x36.png" alt="Gallery Data: weighted progress and chart on a fixed zero-to-one-hundred-percent scale" width="480"></a><br>
-      <sub>Gallery / Data · Progress</sub>
-    </td>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b13-sparkline-block-120x36.png"><img src="examples/workbench/screenshots/b13-sparkline-block-120x36.png" alt="ops_dashboard: Sparkline rendered inside the Latency Block with chart, gauge, progress, and log widgets" width="480"></a><br>
-      <sub>ops_dashboard / Sparkline Block · B13</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-overlays-palette-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-overlays-palette-120x36.png" alt="Gallery Overlays: CommandPalette open with available commands" width="480"></a><br>
-      <sub>Gallery / Overlays · CommandPalette</sub>
-    </td>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-overlays-dialog-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-overlays-dialog-120x36.png" alt="Gallery Overlays: ConfirmDialog open with No selected" width="480"></a><br>
-      <sub>Gallery / Overlays · ConfirmDialog</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-themes-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-themes-120x36.png" alt="Gallery Themes: Graphite and Cyan with native terminal color preview" width="480"></a><br>
-      <sub>Gallery / Themes · Graphite / Cyan</sub>
-    </td>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-themes-light-mono-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-themes-light-mono-120x36.png" alt="Gallery Themes: Light theme with Monochrome capability preview on a true-color terminal" width="480"></a><br>
-      <sub>Gallery / Themes · Light / Monochrome preview</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-workbench-overview-120x36.png"><img src="examples/workbench/screenshots/b00-workbench-overview-120x36.png" alt="Workbench Overview: project tree, status distribution, activity log, task queue, and progress" width="480"></a><br>
-      <sub>Workbench / Overview</sub>
-    </td>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-workbench-task-dropdown-120x36.png"><img src="examples/workbench/screenshots/b00-workbench-task-dropdown-120x36.png" alt="Workbench Tasks: task table with status dropdown open" width="480"></a><br>
-      <sub>Workbench / Tasks · Status Dropdown</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-workbench-task-editor-120x36.png"><img src="examples/workbench/screenshots/b00-workbench-task-editor-120x36.png" alt="Workbench Tasks: task editor with input, priority, checkboxes, tags, notes, and actions" width="480"></a><br>
-      <sub>Workbench / Tasks · Editor</sub>
-    </td>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-workbench-settings-120x36.png"><img src="examples/workbench/screenshots/b00-workbench-settings-120x36.png" alt="Workbench Settings: appearance and simulation controls" width="480"></a><br>
-      <sub>Workbench / Settings</sub>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-workbench-help-dialog-120x36.png"><img src="examples/workbench/screenshots/b00-workbench-help-dialog-120x36.png" alt="Workbench Help dialog over the Tasks page" width="480"></a><br>
-      <sub>Workbench / Help</sub>
-    </td>
-    <td width="50%">
-      <a href="examples/workbench/screenshots/b00-gallery-feedback-120x36.png"><img src="examples/workbench/screenshots/b00-gallery-feedback-120x36.png" alt="Gallery Feedback: severity buttons, active success toast, and toast count badge" width="480"></a><br>
-      <sub>Gallery / Feedback · Active toast</sub>
-    </td>
-  </tr>
-</table>
+```cangjie
+let pageTabs = Tabs(["Gallery", "Overview", "Tasks", "Settings"], selected: app.tabs.selected)
+pageTabs.setTheme(Some(app.theme))
+pageTabs.setFocused(app.focus.isFocused("tabs"))
+frame.renderWidget(pageTabs, layout.tabs)
+```
 
 </details>
 
-## 包结构
+<details>
+<summary>表单：输入框和按钮</summary>
+
+任务编辑器为输入框设置焦点和错误状态；任务页根据当前选择启用或禁用操作。完整上下文见 [Workbench 视图](examples/workbench/src/view.cj)。
+
+```cangjie
+app.editorName.setVisualState(focused: app.interaction.focus().isFocused("editor-name"),
+    error: !app.editorError.isEmpty(), theme: Some(app.theme))
+frame.renderWidget(app.editorName, layout.editorName)
+```
+
+```cangjie
+frame.renderWidget(Button("Run", focused: app.focus.isFocused("task-run"), disabled: !app.canRun(),
+    style: app.theme.normal, focusedStyle: app.selectedStyle(), disabledStyle: app.theme.disabled), layout.taskRun)
+```
+
+</details>
+
+<details>
+<summary>数据：可选中的任务表</summary>
+
+表格使用应用持有的行数据和选择状态。完整上下文见 [Workbench 视图](examples/workbench/src/view.cj)。
+
+```cangjie
+let table = Table(["ID", "Name", "Project", "Status", "Progress"], app.taskRows(options),
+    widths: app.layoutTableWidths(), state: Some(app.taskState), style: app.theme.normal,
+    headerStyle: app.theme.accent, selectedStyle: app.selectedStyle(), selectionMarker: selectionMarker)
+frame.renderWidget(table, layout.taskTable)
+```
+
+</details>
+
+<details>
+<summary>反馈：进度与通知</summary>
+
+任务概览用 `ProgressBar` 显示带百分比的状态分布；通知由应用加入并更新。完整上下文见 [Workbench 视图](examples/workbench/src/view.cj)和[状态与事件处理](examples/workbench/src/workbench.cj)。
+
+```cangjie
+frame.renderWidget(ProgressBar(value, total: total, style: app.borderStyle, fillStyle: fillStyle,
+    labelMode: ProgressBarLabelMode.Percent, labelStyle: app.theme.normal),
+    Rect(area.x + labelWidth, area.y, max(0, area.width - labelWidth), 1))
+```
+
+```cangjie
+toastItems.add(Toast(message, kind: Some(kind), ttl: 3))
+toastAges.add(0)
+rebuildToastManager()
+```
+
+</details>
 
 | 包 | 用途 |
 | --- | --- |
-| `packages/core` | 运行时、事件、终端会话、布局、Widget、富文档和编辑原语 |
-| [markdown v0.9.1](https://github.com/lIlIIlIll/markdown/tree/v0.9.1) | 独立的上游 Markdown 解析器，固定到含 STS 1.2 修复的最新 tag |
-| `packages/markdown_adapter` | 把上游 Markdown AST 转换为 `core.Document` |
-| `packages/terminal` | ANSI 输出解析、终端转录和 `TerminalView` |
-| `packages/diff` | 统一 diff 解析和 `DiffView` |
-| `packages/media` | Kitty、Sixel、文本回退和 ffmpeg ASCII 动画 |
-| `packages/game` | 实体、组件存储、物理、TileMap、精灵和相机 |
-| `packages/testing` | 面向下游应用的稳定 `TestScenario` / `TestReport` 测试入口 |
-| `packages/example_smoke` | 核心组件组合的无头验证 |
+| [`core`](packages/core/) | 运行时、终端会话、布局、组件、主题与编辑原语 |
+| [`markdown_adapter`](packages/markdown_adapter/) | 将 Markdown 解析结果转换为富文档 |
+| [`terminal`](packages/terminal/) | ANSI 输出解析、终端转录和视图 |
+| [`diff`](packages/diff/) | 统一 diff 解析和视图 |
+| [`media`](packages/media/) | 图片协议和文本回退 |
+| [`game`](packages/game/) | 游戏相关数据结构和绘制能力 |
+| [`testing`](packages/testing/) | 下游应用的测试工具 |
 
-`packages/editor`、`packages/document` 以及旧的高级 editor shell 已退役。编辑
-和文档能力直接使用 `core` 中的同名稳定原语；格式解析仍由扩展包负责。
+## 平台与终端
 
-## API 稳定性
-
-下一版本为 `0.0.1`，这是经授权的破坏性 API 重整版本；迁移说明见 [0.0.1 migration](docs/migration-0.0.1.md)。项目仍处于 pre-1.0 阶段。每个公开声明属于以下四个等级之一：
-
-| 等级 | 含义 |
+| 环境 | 当前范围 |
 | --- | --- |
-| `STABLE` | 面向应用的兼容性承诺 |
-| `EXPERIMENTAL` | 可用于评估和扩展，形状或行为可能变化 |
-| `INTERNAL` | 实现或维护者边界，不是普通构造入口 |
-| `TEST_ONLY` | 仅供仓库测试、快照或发布闸门使用 |
+| Linux/glibc | 主要开发与验证目标；发布验证使用 Cangjie STS 1.2.0。 |
+| macOS、Windows | 有原生 CI 测试路径；适配器仍属实验支持，具体结果以对应运行记录为准。 |
+| 色彩与字形 | 支持终端能力适配、Unicode 和 ASCII 回退；Nerd Font 字形取决于终端实际使用的字体。 |
 
-完整成员、所有者、签名和等级以生成的
-[`docs/api-inventory.json`](docs/api-inventory.json) 为准。先看
-[API 总览](docs/api.md)，再看[版本与兼容性](docs/versioning.md)。
+Linux 和 macOS 构建需要 `cc` 与 `ar`；Windows 无需 C 编译器。Windows 默认 waiter 支持提供 `waitHandle()` 的 `EventSource`，仅有 POSIX 文件描述符的 source 需要自定义 waiter。`TerminalSession` 负责恢复终端模式；raw mode 失败时可检查 `rawModeEnabled` 和 `TerminalMode.lastError()`。终端显示还取决于字体、宽度设置和终端能力。详见[平台支持](docs/platforms.md)和[限制](docs/limitations.md)。
 
-## 平台与限制
+## 文档
 
-- Linux/macOS 构建需要 `cc` 和 `ar`（GCC/Clang 或 Xcode Command Line Tools）；
-  `cjpm` 自动构建 POSIX 进程启动库，仓库外路径依赖也适用。Windows 无需 C 编译器。
+- [快速开始](docs/getting-started.md)、[示例目录](docs/examples.md)、[API 总览](docs/api.md)
+- [应用运行时](docs/app-runtime.md)、[组件](docs/widgets.md)、[布局](docs/layout.md)、[事件](docs/events.md)
+- [扩展](docs/extensions.md)、[测试](docs/testing.md)、[版本与兼容性](docs/versioning.md)
 
-- Linux/glibc 是当前完整验证的终端目标。
-- macOS 和 Windows 纳入原生 CI；适配器仍属实验支持，实测结果以对应运行记录为准。
-- Windows 默认 waiter 支持提供 `waitHandle()` 的 `EventSource`；只有 POSIX
-  文件描述符的 source 需要自定义 waiter。
-- `TerminalSession` 负责恢复 raw mode、光标和终端输入模式。raw mode 失败时，
-  检查 `TerminalSession.rawModeEnabled` 和 `TerminalMode.lastError()`。
-- 终端渲染基于单元格，不提供 GPU 渲染器或内嵌浏览器。
-- 大文件、无限日志和大表格应使用虚拟行提供器、环形缓冲区或分页模型。
-
-详见[平台支持](docs/platforms.md)和[限制](docs/limitations.md)。
-
-## 验证与发布
-
-针对事件脚本的快速检查：
-
-```bash
-scripts/run_event_script.sh \
-  packages/core/tests/events/basic.events \
-  packages/core/tests/events/scenario.events
-```
-
-在准备分享或发布构建前，从仓库根目录运行完整发布闸门：
-
-```bash
-scripts/release_gate.sh
-```
-
-发布闸门会运行包测试、事件脚本、快照检查、API 契约和 Unicode 数据检查、示例
-构建与 smoke、脚本化工作流以及压力场景。
-Codecov 覆盖率目标为：生产包行覆盖率 90%、分支覆盖率 80%；示例仍在覆盖率命令中执行，但其演示和操作系统终端生命周期代码不计入汇总。测试层级与执行命令见[测试文档](docs/testing.md)。
+项目处于 pre-1.0 阶段；公开 API 的稳定性分级和兼容策略见[版本与兼容性](docs/versioning.md)。
 
 ## 许可证
 
-本项目使用 Apache License 2.0，完整条款见 [`LICENSE`](LICENSE)。
-
-## 文档导航
-
-| 文档 | 内容 |
-| --- | --- |
-| [快速开始](docs/getting-started.md) | 构建并运行第一个应用 |
-| [App Runtime](docs/app-runtime.md) | 命令、事件、定时器、异步任务和关闭 |
-| [架构](docs/architecture.md) | 状态所有权、更新边界和渲染路径 |
-| [Widgets](docs/widgets.md) | Widget 选择、状态和编辑能力 |
-| [Layout](docs/layout.md) | 约束、间距、Grid 和 Flex 布局 |
-| [Events](docs/events.md) | 键盘、鼠标、粘贴、焦点和终端事件 |
-| [Extensions](docs/extensions.md) | Markdown、终端、diff、媒体和游戏扩展 |
-| [Testing](docs/testing.md) | 测试工具、快照、性能和发布验证 |
-| [Examples](docs/examples.md) | 示例的分类和运行命令 |
-| [API Overview](docs/api.md) | 面向应用的 API 地图 |
-| [Versioning](docs/versioning.md) | 稳定性等级与兼容性规则 |
+[Apache License 2.0](LICENSE)

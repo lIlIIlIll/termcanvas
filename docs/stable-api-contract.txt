@@ -87,6 +87,8 @@ core|HandleResult.toUpdateResult|func|public func toUpdateResult(): UpdateResult
 core|App|class|public class App {
 core|App.init|init|public init( inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
 core|App.init|init|public init( backend!: Backend, inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
+core|App.setTheme|func|public func setTheme(theme: ?Theme): Unit
+core|App.setTextWidthOptions|func|public func setTextWidthOptions(options: TextWidthOptions): Unit
 core|App.run|func|public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
 core|App.runWithCommands|func|public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit
 core|App.runWithExternalPort|func|public func runWithExternalPort( port: ExternalPort<Event>, render: (Frame) -> Unit, update: (Event) -> UpdateResult ): Unit
@@ -112,6 +114,12 @@ core|Buffer.area|let|public let area: Rect
 core|Buffer.init|init|public init(area: Rect)
 core|Buffer.capabilities|func|public func capabilities(): TerminalCapabilities
 core|Buffer.setCapabilities|func|public func setCapabilities(capabilities: TerminalCapabilities): Unit
+core|Buffer.theme|func|public func theme(): ?Theme
+core|Buffer.setTheme|func|public func setTheme(theme: ?Theme): Unit
+core|Buffer.resolveTheme|func|public func resolveTheme(explicit: ?Theme): ?Theme
+core|Buffer.withParentTheme|func|public func withParentTheme(explicit: ?Theme, draw: () -> Unit): Unit
+core|Buffer.textWidthOptions|func|public func textWidthOptions(): TextWidthOptions
+core|Buffer.setTextWidthOptions|func|public func setTextWidthOptions(options: TextWidthOptions): Unit
 core|Buffer.clear|func|public func clear(style!: Style = Style.default()): Unit
 core|Buffer.indexOf|func|public func indexOf(x: Int64, y: Int64): ?Int64
 core|Buffer.setCell|func|public func setCell(x: Int64, y: Int64, cell: Cell): Unit
@@ -142,8 +150,10 @@ core|DrawOp.cell|let|public let cell: Cell
 core|DrawOp.init|init|public init(x: Int64, y: Int64, cell: Cell)
 core|Canvas|class|public class Canvas {
 core|Canvas.init|init|public init(buffer: Buffer, clip: Rect, translateX!: Int64 = 0, translateY!: Int64 = 0)
+core|Canvas.textWidthOptions|func|public func textWidthOptions(): TextWidthOptions
 core|Canvas.fillRect|func|public func fillRect(area: Rect, style: Style): Unit
 core|Canvas.fillRect|func|public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit
+core|Canvas.strokeBorder|func|public func strokeBorder(area: Rect, style: Style, border!: ?BorderSet = None): Unit
 core|Canvas.drawText|func|public func drawText(x: Int64, y: Int64, text: String, style: Style): Unit
 core|ClipboardStatus|enum|public enum ClipboardStatus {
 core|ClipboardStatus.Success|enum_constructor|Success
@@ -353,7 +363,8 @@ core|DocumentViewState.isFolded|func|public func isFolded(startOffset: Int64, en
 core|DocumentViewState.setFolded|func|public func setFolded(startOffset: Int64, endOffset: Int64, folded: Bool): Unit
 core|DocumentViewState.toggleFold|func|public func toggleFold(startOffset: Int64, endOffset: Int64): Bool
 core|DocumentView|class|public class DocumentView <: Widget {
-core|DocumentView.init|init|public init( document: Document, block!: ?Block = None, style!: Style = Style.default(), headingStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], state!: ?DocumentViewState = None, currentSourceStyle!: Style = Style(bg: Color.Indexed(8)), cacheLayout!: Bool = false )
+core|DocumentView.init|init|public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], state!: ?DocumentViewState = None, currentSourceStyle!: ?Style = None, cacheLayout!: Bool = false )
+core|DocumentView.setTextWidthOptions|func|public func setTextWidthOptions(options: TextWidthOptions): Unit
 core|DocumentView.renderedLineCount|func|public func renderedLineCount(width: Int64): Int64
 core|DocumentView.sourceOffsetForRenderedLine|func|public func sourceOffsetForRenderedLine(width: Int64, renderedLine: Int64): ?Int64
 core|DocumentView.sourceOffsetAtRenderedLine|func|public func sourceOffsetAtRenderedLine(width: Int64, renderedLine: Int64): ?Int64
@@ -364,8 +375,8 @@ core|DocumentView.handleKey|func|public func handleKey(key: KeyEvent, width: Int
 core|DocumentView.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
 core|DocumentView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|MarkdownView|class|public class MarkdownView <: Widget {
-core|MarkdownView.init|init|public init( text: String, block!: ?Block = None, style!: Style = Style.default(), headingStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
-core|MarkdownView.init|init|public init( document: Document, block!: ?Block = None, style!: Style = Style.default(), headingStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
+core|MarkdownView.init|init|public init( text: String, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
+core|MarkdownView.init|init|public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
 core|MarkdownView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|InputSource|interface|public interface InputSource {
 core|InputSource.readAvailable|func|func readAvailable(maxBytes: Int64): Array<Byte>
@@ -509,36 +520,39 @@ core|EventParser.hasPendingInputDrain|func|public func hasPendingInputDrain(): B
 core|EventParser.flushEsc|func|public func flushEsc(): Array<Event>
 core|EventParser.flushEscAfterPolls|func|public func flushEscAfterPolls(polls: Int64): Array<Event>
 core|Button|class|public class Button <: Widget {
-core|Button.init|init|public init( label: String, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+core|Button.init|init|public init( label: String, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
 core|Button.handle|func|public func handle(key: KeyEvent): Bool
 core|Button.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+core|Button.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
 core|Button.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Checkbox|class|public class Checkbox <: Widget {
 core|Checkbox.checked|var|public var checked: Bool
-core|Checkbox.init|init|public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+core|Checkbox.init|init|public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
 core|Checkbox.handle|func|public func handle(key: KeyEvent): Bool
 core|Checkbox.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|Checkbox.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|RadioGroup|class|public class RadioGroup <: Widget {
 core|RadioGroup.selected|var|public var selected: Int64
 core|RadioGroup.offset|var|public var offset: Int64 = 0
-core|RadioGroup.init|init|public init( items: Array<String>, selected!: Int64 = 0, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Cyan), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+core|RadioGroup.init|init|public init( items: Array<String>, selected!: Int64 = 0, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: ?Style = None, selectedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
 core|RadioGroup.handle|func|public func handle(key: KeyEvent): Bool
 core|RadioGroup.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+core|RadioGroup.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
 core|RadioGroup.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Select|class|public class Select <: Widget {
 core|Select.selected|var|public var selected: Int64
 core|Select.offset|var|public var offset: Int64 = 0
-core|Select.init|init|public init( items: Array<String>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Select.init|init|public init( items: Array<String>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None )
 core|Select.selectedValue|func|public func selectedValue(): ?String
 core|Select.handle|func|public func handle(key: KeyEvent): ?String
 core|Select.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
+core|Select.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): ?String
 core|Select.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Dropdown|class|public class Dropdown <: Widget {
 core|Dropdown.selected|var|public var selected: Int64
 core|Dropdown.offset|var|public var offset: Int64 = 0
 core|Dropdown.open|var|public var open: Bool
-core|Dropdown.init|init|public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|Dropdown.init|init|public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: ?Style = None )
 core|Dropdown.selectedValue|func|public func selectedValue(): ?String
 core|Dropdown.handle|func|public func handle(key: KeyEvent): ?String
 core|Dropdown.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
@@ -703,9 +717,9 @@ core|StatusBarProgress.style|let|public let style: Style
 core|StatusBarProgress.fillStyle|let|public let fillStyle: Style
 core|StatusBarProgress.labelStyle|let|public let labelStyle: Style
 core|StatusBarProgress.symbols|let|public let symbols: ProgressBarSymbols
-core|StatusBarProgress.init|init|public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = "", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: Style = Style(fg: Color.Indexed(8), bg: Color.White), fillStyle!: Style = Style(fg: Color.Cyan, bg: Color.White), labelStyle!: Style = Style(fg: Color.Black, bg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols(filled: "=", empty: "-", head: ">", indeterminate: ">") )
+core|StatusBarProgress.init|init|public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = "", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: ?Style = None, fillStyle!: ?Style = None, labelStyle!: ?Style = None, symbols!: ?ProgressBarSymbols = None )
 core|StatusBar|class|public class StatusBar <: Widget {
-core|StatusBar.init|init|public init( left!: String = "", right!: String = "", style!: Style = Style(fg: Color.Black, bg: Color.White), progress!: ?StatusBarProgress = None )
+core|StatusBar.init|init|public init( left!: String = "", right!: String = "", style!: ?Style = None, progress!: ?StatusBarProgress = None )
 core|StatusBar.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Viewport|class|public class Viewport <: Widget {
 core|Viewport.offset|var|public var offset: Int64
@@ -850,6 +864,16 @@ core|Style.withBg|func|public func withBg(color: Color): Style
 core|Style.withModifier|func|public func withModifier(modifier: Modifier): Style
 core|Style.patch|func|public func patch(other: Style): Style
 core|Style.operator_==|operator|public operator func ==(other: Style): Bool
+core|StyleOverride|struct|public struct StyleOverride {
+core|StyleOverride.fg|let|public let fg: ?Color
+core|StyleOverride.bg|let|public let bg: ?Color
+core|StyleOverride.bold|let|public let bold: ?Bool
+core|StyleOverride.italic|let|public let italic: ?Bool
+core|StyleOverride.underline|let|public let underline: ?Bool
+core|StyleOverride.reversed|let|public let reversed: ?Bool
+core|StyleOverride.init|init|public init(fg!: ?Color = None, bg!: ?Color = None, bold!: ?Bool = None, italic!: ?Bool = None, underline!: ?Bool = None, reversed!: ?Bool = None)
+core|StyleOverride.apply|func|public func apply(base: Style): Style
+core|resolveStyle|func|public func resolveStyle(base: Style, legacy!: Style = Style.default(), override!: ?StyleOverride = None): Style
 core|IconSet|enum|public enum IconSet {
 core|IconSet.Unicode|enum_constructor|Unicode
 core|IconSet.NerdFont|enum_constructor|NerdFont
@@ -872,9 +896,16 @@ core|Theme.secondary|let|public let secondary: Style
 core|Theme.border|let|public let border: Style
 core|Theme.strongBorder|let|public let strongBorder: Style
 core|Theme.iconSet|let|public let iconSet: IconSet
-core|Theme.init|init|public init( normal!: Style = Style.default(), focused!: Style = Style(modifier: focusModifier()), selected!: Style = Style(bg: Color.Indexed(8), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Indexed(8)), error!: Style = Style(fg: Color.Red), accent!: Style = Style(fg: Color.Cyan), success!: Style = Style(fg: Color.Green), warning!: Style = Style(fg: Color.Yellow), info!: Style = Style(fg: Color.Cyan), canvas!: Style = Style.default(), surface!: Style = Style.default(), raisedSurface!: Style = Style.default(), heading!: Style = Style(modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Indexed(8)), border!: Style = Style(fg: Color.Indexed(8)), strongBorder!: Style = Style.default(), iconSet!: IconSet = IconSet.Unicode )
+core|Theme.borderKind|let|public let borderKind: BorderKind
+core|Theme.progressSymbols|let|public let progressSymbols: ?ProgressBarSymbols
+core|Theme.init|init|public init( normal!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), focused!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(54, 50, 61), modifier: focusModifier()), selected!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(42, 44, 63), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), error!: Style = Style(fg: Color.Rgb(255, 122, 131), bg: Color.Rgb(19, 20, 34), modifier: errorModifier()), accent!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), success!: Style = Style(fg: Color.Rgb(111, 211, 162), bg: Color.Rgb(19, 20, 34)), warning!: Style = Style(fg: Color.Rgb(255, 198, 114), bg: Color.Rgb(19, 20, 34)), info!: Style = Style(fg: Color.Rgb(118, 193, 231), bg: Color.Rgb(19, 20, 34)), canvas!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), surface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(26, 27, 44)), raisedSurface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(36, 38, 57)), heading!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34), modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), border!: Style = Style(fg: Color.Rgb(88, 92, 115), bg: Color.Rgb(19, 20, 34)), strongBorder!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), iconSet!: IconSet = IconSet.Unicode, borderKind!: BorderKind = BorderKind.Auto, progressSymbols!: ?ProgressBarSymbols = None )
 core|Theme.default|func|public static func default(): Theme
+core|Theme.resolveState|func|public func resolveState(focused!: Bool = false, selected!: Bool = false, disabled!: Bool = false, error!: Bool = false, override!: ?StyleOverride = None): Style
 core|Theme.withIconSet|func|public func withIconSet(value: IconSet): Theme
+core|Theme.withBorderKind|func|public func withBorderKind(value: BorderKind): Theme
+core|Theme.withProgressSymbols|func|public func withProgressSymbols(value: ?ProgressBarSymbols): Theme
+core|Theme.withTerminalBackground|func|public func withTerminalBackground(): Theme
+core|Theme.indigo|func|public static func indigo(accent!: Color = Color.Rgb(244, 187, 96)): Theme
 core|Theme.adapted|func|public func adapted(capabilities: TerminalCapabilities): Theme
 core|Theme.serialize|func|public func serialize(): String
 core|Backend|interface|public interface Backend {
@@ -909,6 +940,8 @@ core|RenderDiffPlan.init|init|public init(dirtyCells: Int64, spans: Array<Render
 core|Frame|class|public class Frame {
 core|Frame.area|let|public let area: Rect
 core|Frame.init|init|public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None)
+core|Frame.theme|func|public func theme(): ?Theme
+core|Frame.textWidthOptions|func|public func textWidthOptions(): TextWidthOptions
 core|Frame.renderWidget|func|public func renderWidget(widget: Widget, area: Rect): Unit
 core|Frame.canvas|func|public func canvas(area!: Rect = this.area): Canvas
 core|Frame.fill|func|public func fill(area: Rect, style: Style): Unit
@@ -925,6 +958,8 @@ core|RenderMode.Full|enum_constructor|Full
 core|Terminal|class|public class Terminal {
 core|Terminal.init|init|public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )
 core|Terminal.setCapabilities|func|public func setCapabilities(capabilities: TerminalCapabilities): Unit
+core|Terminal.setTheme|func|public func setTheme(theme: ?Theme): Unit
+core|Terminal.setTextWidthOptions|func|public func setTextWidthOptions(options: TextWidthOptions): Unit
 core|Terminal.draw|func|public func draw(render: (Frame) -> Unit): RenderMetrics
 core|Terminal.draw|func|public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
 core|Terminal.clear|func|public func clear(): Unit
@@ -1064,11 +1099,14 @@ core|displayWidth|func|public func displayWidth(text: String, options!: TextWidt
 core|displayWidth|func|public func displayWidth(r: Rune): Int64
 core|displayWidth|func|public func displayWidth(r: Rune, options!: TextWidthOptions): Int64
 core|graphemeClusters|func|public func graphemeClusters(text: String): Array<GraphemeCluster>
+core|graphemeClusters|func|public func graphemeClusters(text: String, options!: TextWidthOptions): Array<GraphemeCluster>
 core|graphemeDisplayWidth|func|public func graphemeDisplayWidth(text: String): Int64
 core|cut|func|public func cut(text: String, width: Int64): String
 core|graphemePrefix|func|public func graphemePrefix(text: String, maxWidth: Int64): String
+core|graphemePrefix|func|public func graphemePrefix(text: String, maxWidth: Int64, options!: TextWidthOptions): String
 core|graphemeDisplayWidth|func|public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64
 core|wrapText|func|public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String>
+core|wrapText|func|public func wrapText(text: String, width: Int64, mode: WrapMode, options!: TextWidthOptions): Array<String>
 core|clampToRuneBoundary|func|public func clampToRuneBoundary(text: String, offset: Int64): Int64
 core|previousGraphemeOffset|func|public func previousGraphemeOffset(text: String, offset: Int64): Int64
 core|nextGraphemeOffset|func|public func nextGraphemeOffset(text: String, offset: Int64): Int64
@@ -1130,7 +1168,9 @@ core|TextArea.init|init|public init( value!: String = "", model!: ?EditableTextM
 core|TextArea.handle|func|public func handle(key: KeyEvent): Bool
 core|TextArea.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
 core|TextArea.handleVimNavigation|func|public func handleVimNavigation(key: KeyEvent): Bool
+core|TextArea.setTextWidthOptions|func|public func setTextWidthOptions(options: TextWidthOptions): Unit
 core|TextArea.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|TextArea.cursorPosition|func|public func cursorPosition(area: Rect, options!: TextWidthOptions): Position
 core|TextArea.cursorPosition|func|public func cursorPosition(area: Rect): Position
 core|TextArea.cursorPositions|func|public func cursorPositions(area: Rect): Array<Position>
 core|TextArea.select|func|public func select(start: Int64, end: Int64): Unit
@@ -1308,6 +1348,10 @@ core|ProgressBarLabelMode.Percent|enum_constructor|Percent
 core|ProgressBarLabelMode.Value|enum_constructor|Value
 core|ProgressBarLabelMode.Ratio|enum_constructor|Ratio
 core|ProgressBarLabelMode.Text|enum_constructor|Text(String)
+core|ProgressBarLabelPosition|enum|public enum ProgressBarLabelPosition {
+core|ProgressBarLabelPosition.Automatic|enum_constructor|Automatic
+core|ProgressBarLabelPosition.Start|enum_constructor|Start
+core|ProgressBarLabelPosition.End|enum_constructor|End
 core|ProgressBarSymbols|class|public class ProgressBarSymbols {
 core|ProgressBarSymbols.filled|let|public let filled: String
 core|ProgressBarSymbols.empty|let|public let empty: String
@@ -1320,7 +1364,7 @@ core|ProgressBarSegment.style|let|public let style: Style
 core|ProgressBarSegment.symbol|let|public let symbol: String
 core|ProgressBarSegment.init|init|public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#")
 core|ProgressBar|class|public class ProgressBar <: Widget {
-core|ProgressBar.init|init|public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: Style = Style(fg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0 )
+core|ProgressBar.init|init|public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None, theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: ?Style = None, symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0, labelPosition!: ProgressBarLabelPosition = ProgressBarLabelPosition.Automatic, trackOverride!: StyleOverride = StyleOverride(), fillOverride!: StyleOverride = StyleOverride(), labelOverride!: StyleOverride = StyleOverride() )
 core|ProgressBar.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Widget|interface|public interface Widget {
 core|Widget.render|func|func render(area: Rect, buffer: Buffer): Unit
@@ -1337,6 +1381,8 @@ core|BorderKind.Auto|enum_constructor|Auto
 core|BorderKind.Ascii|enum_constructor|Ascii
 core|BorderKind.Unicode|enum_constructor|Unicode
 core|BorderKind.Rounded|enum_constructor|Rounded
+core|BorderKind.Double|enum_constructor|Double
+core|BorderKind.Dashed|enum_constructor|Dashed
 core|BorderKind.NoBorder|enum_constructor|NoBorder
 core|TitleAlign|enum|public enum TitleAlign {
 core|TitleAlign.Left|enum_constructor|Left
@@ -1359,6 +1405,8 @@ core|BorderSet.init|init|public init( horizontal!: String = "-", vertical!: Stri
 core|BorderSet.ascii|func|public static func ascii(): BorderSet
 core|BorderSet.unicode|func|public static func unicode(): BorderSet
 core|BorderSet.rounded|func|public static func rounded(): BorderSet
+core|BorderSet.doubleLine|func|public static func doubleLine(): BorderSet
+core|BorderSet.dashed|func|public static func dashed(): BorderSet
 core|BlockOptions|class|public class BlockOptions {
 core|BlockOptions.title|let|public let title: String
 core|BlockOptions.borderKind|let|public let borderKind: BorderKind
@@ -1375,9 +1423,10 @@ core|BlockOptions.asciiFallback|let|public let asciiFallback: Bool
 core|BlockOptions.theme|let|public let theme: ?Theme
 core|BlockOptions.init|init|public init( title!: String = "", borderKind!: BorderKind = BorderKind.Auto, border!: BorderSet = BorderSet(horizontal: "", vertical: "", topLeft: "", topRight: "", bottomLeft: "", bottomRight: ""), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: ?Style = None, borderStyle!: ?Style = None, contentStyle!: ?Style = None, titleStyle!: ?Style = None, state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )
 core|Block|class|public class Block <: Widget {
-core|Block.init|init|public init(title!: String = "", style!: Style = Style.default())
+core|Block.init|init|public init(title!: String = "", style!: ?Style = None)
 core|Block.init|init|public init(options: BlockOptions)
 core|Block.inner|func|public func inner(area: Rect): Rect
+core|Block.inner|func|public func inner(area: Rect, theme!: ?Theme): Rect
 core|Block.renderInner|func|public func renderInner(area: Rect, buffer: Buffer): Rect
 core|Block.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Panel|class|public class Panel <: Widget {
@@ -1386,11 +1435,12 @@ core|Panel.init|init|public init(options: BlockOptions, child!: ?Widget = None)
 core|Panel.renderInner|func|public func renderInner(area: Rect, buffer: Buffer): Rect
 core|Panel.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Paragraph|class|public class Paragraph <: Widget {
-core|Paragraph.init|init|public init( text: String, block!: ?Block = None, style!: Style = Style.default(), scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
+core|Paragraph.init|init|public init( text: String, block!: ?Block = None, style!: ?Style = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
 core|Paragraph.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|List|class|public class List <: Widget {
 core|List.init|init|public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
 core|List.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+core|List.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
 core|List.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ListState|class|public class ListState {
 core|ListState.selected|var|public var selected: ?Int64
@@ -1403,8 +1453,9 @@ core|ListState.moveWithDirty|func|public func moveWithDirty(delta: Int64, total:
 core|ListState.previous|func|public func previous(total: Int64): Unit
 core|ListState.scrollToVisible|func|public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
 core|Table|class|public class Table <: Widget {
-core|Table.init|init|public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: Style = Style.default(), headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
+core|Table.init|init|public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: ?Style = None, headerStyle!: ?Style = None, selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
 core|Table.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+core|Table.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
 core|Table.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|TableState|class|public class TableState {
 core|TableState.selectedRow|var|public var selectedRow: ?Int64
@@ -1422,12 +1473,16 @@ core|Scrollbar.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Input|class|public class Input <: Widget {
 core|Input.value|var|public var value: String
 core|Input.cursor|var|public var cursor: Int64
-core|Input.init|init|public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), showBoundary!: Bool = true )
+core|Input.init|init|public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: ?Style = None, showBoundary!: Bool = true )
 core|Input.handle|func|public func handle(key: KeyEvent): Bool
 core|Input.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+core|Input.handleWithDirty|func|public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects
 core|Input.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+core|Input.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
 core|Input.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|Input.cursorPosition|func|public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position
 core|Input.cursorPosition|func|public func cursorPosition(area: Rect): Position
+core|Input.cursorPosition|func|public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position
 core|Input.setValue|func|public func setValue(value: String, cursor!: Int64 = -1): Unit
 core|Input.clear|func|public func clear(): Unit
 core|Input.moveToStart|func|public func moveToStart(): Unit

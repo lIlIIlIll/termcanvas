@@ -31,8 +31,18 @@ public class Buffer {
     private let cells: Array<Cell>
     private let media = ArrayList<MediaPlacement>()
     private var capabilitiesValue: TerminalCapabilities = TerminalCapabilities()
+    private var themeValue: ?Theme = None
+    private var adaptedThemeValue: ?Theme = None
+    private var parentThemeValue: ?Theme = None
+    // A render-context snapshot may outlive the parent scope that created it.
+    private var inheritedParentThemeValue: ?Theme = None
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
+    // Width changes do not rewrite existing cells. A later blit must verify
+    // potentially stale ambiguous-width glyphs before copying them.
+    private var widthRevalidationNeeded: Bool = false
     private var writeClip: ?DirtyRects = None
     private var canvasClip: ?Rect = None
+    private var scopedStyleOverride: ?StyleOverride = None
     // Step-0 diagnostics are opt-in and reset for each render closure. These
     // counters never participate in clipping, layout, or cell equality.
     private var workMetricsEnabled: Bool = false
@@ -46,13 +56,87 @@ public class Buffer {
 
     public func capabilities(): TerminalCapabilities { capabilitiesValue }
 
-    public func setCapabilities(capabilities: TerminalCapabilities): Unit { capabilitiesValue = capabilities }
+    public func setCapabilities(capabilities: TerminalCapabilities): Unit {
+        capabilitiesValue = capabilities
+        refreshAdaptedTheme()
+    }
+
+    /** 返回应用为此缓冲区设置的主题，None 表示沿用组件的默认样式。 */
+    public func theme(): ?Theme { themeValue }
+
+    /** 设置后续组件绘制使用的应用主题；已有单元格不会自动重绘。 */
+    public func setTheme(theme: ?Theme): Unit {
+        themeValue = theme
+        inheritedParentThemeValue = None
+        refreshAdaptedTheme()
+    }
+
+    private func refreshAdaptedTheme(): Unit {
+        adaptedThemeValue = match (themeValue) {
+            case Some(value) => Some(value.adapted(capabilitiesValue))
+            case None => None
+        }
+    }
+
+    /** 显式组件主题优先，其次为嵌套父主题，最后为适配终端能力的应用主题。 */
+    public func resolveTheme(explicit: ?Theme): ?Theme {
+        match (explicit) {
+            case Some(value) => Some(value)
+            case None => match (parentThemeValue) {
+                case Some(value) => Some(value)
+                case None => match (inheritedParentThemeValue) {
+                    case Some(value) => Some(value)
+                    case None => adaptedThemeValue
+                }
+            }
+        }
+    }
+
+    /** 在同步绘制闭包内临时提供父主题；子组件显式主题优先，None 保留已有父主题。
+     * 闭包返回或抛出异常时恢复原作用域；同一缓冲区不得在此期间由其他线程使用。
+     */
+    public func withParentTheme(explicit: ?Theme, draw: () -> Unit): Unit {
+        if (explicit.isNone()) { draw(); return }
+        let previous = parentThemeValue
+        parentThemeValue = explicit
+        try {
+            draw()
+        } finally {
+            parentThemeValue = previous
+        }
+    }
+
+    // Capture visual inputs independently of paint state, clips and media.
+    func inheritVisualContext(source: Buffer): Unit {
+        capabilitiesValue = source.capabilitiesValue
+        themeValue = source.themeValue
+        adaptedThemeValue = source.adaptedThemeValue
+        textWidthOptionsValue = source.textWidthOptionsValue
+        inheritedParentThemeValue = match (source.parentThemeValue) {
+            case Some(value) => Some(value)
+            case None => source.inheritedParentThemeValue
+        }
+    }
+
+    /** 返回当前文本的显示宽度策略。 */
+    public func textWidthOptions(): TextWidthOptions { textWidthOptionsValue }
+
+    /** 设置后续绘制的宽度策略；现有单元格不会重新排版。 */
+    public func setTextWidthOptions(options: TextWidthOptions): Unit {
+        let changed = usesWideAmbiguous(options) != usesWideAmbiguous(textWidthOptionsValue)
+        textWidthOptionsValue = options
+        if (changed) { widthRevalidationNeeded = hasStaleWidthCells(area) }
+    }
 
     public func clear(style!: Style = Style.default()): Unit {
+        // A widget-scoped clear must remain within that widget's clip and
+        // the current frame's dirty region, just like other widget writes.
+        if (scopedStyleOverride.isSome()) { fill(area, style: style); return }
         let blank = Cell(" ", style: style)
         for (i in 0..cells.size) {
             cells[i] = blank
         }
+        widthRevalidationNeeded = false
     }
 
     func reset(style!: Style = Style.default()): Unit {
@@ -75,6 +159,31 @@ public class Buffer {
             draw()
         } finally {
             canvasClip = previous
+        }
+    }
+
+    // Overrides apply to writes, not to pre-existing cells. Nested scopes
+    // merge per attribute so a child's choice wins over its parent's.
+    func withStyleOverride(value: StyleOverride, draw: () -> Unit): Unit {
+        let previous = scopedStyleOverride
+        scopedStyleOverride = Some(match (previous) {
+            case Some(outer) => mergeStyleOverride(outer, value)
+            case None => value
+        })
+        try {
+            draw()
+        } finally {
+            scopedStyleOverride = previous
+        }
+    }
+
+    private func scopedCell(cell: Cell): Cell {
+        match (scopedStyleOverride) {
+            case Some(value) =>
+                var result = cell
+                result.style = value.apply(cell.style)
+                result
+            case None => cell
         }
     }
 
@@ -125,12 +234,12 @@ public class Buffer {
             let repairRight = !isWideContinuation(cell) && x + 1 < area.right && isWideContinuation(getCell(x + 1, y))
             if ((repairLeft && !isWritable(x - 1, y)) || (repairRight && !isWritable(x + 1, y))) { return }
             if (repairLeft) {
-                setCellRaw(x - 1, y, Cell(" ", style: cells[index].style))
+                setCellRaw(x - 1, y, scopedCell(Cell(" ", style: cells[index].style)))
             }
             if (repairRight) {
-                setCellRaw(x + 1, y, Cell(" "))
+                setCellRaw(x + 1, y, scopedCell(Cell(" ")))
             }
-            cells[index] = cell
+            cells[index] = scopedCell(cell)
             if (workMetricsEnabled) { cellWritesValue++ }
         }
     }
@@ -155,16 +264,17 @@ public class Buffer {
         let physical = intersect(this.area, area)
         let target = match (canvasClip) { case Some(clip) => intersect(physical, clip); case None => physical }
         if (target.width <= 0 || target.height <= 0) { return }
+        let styled = scopedCell(cell)
         match (writeClip) {
             case Some(clip) =>
                 for (rect in clip.rects()) {
                     let clipped = intersect(target, rect)
-                    fillUnclipped(clipped, cell)
+                    fillUnclipped(clipped, styled)
                 }
                 return
             case None => ()
         }
-        fillUnclipped(target, cell)
+        fillUnclipped(target, styled)
     }
 
     private func fillUnclipped(target: Rect, cell: Cell): Unit {
@@ -222,7 +332,7 @@ public class Buffer {
             return
         }
 
-        let symbolWidth = graphemeDisplayWidth(symbol)
+        let symbolWidth = graphemeDisplayWidth(symbol, options: textWidthOptionsValue)
         if (symbolWidth <= 0) { return }
         if (symbolWidth == 1) {
             for (cx in target.x..target.right) {
@@ -251,7 +361,7 @@ public class Buffer {
             return
         }
 
-        let symbolWidth = graphemeDisplayWidth(symbol)
+        let symbolWidth = graphemeDisplayWidth(symbol, options: textWidthOptionsValue)
         if (symbolWidth <= 0) { return }
         if (symbolWidth == 1) {
             for (cy in target.y..target.bottom) {
@@ -360,7 +470,7 @@ public class Buffer {
             }
             let next = nextGraphemeOffset(text, offset)
             let symbol = text[offset..next]
-            let width = graphemeDisplayWidth(symbol)
+            let width = graphemeDisplayWidth(symbol, options: textWidthOptionsValue)
             if (width > 0) {
                 if (bounded && width > maxWidth - consumed) {
                     break
@@ -412,15 +522,16 @@ public class Buffer {
 
     public func resize(area: Rect): Buffer {
         let next = Buffer(area)
-        next.setCapabilities(capabilitiesValue)
+        next.inheritVisualContext(this)
         let overlap = intersect(this.area, area)
         next.blitFrom(this, overlap, overlap.x, overlap.y)
+        next.widthRevalidationNeeded = widthRevalidationNeeded
         next
     }
 
     public func copy(): Buffer {
         let next = Buffer(area)
-        next.setCapabilities(capabilitiesValue)
+        next.inheritVisualContext(this)
         for (y in area.y..area.bottom) {
             for (x in area.x..area.right) {
                 next.setCell(x, y, getCell(x, y))
@@ -429,6 +540,7 @@ public class Buffer {
         for (placement in media) {
             next.addMedia(placement)
         }
+        next.widthRevalidationNeeded = widthRevalidationNeeded
         next
     }
 
@@ -436,12 +548,18 @@ public class Buffer {
     // The target origin corresponds to the requested sourceArea origin,
     // including when the source rectangle is clipped by the source Buffer.
     // Existing destination glyphs are repaired as a group, as with setString.
+    /** 将来源区域的单元格复制到目标位置；在边界截断宽字符时以空白处理被截断部分，并成组修复目标中原有的宽字符。
+     * 非空来源区域的宽度策略与目标不同时，或来源切换策略后仍有过时字符时，在写入前抛出 IllegalArgumentException。
+     */
     public func blitFrom(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit {
         blitCells(source, sourceArea, targetX, targetY, true)
     }
 
     // Ignore the frame's dirty rectangle for a caller that has already
     // constrained the destination. Physical and Canvas bounds still apply.
+    /** 将来源区域的单元格复制到目标位置，忽略帧的脏矩形限制；物理边界和画布边界仍然生效。调用方需自行约束目标区域。
+     * 与 blitFrom 一样检查宽度策略与过时字符，并在写入前报告不兼容。
+     */
     public func blitFromUnchecked(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit {
         blitCells(source, sourceArea, targetX, targetY, false)
     }
@@ -449,6 +567,15 @@ public class Buffer {
     private func blitCells(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64, respectClip: Bool): Unit {
         let sourceClip = intersect(source.area, sourceArea)
         if (sourceClip.width <= 0 || sourceClip.height <= 0) { return }
+        if (usesWideAmbiguous(source.textWidthOptionsValue) != usesWideAmbiguous(textWidthOptionsValue)) {
+            throw IllegalArgumentException("Cannot blit buffers with different text width policies")
+        }
+        if (source.widthRevalidationNeeded) {
+            if (source.hasStaleWidthCells(sourceClip)) {
+                throw IllegalArgumentException("Cannot blit stale cells after a text width policy change; redraw the source")
+            }
+            if (sourceClip == source.area) { source.widthRevalidationNeeded = false }
+        }
         let clippedTargetX = advanceCoordinate(targetX, sourceClip.x - sourceArea.x)
         let clippedTargetY = advanceCoordinate(targetY, sourceClip.y - sourceArea.y)
         // Snapshot before writing, including when source and destination are
@@ -484,18 +611,43 @@ public class Buffer {
         }
     }
 
+    // Only used after a policy change; normal blits keep their existing fast path.
+    private func hasStaleWidthCells(region: Rect): Bool {
+        let narrow = TextWidthOptions(ambiguousWidth: AmbiguousWidth.Narrow)
+        let wide = TextWidthOptions(ambiguousWidth: AmbiguousWidth.Wide)
+        let currentWide = usesWideAmbiguous(textWidthOptionsValue)
+        for (y in region.y..region.bottom) {
+            for (x in region.x..region.right) {
+                let cell = getCell(x, y)
+                let candidate = match (cell.kind) {
+                    case CellKind.WideCont => if (x > area.x) { getCell(x - 1, y) } else { cell }
+                    case _ => cell
+                }
+                let bytes = unsafe { candidate.symbol.rawData() }
+                if (bytes.size == 0 || bytes[0] < 0x80u8) { continue }
+                let narrowWidth = graphemeDisplayWidth(candidate.symbol, options: narrow)
+                let wideWidth = graphemeDisplayWidth(candidate.symbol, options: wide)
+                if (narrowWidth == wideWidth) { continue }
+                let actualWide = match (candidate.kind) { case CellKind.WideLead => true; case _ => false }
+                if (actualWide != currentWide) { return true }
+            }
+        }
+        false
+    }
+
     // Replace the entire glyph footprint, including old pairs crossed by
     // either edge. Preflight all repairs before modifying any cell.
     private func writeCellGroup(x: Int64, y: Int64, cell: Cell, width: Int64): Unit {
         if (!canWriteGroup(x, y, width)) { return }
+        let styled = scopedCell(cell)
         let leftPair = x > area.x && isWideContinuation(getCell(x, y))
         let right = advanceCoordinate(x, width)
         let rightPair = right < area.right && isWideContinuation(getCell(right, y))
-        if (leftPair) { setCellRaw(x - 1, y, Cell(" ", style: cell.style)) }
-        if (rightPair) { setCellRaw(right, y, Cell(" ", style: cell.style)) }
-        setCellRaw(x, y, cell)
+        if (leftPair) { setCellRaw(x - 1, y, Cell(" ", style: styled.style)) }
+        if (rightPair) { setCellRaw(right, y, Cell(" ", style: styled.style)) }
+        setCellRaw(x, y, styled)
         if (width == 2) {
-            setCellRaw(x + 1, y, Cell("", style: cell.style, kind: CellKind.WideCont))
+            setCellRaw(x + 1, y, Cell("", style: styled.style, kind: CellKind.WideCont))
         }
     }
 

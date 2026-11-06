@@ -71,6 +71,64 @@ class WorkbenchModelTest {
     }
 
     @TestCase
+    func deletedIdsAreNeverReusedAndEmptyModelHasZeroProgress(): Unit {
+        let model = WorkbenchModel()
+        @Expect(model.delete(1))
+        @Expect(model.job(1).isNone())
+        @Expect(model.start(120))
+        let created = model.create("New build", "Alpha")
+        @Expect(created, 121)
+        @Expect(model.job(120).getOrThrow().status, WorkbenchJobStatus.Running)
+        @Expect(model.setMetadata(created, "Renamed", "High", true, [], ""))
+        @Expect(model.job(created).getOrThrow().name, "Renamed")
+        for (id in 2..122) { @Expect(model.delete(id)) }
+        @Expect(model.jobs.size, 0)
+        @Expect(model.totalProgressHundredths(), 0)
+        @Expect(model.queuedCount, 0)
+        @Expect(model.runningCount, 0)
+        @Expect(model.doneCount, 0)
+        @Expect(model.create("After empty", "Beta"), 122)
+    }
+
+    @TestCase
+    func stageLogsFollowSimulationProgressAndPause(): Unit {
+        let model = WorkbenchModel()
+        _ = model.advance(1199)
+        @Expect(model.logs().isEmpty())
+        _ = model.advance(1)
+        @Expect(model.logs().size, 1)
+        @Expect(model.logs()[0], "job-1: Checkout completed; Build started")
+        @Expect(model.pause(1))
+        _ = model.advance(5000)
+        @Expect(model.logs().size, 1)
+        @Expect(model.resume(1))
+        _ = model.advance(1200)
+        @Expect(model.logs().size, 2)
+        @Expect(model.logs()[1], "job-1: Build completed; Test started")
+    }
+
+    @TestCase
+    func perTaskPauseCancelFailureAndRetryRespectState(): Unit {
+        let model = WorkbenchModel()
+        _ = model.advance(1000)
+        @Expect(model.pause(1))
+        let elapsed = model.job(1).getOrThrow().elapsedMillis
+        _ = model.advance(1000)
+        @Expect(model.job(1).getOrThrow().elapsedMillis, elapsed)
+        @Expect(!model.pause(1))
+        @Expect(model.resume(1))
+        @Expect(model.cancel(1))
+        @Expect(!model.cancel(1))
+        @Expect(model.retry(1))
+        @Expect(model.job(1).getOrThrow().progressPercent, 0)
+        @Expect(!model.retry(1))
+        @Expect(model.fail(1))
+        @Expect(model.retry(1))
+        @Expect(model.queuedCount, 120)
+        @Expect(model.runningCount, 0)
+    }
+
+    @TestCase
     func boundedLogsAndHistoryRetainNewestValues(): Unit {
         let model = WorkbenchModel()
         for (i in 0..205) { model.recordLog("entry-${i}") }

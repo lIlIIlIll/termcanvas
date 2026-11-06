@@ -1575,6 +1575,11 @@ public class App {
     private let renderMode: RenderMode
     private var traceSink: ?AppTraceSink = None
     private var runStarted: Bool = false
+    private var animationScheduler: ?AnimationScheduler = None
+    private var glyphCapabilitySession: ?GlyphCapabilitySession = None
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
+    private var themeValue: ?Theme = None
+    private var themePending: Bool = false
 
     public init(
         inputSource!: InputSource = StdinInputSource(),
@@ -1738,6 +1743,32 @@ public class App {
         this.traceSink = Some(traceSink)
     }
 
+    /** 设置应用主题；None 恢复组件默认样式。运行中只能从应用事件循环线程调用；下一帧完整重绘。后台线程应通过事件端口交给 update 设置主题。 */
+    public func setTheme(theme: ?Theme): Unit {
+        themeValue = theme
+        themePending = true
+    }
+
+    /** 在运行前设置应用所有帧的文本宽度策略。 */
+    public func setTextWidthOptions(options: TextWidthOptions): Unit {
+        if (runStarted) { throw Exception("text width options must be set before App.run") }
+        textWidthOptionsValue = options
+    }
+
+    /** 为应用接入动画调度器；须在运行前调用，且只在应用事件循环线程访问调度器。 */
+    public func attachAnimationScheduler(scheduler: AnimationScheduler): Unit {
+        if (runStarted) { throw Exception("animation scheduler must be attached before App.run") }
+        animationScheduler = Some(scheduler)
+    }
+
+    /** 接入后台图标能力协商；须在运行前调用。渲染时使用 session.applyTo(theme)。 */
+    public func attachGlyphCapabilitySession(session: GlyphCapabilitySession): Unit {
+        if (runStarted) { throw Exception("glyph capability session must be attached before App.run") }
+        if (glyphCapabilitySession.isSome()) { throw Exception("glyph capability session already attached") }
+        if (!session.tryAttach()) { throw Exception("glyph capability session already belongs to an app or is closed") }
+        glyphCapabilitySession = Some(session)
+    }
+
     // Experimental PTY support is an explicit pre-run capability. Normal App
     // construction keeps the unsupported default as an implementation detail.
     public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit {
@@ -1782,6 +1813,9 @@ public class App {
             renderMode: renderMode,
             instrumentationEnabled: instrumentationEnabled
         )
+        terminal.setTextWidthOptions(textWidthOptionsValue)
+        terminal.setTheme(themeValue)
+        themePending = false
         let commandQueue = ArrayList<Command>()
         let runtimeQueue = RuntimeQueue<Unit>(metrics: metrics)
         runtimeQueue.beginTurn()
@@ -1883,6 +1917,15 @@ public class App {
                         frameSchedule.request(FrameRequestKind.SurfaceCritical)
                     }
                     let now = MonoTime.now()
+                    match (glyphCapabilitySession) {
+                        case Some(glyphs) =>
+                            if (glyphs.poll()) {
+                                lifecycle.fullRedrawRequested = true
+                                dirty = true
+                                frameSchedule.request(FrameRequestKind.Background)
+                            }
+                        case None => ()
+                    }
                     if (running) {
                         _ = importExternal(externalPort, runtimeQueue)
                         let dirtyCountBefore = pendingDirty.rects().size
@@ -1955,6 +1998,26 @@ public class App {
                             }
                         }
                     }
+                    match (animationScheduler) {
+                        case Some(scheduler) =>
+                            match (scheduler.nextTimeoutMillis()) {
+                                case Some(delay) =>
+                                    if (delay <= 0) {
+                                        lifecycle.fullRedrawRequested = true
+                                        if (!dirty) { frameSchedule.request(FrameRequestKind.Background) }
+                                        dirty = true
+                                    }
+                                case None => ()
+                            }
+                        case None => ()
+                    }
+                    if (themePending) {
+                        terminal.setTheme(themeValue)
+                        themePending = false
+                        lifecycle.fullRedrawRequested = true
+                        dirty = true
+                        frameSchedule.request(FrameRequestKind.SurfaceCritical)
+                    }
                     if (dirty && frameSchedule.readyToPresent()) {
                         if (lifecycle.capabilitiesOverridePending) {
                             terminal.setCapabilities(match (lifecycle.capabilitiesOverride) {
@@ -1968,10 +2031,19 @@ public class App {
                             case Some(trace) => trace.renderStarted()
                             case None => ()
                         }
-                        let renderMetrics = if (lifecycle.fullRedrawRequested || pendingDirty.isEmpty()) {
+                        let fullFrame = lifecycle.fullRedrawRequested || pendingDirty.isEmpty()
+                        let renderMetrics = if (fullFrame) {
                             terminal.draw(render)
                         } else {
                             terminal.draw(render, dirtyRects: Some(pendingDirty.copy()))
+                        }
+                        // Partial updates can omit unrelated animations. Counting them
+                        // would postpone animation frames indefinitely under input load.
+                        if (fullFrame) {
+                            match (animationScheduler) {
+                                case Some(scheduler) => scheduler.framePresented()
+                                case None => ()
+                            }
                         }
                         match (metrics) {
                             case Some(m) => m.record(
@@ -2200,14 +2272,15 @@ public class App {
                                     }
                                 }
                             }
-                            if (running && !flushed && commandQueue.size == 0 && runtimeQueue.size() == 0 && !parser.hasPendingInputDrain() && !lifecycle.hasPendingSources()) {
+                            if (running && !flushed && !themePending && commandQueue.size == 0 && runtimeQueue.size() == 0 && !parser.hasPendingInputDrain() && !lifecycle.hasPendingSources()) {
                                 lastLoopTask = "event_wait"
                                 eventWaiter.wait(
                                     waitTimeoutMillis(
                                         timerRuntime,
                                         nextTick,
                                         frameWakeMillis: frameSchedule.nextWakeMillis(),
-                                        inputWakeMillis: escWakeMillis
+                                        inputWakeMillis: escWakeMillis,
+                                        animationPending: dirty
                                     ),
                                     previousReadBytes: parser.lastReadBytes(),
                                     sources: waitSources(externalPort, asyncRuntime)
@@ -2225,6 +2298,10 @@ public class App {
             }
             timerRuntime.clear()
             asyncRuntime.cancelAll()
+            match (glyphCapabilitySession) {
+                case Some(glyphs) => glyphs.close()
+                case None => ()
+            }
             lifecycle.closeOwnedPtys(ptyRuntime)
             processRuntime.closeAll()
             try {
@@ -2322,6 +2399,10 @@ public class App {
         for (source in ptyRuntime.sources()) { sources.add(source) }
         for (source in processRuntime.sources()) { sources.add(source) }
         sources.add(asyncRuntime.eventSource())
+        match (glyphCapabilitySession) {
+            case Some(glyphs) => sources.add(glyphs.eventSource())
+            case None => ()
+        }
         match (externalPort) {
             case Some(port) => sources.add(port.eventSource())
             case None => ()
@@ -2333,7 +2414,8 @@ public class App {
         timerRuntime: TimerRuntime,
         nextTick: ?MonoTime,
         frameWakeMillis!: ?Int64 = None,
-        inputWakeMillis!: ?Int64 = None
+        inputWakeMillis!: ?Int64 = None,
+        animationPending!: Bool = false
     ): Int64 {
         let now = MonoTime.now()
         var wait: ?Int64 = match (nextTick) {
@@ -2352,6 +2434,13 @@ public class App {
             case Some(value) => wait = match (wait) { case Some(current) => Some(min(current, value)); case None => Some(value) }
             case None => ()
         }
+        match (glyphCapabilitySession) {
+            case Some(glyphs) => match (glyphs.nextTimeoutMillis()) {
+                case Some(value) => wait = match (wait) { case Some(current) => Some(min(current, value)); case None => Some(value) }
+                case None => ()
+            }
+            case None => ()
+        }
         match (frameWakeMillis) {
             case Some(value) =>
                 wait = match (wait) {
@@ -2367,6 +2456,16 @@ public class App {
                     case None => Some(value)
                 }
             case None => ()
+        }
+        if (!animationPending) {
+            match (animationScheduler) {
+                case Some(scheduler) =>
+                    match (scheduler.nextTimeoutMillis()) {
+                        case Some(value) => wait = match (wait) { case Some(current) => Some(min(current, value)); case None => Some(value) }
+                        case None => ()
+                    }
+                case None => ()
+            }
         }
         if (resize) {
             wait = match (wait) {
@@ -3141,6 +3240,19 @@ public class FocusManager {
         let index = indexOf(id)
         if (index < 0 || !enabled[index]) { return false }
         currentIndex = index
+        true
+    }
+
+    /** 更新首个匹配条目的启用状态；不存在时返回 false。禁用当前条目时焦点移到下一个启用条目，全部禁用则清除焦点。重新启用且没有焦点时聚焦该条目。 */
+    public func setEnabled(id: String, value: Bool): Bool {
+        let index = indexOf(id)
+        if (index < 0) { return false }
+        enabled[index] = value
+        if (!value && currentIndex == index) {
+            currentIndex = firstEnabledFrom(index + 1)
+        } else if (value && currentIndex < 0) {
+            currentIndex = index
+        }
         true
     }
 

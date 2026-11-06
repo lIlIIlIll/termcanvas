@@ -22,18 +22,20 @@ public class Menu <: Widget {
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1
     private let block: ?Block
-    private let style: Style
-    private let selectedStyle: Style
-    private let disabledStyle: Style
+    private let style: ?Style
+    private let selectedStyle: ?Style
+    private let disabledStyle: ?Style
+    private let theme: ?Theme
 
     public init(
         title: String,
         items: Array<MenuItem>,
         selected!: Int64 = 0,
         block!: ?Block = None,
-        style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
-        disabledStyle!: Style = Style(fg: Color.Indexed(8))
+        style!: ?Style = None,
+        selectedStyle!: ?Style = None,
+        disabledStyle!: ?Style = None,
+        theme!: ?Theme = None
     ) {
         this.title = title
         this.items = items
@@ -42,6 +44,7 @@ public class Menu <: Widget {
         this.style = style
         this.selectedStyle = selectedStyle
         this.disabledStyle = disabledStyle
+        this.theme = theme
     }
 
     public func handle(key: KeyEvent): ?String {
@@ -73,12 +76,16 @@ public class Menu <: Widget {
 
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
+        let theme = buffer.resolveTheme(this.theme)
+        let normal = widgetRoleStyle(style, theme, ThemeRole.Normal, Style.default())
+        let highlight = widgetRoleStyle(selectedStyle, theme, ThemeRole.Selected, Style(fg: Color.Black, bg: Color.White))
+        let disabled = widgetRoleStyle(disabledStyle, theme, ThemeRole.Disabled, Style(fg: Color.Indexed(8)))
         var target = area
         if (let Some(b) <- block) {
-            b.render(area, buffer)
+            buffer.withParentTheme(this.theme) { => b.render(area, buffer) }
             target = b.inner(area)
         } else if (!title.isEmpty()) {
-            buffer.setString(area.x, area.y, truncate(title, area.width), style: style)
+            buffer.setString(area.x, area.y, truncate(title, area.width, options: buffer.textWidthOptions()), style: normal)
             target = Rect(area.x, area.y + 1, area.width, max(0, area.height - 1))
         }
         viewportHeight = max(1, target.height)
@@ -88,33 +95,37 @@ public class Menu <: Widget {
             let index = offset + row
             let item = items[index]
             let rowStyle = if (!item.enabled) {
-                disabledStyle
-            } else if (index == selected) {
-                selectedStyle
+                disabled
+            } else if (index == this.selected) {
+                highlight
             } else {
-                style
+                normal
             }
-            buffer.setString(target.x, target.y + row, truncate(item.label, target.width), style: rowStyle)
+            buffer.setString(target.x, target.y + row, truncate(item.label, target.width, options: buffer.textWidthOptions()), style: rowStyle)
         }
     }
 }
 
 public class MenuBar <: Widget {
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private let menus: Array<String>
     public var selected: Int64
-    private let style: Style
-    private let selectedStyle: Style
+    private let style: ?Style
+    private let selectedStyle: ?Style
+    private let theme: ?Theme
 
     public init(
         menus: Array<String>,
         selected!: Int64 = 0,
-        style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        style!: ?Style = None,
+        selectedStyle!: ?Style = None,
+        theme!: ?Theme = None
     ) {
         this.menus = menus
         this.selected = clamp(selected, 0, max(0, menus.size - 1))
         this.style = style
         this.selectedStyle = selectedStyle
+        this.theme = theme
     }
 
     public func handle(key: KeyEvent): Bool {
@@ -142,7 +153,7 @@ public class MenuBar <: Widget {
             case (MouseKind.Down, MouseButton.Left) =>
                 var x = area.x
                 for (i in 0..menus.size) {
-                    let width = displayWidth(" " + menus[i] + " ")
+                    let width = displayWidth(" " + menus[i] + " ", options: textWidthOptionsValue)
                     if (mouse.x >= x && mouse.x - x < width) { selected = i; return true }
                     x += width
                 }
@@ -152,14 +163,18 @@ public class MenuBar <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        textWidthOptionsValue = buffer.textWidthOptions()
         if (area.width <= 0 || area.height <= 0) { return }
+        let theme = buffer.resolveTheme(this.theme)
+        let normal = widgetRoleStyle(style, theme, ThemeRole.Normal, Style.default())
+        let selectedStyle = widgetRoleStyle(this.selectedStyle, theme, ThemeRole.Selected, Style(fg: Color.Black, bg: Color.White))
         var x = area.x
         for (i in 0..menus.size) {
             if (x >= area.right) { return }
             let label = " " + menus[i] + " "
-            let rowStyle = if (i == selected) { selectedStyle } else { style }
-            buffer.setString(x, area.y, truncate(label, area.right - x), style: rowStyle)
-            x += displayWidth(label)
+            let rowStyle = if (i == selected) { selectedStyle } else { normal }
+            buffer.setString(x, area.y, truncate(label, area.right - x, options: textWidthOptionsValue), style: rowStyle)
+            x += displayWidth(label, options: textWidthOptionsValue)
         }
     }
 }
@@ -172,9 +187,9 @@ public class CommandPalette <: Widget {
     private var viewportHeight: Int64 = 1
     private var lastQuery: String = ""
     private let block: ?Block
-    private let style: Style
-    private let selectedStyle: Style
-    private let disabledStyle: Style
+    private let style: ?Style
+    private let selectedStyle: ?Style
+    private let disabledStyle: ?Style
     private var theme: ?Theme = None
     private let caseSensitive: Bool
 
@@ -183,9 +198,9 @@ public class CommandPalette <: Widget {
         query!: String = "",
         selected!: Int64 = 0,
         block!: ?Block = Some(Block(title: "Command")),
-        style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
-        disabledStyle!: Style = Style.default(),
+        style!: ?Style = None,
+        selectedStyle!: ?Style = None,
+        disabledStyle!: ?Style = None,
         theme!: ?Theme = None,
         caseSensitive!: Bool = true
     ) {
@@ -201,7 +216,6 @@ public class CommandPalette <: Widget {
         this.caseSensitive = caseSensitive
         clampSelection()
     }
-
     public func setTheme(theme: ?Theme): Unit {
         this.theme = theme
     }
@@ -269,28 +283,29 @@ public class CommandPalette <: Widget {
         let rows = synchronizeQuery()
         var target = area
         if (let Some(b) <- block) {
-            b.render(area, buffer)
+            buffer.withParentTheme(theme) { => b.render(area, buffer) }
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
-        let normalRowStyle = resolvedNormalStyle()
+        let renderTheme = buffer.resolveTheme(theme)
+        let normalRowStyle = resolvedNormalStyle(renderTheme)
         buffer.fillLine(target.y, target.x, target.width, style: normalRowStyle)
-        buffer.setString(target.x, target.y, truncate("> " + query, target.width), style: normalRowStyle)
+        buffer.setString(target.x, target.y, truncate("> " + query, target.width, options: buffer.textWidthOptions()), style: normalRowStyle)
         let contentHeight = max(0, target.height - 1)
         viewportHeight = max(1, contentHeight)
         offset = selectionViewportOffset(offset, selected, rows.size, contentHeight)
         for (row in 0..contentHeight) {
             let y = target.y + 1 + row
             if (rows.isEmpty() && row == 0) {
-                let emptyStyle = resolvedDisabledStyle()
+                let emptyStyle = resolvedDisabledStyle(renderTheme)
                 buffer.fillLine(y, target.x, target.width, style: emptyStyle)
-                buffer.setString(target.x, y, truncate("No matches", target.width), style: emptyStyle)
+                buffer.setString(target.x, y, truncate("No matches", target.width, options: buffer.textWidthOptions()), style: emptyStyle)
             } else if (row < rows.size - offset) {
                 let index = offset + row
                 let item = rows[index]
-                let rowStyle = resolvedRowStyle(item, index)
+                let rowStyle = resolvedRowStyle(item, index, renderTheme)
                 buffer.fillLine(y, target.x, target.width, style: rowStyle)
-                buffer.setString(target.x, y, truncate(item.label, target.width), style: rowStyle)
+                buffer.setString(target.x, y, truncate(item.label, target.width, options: buffer.textWidthOptions()), style: rowStyle)
             } else {
                 buffer.fillLine(y, target.x, target.width, style: normalRowStyle)
             }
@@ -300,30 +315,28 @@ public class CommandPalette <: Widget {
     private func clampSelection(): Unit {
         selected = clamp(selected, 0, max(0, filtered().size - 1))
     }
-
-    private func resolvedNormalStyle(): Style {
-        themedNormal(style, theme)
+    private func resolvedNormalStyle(theme: ?Theme): Style {
+        widgetRoleStyle(style, theme, ThemeRole.Normal, Style.default())
     }
 
-    private func resolvedSelectedStyle(): Style {
-        if (selectedStyle == Style.default()) { themedSelected(selectedStyle, theme) } else { selectedStyle }
-    }
-
-    private func resolvedDisabledStyle(): Style {
-        if (theme.isSome() || disabledStyle != Style.default()) {
-            themedDisabled(disabledStyle, theme)
-        } else {
-            Style(fg: Color.Indexed(8))
+    private func resolvedSelectedStyle(theme: ?Theme): Style {
+        match (selectedStyle) {
+            case Some(value) => if (value == Style.default() && theme.isSome()) { themedSelected(value, theme) } else { value }
+            case None => widgetRoleStyle(Option<Style>.None, theme, ThemeRole.Selected, Style(fg: Color.Black, bg: Color.White))
         }
     }
 
-    private func resolvedRowStyle(item: MenuItem, index: Int64): Style {
+    private func resolvedDisabledStyle(theme: ?Theme): Style {
+        widgetRoleStyle(disabledStyle, theme, ThemeRole.Disabled, Style(fg: Color.Indexed(8)))
+    }
+
+    private func resolvedRowStyle(item: MenuItem, index: Int64, theme: ?Theme): Style {
         if (!item.enabled) {
-            resolvedDisabledStyle()
+            resolvedDisabledStyle(theme)
         } else if (index == selected) {
-            resolvedSelectedStyle()
+            resolvedSelectedStyle(theme)
         } else {
-            resolvedNormalStyle()
+            resolvedNormalStyle(theme)
         }
     }
 
@@ -459,17 +472,17 @@ public class ToastManager <: Widget {
         for (i in 0..rows) {
             let toast = toasts[toasts.size - rows + i]
             let y = area.y + i
-            let style = resolvedStyle(toast)
+            let style = resolvedStyle(toast, buffer.resolveTheme(theme))
             let text = match (toast.kind) {
                 case Some(kind) => marker(kind) + " " + toast.message
                 case None => toast.message
             }
             buffer.fillLine(y, area.x, area.width, style: style)
-            buffer.setString(area.x, y, truncate(text, area.width), style: style)
+            buffer.setString(area.x, y, truncate(text, area.width, options: buffer.textWidthOptions()), style: style)
         }
     }
 
-    private func resolvedStyle(toast: Toast): Style {
+    private func resolvedStyle(toast: Toast, theme: ?Theme): Style {
         match ((toast.kind, theme)) {
             case (Some(kind), Some(currentTheme)) => semanticStyle(currentTheme, kind).patch(toast.style)
             case (Some(_), None) => Style(fg: Color.Black, bg: Color.Yellow).patch(toast.style)
@@ -501,14 +514,16 @@ public class ToastManager <: Widget {
 public class Spinner <: Widget {
     private let label: String
     private let frame: Int64
-    private let style: Style
+    private let style: ?Style
+    private let theme: ?Theme
 
     /** 创建带标签、帧序号和样式的旋转指示符；负帧序号按 0 保存。
      */
-    public init(label!: String = "", frame!: Int64 = 0, style!: Style = Style(fg: Color.Cyan)) {
+    public init(label!: String = "", frame!: Int64 = 0, style!: ?Style = None, theme!: ?Theme = None) {
         this.label = label
         this.frame = max(0, frame)
         this.style = style
+        this.theme = theme
     }
 
     /** 在区域左上角绘制由帧序号选出的符号及非空标签，文字按区域宽度截断；宽或高不为正时不绘制。
@@ -517,19 +532,21 @@ public class Spinner <: Widget {
         if (area.width <= 0 || area.height <= 0) { return }
         let frames = ["|", "/", "-", "\\"]
         let text = frames[frame % frames.size] + if (label.isEmpty()) { "" } else { " " + label }
-        buffer.setString(area.x, area.y, truncate(text, area.width), style: style)
+        let resolved = widgetRoleStyle(style, buffer.resolveTheme(theme), ThemeRole.Accent, Style(fg: Color.Cyan))
+        buffer.setString(area.x, area.y, truncate(text, area.width, options: buffer.textWidthOptions()), style: resolved)
     }
 }
 
 public class Dialog <: Widget {
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private let title: String
     private let body: String
     private let buttons: Array<String>
     public var selected: Int64
     private let width: Int64
     private let height: Int64
-    private let style: Style
-    private let selectedStyle: Style
+    private let style: ?Style
+    private let selectedStyle: ?Style
     private var theme: ?Theme = None
 
     public init(
@@ -539,8 +556,8 @@ public class Dialog <: Widget {
         selected!: Int64 = 0,
         width!: Int64 = 40,
         height!: Int64 = 7,
-        style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
+        style!: ?Style = None,
+        selectedStyle!: ?Style = None,
         theme!: ?Theme = None
     ) {
         this.title = title
@@ -588,7 +605,7 @@ public class Dialog <: Widget {
         if (!widgetHitTest(mouse, inner) || mouse.y != outer.bottom - 2) { return None }
         var x = inner.x
         for (i in 0..buttons.size) {
-            let width = displayWidth("[" + buttons[i] + "]")
+            let width = displayWidth("[" + buttons[i] + "]", options: textWidthOptionsValue)
             if (mouse.x >= x && mouse.x - x < width) { selected = i; return Some(buttons[i]) }
             x += width + 1
         }
@@ -596,6 +613,7 @@ public class Dialog <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        textWidthOptionsValue = buffer.textWidthOptions()
         normalizeSelected()
         let actualWidth = min(width, area.width)
         let actualHeight = min(height, area.height)
@@ -603,24 +621,26 @@ public class Dialog <: Widget {
         let x = area.x + max(0, (area.width - actualWidth) / 2)
         let y = area.y + max(0, (area.height - actualHeight) / 2)
         let dialogArea = Rect(x, y, actualWidth, actualHeight)
-        let renderStyle = themedNormal(style, theme)
-        let renderSelectedStyle = if (theme.isSome() && selectedStyle == Style.default()) {
-            themedSelected(selectedStyle, theme)
-        } else {
-            selectedStyle
+        let renderTheme = buffer.resolveTheme(theme)
+        let renderStyle = widgetRoleStyle(style, renderTheme, ThemeRole.Normal, Style.default())
+        let renderSelectedStyle = match (selectedStyle) {
+            case Some(value) => if (value == Style.default() && renderTheme.isSome()) { themedSelected(value, renderTheme) } else { value }
+            case None => widgetRoleStyle(Option<Style>.None, renderTheme, ThemeRole.Selected, Style(fg: Color.Black, bg: Color.White))
         }
         let block = Block(title: title, style: renderStyle)
-        block.render(dialogArea, buffer)
+        buffer.withParentTheme(theme) { => block.render(dialogArea, buffer) }
         let inner = block.inner(dialogArea)
         if (inner.width <= 0 || inner.height <= 0) { return }
-        Paragraph(body, wrap: WrapMode.Word, style: renderStyle).render(Rect(inner.x, inner.y, inner.width, max(0, inner.height - 1)), buffer)
+        buffer.withParentTheme(theme) { =>
+            Paragraph(body, wrap: WrapMode.Word, style: renderStyle).render(Rect(inner.x, inner.y, inner.width, max(0, inner.height - 1)), buffer)
+        }
         var bx = inner.x
         let by = dialogArea.bottom - 2
         for (i in 0..buttons.size) {
             if (bx >= inner.right) { return }
             let label = "[" + buttons[i] + "]"
-            buffer.setString(bx, by, truncate(label, inner.right - bx), style: if (i == selected) { renderSelectedStyle } else { renderStyle })
-            bx += displayWidth(label) + 1
+            buffer.setString(bx, by, truncate(label, inner.right - bx, options: textWidthOptionsValue), style: if (i == selected) { renderSelectedStyle } else { renderStyle })
+            bx += displayWidth(label, options: textWidthOptionsValue) + 1
         }
     }
     private func normalizeSelected(): Unit {
@@ -634,8 +654,8 @@ public class ConfirmDialog <: Widget {
 
     public init(
         message: String,
-        style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
+        style!: ?Style = None,
+        selectedStyle!: ?Style = None,
         theme!: ?Theme = None
     ) {
         this.dialog = Dialog(

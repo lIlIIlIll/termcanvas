@@ -9,7 +9,7 @@ class TaskActivityViewTest {
     func statesAndAnimationUseProvidedTheme(): Unit {
         let states = [TaskStatus.Pending, TaskStatus.Queued, TaskStatus.Running,
             TaskStatus.Done, TaskStatus.Failed, TaskStatus.Cancelled]
-        let marks = ["o", "-", "/", "+", "x", "-"]
+        let marks = ["o", ">", "/", "+", "x", "-"]
         let styles = [Style(fg: Color.Blue), Style(fg: Color.Blue), Style(fg: Color.Cyan),
             Style(fg: Color.Green), Style(fg: Color.Red), Style(fg: Color.Yellow)]
         let theme = Theme(disabled: styles[0], accent: styles[2], success: styles[3],
@@ -28,6 +28,41 @@ class TaskActivityViewTest {
         TaskActivityView(running, activityFrame: 1).render(second.area, second)
         @Expect(first.getCell(0, 0).symbol, "◐")
         @Expect(second.getCell(0, 0).symbol, "◓")
+    }
+
+    @TestCase
+    func queuedMarkerIsDistinctFromTextOverflowAcrossCapabilities(): Unit {
+        let item = TaskActivity("long build title", status: TaskStatus.Queued)
+        let unicode = Buffer(Rect(0, 0, 8, 1))
+        TaskActivityView(item).render(unicode.area, unicode)
+        @Expect(unicode.getCell(0, 0).symbol, "◌")
+        @Expect(unicode.getCell(7, 0).symbol, "…")
+
+        let wide = Buffer(Rect(0, 0, 8, 1))
+        wide.setTextWidthOptions(TextWidthOptions(ambiguousWidth: AmbiguousWidth.Wide))
+        TaskActivityView(item).render(wide.area, wide)
+        @Expect(wide.getCell(0, 0).symbol, "◌")
+        @Expect(wide.getCell(1, 0).symbol, " ")
+        @Expect(wide.getCell(3, 0).symbol, "l")
+        @Expect(wide.getCell(7, 0).symbol, ".")
+
+        let ascii = Buffer(Rect(0, 0, 8, 1))
+        ascii.setCapabilities(TerminalCapabilities(unicode: false))
+        TaskActivityView(item, theme: Theme(iconSet: IconSet.NerdFont)).render(ascii.area, ascii)
+        @Expect(ascii.getCell(0, 0).symbol, ">")
+        @Expect(ascii.getCell(7, 0).symbol, ".")
+
+        let nerd = Buffer(Rect(0, 0, 8, 1))
+        TaskActivityView(item, theme: Theme(iconSet: IconSet.NerdFont)).render(nerd.area, nerd)
+        @Expect(nerd.getCell(0, 0).symbol, "\u{f252}")
+        @Expect(nerd.getCell(7, 0).symbol, "…")
+
+        let tiny = Buffer(Rect(0, 0, 1, 1))
+        TaskActivityView(item, layout: TaskActivityLayout.Compact).render(tiny.area, tiny)
+        @Expect(tiny.getCell(0, 0).symbol, "◌")
+        let asciiTiny = Buffer(Rect(0, 0, 1, 1))
+        TaskActivityView(item, layout: TaskActivityLayout.Compact, unicode: false).render(asciiTiny.area, asciiTiny)
+        @Expect(asciiTiny.getCell(0, 0).symbol, ">")
     }
 
     @TestCase
@@ -63,7 +98,7 @@ class TaskActivityViewTest {
         @Expect(over.getCell(2, 1).symbol, "●")
         @Expect(over.getCell(4, 1).symbol, "●")
         @Expect(huge.getCell(2, 1).symbol, "●")
-        @Expect(huge.getCell(10, 1).symbol, "◌")
+        @Expect(huge.getCell(10, 1).symbol, "…")
         let empty = Buffer(Rect(0, 0, 12, 3))
         TaskActivityView(TaskActivity("job", progress: Some(TaskProgress.Counts(5, -2)))).render(empty.area, empty)
         @Expect(empty.getCell(2, 1).symbol, " ")

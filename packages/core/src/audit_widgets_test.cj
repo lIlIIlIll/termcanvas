@@ -185,7 +185,7 @@ class CjTuiAuditWidgetsTest {
         table.render(area, actual)
         @Expect(auditWidgetOutsideChanges(actual, area), 0)
         @Expect(actual.getCell(2, 2).symbol, "A")
-        @Expect(actual.getCell(5, 2).symbol, "D")
+        @Expect(actual.getCell(5, 2).symbol, "…")
         let framed = auditWidgetSentinels()
         let outer = Rect(2, 1, 8, 4)
         VirtualTable([TableColumn("HEAD", width: 12)], 1, { _ => ["abcdefghijk"] }, block: Some(Block(title: "T"))).render(outer, framed)

@@ -7,6 +7,10 @@ public enum BorderKind {
     | Ascii
     | Unicode
     | Rounded
+    /** 双线 Unicode 边框。 */
+    | Double
+    /** 使用 Unicode 虚线边及直角连接符。 */
+    | Dashed
     | NoBorder
 }
 
@@ -58,6 +62,14 @@ public class BorderSet {
 
     public static func rounded(): BorderSet {
         BorderSet(horizontal: "─", vertical: "│", topLeft: "╭", topRight: "╮", bottomLeft: "╰", bottomRight: "╯")
+    }
+
+    public static func doubleLine(): BorderSet {
+        BorderSet(horizontal: "═", vertical: "║", topLeft: "╔", topRight: "╗", bottomLeft: "╚", bottomRight: "╝")
+    }
+
+    public static func dashed(): BorderSet {
+        BorderSet(horizontal: "┄", vertical: "┆", topLeft: "┌", topRight: "┐", bottomLeft: "└", bottomRight: "┘")
     }
 }
 
@@ -117,8 +129,9 @@ public class BlockOptions {
 
 public class Block <: Widget {
     private let options: BlockOptions
+    private var inheritedTheme: ?Theme = None
 
-    public init(title!: String = "", style!: Style = Style.default()) {
+    public init(title!: String = "", style!: ?Style = None) {
         this.options = BlockOptions(title: title, borderStyle: style, titleStyle: style)
     }
 
@@ -126,11 +139,22 @@ public class Block <: Widget {
         this.options = options
     }
 
+    // Panel uses the block's explicit theme as the default for its child.
+    func explicitTheme(): ?Theme { options.theme }
+
+    /** 根据最近一次绘制时的主题计算内容区域；尚未绘制时使用区块显式主题和默认值。
+     */
     public func inner(area: Rect): Rect {
         contentArea(frameArea(area))
     }
 
+    /** 绘制前可显式提供应用主题以计算内容区域；区块自身的显式主题优先。 */
+    public func inner(area: Rect, theme!: ?Theme): Rect {
+        contentAreaForTheme(frameArea(area), resolveBlockTheme(theme))
+    }
+
     public func renderInner(area: Rect, buffer: Buffer): Rect {
+        inheritedTheme = buffer.resolveTheme(None)
         let frame = frameArea(area)
         if (frame.width <= 0 || frame.height <= 0) { return Rect(frame.x, frame.y, 0, 0) }
         buffer.withCanvasClip(frame) { => renderFrame(frame, buffer) }
@@ -138,11 +162,11 @@ public class Block <: Widget {
     }
 
     private func renderFrame(frame: Rect, buffer: Buffer): Unit {
-        let background = resolvedBoxBackground()
+        let background = resolvedBoxBackground(buffer)
         if (options.hasBackgroundStyle || background != Style.default()) {
             buffer.fill(frame, style: background)
         }
-        if (!isBorderNone(options.borderKind)) {
+        if (!isBorderNone(effectiveBorderKind())) {
             renderBorder(frame, buffer)
             renderTitle(frame, buffer)
         }
@@ -161,7 +185,11 @@ public class Block <: Widget {
     }
 
     private func contentArea(frame: Rect): Rect {
-        let borderInset = if (isBorderNone(options.borderKind)) { Int64(0) } else { Int64(1) }
+        contentAreaForTheme(frame, resolveBlockTheme(inheritedTheme))
+    }
+
+    private func contentAreaForTheme(frame: Rect, theme: ?Theme): Rect {
+        let borderInset = if (isBorderNone(effectiveBorderKind(theme))) { Int64(0) } else { Int64(1) }
         options.padding.inner(Rect(
             frame.x + borderInset,
             frame.y + borderInset,
@@ -173,9 +201,15 @@ public class Block <: Widget {
     private func renderBorder(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let border = resolvedBorder(buffer)
-        let style = resolvedBoxBorder()
+        let style = resolvedBoxBorder(buffer)
         if (area.height == 1) {
             _ = buffer.writeStringClipped(area.x, area.y, repeat(border.horizontal, area.width), maxWidth: area.width, style: style)
+            return
+        }
+        if (area.width == 1) {
+            for (y in area.y..area.bottom) {
+                _ = buffer.writeStringClipped(area.x, y, border.vertical, maxWidth: 1, style: style)
+            }
             return
         }
         _ = buffer.writeStringClipped(area.x, area.y, repeat(border.horizontal, area.width), maxWidth: area.width, style: style)
@@ -194,14 +228,14 @@ public class Block <: Widget {
 
     private func renderTitle(area: Rect, buffer: Buffer): Unit {
         if (options.title.isEmpty() || area.width <= 4) { return }
-        let text = truncate(options.title, max(0, area.width - 4))
-        let width = displayWidthFast(text)
+        let text = truncate(options.title, max(0, area.width - 4), options: buffer.textWidthOptions())
+        let width = displayWidthFast(text, options: buffer.textWidthOptions())
         let x = match (options.titleAlign) {
             case TitleAlign.Left => area.x + 2
             case TitleAlign.Center => area.x + max(1, (area.width - width) / 2)
             case TitleAlign.Right => area.right - width - 2
         }
-        buffer.setString(max(area.x + 1, min(x, area.right - width - 1)), area.y, text, style: resolvedBoxTitle())
+        buffer.setString(max(area.x + 1, min(x, area.right - width - 1)), area.y, text, style: resolvedBoxTitle(buffer))
     }
 
     private func resolvedBorder(buffer: Buffer): BorderSet {
@@ -212,23 +246,59 @@ public class Block <: Widget {
             !border.bottomLeft.isEmpty() || !border.bottomRight.isEmpty()) {
             return border
         }
+        // Single-cell Unicode borders cannot be represented when ambiguous characters are wide.
+        if (usesWideAmbiguous(buffer.textWidthOptions())) { return BorderSet.ascii() }
+        // A theme supplies the application default; honor the terminal's
+        // Unicode capability unless the component explicitly chose a kind.
         match (options.borderKind) {
+            case BorderKind.Auto => if (!buffer.capabilities().unicode) { return BorderSet.ascii() }
+            case _ => ()
+        }
+        match (effectiveBorderKind()) {
             case BorderKind.Auto => if (buffer.capabilities().unicode) { BorderSet.rounded() } else { BorderSet.ascii() }
             case BorderKind.Ascii => BorderSet.ascii()
             case BorderKind.Unicode => BorderSet.unicode()
             case BorderKind.Rounded => BorderSet.rounded()
+            case BorderKind.Double => BorderSet.doubleLine()
+            case BorderKind.Dashed => BorderSet.dashed()
             case BorderKind.NoBorder => BorderSet.ascii()
         }
     }
 
-    private func resolvedBoxBackground(): Style {
-        if (options.hasBackgroundStyle) { return options.backgroundStyle }
-        match (options.theme) { case Some(theme) => theme.canvas; case None => Style.default() }
+    private func resolveBlockTheme(theme: ?Theme): ?Theme {
+        match (options.theme) { case Some(value) => Some(value); case None => theme }
     }
 
-    private func resolvedBoxBorder(): Style {
+    private func effectiveBorderKind(): BorderKind {
+        effectiveBorderKind(resolveBlockTheme(inheritedTheme))
+    }
+
+    private func effectiveBorderKind(theme: ?Theme): BorderKind {
+        match (options.borderKind) {
+            case BorderKind.Auto =>
+                let border = options.border
+                if (!border.horizontal.isEmpty() || !border.vertical.isEmpty() ||
+                    !border.topLeft.isEmpty() || !border.topRight.isEmpty() ||
+                    !border.bottomLeft.isEmpty() || !border.bottomRight.isEmpty()) {
+                    BorderKind.Auto
+                } else {
+                    match (theme) {
+                        case Some(value) => value.borderKind
+                        case None => BorderKind.Auto
+                    }
+                }
+            case _ => options.borderKind
+        }
+    }
+
+    private func resolvedBoxBackground(buffer: Buffer): Style {
+        if (options.hasBackgroundStyle) { return options.backgroundStyle }
+        match (buffer.resolveTheme(options.theme)) { case Some(theme) => theme.canvas; case None => Style.default() }
+    }
+
+    private func resolvedBoxBorder(buffer: Buffer): Style {
         if (options.hasBorderStyle) { return options.borderStyle }
-        match (options.theme) {
+        match (buffer.resolveTheme(options.theme)) {
             case Some(theme) => match (options.state) {
                 case BoxState.Normal => theme.border
                 case BoxState.Focused | BoxState.Active => theme.strongBorder
@@ -239,9 +309,9 @@ public class Block <: Widget {
         }
     }
 
-    private func resolvedBoxTitle(): Style {
+    private func resolvedBoxTitle(buffer: Buffer): Style {
         if (options.hasTitleStyle) { return options.titleStyle }
-        match (options.theme) { case Some(theme) => theme.heading; case None => Style.default() }
+        match (buffer.resolveTheme(options.theme)) { case Some(theme) => theme.heading; case None => Style.default() }
     }
 
 }
@@ -263,7 +333,7 @@ public class Panel <: Widget {
     public func renderInner(area: Rect, buffer: Buffer): Rect {
         let inner = block.renderInner(area, buffer)
         match (child) {
-            case Some(w) => w.render(inner, buffer)
+            case Some(w) => buffer.withParentTheme(block.explicitTheme()) { => w.render(inner, buffer) }
             case None => ()
         }
         inner
@@ -277,15 +347,17 @@ public class Panel <: Widget {
 public class Paragraph <: Widget {
     private let text: String
     private let block: ?Block
-    private let style: Style
+    private let style: ?Style
     private let scroll: Int64
     private let wrap: WrapMode
     private let align: TextAlign
 
+    /** 保存段落文本与绘制设置；负数滚动行数按零处理。省略样式时使用应用主题的正文样式，显式样式优先。
+     */
     public init(
         text: String,
         block!: ?Block = None,
-        style!: Style = Style.default(),
+        style!: ?Style = None,
         scroll!: Int64 = 0,
         wrap!: WrapMode = WrapMode.Character,
         align!: TextAlign = TextAlign.Left
@@ -309,15 +381,30 @@ public class Paragraph <: Widget {
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
-        let lines = wrapText(text, target.width, wrap)
+        let normalStyle = match (style) {
+            case Some(value) => value
+            case None => match (buffer.resolveTheme(None)) { case Some(value) => value.normal; case None => Style.default() }
+        }
+        let lines = wrapText(text, target.width, wrap, options: buffer.textWidthOptions())
         var row: Int64 = 0
         while (row < target.height && row + scroll < lines.size) {
             let line = lines[row + scroll]
-            let x = alignedX(target, displayWidth(line), align)
-            buffer.setString(x, target.y + row, truncate(line, target.width), style: style)
+            let x = alignedX(target, displayWidth(line, options: buffer.textWidthOptions()), align)
+            buffer.setString(x, target.y + row, truncate(line, target.width, options: buffer.textWidthOptions()), style: normalStyle)
             row++
         }
     }
+}
+
+// Event APIs have no Buffer. Prefer a component theme, then an explicitly
+// supplied layout theme, then the context from this component's last render.
+func controlBlockArea(area: Rect, block: ?Block, componentTheme: ?Theme,
+    layoutTheme: ?Theme, renderedTheme: ?Theme): Rect {
+    let effective = match (componentTheme) {
+        case Some(value) => Some(value)
+        case None => match (layoutTheme) { case Some(value) => Some(value); case None => renderedTheme }
+    }
+    match (block) { case Some(value) => value.inner(area, theme: effective); case None => area }
 }
 
 public class List <: Widget {
@@ -330,6 +417,7 @@ public class List <: Widget {
     private let selectedStyle: ?Style
     private let focused: Bool
     private let theme: ?Theme
+    private var renderedTheme: ?Theme = None
     private let selectionMarker: ?String
 
     public init(
@@ -356,8 +444,11 @@ public class List <: Widget {
         this.selectionMarker = selectionMarker
     }
 
-    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
-        let target = widgetInnerArea(area, block)
+    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
+        let target = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         match (state) {
             case Some(value) =>
                 let current = match (value.selected) { case Some(index) => index; case None => 0 }
@@ -376,9 +467,10 @@ public class List <: Widget {
     }
 
     private func renderClipped(area: Rect, buffer: Buffer): Unit {
+        renderedTheme = buffer.resolveTheme(None)
         var target = area
         if (let Some(b) <- block) {
-            b.render(area, buffer)
+            buffer.withParentTheme(theme) { => b.render(area, buffer) }
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
@@ -396,8 +488,9 @@ public class List <: Widget {
             case Some(s) => s.selected
             case None => selected
         }
-        let marker = resolvedSelectionMarker(selectionMarker, theme, buffer.capabilities())
-        let markerColumns = min(target.width, displayWidth(marker))
+        let activeTheme = buffer.resolveTheme(theme)
+        let marker = resolvedSelectionMarker(selectionMarker, activeTheme, buffer.capabilities())
+        let markerColumns = min(target.width, displayWidth(marker, options: buffer.textWidthOptions()))
         let gap = if (markerColumns > 0) { Int64(1) } else { Int64(0) }
         for (i in 0..rows) {
             let itemIndex = i + renderOffset
@@ -406,17 +499,49 @@ public class List <: Widget {
                 case Some(v) => v == itemIndex
                 case None => false
             }
-            let prefix = if (active) { truncate(marker, markerColumns) + repeat(" ", gap) } else { repeat(" ", markerColumns + gap) }
-            var rowStyle = if (active) { listSelectionStyle(selectedStyle, theme) } else { themedNormal(style, theme) }
+            var rowStyle = if (active) { listSelectionStyle(selectedStyle, activeTheme) } else { themedNormal(style, activeTheme) }
             if (active && focused) {
                 var modifier = rowStyle.modifier
                 modifier.bold = true
                 modifier.underline = true
                 rowStyle = rowStyle.withModifier(modifier)
             }
-            buffer.fillRect(Rect(target.x, target.y + i, target.width, 1), style: rowStyle)
-            _ = buffer.writeStringClipped(target.x, target.y + i, prefix + items[itemIndex], maxWidth: target.width, style: rowStyle)
+            buffer.fillRect(Rect(target.x, target.y + i, target.width, 1), style: rowFillStyle(rowStyle))
+            if (active && markerColumns > 0) {
+                if (focused) {
+                    writeFocusedListText(target.x, target.y + i, marker, markerColumns, rowStyle, buffer)
+                } else {
+                    _ = buffer.writeStringClipped(target.x, target.y + i, marker, maxWidth: markerColumns, style: rowStyle)
+                }
+            }
+            let prefixWidth = min(target.width, markerColumns + gap)
+            if (active && focused) {
+                writeFocusedListText(target.x + prefixWidth, target.y + i, items[itemIndex],
+                    target.width - prefixWidth, rowStyle, buffer)
+            } else {
+                _ = buffer.writeStringClipped(target.x + prefixWidth, target.y + i, items[itemIndex],
+                    maxWidth: target.width - prefixWidth, style: rowStyle)
+            }
         }
+    }
+}
+
+// Focus underlines should not join tree glyphs and labels across indentation.
+// Preserve each whitespace grapheme and its width; only its underline changes.
+func writeFocusedListText(x: Int64, y: Int64, text: String, width: Int64, style: Style, buffer: Buffer): Unit {
+    var used: Int64 = 0
+    var offset: Int64 = 0
+    while (offset < text.size && used < width) {
+        let next = nextGraphemeOffset(text, offset)
+        let glyph = text[offset..next]
+        let glyphWidth = graphemeDisplayWidth(glyph, options: buffer.textWidthOptions())
+        offset = next
+        if (glyphWidth <= 0) { continue }
+        if (glyphWidth > width - used) { break }
+        let whitespace = glyph == " " || glyph == "\u{00A0}" || glyph == "\u{3000}"
+        let glyphStyle = if (whitespace) { rowFillStyle(style) } else { style }
+        _ = buffer.writeStringClipped(x + used, y, glyph, maxWidth: width - used, style: glyphStyle)
+        used += glyphWidth
     }
 }
 
@@ -513,21 +638,26 @@ public class Table <: Widget {
     private let widths: Array<Int64>
     private let state: ?TableState
     private let block: ?Block
-    private let style: Style
-    private let headerStyle: Style
+    private let style: ?Style
+    private let headerStyle: ?Style
     private let selectedStyle: ?Style
     private let focused: Bool
     private let theme: ?Theme
+    private var renderedTheme: ?Theme = None
     private let selectionMarker: ?String
 
+    /** 保存表头、数据行、列宽及绘制设置，用于后续表格绘制。
+     * 省略 style 时普通数据行保留已有背景；显式样式沿用主题样式合并规则。
+     * 省略 headerStyle 时使用主题标题样式，并保留表头与分隔线下方已有的背景；显式样式原样使用，包括重置背景色。
+     */
     public init(
         headers: Array<String>,
         rows: Array<Array<String>>,
         widths!: Array<Int64> = [],
         state!: ?TableState = None,
         block!: ?Block = None,
-        style!: Style = Style.default(),
-        headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()),
+        style!: ?Style = None,
+        headerStyle!: ?Style = None,
         selectedStyle!: ?Style = None,
         focused!: Bool = false,
         theme!: ?Theme = None,
@@ -546,8 +676,11 @@ public class Table <: Widget {
         this.selectionMarker = selectionMarker
     }
 
-    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
-        let inner = widgetInnerArea(area, block)
+    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
+        let inner = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         let target = Rect(inner.x, inner.y + 2, inner.width, max(0, inner.height - 2))
         match (state) {
             case Some(value) =>
@@ -567,9 +700,10 @@ public class Table <: Widget {
     }
 
     private func renderClipped(area: Rect, buffer: Buffer): Unit {
+        renderedTheme = buffer.resolveTheme(None)
         var target = area
         if (let Some(b) <- block) {
-            b.render(area, buffer)
+            buffer.withParentTheme(theme) { => b.render(area, buffer) }
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
@@ -578,15 +712,33 @@ public class Table <: Widget {
     }
 
     private func renderRows(target: Rect, buffer: Buffer): Unit {
-        let marker = resolvedSelectionMarker(selectionMarker, theme, buffer.capabilities())
-        let markerColumns = min(max(0, target.width - 1), displayWidth(marker))
+        let activeTheme = buffer.resolveTheme(theme)
+        let marker = resolvedSelectionMarker(selectionMarker, activeTheme, buffer.capabilities())
+        let markerColumns = min(max(0, target.width - 1), displayWidth(marker, options: buffer.textWidthOptions()))
         let markerWidth: Int64 = if (state.isSome() && markerColumns > 0 && markerColumns + 1 < target.width) { markerColumns + 1 } else { 0 }
         let colWidths = resolvedWidths(target.width - markerWidth)
-        renderRow(target.x + markerWidth, target.y, target.right, headers, colWidths, headerStyle, buffer)
-        if (target.height > 1) {
-            let line = if (buffer.capabilities().unicode) { "─" } else { "-" }
-            buffer.setString(target.x, target.y + 1, repeat(line, target.width), style: headerStyle)
+        let headerPaint = match (headerStyle) {
+            case Some(explicit) => explicit
+            case None => match (activeTheme) {
+                case Some(value) => value.heading
+                case None => Style(fg: Color.Yellow, modifier: Modifier.strong())
+            }
         }
+        let headerSurface: ?TableHeaderSurface = if (headerStyle.isNone()) {
+            Some(TableHeaderSurface(Rect(target.x, target.y, target.width, min(Int64(2), target.height)), buffer))
+        } else { None }
+        renderRow(target.x + markerWidth, target.y, target.right, headers, colWidths, headerPaint, buffer,
+            headerSurface: headerSurface)
+        if (target.height > 1) {
+            let line = if (buffer.capabilities().unicode && !usesWideAmbiguous(buffer.textWidthOptions())) { "─" } else { "-" }
+            let text = repeat(line, target.width)
+            match (headerSurface) {
+                case Some(surface) => tableWriteOnExistingBackground(target.x, target.y + 1, text,
+                    target.width, headerPaint, buffer, surface)
+                case None => buffer.setString(target.x, target.y + 1, text, style: headerPaint)
+            }
+        }
+        if (let Some(surface) <- headerSurface) { surface.restoreWideRepairs(buffer) }
         let rowLimit = min(rows.size, max(0, target.height - 2))
         let renderOffset = match (state) {
             case Some(s) => max(0, s.offset)
@@ -603,18 +755,29 @@ public class Table <: Widget {
                 case Some(v) => v == rowIndex
                 case None => false
             }
-            var rowStyle = if (active) { listSelectionStyle(selectedStyle, theme) } else { themedNormal(style, theme) }
+            let normalStyle = match (style) { case Some(value) => value; case None => Style.default() }
+            var rowStyle = if (active) { listSelectionStyle(selectedStyle, activeTheme) } else { themedNormal(normalStyle, activeTheme) }
             if (active && focused) {
                 var modifier = rowStyle.modifier
                 modifier.bold = true
                 modifier.underline = true
                 rowStyle = rowStyle.withModifier(modifier)
             }
-            buffer.fillRect(Rect(target.x, target.y + 2 + i, target.width, 1), style: rowStyle)
-            if (active && markerWidth > 0) {
-                _ = buffer.writeStringClipped(target.x, target.y + 2 + i, marker, maxWidth: markerWidth - 1, style: rowStyle)
+            let rowY = target.y + 2 + i
+            let rowSurface: ?TableHeaderSurface = if (!active && style.isNone()) {
+                Some(TableHeaderSurface(Rect(target.x, rowY, target.width, 1), buffer))
+            } else { None }
+            match (rowSurface) {
+                case Some(surface) => tableWriteOnExistingBackground(target.x, rowY, repeat(" ", target.width),
+                    target.width, rowFillStyle(rowStyle), buffer, surface)
+                case None => buffer.fillRect(Rect(target.x, rowY, target.width, 1), style: rowFillStyle(rowStyle))
             }
-            renderRow(target.x + markerWidth, target.y + 2 + i, target.right, rows[rowIndex], colWidths, rowStyle, buffer)
+            if (active && markerWidth > 0) {
+                _ = buffer.writeStringClipped(target.x, rowY, marker, maxWidth: markerWidth - 1, style: rowStyle)
+            }
+            renderRow(target.x + markerWidth, rowY, target.right, rows[rowIndex], colWidths, rowStyle, buffer,
+                headerSurface: rowSurface)
+            if (let Some(surface) <- rowSurface) { surface.restoreWideRepairs(buffer) }
         }
     }
 
@@ -634,17 +797,110 @@ public class Table <: Widget {
         cols: Array<String>,
         widths: Array<Int64>,
         style: Style,
-        buffer: Buffer
+        buffer: Buffer,
+        headerSurface!: ?TableHeaderSurface = None
     ): Unit {
         var cx = x
         let limit = min(cols.size, widths.size)
         for (i in 0..limit) {
             if (cx >= right) { return }
             let width = max(0, widths[i])
-            _ = buffer.writeStringClipped(cx, y, cols[i], maxWidth: min(width, right - cx), style: style)
+            let visibleWidth = min(width, right - cx)
+            let text = clippedWithEllipsis(cols[i], visibleWidth, buffer)
+            let textWidth = displayWidth(text, options: buffer.textWidthOptions())
+            if (text != cols[i] && textWidth < visibleWidth) {
+                match (headerSurface) {
+                    case Some(surface) => tableWriteOnExistingBackground(cx + textWidth, y,
+                        repeat(" ", visibleWidth - textWidth), visibleWidth - textWidth, style, buffer, surface)
+                    case None => buffer.fillRect(Rect(cx + textWidth, y, visibleWidth - textWidth, 1), style: style)
+                }
+            }
+            match (headerSurface) {
+                case Some(surface) => tableWriteOnExistingBackground(cx, y, text, visibleWidth, style, buffer, surface)
+                case None => _ = buffer.writeStringClipped(cx, y, text, maxWidth: visibleWidth, style: style)
+            }
             cx += width + 1
         }
     }
+
+}
+
+// Snapshot both rows before drawing: writing one half of an old wide glyph can
+// repair the other half, so reading live backgrounds while drawing is unsafe.
+class TableHeaderSurface {
+    private let area: Rect
+    private let cells: Array<Cell>
+
+    init(area: Rect, buffer: Buffer) {
+        let clipped = intersect(area, buffer.area)
+        this.area = clipped
+        this.cells = Array<Cell>(clipped.width * clipped.height, { i =>
+            buffer.getCell(clipped.x + i % clipped.width, clipped.y + i / clipped.width)
+        })
+    }
+
+    func background(x: Int64, y: Int64): Color {
+        if (x < area.x || x >= area.right || y < area.y || y >= area.bottom) { return Color.Reset }
+        cells[(y - area.y) * area.width + x - area.x].style.bg
+    }
+
+    func restoreWideRepairs(buffer: Buffer): Unit {
+        for (y in area.y..area.bottom) {
+            for (x in area.x..area.right) {
+                let original = cells[(y - area.y) * area.width + x - area.x]
+                let wasWide = match (original.kind) { case CellKind.WideLead | CellKind.WideCont => true; case _ => false }
+                if (!wasWide) { continue }
+                let current = buffer.getCell(x, y)
+                let blank = match (current.kind) { case CellKind.Normal => current.symbol == " "; case _ => false }
+                if (blank && !colorEquals(current.style.bg, original.style.bg)) {
+                    buffer.setCell(x, y, Cell(" ", style: current.style.withBg(original.style.bg)))
+                }
+            }
+        }
+    }
+}
+
+// A header without an explicit style inherits the captured surface below each glyph.
+func tableWriteOnExistingBackground(x: Int64, y: Int64, text: String, maxWidth: Int64,
+    style: Style, buffer: Buffer, surface: TableHeaderSurface): Unit {
+    var column = x
+    var used: Int64 = 0
+    for (cluster in graphemeClusters(text, options: buffer.textWidthOptions())) {
+        if (cluster.width <= 0) { continue }
+        if (cluster.width > maxWidth - used) { break }
+        let paint = style.withBg(surface.background(column, y))
+        _ = buffer.writeStringClipped(column, y, cluster.text, maxWidth: cluster.width, style: paint)
+        column += cluster.width
+        used += cluster.width
+    }
+}
+
+// Keep the truncation marker to one cell even on ASCII or wide-ambiguous terminals.
+func clippedWithEllipsis(text: String, width: Int64, buffer: Buffer): String {
+    if (width <= 0) { return "" }
+    let options = buffer.textWidthOptions()
+    let (prefixEnd, _, clipped) = ellipsisScan(text, width, options)
+    if (!clipped) { return text }
+    let marker = if (buffer.capabilities().unicode && displayWidth("…", options: options) == 1) { "…" } else { "." }
+    text[0..prefixEnd] + marker
+}
+
+// Return the fitting prefix, consumed byte offset and whether the text overflowed.
+func ellipsisScan(text: String, width: Int64, options: TextWidthOptions): (Int64, Int64, Bool) {
+    var offset: Int64 = 0
+    var used: Int64 = 0
+    var prefixEnd: Int64 = 0
+    while (offset < text.size) {
+        let next = nextGraphemeOffset(text, offset)
+        let clusterWidth = graphemeDisplayWidth(text[offset..next], options: options)
+        if (clusterWidth > width - used) {
+            return (prefixEnd, next, true)
+        }
+        used += clusterWidth
+        offset = next
+        if (used <= width - 1) { prefixEnd = offset }
+    }
+    (prefixEnd, offset, false)
 }
 
 // Explicit markers are application-owned. Built-in markers follow both the
@@ -661,6 +917,13 @@ func resolvedSelectionMarker(marker: ?String, theme: ?Theme, capabilities: Termi
                 case IconSet.NerdFont => "\u{F111}"
             }
     }
+}
+
+// Underline is a text decoration: keep all other row style attributes on padding.
+func rowFillStyle(style: Style): Style {
+    var modifier = style.modifier
+    modifier.underline = false
+    style.withModifier(modifier)
 }
 
 // Preserve explicit selection styles while providing a visible default without a theme.
@@ -802,20 +1065,41 @@ public class Scrollbar <: Widget {
         }
     }
 
+    /** 在区域最右列绘制轨道和滑块；Unicode 不可用或符号并非单列时回退至 ASCII。单行视口使用方向标记表示还有内容可滚动。区域宽高不大于 0、视口不大于 0 或内容量不超过视口时不写入缓冲区。
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0 || total <= viewport || viewport <= 0) {
             return
         }
         let x = area.right - 1
+        if (area.height == 1) {
+            let maximum = total - viewport
+            let marker = if (offset <= 0) { "↓" } else if (offset >= maximum) { "↑" } else { "↕" }
+            let fallback = if (offset <= 0) { "v" } else if (offset >= maximum) { "^" } else { ":" }
+            let symbol = if (buffer.capabilities().unicode && displayWidth(marker, options: buffer.textWidthOptions()) == 1) {
+                marker
+            } else {
+                fallback
+            }
+            _ = buffer.writeStringClipped(x, area.y, symbol, maxWidth: 1, style: thumbStyle)
+            return
+        }
+        let unicodeTrack = "│"
+        let unicodeThumb = "┃"
+        let useUnicode = buffer.capabilities().unicode &&
+            displayWidth(unicodeTrack, options: buffer.textWidthOptions()) == 1 &&
+            displayWidth(unicodeThumb, options: buffer.textWidthOptions()) == 1
+        let track = if (useUnicode) { unicodeTrack } else { "|" }
+        let thumb = if (useUnicode) { unicodeThumb } else { "#" }
         for (y in area.y..area.bottom) {
-            buffer.setString(x, y, "|", style: style)
+            buffer.setString(x, y, track, style: style)
         }
         let thumbHeight = max(1, scaledChartHeight(min(viewport, total), area.height, total))
         let maxOffset = max(1, total - viewport)
         let maxThumbTop = max(0, area.height - thumbHeight)
         let thumbTop = area.y + min(maxThumbTop, scaledChartHeight(min(offset, maxOffset), maxThumbTop, maxOffset))
         for (y in thumbTop..min(area.bottom, thumbTop + thumbHeight)) {
-            buffer.setString(x, y, "#", style: thumbStyle)
+            buffer.setString(x, y, thumb, style: thumbStyle)
         }
     }
 }
@@ -830,15 +1114,17 @@ public class Input <: Widget {
      */
     public var cursor: Int64
     private var viewportOffset: Int64 = 0
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private let block: ?Block
     private let style: Style
     private let placeholder: String
-    private let placeholderStyle: Style
+    private let placeholderStyle: ?Style
     private let showBoundary: Bool
     private var focused: Bool = false
     private var disabled: Bool = false
     private var error: Bool = false
     private var theme: ?Theme = None
+    private var renderedTheme: ?Theme = None
 
     /** 建立输入控件并保存文本、边框及显示样式；初始光标位置会调整到文本的字符边界。
      */
@@ -848,7 +1134,7 @@ public class Input <: Widget {
         block!: ?Block = None,
         style!: Style = Style.default(),
         placeholder!: String = "",
-        placeholderStyle!: Style = Style(fg: Color.Indexed(8)),
+        placeholderStyle!: ?Style = None,
         showBoundary!: Bool = true
     ) {
         this.value = value
@@ -914,7 +1200,9 @@ public class Input <: Widget {
         }
     }
 
-    public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects {
+    public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects { handleWithDirty(key, area, layoutTheme: None) }
+
+    public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects {
         let beforeViewport = viewportOffset
         let beforeEmpty = value.isEmpty()
         if (!handle(key)) { return None }
@@ -922,21 +1210,24 @@ public class Input <: Widget {
         if (beforeViewport != viewportOffset || beforeEmpty != value.isEmpty()) {
             dirty.add(area)
         } else {
-            let target = widgetInnerArea(area, block)
+            let target = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
             dirty.add(Rect(target.x, target.y, target.width, min(Int64(1), target.height)))
         }
         Some(dirty)
     }
 
-    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
         if (disabled) { return false }
-        let outer = widgetInnerArea(area, block)
+        let outer = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         if (!widgetHitTest(mouse, outer) || mouse.y != outer.y) { return false }
         let target = inputContentArea(outer)
         match ((mouse.kind, mouse.button)) {
             case (MouseKind.Down, MouseButton.Left) =>
                 ensureCursorVisible(target.width)
-                cursor = viewportOffset + offsetAtLineColumn(value[viewportOffset..], 0, max(0, mouse.x - target.x))
+                cursor = viewportOffset + offsetAtLineColumn(value[viewportOffset..], 0, max(0, mouse.x - target.x), options: textWidthOptionsValue)
                 true
             case _ => false
         }
@@ -947,14 +1238,17 @@ public class Input <: Widget {
     }
 
     private func renderClipped(area: Rect, buffer: Buffer): Unit {
+        textWidthOptionsValue = buffer.textWidthOptions()
+        renderedTheme = buffer.resolveTheme(None)
         var target = area
         if (let Some(b) <- block) {
-            b.render(area, buffer)
+            buffer.withParentTheme(theme) { => b.render(area, buffer) }
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
-        let resolved = visualStyle()
-        buffer.fillRect(target, style: resolved)
+        let activeTheme = buffer.resolveTheme(theme)
+        let resolved = visualStyle(activeTheme)
+        buffer.fillRect(target, style: rowFillStyle(resolved))
         let content = inputContentArea(target)
         if (showBoundary && block.isNone()) {
             buffer.setString(target.x, target.y, "[", style: resolved)
@@ -963,22 +1257,25 @@ public class Input <: Widget {
         target = content
         if (target.width <= 0) { return }
         if (value.isEmpty() && !placeholder.isEmpty()) {
-            var placeholderColor = placeholderStyle
-            if (placeholderColor == Style(fg: Color.Indexed(8))) {
-                match (theme) {
-                    case Some(value) => placeholderColor = value.disabled
-                    case None => placeholderColor = Style(fg: Color.Indexed(8))
+            let placeholderColor = match (placeholderStyle) {
+                case Some(value) => value
+                case None => if (error && !disabled) { resolved } else {
+                    match (activeTheme) {
+                        case Some(value) => value.disabled
+                        case None => Style(fg: Color.Indexed(8))
+                    }
                 }
             }
-            buffer.setString(target.x, target.y, truncate(placeholder, target.width),
-                style: placeholderColor.withBg(resolved.bg))
+            let placeholderModifier = combineModifiers(placeholderColor.modifier, resolved.modifier)
+            buffer.setString(target.x, target.y, truncate(placeholder, target.width, options: buffer.textWidthOptions()),
+                style: placeholderColor.withBg(resolved.bg).withModifier(placeholderModifier))
             return
         }
         ensureCursorVisible(target.width)
-        buffer.setString(target.x, target.y, truncate(value[viewportOffset..], target.width), style: resolved)
+        buffer.setString(target.x, target.y, truncate(value[viewportOffset..], target.width, options: buffer.textWidthOptions()), style: resolved)
     }
 
-    private func visualStyle(): Style {
+    private func visualStyle(theme: ?Theme): Style {
         match (theme) {
             case Some(_) =>
                 resolvedSemanticStateStyle(
@@ -1008,18 +1305,23 @@ public class Input <: Widget {
         }
     }
 
-    /** 按内容区域宽度调整文本视口，并返回光标在该区域首行的显示位置；有外围区块时使用其内部区域。
+    /** 使用指定宽度策略计算光标位置，也将其用于后续的鼠标命中及视口调整。 */
+    public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position {
+        textWidthOptionsValue = options
+        cursorPosition(area, layoutTheme: layoutTheme)
+    }
+
+    /** 按内容区域宽度调整文本视口，并返回光标在该区域首行的显示位置；有外围区块时使用其内部区域。绘制前可用 layoutTheme 指定应用主题。
      */
-    public func cursorPosition(area: Rect): Position {
-        var target = area
-        if (let Some(b) <- block) {
-            target = b.inner(area)
-        }
+    public func cursorPosition(area: Rect): Position { cursorPosition(area, layoutTheme: None) }
+
+    public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position {
+        var target = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         let outer = target
         target = inputContentArea(target)
         if (target.width <= 0) { return Position(outer.x, outer.y) }
         ensureCursorVisible(target.width)
-        Position(target.x + min(displayWidth(value[viewportOffset..cursor]), target.width - 1), target.y)
+        Position(target.x + min(displayWidth(value[viewportOffset..cursor], options: textWidthOptionsValue), target.width - 1), target.y)
     }
 
     private func inputContentArea(area: Rect): Rect {
@@ -1079,7 +1381,7 @@ public class Input <: Widget {
         if (cursor < viewportOffset) {
             viewportOffset = cursor
         }
-        while (displayWidth(value[viewportOffset..cursor]) >= width && viewportOffset < cursor) {
+        while (displayWidth(value[viewportOffset..cursor], options: textWidthOptionsValue) >= width && viewportOffset < cursor) {
             viewportOffset = nextRuneOffset(value, viewportOffset)
         }
         if (viewportOffset > value.size) {

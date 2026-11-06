@@ -193,6 +193,12 @@ public class Frame {
         this.dirty = dirty
     }
 
+    /** 返回应用为该帧设置的主题；None 表示使用组件原有默认样式。 */
+    public func theme(): ?Theme { buffer.theme() }
+
+    /** 返回该帧采用的文本显示宽度策略。 */
+    public func textWidthOptions(): TextWidthOptions { buffer.textWidthOptions() }
+
     public func renderWidget(widget: Widget, area: Rect): Unit {
         if (!isDirty(area)) { return }
         widget.render(area, buffer)
@@ -269,6 +275,8 @@ public class Terminal {
     private var cursorVisible: Bool = false
     private var cursorStateKnown: Bool = true
     private var capabilitiesValue: TerminalCapabilities = TerminalCapabilities()
+    private var themeValue: ?Theme = None
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
 
     public init(
         backend: Backend,
@@ -287,10 +295,27 @@ public class Terminal {
         back = None
     }
 
+    /** 设置后续帧的应用主题，并强制下一帧完整重绘；None 恢复组件默认样式。 */
+    public func setTheme(theme: ?Theme): Unit {
+        themeValue = theme
+        front = None
+        back = None
+    }
+
+    /** 设置后续帧的文本宽度策略，并强制完整重绘。 */
+    public func setTextWidthOptions(options: TextWidthOptions): Unit {
+        textWidthOptionsValue = options
+        front = None
+        back = None
+    }
+
     public func draw(render: (Frame) -> Unit): RenderMetrics {
         draw(render, dirtyRects: None)
     }
 
+    /** 按后端当前尺寸绘制一帧；尺寸变化时丢弃旧缓冲区，差异模式下可依据脏区域局部渲染，并返回渲染指标。
+     * 渲染回调抛出异常时原样传播，并使后续一帧完整重绘。
+     */
     public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics {
         let area = backend.size()
         if (!frontMatches(area)) {
@@ -336,13 +361,26 @@ public class Terminal {
             fresh
         }
         buffer.setCapabilities(capabilitiesValue)
+        buffer.setTheme(themeValue)
+        buffer.setTextWidthOptions(textWidthOptionsValue)
         let frameDirty: ?DirtyRects = if (partialRender) { Some(effectiveDirty) } else { None }
         let frame = Frame(area, buffer, dirty: frameDirty)
         buffer.beginWorkMetrics(instrumentationEnabled)
         let totalStart = MonoTime.now()
         let renderStart = MonoTime.now()
-        render(frame)
-        buffer.setWriteClip(None)
+        var rendered = false
+        try {
+            render(frame)
+            rendered = true
+        } finally {
+            buffer.setWriteClip(None)
+            if (!rendered) {
+                // A partial frame edits the current front buffer in place.
+                // Its saved contents no longer describe the physical terminal.
+                front = None
+                back = None
+            }
+        }
         let renderDuration = MonoTime.now() - renderStart
         let renderNanos = renderDuration.toNanoseconds()
         let renderMillis = durationMillis(renderDuration)
@@ -1234,6 +1272,37 @@ public func defaultTerminalDriver(): TerminalDriver {
     WindowsTerminalDriver()
 }
 
+// Indexed colors have different wire representations on 16-color terminals.
+// Keep the generic serializer unchanged for truecolor and 256-color outputs.
+func terminalStyleToAnsi(style: Style, capabilities: TerminalCapabilities): String {
+    if (capabilities.trueColor || capabilities.colorLevel >= 256 || capabilities.colorLevel < 8) {
+        return styleToAnsi(style)
+    }
+    var base = style
+    var foreground: ?Int64 = None
+    var background: ?Int64 = None
+    match (style.fg) {
+        case Color.Indexed(value) =>
+            if (value < 16) {
+                foreground = Some(if (value < 8) { 30 + Int64(value) } else { 90 + Int64(value) - 8 })
+                base.fg = Color.Reset
+            }
+        case _ => ()
+    }
+    match (style.bg) {
+        case Color.Indexed(value) =>
+            if (value < 16) {
+                background = Some(if (value < 8) { 40 + Int64(value) } else { 100 + Int64(value) - 8 })
+                base.bg = Color.Reset
+            }
+        case _ => ()
+    }
+    var output = styleToAnsi(base)
+    match (foreground) { case Some(code) => output += "${ESC}[${code}m"; case None => () }
+    match (background) { case Some(code) => output += "${ESC}[${code}m"; case None => () }
+    output
+}
+
 public class AnsiBackend <: Backend {
     private let output: OutputStream
     private let driver: TerminalDriver
@@ -1289,7 +1358,7 @@ public class AnsiBackend <: Backend {
                 if (cell.style != logical) {
                     let style = adaptStyleForCapabilities(cell.style, buffer.capabilities())
                     if (style != current) {
-                        batch.append(styleToAnsi(style))
+                        batch.append(terminalStyleToAnsi(style, buffer.capabilities()))
                         current = style
                     }
                     logical = cell.style
@@ -1314,7 +1383,7 @@ public class AnsiBackend <: Backend {
             batch.append("${ESC}[${span.y + 1};${span.x + 1}H")
             let style = adaptStyleForCapabilities(span.style, next.capabilities())
             if (style != current) {
-                batch.append(styleToAnsi(style))
+                batch.append(terminalStyleToAnsi(style, next.capabilities()))
                 current = style
             }
             batch.append(span.text)
@@ -1795,7 +1864,7 @@ public class DebugOverlay <: Widget {
             case Some(m) => "fps=${m.fps} render=${m.renderMillis}ms draw=${m.drawMillis}ms dirty=${m.dirtyCells} writes=${m.diffWrites} queue=${m.eventQueueLength} size=${m.terminalSize.width}x${m.terminalSize.height} dropped=${m.droppedTicks}"
             case None => "fps=0 render=0ms draw=0ms dirty=0 writes=0 queue=0 size=${area.width}x${area.height} dropped=0"
         }
-        buffer.setString(area.x, area.y, truncate(text, area.width), style: style)
+        buffer.setString(area.x, area.y, truncate(text, area.width, options: buffer.textWidthOptions()), style: style)
     }
 }
 

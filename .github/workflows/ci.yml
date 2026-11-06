@@ -21,6 +21,10 @@ jobs:
           path: cj_tui
           fetch-depth: 0
 
+      - name: Test visual evidence tooling (not a visual audit)
+        working-directory: cj_tui
+        run: python3 -m unittest discover -s scripts -p 'test_visual_*.py' -v
+
       - name: Install pinned Cangjie STS SDK
         uses: Zxilly/setup-cangjie@91463316b1c359f216c2ac49e35900f9341c1571 # v3.2.0
         with:
@@ -42,6 +46,12 @@ jobs:
           command -v cjc
           cjc -v
           command -v cjpm
+
+      - name: Compile and exercise README quickstart
+        working-directory: cj_tui
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_readme_quickstart.py' -v
+          python3 scripts/check_readme_quickstart.py
 
       - name: Run release gate
         id: release_gate

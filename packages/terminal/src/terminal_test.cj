@@ -94,14 +94,16 @@ class TerminalExtensionTest {
     func unicodeSearchUsesScreenColumnsAndPreservesWideCells(): Unit {
         let transcript = TerminalTranscript(cols: 8, rows: 2)
         transcript.append("中x中")
+        var highlight = Modifier.none()
+        highlight.underline = true
         let ascii = Buffer(Rect(0, 0, 8, 2))
         TerminalView(transcript, search: "x").render(ascii.area, ascii)
-        @Expect(ascii.getCell(2, 0), Cell("x", style: Style(bg: Color.Yellow)))
+        @Expect(ascii.getCell(2, 0), Cell("x", style: Style(bg: Color.Yellow, modifier: highlight)))
         let wide = Buffer(Rect(0, 0, 8, 2))
         TerminalView(transcript, search: "中").render(wide.area, wide)
-        @Expect(wide.getCell(0, 0), Cell("中", style: Style(bg: Color.Yellow), kind: CellKind.WideLead))
-        @Expect(wide.getCell(1, 0), Cell("", style: Style(bg: Color.Yellow), kind: CellKind.WideCont))
-        @Expect(wide.getCell(3, 0), Cell("中", style: Style(bg: Color.Yellow), kind: CellKind.WideLead))
+        @Expect(wide.getCell(0, 0), Cell("中", style: Style(bg: Color.Yellow, modifier: highlight), kind: CellKind.WideLead))
+        @Expect(wide.getCell(1, 0), Cell("", style: Style(bg: Color.Yellow, modifier: highlight), kind: CellKind.WideCont))
+        @Expect(wide.getCell(3, 0), Cell("中", style: Style(bg: Color.Yellow, modifier: highlight), kind: CellKind.WideLead))
     }
 
     @TestCase

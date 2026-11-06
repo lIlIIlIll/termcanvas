@@ -10,18 +10,19 @@ private func horizontalFirstVisible(
     selectedSuffix: String,
     regularPrefix: String,
     regularSuffix: String,
-    separatorWidth: Int64
+    separatorWidth: Int64,
+    options: TextWidthOptions
 ): Int64 {
     if (items.isEmpty()) { return 0 }
     let current = clamp(selected, 0, items.size - 1)
     if (width <= 0) { return current }
     let selectedText = selectedPrefix + items[current] + selectedSuffix
-    var used = displayWidth(selectedText)
+    var used = displayWidth(selectedText, options: options)
     if (used > width) { return current }
     var first = current
     while (first > 0) {
         let previousText = regularPrefix + items[first - 1] + regularSuffix
-        let previousWidth = displayWidth(previousText) + separatorWidth
+        let previousWidth = displayWidth(previousText, options: options) + separatorWidth
         if (previousWidth > width - used) { break }
         used += previousWidth
         first--
@@ -32,6 +33,7 @@ private func horizontalFirstVisible(
 /** 按顺序在一行绘制标签标题，以不同样式标示当前选中项；左右方向键可切换选中项。
  */
 public class Tabs <: Widget {
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private let titles: Array<String>
     /** 当前选中标签的索引，从 0 开始，可直接修改；构造、键盘、鼠标及绘制操作会先将其限制在标题索引范围内，空标题列表中为 0。
      */
@@ -91,8 +93,9 @@ public class Tabs <: Widget {
                 let first = ensureSelectionVisible(area.width)
                 for (i in first..titles.size) {
                     if (x >= area.right) { return false }
-                    let fullWidth = displayWidth(" " + titles[i] + " ")
-                    let visibleWidth = min(fullWidth, area.right - x)
+                    let full = " " + titles[i] + " "
+                    let fullWidth = displayWidth(full, options: textWidthOptionsValue)
+                    let visibleWidth = displayWidth(truncate(full, area.right - x, options: textWidthOptionsValue), options: textWidthOptionsValue)
                     if (mouse.x >= x && mouse.x - x < visibleWidth) {
                         selected = i
                         _ = ensureSelectionVisible(area.width)
@@ -109,19 +112,21 @@ public class Tabs <: Widget {
     /** 在区域首行绘制当前视口内的标签；选中标签使用选中样式，聚焦时再加粗并下划线，绘制前限制公开索引。
      */
     public func render(area: Rect, buffer: Buffer): Unit {
+        textWidthOptionsValue = buffer.textWidthOptions()
         normalizeSelected()
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
 
     private func renderClipped(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0 || titles.isEmpty()) { return }
+        let theme = buffer.resolveTheme(this.theme)
         var x = area.x
         let first = ensureSelectionVisible(area.width)
         for (i in first..titles.size) {
             if (x >= area.right) { return }
             let full = " " + titles[i] + " "
-            let text = truncate(full, area.right - x)
-            let visibleWidth = displayWidth(text)
+            let text = truncate(full, area.right - x, options: textWidthOptionsValue)
+            let visibleWidth = displayWidth(text, options: textWidthOptionsValue)
             var itemStyle = if (i == selected) {
                 listSelectionStyle(selectedStyle, theme)
             } else {
@@ -134,7 +139,7 @@ public class Tabs <: Widget {
                 itemStyle = itemStyle.withModifier(modifier)
             }
             buffer.setString(x, area.y, text, style: itemStyle)
-            let fullWidth = displayWidth(full)
+            let fullWidth = displayWidth(full, options: textWidthOptionsValue)
             x += visibleWidth
             if (visibleWidth < fullWidth) { return }
         }
@@ -150,20 +155,21 @@ public class Tabs <: Widget {
 
     private func ensureSelectionVisible(width: Int64): Int64 {
         normalizeSelected()
-        horizontalFirstVisible(titles, selected, width, " ", " ", " ", " ", 0)
+        horizontalFirstVisible(titles, selected, width, " ", " ", " ", " ", 0, textWidthOptionsValue)
     }
 }
 
 /** 在一行绘制可切换的分段值；键盘切换有界，鼠标只命中可见段文本。
  */
 public class SegmentedControl <: Widget {
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private let items: Array<String>
     /** 当前选中项的索引；非空列表的操作、值查询和绘制会先限制到有效范围，空列表中为 0。
      */
     public var selected: Int64
     private let style: Style
     private let selectedStyle: Style
-    private let disabledStyle: Style
+    private let disabledStyle: ?Style
     private var focused: Bool
     private var disabled: Bool
     private var theme: ?Theme
@@ -175,7 +181,7 @@ public class SegmentedControl <: Widget {
         selected!: Int64 = 0,
         style!: Style = Style.default(),
         selectedStyle!: Style = Style.default(),
-        disabledStyle!: Style = Style(fg: Color.Indexed(8)),
+        disabledStyle!: ?Style = None,
         focused!: Bool = false,
         disabled!: Bool = false,
         theme!: ?Theme = None
@@ -244,9 +250,9 @@ public class SegmentedControl <: Widget {
                 for (index in first..items.size) {
                     if (x >= area.right) { return false }
                     let fullText = segmentText(index)
-                    let fullWidth = displayWidth(fullText)
-                    let visibleText = truncate(fullText, area.right - x)
-                    let visibleWidth = displayWidth(visibleText)
+                    let fullWidth = displayWidth(fullText, options: textWidthOptionsValue)
+                    let visibleText = truncate(fullText, area.right - x, options: textWidthOptionsValue)
+                    let visibleWidth = displayWidth(visibleText, options: textWidthOptionsValue)
                     if (mouse.x >= x && mouse.x - x < visibleWidth) {
                         selected = index
                         return true
@@ -263,6 +269,7 @@ public class SegmentedControl <: Widget {
     /** 绘制一行分段值；选中段用方括号，其他段两侧留空，间隔空格不属于任何段。
      */
     public func render(area: Rect, buffer: Buffer): Unit {
+        textWidthOptionsValue = buffer.textWidthOptions()
         normalizeSelected()
         if (area.width <= 0 || area.height <= 0) { return }
         buffer.withCanvasClip(Rect(area.x, area.y, area.width, 1)) { => renderClipped(area, buffer) }
@@ -270,9 +277,10 @@ public class SegmentedControl <: Widget {
 
     private func renderClipped(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
+        let theme = buffer.resolveTheme(this.theme)
         let useTheme = selectedStyle == Style.default()
         let rowStyle = if (disabled) {
-            themeRoleStyle(disabledStyle, ThemeRole.Disabled, theme)
+            resolvedDisabledStyle(theme)
         } else if (useTheme) {
             themedNormal(style, theme)
         } else {
@@ -285,10 +293,10 @@ public class SegmentedControl <: Widget {
         for (index in first..items.size) {
             if (x >= area.right) { return }
             let fullText = segmentText(index)
-            let text = truncate(fullText, area.right - x)
-            let visibleWidth = displayWidth(text)
-            buffer.setString(x, area.y, text, style: segmentStyle(index, useTheme))
-            let fullWidth = displayWidth(fullText)
+            let text = truncate(fullText, area.right - x, options: textWidthOptionsValue)
+            let visibleWidth = displayWidth(text, options: textWidthOptionsValue)
+            buffer.setString(x, area.y, text, style: segmentStyle(index, useTheme, theme))
+            let fullWidth = displayWidth(fullText, options: textWidthOptionsValue)
             x += visibleWidth
             if (visibleWidth < fullWidth) { return }
             if (index + 1 < items.size && x < area.right) { x += 1 }
@@ -299,8 +307,8 @@ public class SegmentedControl <: Widget {
         if (index == selected) { "[" + items[index] + "]" } else { " " + items[index] + " " }
     }
 
-    private func segmentStyle(index: Int64, useTheme: Bool): Style {
-        if (disabled) { return themeRoleStyle(disabledStyle, ThemeRole.Disabled, theme) }
+    private func segmentStyle(index: Int64, useTheme: Bool, theme: ?Theme): Style {
+        if (disabled) { return resolvedDisabledStyle(theme) }
         let isSelected = index == selected
         var resolved = if (useTheme) {
             if (isSelected) { themedSelected(selectedStyle, theme) } else { themedNormal(style, theme) }
@@ -316,6 +324,11 @@ public class SegmentedControl <: Widget {
         resolved
     }
 
+    private func resolvedDisabledStyle(theme: ?Theme): Style {
+        let fallback = match (theme) { case Some(_) => Style.default(); case None => Style(fg: Color.Indexed(8)) }
+        themeRoleStyle(match (disabledStyle) { case Some(value) => value; case None => fallback }, ThemeRole.Disabled, theme)
+    }
+
     private func normalizeSelected(): Unit {
         if (items.isEmpty()) {
             selected = 0
@@ -325,7 +338,7 @@ public class SegmentedControl <: Widget {
     }
 
     private func firstVisible(width: Int64): Int64 {
-        horizontalFirstVisible(items, selected, width, "[", "]", " ", " ", 1)
+        horizontalFirstVisible(items, selected, width, "[", "]", " ", " ", 1, textWidthOptionsValue)
     }
 }
 
@@ -335,44 +348,68 @@ public class StatusBarProgress {
     public let width: Int64
     public let label: String
     public let labelMode: ProgressBarLabelMode
+    /** 未使用应用主题时的默认基础样式；显式设置始终优先。
+     */
     public let style: Style
+    /** 未使用应用主题时的默认填充样式；显式设置始终优先。
+     */
     public let fillStyle: Style
+    /** 未使用应用主题时的默认标签样式；显式设置始终优先。
+     */
     public let labelStyle: Style
+    /** 未使用应用主题时的默认符号；显式设置始终优先。
+     */
     public let symbols: ProgressBarSymbols
+    private let customStyle: Bool
+    private let customFillStyle: Bool
+    private let customLabelStyle: Bool
+    private let customSymbols: Bool
 
+    /** 保存状态栏进度条的配置；将当前值限制为至少 0、总量限制为至少 1、宽度限制为至少 0。
+     * 未显式设置样式或符号时，有应用主题则继承主题，否则使用上述默认值。
+     */
     public init(
         value: Int64,
         total!: Int64 = 100,
         width!: Int64 = 18,
         label!: String = "",
         labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent,
-        style!: Style = Style(fg: Color.Indexed(8), bg: Color.White),
-        fillStyle!: Style = Style(fg: Color.Cyan, bg: Color.White),
-        labelStyle!: Style = Style(fg: Color.Black, bg: Color.White),
-        symbols!: ProgressBarSymbols = ProgressBarSymbols(filled: "=", empty: "-", head: ">", indeterminate: ">")
+        style!: ?Style = None,
+        fillStyle!: ?Style = None,
+        labelStyle!: ?Style = None,
+        symbols!: ?ProgressBarSymbols = None
     ) {
         this.value = max(0, value)
         this.total = max(1, total)
         this.width = max(0, width)
         this.label = label
         this.labelMode = labelMode
-        this.style = style
-        this.fillStyle = fillStyle
-        this.labelStyle = labelStyle
-        this.symbols = symbols
+        this.customStyle = style.isSome()
+        this.customFillStyle = fillStyle.isSome()
+        this.customLabelStyle = labelStyle.isSome()
+        this.customSymbols = symbols.isSome()
+        this.style = match (style) { case Some(value) => value; case None => Style(fg: Color.Indexed(8), bg: Color.White) }
+        this.fillStyle = match (fillStyle) { case Some(value) => value; case None => Style(fg: Color.Cyan, bg: Color.White) }
+        this.labelStyle = match (labelStyle) { case Some(value) => value; case None => Style(fg: Color.Black, bg: Color.White) }
+        this.symbols = match (symbols) { case Some(value) => value; case None => ProgressBarSymbols(filled: "=", empty: "-", head: ">", indeterminate: ">") }
     }
+
+    func hasCustomStyle(): Bool { customStyle }
+    func hasCustomFillStyle(): Bool { customFillStyle }
+    func hasCustomLabelStyle(): Bool { customLabelStyle }
+    func hasCustomSymbols(): Bool { customSymbols }
 }
 
 public class StatusBar <: Widget {
     private let left: String
     private let right: String
-    private let style: Style
+    private let style: ?Style
     private let progress: ?StatusBarProgress
 
     public init(
         left!: String = "",
         right!: String = "",
-        style!: Style = Style(fg: Color.Black, bg: Color.White),
+        style!: ?Style = None,
         progress!: ?StatusBarProgress = None
     ) {
         this.left = left
@@ -381,16 +418,25 @@ public class StatusBar <: Widget {
         this.progress = progress
     }
 
+    /** 宽或高不大于 0 时不绘制；否则在区域首行先填充空格，再绘制左侧及右对齐文字。宽度不足时以省略标记表示未显示内容；两侧均有内容且区域至少三列时保留分隔。配置了进度条且可用宽度至少为 6 时，在两侧文字之间绘制进度条。
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
 
     private func renderClipped(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
+        let style = match (buffer.resolveTheme(None)) {
+            case Some(theme) => match (this.style) { case Some(value) => theme.raisedSurface.patch(value); case None => theme.raisedSurface }
+            case None => match (this.style) { case Some(value) => value; case None => Style(fg: Color.Black, bg: Color.White) }
+        }
         buffer.setString(area.x, area.y, repeat(" ", area.width), style: style)
 
-        let rightText = truncate(right, area.width)
-        let rightWidth = displayWidth(rightText)
+        // Reserve room for a left indicator and a separator when both sides
+        // have content and the row can accommodate both.
+        let rightBudget = if (!left.isEmpty() && !right.isEmpty() && area.width >= 3) { area.width - 2 } else { area.width }
+        let rightText = clippedText(right, rightBudget, buffer)
+        let rightWidth = displayWidth(rightText, options: buffer.textWidthOptions())
         let rightX = area.right - rightWidth
         var leftLimit = if (rightWidth > 0) { max(0, rightX - area.x - 1) } else { area.width }
         match (progress) {
@@ -400,25 +446,42 @@ public class StatusBar <: Widget {
                 let progressWidth = min(p.width, available)
                 if (progressWidth >= 6) {
                     let progressX = rightX - gap - progressWidth
+                    let themed = buffer.resolveTheme(None).isSome()
+                    let trackStyle: ?Style = if (themed && !p.hasCustomStyle()) { None } else { Some(p.style) }
+                    let filledStyle: ?Style = if (themed && !p.hasCustomFillStyle()) { None } else { Some(p.fillStyle) }
+                    let progressLabelStyle: ?Style = if (themed && !p.hasCustomLabelStyle()) { None } else { Some(p.labelStyle) }
+                    let progressSymbols = if (themed && !p.hasCustomSymbols()) { ProgressBarSymbols.automatic() } else { p.symbols }
                     ProgressBar(
                         p.value,
                         total: p.total,
                         label: p.label,
-                        style: p.style,
-                        fillStyle: p.fillStyle,
+                        style: trackStyle,
+                        fillStyle: filledStyle,
                         labelMode: p.labelMode,
-                        labelStyle: p.labelStyle,
-                        symbols: p.symbols
+                        labelStyle: progressLabelStyle,
+                        symbols: progressSymbols,
+                        trackOverride: if (themed && !p.hasCustomStyle()) { StyleOverride(bg: Some(style.bg)) } else { StyleOverride() },
+                        fillOverride: if (themed && !p.hasCustomFillStyle()) { StyleOverride(bg: Some(style.bg)) } else { StyleOverride() }
                     ).render(Rect(progressX, area.y, progressWidth, 1), buffer)
                     leftLimit = max(0, progressX - area.x - 1)
                 }
             case None => ()
         }
-        buffer.setString(area.x, area.y, truncate(left, leftLimit), style: style)
+        buffer.setString(area.x, area.y, clippedText(left, leftLimit, buffer), style: style)
         if (rightWidth > 0) {
             buffer.setString(rightX, area.y, rightText, style: style)
         }
     }
+    // Reserve one column for a visible omission marker without splitting a
+    // grapheme. East Asian ambiguous-wide terminals use a one-cell period.
+    private func clippedText(text: String, width: Int64, buffer: Buffer): String {
+        if (width <= 0 || text.isEmpty()) { return "" }
+        let options = buffer.textWidthOptions()
+        if (displayWidth(text, options: options) <= width) { return text }
+        let marker = if (buffer.capabilities().unicode && displayWidth("…", options: options) == 1) { "…" } else { "." }
+        graphemePrefix(text, width - 1, options: options) + marker
+    }
+
 }
 
 public class Viewport <: Widget {
@@ -460,10 +523,11 @@ public class Viewport <: Widget {
             b.render(area, buffer)
             target = b.inner(area)
         }
+        let resolvedStyle = themedNormal(style, buffer.resolveTheme(None))
         for (row in 0..target.height) {
             let index = offset + row
             if (index >= lines.size) { return }
-            buffer.setString(target.x, target.y + row, truncate(lines[index], target.width), style: style)
+            buffer.setString(target.x, target.y + row, truncate(lines[index], target.width, options: buffer.textWidthOptions()), style: resolvedStyle)
         }
     }
 }

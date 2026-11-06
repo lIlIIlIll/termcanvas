@@ -46,6 +46,55 @@ func selectedModifier(): Modifier {
     modifier
 }
 
+func errorModifier(): Modifier {
+    var modifier = Modifier()
+    modifier.italic = true
+    modifier
+}
+
+// Keep user-provided modifiers and add a single independent disabled cue.
+// If every modifier is already enabled there is no additive cue available.
+func distinguishDisabled(style: Style): Style {
+    var modifier = style.modifier
+    if (!modifier.italic) { modifier.italic = true }
+    else if (!modifier.underline) { modifier.underline = true }
+    else if (!modifier.reversed) { modifier.reversed = true }
+    else if (!modifier.bold) { modifier.bold = true }
+    style.withModifier(modifier)
+}
+
+// Preserve a clearly red semantic error when a low-color palette's nearest
+// Euclidean match would otherwise turn it into dark neutral gray.
+func adaptErrorThemeRole(style: Style, capabilities: TerminalCapabilities): Style {
+    let adapted = adaptStyleForCapabilities(style, capabilities)
+    if (capabilities.trueColor || capabilities.colorLevel < 16 || capabilities.colorLevel >= 256 ||
+        !colorEquals(adapted.fg, Color.Indexed(8)) ||
+        !(colorEquals(adapted.bg, Color.Indexed(0)) || colorEquals(adapted.bg, Color.Black))) { return adapted }
+    match (style.fg) {
+        case Color.Rgb(r, g, b) =>
+            if (Int64(r) >= Int64(g) + 60 && Int64(r) >= Int64(b) + 60) {
+                return adapted.withFg(Color.Indexed(9))
+            }
+        case _ => ()
+    }
+    adapted
+}
+
+// A reasonably bright muted role should remain legible on black in the
+// 16-color palette; explicit indexed and named colors remain untouched.
+func adaptMutedThemeRole(style: Style, capabilities: TerminalCapabilities): Style {
+    let adapted = adaptStyleForCapabilities(style, capabilities)
+    if (capabilities.trueColor || capabilities.colorLevel < 16 || capabilities.colorLevel >= 256 ||
+        !colorEquals(adapted.fg, Color.Indexed(8)) ||
+        !(colorEquals(adapted.bg, Color.Indexed(0)) || colorEquals(adapted.bg, Color.Black))) { return adapted }
+    match (style.fg) {
+        case Color.Rgb(r, g, b) =>
+            if (Int64(r) + Int64(g) + Int64(b) >= 450) { return adapted.withFg(Color.Indexed(7)) }
+        case _ => ()
+    }
+    adapted
+}
+
 func addFocusedModifiers(style: Style, focusedStyle: Style, theme: ?Theme): Style {
     match (theme) {
         case Some(value) =>
@@ -69,7 +118,11 @@ func resolvedSemanticStateStyle(
 ): Style {
     if (disabled) { return themeRoleStyle(disabledStyle, ThemeRole.Disabled, theme) }
     if (error) {
-        let resolved = themeRoleStyle(errorStyle, ThemeRole.Error, theme)
+        var resolved = themeRoleStyle(errorStyle, ThemeRole.Error, theme)
+        if (selected) {
+            let selected = themeRoleStyle(selectedStyle, ThemeRole.Selected, theme)
+            resolved = resolved.withModifier(combineModifiers(resolved.modifier, selected.modifier))
+        }
         return if (focused) { addFocusedModifiers(resolved, focusedStyle, theme) } else { resolved }
     }
     if (selected) {
@@ -124,6 +177,13 @@ public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabi
             modifier: style.modifier
         )
     }
+    if (capabilities.colorLevel >= 16) {
+        return Style(
+            fg: adaptAnsi16Color(style.fg),
+            bg: adaptAnsi16Color(style.bg),
+            modifier: style.modifier
+        )
+    }
     if (capabilities.colorLevel >= 8) {
         return Style(
             fg: adaptAnsi8Color(style.fg),
@@ -132,6 +192,37 @@ public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabi
         )
     }
     Style(fg: Color.Reset, bg: Color.Reset, modifier: style.modifier)
+}
+
+private func adaptAnsi16Color(color: Color): Color {
+    match (color) {
+        case Color.Reset => Color.Reset
+        case Color.Black | Color.Red | Color.Green | Color.Yellow |
+            Color.Blue | Color.Magenta | Color.Cyan | Color.White => color
+        case Color.Indexed(index) =>
+            if (index < 16) { color } else {
+                let (r, g, b) = xtermRgb(Int64(index))
+                Color.Indexed(nearestAnsi16Index(r, g, b))
+            }
+        case Color.Rgb(r, g, b) => Color.Indexed(nearestAnsi16Index(Int64(r), Int64(g), Int64(b)))
+    }
+}
+
+private func nearestAnsi16Index(r: Int64, g: Int64, b: Int64): UInt8 {
+    var bestIndex: Int64 = 0
+    var bestDistance: Int64 = 195076
+    for (index in 0..16) {
+        let (pr, pg, pb) = xtermRgb(index)
+        let dr = r - pr
+        let dg = g - pg
+        let db = b - pb
+        let distance = dr * dr + dg * dg + db * db
+        if (distance < bestDistance) {
+            bestDistance = distance
+            bestIndex = index
+        }
+    }
+    UInt8(bestIndex)
 }
 
 private func adaptXtermColor(color: Color): Color {

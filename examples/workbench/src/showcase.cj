@@ -19,7 +19,7 @@ func renderShowcase(app: WorkbenchApp, frame: Frame): Unit {
     if (layout.galleryContent.width <= 0 || layout.galleryContent.height <= 0) { return }
     let areas = workbenchGalleryAreas(layout.galleryContent, app.galleryTabs.selected, sample: app.galleryDataTabs.selected)
     if (app.interaction.active().isNone() && app.galleryTabs.selected == 2 && app.focus.current() == Some("gallery-input")) {
-        frame.setCursor(app.galleryInput.cursorPosition(areas.formInputs[1]))
+        frame.setCursor(app.galleryInput.cursorPosition(areas.formInputs[1], options: frame.textWidthOptions()))
     }
     if (!frame.isDirty(layout.galleryContent)) { return }
     frame.fill(layout.galleryContent, app.theme.normal)
