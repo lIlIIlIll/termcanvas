@@ -63,7 +63,7 @@ class TaskActivityViewTest {
         @Expect(over.getCell(2, 1).symbol, "●")
         @Expect(over.getCell(4, 1).symbol, "●")
         @Expect(huge.getCell(2, 1).symbol, "●")
-        @Expect(huge.getCell(10, 1).symbol, "◌")
+        @Expect(huge.getCell(10, 1).symbol, "…")
         let empty = Buffer(Rect(0, 0, 12, 3))
         TaskActivityView(TaskActivity("job", progress: Some(TaskProgress.Counts(5, -2)))).render(empty.area, empty)
         @Expect(empty.getCell(2, 1).symbol, " ")

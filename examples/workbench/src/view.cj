@@ -217,7 +217,7 @@ func galleryColumns(area: Rect, y: Int64, height: Int64, count: Int64): Array<Re
     out.toArray()
 }
 
-func workbenchLayout(area: Rect, page: WorkbenchPage): WorkbenchLayout {
+func workbenchLayout(area: Rect, page: WorkbenchPage, product!: Bool = false): WorkbenchLayout {
     let out = WorkbenchLayout(area)
     out.interactive = area.width >= 80 && area.height >= 24
     out.complete = area.width >= 120 && area.height >= 32
@@ -240,6 +240,11 @@ func workbenchLayout(area: Rect, page: WorkbenchPage): WorkbenchLayout {
         out.status = Rect(out.status.x + shift, out.status.y, 140, out.status.height)
         out.toast = Rect(out.body.right - min(48, out.body.width), out.body.bottom - min(3, out.body.height),
             min(48, out.body.width), min(3, out.body.height))
+    }
+    if (product && out.body.height > 0) {
+        // Product notifications have a dedicated row outside every content panel.
+        out.toast = Rect(out.body.x, out.body.bottom - 1, out.body.width, 1)
+        out.body = Rect(out.body.x, out.body.y, out.body.width, out.body.height - 1)
     }
     var content = out.body
     if (out.complete && (page == WorkbenchPage.Overview || page == WorkbenchPage.Tasks)) {
@@ -319,8 +324,12 @@ func workbenchLayout(area: Rect, page: WorkbenchPage): WorkbenchLayout {
         let tableWidth = max(0, content.width - detailWidth - detailGap)
         out.taskTableBlock = Rect(content.x, tableY, tableWidth, tableHeight)
         let tableInner = Block(title: "Tasks").inner(out.taskTableBlock)
-        out.taskScrollbar = Rect(tableInner.right - min(1, tableInner.width), tableInner.y, min(1, tableInner.width), tableInner.height)
-        out.taskTable = Rect(tableInner.x, tableInner.y, max(0, tableInner.width - 1), tableInner.height)
+        // Keep a blank gutter between the table and scroll indicator; the
+        // indicator tracks data rows rather than covering the header/rule.
+        let scrollY = tableInner.y + min(2, tableInner.height)
+        out.taskScrollbar = Rect(tableInner.right - min(1, tableInner.width), scrollY,
+            min(1, tableInner.width), max(0, tableInner.bottom - scrollY))
+        out.taskTable = Rect(tableInner.x, tableInner.y, max(0, tableInner.width - min(2, tableInner.width)), tableInner.height)
         if (detailWidth > 0) {
             out.taskDetail = Rect(content.right - detailWidth, tableY, detailWidth, tableHeight)
             let inner = Block(title: "Selected task").inner(out.taskDetail)
@@ -348,6 +357,8 @@ func workbenchLayout(area: Rect, page: WorkbenchPage): WorkbenchLayout {
         out.settingReset = Rect(out.settingsRight.x, out.settingsRight.y + min(10, out.settingsRight.height), out.settingsRight.width, if (out.settingsRight.bottom > out.settingsRight.y + 10) { 1 } else { 0 })
     }
 
+    if (product && page == WorkbenchPage.Overview) { configureCiOverview(out) }
+
     let editorWidth = min(88, max(0, area.width - 4))
     let editorHeight = min(22, max(0, area.height - 2))
     out.editor = centered(area, editorWidth, editorHeight)
@@ -369,6 +380,53 @@ func workbenchLayout(area: Rect, page: WorkbenchPage): WorkbenchLayout {
     out.palette = centered(area, paletteWidth, paletteHeight)
     out.dialog = centered(area, min(64, max(0, area.width - 4)), min(12, max(0, area.height - 2)))
     out
+}
+
+
+// Product overview gives the running pipeline and its log most of the screen.
+// The project filter remains available on the Tasks page and command palette.
+func configureCiOverview(out: WorkbenchLayout): Unit {
+    let body = out.body
+    out.projectTree = Rect(0, 0, 0, 0)
+    out.overviewArea = body
+    out.overviewTop = Rect(body.x, body.y, body.width, min(3, body.height))
+    let metricWidth = max(0, (body.width - 3) / 4)
+    let cards = ArrayList<Rect>()
+    for (index in 0..4) {
+        let x = body.x + index * (metricWidth + 1)
+        let width = if (index == 3) { max(0, body.right - x) } else { metricWidth }
+        cards.add(Rect(x, body.y, width, out.overviewTop.height))
+    }
+    out.metricCards = cards.toArray()
+    let compact = body.width < 100 || body.height < 27
+    let top = min(body.bottom, out.overviewTop.bottom + if (compact) { 0 } else { 1 })
+    let available = max(0, body.bottom - top)
+    let pipelineHeight = if (compact) { min(9, max(0, available - 6)) }
+        else { min(12, max(0, available - 11)) }
+    let sideWidth = if (!compact) { max(30, body.width / 3) } else { Int64(0) }
+    let gap = if (sideWidth > 0) { Int64(1) } else { Int64(0) }
+    out.overviewTask = Rect(body.x, top, max(0, body.width - sideWidth - gap), pipelineHeight)
+    out.chartPanel = Rect(out.overviewTask.right + gap, top, sideWidth, min(7, pipelineHeight))
+    out.sparkPanel = Rect(out.chartPanel.x, min(body.bottom, out.chartPanel.bottom + 1), sideWidth,
+        max(0, pipelineHeight - out.chartPanel.height - 1))
+    let chartInner = Block(title: "").inner(out.chartPanel)
+    out.chartLegend = Rect(chartInner.x, chartInner.y, chartInner.width, min(1, chartInner.height))
+    out.chartMeters = Rect(chartInner.x, chartInner.y + min(1, chartInner.height), chartInner.width,
+        max(0, chartInner.height - 1))
+    let afterPipeline = min(body.bottom, out.overviewTask.bottom + if (compact) { 0 } else { 1 })
+    let remaining = max(0, body.bottom - afterPipeline)
+    // Reserve a readable activity log, then use available rows for real tasks.
+    let feedHeight = if (compact) { Int64(0) } else { min(11, max(0, remaining - 7)) }
+    out.queuePanel = Rect(body.x, afterPipeline, body.width, feedHeight)
+    let logY = min(body.bottom, out.queuePanel.bottom + if (feedHeight > 0) { 1 } else { 0 })
+    out.overviewBottom = Rect(body.x, logY, body.width, max(0, body.bottom - logY))
+    out.logPanel = out.overviewBottom
+    let logInner = Block(title: "").inner(out.logPanel)
+    let logYInner = logInner.y + min(1, logInner.height)
+    out.logView = Rect(logInner.x, logYInner, logInner.width, max(0, logInner.bottom - logYInner))
+    out.logScrollbar = Rect(0, 0, 0, 0)
+    out.pipelinePanel = Rect(0, 0, 0, 0)
+    out.pipelineCanvas = Rect(0, 0, 0, 0)
 }
 
 
@@ -396,7 +454,7 @@ func renderWorkbench(app: WorkbenchApp, frame: Frame): Unit {
         let titleStyle = app.theme.accent.withModifier(Modifier.strong())
         frame.renderWidget(Paragraph(title, style: titleStyle), layout.title)
         let labelArea = Rect(max(layout.title.x, layout.title.right - 20), layout.title.y, min(20, layout.title.width), layout.title.height)
-        frame.renderWidget(Paragraph("LOCAL DEMO", style: app.secondaryStyle), labelArea)
+        frame.renderWidget(Paragraph("SIMULATED / MEMORY", style: app.secondaryStyle), labelArea)
     }
     if (frame.isDirty(layout.tabs)) {
         let pageTabs = Tabs(["Gallery", "Overview", "Tasks", "Settings"], selected: app.tabs.selected)
@@ -415,12 +473,16 @@ func renderWorkbench(app: WorkbenchApp, frame: Frame): Unit {
     }
     if (frame.isDirty(layout.status)) {
         frame.fill(layout.status, app.theme.normal)
-        let counts = "Q ${app.model.queuedCount}  R ${app.model.runningCount}  D ${app.model.doneCount}"
+        let other = app.model.jobs.size - app.model.queuedCount - app.model.runningCount - app.model.doneCount
+        let counts = "Q ${app.model.queuedCount}  R ${app.model.runningCount}  D ${app.model.doneCount}  Other ${other}"
         let state = if (app.paused) { "PAUSED" } else { "RUNNING" }
-        let right = if (layout.status.width < 100) { "Tab focus  F1 help  F2 cmds  Ctrl-C exit" }
+        let right = if (app.productMode) { "F1 help  F2 cmds  Tab focus  Ctrl-C exit" }
+            else if (layout.status.width < 100) { "Tab focus  F1 help  F2 cmds  Ctrl-C exit" }
             else { "LOCAL DEMO  ${state}  F1 help  F2 palette  F3 page  Tab focus  Ctrl-C exit" }
-        frame.renderWidget(StatusBar(left: counts + "  " + app.statusMessage, right: right,
-            style: app.secondaryStyle), layout.status)
+        let status = if (app.productMode && (app.statusMessage == "Ready" || app.statusMessage == "Terminal focus lost")) {
+            counts
+        } else { counts + "  " + app.statusMessage }
+        frame.renderWidget(StatusBar(left: status, right: right, style: app.secondaryStyle), layout.status)
     }
     let localGalleryToast = app.page == WorkbenchPage.Showcase && app.galleryTabs.selected == 5
     if (app.toastManager.count() > 0 && !localGalleryToast && frame.isDirty(layout.toast)) {
@@ -456,6 +518,7 @@ func renderStatusMeter(app: WorkbenchApp, frame: Frame, area: Rect, label: Strin
 }
 
 func renderOverview(app: WorkbenchApp, frame: Frame): Unit {
+    if (app.productMode) { renderCiOverview(app, frame); return }
     let layout = app.layout
     if (layout.projectTree.width > 0 && frame.isDirty(layout.projectTree)) {
         renderProjectSidebar(app, frame, layout.projectTree)
@@ -475,7 +538,7 @@ func renderOverview(app: WorkbenchApp, frame: Frame): Unit {
         }
         let progress = app.model.totalProgressHundredths()
         let area = layout.metricCards[3]
-        frame.renderWidget(MetricCard("TOTAL PROGRESS", formatPercent(progress), detail: "Across all 120 tasks",
+        frame.renderWidget(MetricCard("TOTAL PROGRESS", formatPercent(progress), detail: "Across ${app.model.jobs.size} tasks",
             style: app.secondaryStyle, valueStyle: app.theme.normal.withModifier(Modifier.strong())), area)
         if (area.height > 3) {
             frame.renderWidget(ProgressBar(progress, total: 10000, style: app.borderStyle,
@@ -487,7 +550,8 @@ func renderOverview(app: WorkbenchApp, frame: Frame): Unit {
         frame.renderWidget(galleryBlock(app, "", BorderKind.Rounded), layout.chartPanel)
         frame.renderWidget(Paragraph("Status distribution", style: app.secondaryStyle), layout.chartLegend)
         let meters = layout.chartMeters
-        let spacing = if (meters.height >= 5) { Int64(2) } else { Int64(1) }
+        let other = app.model.jobs.size - app.model.queuedCount - app.model.runningCount - app.model.doneCount
+        let spacing = if (meters.height >= 5 && (other == 0 || meters.height >= 7)) { Int64(2) } else { Int64(1) }
         if (meters.height >= 3) {
             let total = app.model.jobs.size
             renderStatusMeter(app, frame, Rect(meters.x, meters.y, meters.width, 1),
@@ -496,6 +560,10 @@ func renderOverview(app: WorkbenchApp, frame: Frame): Unit {
                 "Running ${app.model.runningCount}", app.model.runningCount, total, app.theme.accent)
             renderStatusMeter(app, frame, Rect(meters.x, meters.y + spacing * 2, meters.width, 1),
                 "Done ${app.model.doneCount}", app.model.doneCount, total, app.theme.success)
+            if (other > 0 && meters.height > spacing * 3) {
+                renderStatusMeter(app, frame, Rect(meters.x, meters.y + spacing * 3, meters.width, 1),
+                    "Other ${other}", other, total, app.theme.warning)
+            }
         }
     }
     if (frame.isDirty(layout.sparkPanel)) {
@@ -560,6 +628,171 @@ func renderOverview(app: WorkbenchApp, frame: Frame): Unit {
     }
 }
 
+func renderCiOverview(app: WorkbenchApp, frame: Frame): Unit {
+    let layout = app.layout
+    if (frame.isDirty(layout.overviewTop)) {
+        frame.fill(layout.overviewTop, app.theme.normal)
+        let values = ["${app.model.runningCount} / 4", app.model.queuedCount.toString(),
+            app.model.doneCount.toString(), formatPercent(app.model.totalProgressHundredths())]
+        let titles = ["RUNNING", "QUEUED", "COMPLETED", "TOTAL PROGRESS"]
+        let details = [if (app.paused) { "Simulation paused" } else { "Active slots" },
+            "Ready to start", "Finished this run", "Across ${app.model.jobs.size} tasks"]
+        for (index in 0..4) {
+            frame.renderWidget(MetricCard(titles[index], values[index], detail: details[index],
+                style: app.secondaryStyle, valueStyle: if (index == 0) { app.theme.accent } else { app.theme.normal }),
+                layout.metricCards[index])
+        }
+    }
+    if (frame.isDirty(layout.overviewTask)) {
+        let area = layout.overviewTask
+        frame.fill(area, app.theme.normal)
+        let block = galleryBlock(app, "", BorderKind.Rounded)
+        frame.renderWidget(block, area)
+        let inner = block.inner(area)
+        frame.renderWidget(Paragraph("SELECTED PIPELINE  /  simulated", style: app.secondaryStyle),
+            Rect(inner.x, inner.y, inner.width, min(1, inner.height)))
+        match (app.selectedId) {
+            case Some(id) =>
+                match (app.model.job(id)) {
+                    case Some(task) =>
+                        let stages = Array<TaskStatus>(5, { index => workbenchStageStatus(task, index) })
+                        let current = min(4, task.progressPercent / 20)
+                        let item = TaskActivity(task.name, status: workbenchActivityStatus(task.status), id: task.label(),
+                            prefix: "CI", duration: "${task.elapsedMillis / 1000}s",
+                            progressLabel: "Stages", progress: Some(TaskProgress.Items(stages)),
+                            detail: "${statusLabel(task.status)} / ${task.project} / ${task.progressPercent}%  |  ${workbenchStageName(current)} ${current + 1}/5")
+                        let body = Rect(inner.x, inner.y + min(1, inner.height), inner.width, max(0, inner.height - 1))
+                        frame.renderWidget(TaskActivityView(item, activityFrame: app.spinnerFrame, theme: app.theme),
+                            Rect(body.x, body.y, body.width, min(3, body.height)))
+                        let stageArea = Rect(body.x + min(2, body.width), body.y + min(3, body.height),
+                            max(0, body.width - 2), max(0, body.height - 3))
+                        renderCiStageList(app, frame, task, stageArea)
+                    case None => frame.renderWidget(Paragraph("No task selected", style: app.secondaryStyle), inner)
+                }
+            case None => frame.renderWidget(Paragraph("No task selected", style: app.secondaryStyle), inner)
+        }
+    }
+    if (layout.chartPanel.width > 0 && frame.isDirty(layout.chartPanel)) {
+        let area = layout.chartPanel
+        frame.fill(area, app.theme.normal)
+        frame.renderWidget(galleryBlock(app, "", BorderKind.Rounded), area)
+        frame.renderWidget(Paragraph("STATUS", style: app.secondaryStyle), layout.chartLegend)
+        let meters = layout.chartMeters
+        let total = app.model.jobs.size
+        let other = total - app.model.queuedCount - app.model.runningCount - app.model.doneCount
+        if (meters.height >= 3) {
+            renderStatusMeter(app, frame, Rect(meters.x, meters.y, meters.width, 1),
+                "Queued ${app.model.queuedCount}", app.model.queuedCount, total, app.secondaryStyle)
+            renderStatusMeter(app, frame, Rect(meters.x, meters.y + 1, meters.width, 1),
+                "Running ${app.model.runningCount}", app.model.runningCount, total, app.theme.accent)
+            renderStatusMeter(app, frame, Rect(meters.x, meters.y + 2, meters.width, 1),
+                "Done ${app.model.doneCount}", app.model.doneCount, total, app.theme.success)
+            if (other > 0 && meters.height >= 4) {
+                renderStatusMeter(app, frame, Rect(meters.x, meters.y + 3, meters.width, 1),
+                    "Other ${other}", other, total, app.theme.warning)
+            }
+        }
+    }
+    if (layout.sparkPanel.width > 0 && frame.isDirty(layout.sparkPanel)) {
+        let area = layout.sparkPanel
+        frame.fill(area, app.theme.normal)
+        let block = galleryBlock(app, "", BorderKind.Rounded)
+        frame.renderWidget(block, area)
+        let inner = block.inner(area)
+        let all = app.model.history()
+        let samples = ArrayList<Int64>()
+        var peak: Int64 = 0
+        for (index in max(0, all.size - inner.width)..all.size) {
+            samples.add(all[index])
+            peak = max(peak, all[index])
+        }
+        let fullTitle = "PROGRESS / sampled peak ${formatPercent(peak)}"
+        let shortTitle = "sample peak ${formatPercent(peak)}"
+        let title = if (displayWidth(fullTitle) <= inner.width) { fullTitle } else { shortTitle }
+        frame.renderWidget(Paragraph(title, style: app.secondaryStyle),
+            Rect(inner.x, inner.y, inner.width, min(1, inner.height)))
+        frame.renderWidget(Sparkline(samples.toArray(), maxValue: peak, style: app.theme.accent),
+            Rect(inner.x, inner.y + min(1, inner.height), inner.width, max(0, inner.height - 1)))
+    }
+    if (layout.queuePanel.height > 0 && frame.isDirty(layout.queuePanel)) {
+        renderCiTaskFeed(app, frame)
+    }
+    if (frame.isDirty(layout.overviewBottom)) {
+        let area = layout.logPanel
+        frame.fill(area, app.theme.normal)
+        let block = galleryBlock(app, "", BorderKind.Rounded)
+        frame.renderWidget(block, area)
+        let inner = block.inner(area)
+        let lines = app.model.logs()
+        app.logScroll.offset = max(0, min(app.logScroll.offset, max(0, lines.size - layout.logView.height)))
+        let title = if (lines.size > layout.logView.height) { "ACTIVITY / simulated log  ·  Tab then Up/Down to scroll" }
+            else { "ACTIVITY / simulated log" }
+        frame.renderWidget(Paragraph(title, style: app.secondaryStyle),
+            Rect(inner.x, inner.y, inner.width, min(1, inner.height)))
+        frame.renderWidget(LogView(lines, offset: app.logScroll.offset, style: app.theme.normal), layout.logView)
+    }
+}
+
+func renderCiStageList(app: WorkbenchApp, frame: Frame, task: WorkbenchJob, area: Rect): Unit {
+    let current = min(4, task.progressPercent / 20)
+    let visible = if (area.height >= 5) { Int64(5) } else { max(1, area.height - 1) }
+    let first = max(0, min(5 - visible, current - visible / 2))
+    let entries = ArrayList<TaskActivityListEntry>()
+    for (index in 0..5) {
+        let description = if (index == current && task.status == WorkbenchJobStatus.Running) { "in progress" }
+            else if (index < current || task.status == WorkbenchJobStatus.Done) { "complete" }
+            else { "waiting" }
+        let label = if (index == current && task.status != WorkbenchJobStatus.Queued) {
+            statusLabel(task.status)
+        } else { description }
+        let stage = TaskActivity(workbenchStageName(index), status: workbenchStageStatus(task, index), statusText: label)
+        entries.add(TaskActivityListEntry(stage, layout: TaskActivityLayout.Compact))
+    }
+    frame.renderWidget(TaskActivityList(entries.toArray(), offset: first,
+        activityFrame: app.spinnerFrame, theme: app.theme), area)
+}
+
+func renderCiTaskFeed(app: WorkbenchApp, frame: Frame): Unit {
+    let area = app.layout.queuePanel
+    frame.fill(area, app.theme.normal)
+    let block = galleryBlock(app, "", BorderKind.Rounded)
+    frame.renderWidget(block, area)
+    let inner = block.inner(area)
+    frame.renderWidget(Paragraph("OTHER TASKS  /  simulated", style: app.secondaryStyle),
+        Rect(inner.x, inner.y, inner.width, min(1, inner.height)))
+    let rows = max(0, inner.height - 1)
+    let expanded = rows >= 9
+    let stride = if (expanded) { Int64(3) } else { Int64(1) }
+    var displayed: Int64 = 0
+    for (task in app.model.jobs) {
+        if (app.selectedId == Some(task.id)) { continue }
+        if ((displayed + 1) * stride > rows) { break }
+        let stages = Array<TaskStatus>(5, { index => workbenchStageStatus(task, index) })
+        let stage = workbenchStageName(min(4, task.progressPercent / 20))
+        let item = TaskActivity(task.name, status: workbenchActivityStatus(task.status), id: task.label(),
+            statusText: statusLabel(task.status), duration: "${task.elapsedMillis / 1000}s",
+            detail: "${task.project} / ${stage} / ${task.progressPercent}%", progressLabel: "Stages",
+            progress: Some(TaskProgress.Items(stages)))
+        frame.renderWidget(TaskActivityView(item,
+            layout: if (expanded) { TaskActivityLayout.Expanded } else { TaskActivityLayout.Compact },
+            activityFrame: app.spinnerFrame, theme: app.theme),
+            Rect(inner.x, inner.y + 1 + displayed * stride, inner.width, stride))
+        displayed++
+    }
+    if (displayed == 0 && rows > 0) {
+        frame.renderWidget(Paragraph("No other tasks", style: app.secondaryStyle),
+            Rect(inner.x, inner.y + 1, inner.width, 1))
+    }
+}
+
+func workbenchStageStatus(task: WorkbenchJob, index: Int64): TaskStatus {
+    if (task.status == WorkbenchJobStatus.Done) { return TaskStatus.Done }
+    let current = min(4, task.progressPercent / 20)
+    if (index < current) { return TaskStatus.Done }
+    if (index > current) { return TaskStatus.Pending }
+    workbenchActivityStatus(task.status)
+}
+
 func renderOverviewTask(app: WorkbenchApp, frame: Frame): Unit {
     let area = app.layout.overviewTask
     if (area.width <= 0 || area.height <= 0) { return }
@@ -573,6 +806,14 @@ func renderOverviewTask(app: WorkbenchApp, frame: Frame): Unit {
         case Some(id) =>
             match (app.model.job(id)) {
                 case Some(task) =>
+                    if (app.productMode) {
+                        let item = TaskActivity(task.name, status: workbenchActivityStatus(task.status), id: task.label(),
+                            prefix: "CI", statusText: statusLabel(task.status),
+                            duration: "${task.elapsedMillis / 1000}s", detail: "${statusLabel(task.status)} / ${task.project} / ${task.progressPercent}%",
+                            progressLabel: "Progress", progress: Some(TaskProgress.Counts(task.progressPercent / 20, 5)))
+                        frame.renderWidget(TaskActivityView(item, activityFrame: app.spinnerFrame, theme: app.theme), body)
+                        return
+                    }
                     let progress = if (body.height >= 5) { "\nProgress: ${task.progressPercent}%" } else { "" }
                     let tags = if (body.height >= 6) { "\nTags: ${joinText(task.tags, ", ")}" } else { "" }
                     let notify = if (body.height >= 7) { "\nNotify: ${if (task.notify) { "yes" } else { "no" }}" } else { "" }
@@ -623,7 +864,7 @@ func renderTasks(app: WorkbenchApp, frame: Frame): Unit {
         frame.renderWidget(app.taskSearch, layout.taskSearch)
     }
     if (app.interaction.active().isNone() && app.focus.isFocused("task-search")) {
-        frame.setCursor(app.taskSearch.cursorPosition(layout.taskSearch))
+        frame.setCursor(app.taskSearch.cursorPosition(layout.taskSearch, options: frame.textWidthOptions()))
     }
     if (frame.isDirty(layout.taskActions)) {
         frame.fill(layout.taskActions, app.theme.normal)
@@ -638,9 +879,11 @@ func renderTasks(app: WorkbenchApp, frame: Frame): Unit {
         frame.fill(layout.taskTableBlock, app.theme.normal)
         frame.renderWidget(galleryBlock(app, "Tasks", BorderKind.Rounded), layout.taskTableBlock)
         let visible = app.model.visibleIds()
-        let table = Table(["ID", "Name", "Project", "Status", "Progress"], app.model.visibleRows(),
+        let options = frame.textWidthOptions()
+        let selectionMarker = if (app.capabilities.unicode && displayWidth("●", options: options) == 1) { "●" } else { "*" }
+        let table = Table(["ID", "Name", "Project", "Status", "Progress"], app.taskRows(options),
             widths: app.layoutTableWidths(), state: Some(app.taskState), style: app.theme.normal,
-            headerStyle: app.theme.accent, selectedStyle: app.selectedStyle())
+            headerStyle: app.theme.accent, selectedStyle: app.selectedStyle(), selectionMarker: selectionMarker)
         frame.renderWidget(table, layout.taskTable)
         let viewport = max(0, layout.taskTable.height - 2)
         frame.renderWidget(Scrollbar(visible.size, offset: app.taskScroll.offset, viewport: viewport,
@@ -667,7 +910,8 @@ func renderTaskDetail(app: WorkbenchApp, frame: Frame): Unit {
         case Some(id) =>
             match (app.model.job(id)) {
                 case Some(task) =>
-                    let text = "${task.label()}\n${task.name}\n${task.project} / ${statusLabel(task.status)}\nPriority: ${task.priority}\nNotify: ${if (task.notify) { "yes" } else { "no" }}\nTags: ${joinText(task.tags, ", ")}\n${task.notes}"
+                    let lastEvent = if (task.events.isEmpty()) { "" } else { task.events[task.events.size - 1] }
+                    let text = "${task.label()}\n${task.name}\n${task.project} / ${statusLabel(task.status)}\nPriority: ${task.priority}\nNotify: ${if (task.notify) { "yes" } else { "no" }}\nTags: ${joinText(task.tags, ", ")}\n${task.notes}\nLast: ${lastEvent}"
                     frame.renderWidget(Paragraph(text, style: app.theme.normal), Rect(inner.x, inner.y, inner.width, min(8, inner.height)))
                     let progress = app.detailProgress(id, task.progressPercent * 100)
                     frame.renderWidget(ProgressBar(progress, total: 10000, label: formatPercent(progress),
@@ -739,6 +983,11 @@ func renderSettings(app: WorkbenchApp, frame: Frame): Unit {
 func renderModal(app: WorkbenchApp, frame: Frame): Unit {
     match (app.interaction.active()) {
         case Some("editor") => renderEditor(app, frame)
+        case Some("details") =>
+            if (frame.isDirty(app.layout.dialog)) {
+                frame.fill(app.layout.dialog, app.theme.normal)
+                frame.renderWidget(app.detailsDialog, app.layout.dialog)
+            }
         case Some("palette") =>
             if (frame.isDirty(app.layout.palette)) {
                 frame.fill(app.layout.palette, app.theme.normal)
@@ -751,7 +1000,7 @@ func renderModal(app: WorkbenchApp, frame: Frame): Unit {
                 frame.renderWidget(app.galleryDialog, app.layout.dialog)
             }
         case Some("help") =>
-            if (app.editingId.isSome()) { renderEditor(app, frame) }
+            if (app.editingId.isSome() || app.editorCreating) { renderEditor(app, frame) }
             if (frame.isDirty(app.layout.dialog)) {
                 frame.fill(app.layout.dialog, app.theme.normal)
                 frame.renderWidget(app.helpDialog, app.layout.dialog)
@@ -774,8 +1023,8 @@ func renderEditor(app: WorkbenchApp, frame: Frame): Unit {
     let layout = app.layout
     if (app.interaction.active() == Some("editor")) {
         match (app.interaction.focus().current()) {
-            case Some("editor-name") => frame.setCursor(app.editorName.cursorPosition(layout.editorName))
-            case Some("editor-notes") => frame.setCursor(app.editorNotes.cursorPosition(layout.editorNotes))
+            case Some("editor-name") => frame.setCursor(app.editorName.cursorPosition(layout.editorName, options: frame.textWidthOptions()))
+            case Some("editor-notes") => frame.setCursor(app.editorNotes.cursorPosition(layout.editorNotes, options: frame.textWidthOptions()))
             case _ => ()
         }
     }
@@ -783,7 +1032,7 @@ func renderEditor(app: WorkbenchApp, frame: Frame): Unit {
     frame.fill(layout.editor, app.theme.normal)
     frame.renderWidget(galleryBlock(app, "", BorderKind.Rounded), layout.editor)
     let inner = Block(title: "").inner(layout.editor)
-    frame.renderWidget(Paragraph("EDIT TASK  /  Local demo", style: app.theme.normal.withModifier(Modifier.strong())),
+    frame.renderWidget(Paragraph(if (app.editorCreating) { "NEW TASK  /  Simulated" } else { "EDIT TASK  /  Simulated" }, style: app.theme.normal.withModifier(Modifier.strong())),
         Rect(inner.x + 1, inner.y, max(0, inner.width - 2), 1))
     let nameMarker = if (app.interaction.focus().isFocused("editor-name")) { "> " }
         else if (app.hovered == Some("editor-name")) { "~ " } else { "" }
@@ -831,10 +1080,24 @@ func renderEditor(app: WorkbenchApp, frame: Frame): Unit {
     }
 }
 
+func workbenchActivityStatus(status: WorkbenchJobStatus): TaskStatus {
+    match (status) {
+        case WorkbenchJobStatus.Queued => TaskStatus.Queued
+        case WorkbenchJobStatus.Running => TaskStatus.Running
+        case WorkbenchJobStatus.Paused => TaskStatus.Paused
+        case WorkbenchJobStatus.Cancelled => TaskStatus.Cancelled
+        case WorkbenchJobStatus.Failed => TaskStatus.Failed
+        case WorkbenchJobStatus.Done => TaskStatus.Done
+    }
+}
+
 func statusLabel(status: WorkbenchJobStatus): String {
     match (status) {
         case WorkbenchJobStatus.Queued => "Queued"
         case WorkbenchJobStatus.Running => "Running"
+        case WorkbenchJobStatus.Paused => "Paused"
+        case WorkbenchJobStatus.Cancelled => "Cancelled"
+        case WorkbenchJobStatus.Failed => "Failed"
         case WorkbenchJobStatus.Done => "Done"
     }
 }

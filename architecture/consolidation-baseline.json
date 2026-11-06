@@ -334,9 +334,9 @@
     "phase": "5B",
     "review_status": "closed",
     "inventory_source": "docs/api-inventory.json plus architecture/api-classification.json",
-    "top_level_total": 160,
-    "contract_entry_total": 1022,
-    "family_total": 26,
+    "top_level_total": 172,
+    "contract_entry_total": 1090,
+    "family_total": 30,
     "coverage": "Every EXPERIMENTAL top-level declaration has exactly one primary family; classification-rule subsets below resolve mixed rules without changing API classification.",
     "selected_next_family": null,
     "selected_next_phase": null,
@@ -513,7 +513,7 @@
           "core-focus-manager-experimental"
         ],
         "top_level": 1,
-        "contract_entries": 10,
+        "contract_entries": 11,
         "owner": "core/focus",
         "decision": "KEEP_EXPERIMENTAL",
         "review_phase": "5D",
@@ -648,7 +648,7 @@
           "core-data-experimental"
         ],
         "top_level": 6,
-        "contract_entries": 80,
+        "contract_entries": 81,
         "owner": "core/widgets",
         "decision": "KEEP_EXPERIMENTAL",
         "review_phase": "5F",
@@ -703,8 +703,8 @@
           "transcriptStatusLabel",
           "transcriptCardDocument"
         ],
-        "top_level": 11,
-        "contract_entries": 70,
+        "top_level": 12,
+        "contract_entries": 71,
         "owner": "core/editor",
         "decision": "KEEP_EXPERIMENTAL",
         "review_phase": "5I",
@@ -772,7 +772,7 @@
           }
         ],
         "adoption": "agent_tui production owns canonical UiSnapshot/UiCard state and projects it through the item/theme/document helpers into VirtualTranscript; recommended assistant_console owns a separate Transcript and renders TranscriptView; oh_my_pi_skin has no direct symbol use from this family",
-        "reason": "The eleven declarations are seven lifecycle subcohorts, not one presentation contract. agent_tui and assistant_console overlap only on a small basic TranscriptItem/card-rendering subset rather than the exact current constructors, enum cases, theme slots, mutable model, or view semantics. Exact glyphs, English labels, colors, NO_COLOR behavior, Document decomposition, card chrome defaults, public collapsed/offset/selected mutation, duplicate-id toggle behavior, and empty navigation consumption remain under-frozen.",
+        "reason": "The eleven distinct symbols and twelve declarations form seven lifecycle subcohorts, not one presentation contract. agent_tui and assistant_console overlap only on a small basic TranscriptItem/card-rendering subset rather than the exact current constructors, enum cases, theme slots, mutable model, or view semantics. Exact glyphs, English labels, colors, NO_COLOR behavior, Document decomposition, card chrome defaults, public collapsed/offset/selected mutation, duplicate-id toggle behavior, and empty navigation consumption remain under-frozen.",
         "revisit": "Review one exact subcohort only after direct semantic tests freeze its enum/value/default/output or mutable interaction contract and two independent consumers validate that same exact responsibility. Theme/card promotion requires independent presentation justification and must not be used to launder VirtualTranscript closure; do not count custom Canvas transcript visuals or manufacture adoption."
       },
       {
@@ -796,11 +796,11 @@
           "TaskActivityList"
         ],
         "top_level": 11,
-        "contract_entries": 49,
-        "owner": "core/editor",
+        "contract_entries": 50,
+        "owner": "core/editor and core/widgets",
         "decision": "KEEP_EXPERIMENTAL",
-        "adoption": "recommended assistant_console and one combined core test",
-        "reason": "The request and activity widgets remain experimental; the task activity widget has focused behavior tests and an example but no independent production adopter.",
+        "adoption": "assistant_console exercises activity and request dialogs; ci_activity and Workbench use TaskActivity; focused core tests cover task activity. Independent production adoption is not established.",
+        "reason": "The request and activity widgets remain experimental; core/editor owns the dialog and timeline components, and core/widgets owns task activity. Their interaction and presentation contracts are not yet stable.",
         "revisit": "Revisit after real workflow adoption freezes decision, selection, and activity-state semantics."
       },
       {
@@ -820,10 +820,11 @@
         "id": "canvas_surfaces",
         "rules": [
           "core-canvas-advanced-experimental",
-          "core-canvas-surface-policy-experimental"
+          "core-canvas-surface-policy-experimental",
+          "core-canvas-create-surface-experimental"
         ],
         "top_level": 5,
-        "contract_entries": 34,
+        "contract_entries": 35,
         "owner": "experimental/canvas",
         "decision": "KEEP_EXPERIMENTAL",
         "review_phase": "5G-I",
@@ -848,7 +849,8 @@
             "id": "surface_composition",
             "symbols": [
               "Surface",
-              "Canvas.composite"
+              "Canvas.composite",
+              "Canvas.createSurface"
             ],
             "next": "KEEP_EXPERIMENTAL"
           },
@@ -863,7 +865,7 @@
             "next": "KEEP_EXPERIMENTAL"
           }
         ],
-        "adoption": "agent_tui production uses centeredViewport; official examples exercise ResizePolicy/ViewportFit/SizeGuard and advanced Canvas conveniences; no caller uses Surface/composite",
+        "adoption": "agent_tui production uses centeredViewport; official examples exercise resize policy and advanced Canvas conveniences; the visual matrix exercises Surface/composite, with no established production Surface consumer",
         "reason": "The stable Canvas owner intentionally has qualified EXPERIMENTAL overrides. Convenience methods need method-specific semantic adoption/tests; Surface/composition needs independent adoption plus ownership/zIndex and wide-cell tests; viewport/resize policy needs distinct safe policy semantics and same-policy adoption.",
         "revisit": "Review each exact remaining group independently. Do not inherit Canvas owner stability, manufacture adoption, or add a graphics framework."
       },
@@ -874,7 +876,7 @@
           "core-virtual-transcript-metrics"
         ],
         "top_level": 4,
-        "contract_entries": 82,
+        "contract_entries": 85,
         "owner": "specialized/virtual_transcript",
         "decision": "KEEP_EXPERIMENTAL",
         "review_phase": "5E",
@@ -990,14 +992,15 @@
       {
         "id": "diff_package",
         "rules": [
-          "diff-package-experimental"
+          "diff-package-experimental",
+          "diff-view-styles-experimental"
         ],
-        "top_level": 7,
-        "contract_entries": 35,
+        "top_level": 8,
+        "contract_entries": 43,
         "owner": "packages/diff",
         "decision": "KEEP_EXPERIMENTAL",
-        "adoption": "terminal_lab feature demo and three package tests",
-        "reason": "The package has coherent independent value but only one feature-demo adopter and no production compatibility owner.",
+        "adoption": "terminal_lab and showcase_editor demonstrate DiffView; package tests cover rendering and optional styles. Independent production adoption is not established.",
+        "reason": "The package has coherent independent value and feature-demo adoption, but no established production compatibility owner; style customization remains experimental.",
         "revisit": "Revisit after a real consumer validates parse/render and side-by-side semantics."
       },
       {
@@ -1019,7 +1022,7 @@
           "game-package-experimental"
         ],
         "top_level": 21,
-        "contract_entries": 128,
+        "contract_entries": 129,
         "owner": "packages/game",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "crystal_caves feature demo and eight package tests",
@@ -1032,7 +1035,7 @@
           "terminal-package-experimental"
         ],
         "top_level": 6,
-        "contract_entries": 29,
+        "contract_entries": 31,
         "owner": "packages/terminal",
         "decision": "KEEP_EXPERIMENTAL",
         "adoption": "terminal_lab feature demo and five package tests",
@@ -1091,12 +1094,65 @@
         "adoption": "0.0.1 real example and bounded integration tests; independent production adoption not claimed.",
         "reason": "Explicit 0.0.1 optional integration. The primary application state/update/render model is unchanged.",
         "revisit": "Review after independent production adoption and native-platform evidence; do not infer stabilization from example counts."
+      },
+      {
+        "id": "visual_runtime_scheduling",
+        "rules": [
+          "core-animation-experimental",
+          "core-visual-runtime-attachment-experimental"
+        ],
+        "top_level": 3,
+        "contract_entries": 22,
+        "owner": "core/runtime and core/animation",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "Core App integrates the scheduler and glyph-session attachment; focused core tests cover the new runtime paths. Independent production adoption is not established.",
+        "reason": "The scheduler owns scoped animation identities, frame timing and application integration; the shared App attachment classification also covers the glyph session. Both attachment members remain under core/runtime, while scheduler semantics are owned by core/animation.",
+        "revisit": "Review scheduler identity, visibility, cleanup and cadence with independent adopters; review attachment lifecycle and shutdown separately before stabilization."
+      },
+      {
+        "id": "glyph_capability_negotiation",
+        "rules": [
+          "core-glyph-capability-experimental"
+        ],
+        "top_level": 4,
+        "contract_entries": 17,
+        "owner": "core/terminal",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "App integration and focused core tests exercise conservative capability negotiation; independent production adoption is not established.",
+        "reason": "Providers explicitly report trusted glyph evidence; unknown results fall back conservatively, with an application override and bounded asynchronous session. Font availability is not universally discoverable.",
+        "revisit": "Revisit after independent application adoption and cross-terminal evidence for provider trust, input preservation, timeout, override and shutdown behavior."
+      },
+      {
+        "id": "scoped_widget_styling",
+        "rules": [
+          "core-styled-widget-experimental"
+        ],
+        "top_level": 1,
+        "contract_entries": 3,
+        "owner": "core/widgets",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "Core behavior tests and the visual matrix exercise nested widget styling; independent production adoption is not established.",
+        "reason": "StyledWidget supplies a scoped partial style override, including explicit attribute clearing; scope and inheritance semantics remain experimental.",
+        "revisit": "Review nested override, state composition, wide-cell repair and terminal capability behavior with independent applications before stabilization."
+      },
+      {
+        "id": "markdown_theme_integration",
+        "rules": [
+          "markdown-themed-view-experimental"
+        ],
+        "top_level": 2,
+        "contract_entries": 7,
+        "owner": "packages/markdown_adapter",
+        "decision": "KEEP_EXPERIMENTAL",
+        "adoption": "ThemedMarkdownView uses the theme conversion helper; adapter tests and the visual matrix exercise rendering. Independent production adoption is not established.",
+        "reason": "Theme-derived Markdown rendering and caching bridge the core visual context and the Markdown adapter without a stable cross-package compatibility commitment.",
+        "revisit": "Revisit after independent consumers validate theme changes, explicit overrides, rendering and interaction across supported terminal capabilities."
       }
     ],
     "distribution": {
       "KEEP_EXPERIMENTAL": {
-        "families": 26,
-        "top_level": 160
+        "families": 30,
+        "top_level": 172
       }
     },
     "priority": []

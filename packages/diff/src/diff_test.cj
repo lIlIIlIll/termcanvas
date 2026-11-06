@@ -91,8 +91,8 @@ class DiffExtensionTest {
         let buffer = Buffer(Rect(0, 0, 5, 5))
         buffer.fill(buffer.area, sentinel)
         DiffView(doc, sideBySide: true).render(Rect(1, 0, 2, 5), buffer)
-        @Expect(buffer.getCell(1, 2), Cell(" ", style: Style(fg: Color.Red)))
-        @Expect(buffer.getCell(2, 3), Cell(" ", style: Style(fg: Color.Green)))
+        @Expect(buffer.getCell(1, 2), Cell("-", style: Style(fg: Color.Red)))
+        @Expect(buffer.getCell(2, 2), Cell("+", style: Style(fg: Color.Green)))
         for (y in 0..buffer.area.height) {
             @Expect(buffer.getCell(0, y), sentinel)
             @Expect(buffer.getCell(3, y), sentinel)
@@ -164,9 +164,45 @@ class DiffExtensionTest {
         let doc = parseUnifiedDiff("--- a/a.txt\n+++ b/a.txt\n@@ -7 +7 @@\n-old\n+new\n")
         let buffer = Buffer(Rect(0, 0, 32, 5))
         DiffView(doc, sideBySide: true).render(buffer.area, buffer)
-        @Expect(buffer.getCell(3, 2).symbol, "7")
-        @Expect(buffer.getCell(16 + 3, 3).symbol, "7")
-        @Expect(buffer.getCell(0, 2).style, Style(fg: Color.Red))
-        @Expect(buffer.getCell(16, 3).style, Style(fg: Color.Green))
+        @Expect(buffer.getCell(4, 2).symbol, "7")
+        @Expect(buffer.getCell(16 + 4, 2).symbol, "7")
+        @Expect(buffer.getCell(0, 2), Cell("-", style: Style(fg: Color.Red)))
+        @Expect(buffer.getCell(16, 2), Cell("+", style: Style(fg: Color.Green)))
     }
+    @TestCase
+    func sideBySidePairsUnequalRunsAndSeparatesChangeGroups(): Unit {
+        let lines = [
+            DiffLine(DiffLineKind.Delete, "-A", oldLine: 1),
+            DiffLine(DiffLineKind.Delete, "-B", oldLine: 2),
+            DiffLine(DiffLineKind.Add, "+X", newLine: 1),
+            DiffLine(DiffLineKind.Context, " same", oldLine: 3, newLine: 2),
+            DiffLine(DiffLineKind.Add, "+Y", newLine: 3),
+            DiffLine(DiffLineKind.Delete, "-C", oldLine: 4),
+            DiffLine(DiffLineKind.Add, "+Z", newLine: 4)
+        ]
+        let doc = DiffDocument([DiffFile("a", "a", hunks: [DiffHunk("@@", lines: lines)])])
+        let buffer = Buffer(Rect(0, 0, 32, 8))
+        buffer.setCapabilities(TerminalCapabilities(trueColor: false, colorLevel: 0))
+        buffer.fill(buffer.area, Cell("#"))
+        DiffView(doc, sideBySide: true).render(buffer.area, buffer)
+        @Expect(buffer.getCell(0, 2).symbol, "-")
+        @Expect(buffer.getCell(6, 2).symbol, "A")
+        @Expect(buffer.getCell(16, 2).symbol, "+")
+        @Expect(buffer.getCell(22, 2).symbol, "X")
+        @Expect(buffer.getCell(6, 3).symbol, "B")
+        @Expect(buffer.getCell(16, 3).symbol, " ")
+        @Expect(buffer.getCell(6, 4).symbol, "s")
+        @Expect(buffer.getCell(22, 4).symbol, "s")
+        @Expect(buffer.getCell(6, 5).symbol, "C")
+        @Expect(buffer.getCell(22, 5).symbol, "Y")
+        @Expect(buffer.getCell(0, 6).symbol, " ")
+        @Expect(buffer.getCell(16, 6).symbol, "+")
+        @Expect(buffer.getCell(22, 6).symbol, "Z")
+        let scrolled = Buffer(buffer.area)
+        DiffView(doc, sideBySide: true, offset: 2).render(scrolled.area, scrolled)
+        @Expect(scrolled.getCell(6, 1).symbol, "B")
+        @Expect(scrolled.getCell(16, 1).symbol, " ")
+        @Expect(scrolled.getCell(6, 2).symbol, "s")
+    }
+
 }

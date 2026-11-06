@@ -3,6 +3,15 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+cjpm_test_jobs=()
+if [[ ${TERMCANVAS_CJPM_JOBS+x} ]]; then
+    if [[ ! $TERMCANVAS_CJPM_JOBS =~ ^[0-9]+$ || ! $TERMCANVAS_CJPM_JOBS =~ [1-9] ]]; then
+        echo "TERMCANVAS_CJPM_JOBS must be a positive integer" >&2
+        exit 2
+    fi
+    cjpm_test_jobs=(--jobs "$TERMCANVAS_CJPM_JOBS")
+fi
+
 sdk_root=$("$ROOT/scripts/check_sdk.sh")
 export CANGJIE_SDK_ROOT="$sdk_root"
 export CJ_TUI_CANONICAL_TARGET_ROOT="${CJ_TUI_CANONICAL_TARGET_ROOT:-${TMPDIR:-/tmp}/cj-tui-canonical-target}"
@@ -22,7 +31,7 @@ run_cjpm_test() {
     local dir="$1"
     local label="$2"
     echo "==> $label"
-    "$ROOT/scripts/cangjie_cmd.sh" "$dir" cjpm test --no-color
+    "$ROOT/scripts/cangjie_cmd.sh" "$dir" cjpm test --no-color "${cjpm_test_jobs[@]}"
 }
 
 run_cjpm_test "$ROOT/packages/core" "core tests"

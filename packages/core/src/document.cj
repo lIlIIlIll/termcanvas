@@ -289,13 +289,19 @@ public class DocumentViewState {
 public class DocumentView <: Widget {
     private let document: Document
     private let block: ?Block
-    private let theme: DocumentTheme
+    private var theme: DocumentTheme
+    private let explicitTheme: ?DocumentTheme
+    private let baseStyle: ?Style
+    private let headingStyle: ?Style
+    private var contextTheme: ?Theme = None
     private let scroll: Int64
     private let wrap: WrapMode
     private let highlights: Array<DocumentHighlight>
     private let state: ?DocumentViewState
-    private let currentSourceStyle: Style
+    private let currentSourceOverride: ?Style
+    private var currentSourceStyle: Style
     private let cacheLayout: Bool
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private var cachedWidth: Int64 = -1
     private var cachedRows: Array<StyledLine> = []
     private var cachedFoldRevision: Int64 = -1
@@ -304,28 +310,40 @@ public class DocumentView <: Widget {
     public init(
         document: Document,
         block!: ?Block = None,
-        style!: Style = Style.default(),
-        headingStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()),
+        style!: ?Style = None,
+        headingStyle!: ?Style = None,
         theme!: ?DocumentTheme = None,
         scroll!: Int64 = 0,
         wrap!: WrapMode = WrapMode.Word,
         highlights!: Array<DocumentHighlight> = [],
         state!: ?DocumentViewState = None,
-        currentSourceStyle!: Style = Style(bg: Color.Indexed(8)),
+        currentSourceStyle!: ?Style = None,
         cacheLayout!: Bool = false
     ) {
         this.document = document
         this.block = block
+        this.explicitTheme = theme
+        this.baseStyle = style
+        this.headingStyle = headingStyle
         this.theme = match (theme) {
             case Some(t) => t
-            case None => DocumentTheme(paragraph: style, heading: headingStyle)
+            case None => DocumentTheme(
+                paragraph: match (style) { case Some(value) => value; case None => Style.default() },
+                heading: match (headingStyle) { case Some(value) => value; case None => Style(fg: Color.Yellow, modifier: Modifier.strong()) })
         }
         this.scroll = max(0, scroll)
         this.wrap = wrap
         this.highlights = highlights
         this.state = state
-        this.currentSourceStyle = currentSourceStyle
+        this.currentSourceOverride = currentSourceStyle
+        this.currentSourceStyle = match (currentSourceStyle) { case Some(value) => value; case None => Style(bg: Color.Indexed(8)) }
         this.cacheLayout = cacheLayout
+    }
+
+    /** 指定后续排版采用的宽度策略；变更时使缓存失效。 */
+    public func setTextWidthOptions(options: TextWidthOptions): Unit {
+        if (usesWideAmbiguous(options) != usesWideAmbiguous(textWidthOptionsValue)) { cachedWidth = -1 }
+        textWidthOptionsValue = options
     }
 
     public func renderedLineCount(width: Int64): Int64 {
@@ -438,6 +456,38 @@ public class DocumentView <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        let applicationTheme = buffer.resolveTheme(Option<Theme>.None)
+        let sourceHighlight = match (currentSourceOverride) {
+            case Some(value) => value
+            case None => widgetRoleStyle(Option<Style>.None, applicationTheme, ThemeRole.Selected, Style(bg: Color.Indexed(8)))
+        }
+        if (currentSourceStyle != sourceHighlight) {
+            currentSourceStyle = sourceHighlight
+            cachedWidth = -1
+        }
+        if (explicitTheme.isNone()) {
+            if (!documentContextThemeEqual(contextTheme, applicationTheme)) {
+                contextTheme = applicationTheme
+                theme = match (applicationTheme) {
+                    case Some(value) =>
+                        let heading = match (headingStyle) { case Some(style) => value.heading.patch(style); case None => value.heading }
+                        DocumentTheme(
+                        paragraph: widgetRoleStyle(baseStyle, applicationTheme, ThemeRole.Normal, Style.default()),
+                        heading: heading,
+                        heading1: Some(heading), heading2: Some(heading), heading3: Some(heading),
+                        heading4: Some(heading), heading5: Some(heading), heading6: Some(heading),
+                        list: value.accent, quoteStyle: value.secondary, code: value.accent, table: value.normal,
+                        link: value.info, emphasis: value.normal, strong: value.heading, inlineCode: value.accent,
+                        image: value.accent, diagnostic: value.error, html: value.secondary,
+                        strikethrough: value.secondary, tableHeader: value.heading)
+                    case None => DocumentTheme(
+                        paragraph: match (baseStyle) { case Some(style) => style; case None => Style.default() },
+                        heading: match (headingStyle) { case Some(style) => style; case None => Style(fg: Color.Yellow, modifier: Modifier.strong()) })
+                }
+                cachedWidth = -1
+            }
+        }
+        setTextWidthOptions(buffer.textWidthOptions())
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)
@@ -574,13 +624,13 @@ public class DocumentView <: Widget {
             case WrapMode.NoWrap => true
             case _ => false
         }
-        if (displayWidth(text) <= width || noWrap) {
+        if (displayWidth(text, options: textWidthOptionsValue) <= width || noWrap) {
             rows.add(StyledLine(highlighted))
             return
         }
         let wrapped = match (wrap) {
-            case WrapMode.Word => wrapRichSpansByWord(highlighted, width)
-            case _ => wrapRichSpans(highlighted, width)
+            case WrapMode.Word => wrapRichSpansByWord(highlighted, width, textWidthOptionsValue)
+            case _ => wrapRichSpans(highlighted, width, textWidthOptionsValue)
         }
         for (line in wrapped) {
             rows.add(line)
@@ -618,26 +668,36 @@ public class DocumentView <: Widget {
     }
 }
 
+// Document layout stores styled spans, so a palette change must invalidate it.
+func documentContextThemeEqual(left: ?Theme, right: ?Theme): Bool {
+    match ((left, right)) {
+        case (None, None) => true
+        case (Some(a), Some(b)) => a.normal == b.normal && a.heading == b.heading &&
+            a.accent == b.accent && a.info == b.info && a.secondary == b.secondary && a.error == b.error
+        case _ => false
+    }
+}
+
 public class MarkdownView <: Widget {
     private let view: DocumentView
 
     public init(
         text: String,
         block!: ?Block = None,
-        style!: Style = Style.default(),
-        headingStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()),
+        style!: ?Style = None,
+        headingStyle!: ?Style = None,
         theme!: ?DocumentTheme = None,
         scroll!: Int64 = 0,
         wrap!: WrapMode = WrapMode.Word
     ) {
-        this.view = DocumentView(Document.plain(text, style: style), block: block, style: style, headingStyle: headingStyle, theme: theme, scroll: scroll, wrap: wrap)
+        this.view = DocumentView(Document.plain(text), block: block, style: style, headingStyle: headingStyle, theme: theme, scroll: scroll, wrap: wrap)
     }
 
     public init(
         document: Document,
         block!: ?Block = None,
-        style!: Style = Style.default(),
-        headingStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()),
+        style!: ?Style = None,
+        headingStyle!: ?Style = None,
         theme!: ?DocumentTheme = None,
         scroll!: Int64 = 0,
         wrap!: WrapMode = WrapMode.Word
@@ -847,13 +907,13 @@ func lineStartOffset(line: DocumentLine): ?Int64 {
     None
 }
 
-func wrapRichSpans(spans: Array<RichSpan>, width: Int64): Array<StyledLine> {
+func wrapRichSpans(spans: Array<RichSpan>, width: Int64, options: TextWidthOptions): Array<StyledLine> {
     let rows = ArrayList<StyledLine>()
     if (width <= 0) { return rows.toArray() }
     var current = ArrayList<RichSpan>()
     var currentWidth: Int64 = 0
     for (span in spans) {
-        for (cluster in graphemeClusters(span.text)) {
+        for (cluster in graphemeClusters(span.text, options: options)) {
             let w = cluster.width
             if (w > 0 && currentWidth > 0 && currentWidth + w > width) {
                 rows.add(StyledLine(current.toArray()))
@@ -870,7 +930,7 @@ func wrapRichSpans(spans: Array<RichSpan>, width: Int64): Array<StyledLine> {
     rows.toArray()
 }
 
-func wrapRichSpansByWord(spans: Array<RichSpan>, width: Int64): Array<StyledLine> {
+func wrapRichSpansByWord(spans: Array<RichSpan>, width: Int64, options: TextWidthOptions): Array<StyledLine> {
     let rows = ArrayList<StyledLine>()
     if (width <= 0) { return rows.toArray() }
     var current = ArrayList<RichSpan>()
@@ -878,14 +938,14 @@ func wrapRichSpansByWord(spans: Array<RichSpan>, width: Int64): Array<StyledLine
     for (span in spans) {
         let chunks = wordChunks(span.text)
         for (chunk in chunks) {
-            let w = displayWidth(chunk)
+            let w = displayWidth(chunk, options: options)
             if (w > width) {
                 if (current.size > 0) {
                     rows.add(StyledLine(current.toArray()))
                     current = ArrayList<RichSpan>()
                     currentWidth = 0
                 }
-                for (line in wrapRichSpans([RichSpan(chunk, style: span.style, linkUrl: span.linkUrl, sourceRange: span.sourceRange)], width)) {
+                for (line in wrapRichSpans([RichSpan(chunk, style: span.style, linkUrl: span.linkUrl, sourceRange: span.sourceRange)], width, options)) {
                     rows.add(line)
                 }
             } else if (currentWidth > 0 && currentWidth + w > width) {
@@ -894,7 +954,7 @@ func wrapRichSpansByWord(spans: Array<RichSpan>, width: Int64): Array<StyledLine
                 currentWidth = 0
                 if (!isOnlySpaces(chunk)) {
                     current.add(RichSpan(trimLeadingSpaces(chunk), style: span.style, linkUrl: span.linkUrl, sourceRange: span.sourceRange))
-                    currentWidth += displayWidth(trimLeadingSpaces(chunk))
+                    currentWidth += displayWidth(trimLeadingSpaces(chunk), options: options)
                 }
             } else {
                 current.add(RichSpan(chunk, style: span.style, linkUrl: span.linkUrl, sourceRange: span.sourceRange))

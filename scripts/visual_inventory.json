@@ -1,0 +1,2853 @@
+{
+  "themes": [
+    "indigo",
+    "graphite",
+    "light"
+  ],
+  "theme_aliases": {
+    "default": "indigo"
+  },
+  "subjects": [
+    {
+      "id": "core.Button",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "focused",
+        "disabled",
+        "focused+disabled"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Checkbox",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "checked",
+        "focused",
+        "focused+checked",
+        "disabled",
+        "disabled+checked",
+        "focused+disabled",
+        "focused+disabled+checked"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Block",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "focused",
+        "active",
+        "error",
+        "disabled"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.ProgressBar",
+      "kind": "widget",
+      "state_target_widths": {
+        "tiny+width-3": 3,
+        "tiny+width-4": 4,
+        "tiny+width-8": 8
+      },
+      "states": [
+        "normal",
+        "empty",
+        "full",
+        "percent",
+        "ratio",
+        "value",
+        "text",
+        "tiny",
+        "tiny+width-3",
+        "tiny+width-4",
+        "tiny+width-8",
+        "indeterminate-early",
+        "indeterminate-mid",
+        "vertical",
+        "vertical+percent"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true,
+      "unverified_states": ["real-time indeterminate scheduling and other phases"]
+    },
+    {
+      "id": "core.Canvas.strokeBorder",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Switch",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "checked",
+        "focused",
+        "focused+checked",
+        "disabled",
+        "disabled+checked",
+        "focused+disabled",
+        "focused+disabled+checked"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.RadioGroup",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "focused",
+        "disabled",
+        "focused+disabled"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.SegmentedControl",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "focused",
+        "disabled",
+        "focused+disabled"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Input",
+      "kind": "widget",
+      "max_effective_height": 1,
+      "states": [
+        "normal",
+        "focused",
+        "disabled",
+        "focused+disabled",
+        "error",
+        "focused+error",
+        "disabled+error",
+        "focused+disabled+error",
+        "empty+focused",
+        "empty+error",
+        "empty+focused+error"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          1
+        ],
+        [
+          40,
+          1
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.ColorPicker",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "focused",
+        "disabled",
+        "focused+disabled"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.DatePicker",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "focused",
+        "disabled",
+        "focused+disabled"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Dropdown",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "focused",
+        "disabled",
+        "focused+disabled",
+        "open",
+        "open+focused",
+        "open+disabled",
+        "open+focused+disabled"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Select",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.MultiSelect",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Tabs",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "focused"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.List",
+      "kind": "widget",
+      "states": [
+        "selected",
+        "focused"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Table",
+      "kind": "widget",
+      "states": [
+        "selected",
+        "focused",
+        "no-selection",
+        "scrolled+selected",
+        "scrolled+focused",
+        "custom-surface"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Tree",
+      "kind": "widget",
+      "state_target_widths": {
+        "long-name+expanded+width-39": 39,
+        "long-name+expanded+width-40": 40,
+        "long-name+expanded+width-41": 41,
+        "long-name+expanded+width-42": 42
+      },
+      "states": [
+        "selected",
+        "focused",
+        "long-name+collapsed",
+        "long-name+expanded",
+        "long-name+expanded+width-39",
+        "long-name+expanded+width-40",
+        "long-name+expanded+width-41",
+        "long-name+expanded+width-42"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ],
+        [
+          41,
+          3
+        ],
+        [
+          42,
+          3
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Scrollbar",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Paragraph",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.TextArea",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.MarkdownTextEditor",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.MarkdownView",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Composer",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.ActivityTimeline",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.RequestDialog",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Dialog",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.ConfirmDialog",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Menu",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.MenuBar",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.CommandPalette",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.ToastManager",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Spinner",
+      "kind": "widget",
+      "states": [
+        "frame-0",
+        "frame-1",
+        "frame-2",
+        "frame-3"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true,
+      "unverified_states": ["real-time frame scheduling"]
+    },
+    {
+      "id": "core.MetricCard",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Meter",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.TimeSeriesChart",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.HeaderBar",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.FooterBar",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.EmptyState",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.ErrorBox",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.LoadingOverlay",
+      "kind": "widget",
+      "states": [
+        "frame-0",
+        "frame-1",
+        "frame-2",
+        "frame-3"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true,
+      "unverified_states": ["real-time frame scheduling"]
+    },
+    {
+      "id": "core.Skeleton",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.InlineAlert",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Badge",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Sparkline",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Gauge",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Chart",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.LogView",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.StatusBar",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Viewport",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Scrollable",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Panel",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.TaskActivityView",
+      "kind": "widget",
+      "states": [
+        "pending+compact",
+        "pending+expanded",
+        "queued+compact",
+        "queued+expanded",
+        "running+compact",
+        "running+expanded",
+        "paused+compact",
+        "paused+expanded",
+        "done+compact",
+        "done+expanded",
+        "failed+compact",
+        "failed+expanded",
+        "cancelled+compact",
+        "cancelled+expanded",
+        "mixed-stages+expanded",
+        "long-title+duration+expanded"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.TaskActivityList",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Legend",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.DocumentView",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.TranscriptView",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.VirtualTranscriptView",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.HelpView",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.DebugOverlay",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.VirtualTable",
+      "kind": "widget",
+      "state_target_widths": {
+        "sort-asc+width-1": 1,
+        "sort-asc+width-2": 2,
+        "sort-desc+width-1": 1,
+        "sort-desc+width-2": 2
+      },
+      "states": [
+        "normal",
+        "empty",
+        "loading",
+        "error",
+        "custom-surface",
+        "empty+custom-surface",
+        "loading+custom-surface",
+        "error+custom-surface",
+        "paged+custom-surface",
+        "sort-asc+width-1",
+        "sort-asc+width-2",
+        "sort-desc+width-1",
+        "sort-desc+width-2"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.VBox",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.HBox",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Stack",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Overlay",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Padding",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Margin",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Centered",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Dock",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "game.SpriteRenderer.render",
+      "kind": "extension",
+      "states": ["normal", "offset"],
+      "widget_sizes": [[0, 0], [1, 1], [16, 3], [40, 10]],
+      "high_risk": true,
+      "unverified_states": ["other sprites, transparency symbols, camera and clipping combinations"]
+    },
+    {
+      "id": "game.SpriteRenderer.drawSprite",
+      "kind": "extension",
+      "states": ["normal", "offset"],
+      "widget_sizes": [[0, 0], [1, 1], [16, 3], [40, 10]],
+      "high_risk": true,
+      "unverified_states": ["other sprites, transparency symbols, camera and clipping combinations"]
+    },
+    {
+      "id": "game.TileMap.render",
+      "kind": "extension",
+      "states": ["normal", "offset"],
+      "widget_sizes": [[0, 0], [1, 1], [16, 3], [40, 10]],
+      "high_risk": true,
+      "unverified_states": ["other map data, camera and text width combinations"]
+    },
+    {
+      "id": "diff.DiffView",
+      "kind": "extension",
+      "states": [
+        "normal",
+        "side-by-side"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "media.AsciiAnimationView",
+      "kind": "extension",
+      "states": [
+        "frame-0",
+        "frame-1",
+        "paused-frame-0",
+        "paused-frame-1"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true,
+      "unverified_states": ["real-time scheduling and caller-controlled pause timing"]
+    },
+    {
+      "id": "terminal.TerminalView",
+      "kind": "extension",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Buffer.setCell",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Buffer.setString",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Buffer.fill",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Buffer.fillRect",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Buffer.fillLine",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Buffer.hline",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Buffer.vline",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Buffer.writeAsciiSpan",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Buffer.blitFrom",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.fillRect",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.hline",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.vline",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.strokeRect",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.drawLine",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.drawText",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.drawSprite",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.render",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.composite",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.FilePicker",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.FileDialog",
+      "kind": "widget",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Buffer.addMedia",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.withClip",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.translated",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Canvas.viewport",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Frame.fill",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Frame.fillRect",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Frame.renderWidget",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.Frame.addMedia",
+      "kind": "primitive",
+      "states": [
+        "normal"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true
+    },
+    {
+      "id": "core.StyledWidget",
+      "kind": "widget",
+      "states": [
+        "normal",
+        "clear-background",
+        "clear-modifiers",
+        "nested"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true,
+      "unverified_states": [
+        "nested combinations beyond the declared case",
+        "clipping and exception paths",
+        "wide glyphs at boundaries",
+        "media placements"
+      ]
+    },
+    {
+      "id": "markdown_adapter.ThemedMarkdownView",
+      "kind": "extension",
+      "states": [
+        "normal",
+        "explicit-theme",
+        "syntax-off",
+        "syntax-on",
+        "scroll-start",
+        "scroll-next"
+      ],
+      "widget_sizes": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          16,
+          3
+        ],
+        [
+          40,
+          10
+        ]
+      ],
+      "high_risk": true,
+      "unverified_states": [
+        "preserve soft breaks and wrap modes",
+        "highlight overlays and source updates",
+        "explicit theme combined with syntax and scrolling",
+        "other markdown constructs and syntax definitions"
+      ]
+    }
+  ]
+}

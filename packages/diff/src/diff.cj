@@ -152,78 +152,202 @@ public func parseUnifiedDiff(text: String): DiffDocument {
     DiffDocument(files.toArray())
 }
 
+/** 差异视图各语义角色的逐属性覆盖。未指定的属性继承对应主题样式；
+ * `Some(Color.Reset)` 可显式恢复终端默认颜色。
+ */
+public struct DiffViewStyles {
+    public let summary: StyleOverride
+    public let hunk: StyleOverride
+    public let context: StyleOverride
+    public let add: StyleOverride
+    public let delete: StyleOverride
+    public let header: StyleOverride
+
+    public init(summary!: StyleOverride = StyleOverride(), hunk!: StyleOverride = StyleOverride(),
+        context!: StyleOverride = StyleOverride(), add!: StyleOverride = StyleOverride(),
+        delete!: StyleOverride = StyleOverride(), header!: StyleOverride = StyleOverride()) {
+        this.summary = summary
+        this.hunk = hunk
+        this.context = context
+        this.add = add
+        this.delete = delete
+        this.header = header
+    }
+}
+
 public class DiffView <: Widget {
     private let document: DiffDocument
     // render normalizes this index to the available file range (negative => 0).
     public var selectedFile: Int64
     public var selectedLine: Int64
+    /** 差异内容的显示偏移量，按显示行跳过区块标题及差异行；并排模式的配对行算一行。构造时传入的负值按 0 保存。
+     */
     public var offset: Int64
     private let block: ?Block
     private let sideBySide: Bool
+    private let theme: ?Theme
+    private let styles: DiffViewStyles
 
-    public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, sideBySide!: Bool = false) {
+    /** 以指定文档创建差异视图，保存显示选项，并将文件索引、行索引和偏移量的负值置为 0。
+     * 指定主题时内容区铺设 surface 背景，各角色继承对应语义样式；styles 可逐项覆盖文本样式，包括显式清除背景。
+     * 未指定主题时继承缓冲区上下文主题；无上下文主题时保留传统配色。外围区块的显式主题优先。
+     */
+    public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0,
+        block!: ?Block = None, sideBySide!: Bool = false, theme!: ?Theme = None,
+        styles!: DiffViewStyles = DiffViewStyles()) {
         this.document = document
         this.selectedFile = max(0, selectedFile)
         this.selectedLine = max(0, selectedLine)
         this.offset = max(0, offset)
         this.block = block
         this.sideBySide = sideBySide
+        this.theme = theme
+        this.styles = styles
     }
 
+    /** 将选中文件的路径及增删行数绘制到目标区域，并按偏移量绘制区块标题和未折叠的差异行；有外围区块时先绘制区块并使用其内部区域。区域无可用宽高或文档无文件时不绘制差异内容；有主题时空内容区仍铺设 surface 背景。渲染时会修正选中文件索引。
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
-            b.render(area, buffer)
+            buffer.withParentTheme(theme) { => b.render(area, buffer) }
             target = b.inner(area)
         }
-        if (target.width <= 0 || target.height <= 0 || document.files.size == 0) { return }
+        if (target.width <= 0 || target.height <= 0) { return }
         let canvas = Canvas(buffer, target)
+        let resolvedTheme = buffer.resolveTheme(theme)
+        if (let Some(t) <- resolvedTheme) { canvas.fillRect(target, t.surface) }
+        if (document.files.size == 0) { return }
         selectedFile = max(0, min(selectedFile, document.files.size - 1))
         let file = document.files[selectedFile]
         var y = target.y
         let summary = "${file.newPath}  +${file.addedLines()} -${file.deletedLines()}"
-        canvas.drawText(target.x, y, truncateDiff(summary, target.width), Style(fg: Color.Cyan))
+        canvas.drawText(target.x, y, truncateDiff(summary, target.width, canvas.textWidthOptions()), summaryStyle(resolvedTheme))
         y++
         var rendered: Int64 = 0
         for (hunk in file.hunks) {
             if (rendered >= offset && y < target.bottom) {
-                canvas.drawText(target.x, y, truncateDiff(hunk.header, target.width), Style(fg: Color.Magenta))
+                canvas.drawText(target.x, y, truncateDiff(hunk.header, target.width, canvas.textWidthOptions()), hunkStyle(resolvedTheme))
                 y++
             }
             rendered++
             if (!hunk.collapsed) {
-                for (line in hunk.lines) {
-                    if (rendered >= offset && y < target.bottom) {
-                        // A single visible column uses the unified layout.
-                        if (sideBySide && target.width >= 2) {
-                            renderSideBySideLine(target, y, line, canvas)
-                        } else {
-                            let prefix = formatLineNumber(line.oldLine) + " " + formatLineNumber(line.newLine) + " "
-                            canvas.drawText(target.x, y, truncateDiff(prefix + line.text, target.width), diffLineStyle(line.kind))
+                // A single visible column uses the unified layout.
+                if (sideBySide && target.width >= 2) {
+                    for (row in sideBySideRows(hunk.lines)) {
+                        if (rendered >= offset && y < target.bottom) {
+                            renderSideBySideRow(target, y, row, canvas, resolvedTheme)
+                            y++
                         }
-                        y++
+                        rendered++
                     }
-                    rendered++
+                } else {
+                    for (line in hunk.lines) {
+                        if (rendered >= offset && y < target.bottom) {
+                            let prefix = formatLineNumber(line.oldLine) + " " + formatLineNumber(line.newLine) + " "
+                            canvas.drawText(target.x, y, truncateDiff(prefix + line.text, target.width, canvas.textWidthOptions()), diffLineStyle(line.kind, resolvedTheme))
+                            y++
+                        }
+                        rendered++
+                    }
                 }
             }
         }
     }
 
-    private func renderSideBySideLine(area: Rect, y: Int64, line: DiffLine, canvas: Canvas): Unit {
+    private func renderSideBySideRow(area: Rect, y: Int64, row: DiffSideRow, canvas: Canvas, resolvedTheme: ?Theme): Unit {
         let leftWidth = area.width / 2
         let rightWidth = area.width - leftWidth
-        let oldText = formatLineNumber(line.oldLine) + " " + stripSign(line.text)
-        let newText = formatLineNumber(line.newLine) + " " + stripSign(line.text)
-        match (line.kind) {
-            case DiffLineKind.Delete =>
-                canvas.drawText(area.x, y, truncateDiff(oldText, leftWidth), diffLineStyle(line.kind))
-            case DiffLineKind.Add =>
-                canvas.drawText(area.x + leftWidth, y, truncateDiff(newText, rightWidth), diffLineStyle(line.kind))
-            case _ =>
-                canvas.drawText(area.x, y, truncateDiff(oldText, leftWidth), diffLineStyle(line.kind))
-                canvas.drawText(area.x + leftWidth, y, truncateDiff(newText, rightWidth), diffLineStyle(line.kind))
+        // The absent side and trailing cells must not retain an older frame.
+        if (resolvedTheme.isNone()) { canvas.fillRect(Rect(area.x, y, area.width, 1), Style.default()) }
+        if (let Some(line) <- row.oldLine) {
+            let marker = if (sameDiffKind(line.kind, DiffLineKind.Delete)) { "-" } else { " " }
+            let text = marker + formatLineNumber(line.oldLine) + " " + stripSign(line.text)
+            canvas.drawText(area.x, y, truncateDiff(text, leftWidth, canvas.textWidthOptions()), diffLineStyle(line.kind, resolvedTheme))
+        }
+        if (let Some(line) <- row.newLine) {
+            let marker = if (sameDiffKind(line.kind, DiffLineKind.Add)) { "+" } else { " " }
+            let text = marker + formatLineNumber(line.newLine) + " " + stripSign(line.text)
+            canvas.drawText(area.x + leftWidth, y, truncateDiff(text, rightWidth, canvas.textWidthOptions()), diffLineStyle(line.kind, resolvedTheme))
         }
     }
+
+    private func summaryStyle(resolvedTheme: ?Theme): Style {
+        let base = match (resolvedTheme) {
+            case Some(t) => t.accent.withBg(t.surface.bg)
+            case None => Style(fg: Color.Cyan)
+        }
+        styles.summary.apply(base)
+    }
+
+    private func hunkStyle(resolvedTheme: ?Theme): Style {
+        let base = match (resolvedTheme) {
+            case Some(t) => t.info.withBg(t.surface.bg)
+            case None => Style(fg: Color.Magenta)
+        }
+        styles.hunk.apply(base)
+    }
+
+    private func diffLineStyle(kind: DiffLineKind, resolvedTheme: ?Theme): Style {
+        let base = match (resolvedTheme) {
+            case Some(t) => match (kind) {
+                case DiffLineKind.Context => t.normal.withBg(t.surface.bg)
+                case DiffLineKind.Add => t.success.withBg(t.surface.bg)
+                case DiffLineKind.Delete => t.error.withBg(t.surface.bg)
+                case DiffLineKind.Header => t.heading.withBg(t.surface.bg)
+            }
+            case None => legacyDiffLineStyle(kind)
+        }
+        match (kind) {
+            case DiffLineKind.Context => styles.context.apply(base)
+            case DiffLineKind.Add => styles.add.apply(base)
+            case DiffLineKind.Delete => styles.delete.apply(base)
+            case DiffLineKind.Header => styles.header.apply(base)
+        }
+    }
+}
+
+// Pair only contiguous change blocks within a hunk, preserving order within
+// each side. Context and headers separate blocks and appear on both sides.
+private class DiffSideRow {
+    let oldLine: ?DiffLine
+    let newLine: ?DiffLine
+    init(oldLine: ?DiffLine, newLine: ?DiffLine) {
+        this.oldLine = oldLine
+        this.newLine = newLine
+    }
+}
+
+private func sideBySideRows(lines: Array<DiffLine>): Array<DiffSideRow> {
+    let rows = ArrayList<DiffSideRow>()
+    var index: Int64 = 0
+    while (index < lines.size) {
+        let line = lines[index]
+        if (!sameDiffKind(line.kind, DiffLineKind.Add) && !sameDiffKind(line.kind, DiffLineKind.Delete)) {
+            rows.add(DiffSideRow(Some(line), Some(line)))
+            index++
+            continue
+        }
+        let removed = ArrayList<DiffLine>()
+        let added = ArrayList<DiffLine>()
+        while (index < lines.size) {
+            let change = lines[index]
+            if (sameDiffKind(change.kind, DiffLineKind.Delete)) {
+                removed.add(change)
+            } else if (sameDiffKind(change.kind, DiffLineKind.Add)) {
+                added.add(change)
+            } else {
+                break
+            }
+            index++
+        }
+        for (row in 0..max(removed.size, added.size)) {
+            let left: ?DiffLine = if (row < removed.size) { Some(removed[row]) } else { None }
+            let right: ?DiffLine = if (row < added.size) { Some(added[row]) } else { None }
+            rows.add(DiffSideRow(left, right))
+        }
+    }
+    rows.toArray()
 }
 
 func sameDiffKind(left: DiffLineKind, right: DiffLineKind): Bool {
@@ -354,7 +478,7 @@ func splitDiffLines(text: String): Array<String> {
     out.toArray()
 }
 
-func diffLineStyle(kind: DiffLineKind): Style {
+func legacyDiffLineStyle(kind: DiffLineKind): Style {
     match (kind) {
         case DiffLineKind.Add => Style(fg: Color.Green)
         case DiffLineKind.Delete => Style(fg: Color.Red)
@@ -363,6 +487,6 @@ func diffLineStyle(kind: DiffLineKind): Style {
     }
 }
 
-func truncateDiff(text: String, width: Int64): String {
-    graphemePrefix(text, max(0, width))
+func truncateDiff(text: String, width: Int64, options: TextWidthOptions): String {
+    graphemePrefix(text, max(0, width), options: options)
 }

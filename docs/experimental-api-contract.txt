@@ -1,3 +1,23 @@
+core|AnimationConfig|struct|public struct AnimationConfig {
+core|AnimationConfig.durationMillis|let|public let durationMillis: Int64
+core|AnimationConfig.framesPerSecond|let|public let framesPerSecond: Int64
+core|AnimationConfig.enabled|let|public let enabled: Bool
+core|AnimationConfig.init|init|public init(durationMillis!: Int64 = 1000, framesPerSecond!: Int64 = 30, enabled!: Bool = true)
+core|AnimationSample|struct|public struct AnimationSample {
+core|AnimationSample.elapsedMillis|let|public let elapsedMillis: Int64
+core|AnimationSample.cycleMillis|let|public let cycleMillis: Int64
+core|AnimationSample.durationMillis|let|public let durationMillis: Int64
+core|AnimationSample.init|init|public init(elapsedMillis: Int64, durationMillis: Int64)
+core|AnimationScheduler|class|public class AnimationScheduler {
+core|AnimationScheduler.init|init|public init(clock!: RuntimeClock = MonotonicRuntimeClock(), maxFramesPerSecond!: Int64 = 30)
+core|AnimationScheduler.register|func|public func register(scope: String, id: String, config!: AnimationConfig = AnimationConfig(), group!: ?String = None, visible!: Bool = true): Bool
+core|AnimationScheduler.setVisible|func|public func setVisible(scope: String, id: String, visible: Bool): Bool
+core|AnimationScheduler.setConfig|func|public func setConfig(scope: String, id: String, config: AnimationConfig): Bool
+core|AnimationScheduler.remove|func|public func remove(scope: String, id: String): Bool
+core|AnimationScheduler.removeScope|func|public func removeScope(scope: String): Unit
+core|AnimationScheduler.sample|func|public func sample(scope: String, id: String): ?AnimationSample
+core|AnimationScheduler.nextTimeoutMillis|func|public func nextTimeoutMillis(): ?Int64
+core|AnimationScheduler.framePresented|func|public func framePresented(): Unit
 core|AppTraceSink|interface|public interface AppTraceSink {
 core|AppTraceSink.externalDequeued|func|func externalDequeued(_: Int64): Unit
 core|AppTraceSink.inputReceived|func|func inputReceived(event: Event, eventQueueLength: Int64): Unit
@@ -18,6 +38,8 @@ core|RuntimeMetricsSnapshot.queueOverflows|let|public let queueOverflows: Int64
 core|RuntimeMetricsSnapshot.scheduling|let|public let scheduling: FrameSchedulingSnapshot
 core|RuntimeMetricsSnapshot.init|init|public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, yieldedTurns!: Int64 = 0, queueOverflows!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )
 core|App.attachTraceSink|func|public func attachTraceSink(traceSink: AppTraceSink): Unit
+core|App.attachAnimationScheduler|func|public func attachAnimationScheduler(scheduler: AnimationScheduler): Unit
+core|App.attachGlyphCapabilitySession|func|public func attachGlyphCapabilitySession(session: GlyphCapabilitySession): Unit
 core|App.attachProcessRuntime|func|public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit
 core|App.attachPtyRuntime|func|public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit
 core|FocusManager|class|public class FocusManager {
@@ -25,6 +47,7 @@ core|FocusManager.init|init|public init()
 core|FocusManager.add|func|public func add(id: String, enabled!: Bool = true): Unit
 core|FocusManager.remove|func|public func remove(id: String): Unit
 core|FocusManager.focus|func|public func focus(id: String): Bool
+core|FocusManager.setEnabled|func|public func setEnabled(id: String, value: Bool): Bool
 core|FocusManager.current|func|public func current(): ?String
 core|FocusManager.isFocused|func|public func isFocused(id: String): Bool
 core|FocusManager.next|func|public func next(): ?String
@@ -53,6 +76,7 @@ core|Surface.zIndex|let|public let zIndex: Int64
 core|Surface.init|init|public init(area: Rect, zIndex!: Int64 = 0)
 core|Surface.canvas|func|public func canvas(): Canvas
 core|Surface.bufferView|func|public func bufferView(): Buffer
+core|Canvas.createSurface|func|public func createSurface(area: Rect, zIndex!: Int64 = 0): Surface
 core|Canvas.withClip|func|public func withClip(area: Rect): Canvas
 core|Canvas.translated|func|public func translated(x: Int64, y: Int64): Canvas
 core|Canvas.viewport|func|public func viewport(camera: Position): Canvas
@@ -93,13 +117,13 @@ core|MenuItem.init|init|public init(label: String, action!: String = "", enabled
 core|Menu|class|public class Menu <: Widget {
 core|Menu.selected|var|public var selected: Int64
 core|Menu.offset|var|public var offset: Int64 = 0
-core|Menu.init|init|public init( title: String, items: Array<MenuItem>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)) )
+core|Menu.init|init|public init( title: String, items: Array<MenuItem>, selected!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
 core|Menu.handle|func|public func handle(key: KeyEvent): ?String
 core|Menu.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|Menu.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|MenuBar|class|public class MenuBar <: Widget {
 core|MenuBar.selected|var|public var selected: Int64
-core|MenuBar.init|init|public init( menus: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+core|MenuBar.init|init|public init( menus: Array<String>, selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None )
 core|MenuBar.handle|func|public func handle(key: KeyEvent): Bool
 core|MenuBar.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|MenuBar.render|func|public func render(area: Rect, buffer: Buffer): Unit
@@ -107,7 +131,7 @@ core|CommandPalette|class|public class CommandPalette <: Widget {
 core|CommandPalette.query|var|public var query: String
 core|CommandPalette.selected|var|public var selected: Int64
 core|CommandPalette.offset|var|public var offset: Int64 = 0
-core|CommandPalette.init|init|public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style.default(), theme!: ?Theme = None, caseSensitive!: Bool = true )
+core|CommandPalette.init|init|public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: ?Style = None, selectedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None, caseSensitive!: Bool = true )
 core|CommandPalette.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|CommandPalette.paste|func|public func paste(text: String): Unit
 core|CommandPalette.handle|func|public func handle(key: KeyEvent): ?String
@@ -133,18 +157,18 @@ core|ToastManager.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|ToastManager.tick|func|public func tick(): Unit
 core|ToastManager.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Spinner|class|public class Spinner <: Widget {
-core|Spinner.init|init|public init(label!: String = "", frame!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
+core|Spinner.init|init|public init(label!: String = "", frame!: Int64 = 0, style!: ?Style = None, theme!: ?Theme = None)
 core|Spinner.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Dialog|class|public class Dialog <: Widget {
 core|Dialog.selected|var|public var selected: Int64
-core|Dialog.init|init|public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+core|Dialog.init|init|public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None )
 core|Dialog.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|Dialog.handle|func|public func handle(key: KeyEvent): ?String
 core|Dialog.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 core|Dialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ConfirmDialog|class|public class ConfirmDialog <: Widget {
 core|ConfirmDialog.confirmed|var|public var confirmed: Bool = false
-core|ConfirmDialog.init|init|public init( message: String, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+core|ConfirmDialog.init|init|public init( message: String, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None )
 core|ConfirmDialog.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|ConfirmDialog.handle|func|public func handle(key: KeyEvent): ?Bool
 core|ConfirmDialog.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
@@ -187,7 +211,7 @@ core|TranscriptCardTheme.topTitleStyle|let|public let topTitleStyle: Style
 core|TranscriptCardTheme.fullFrame|let|public let fullFrame: Bool
 core|TranscriptCardTheme.fillBackground|let|public let fillBackground: Bool
 core|TranscriptCardTheme.contentPadding|let|public let contentPadding: Spacing
-core|TranscriptCardTheme.init|init|public init( style!: Style = Style.default(), titleStyle!: Style = Style(modifier: Modifier.strong()), mutedStyle!: Style = Style(fg: Color.Indexed(8)), selectedStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()), bodyIndent!: Int64 = 2, bodyLimit!: Int64 = 12, borderStyle!: Style = Style(fg: Color.Indexed(8)), borderBackground!: Style = Style.default(), topTitleStyle!: Style = Style(modifier: Modifier.strong()), fullFrame!: Bool = false, fillBackground!: Bool = false, contentPadding!: Spacing = Spacing.zero() )
+core|TranscriptCardTheme.init|init|public init( style!: Style = Style.default(), titleStyle!: Style = Style(modifier: Modifier.strong()), mutedStyle!: Style = Style(fg: Color.Indexed(8)), selectedStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()), bodyIndent!: Int64 = 2, bodyLimit!: Int64 = 12, borderStyle!: Style = Style(fg: Color.Indexed(8)), borderBackground!: Style = Style.default(), topTitleStyle!: Style = Style(modifier: Modifier.strong()), fullFrame!: Bool = false, fillBackground!: Bool = false, contentPadding!: Spacing = Spacing.zero(), semanticTheme!: ?Theme = None )
 core|TranscriptItem|class|public class TranscriptItem {
 core|TranscriptItem.id|let|public let id: String
 core|TranscriptItem.kind|let|public let kind: TranscriptItemKind
@@ -212,7 +236,7 @@ core|Transcript.toggleCollapsed|func|public func toggleCollapsed(id: String): Bo
 core|TranscriptView|class|public class TranscriptView <: Widget {
 core|TranscriptView.offset|var|public var offset: Int64
 core|TranscriptView.selected|var|public var selected: Int64
-core|TranscriptView.init|init|public init( transcript: Transcript, offset!: Int64 = 0, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cardTheme!: ?TranscriptCardTheme = None )
+core|TranscriptView.init|init|public init( transcript: Transcript, offset!: Int64 = 0, selected!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cardTheme!: ?TranscriptCardTheme = None )
 core|TranscriptView.handle|func|public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 core|TranscriptView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ActivityStep|class|public class ActivityStep {
@@ -226,55 +250,56 @@ core|ActivityTimeline.init|init|public init(steps: Array<ActivityStep>, block!: 
 core|ActivityTimeline.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|RequestDialog|class|public class RequestDialog <: Widget {
 core|RequestDialog.selected|var|public var selected: Int64
-core|RequestDialog.init|init|public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None)
+core|RequestDialog.init|init|public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
 core|RequestDialog.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|RequestDialog.handle|func|public func handle(key: KeyEvent): ?String
 core|RequestDialog.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|DecisionDialog|type|public type DecisionDialog = RequestDialog
 core|statusMark|func|public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
 core|transcriptStatusStyle|func|public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
+core|transcriptStatusStyle|func|public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style
 core|transcriptStatusLabel|func|public func transcriptStatusLabel(status: TranscriptItemStatus): String
 core|transcriptCardDocument|func|public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
 core|MetricCard|class|public class MetricCard <: Widget {
-core|MetricCard.init|init|public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: Style = Style.default(), valueStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()) )
+core|MetricCard.init|init|public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: ?Style = None, valueStyle!: ?Style = None )
 core|MetricCard.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Meter|class|public class Meter <: Widget {
-core|Meter.init|init|public init(label: String, value: Int64, total!: Int64 = 100, style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green))
+core|Meter.init|init|public init(label: String, value: Int64, total!: Int64 = 100, style!: ?Style = None, fillStyle!: ?Style = None)
 core|Meter.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|LegendItem|class|public class LegendItem {
 core|LegendItem.label|let|public let label: String
 core|LegendItem.symbol|let|public let symbol: String
 core|LegendItem.style|let|public let style: Style
-core|LegendItem.init|init|public init(label: String, symbol!: String = "#", style!: Style = Style(fg: Color.Cyan))
+core|LegendItem.init|init|public init(label: String, symbol!: String = "#", style!: ?Style = None)
 core|Legend|class|public class Legend <: Widget {
 core|Legend.init|init|public init(items: Array<LegendItem>, gap!: String = " ")
 core|Legend.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|TimeSeriesChart|class|public class TimeSeriesChart <: Widget {
-core|TimeSeriesChart.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
+core|TimeSeriesChart.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None)
 core|TimeSeriesChart.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|HeaderBar|class|public class HeaderBar <: Widget {
-core|HeaderBar.init|init|public init(title: String, left!: String = "", right!: String = "", style!: Style = Style(fg: Color.White, modifier: Modifier.strong()))
+core|HeaderBar.init|init|public init(title: String, left!: String = "", right!: String = "", style!: ?Style = None)
 core|HeaderBar.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|FooterBar|class|public class FooterBar <: Widget {
-core|FooterBar.init|init|public init(left!: String = "", center!: String = "", right!: String = "", style!: Style = Style(fg: Color.Indexed(8)))
+core|FooterBar.init|init|public init(left!: String = "", center!: String = "", right!: String = "", style!: ?Style = None)
 core|FooterBar.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|EmptyState|class|public class EmptyState <: Widget {
-core|EmptyState.init|init|public init(title!: String = "No data", detail!: String = "", style!: Style = Style(fg: Color.Indexed(8)))
+core|EmptyState.init|init|public init(title!: String = "No data", detail!: String = "", style!: ?Style = None)
 core|EmptyState.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|ErrorBox|class|public class ErrorBox <: Widget {
-core|ErrorBox.init|init|public init(message: String, detail!: String = "")
+core|ErrorBox.init|init|public init(message: String, detail!: String = "", style!: ?Style = None, borderKind!: ?BorderKind = None, theme!: ?Theme = None)
 core|ErrorBox.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|LoadingOverlay|class|public class LoadingOverlay <: Widget {
 core|LoadingOverlay.init|init|public init(label!: String = "Loading", frame!: Int64 = 0)
 core|LoadingOverlay.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Skeleton|class|public class Skeleton <: Widget {
-core|Skeleton.init|init|public init(rows!: Int64 = 3, style!: Style = Style(fg: Color.Indexed(8)))
+core|Skeleton.init|init|public init(rows!: Int64 = 3, style!: ?Style = None)
 core|Skeleton.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|InlineAlert|class|public class InlineAlert <: Widget {
 core|InlineAlert.init|init|public init(message: String, state!: StyleState = StyleState.Accent)
 core|InlineAlert.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Badge|class|public class Badge <: Widget {
-core|Badge.init|init|public init(label: String, style!: Style = Style.default(), theme!: ?Theme = None)
+core|Badge.init|init|public init(label: String, style!: ?Style = None, theme!: ?Theme = None)
 core|Badge.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Paginator|class|public class Paginator {
 core|Paginator.page|var|public var page: Int64
@@ -309,7 +334,7 @@ core|VirtualTable.stickyHeader|var|public var stickyHeader: Bool = true
 core|VirtualTable.status|var|public var status: TableStatus = TableStatus.Ready
 core|VirtualTable.emptyText|var|public var emptyText: String = "No rows"
 core|VirtualTable.loadingText|var|public var loadingText: String = "Loading"
-core|VirtualTable.init|init|public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan), statusStyle!: Style = Style(fg: Color.Indexed(8)), selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None, dataModel!: ?PagedTableModel = None, cacheCapacity!: Int64 = 1024 )
+core|VirtualTable.init|init|public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cellStyle!: ?Style = None, statusStyle!: ?Style = None, selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None, dataModel!: ?PagedTableModel = None, cacheCapacity!: Int64 = 1024 )
 core|VirtualTable.init|init|public init(columns: Array<TableColumn>, model: PagedTableModel, block!: ?Block = None)
 core|VirtualTable.handle|func|public func handle(mouse: MouseEvent, area: Rect): Bool
 core|VirtualTable.render|func|public func render(area: Rect, buffer: Buffer): Unit
@@ -346,6 +371,7 @@ core|Tree.init|init|public init(model: LazyTreeModel, block!: ?Block = None, foc
 core|Tree.setFocused|func|public func setFocused(value: Bool): Unit
 core|Tree.setTheme|func|public func setTheme(value: ?Theme): Unit
 core|Tree.handle|func|public func handle(mouse: MouseEvent, area: Rect): Bool
+core|Tree.handle|func|public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool
 core|Tree.toggleSelected|func|public func toggleSelected(): Unit
 core|Tree.selectedId|func|public func selectedId(): ?String
 core|Tree.selectById|func|public func selectById(id: String): Bool
@@ -358,7 +384,7 @@ core|Tree.collapseSelected|func|public func collapseSelected(): Unit
 core|Tree.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Switch|class|public class Switch <: Widget {
 core|Switch.checked|var|public var checked: Bool
-core|Switch.init|init|public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+core|Switch.init|init|public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
 core|Switch.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
 core|Switch.handle|func|public func handle(key: KeyEvent): Bool
 core|Switch.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
@@ -377,7 +403,7 @@ core|ColorPicker.render|func|public func render(area: Rect, buffer: Buffer): Uni
 core|MultiSelect|class|public class MultiSelect <: Widget {
 core|MultiSelect.cursor|var|public var cursor: Int64
 core|MultiSelect.offset|var|public var offset: Int64 = 0
-core|MultiSelect.init|init|public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White))
+core|MultiSelect.init|init|public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
 core|MultiSelect.selectedIndices|func|public func selectedIndices(): Array<Int64>
 core|MultiSelect.toggle|func|public func toggle(): Unit
 core|MultiSelect.handle|func|public func handle(key: KeyEvent): Bool
@@ -392,6 +418,23 @@ core|DatePicker.setVisualState|func|public func setVisualState( focused!: Bool =
 core|DatePicker.value|func|public func value(): String
 core|DatePicker.handle|func|public func handle(key: KeyEvent): Bool
 core|DatePicker.render|func|public func render(area: Rect, buffer: Buffer): Unit
+core|GlyphCapability|enum|public enum GlyphCapability {
+core|GlyphCapability.Unknown|enum_constructor|Unknown
+core|GlyphCapability.VerifiedSupported|enum_constructor|VerifiedSupported
+core|GlyphCapability.Unsupported|enum_constructor|Unsupported
+core|GlyphCapabilityProvider|interface|public interface GlyphCapabilityProvider {
+core|GlyphCapabilityProvider.probe|func|func probe(budgetMillis: Int64): GlyphCapability
+core|UnknownGlyphCapabilityProvider|class|public class UnknownGlyphCapabilityProvider <: GlyphCapabilityProvider {
+core|UnknownGlyphCapabilityProvider.init|init|public init()
+core|UnknownGlyphCapabilityProvider.probe|func|public func probe(_: Int64): GlyphCapability
+core|GlyphCapabilitySession|class|public class GlyphCapabilitySession {
+core|GlyphCapabilitySession.init|init|public init(provider!: GlyphCapabilityProvider = UnknownGlyphCapabilityProvider(), timeoutMillis!: Int64 = 150, clock!: RuntimeClock = MonotonicRuntimeClock())
+core|GlyphCapabilitySession.iconSet|func|public func iconSet(): IconSet
+core|GlyphCapabilitySession.detected|func|public func detected(): GlyphCapability
+core|GlyphCapabilitySession.applyTo|func|public func applyTo(theme: Theme): Theme
+core|GlyphCapabilitySession.setOverride|func|public func setOverride(value: ?IconSet): Unit
+core|GlyphCapabilitySession.requestProbe|func|public func requestProbe(): Unit
+core|GlyphCapabilitySession.close|func|public func close(): Unit
 core|LazyTreeNode|class|public class LazyTreeNode {
 core|LazyTreeNode.id|let|public let id: String
 core|LazyTreeNode.label|let|public let label: String
@@ -424,7 +467,7 @@ core|Tabs.setFocused|func|public func setFocused(focused: Bool): Unit
 core|Tabs.setTheme|func|public func setTheme(theme: ?Theme): Unit
 core|SegmentedControl|class|public class SegmentedControl <: Widget {
 core|SegmentedControl.selected|var|public var selected: Int64
-core|SegmentedControl.init|init|public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: Style = Style(fg: Color.Indexed(8)), focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )
+core|SegmentedControl.init|init|public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: ?Style = None, focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )
 core|SegmentedControl.selectedValue|func|public func selectedValue(): ?String
 core|SegmentedControl.setVisualState|func|public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
 core|SegmentedControl.handle|func|public func handle(key: KeyEvent): Bool
@@ -570,10 +613,14 @@ core|StyleState.Selected|enum_constructor|Selected
 core|StyleState.Disabled|enum_constructor|Disabled
 core|StyleState.Error|enum_constructor|Error
 core|StyleState.Accent|enum_constructor|Accent
+core|StyledWidget|class|public class StyledWidget <: Widget {
+core|StyledWidget.init|init|public init(child: Widget, override!: StyleOverride)
+core|StyledWidget.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|TaskStatus|enum|public enum TaskStatus {
 core|TaskStatus.Pending|enum_constructor|Pending
 core|TaskStatus.Queued|enum_constructor|Queued
 core|TaskStatus.Running|enum_constructor|Running
+core|TaskStatus.Paused|enum_constructor|Paused
 core|TaskStatus.Done|enum_constructor|Done
 core|TaskStatus.Failed|enum_constructor|Failed
 core|TaskStatus.Cancelled|enum_constructor|Cancelled
@@ -594,14 +641,14 @@ core|TaskActivity.detail|let|public let detail: String
 core|TaskActivity.progressLabel|let|public let progressLabel: String
 core|TaskActivity.init|init|public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
 core|TaskActivityView|class|public class TaskActivityView <: Widget {
-core|TaskActivityView.init|init|public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
+core|TaskActivityView.init|init|public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
 core|TaskActivityView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|TaskActivityListEntry|class|public class TaskActivityListEntry {
 core|TaskActivityListEntry.activity|let|public let activity: TaskActivity
 core|TaskActivityListEntry.layout|let|public let layout: TaskActivityLayout
 core|TaskActivityListEntry.init|init|public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded)
 core|TaskActivityList|class|public class TaskActivityList <: Widget {
-core|TaskActivityList.init|init|public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
+core|TaskActivityList.init|init|public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
 core|TaskActivityList.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|CursorShape|enum|public enum CursorShape {
 core|CursorShape.Block|enum_constructor|Block
@@ -676,7 +723,9 @@ core|VirtualTranscriptSource.itemFooter|func|func itemFooter(_: Int64): String
 core|VirtualTranscriptSource.itemUsesCompactCardChrome|func|func itemUsesCompactCardChrome(_: Int64): Bool
 core|VirtualTranscriptSource.revision|func|func revision(index: Int64): Int64
 core|VirtualTranscriptSource.itemAppendOnlyText|func|func itemAppendOnlyText( _: Int64, _: Int64, _: String ): ?VirtualTranscriptAppendOnlyText
+core|VirtualTranscriptSource.itemAppendOnlyTextWithTheme|func|func itemAppendOnlyTextWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): ?VirtualTranscriptAppendOnlyText
 core|VirtualTranscriptSource.document|func|func document(index: Int64, width: Int64, themeKey: String): Document
+core|VirtualTranscriptSource.documentWithTheme|func|func documentWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): Document
 core|VirtualTranscriptSource.itemCardTheme|func|func itemCardTheme(_: Int64): ?TranscriptCardTheme
 core|VirtualTranscriptState|class|public class VirtualTranscriptState {
 core|VirtualTranscriptState.scrollTop|var|public var scrollTop: Int64
@@ -740,6 +789,7 @@ core|VirtualTranscriptView.setThemeKey|func|public func setThemeKey(value: Strin
 core|VirtualTranscriptView.setCardChrome|func|public func setCardChrome(enabled: Bool): Unit
 core|VirtualTranscriptView.setUnicode|func|public func setUnicode(enabled: Bool): Unit
 core|VirtualTranscriptView.setCardTheme|func|public func setCardTheme(theme: TranscriptCardTheme): Unit
+core|VirtualTranscriptView.clearCardTheme|func|public func clearCardTheme(): Unit
 core|VirtualTranscriptView.invalidateItem|func|public func invalidateItem(id: String): Bool
 core|VirtualTranscriptView.totalRows|func|public func totalRows(): Int64
 core|VirtualTranscriptView.materializedCount|func|public func materializedCount(): Int64
@@ -748,13 +798,13 @@ core|VirtualTranscriptView.dirtyRectForItemRevision|func|public func dirtyRectFo
 core|VirtualTranscriptView.handle|func|public func handle(key: KeyEvent): Bool
 core|VirtualTranscriptView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Sparkline|class|public class Sparkline <: Widget {
-core|Sparkline.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
+core|Sparkline.init|init|public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None, block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
 core|Sparkline.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Gauge|class|public class Gauge <: Widget {
-core|Gauge.init|init|public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )
+core|Gauge.init|init|public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None )
 core|Gauge.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|Chart|class|public class Chart <: Widget {
-core|Chart.init|init|public init( values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan), maxValue!: Int64 = 0 )
+core|Chart.init|init|public init( values: Array<Int64>, block!: ?Block = None, style!: ?Style = None, maxValue!: Int64 = 0 )
 core|Chart.render|func|public func render(area: Rect, buffer: Buffer): Unit
 core|LogView|class|public class LogView <: Widget {
 core|LogView.offset|var|public var offset: Int64
@@ -791,11 +841,19 @@ diff|DiffDocument.init|init|public init(files: Array<DiffFile>)
 diff|DiffDocument.addedLines|func|public func addedLines(): Int64
 diff|DiffDocument.deletedLines|func|public func deletedLines(): Int64
 diff|parseUnifiedDiff|func|public func parseUnifiedDiff(text: String): DiffDocument
+diff|DiffViewStyles|struct|public struct DiffViewStyles {
+diff|DiffViewStyles.summary|let|public let summary: StyleOverride
+diff|DiffViewStyles.hunk|let|public let hunk: StyleOverride
+diff|DiffViewStyles.context|let|public let context: StyleOverride
+diff|DiffViewStyles.add|let|public let add: StyleOverride
+diff|DiffViewStyles.delete|let|public let delete: StyleOverride
+diff|DiffViewStyles.header|let|public let header: StyleOverride
+diff|DiffViewStyles.init|init|public init(summary!: StyleOverride = StyleOverride(), hunk!: StyleOverride = StyleOverride(), context!: StyleOverride = StyleOverride(), add!: StyleOverride = StyleOverride(), delete!: StyleOverride = StyleOverride(), header!: StyleOverride = StyleOverride())
 diff|DiffView|class|public class DiffView <: Widget {
 diff|DiffView.selectedFile|var|public var selectedFile: Int64
 diff|DiffView.selectedLine|var|public var selectedLine: Int64
 diff|DiffView.offset|var|public var offset: Int64
-diff|DiffView.init|init|public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, sideBySide!: Bool = false)
+diff|DiffView.init|init|public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, sideBySide!: Bool = false, theme!: ?Theme = None, styles!: DiffViewStyles = DiffViewStyles())
 diff|DiffView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 game|EntityId|struct|public struct EntityId <: Equatable<EntityId> {
 game|EntityId.value|let|public let value: Int64
@@ -918,19 +976,27 @@ game|SpriteRenderer.drawSprite|func|public func drawSprite(canvas: Canvas, trans
 game|TileMap|class|public class TileMap {
 game|TileMap.width|let|public let width: Int64
 game|TileMap.height|let|public let height: Int64
-game|TileMap.init|init|public init(rows: Array<String>, solidSymbol!: String = "#")
+game|TileMap.init|init|public init(rows: Array<String>, solidSymbol!: String = "#", widthOptions!: TextWidthOptions = TextWidthOptions())
 game|TileMap.isSolid|func|public func isSolid(x: Int64, y: Int64): Bool
 game|TileMap.tileAt|func|public func tileAt(x: Int64, y: Int64): String
 game|TileMap.find|func|public func find(symbol: String): Array<TileMarker>
 game|TileMap.findAny|func|public func findAny(symbols: Array<String>): Array<TileMarker>
 game|TileMap.addStaticColliders|func|public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
-game|TileMap.render|func|public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style = Style(fg: Color.White)): Unit
+game|TileMap.render|func|public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style): Unit
+game|TileMap.render|func|public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit
+markdown_adapter|documentThemeFromTheme|func|public func documentThemeFromTheme(theme: Theme): DocumentTheme
 markdown_adapter|MarkdownPresentation|class|public class MarkdownPresentation {
 markdown_adapter|MarkdownPresentation.document|let|public let document: Document
 markdown_adapter|MarkdownPresentation.decorations|let|public let decorations: Array<TextDecoration>
 markdown_adapter|markdownAstToPresentation|func|public func markdownAstToPresentation( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None ): MarkdownPresentation
 markdown_adapter|SyntaxHighlightConfig|class|public class SyntaxHighlightConfig {
 markdown_adapter|parseSyntaxHighlightConfig|func|public func parseSyntaxHighlightConfig(text: String): SyntaxHighlightConfig
+markdown_adapter|ThemedMarkdownView|class|public class ThemedMarkdownView <: Widget {
+markdown_adapter|ThemedMarkdownView.init|init|public init(text: String, theme!: ?DocumentTheme = None, preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None, block!: ?Block = None, state!: ?DocumentViewState = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], cacheLayout!: Bool = false)
+markdown_adapter|ThemedMarkdownView.setText|func|public func setText(text: String): Unit
+markdown_adapter|ThemedMarkdownView.handleKey|func|public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool
+markdown_adapter|ThemedMarkdownView.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
+markdown_adapter|ThemedMarkdownView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 media|MediaDecodeRequest|class|public class MediaDecodeRequest {
 media|MediaDecodeRequest.source|let|public let source: MediaSource
 media|MediaDecodeRequest.area|let|public let area: Rect
@@ -986,7 +1052,7 @@ media|FfmpegAsciiAnimationDecoder.init|init|public init(ffmpeg!: String = "ffmpe
 media|FfmpegAsciiAnimationDecoder.decode|func|public func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
 media|FfmpegAsciiAnimationDecoder.commandFor|func|public func commandFor(source: MediaSource, options: AsciiRenderOptions): String
 media|AsciiAnimationView|class|public class AsciiAnimationView <: Widget {
-media|AsciiAnimationView.init|init|public init( animation: AsciiAnimation, elapsedMillis!: Int64 = 0, zoom!: Int64 = 1, paused!: Bool = false, block!: ?Block = None, style!: Style = Style(fg: Color.White), pausedStyle!: Style = Style(fg: Color.Yellow) )
+media|AsciiAnimationView.init|init|public init( animation: AsciiAnimation, elapsedMillis!: Int64 = 0, zoom!: Int64 = 1, paused!: Bool = false, block!: ?Block = None, style!: ?Style = None, pausedStyle!: ?Style = None )
 media|AsciiAnimationView.render|func|public func render(area: Rect, buffer: Buffer): Unit
 media|rgbaToAsciiFrame|func|public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame
 media|preferredMediaProtocol|func|public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol
@@ -1005,7 +1071,9 @@ terminal|parseAnsi|func|public func parseAnsi(text: String): Array<AnsiToken>
 terminal|TerminalScreen|class|public class TerminalScreen {
 terminal|TerminalScreen.cols|let|public let cols: Int64
 terminal|TerminalScreen.rows|let|public let rows: Int64
-terminal|TerminalScreen.init|init|public init(cols!: Int64 = 80, rows!: Int64 = 24)
+terminal|TerminalScreen.init|init|public init(cols!: Int64 = 80, rows!: Int64 = 24, textWidthOptions!: TextWidthOptions = TextWidthOptions())
+terminal|TerminalScreen.textWidthOptions|func|public func textWidthOptions(): TextWidthOptions
+terminal|TerminalScreen.matchesTextWidthOptions|func|public func matchesTextWidthOptions(options: TextWidthOptions): Bool
 terminal|TerminalScreen.cell|func|public func cell(x: Int64, y: Int64): Cell
 terminal|TerminalScreen.lineText|func|public func lineText(y: Int64): String
 terminal|TerminalScreen.feed|func|public func feed(text: String): Unit
@@ -1014,9 +1082,9 @@ terminal|TerminalTranscript|class|public class TerminalTranscript {
 terminal|TerminalTranscript.screen|let|public let screen: TerminalScreen
 terminal|TerminalTranscript.maxChunks|let|public let maxChunks: Int64
 terminal|TerminalTranscript.followTail|var|public var followTail: Bool
-terminal|TerminalTranscript.init|init|public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true)
+terminal|TerminalTranscript.init|init|public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true, textWidthOptions!: TextWidthOptions = TextWidthOptions())
 terminal|TerminalTranscript.append|func|public func append(text: String): Unit
 terminal|TerminalTranscript.chunkCount|func|public func chunkCount(): Int64
 terminal|TerminalView|class|public class TerminalView <: Widget {
-terminal|TerminalView.init|init|public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "")
+terminal|TerminalView.init|init|public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "", searchStyle!: ?StyleOverride = None, theme!: ?Theme = None)
 terminal|TerminalView.render|func|public func render(area: Rect, buffer: Buffer): Unit

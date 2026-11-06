@@ -80,6 +80,20 @@ public class Canvas {
         this.dy = translateY
     }
 
+    /** 返回画布底层缓冲区采用的文本宽度策略。 */
+    public func textWidthOptions(): TextWidthOptions { buffer.textWidthOptions() }
+
+    /** 创建带当前缓冲区视觉上下文快照的独立表面；area 使用缓冲区绝对坐标。
+     * 快照包含应用及有效父主题、终端能力和文本宽度策略；后续修改不会自动同步。
+     * 示例：`let surface = canvas.createSurface(area)`，绘制后用 `canvas.composite(surface)` 合成。
+     * 直接调用 Surface(area) 仍创建具有默认上下文的独立表面。
+     */
+    public func createSurface(area: Rect, zIndex!: Int64 = 0): Surface {
+        let result = Surface(area, zIndex: zIndex)
+        result.bufferView().inheritVisualContext(buffer)
+        result
+    }
+
     public func withClip(area: Rect): Canvas {
         Canvas(buffer, intersect(clip, area), translateX: dx, translateY: dy)
     }
@@ -113,7 +127,7 @@ public class Canvas {
         if (height <= 0) { return }
         let target = intersect(clip, Rect(x + dx, y + dy, 1, height))
         if (target.width <= 0 || target.height <= 0) { return }
-        let clippedSymbol = truncate(symbol, clip.right - target.x)
+        let clippedSymbol = truncate(symbol, clip.right - target.x, options: buffer.textWidthOptions())
         buffer.withCanvasClip(clip) { =>
             for (row in target.y..target.bottom) {
                 buffer.setString(target.x, row, clippedSymbol, style: style)
@@ -131,6 +145,32 @@ public class Canvas {
             drawText(area.x, y, vertical, style)
             if (area.width > 1) { drawText(area.x + area.width - 1, y, vertical, style) }
         }
+    }
+
+    /** 使用与 Block 相同的字符集在区域自身边界单元格上绘制边框。 */
+    public func strokeBorder(area: Rect, style: Style, border!: ?BorderSet = None): Unit {
+        if (area.width <= 0 || area.height <= 0) { return }
+        let chars = match (border) {
+            case Some(value) => value
+            case None => if (buffer.capabilities().unicode && !usesWideAmbiguous(buffer.textWidthOptions())) { BorderSet.rounded() } else { BorderSet.ascii() }
+        }
+        let vertical = truncate(chars.vertical, 1, options: buffer.textWidthOptions())
+        if (area.height == 1) {
+            hline(area.x, area.y, area.width, chars.horizontal, style)
+            return
+        }
+        if (area.width == 1) {
+            vline(area.x, area.y, area.height, vertical, style)
+            return
+        }
+        hline(area.x, area.y, area.width, chars.horizontal, style)
+        hline(area.x, area.bottom - 1, area.width, chars.horizontal, style)
+        vline(area.x, area.y + 1, area.height - 2, vertical, style)
+        vline(area.right - 1, area.y + 1, area.height - 2, vertical, style)
+        drawText(area.x, area.y, truncate(chars.topLeft, 1, options: buffer.textWidthOptions()), style)
+        drawText(area.right - 1, area.y, truncate(chars.topRight, 1, options: buffer.textWidthOptions()), style)
+        drawText(area.x, area.bottom - 1, truncate(chars.bottomLeft, 1, options: buffer.textWidthOptions()), style)
+        drawText(area.right - 1, area.bottom - 1, truncate(chars.bottomRight, 1, options: buffer.textWidthOptions()), style)
     }
 
     public func drawLine(x1: Int64, y1: Int64, x2: Int64, y2: Int64, symbol: String, style: Style): Unit {
@@ -170,12 +210,12 @@ public class Canvas {
             return
         }
         if (tx >= clip.x) {
-            buffer.setString(tx, ty, truncate(text, clip.right - tx), style: style)
+            buffer.setString(tx, ty, truncate(text, clip.right - tx, options: buffer.textWidthOptions()), style: style)
         } else {
             let hiddenWidth = clip.x - tx
             var droppedWidth: Int64 = 0
             var byteOffset: Int64 = 0
-            for (cluster in graphemeClusters(text)) {
+            for (cluster in graphemeClusters(text, options: buffer.textWidthOptions())) {
                 if (droppedWidth + cluster.width <= hiddenWidth) {
                     droppedWidth += cluster.width
                     byteOffset = cluster.endOffset
@@ -191,7 +231,7 @@ public class Canvas {
             }
             let drawX = tx + droppedWidth
             if (byteOffset < text.size && drawX < clip.right) {
-                buffer.setString(drawX, ty, truncate(text[byteOffset..], clip.right - drawX), style: style)
+                buffer.setString(drawX, ty, truncate(text[byteOffset..], clip.right - drawX, options: buffer.textWidthOptions()), style: style)
             }
         }
     }
@@ -230,6 +270,9 @@ public class Canvas {
         buffer.withCanvasClip(clip) { => widget.render(target, buffer) }
     }
 
+    /** 以表面的缓冲区视图为来源，将表面区域与画布裁剪范围的交集复制到画布缓冲区的相同位置；不使用画布平移量。
+     * 来源与目标的文本宽度策略不一致或来源含过时字符时，在任何目标写入前抛出 IllegalArgumentException。
+     */
     public func composite(surface: Surface): Unit {
         let source = surface.bufferView()
         let target = intersect(clip, surface.area)

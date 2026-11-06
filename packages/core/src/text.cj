@@ -17,6 +17,13 @@ public struct TextWidthOptions {
     }
 }
 
+func usesWideAmbiguous(options: TextWidthOptions): Bool {
+    match (options.ambiguousWidth) {
+        case AmbiguousWidth.Wide => true
+        case AmbiguousWidth.Narrow => false
+    }
+}
+
 public struct GraphemeCluster {
     public let text: String
     public let startOffset: Int64
@@ -48,10 +55,10 @@ public func displayWidth(text: String, options!: TextWidthOptions): Int64 {
     width
 }
 
-func displayWidthFast(text: String): Int64 {
+func displayWidthFast(text: String, options!: TextWidthOptions = TextWidthOptions()): Int64 {
     let bytes = unsafe { text.rawData() }
     if (isPrintableAscii(bytes)) { return bytes.size }
-    displayWidth(text)
+    displayWidth(text, options: options)
 }
 
 public func displayWidth(r: Rune): Int64 {
@@ -100,12 +107,17 @@ public func displayWidth(r: Rune, options!: TextWidthOptions): Int64 {
 }
 
 public func graphemeClusters(text: String): Array<GraphemeCluster> {
+    graphemeClusters(text, options: TextWidthOptions())
+}
+
+/** 使用指定的显示宽度策略拆分字素簇。 */
+public func graphemeClusters(text: String, options!: TextWidthOptions): Array<GraphemeCluster> {
     let clusters = ArrayList<GraphemeCluster>()
     var offset: Int64 = 0
     while (offset < text.size) {
         let next = nextGraphemeOffset(text, offset)
         let cluster = text[offset..next]
-        clusters.add(GraphemeCluster(cluster, offset, next, graphemeDisplayWidth(cluster)))
+        clusters.add(GraphemeCluster(cluster, offset, next, graphemeDisplayWidth(cluster, options: options)))
         offset = next
     }
     clusters.toArray()
@@ -132,12 +144,17 @@ public func cut(text: String, width: Int64): String {
 }
 
 public func graphemePrefix(text: String, maxWidth: Int64): String {
+    graphemePrefix(text, maxWidth, options: TextWidthOptions())
+}
+
+/** 按指定宽度策略返回完整字素簇前缀。 */
+public func graphemePrefix(text: String, maxWidth: Int64, options!: TextWidthOptions): String {
     if (maxWidth <= 0) {
         return ""
     }
     var result = ""
     var width: Int64 = 0
-    for (cluster in graphemeClusters(text)) {
+    for (cluster in graphemeClusters(text, options: options)) {
         if (width + cluster.width > maxWidth) {
             break
         }
@@ -172,6 +189,11 @@ public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int6
 }
 
 public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String> {
+    wrapText(text, width, mode, options: TextWidthOptions())
+}
+
+/** 使用指定的显示宽度策略换行。 */
+public func wrapText(text: String, width: Int64, mode: WrapMode, options!: TextWidthOptions): Array<String> {
     let lines = ArrayList<String>()
     if (width <= 0) { return lines.toArray() }
     var start: Int64 = 0
@@ -180,27 +202,27 @@ public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String> 
     while (offset < bytes.size) {
         let (r, len) = Rune.fromUtf8(bytes, offset)
         if (r == r'\n') {
-            appendWrappedLine(text[start..offset], width, mode, lines)
+            appendWrappedLine(text[start..offset], width, mode, lines, options)
             start = offset + len
         }
         offset += len
     }
-    appendWrappedLine(text[start..], width, mode, lines)
+    appendWrappedLine(text[start..], width, mode, lines, options)
     lines.toArray()
 }
 
-func appendWrappedLine(text: String, width: Int64, mode: WrapMode, lines: ArrayList<String>): Unit {
+func appendWrappedLine(text: String, width: Int64, mode: WrapMode, lines: ArrayList<String>, options: TextWidthOptions): Unit {
     match (mode) {
         case NoWrap =>
             lines.add(text)
         case Character =>
-            appendCharacterWrappedLine(text, width, lines)
+            appendCharacterWrappedLine(text, width, lines, options)
         case Word =>
-            appendWordWrappedLine(text, width, lines)
+            appendWordWrappedLine(text, width, lines, options)
     }
 }
 
-func appendCharacterWrappedLine(text: String, width: Int64, lines: ArrayList<String>): Unit {
+func appendCharacterWrappedLine(text: String, width: Int64, lines: ArrayList<String>, options: TextWidthOptions): Unit {
     if (text.isEmpty()) {
         lines.add("")
         return
@@ -211,7 +233,7 @@ func appendCharacterWrappedLine(text: String, width: Int64, lines: ArrayList<Str
     while (offset < text.size) {
         let next = nextGraphemeOffset(text, offset)
         let part = text[offset..next]
-        let partWidth = graphemeDisplayWidth(part)
+        let partWidth = graphemeDisplayWidth(part, options: options)
         if (partWidth > 0 && currentWidth > 0 && currentWidth + partWidth > width) {
             lines.add(current)
             current = ""
@@ -224,7 +246,7 @@ func appendCharacterWrappedLine(text: String, width: Int64, lines: ArrayList<Str
     lines.add(current)
 }
 
-func appendWordWrappedLine(text: String, width: Int64, lines: ArrayList<String>): Unit {
+func appendWordWrappedLine(text: String, width: Int64, lines: ArrayList<String>, options: TextWidthOptions): Unit {
     let words = splitAsciiWords(text)
     if (words.size == 0) {
         lines.add("")
@@ -233,14 +255,14 @@ func appendWordWrappedLine(text: String, width: Int64, lines: ArrayList<String>)
     var current = ""
     var currentWidth: Int64 = 0
     for (word in words) {
-        let wordWidth = displayWidth(word)
+        let wordWidth = displayWidth(word, options: options)
         if (wordWidth > width) {
             if (!current.isEmpty()) {
                 lines.add(current)
                 current = ""
                 currentWidth = 0
             }
-            appendCharacterWrappedLine(word, width, lines)
+            appendCharacterWrappedLine(word, width, lines, options)
         } else if (current.isEmpty()) {
             current = word
             currentWidth = wordWidth
@@ -343,7 +365,7 @@ func colorEquals(a: Color, b: Color): Bool {
     }
 }
 
-func truncate(text: String, maxWidth: Int64): String {
+func truncate(text: String, maxWidth: Int64, options!: TextWidthOptions = TextWidthOptions()): String {
     if (maxWidth <= 0) { return "" }
     let bytes = unsafe { text.rawData() }
     if (isPrintableAscii(bytes)) {
@@ -356,7 +378,7 @@ func truncate(text: String, maxWidth: Int64): String {
     while (offset < bytes.size) {
         let next = nextGraphemeOffset(text, offset)
         let part = text[offset..next]
-        let w = graphemeDisplayWidth(part)
+        let w = graphemeDisplayWidth(part, options: options)
         if (width + w > maxWidth) { break }
         out.append(part)
         width += w
@@ -579,7 +601,7 @@ func lineEnd(text: String, offset: Int64): Int64 {
     text.size
 }
 
-func offsetAtLineColumn(text: String, line: Int64, column: Int64): Int64 {
+func offsetAtLineColumn(text: String, line: Int64, column: Int64, options!: TextWidthOptions = TextWidthOptions()): Int64 {
     let bytes = unsafe { text.rawData() }
     var pos: Int64 = 0
     var currentLine: Int64 = 0
@@ -593,7 +615,7 @@ func offsetAtLineColumn(text: String, line: Int64, column: Int64): Int64 {
         let (r, _) = Rune.fromUtf8(bytes, pos)
         if (r == r'\n') { return pos }
         let next = nextGraphemeOffset(text, pos)
-        let w = graphemeDisplayWidth(text[pos..next])
+        let w = graphemeDisplayWidth(text[pos..next], options: options)
         if (width + w > column) { return pos }
         width += w
         pos = next

@@ -313,7 +313,7 @@ class CjTuiComponentPrimitivesTest {
         let scroll = ScrollState(offset: 1)
         Scrollable(["zero", "one", "two"], state: scroll).render(Rect(10, 0, 6, 2), buffer)
         @Expect(buffer.getCell(10, 0).symbol, "o")
-        @Expect(buffer.getCell(15, 0).symbol, "|")
+        @Expect(buffer.getCell(15, 0).symbol, "│")
     }
 
     @TestCase

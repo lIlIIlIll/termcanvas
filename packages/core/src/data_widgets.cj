@@ -97,10 +97,10 @@ public class VirtualTable <: Widget {
     private var cachedVisibleSortColumn: ?Int64 = None
     private var cachedVisibleSortDescending: Bool = false
     private let block: ?Block
-    private let style: Style
-    private let selectedStyle: Style
-    private let cellStyle: Style
-    private let statusStyle: Style
+    private let style: ?Style
+    private let selectedStyle: ?Style
+    private let cellStyle: ?Style
+    private let statusStyle: ?Style
     private let selectionModel: ?SelectionModel
     private let scrollState: ?ScrollState
     private let sortState: ?SortState
@@ -115,10 +115,10 @@ public class VirtualTable <: Widget {
         selectedColumn!: Int64 = 0,
         columnOffset!: Int64 = 0,
         block!: ?Block = None,
-        style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
-        cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan),
-        statusStyle!: Style = Style(fg: Color.Indexed(8)),
+        style!: ?Style = None,
+        selectedStyle!: ?Style = None,
+        cellStyle!: ?Style = None,
+        statusStyle!: ?Style = None,
         selectionModel!: ?SelectionModel = None,
         scrollState!: ?ScrollState = None,
         sortState!: ?SortState = None,
@@ -212,8 +212,13 @@ public class VirtualTable <: Widget {
     private func renderRows(target: Rect, buffer: Buffer): Unit {
         ensureColumnVisible(target.width)
         let headerRows = if (stickyHeader) { Int64(1) } else { Int64(0) }
+        let palette = buffer.resolveTheme(None)
         if (stickyHeader) {
-            renderColumns(target.x, target.y, target.right, columnTitles(), buffer, Style(fg: Color.Yellow, modifier: Modifier.strong()), None)
+            let header = match (palette) { case Some(theme) => theme.heading; case None => Style(fg: Color.Yellow, modifier: Modifier.strong()) }
+            let surface = TableHeaderSurface(Rect(target.x, target.y, target.width, 1), buffer)
+            renderColumns(target.x, target.y, target.right, columnTitles(), buffer, header, None,
+                header: true, headerSurface: Some(surface))
+            surface.restoreWideRepairs(buffer)
         }
         if (renderStatus(target, buffer, headerRows)) { return }
         let limit = max(0, target.height - headerRows)
@@ -229,20 +234,30 @@ public class VirtualTable <: Widget {
                         if (let Some(value) <- model.row(index)) {
                             active = model.selectedId() == Some(value.id) || model.isSelected(value.id)
                         } else {
-                            let message = match (model.statusAt(index)) { case TableStatus.Error(error) => error; case _ => loadingText }
-                            buffer.setString(target.x, target.y + headerRows + row, truncate(message, target.width), style: statusStyle)
+                            let pageStatus = model.statusAt(index)
+                            let message = match (pageStatus) { case TableStatus.Error(error) => error; case _ => loadingText }
+                            let failed = match (pageStatus) { case TableStatus.Error(_) => true; case _ => false }
+                            renderStatusText(Rect(target.x, target.y + headerRows + row, target.width, 1), buffer,
+                                message, pagedStatusStyle(failed, buffer, palette))
                             continue
                         }
                     }
+                    let rowY = target.y + headerRows + row
+                    let rowSurface: ?TableHeaderSurface = if (!active && style.isNone()) {
+                        Some(TableHeaderSurface(Rect(target.x, rowY, target.width, 1), buffer))
+                    } else { None }
                     renderColumns(
                         target.x,
-                        target.y + headerRows + row,
+                        rowY,
                         target.right,
                         cachedRow(sourceIndex),
                         buffer,
-                        if (active) { selectedStyle } else { style },
-                        if (active) { selectedColumn } else { None }
+                        if (active) { tableStyle(selectedStyle, ThemeRole.Selected, Style(fg: Color.Black, bg: Color.White), palette) }
+                        else { tableStyle(style, ThemeRole.Normal, Style.default(), palette) },
+                        if (active) { selectedColumn } else { None },
+                        headerSurface: rowSurface
                     )
+                    if (let Some(surface) <- rowSurface) { surface.restoreWideRepairs(buffer) }
                 case None => return
             }
         }
@@ -494,31 +509,26 @@ public class VirtualTable <: Widget {
     private func columnTitles(): Array<String> {
         let titles = ArrayList<String>()
         for (i in 0..columns.size) {
-            let suffix = match (sortColumn) {
-                case Some(col) =>
-                    if (col == i) {
-                        if (sortDescending) { " v" } else { " ^" }
-                    } else {
-                        ""
-                    }
-                case None => ""
-            }
-            titles.add(columns[i].title + suffix)
+            titles.add(columns[i].title)
         }
         titles.toArray()
     }
 
-    private func renderColumns(x: Int64, y: Int64, right: Int64, values: Array<String>, buffer: Buffer, style: Style, activeColumn: ?Int64): Unit {
+    private func renderColumns(x: Int64, y: Int64, right: Int64, values: Array<String>, buffer: Buffer, style: Style,
+        activeColumn: ?Int64, header!: Bool = false, headerSurface!: ?TableHeaderSurface = None): Unit {
         var cx = x
+        let activeStyle = if (activeColumn.isSome()) {
+            tableStyle(cellStyle, ThemeRole.Focused, Style(fg: Color.Black, bg: Color.Cyan), buffer.resolveTheme(None))
+        } else { Style.default() }
         let limit = min(values.size, columns.size)
         let frozen = min(frozenColumns, limit)
         for (i in 0..frozen) {
             if (cx >= right) { return }
-            cx = renderColumnCell(cx, y, right, i, values, buffer, style, activeColumn)
+            cx = renderColumnCell(cx, y, right, i, values, buffer, style, activeColumn, activeStyle, header, headerSurface)
         }
         for (i in max(columnOffset, frozen)..limit) {
             if (cx >= right) { return }
-            cx = renderColumnCell(cx, y, right, i, values, buffer, style, activeColumn)
+            cx = renderColumnCell(cx, y, right, i, values, buffer, style, activeColumn, activeStyle, header, headerSurface)
         }
     }
 
@@ -530,17 +540,40 @@ public class VirtualTable <: Widget {
         values: Array<String>,
         buffer: Buffer,
         style: Style,
-        activeColumn: ?Int64
+        activeColumn: ?Int64,
+        activeStyle: Style,
+        header: Bool,
+        headerSurface: ?TableHeaderSurface
     ): Int64 {
             let column = columns[i]
             let width = min(max(0, column.width), max(0, right - cx))
-            let text = truncate(values[i], width)
+            let sorted = header && sortColumn == Some(i)
+            let text = if (!sorted || width <= 0) {
+                clippedWithEllipsis(values[i], width, buffer)
+            } else {
+                let direction = if (sortDescending) { "v" } else { "^" }
+                if (width == 1) { direction }
+                else if (width == 2) { clippedWithEllipsis(values[i], 1, buffer) + direction }
+                else { clippedWithEllipsis(values[i], width - 2, buffer) + " " + direction }
+            }
             let cellArea = Rect(cx, y, width, 1)
             let rowStyle = match (activeColumn) {
-                case Some(col) => if (col == i) { cellStyle } else { style }
+                case Some(col) => if (col == i) { activeStyle } else { style }
                 case None => style
             }
-            buffer.setString(alignedX(cellArea, displayWidthFast(text), column.align), y, text, style: rowStyle)
+            if (text != values[i] && displayWidth(text, options: buffer.textWidthOptions()) < width) {
+                match (headerSurface) {
+                    case Some(surface) => tableWriteOnExistingBackground(cx, y, repeat(" ", width), width,
+                        rowStyle, buffer, surface)
+                    case None => buffer.fillRect(cellArea, style: rowStyle)
+                }
+            }
+            let textX = alignedX(cellArea, displayWidthFast(text, options: buffer.textWidthOptions()), column.align)
+            match (headerSurface) {
+                case Some(surface) => tableWriteOnExistingBackground(textX, y, text, right - textX,
+                    rowStyle, buffer, surface)
+                case None => buffer.setString(textX, y, text, style: rowStyle)
+            }
             if (width >= right - cx) { right } else { cx + width + 1 }
     }
 
@@ -683,22 +716,59 @@ public class VirtualTable <: Widget {
     private func renderStatus(area: Rect, buffer: Buffer, headerRows: Int64): Bool {
         let y = area.y + headerRows
         if (y >= area.bottom) { return true }
+        let palette = buffer.resolveTheme(None)
+        let statusPaint = tableStyle(statusStyle, ThemeRole.Disabled, Style(fg: Color.Indexed(8)), palette)
         match (status) {
             case TableStatus.Ready =>
                 if (visibleRowCount() == 0) {
-                    buffer.setString(area.x, y, truncate(emptyText, area.width), style: statusStyle)
+                    renderStatusText(Rect(area.x, y, area.width, 1), buffer, emptyText, statusPaint)
                     return true
                 }
                 false
             case TableStatus.Empty =>
-                buffer.setString(area.x, y, truncate(emptyText, area.width), style: statusStyle)
+                renderStatusText(Rect(area.x, y, area.width, 1), buffer, emptyText, statusPaint)
                 true
             case TableStatus.Loading =>
-                buffer.setString(area.x, y, truncate(loadingText, area.width), style: statusStyle)
+                renderStatusText(Rect(area.x, y, area.width, 1), buffer, loadingText, statusPaint)
                 true
             case TableStatus.Error(message) =>
-                buffer.setString(area.x, y, truncate(message, area.width), style: Style(fg: Color.Red).patch(statusStyle))
+                let errorPaint = tableStyle(statusStyle, ThemeRole.Error, Style(fg: Color.Red).patch(statusPaint), palette)
+                renderStatusText(Rect(area.x, y, area.width, 1), buffer, message, errorPaint)
                 true
+        }
+    }
+
+    private func pagedStatusStyle(failed: Bool, buffer: Buffer, palette: ?Theme): Style {
+        let loading = tableStyle(statusStyle, ThemeRole.Disabled, Style(fg: Color.Indexed(8)), palette)
+        if (!failed || statusStyle.isSome()) { return loading }
+        var error = tableStyle(None, ThemeRole.Error, Style(fg: Color.Red), palette)
+        let caps = buffer.capabilities()
+        let visibleError = adaptStyleForCapabilities(error, caps)
+        let visibleLoading = adaptStyleForCapabilities(loading, caps)
+        if (!caps.trueColor &&
+            Style(fg: visibleError.fg, modifier: visibleError.modifier) ==
+                Style(fg: visibleLoading.fg, modifier: visibleLoading.modifier)) {
+            var modifier = error.modifier
+            if (!modifier.underline) { modifier.underline = true }
+            else if (!modifier.reversed) { modifier.reversed = true }
+            else if (!modifier.bold) { modifier.bold = true }
+            else if (!modifier.italic) { modifier.italic = true }
+            else { modifier.underline = false }
+            error = error.withModifier(modifier)
+        }
+        error
+    }
+
+    // Omitted status style uses the foreground role over the actual surface;
+    // explicit status styles retain the existing theme merge and paint behavior.
+    private func renderStatusText(area: Rect, buffer: Buffer, text: String, paint: Style): Unit {
+        let visible = truncate(text, area.width, options: buffer.textWidthOptions())
+        if (statusStyle.isNone()) {
+            let surface = TableHeaderSurface(area, buffer)
+            tableWriteOnExistingBackground(area.x, area.y, visible, area.width, paint, buffer, surface)
+            surface.restoreWideRepairs(buffer)
+        } else {
+            buffer.setString(area.x, area.y, visible, style: paint)
         }
     }
 
@@ -817,8 +887,22 @@ public class Tree <: Widget {
 
     public func setTheme(value: ?Theme): Unit { theme = value }
 
+    /** 按上次绘制的区块几何处理鼠标；若树自身指定了主题，则绘制前也使用该主题计算几何。 */
     public func handle(mouse: MouseEvent, area: Rect): Bool {
-        let target = match (block) { case Some(b) => b.inner(area); case None => area }
+        handleMouseWithTheme(mouse, area, theme)
+    }
+
+    /** 绘制前可传入应用或父主题以计算鼠标命中区域；树和区块的显式主题优先。 */
+    public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool {
+        let effective = match (this.theme) { case Some(value) => Some(value); case None => theme }
+        handleMouseWithTheme(mouse, area, effective)
+    }
+
+    private func handleMouseWithTheme(mouse: MouseEvent, area: Rect, effective: ?Theme): Bool {
+        let target = match (block) {
+            case Some(b) => match (effective) { case Some(_) => b.inner(area, theme: effective); case None => b.inner(area) }
+            case None => area
+        }
         if (!widgetHitTest(mouse, target)) { return false }
         let total = match (dataModel) { case Some(model) => model.visibleCount(); case None => visibleRows().size }
         let delta = mouseScrollDelta(mouse)
@@ -834,8 +918,10 @@ public class Tree <: Widget {
                 let rows = visibleRows()
                 stableId = Some(rows[index][0].id); rememberedIndex = index; depth = rows[index][1]
             }
-            let disclosure = target.x + 2 + depth * 2
-            if (mouse.x >= disclosure && mouse.x < disclosure + 2) { toggleSelected() }
+            let disclosureOffset = treeDisclosureOffset(target.width, depth)
+            let disclosureWidth: Int64 = if (target.width >= 5) { 2 } else { 1 }
+            if (disclosureOffset >= 0 && mouse.x >= target.x + disclosureOffset &&
+                mouse.x < target.x + disclosureOffset + disclosureWidth) { toggleSelected() }
             return true
         }
         false
@@ -955,14 +1041,18 @@ public class Tree <: Widget {
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
-            b.render(area, buffer)
-            target = b.inner(area)
+            let content = [area]
+            buffer.withParentTheme(theme) { =>
+                content[0] = b.renderInner(area, buffer)
+            }
+            target = content[0]
         }
+        let visualTheme = buffer.resolveTheme(theme)
         if (let Some(model) <- dataModel) {
             for (row in model.rows(offset, target.height)) {
                 let marker = if (row.node.childCount > 0) { if (row.expanded) { "- " } else { "+ " } } else { "  " }
                 renderTreeRow(buffer, target, target.y + row.index - offset, row.depth, marker, row.node.label,
-                    model.selectedId() == Some(row.node.id))
+                    model.selectedId() == Some(row.node.id), visualTheme)
             }
             if (let Some(index) <- model.selectedIndex()) { selected = index }
             return
@@ -973,12 +1063,12 @@ public class Tree <: Widget {
             if (index >= nodes.size) { return }
             let (node, depth) = nodes[index]
             let marker = if (node.childNodes().size > 0) { if (node.expanded) { "- " } else { "+ " } } else { "  " }
-            renderTreeRow(buffer, target, target.y + row, depth, marker, node.label, index == selected)
+            renderTreeRow(buffer, target, target.y + row, depth, marker, node.label, index == selected, visualTheme)
         }
     }
 
     private func renderTreeRow(buffer: Buffer, area: Rect, y: Int64, depth: Int64,
-        disclosure: String, label: String, selected: Bool): Unit {
+        disclosure: String, label: String, selected: Bool, theme: ?Theme): Unit {
         let palette = match (theme) { case Some(value) => value; case None => Theme.default() }
         let rowStyle = if (!selected) {
             themeRoleStyle(style, ThemeRole.Normal, theme)
@@ -995,9 +1085,26 @@ public class Tree <: Widget {
         }
         let canvas = Canvas(buffer, area)
         if (selected) { canvas.fillRect(Rect(area.x, y, area.width, 1), rowStyle) }
-        let selectedMark = if (!selected) { " " } else if (!buffer.capabilities().unicode) { "*" }
+        let marker = if (!buffer.capabilities().unicode) { "*" }
             else { match (palette.iconSet) { case IconSet.Ascii => "*"; case IconSet.NerdFont => "\u{F111}"; case IconSet.Unicode => "●" } }
-        canvas.drawText(area.x, y, selectedMark + " " + repeat("  ", depth) + disclosure + label, rowStyle)
+        // Disclosure hit testing uses a one-cell marker column. If a terminal
+        // treats the selected symbol as wide, use its single-cell fallback so
+        // selected and unselected rows keep the same layout and hit targets.
+        let safeMarker = if (displayWidth(marker, options: buffer.textWidthOptions()) == 1) { marker } else { "*" }
+        let selectedMark = if (selected) { safeMarker } else { " " }
+        let prefix = if (area.width <= 1) { "" }
+            else if (area.width == 2) { disclosure[0..1] }
+            else if (area.width == 3) { selectedMark + disclosure[0..1] }
+            else if (area.width == 4) { selectedMark + " " + disclosure[0..1] }
+            else { selectedMark + " " + repeat("  ", min(depth, max(0, (area.width - 5) / 2))) + disclosure }
+        let labelWidth = max(0, area.width - displayWidth(prefix, options: buffer.textWidthOptions()))
+        let visibleLabel = clippedWithEllipsis(label, labelWidth, buffer)
+        let visibleWidth = displayWidth(visibleLabel, options: buffer.textWidthOptions())
+        if (!selected && visibleLabel != label && visibleWidth < labelWidth) {
+            let labelStart = area.x + displayWidth(prefix, options: buffer.textWidthOptions())
+            canvas.fillRect(Rect(labelStart + visibleWidth, y, labelWidth - visibleWidth, 1), rowStyle)
+        }
+        canvas.drawText(area.x, y, prefix + visibleLabel, rowStyle)
     }
 
     private func ensureVisible(total: Int64, viewportHeight: Int64): Unit {
@@ -1031,6 +1138,22 @@ public class Tree <: Widget {
         }
         rememberedIndex = selected
         rows.toArray()
+    }
+}
+
+// Reserve at least one column for a node label; hit testing shares this geometry.
+func treeDisclosureOffset(width: Int64, depth: Int64): Int64 {
+    if (width <= 1) { return -1 }
+    if (width == 2) { return 0 }
+    if (width == 3) { return 1 }
+    if (width == 4) { return 2 }
+    2 + min(depth, max(0, (width - 5) / 2)) * 2
+}
+
+private func tableStyle(style: ?Style, role: ThemeRole, fallback: Style, theme: ?Theme): Style {
+    match (theme) {
+        case Some(value) => themeRoleStyle(match (style) { case Some(custom) => custom; case None => Style.default() }, role, Some(value))
+        case None => match (style) { case Some(custom) => custom; case None => fallback }
     }
 }
 

@@ -1,0 +1,17 @@
+[package]
+  cjc-version = "1.2.0"
+  name = "showcase_editor"
+  organization = ""
+  description = "In-memory editor and diff showcase"
+  version = "0.0.1"
+  target-dir = ""
+  script-dir = ""
+  output-type = "executable"
+  compile-option = ""
+  override-compile-option = ""
+  link-option = ""
+  package-configuration = {}
+
+[dependencies]
+  "core" = { path = "../../packages/core", output-type = "static" }
+  "diff" = { path = "../../packages/diff", output-type = "static" }

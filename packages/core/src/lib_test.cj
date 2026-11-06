@@ -1426,7 +1426,7 @@ class CjTuiCoreTest {
 
         let scrollBuffer = Buffer(Rect(0, 0, 1, 5))
         Scrollbar(10, offset: 5, viewport: 5).render(scrollBuffer.area, scrollBuffer)
-        @Expect(scrollBuffer.getCell(0, 3).symbol, "#")
+        @Expect(scrollBuffer.getCell(0, 3).symbol, "┃")
     }
 
     @TestCase
