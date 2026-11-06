@@ -47,6 +47,11 @@ To request the previous unthemed colors explicitly, pass
 `style: Style(fg: Color.White)` and `pausedStyle: Style(fg: Color.Yellow)`.
 Frame colors still take precedence.
 
+`TaskActivityView` and `TaskActivityList` now show queued tasks with `◌`
+instead of `…` when using Unicode, and `>` instead of `-` when using ASCII.
+The Nerd Font queued glyph is unchanged. Update snapshots or output parsers
+that depend on the old markers; prefer the task's `TaskStatus` when available.
+
 `GlyphCapabilitySession` is experimental. Close an unused session explicitly;
 an attached session is closed when the application exits. An unavailable or
 inconclusive font probe does not establish Nerd Font support.

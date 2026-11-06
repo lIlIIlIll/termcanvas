@@ -332,7 +332,7 @@ public class TaskActivityView <: Widget {
         }
         match (status) {
             case TaskStatus.Pending => if (unicode) { "○" } else { "o" }
-            case TaskStatus.Queued => if (unicode) { "…" } else { "-" }
+            case TaskStatus.Queued => if (unicode) { "◌" } else { ">" }
             case TaskStatus.Running =>
                 if (!unicode) {
                     ["|", "/", "-", "\\"][activityFrame % 4]

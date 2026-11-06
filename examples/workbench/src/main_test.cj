@@ -2117,14 +2117,14 @@ class WorkbenchVisualPrototypeTest {
                 @Expect(partialBackend.snapshot().contains("OTHER TASKS"))
                 @Expect(partialBackend.snapshot().contains("Documentation checks"))
                 @Expect(partialBackend.snapshot().contains("Release packaging"))
-                // The feed fills its actual inner rows, leaving space for the
-                // dedicated notification row and readable activity log.
-                let count = max(0, partialApp.layout.queuePanel.height - 3)
-                @Expect(partialBackend.snapshot().contains("job-${count + 1}"))
+                // One inner row reports the exact number of remaining tasks.
+                let visible = max(0, partialApp.layout.queuePanel.height - 4)
+                @Expect(partialBackend.snapshot().contains("job-${visible + 1}"))
+                @Expect(partialBackend.snapshot().contains("${119 - visible} more"))
             }
             if (screen.width >= 160) {
-                @Expect(partialBackend.snapshot().contains("job-9"))
-                @Expect(partialBackend.snapshot().contains("Package archive"))
+                @Expect(partialBackend.snapshot().contains("job-8"))
+                @Expect(partialBackend.snapshot().contains("API compatibility"))
             }
             let changed = partialApp.update(Event.Tick(TickEvent(deltaMillis: 1200)))
             _ = fullApp.update(Event.Tick(TickEvent(deltaMillis: 1200)))
@@ -2133,6 +2133,47 @@ class WorkbenchVisualPrototypeTest {
             @Expect(partialBackend.lastBuffer().getOrThrow().diff(fullBackend.lastBuffer().getOrThrow()).size, 0)
             @Expect(partialBackend.snapshot().contains("Build started"))
         }
+    }
+
+    @TestCase
+    func ciTaskFeedReportsHiddenTasksAndExcludesSelection(): Unit {
+        let app = WorkbenchApp()
+        app.enterCiShowcase()
+        app.selectedId = Some(2)
+        for ((width, height, expected) in [(Int64(60), Int64(6), "117 more"),
+            (Int64(60), Int64(4), "118 more"), (Int64(9), Int64(6), "v117"),
+            (Int64(60), Int64(13), "116 more")]) {
+            let area = Rect(0, 0, width, height)
+            app.layout.queuePanel = area
+            let backend = TestBackend(area: area)
+            let terminal = Terminal(backend, renderMode: RenderMode.Full)
+            _ = terminal.draw { frame => renderCiTaskFeed(app, frame) }
+            let output = backend.snapshot()
+            @Expect(output.contains(expected))
+            if (width >= 60) {
+                @Expect(output.contains("job-1"))
+                @Expect(!output.contains("job-2"))
+            }
+            if (height == 13) {
+                @Expect(output.contains("Stages"))
+                @Expect(output.contains("job-4"))
+            }
+        }
+    }
+
+    @TestCase
+    func ciTaskFeedShowsEmptyStateWithoutAnOverflowCount(): Unit {
+        let app = WorkbenchApp()
+        app.enterCiShowcase()
+        app.model.jobs.clear()
+        app.selectedId = None
+        let area = Rect(0, 0, 60, 6)
+        app.layout.queuePanel = area
+        let backend = TestBackend(area: area)
+        let terminal = Terminal(backend, renderMode: RenderMode.Full)
+        _ = terminal.draw { frame => renderCiTaskFeed(app, frame) }
+        @Expect(backend.snapshot().contains("No other tasks"))
+        @Expect(!backend.snapshot().contains("more"))
     }
 
     @TestCase

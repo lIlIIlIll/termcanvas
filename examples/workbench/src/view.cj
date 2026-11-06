@@ -762,26 +762,24 @@ func renderCiTaskFeed(app: WorkbenchApp, frame: Frame): Unit {
         Rect(inner.x, inner.y, inner.width, min(1, inner.height)))
     let rows = max(0, inner.height - 1)
     let expanded = rows >= 9
-    let stride = if (expanded) { Int64(3) } else { Int64(1) }
-    var displayed: Int64 = 0
+    let entries = ArrayList<TaskActivityListEntry>()
     for (task in app.model.jobs) {
         if (app.selectedId == Some(task.id)) { continue }
-        if ((displayed + 1) * stride > rows) { break }
         let stages = Array<TaskStatus>(5, { index => workbenchStageStatus(task, index) })
         let stage = workbenchStageName(min(4, task.progressPercent / 20))
         let item = TaskActivity(task.name, status: workbenchActivityStatus(task.status), id: task.label(),
             statusText: statusLabel(task.status), duration: "${task.elapsedMillis / 1000}s",
             detail: "${task.project} / ${stage} / ${task.progressPercent}%", progressLabel: "Stages",
             progress: Some(TaskProgress.Items(stages)))
-        frame.renderWidget(TaskActivityView(item,
-            layout: if (expanded) { TaskActivityLayout.Expanded } else { TaskActivityLayout.Compact },
-            activityFrame: app.spinnerFrame, theme: app.theme),
-            Rect(inner.x, inner.y + 1 + displayed * stride, inner.width, stride))
-        displayed++
+        entries.add(TaskActivityListEntry(item,
+            layout: if (expanded) { TaskActivityLayout.Expanded } else { TaskActivityLayout.Compact }))
     }
-    if (displayed == 0 && rows > 0) {
+    let feed = Rect(inner.x, inner.y + min(1, inner.height), inner.width, rows)
+    if (entries.isEmpty() && rows > 0) {
         frame.renderWidget(Paragraph("No other tasks", style: app.secondaryStyle),
-            Rect(inner.x, inner.y + 1, inner.width, 1))
+            Rect(feed.x, feed.y, feed.width, 1))
+    } else {
+        frame.renderWidget(TaskActivityList(entries.toArray(), activityFrame: app.spinnerFrame, theme: app.theme), feed)
     }
 }
 
