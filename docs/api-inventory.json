@@ -8018,7 +8018,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 6,
+      "line": 8,
       "level": "top_level",
       "kind": "class",
       "symbol": "MenuItem",
@@ -8036,7 +8036,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 7,
+      "line": 11,
       "level": "member",
       "kind": "let",
       "symbol": "label",
@@ -8054,7 +8054,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 8,
+      "line": 14,
       "level": "member",
       "kind": "let",
       "symbol": "action",
@@ -8072,7 +8072,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 9,
+      "line": 17,
       "level": "member",
       "kind": "let",
       "symbol": "enabled",
@@ -8090,7 +8090,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 11,
+      "line": 24,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -8108,7 +8108,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 18,
+      "line": 33,
       "level": "top_level",
       "kind": "class",
       "symbol": "Menu",
@@ -8126,7 +8126,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 21,
+      "line": 38,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -8144,7 +8144,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 22,
+      "line": 41,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -8162,7 +8162,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 30,
+      "line": 59,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -8180,7 +8180,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 50,
+      "line": 83,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -8198,7 +8198,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 64,
+      "line": 102,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -8216,7 +8216,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 77,
+      "line": 119,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -8234,7 +8234,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 109,
+      "line": 153,
       "level": "top_level",
       "kind": "class",
       "symbol": "MenuBar",
@@ -8252,7 +8252,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 112,
+      "line": 158,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -8270,7 +8270,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 117,
+      "line": 170,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -8288,7 +8288,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 131,
+      "line": 188,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -8306,7 +8306,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 150,
+      "line": 212,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -8324,7 +8324,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 165,
+      "line": 231,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -8342,7 +8342,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 182,
+      "line": 250,
       "level": "top_level",
       "kind": "class",
       "symbol": "CommandPalette",
@@ -8360,7 +8360,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 184,
+      "line": 254,
       "level": "member",
       "kind": "var",
       "symbol": "query",
@@ -8378,7 +8378,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 185,
+      "line": 257,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -8396,7 +8396,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 186,
+      "line": 260,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -8414,7 +8414,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 196,
+      "line": 281,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -8432,7 +8432,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 219,
+      "line": 307,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -8450,7 +8450,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 223,
+      "line": 314,
       "level": "member",
       "kind": "func",
       "symbol": "paste",
@@ -8468,7 +8468,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 228,
+      "line": 323,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -8486,7 +8486,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 259,
+      "line": 359,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -8504,7 +8504,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 282,
+      "line": 386,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -8522,7 +8522,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 359,
+      "line": 463,
       "level": "top_level",
       "kind": "enum",
       "symbol": "ToastKind",
@@ -8540,7 +8540,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 360,
+      "line": 464,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -8559,7 +8559,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 361,
+      "line": 465,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -8578,7 +8578,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 362,
+      "line": 466,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -8597,7 +8597,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 363,
+      "line": 467,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -8616,7 +8616,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 366,
+      "line": 470,
       "level": "top_level",
       "kind": "class",
       "symbol": "Toast",
@@ -8634,7 +8634,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 367,
+      "line": 471,
       "level": "member",
       "kind": "let",
       "symbol": "message",
@@ -8652,7 +8652,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 368,
+      "line": 472,
       "level": "member",
       "kind": "let",
       "symbol": "ttl",
@@ -8670,7 +8670,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 369,
+      "line": 473,
       "level": "member",
       "kind": "let",
       "symbol": "style",
@@ -8688,7 +8688,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 370,
+      "line": 474,
       "level": "member",
       "kind": "let",
       "symbol": "kind",
@@ -8706,7 +8706,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 372,
+      "line": 476,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -8724,7 +8724,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 379,
+      "line": 483,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -8742,7 +8742,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 392,
+      "line": 496,
       "level": "top_level",
       "kind": "class",
       "symbol": "ToastManager",
@@ -8760,7 +8760,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 397,
+      "line": 501,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -8778,7 +8778,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 432,
+      "line": 536,
       "level": "member",
       "kind": "func",
       "symbol": "push",
@@ -8796,7 +8796,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 441,
+      "line": 545,
       "level": "member",
       "kind": "func",
       "symbol": "count",
@@ -8814,7 +8814,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 445,
+      "line": 549,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -8832,7 +8832,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 449,
+      "line": 553,
       "level": "member",
       "kind": "func",
       "symbol": "tick",
@@ -8850,7 +8850,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 469,
+      "line": 573,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -8868,7 +8868,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 514,
+      "line": 618,
       "level": "top_level",
       "kind": "class",
       "symbol": "Spinner",
@@ -8886,7 +8886,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 522,
+      "line": 626,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -8904,7 +8904,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 531,
+      "line": 635,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -8922,7 +8922,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 540,
+      "line": 644,
       "level": "top_level",
       "kind": "class",
       "symbol": "Dialog",
@@ -8940,7 +8940,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 545,
+      "line": 649,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -8958,7 +8958,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 553,
+      "line": 657,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -8976,7 +8976,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 576,
+      "line": 680,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -8994,7 +8994,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 580,
+      "line": 684,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -9012,7 +9012,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 595,
+      "line": 699,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -9030,7 +9030,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 616,
+      "line": 720,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -9048,7 +9048,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 654,
+      "line": 758,
       "level": "top_level",
       "kind": "class",
       "symbol": "ConfirmDialog",
@@ -9066,7 +9066,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 656,
+      "line": 760,
       "level": "member",
       "kind": "var",
       "symbol": "confirmed",
@@ -9084,7 +9084,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 658,
+      "line": 762,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9102,7 +9102,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 676,
+      "line": 780,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -9120,7 +9120,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 680,
+      "line": 784,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -9138,7 +9138,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 700,
+      "line": 804,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -9156,7 +9156,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 709,
+      "line": 813,
       "level": "member",
       "kind": "func",
       "symbol": "render",

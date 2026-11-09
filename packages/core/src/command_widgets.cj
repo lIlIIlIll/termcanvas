@@ -3,11 +3,24 @@ package core
 import std.collection.*
 import std.unicode.*
 
+/** 菜单或命令面板中的动作项。
+ */
 public class MenuItem {
+    /** 显示文本。
+     */
     public let label: String
+    /** 触发时返回的动作标识。
+     */
     public let action: String
+    /** 是否允许触发。
+     */
     public let enabled: Bool
 
+    /** 创建动作项；动作标识为空时使用显示文本。
+     * @param label 显示文本
+     * @param action 可选动作标识
+     * @param enabled 是否允许触发
+     */
     public init(label: String, action!: String = "", enabled!: Bool = true) {
         this.label = label
         this.action = if (action.isEmpty()) { label } else { action }
@@ -15,10 +28,16 @@ public class MenuItem {
     }
 }
 
+/** 纵向菜单，返回被触发项目的动作标识。
+ */
 public class Menu <: Widget {
     private let title: String
     private let items: Array<MenuItem>
+    /** 当前选中索引。
+     */
     public var selected: Int64
+    /** 列表起始索引。
+     */
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1
     private let block: ?Block
@@ -27,6 +46,16 @@ public class Menu <: Widget {
     private let disabledStyle: ?Style
     private let theme: ?Theme
 
+    /** 创建控件。
+     * @param title 标题
+     * @param items 菜单项
+     * @param selected 初始选中索引
+     * @param block 可选外框
+     * @param style 普通项样式
+     * @param selectedStyle 选中项样式
+     * @param disabledStyle 禁用项样式
+     * @param theme 可选语义主题
+     */
     public init(
         title: String,
         items: Array<MenuItem>,
@@ -47,6 +76,10 @@ public class Menu <: Widget {
         this.theme = theme
     }
 
+    /** 处理键盘导航和动作触发。
+     * @param key 键盘事件
+     * @return 触发启用项时返回动作标识，否则返回 None。
+     */
     public func handle(key: KeyEvent): ?String {
         if (items.isEmpty()) { return None }
         selected = clamp(selected, 0, items.size - 1)
@@ -61,6 +94,11 @@ public class Menu <: Widget {
         }
     }
 
+    /** 处理鼠标选择和动作触发。
+     * @param mouse 鼠标事件
+     * @param area 控件区域
+     * @return 触发启用项时返回动作标识，否则返回 None。
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
         var target = widgetInnerArea(area, block)
         if (block.isNone() && !title.isEmpty()) {
@@ -74,6 +112,10 @@ public class Menu <: Widget {
         None
     }
 
+    /** 在区域内绘制控件。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let theme = buffer.resolveTheme(this.theme)
@@ -106,14 +148,25 @@ public class Menu <: Widget {
     }
 }
 
+/** 横向菜单标签栏。
+ */
 public class MenuBar <: Widget {
     private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private let menus: Array<String>
+    /** 当前选中索引。
+     */
     public var selected: Int64
     private let style: ?Style
     private let selectedStyle: ?Style
     private let theme: ?Theme
 
+    /** 创建控件。
+     * @param menus 标签文本
+     * @param selected 初始选中索引
+     * @param style 普通标签样式
+     * @param selectedStyle 选中标签样式
+     * @param theme 可选语义主题
+     */
     public init(
         menus: Array<String>,
         selected!: Int64 = 0,
@@ -128,6 +181,10 @@ public class MenuBar <: Widget {
         this.theme = theme
     }
 
+    /** 处理左右及首页、末页按键。
+     * @param key 键盘事件
+     * @return 支持且存在标签时为 true。
+     */
     public func handle(key: KeyEvent): Bool {
         if (menus.size == 0) { return false }
         match (key.code) {
@@ -147,6 +204,11 @@ public class MenuBar <: Widget {
         }
     }
 
+    /** 处理首行标签的鼠标选择。
+     * @param mouse 鼠标事件
+     * @param area 菜单栏区域
+     * @return 选中标签时为 true。
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         if (!widgetHitTest(mouse, area) || mouse.y != area.y) { return false }
         match ((mouse.kind, mouse.button)) {
@@ -162,6 +224,10 @@ public class MenuBar <: Widget {
         }
     }
 
+    /** 在区域内绘制控件。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         textWidthOptionsValue = buffer.textWidthOptions()
         if (area.width <= 0 || area.height <= 0) { return }
@@ -179,10 +245,18 @@ public class MenuBar <: Widget {
     }
 }
 
+/** 支持文本过滤的命令选择面板。
+ */
 public class CommandPalette <: Widget {
     private let items: Array<MenuItem>
+    /** 当前过滤文本。
+     */
     public var query: String
+    /** 当前选中索引。
+     */
     public var selected: Int64
+    /** 列表起始索引。
+     */
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1
     private var lastQuery: String = ""
@@ -193,6 +267,17 @@ public class CommandPalette <: Widget {
     private var theme: ?Theme = None
     private let caseSensitive: Bool
 
+    /** 创建控件。
+     * @param items 命令项
+     * @param query 初始查询文本
+     * @param selected 初始选中索引
+     * @param block 可选外框
+     * @param style 普通项样式
+     * @param selectedStyle 选中项样式
+     * @param disabledStyle 禁用项样式
+     * @param theme 可选语义主题
+     * @param caseSensitive 过滤时是否区分大小写
+     */
     public init(
         items: Array<MenuItem>,
         query!: String = "",
@@ -216,15 +301,25 @@ public class CommandPalette <: Widget {
         this.caseSensitive = caseSensitive
         clampSelection()
     }
+    /** 设置或清除语义主题。
+     * @param theme 主题；None 表示清除
+     */
     public func setTheme(theme: ?Theme): Unit {
         this.theme = theme
     }
 
+    /** 将文本追加到查询并同步过滤结果。
+     * @param text 要追加的文本
+     */
     public func paste(text: String): Unit {
         query += text
         _ = synchronizeQuery()
     }
 
+    /** 处理键盘导航和动作触发。
+     * @param key 键盘事件
+     * @return 触发启用项时返回动作标识，否则返回 None。
+     */
     public func handle(key: KeyEvent): ?String {
         let rows = synchronizeQuery()
         if (let Some(index) <- selectionNavigation(key, selected, rows.size, viewportHeight)) {
@@ -256,6 +351,11 @@ public class CommandPalette <: Widget {
         }
     }
 
+    /** 处理鼠标选择和动作触发。
+     * @param mouse 鼠标事件
+     * @param area 控件区域
+     * @return 触发启用项时返回动作标识，否则返回 None。
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
         let rows = synchronizeQuery()
         let inner = widgetInnerArea(area, block)
@@ -279,6 +379,10 @@ public class CommandPalette <: Widget {
         rows
     }
 
+    /** 在区域内绘制控件。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         let rows = synchronizeQuery()
         var target = area
