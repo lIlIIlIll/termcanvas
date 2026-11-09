@@ -5389,6 +5389,68 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "core-vim-editing",
+      "source": "docs/api-examples/vim-editor.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/vim_editor.cj",
+          "symbol": "VimMode",
+          "signature": "public enum VimMode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/vim_editor.cj",
+          "symbol": "VimMode.Normal",
+          "signature": "Normal"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/vim_editor.cj",
+          "symbol": "VimMode.Insert",
+          "signature": "Insert"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/vim_editor.cj",
+          "symbol": "VimEditorBehavior",
+          "signature": "public class VimEditorBehavior {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/vim_editor.cj",
+          "symbol": "VimEditorBehavior.init",
+          "signature": "public init(area: TextArea, insertHandler!: (TextArea, KeyEvent) -> Bool ="
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/vim_editor.cj",
+          "symbol": "VimEditorBehavior.mode",
+          "signature": "public prop mode: VimMode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/vim_editor.cj",
+          "symbol": "VimEditorBehavior.deactivate",
+          "signature": "public func deactivate(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/vim_editor.cj",
+          "symbol": "VimEditorBehavior.handle",
+          "signature": "public func handle(event: Event): Bool"
+        }
+      ]
     }
   ]
 }

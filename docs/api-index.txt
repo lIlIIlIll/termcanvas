@@ -2385,14 +2385,14 @@ packages/core/src/text_model.cj:379:public func undo(): Bool
 packages/core/src/text_model.cj:391:public func redo(): Bool
 packages/core/src/text_model.cj:401:public func clearHistory(): Unit
 packages/core/src/theme_capabilities.cj:175:public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style
-packages/core/src/vim_editor.cj:5:public enum VimMode {
-packages/core/src/vim_editor.cj:6:Normal
-packages/core/src/vim_editor.cj:7:Insert
-packages/core/src/vim_editor.cj:10:public class VimEditorBehavior {
-packages/core/src/vim_editor.cj:17:public init(area: TextArea, insertHandler!: (TextArea, KeyEvent) -> Bool =
-packages/core/src/vim_editor.cj:27:public prop mode: VimMode {
-packages/core/src/vim_editor.cj:31:public func deactivate(): Unit
-packages/core/src/vim_editor.cj:45:public func handle(event: Event): Bool
+packages/core/src/vim_editor.cj:6:public enum VimMode {
+packages/core/src/vim_editor.cj:8:Normal
+packages/core/src/vim_editor.cj:10:Insert
+packages/core/src/vim_editor.cj:14:public class VimEditorBehavior {
+packages/core/src/vim_editor.cj:26:public init(area: TextArea, insertHandler!: (TextArea, KeyEvent) -> Bool =
+packages/core/src/vim_editor.cj:37:public prop mode: VimMode {
+packages/core/src/vim_editor.cj:42:public func deactivate(): Unit
+packages/core/src/vim_editor.cj:61:public func handle(event: Event): Bool
 packages/core/src/virtual_transcript.cj:40:public struct VirtualTranscriptAppendOnlyText {
 packages/core/src/virtual_transcript.cj:41:public let text: String
 packages/core/src/virtual_transcript.cj:42:public let style: Style
