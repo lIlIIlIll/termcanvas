@@ -2540,125 +2540,125 @@ packages/core/src/widget_base.cj:46:public enum TextAlign {
 packages/core/src/widget_base.cj:48:Left
 packages/core/src/widget_base.cj:50:Center
 packages/core/src/widget_base.cj:52:Right
-packages/core/src/widgets.cj:5:public enum BorderKind {
-packages/core/src/widgets.cj:6:Auto
-packages/core/src/widgets.cj:7:Ascii
-packages/core/src/widgets.cj:8:Unicode
-packages/core/src/widgets.cj:9:Rounded
-packages/core/src/widgets.cj:11:Double
-packages/core/src/widgets.cj:13:Dashed
-packages/core/src/widgets.cj:14:NoBorder
-packages/core/src/widgets.cj:17:public enum TitleAlign {
-packages/core/src/widgets.cj:18:Left
-packages/core/src/widgets.cj:19:Center
-packages/core/src/widgets.cj:20:Right
-packages/core/src/widgets.cj:23:public enum BoxState {
-packages/core/src/widgets.cj:24:Normal
-packages/core/src/widgets.cj:25:Focused
-packages/core/src/widgets.cj:26:Active
-packages/core/src/widgets.cj:27:Error
-packages/core/src/widgets.cj:28:Disabled
-packages/core/src/widgets.cj:31:public class BorderSet {
-packages/core/src/widgets.cj:32:public let horizontal: String
-packages/core/src/widgets.cj:33:public let vertical: String
-packages/core/src/widgets.cj:34:public let topLeft: String
-packages/core/src/widgets.cj:35:public let topRight: String
-packages/core/src/widgets.cj:36:public let bottomLeft: String
-packages/core/src/widgets.cj:37:public let bottomRight: String
-packages/core/src/widgets.cj:39:public init( horizontal!: String = "-", vertical!: String = "|", topLeft!: String = "+", topRight!: String = "+", bottomLeft!: String = "+", bottomRight!: String = "+" )
-packages/core/src/widgets.cj:55:public static func ascii(): BorderSet
-packages/core/src/widgets.cj:59:public static func unicode(): BorderSet
-packages/core/src/widgets.cj:63:public static func rounded(): BorderSet
-packages/core/src/widgets.cj:67:public static func doubleLine(): BorderSet
-packages/core/src/widgets.cj:71:public static func dashed(): BorderSet
-packages/core/src/widgets.cj:76:public class BlockOptions {
-packages/core/src/widgets.cj:77:public let title: String
-packages/core/src/widgets.cj:78:public let borderKind: BorderKind
-packages/core/src/widgets.cj:79:public let border: BorderSet
-packages/core/src/widgets.cj:80:public let titleAlign: TitleAlign
-packages/core/src/widgets.cj:81:public let padding: Spacing
-packages/core/src/widgets.cj:82:public let margin: Spacing
-packages/core/src/widgets.cj:83:public let backgroundStyle: Style
-packages/core/src/widgets.cj:84:public let borderStyle: Style
-packages/core/src/widgets.cj:85:public let contentStyle: Style
-packages/core/src/widgets.cj:86:public let titleStyle: Style
-packages/core/src/widgets.cj:91:public let state: BoxState
-packages/core/src/widgets.cj:92:public let asciiFallback: Bool
-packages/core/src/widgets.cj:93:public let theme: ?Theme
-packages/core/src/widgets.cj:95:public init( title!: String = "", borderKind!: BorderKind = BorderKind.Auto, border!: BorderSet = BorderSet(horizontal: "", vertical: "", topLeft: "", topRight: "", bottomLeft: "", bottomRight: ""), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: ?Style = None, borderStyle!: ?Style = None, contentStyle!: ?Style = None, titleStyle!: ?Style = None, state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )
-packages/core/src/widgets.cj:130:public class Block <: Widget {
-packages/core/src/widgets.cj:134:public init(title!: String = "", style!: ?Style = None)
-packages/core/src/widgets.cj:138:public init(options: BlockOptions)
-packages/core/src/widgets.cj:147:public func inner(area: Rect): Rect
-packages/core/src/widgets.cj:152:public func inner(area: Rect, theme!: ?Theme): Rect
-packages/core/src/widgets.cj:156:public func renderInner(area: Rect, buffer: Buffer): Rect
-packages/core/src/widgets.cj:179:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:319:public class Panel <: Widget {
-packages/core/src/widgets.cj:323:public init(block!: Block = Block(), child!: ?Widget = None)
-packages/core/src/widgets.cj:328:public init(options: BlockOptions, child!: ?Widget = None)
-packages/core/src/widgets.cj:333:public func renderInner(area: Rect, buffer: Buffer): Rect
-packages/core/src/widgets.cj:342:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:347:public class Paragraph <: Widget {
-packages/core/src/widgets.cj:357:public init( text: String, block!: ?Block = None, style!: ?Style = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
-packages/core/src/widgets.cj:373:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:410:public class List <: Widget {
-packages/core/src/widgets.cj:423:public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
-packages/core/src/widgets.cj:448:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/widgets.cj:450:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
-packages/core/src/widgets.cj:465:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:548:public class ListState {
-packages/core/src/widgets.cj:549:public var selected: ?Int64
-packages/core/src/widgets.cj:550:public var offset: Int64
-packages/core/src/widgets.cj:552:public init(selected!: ?Int64 = None, offset!: Int64 = 0)
-packages/core/src/widgets.cj:557:public func select(index: ?Int64): Unit
-packages/core/src/widgets.cj:561:public func next(total: Int64): Unit
-packages/core/src/widgets.cj:574:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
-packages/core/src/widgets.cj:590:public func moveWithDirty(delta: Int64, total: Int64, viewportHeight: Int64, area: Rect): DirtyRects
-packages/core/src/widgets.cj:604:public func previous(total: Int64): Unit
-packages/core/src/widgets.cj:617:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
-packages/core/src/widgets.cj:635:public class Table <: Widget {
-packages/core/src/widgets.cj:653:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: ?Style = None, headerStyle!: ?Style = None, selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
-packages/core/src/widgets.cj:680:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/widgets.cj:682:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
-packages/core/src/widgets.cj:698:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:940:public class TableState {
-packages/core/src/widgets.cj:941:public var selectedRow: ?Int64
-packages/core/src/widgets.cj:942:public var offset: Int64
-packages/core/src/widgets.cj:944:public init(selectedRow!: ?Int64 = None, offset!: Int64 = 0)
-packages/core/src/widgets.cj:949:public func select(index: ?Int64): Unit
-packages/core/src/widgets.cj:953:public func next(total: Int64): Unit
-packages/core/src/widgets.cj:966:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
-packages/core/src/widgets.cj:982:public func previous(total: Int64): Unit
-packages/core/src/widgets.cj:995:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
-packages/core/src/widgets.cj:1013:public class Scrollbar <: Widget {
-packages/core/src/widgets.cj:1020:public init( total: Int64, offset!: Int64 = 0, viewport!: Int64 = 0, style!: Style = Style(fg: Color.Indexed(8)), thumbStyle!: Style = Style(fg: Color.White) )
-packages/core/src/widgets.cj:1034:public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool
-packages/core/src/widgets.cj:1070:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:1109:public class Input <: Widget {
-packages/core/src/widgets.cj:1112:public var value: String
-packages/core/src/widgets.cj:1115:public var cursor: Int64
-packages/core/src/widgets.cj:1131:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: ?Style = None, showBoundary!: Bool = true )
-packages/core/src/widgets.cj:1150:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/widgets.cj:1164:public func paste(text: String): Unit
-packages/core/src/widgets.cj:1172:public func handle(key: KeyEvent): Bool
-packages/core/src/widgets.cj:1203:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
-packages/core/src/widgets.cj:1205:public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects
-packages/core/src/widgets.cj:1220:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/widgets.cj:1222:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
-packages/core/src/widgets.cj:1236:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:1309:public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position
-packages/core/src/widgets.cj:1316:public func cursorPosition(area: Rect): Position
-packages/core/src/widgets.cj:1318:public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position
-packages/core/src/widgets.cj:1335:public func setValue(value: String, cursor!: Int64 = -1): Unit
-packages/core/src/widgets.cj:1341:public func clear(): Unit
-packages/core/src/widgets.cj:1347:public func moveToStart(): Unit
-packages/core/src/widgets.cj:1352:public func moveToEnd(): Unit
-packages/core/src/widgets.cj:1404:public class FileDialog <: Widget {
-packages/core/src/widgets.cj:1405:public let picker: FilePicker
-packages/core/src/widgets.cj:1407:public init(path!: String = ".", extension!: String = "", title!: String = "Files")
-packages/core/src/widgets.cj:1411:public func selectedPath(): ?String
-packages/core/src/widgets.cj:1412:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/widgets.cj:1413:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:6:public enum BorderKind {
+packages/core/src/widgets.cj:8:Auto
+packages/core/src/widgets.cj:10:Ascii
+packages/core/src/widgets.cj:12:Unicode
+packages/core/src/widgets.cj:14:Rounded
+packages/core/src/widgets.cj:16:Double
+packages/core/src/widgets.cj:18:Dashed
+packages/core/src/widgets.cj:20:NoBorder
+packages/core/src/widgets.cj:24:public enum TitleAlign {
+packages/core/src/widgets.cj:26:Left
+packages/core/src/widgets.cj:28:Center
+packages/core/src/widgets.cj:30:Right
+packages/core/src/widgets.cj:34:public enum BoxState {
+packages/core/src/widgets.cj:36:Normal
+packages/core/src/widgets.cj:38:Focused
+packages/core/src/widgets.cj:40:Active
+packages/core/src/widgets.cj:42:Error
+packages/core/src/widgets.cj:44:Disabled
+packages/core/src/widgets.cj:48:public class BorderSet {
+packages/core/src/widgets.cj:50:public let horizontal: String
+packages/core/src/widgets.cj:52:public let vertical: String
+packages/core/src/widgets.cj:54:public let topLeft: String
+packages/core/src/widgets.cj:56:public let topRight: String
+packages/core/src/widgets.cj:58:public let bottomLeft: String
+packages/core/src/widgets.cj:60:public let bottomRight: String
+packages/core/src/widgets.cj:70:public init( horizontal!: String = "-", vertical!: String = "|", topLeft!: String = "+", topRight!: String = "+", bottomLeft!: String = "+", bottomRight!: String = "+" )
+packages/core/src/widgets.cj:89:public static func ascii(): BorderSet
+packages/core/src/widgets.cj:96:public static func unicode(): BorderSet
+packages/core/src/widgets.cj:103:public static func rounded(): BorderSet
+packages/core/src/widgets.cj:110:public static func doubleLine(): BorderSet
+packages/core/src/widgets.cj:117:public static func dashed(): BorderSet
+packages/core/src/widgets.cj:123:public class BlockOptions {
+packages/core/src/widgets.cj:125:public let title: String
+packages/core/src/widgets.cj:127:public let borderKind: BorderKind
+packages/core/src/widgets.cj:129:public let border: BorderSet
+packages/core/src/widgets.cj:131:public let titleAlign: TitleAlign
+packages/core/src/widgets.cj:133:public let padding: Spacing
+packages/core/src/widgets.cj:135:public let margin: Spacing
+packages/core/src/widgets.cj:137:public let backgroundStyle: Style
+packages/core/src/widgets.cj:139:public let borderStyle: Style
+packages/core/src/widgets.cj:141:public let contentStyle: Style
+packages/core/src/widgets.cj:143:public let titleStyle: Style
+packages/core/src/widgets.cj:149:public let state: BoxState
+packages/core/src/widgets.cj:151:public let asciiFallback: Bool
+packages/core/src/widgets.cj:153:public let theme: ?Theme
+packages/core/src/widgets.cj:170:public init( title!: String = "", borderKind!: BorderKind = BorderKind.Auto, border!: BorderSet = BorderSet(horizontal: "", vertical: "", topLeft: "", topRight: "", bottomLeft: "", bottomRight: ""), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: ?Style = None, borderStyle!: ?Style = None, contentStyle!: ?Style = None, titleStyle!: ?Style = None, state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )
+packages/core/src/widgets.cj:206:public class Block <: Widget {
+packages/core/src/widgets.cj:214:public init(title!: String = "", style!: ?Style = None)
+packages/core/src/widgets.cj:221:public init(options: BlockOptions)
+packages/core/src/widgets.cj:232:public func inner(area: Rect): Rect
+packages/core/src/widgets.cj:241:public func inner(area: Rect, theme!: ?Theme): Rect
+packages/core/src/widgets.cj:250:public func renderInner(area: Rect, buffer: Buffer): Rect
+packages/core/src/widgets.cj:277:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:418:public class Panel <: Widget {
+packages/core/src/widgets.cj:426:public init(block!: Block = Block(), child!: ?Widget = None)
+packages/core/src/widgets.cj:435:public init(options: BlockOptions, child!: ?Widget = None)
+packages/core/src/widgets.cj:445:public func renderInner(area: Rect, buffer: Buffer): Rect
+packages/core/src/widgets.cj:458:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:464:public class Paragraph <: Widget {
+packages/core/src/widgets.cj:480:public init( text: String, block!: ?Block = None, style!: ?Style = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
+packages/core/src/widgets.cj:500:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:537:public class List <: Widget {
+packages/core/src/widgets.cj:550:public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
+packages/core/src/widgets.cj:575:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:577:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
+packages/core/src/widgets.cj:592:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:675:public class ListState {
+packages/core/src/widgets.cj:676:public var selected: ?Int64
+packages/core/src/widgets.cj:677:public var offset: Int64
+packages/core/src/widgets.cj:679:public init(selected!: ?Int64 = None, offset!: Int64 = 0)
+packages/core/src/widgets.cj:684:public func select(index: ?Int64): Unit
+packages/core/src/widgets.cj:688:public func next(total: Int64): Unit
+packages/core/src/widgets.cj:701:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
+packages/core/src/widgets.cj:717:public func moveWithDirty(delta: Int64, total: Int64, viewportHeight: Int64, area: Rect): DirtyRects
+packages/core/src/widgets.cj:731:public func previous(total: Int64): Unit
+packages/core/src/widgets.cj:744:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
+packages/core/src/widgets.cj:762:public class Table <: Widget {
+packages/core/src/widgets.cj:780:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: ?Style = None, headerStyle!: ?Style = None, selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
+packages/core/src/widgets.cj:807:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:809:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
+packages/core/src/widgets.cj:825:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:1067:public class TableState {
+packages/core/src/widgets.cj:1068:public var selectedRow: ?Int64
+packages/core/src/widgets.cj:1069:public var offset: Int64
+packages/core/src/widgets.cj:1071:public init(selectedRow!: ?Int64 = None, offset!: Int64 = 0)
+packages/core/src/widgets.cj:1076:public func select(index: ?Int64): Unit
+packages/core/src/widgets.cj:1080:public func next(total: Int64): Unit
+packages/core/src/widgets.cj:1093:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
+packages/core/src/widgets.cj:1109:public func previous(total: Int64): Unit
+packages/core/src/widgets.cj:1122:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
+packages/core/src/widgets.cj:1140:public class Scrollbar <: Widget {
+packages/core/src/widgets.cj:1147:public init( total: Int64, offset!: Int64 = 0, viewport!: Int64 = 0, style!: Style = Style(fg: Color.Indexed(8)), thumbStyle!: Style = Style(fg: Color.White) )
+packages/core/src/widgets.cj:1161:public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool
+packages/core/src/widgets.cj:1197:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:1236:public class Input <: Widget {
+packages/core/src/widgets.cj:1239:public var value: String
+packages/core/src/widgets.cj:1242:public var cursor: Int64
+packages/core/src/widgets.cj:1258:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: ?Style = None, showBoundary!: Bool = true )
+packages/core/src/widgets.cj:1277:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/widgets.cj:1291:public func paste(text: String): Unit
+packages/core/src/widgets.cj:1299:public func handle(key: KeyEvent): Bool
+packages/core/src/widgets.cj:1330:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+packages/core/src/widgets.cj:1332:public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects
+packages/core/src/widgets.cj:1347:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:1349:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
+packages/core/src/widgets.cj:1363:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:1436:public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position
+packages/core/src/widgets.cj:1443:public func cursorPosition(area: Rect): Position
+packages/core/src/widgets.cj:1445:public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position
+packages/core/src/widgets.cj:1462:public func setValue(value: String, cursor!: Int64 = -1): Unit
+packages/core/src/widgets.cj:1468:public func clear(): Unit
+packages/core/src/widgets.cj:1474:public func moveToStart(): Unit
+packages/core/src/widgets.cj:1479:public func moveToEnd(): Unit
+packages/core/src/widgets.cj:1531:public class FileDialog <: Widget {
+packages/core/src/widgets.cj:1532:public let picker: FilePicker
+packages/core/src/widgets.cj:1534:public init(path!: String = ".", extension!: String = "", title!: String = "Files")
+packages/core/src/widgets.cj:1538:public func selectedPath(): ?String
+packages/core/src/widgets.cj:1539:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/widgets.cj:1540:public func render(area: Rect, buffer: Buffer): Unit
 packages/diff/src/diff.cj:7:public enum DiffLineKind {
 packages/diff/src/diff.cj:9:Context
 packages/diff/src/diff.cj:11:Add

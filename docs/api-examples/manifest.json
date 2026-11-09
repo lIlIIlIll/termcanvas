@@ -4633,6 +4633,386 @@
           "signature": "public func close(): Unit"
         }
       ]
+    },
+    {
+      "id": "core-borders-and-panels",
+      "source": "docs/api-examples/borders-and-panels.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderKind",
+          "signature": "public enum BorderKind {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderKind.Auto",
+          "signature": "Auto"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderKind.Ascii",
+          "signature": "Ascii"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderKind.Unicode",
+          "signature": "Unicode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderKind.Rounded",
+          "signature": "Rounded"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderKind.Double",
+          "signature": "Double"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderKind.Dashed",
+          "signature": "Dashed"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderKind.NoBorder",
+          "signature": "NoBorder"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TitleAlign",
+          "signature": "public enum TitleAlign {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TitleAlign.Left",
+          "signature": "Left"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TitleAlign.Center",
+          "signature": "Center"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TitleAlign.Right",
+          "signature": "Right"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BoxState",
+          "signature": "public enum BoxState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BoxState.Normal",
+          "signature": "Normal"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BoxState.Focused",
+          "signature": "Focused"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BoxState.Active",
+          "signature": "Active"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BoxState.Error",
+          "signature": "Error"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BoxState.Disabled",
+          "signature": "Disabled"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet",
+          "signature": "public class BorderSet {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.horizontal",
+          "signature": "public let horizontal: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.vertical",
+          "signature": "public let vertical: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.topLeft",
+          "signature": "public let topLeft: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.topRight",
+          "signature": "public let topRight: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.bottomLeft",
+          "signature": "public let bottomLeft: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.bottomRight",
+          "signature": "public let bottomRight: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.init",
+          "signature": "public init( horizontal!: String = \"-\", vertical!: String = \"|\", topLeft!: String = \"+\", topRight!: String = \"+\", bottomLeft!: String = \"+\", bottomRight!: String = \"+\" )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.ascii",
+          "signature": "public static func ascii(): BorderSet"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.unicode",
+          "signature": "public static func unicode(): BorderSet"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.rounded",
+          "signature": "public static func rounded(): BorderSet"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.doubleLine",
+          "signature": "public static func doubleLine(): BorderSet"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BorderSet.dashed",
+          "signature": "public static func dashed(): BorderSet"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions",
+          "signature": "public class BlockOptions {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.title",
+          "signature": "public let title: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.borderKind",
+          "signature": "public let borderKind: BorderKind"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.border",
+          "signature": "public let border: BorderSet"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.titleAlign",
+          "signature": "public let titleAlign: TitleAlign"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.padding",
+          "signature": "public let padding: Spacing"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.margin",
+          "signature": "public let margin: Spacing"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.backgroundStyle",
+          "signature": "public let backgroundStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.borderStyle",
+          "signature": "public let borderStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.contentStyle",
+          "signature": "public let contentStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.titleStyle",
+          "signature": "public let titleStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.state",
+          "signature": "public let state: BoxState"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.asciiFallback",
+          "signature": "public let asciiFallback: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.theme",
+          "signature": "public let theme: ?Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "BlockOptions.init",
+          "signature": "public init( title!: String = \"\", borderKind!: BorderKind = BorderKind.Auto, border!: BorderSet = BorderSet(horizontal: \"\", vertical: \"\", topLeft: \"\", topRight: \"\", bottomLeft: \"\", bottomRight: \"\"), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: ?Style = None, borderStyle!: ?Style = None, contentStyle!: ?Style = None, titleStyle!: ?Style = None, state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Block",
+          "signature": "public class Block <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Block.init",
+          "signature": "public init(title!: String = \"\", style!: ?Style = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Block.init",
+          "signature": "public init(options: BlockOptions)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Block.inner",
+          "signature": "public func inner(area: Rect): Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Block.inner",
+          "signature": "public func inner(area: Rect, theme!: ?Theme): Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Block.renderInner",
+          "signature": "public func renderInner(area: Rect, buffer: Buffer): Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Block.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Panel",
+          "signature": "public class Panel <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Panel.init",
+          "signature": "public init(block!: Block = Block(), child!: ?Widget = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Panel.init",
+          "signature": "public init(options: BlockOptions, child!: ?Widget = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Panel.renderInner",
+          "signature": "public func renderInner(area: Rect, buffer: Buffer): Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Panel.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Paragraph",
+          "signature": "public class Paragraph <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Paragraph.init",
+          "signature": "public init( text: String, block!: ?Block = None, style!: ?Style = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Paragraph.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

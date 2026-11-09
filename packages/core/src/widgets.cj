@@ -2,40 +2,71 @@ package core
 
 import std.collection.*
 
+/** 区块边框类型；Auto 使用主题或终端能力选择默认外观。 */
 public enum BorderKind {
+    /** 根据主题及终端能力选择。 */
     | Auto
+    /** 使用 ASCII 边框。 */
     | Ascii
+    /** 使用直角 Unicode 单线边框。 */
     | Unicode
+    /** 使用圆角 Unicode 单线边框。 */
     | Rounded
     /** 双线 Unicode 边框。 */
     | Double
     /** 使用 Unicode 虚线边及直角连接符。 */
     | Dashed
+    /** 不绘制边框。 */
     | NoBorder
 }
 
+/** 区块标题在顶部边框上的对齐方式。 */
 public enum TitleAlign {
+    /** 靠左对齐。 */
     | Left
+    /** 居中对齐。 */
     | Center
+    /** 靠右对齐。 */
     | Right
 }
 
+/** 区块解析语义边框样式时使用的状态。 */
 public enum BoxState {
+    /** 普通状态。 */
     | Normal
+    /** 焦点状态。 */
     | Focused
+    /** 活动状态。 */
     | Active
+    /** 错误状态。 */
     | Error
+    /** 禁用状态。 */
     | Disabled
 }
 
+/** 描述边框水平边、垂直边和四角使用的字符串。 */
 public class BorderSet {
+    /** 水平边符号。 */
     public let horizontal: String
+    /** 垂直边符号。 */
     public let vertical: String
+    /** 左上角符号。 */
     public let topLeft: String
+    /** 右上角符号。 */
     public let topRight: String
+    /** 左下角符号。 */
     public let bottomLeft: String
+    /** 右下角符号。 */
     public let bottomRight: String
 
+    /** 创建边框字符集。
+     * @param horizontal 水平边符号
+     * @param vertical 垂直边符号
+     * @param topLeft 左上角符号
+     * @param topRight 右上角符号
+     * @param bottomLeft 左下角符号
+     * @param bottomRight 右下角符号
+     */
     public init(
         horizontal!: String = "-",
         vertical!: String = "|",
@@ -52,46 +83,90 @@ public class BorderSet {
         this.bottomRight = bottomRight
     }
 
+    /** 创建ASCII 边框字符集。
+     * @return 边框字符集
+     */
     public static func ascii(): BorderSet {
         BorderSet()
     }
 
+    /** 创建直角 Unicode 单线边框字符集。
+     * @return 边框字符集
+     */
     public static func unicode(): BorderSet {
         BorderSet(horizontal: "─", vertical: "│", topLeft: "┌", topRight: "┐", bottomLeft: "└", bottomRight: "┘")
     }
 
+    /** 创建圆角 Unicode 单线边框字符集。
+     * @return 边框字符集
+     */
     public static func rounded(): BorderSet {
         BorderSet(horizontal: "─", vertical: "│", topLeft: "╭", topRight: "╮", bottomLeft: "╰", bottomRight: "╯")
     }
 
+    /** 创建Unicode 双线边框字符集。
+     * @return 边框字符集
+     */
     public static func doubleLine(): BorderSet {
         BorderSet(horizontal: "═", vertical: "║", topLeft: "╔", topRight: "╗", bottomLeft: "╚", bottomRight: "╝")
     }
 
+    /** 创建Unicode 虚线边框字符集。
+     * @return 边框字符集
+     */
     public static func dashed(): BorderSet {
         BorderSet(horizontal: "┄", vertical: "┆", topLeft: "┌", topRight: "┐", bottomLeft: "└", bottomRight: "┘")
     }
 }
 
+/** 区块标题、边框、间距及语义样式选项。显式样式优先于主题样式。 */
 public class BlockOptions {
+    /** 标题文字。 */
     public let title: String
+    /** 边框类型。 */
     public let borderKind: BorderKind
+    /** 显式边框字符集；空字符串集合表示自动选择。 */
     public let border: BorderSet
+    /** 标题对齐方式。 */
     public let titleAlign: TitleAlign
+    /** 内容内边距。 */
     public let padding: Spacing
+    /** 区块外边距。 */
     public let margin: Spacing
+    /** 背景样式；未显式提供时字段为默认样式。 */
     public let backgroundStyle: Style
+    /** 边框样式；未显式提供时字段为默认样式。 */
     public let borderStyle: Style
+    /** 内容样式；未显式提供时字段为默认样式。 */
     public let contentStyle: Style
+    /** 标题样式；未显式提供时字段为默认样式。 */
     public let titleStyle: Style
     let hasBackgroundStyle: Bool
     let hasBorderStyle: Bool
     let hasContentStyle: Bool
     let hasTitleStyle: Bool
+    /** 语义状态。 */
     public let state: BoxState
+    /** 是否强制使用 ASCII 边框。 */
     public let asciiFallback: Bool
+    /** 可选显式主题。 */
     public let theme: ?Theme
 
+    /** 创建区块选项。绘制边框时显式字符集优先于边框类型；ASCII 回退优先于显式字符集。
+     * @param title 标题文字
+     * @param borderKind 边框类型
+     * @param border 显式边框字符集
+     * @param titleAlign 标题对齐方式
+     * @param padding 内容内边距
+     * @param margin 区块外边距
+     * @param backgroundStyle 可选背景样式
+     * @param borderStyle 可选边框样式
+     * @param contentStyle 可选内容样式
+     * @param titleStyle 可选标题样式
+     * @param state 语义状态
+     * @param asciiFallback 是否强制 ASCII 边框
+     * @param theme 可选显式主题
+     */
     public init(
         title!: String = "",
         borderKind!: BorderKind = BorderKind.Auto,
@@ -127,14 +202,22 @@ public class BlockOptions {
     }
 }
 
+/** 绘制背景、边框与标题，并计算内部内容区域。 */
 public class Block <: Widget {
     private let options: BlockOptions
     private var inheritedTheme: ?Theme = None
 
+    /** 使用标题和可选样式创建区块。
+     * @param title 标题文字
+     * @param style 可选的边框和标题样式
+     */
     public init(title!: String = "", style!: ?Style = None) {
         this.options = BlockOptions(title: title, borderStyle: style, titleStyle: style)
     }
 
+    /** 使用完整选项创建区块。
+     * @param options 区块选项
+     */
     public init(options: BlockOptions) {
         this.options = options
     }
@@ -143,16 +226,27 @@ public class Block <: Widget {
     func explicitTheme(): ?Theme { options.theme }
 
     /** 根据最近一次绘制时的主题计算内容区域；尚未绘制时使用区块显式主题和默认值。
+     * @param area 外部区域
+     * @return 扣除外边距、边框和内边距后的内容区域
      */
     public func inner(area: Rect): Rect {
         contentArea(frameArea(area))
     }
 
-    /** 绘制前可显式提供应用主题以计算内容区域；区块自身的显式主题优先。 */
+    /** 绘制前可显式提供应用主题以计算内容区域；区块自身的显式主题优先。
+     * @param area 外部区域
+     * @param theme 可选应用主题
+     * @return 内容区域
+     */
     public func inner(area: Rect, theme!: ?Theme): Rect {
         contentAreaForTheme(frameArea(area), resolveBlockTheme(theme))
     }
 
+    /** 绘制区块并返回内容区域。
+     * @param area 外部区域
+     * @param buffer 目标缓冲区
+     * @return 内容区域
+     */
     public func renderInner(area: Rect, buffer: Buffer): Rect {
         inheritedTheme = buffer.resolveTheme(None)
         let frame = frameArea(area)
@@ -176,6 +270,10 @@ public class Block <: Widget {
         }
     }
 
+    /** 绘制区块。
+     * @param area 外部区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         _ = renderInner(area, buffer)
     }
@@ -316,20 +414,34 @@ public class Block <: Widget {
 
 }
 
+/** 使用区块包装可选子组件的面板。 */
 public class Panel <: Widget {
     private let block: Block
     private let child: ?Widget
 
+    /** 使用区块和可选子组件创建面板。
+     * @param block 外围区块
+     * @param child 可选子组件
+     */
     public init(block!: Block = Block(), child!: ?Widget = None) {
         this.block = block
         this.child = child
     }
 
+    /** 使用区块选项和可选子组件创建面板。
+     * @param options 区块选项
+     * @param child 可选子组件
+     */
     public init(options: BlockOptions, child!: ?Widget = None) {
         this.block = Block(options)
         this.child = child
     }
 
+    /** 绘制区块及子组件，并返回内容区域。
+     * @param area 外部区域
+     * @param buffer 目标缓冲区
+     * @return 内容区域
+     */
     public func renderInner(area: Rect, buffer: Buffer): Rect {
         let inner = block.renderInner(area, buffer)
         match (child) {
@@ -339,11 +451,16 @@ public class Panel <: Widget {
         inner
     }
 
+    /** 绘制面板和子组件。
+     * @param area 外部区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         _ = renderInner(area, buffer)
     }
 }
 
+/** 支持换行、对齐和滚动的文本段落。 */
 public class Paragraph <: Widget {
     private let text: String
     private let block: ?Block
@@ -353,6 +470,12 @@ public class Paragraph <: Widget {
     private let align: TextAlign
 
     /** 保存段落文本与绘制设置；负数滚动行数按零处理。省略样式时使用应用主题的正文样式，显式样式优先。
+     * @param text 段落文本
+     * @param block 可选外围区块
+     * @param style 可选文字样式
+     * @param scroll 起始滚动行数
+     * @param wrap 换行方式
+     * @param align 水平对齐方式
      */
     public init(
         text: String,
@@ -370,6 +493,10 @@ public class Paragraph <: Widget {
         this.align = align
     }
 
+    /** 在区域内绘制段落。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
