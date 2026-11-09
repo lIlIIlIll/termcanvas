@@ -48,4 +48,13 @@ class DialogThemeGeometryTest {
         @Expect(dialog.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 0, 5), area).isNone())
         @Expect(dialog.handleMouse(MouseEvent(MouseKind.Down, MouseButton.Left, 1, 5), area), Some("OK"))
     }
+
+    @TestCase
+    func borderlessSingleRowDoesNotDrawOutsideDialog(): Unit {
+        let buffer = Buffer(Rect(0, 0, 20, 8))
+        let area = Rect(2, 3, 8, 1)
+        let dialog = Dialog(buttons: ["OK"], theme: Theme(borderKind: BorderKind.NoBorder))
+        dialog.render(area, buffer)
+        @Expect(buffer.getCell(2, 2).symbol, " ")
+    }
 }

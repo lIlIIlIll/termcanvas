@@ -638,6 +638,7 @@ public class Dialog <: Widget {
         }
         var bx = inner.x
         let by = dialogArea.bottom - 2
+        if (by < inner.y || by >= inner.bottom) { return }
         for (i in 0..buttons.size) {
             if (bx >= inner.right) { return }
             let label = "[" + buttons[i] + "]"

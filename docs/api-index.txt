@@ -494,13 +494,13 @@ packages/core/src/command_widgets.cj:576:public func setTheme(theme: ?Theme): Un
 packages/core/src/command_widgets.cj:580:public func handle(key: KeyEvent): ?String
 packages/core/src/command_widgets.cj:595:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/command_widgets.cj:616:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/command_widgets.cj:653:public class ConfirmDialog <: Widget {
-packages/core/src/command_widgets.cj:655:public var confirmed: Bool = false
-packages/core/src/command_widgets.cj:657:public init( message: String, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None )
-packages/core/src/command_widgets.cj:675:public func setTheme(theme: ?Theme): Unit
-packages/core/src/command_widgets.cj:679:public func handle(key: KeyEvent): ?Bool
-packages/core/src/command_widgets.cj:699:public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
-packages/core/src/command_widgets.cj:708:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/command_widgets.cj:654:public class ConfirmDialog <: Widget {
+packages/core/src/command_widgets.cj:656:public var confirmed: Bool = false
+packages/core/src/command_widgets.cj:658:public init( message: String, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None )
+packages/core/src/command_widgets.cj:676:public func setTheme(theme: ?Theme): Unit
+packages/core/src/command_widgets.cj:680:public func handle(key: KeyEvent): ?Bool
+packages/core/src/command_widgets.cj:700:public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
+packages/core/src/command_widgets.cj:709:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/container_widgets.cj:5:public class VBox <: Widget {
 packages/core/src/container_widgets.cj:10:public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())
 packages/core/src/container_widgets.cj:16:public func render(area: Rect, buffer: Buffer): Unit
