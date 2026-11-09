@@ -323,11 +323,20 @@ public struct Velocity2D {
     }
 }
 
+/** 由文本行组成的二维精灵。 */
 public struct Sprite2D {
+    /** 精灵文本行。 */
     public let rows: Array<String>
+    /** 绘制样式。 */
     public let style: Style
+    /** 绘制时跳过的字素簇。 */
     public let transparent: String
 
+    /** 创建精灵。
+     * @param rows 精灵文本行
+     * @param style 绘制样式
+     * @param transparent 透明字素簇
+     */
     public init(rows: Array<String>, style!: Style = Style.default(), transparent!: String = " ") {
         this.rows = rows
         this.style = style
@@ -335,32 +344,49 @@ public struct Sprite2D {
     }
 }
 
+/** 精灵动画的一帧。 */
 public struct SpriteFrame {
+    /** 帧中的精灵。 */
     public let sprite: Sprite2D
+    /** 帧持续时间，至少为一毫秒。 */
     public let durationMillis: Int64
 
+    /** 创建精灵帧。
+     * @param sprite 帧中的精灵
+     * @param durationMillis 持续毫秒数，至少为一
+     */
     public init(sprite: Sprite2D, durationMillis!: Int64 = 120) {
         this.sprite = sprite
         this.durationMillis = max(1, durationMillis)
     }
 }
 
+/** 按帧持续时间推进精灵的动画。 */
 public class SpriteAnimation {
     private let frames: Array<SpriteFrame>
     private let loop: Bool
     private var index: Int64 = 0
     private var elapsedMillis: Int64 = 0
 
+    /** 创建精灵动画。
+     * @param frames 按顺序播放的帧
+     * @param loop 是否循环播放
+     */
     public init(frames: Array<SpriteFrame>, loop!: Bool = true) {
         this.frames = frames
         this.loop = loop
     }
 
+    /** 将动画重置到第一帧和零经过时间。 */
     public func reset(): Unit {
         index = 0
         elapsedMillis = 0
     }
 
+    /** 推进动画并返回当前精灵；空动画返回空精灵。
+     * @param deltaMillis 增加的毫秒数，负值按零处理
+     * @return 当前精灵
+     */
     public func advance(deltaMillis: Int64): Sprite2D {
         if (frames.size == 0) { return Sprite2D([]) }
         elapsedMillis += max(0, deltaMillis)
@@ -374,15 +400,25 @@ public class SpriteAnimation {
         current.sprite
     }
 
+    /** 获取当前精灵；空动画返回空精灵。
+     * @return 当前精灵
+     */
     public func current(): Sprite2D {
         if (frames.size == 0) { Sprite2D([]) } else { frames[index].sprite }
     }
 }
 
+/** 将世界位置映射到终端视口的相机。 */
 public struct Camera2D {
+    /** 世界坐标中的视口原点。 */
     public var origin: Vec2
+    /** 终端中的视口区域。 */
     public var viewport: Rect
 
+    /** 创建二维相机。
+     * @param origin 世界坐标原点
+     * @param viewport 终端视口区域
+     */
     public init(origin!: Vec2 = Vec2(), viewport!: Rect = Rect(0, 0, 80, 24)) {
         this.origin = origin
         this.viewport = viewport
@@ -695,9 +731,18 @@ public class GameInputState {
     }
 }
 
+/** 将精灵和变换组件绘制到终端缓冲区。 */
 public class SpriteRenderer {
+    /** 创建精灵渲染器。 */
     public init() {}
 
+    /** 绘制同时具有精灵和变换组件的实体。
+     * @param area 画布区域
+     * @param buffer 目标缓冲区
+     * @param transforms 实体变换存储
+     * @param sprites 实体精灵存储
+     * @param camera 世界坐标到视口的映射
+     */
     public func render(
         area: Rect,
         buffer: Buffer,
@@ -719,6 +764,12 @@ public class SpriteRenderer {
         }
     }
 
+    /** 将一个精灵绘制到画布，跳过透明字素簇。
+     * @param canvas 目标画布
+     * @param transform 实体变换
+     * @param sprite 要绘制的精灵
+     * @param camera 世界坐标到视口的映射
+     */
     public func drawSprite(canvas: Canvas, transform: Transform2D, sprite: Sprite2D, camera: Camera2D): Unit {
         let x = roundCell(transform.position.x - camera.origin.x) + camera.viewport.x
         let y = roundCell(transform.position.y - camera.origin.y) + camera.viewport.y

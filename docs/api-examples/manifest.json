@@ -9929,6 +9929,153 @@
           "signature": "public init(value!: Vec2 = Vec2())"
         }
       ]
+    },
+    {
+      "id": "game-sprites",
+      "source": "docs/api-examples/game-sprites.cj",
+      "dependencies": [
+        "core",
+        "game"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Sprite2D",
+          "signature": "public struct Sprite2D {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Sprite2D.rows",
+          "signature": "public let rows: Array<String>"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Sprite2D.style",
+          "signature": "public let style: Style"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Sprite2D.transparent",
+          "signature": "public let transparent: String"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Sprite2D.init",
+          "signature": "public init(rows: Array<String>, style!: Style = Style.default(), transparent!: String = \" \")"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteFrame",
+          "signature": "public struct SpriteFrame {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteFrame.sprite",
+          "signature": "public let sprite: Sprite2D"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteFrame.durationMillis",
+          "signature": "public let durationMillis: Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteFrame.init",
+          "signature": "public init(sprite: Sprite2D, durationMillis!: Int64 = 120)"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteAnimation",
+          "signature": "public class SpriteAnimation {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteAnimation.init",
+          "signature": "public init(frames: Array<SpriteFrame>, loop!: Bool = true)"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteAnimation.reset",
+          "signature": "public func reset(): Unit"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteAnimation.advance",
+          "signature": "public func advance(deltaMillis: Int64): Sprite2D"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteAnimation.current",
+          "signature": "public func current(): Sprite2D"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Camera2D",
+          "signature": "public struct Camera2D {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Camera2D.origin",
+          "signature": "public var origin: Vec2"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Camera2D.viewport",
+          "signature": "public var viewport: Rect"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Camera2D.init",
+          "signature": "public init(origin!: Vec2 = Vec2(), viewport!: Rect = Rect(0, 0, 80, 24))"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteRenderer",
+          "signature": "public class SpriteRenderer {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteRenderer.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteRenderer.render",
+          "signature": "public func render( area: Rect, buffer: Buffer, transforms: ComponentStore<Transform2D>, sprites: ComponentStore<Sprite2D>, camera!: Camera2D = Camera2D() ): Unit"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "SpriteRenderer.drawSprite",
+          "signature": "public func drawSprite(canvas: Canvas, transform: Transform2D, sprite: Sprite2D, camera: Camera2D): Unit"
+        }
+      ]
     }
   ]
 }
