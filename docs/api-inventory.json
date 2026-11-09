@@ -52841,7 +52841,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 370,
+      "line": 371,
       "level": "top_level",
       "kind": "interface",
       "symbol": "AsciiAnimationDecoder",
@@ -52859,7 +52859,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 371,
+      "line": 377,
       "level": "member",
       "kind": "func",
       "symbol": "decode",
@@ -52878,7 +52878,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 374,
+      "line": 381,
       "level": "top_level",
       "kind": "class",
       "symbol": "FfmpegAsciiAnimationDecoder",
@@ -52896,7 +52896,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 377,
+      "line": 387,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -52914,7 +52914,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 384,
+      "line": 399,
       "level": "member",
       "kind": "func",
       "symbol": "decode",
@@ -52932,7 +52932,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 391,
+      "line": 411,
       "level": "member",
       "kind": "func",
       "symbol": "commandFor",
@@ -52950,7 +52950,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 397,
+      "line": 417,
       "level": "top_level",
       "kind": "class",
       "symbol": "AsciiAnimationView",
@@ -52968,7 +52968,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 415,
+      "line": 435,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -52986,7 +52986,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 437,
+      "line": 457,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -53004,7 +53004,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 479,
+      "line": 499,
       "level": "top_level",
       "kind": "func",
       "symbol": "rgbaToAsciiFrame",
@@ -53022,7 +53022,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 606,
+      "line": 626,
       "level": "top_level",
       "kind": "func",
       "symbol": "preferredMediaProtocol",
@@ -53040,7 +53040,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 622,
+      "line": 642,
       "level": "top_level",
       "kind": "func",
       "symbol": "mediaPlacementWithAdapter",

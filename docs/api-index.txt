@@ -2907,18 +2907,18 @@ packages/media/src/media.cj:331:public func isEmpty(): Bool
 packages/media/src/media.cj:338:public func totalDurationMillis(): Int64
 packages/media/src/media.cj:350:public func frameAtIndex(index: Int64): AsciiFrame
 packages/media/src/media.cj:359:public func frameAtElapsed(elapsedMillis: Int64): AsciiFrame
-packages/media/src/media.cj:370:public interface AsciiAnimationDecoder {
-packages/media/src/media.cj:371:func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
-packages/media/src/media.cj:374:public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {
-packages/media/src/media.cj:377:public init(ffmpeg!: String = "ffmpeg")
-packages/media/src/media.cj:384:public func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
-packages/media/src/media.cj:391:public func commandFor(source: MediaSource, options: AsciiRenderOptions): String
-packages/media/src/media.cj:397:public class AsciiAnimationView <: Widget {
-packages/media/src/media.cj:415:public init( animation: AsciiAnimation, elapsedMillis!: Int64 = 0, zoom!: Int64 = 1, paused!: Bool = false, block!: ?Block = None, style!: ?Style = None, pausedStyle!: ?Style = None )
-packages/media/src/media.cj:437:public func render(area: Rect, buffer: Buffer): Unit
-packages/media/src/media.cj:479:public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame
-packages/media/src/media.cj:606:public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol
-packages/media/src/media.cj:622:public func mediaPlacementWithAdapter( id: String, source: MediaSource, area: Rect, caps: TerminalCapabilities, adapter!: MediaAdapter = FallbackMediaAdapter(), fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0 ): MediaPlacement
+packages/media/src/media.cj:371:public interface AsciiAnimationDecoder {
+packages/media/src/media.cj:377:func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
+packages/media/src/media.cj:381:public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {
+packages/media/src/media.cj:387:public init(ffmpeg!: String = "ffmpeg")
+packages/media/src/media.cj:399:public func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
+packages/media/src/media.cj:411:public func commandFor(source: MediaSource, options: AsciiRenderOptions): String
+packages/media/src/media.cj:417:public class AsciiAnimationView <: Widget {
+packages/media/src/media.cj:435:public init( animation: AsciiAnimation, elapsedMillis!: Int64 = 0, zoom!: Int64 = 1, paused!: Bool = false, block!: ?Block = None, style!: ?Style = None, pausedStyle!: ?Style = None )
+packages/media/src/media.cj:457:public func render(area: Rect, buffer: Buffer): Unit
+packages/media/src/media.cj:499:public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame
+packages/media/src/media.cj:626:public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol
+packages/media/src/media.cj:642:public func mediaPlacementWithAdapter( id: String, source: MediaSource, area: Rect, caps: TerminalCapabilities, adapter!: MediaAdapter = FallbackMediaAdapter(), fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0 ): MediaPlacement
 packages/terminal/src/terminal.cj:7:public enum AnsiTokenKind {
 packages/terminal/src/terminal.cj:9:Text
 packages/terminal/src/terminal.cj:11:Sgr

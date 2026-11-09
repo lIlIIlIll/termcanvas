@@ -367,13 +367,23 @@ public class AsciiAnimation {
     }
 }
 
+/** 将媒体来源解码为字符动画的接口。 */
 public interface AsciiAnimationDecoder {
+    /** 解码字符动画。
+     * @param source 媒体来源
+     * @param options 字符渲染配置
+     * @return 解码成功时的动画；失败时为 None
+     */
     func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
 }
 
+/** 使用 ffmpeg 解码视频并转换为字符动画。 */
 public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {
     private let ffmpeg: String
 
+    /** 创建 ffmpeg 解码器。
+     * @param ffmpeg ffmpeg 可执行文件
+     */
     public init(ffmpeg!: String = "ffmpeg") {
         this.ffmpeg = ffmpeg
     }
@@ -381,6 +391,11 @@ public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {
     // Synchronous, cancellable through the calling Future. Returns None on a
     // 10-second tool deadline, more than 16 MiB of output, incomplete RGBA, or
     // more than 256 frames. No truncated animation is reported as complete.
+    /** 同步解码媒体；工具失败、超时、输出超限或帧数据不完整时返回 None。
+     * @param source 媒体来源
+     * @param options 字符渲染配置
+     * @return 完整动画；解码失败时为 None
+     */
     public func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation {
         match (runTool(ffmpeg, ffmpegAsciiArgs(source, options))) {
             case Some(bytes) => asciiAnimationFromRgba(bytes, options)
@@ -388,6 +403,11 @@ public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {
         }
     }
 
+    /** 生成供查看的 ffmpeg 命令文本；文本未经过 shell 转义。
+     * @param source 媒体来源
+     * @param options 字符渲染配置
+     * @return 命令文本
+     */
     public func commandFor(source: MediaSource, options: AsciiRenderOptions): String {
         ffmpeg + " " + joinLocal(ffmpegAsciiArgs(source, options), " ")
     }

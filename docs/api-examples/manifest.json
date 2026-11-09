@@ -8522,6 +8522,57 @@
           "signature": "public func mediaPlacementWithAdapter( id: String, source: MediaSource, area: Rect, caps: TerminalCapabilities, adapter!: MediaAdapter = FallbackMediaAdapter(), fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0 ): MediaPlacement"
         }
       ]
+    },
+    {
+      "id": "ffmpeg-animation",
+      "source": "docs/api-examples/ffmpeg-animation.cj",
+      "dependencies": [
+        "core",
+        "media"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimationDecoder",
+          "signature": "public interface AsciiAnimationDecoder {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimationDecoder.decode",
+          "signature": "func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "FfmpegAsciiAnimationDecoder",
+          "signature": "public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "FfmpegAsciiAnimationDecoder.init",
+          "signature": "public init(ffmpeg!: String = \"ffmpeg\")"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "FfmpegAsciiAnimationDecoder.decode",
+          "signature": "public func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "FfmpegAsciiAnimationDecoder.commandFor",
+          "signature": "public func commandFor(source: MediaSource, options: AsciiRenderOptions): String"
+        }
+      ]
     }
   ]
 }
