@@ -781,26 +781,63 @@ func renderDiffPlanWithPrevious(previousCell: (Int64, Int64) -> Cell, previousAr
     RenderDiffPlan(dirtyCells, spans.toArray())
 }
 
+/** 键盘协议的配置方式。
+ */
 public enum KeyboardProtocolMode {
+    /** 基础协议。
+     */
     | Basic
+    /** ModifyOtherKeys 协议。
+     */
     | ModifyOtherKeys
+    /** Kitty 键盘协议。
+     */
     | Kitty
+    /** 根据终端能力自动选择。
+     */
     | Auto
 }
 
+/** 终端能力的探测方式。
+ */
 public enum TerminalProbeMode {
+    /** 禁用探测。
+     */
     | Disabled
+    /** 仅依据环境信息。
+     */
     | EnvOnly
+    /** 主动查询终端。
+     */
     | Active
 }
 
+/** 键盘协议、探测和按键计时设置。
+ */
 public struct KeyboardOptions {
+    /** 键盘协议模式。
+     */
     public let mode: KeyboardProtocolMode
+    /** 能力探测模式。
+     */
     public let probe: TerminalProbeMode
+    /** 主动探测预算，限制在 0 至 100 毫秒。
+     */
     public let probeBudgetMillis: Int64
+    /** 独立 Escape 的等待毫秒数。
+     */
     public let escDelayMillis: Int64
+    /** 按键保持时间设置。
+     */
     public let repeatHeldMillis: Int64
 
+    /** 创建配置或结果。
+     * @param mode 键盘协议模式
+     * @param probe 探测模式
+     * @param probeBudgetMillis 探测预算，限制在 0 至 100 毫秒
+     * @param escDelayMillis Escape 等待时间，负值按零处理
+     * @param repeatHeldMillis 按键保持时间，至少为一毫秒
+     */
     public init(
         mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic,
         probe!: TerminalProbeMode = TerminalProbeMode.Disabled,
@@ -816,14 +853,30 @@ public struct KeyboardOptions {
     }
 }
 
+/** 终端探测得到的能力和读取字节。
+ */
 public struct TerminalProbeResult {
+    /** 探测后的终端能力。
+     */
     public let capabilities: TerminalCapabilities
     // All bytes read during the probe, including ordinary input. App replays
     // the non-response bytes through its normal EventParser.
+    /** 探测期间读取的全部字节，可能包含普通输入。
+     */
     public let consumedBytes: Array<Byte>
+    /** 探测预算，限制在 0 至 100 毫秒。
+     */
     public let budgetMillis: Int64
+    /** 已用毫秒数。
+     */
     public let elapsedMillis: Int64
 
+    /** 创建配置或结果。
+     * @param capabilities 探测后的能力
+     * @param consumedBytes 探测期间读取的全部字节
+     * @param budgetMillis 探测预算，限制在 0 至 100 毫秒
+     * @param elapsedMillis 已用时间，负值按零处理
+     */
     public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64) {
         this.capabilities = capabilities
         this.consumedBytes = consumedBytes
@@ -832,7 +885,16 @@ public struct TerminalProbeResult {
     }
 }
 
+/** 主动查询终端键盘能力。
+ */
 public class TerminalProbe {
+    /** 发送查询并读取响应；输入源应及时返回，预算不能中断阻塞读取。
+     * @param backend 输出查询的后端
+     * @param inputSource 用于读取响应的输入源
+     * @param base 探测前能力
+     * @param budgetMillis 探测预算，限制在 0 至 100 毫秒
+     * @return 探测能力及读取的字节。
+     */
     public static func run(
         backend: Backend,
         inputSource: InputSource,
@@ -882,6 +944,8 @@ class SessionInputSource <: InputSource {
     }
 }
 
+/** 管理终端模式的启用和恢复。
+ */
 public class TerminalSession {
     private let backend: Backend
     private let driver: TerminalDriver
@@ -907,8 +971,23 @@ public class TerminalSession {
     private let pendingProbeInput = ArrayList<Byte>()
     private var probeInputOffset: Int64 = 0
 
+    /** 当前会话是否成功启用原始模式。
+     */
     public prop rawModeEnabled: Bool { get() { rawActive } }
 
+    /** 配置终端会话。
+     * @param backend 终端后端
+     * @param driver 原始模式和尺寸驱动
+     * @param probeInputSource 主动探测输入源
+     * @param rawMode 是否启用原始模式
+     * @param alternateScreen 是否启用备用屏幕
+     * @param mouse 是否启用鼠标
+     * @param mouseMove 是否启用鼠标移动事件
+     * @param focusEvents 是否启用焦点事件
+     * @param bracketedPaste 是否启用括号粘贴
+     * @param hideCursor 是否隐藏光标
+     * @param keyboard 键盘协议选项
+     */
     public init(
         backend: Backend,
         driver!: TerminalDriver = defaultTerminalDriver(),
@@ -935,6 +1014,9 @@ public class TerminalSession {
         this.keyboard = keyboard
     }
 
+    /** 获取最近一次主动探测结果。
+     * @return 结果或 None。
+     */
     public func probeResult(): ?TerminalProbeResult {
         lastProbe
     }
@@ -950,6 +1032,9 @@ public class TerminalSession {
         bytes
     }
 
+    /** 启用配置的模式；原始模式失败时回滚已启用模式。
+     * @return 成功时为 true，原始模式启用失败时为 false。
+     */
     public func start(): Bool {
         if (active) { return true }
         lastProbe = None
@@ -993,6 +1078,8 @@ public class TerminalSession {
         }
     }
 
+    /** 恢复当前会话启用的模式；未启动时不执行操作。
+     */
     public func stop(): Unit {
         if (!active) { return }
         let cleanupFailure = cleanupStartedModes()
@@ -1001,6 +1088,9 @@ public class TerminalSession {
         }
     }
 
+    /** 启动会话、执行动作并尝试恢复；动作异常时也会恢复。
+     * @param action 会话中执行的动作
+     */
     public func run(action: () -> Unit): Unit {
         start()
         try {

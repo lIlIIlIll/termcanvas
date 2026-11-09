@@ -15619,6 +15619,206 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "terminal-session",
+      "source": "docs/api-examples/terminal-session.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardProtocolMode",
+          "signature": "public enum KeyboardProtocolMode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardProtocolMode.Basic",
+          "signature": "Basic"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardProtocolMode.ModifyOtherKeys",
+          "signature": "ModifyOtherKeys"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardProtocolMode.Kitty",
+          "signature": "Kitty"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardProtocolMode.Auto",
+          "signature": "Auto"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbeMode",
+          "signature": "public enum TerminalProbeMode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbeMode.Disabled",
+          "signature": "Disabled"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbeMode.EnvOnly",
+          "signature": "EnvOnly"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbeMode.Active",
+          "signature": "Active"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardOptions",
+          "signature": "public struct KeyboardOptions {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardOptions.mode",
+          "signature": "public let mode: KeyboardProtocolMode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardOptions.probe",
+          "signature": "public let probe: TerminalProbeMode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardOptions.probeBudgetMillis",
+          "signature": "public let probeBudgetMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardOptions.escDelayMillis",
+          "signature": "public let escDelayMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardOptions.repeatHeldMillis",
+          "signature": "public let repeatHeldMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "KeyboardOptions.init",
+          "signature": "public init( mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic, probe!: TerminalProbeMode = TerminalProbeMode.Disabled, probeBudgetMillis!: Int64 = 100, escDelayMillis!: Int64 = 25, repeatHeldMillis!: Int64 = 120 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbeResult",
+          "signature": "public struct TerminalProbeResult {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbeResult.capabilities",
+          "signature": "public let capabilities: TerminalCapabilities"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbeResult.consumedBytes",
+          "signature": "public let consumedBytes: Array<Byte>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbeResult.budgetMillis",
+          "signature": "public let budgetMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbeResult.elapsedMillis",
+          "signature": "public let elapsedMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbeResult.init",
+          "signature": "public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbe",
+          "signature": "public class TerminalProbe {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalProbe.run",
+          "signature": "public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalSession",
+          "signature": "public class TerminalSession {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalSession.rawModeEnabled",
+          "signature": "public prop rawModeEnabled: Bool { get() { rawActive } }"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalSession.init",
+          "signature": "public init( backend: Backend, driver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions() )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalSession.probeResult",
+          "signature": "public func probeResult(): ?TerminalProbeResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalSession.start",
+          "signature": "public func start(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalSession.stop",
+          "signature": "public func stop(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalSession.run",
+          "signature": "public func run(action: () -> Unit): Unit"
+        }
+      ]
     }
   ]
 }

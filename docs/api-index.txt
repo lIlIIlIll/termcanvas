@@ -1927,205 +1927,205 @@ packages/core/src/terminal.cj:437:public func setTextWidthOptions(options: TextW
 packages/core/src/terminal.cj:447:public func draw(render: (Frame) -> Unit): RenderMetrics
 packages/core/src/terminal.cj:457:public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
 packages/core/src/terminal.cj:623:public func clear(): Unit
-packages/core/src/terminal.cj:784:public enum KeyboardProtocolMode {
-packages/core/src/terminal.cj:785:Basic
-packages/core/src/terminal.cj:786:ModifyOtherKeys
-packages/core/src/terminal.cj:787:Kitty
-packages/core/src/terminal.cj:788:Auto
-packages/core/src/terminal.cj:791:public enum TerminalProbeMode {
-packages/core/src/terminal.cj:792:Disabled
-packages/core/src/terminal.cj:793:EnvOnly
-packages/core/src/terminal.cj:794:Active
-packages/core/src/terminal.cj:797:public struct KeyboardOptions {
-packages/core/src/terminal.cj:798:public let mode: KeyboardProtocolMode
-packages/core/src/terminal.cj:799:public let probe: TerminalProbeMode
-packages/core/src/terminal.cj:800:public let probeBudgetMillis: Int64
-packages/core/src/terminal.cj:801:public let escDelayMillis: Int64
-packages/core/src/terminal.cj:802:public let repeatHeldMillis: Int64
-packages/core/src/terminal.cj:804:public init( mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic, probe!: TerminalProbeMode = TerminalProbeMode.Disabled, probeBudgetMillis!: Int64 = 100, escDelayMillis!: Int64 = 25, repeatHeldMillis!: Int64 = 120 )
-packages/core/src/terminal.cj:819:public struct TerminalProbeResult {
-packages/core/src/terminal.cj:820:public let capabilities: TerminalCapabilities
-packages/core/src/terminal.cj:823:public let consumedBytes: Array<Byte>
-packages/core/src/terminal.cj:824:public let budgetMillis: Int64
-packages/core/src/terminal.cj:825:public let elapsedMillis: Int64
-packages/core/src/terminal.cj:827:public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64)
-packages/core/src/terminal.cj:835:public class TerminalProbe {
-packages/core/src/terminal.cj:836:public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult
-packages/core/src/terminal.cj:885:public class TerminalSession {
-packages/core/src/terminal.cj:910:public prop rawModeEnabled: Bool { get() { rawActive } }
-packages/core/src/terminal.cj:912:public init( backend: Backend, driver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions() )
-packages/core/src/terminal.cj:938:public func probeResult(): ?TerminalProbeResult
-packages/core/src/terminal.cj:953:public func start(): Bool
-packages/core/src/terminal.cj:996:public func stop(): Unit
-packages/core/src/terminal.cj:1004:public func run(action: () -> Unit): Unit
-packages/core/src/terminal.cj:1275:public interface TerminalDriver {
-packages/core/src/terminal.cj:1276:func name(): String
-packages/core/src/terminal.cj:1277:func enterRawMode(): Bool
-packages/core/src/terminal.cj:1278:func restore(): Unit
-packages/core/src/terminal.cj:1279:func size(): ?Rect
-packages/core/src/terminal.cj:1280:func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1284:public class LinuxTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1285:public init()
-packages/core/src/terminal.cj:1287:public func name(): String
-packages/core/src/terminal.cj:1288:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1289:public func restore(): Unit
-packages/core/src/terminal.cj:1290:public func size(): ?Rect
-packages/core/src/terminal.cj:1291:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1296:public class FallbackTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1298:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1302:public func name(): String
-packages/core/src/terminal.cj:1303:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1304:public func restore(): Unit
-packages/core/src/terminal.cj:1305:public func size(): ?Rect
-packages/core/src/terminal.cj:1306:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1320:public class MacOSTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1323:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1327:public func name(): String
-packages/core/src/terminal.cj:1328:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1329:public func restore(): Unit
-packages/core/src/terminal.cj:1330:public func size(): ?Rect
-packages/core/src/terminal.cj:1331:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1345:public class MacOSTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1346:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1350:public func name(): String
-packages/core/src/terminal.cj:1351:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1352:public func restore(): Unit
-packages/core/src/terminal.cj:1353:public func size(): ?Rect
-packages/core/src/terminal.cj:1354:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1360:public class WindowsTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1363:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1367:public func name(): String
-packages/core/src/terminal.cj:1368:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1369:public func restore(): Unit
-packages/core/src/terminal.cj:1370:public func size(): ?Rect
-packages/core/src/terminal.cj:1371:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1385:public class WindowsTerminalDriver <: TerminalDriver {
-packages/core/src/terminal.cj:1386:public init(area!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1390:public func name(): String
-packages/core/src/terminal.cj:1391:public func enterRawMode(): Bool
-packages/core/src/terminal.cj:1392:public func restore(): Unit
-packages/core/src/terminal.cj:1393:public func size(): ?Rect
-packages/core/src/terminal.cj:1394:public func capabilities(backend: Backend): TerminalCapabilities
-packages/core/src/terminal.cj:1400:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1405:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1410:public func defaultTerminalDriver(): TerminalDriver
-packages/core/src/terminal.cj:1445:public class AnsiBackend <: Backend {
-packages/core/src/terminal.cj:1453:public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24))
-packages/core/src/terminal.cj:1459:public func clear(): Unit
-packages/core/src/terminal.cj:1463:public func moveTo(x: Int64, y: Int64): Unit
-packages/core/src/terminal.cj:1467:public func enterAlternateScreen(): Unit
-packages/core/src/terminal.cj:1468:public func leaveAlternateScreen(): Unit
-packages/core/src/terminal.cj:1469:public func hideCursor(): Unit
-packages/core/src/terminal.cj:1470:public func showCursor(): Unit
-packages/core/src/terminal.cj:1471:public func setCursorShape(shape: ?CursorShape): Unit
-packages/core/src/terminal.cj:1477:public func enableMouse(): Unit
-packages/core/src/terminal.cj:1478:public func disableMouse(): Unit
-packages/core/src/terminal.cj:1479:public func enableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1480:public func disableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1482:public func size(): Rect
-packages/core/src/terminal.cj:1489:public func draw(buffer: Buffer): Unit
-packages/core/src/terminal.cj:1513:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
-packages/core/src/terminal.cj:1535:public func drawMedia(ops: Array<MediaOp>): Unit
-packages/core/src/terminal.cj:1545:public func write(text: String): Unit
-packages/core/src/terminal.cj:1551:public func setInstrumentationEnabled(enabled: Bool): Unit
-packages/core/src/terminal.cj:1555:public func diagnosticByteCount(): Int64
-packages/core/src/terminal.cj:1559:public func flush(): Unit
-packages/core/src/terminal.cj:1588:public class TestBackend <: Backend {
-packages/core/src/terminal.cj:1606:public init( area!: Rect = Rect(0, 0, 80, 24), captureSnapshots!: Bool = true )
-packages/core/src/terminal.cj:1615:public func clear(): Unit
-packages/core/src/terminal.cj:1623:public func moveTo(x: Int64, y: Int64): Unit
-packages/core/src/terminal.cj:1628:public func enterAlternateScreen(): Unit
-packages/core/src/terminal.cj:1630:public func leaveAlternateScreen(): Unit
-packages/core/src/terminal.cj:1632:public func hideCursor(): Unit
-packages/core/src/terminal.cj:1634:public func showCursor(): Unit
-packages/core/src/terminal.cj:1638:public func setCursorShape(shape: ?CursorShape): Unit
-packages/core/src/terminal.cj:1645:public func enableMouse(): Unit
-packages/core/src/terminal.cj:1647:public func disableMouse(): Unit
-packages/core/src/terminal.cj:1649:public func enableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1651:public func disableBracketedPaste(): Unit
-packages/core/src/terminal.cj:1656:public func size(): Rect
-packages/core/src/terminal.cj:1663:public func setSize(area: Rect): Unit
-packages/core/src/terminal.cj:1670:public func draw(buffer: Buffer): Unit
-packages/core/src/terminal.cj:1684:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
-packages/core/src/terminal.cj:1697:public func drawMedia(ops: Array<MediaOp>): Unit
-packages/core/src/terminal.cj:1707:public func write(text: String): Unit
-packages/core/src/terminal.cj:1714:public func flush(): Unit
-packages/core/src/terminal.cj:1719:public func output(): String
-packages/core/src/terminal.cj:1724:public func clearOutput(): Unit
-packages/core/src/terminal.cj:1733:public func lastBuffer(): ?Buffer
-packages/core/src/terminal.cj:1740:public func lastDiffOps(): Int64
-packages/core/src/terminal.cj:1747:public func lastDiffWrites(): Int64
-packages/core/src/terminal.cj:1754:public func lastMediaOps(): Array<MediaOp>
-packages/core/src/terminal.cj:1762:public func mediaFrameCount(): Int64
-packages/core/src/terminal.cj:1769:public func snapshot(): String
-packages/core/src/terminal.cj:1779:public func snapshots(): Array<String>
-packages/core/src/terminal.cj:1787:public func snapshotAt(index: Int64): String
-packages/core/src/terminal.cj:1799:public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool
-packages/core/src/terminal.cj:1812:public func assertSnapshot(expected: String): Bool
-packages/core/src/terminal.cj:1821:public func assertSnapshotAt(index: Int64, expected: String): Bool
-packages/core/src/terminal.cj:1829:public func assertLastMediaOpCount(expected: Int64): Bool
-packages/core/src/terminal.cj:1843:public struct TerminalCapabilities {
-packages/core/src/terminal.cj:1845:public let size: Rect
-packages/core/src/terminal.cj:1847:public let trueColor: Bool
-packages/core/src/terminal.cj:1849:public let colorLevel: Int64
-packages/core/src/terminal.cj:1851:public let mouse: Bool
-packages/core/src/terminal.cj:1853:public let mouseMove: Bool
-packages/core/src/terminal.cj:1855:public let focusEvents: Bool
-packages/core/src/terminal.cj:1857:public let bracketedPaste: Bool
-packages/core/src/terminal.cj:1859:public let alternateScreen: Bool
-packages/core/src/terminal.cj:1861:public let unicode: Bool
-packages/core/src/terminal.cj:1863:public let kittyGraphics: Bool
-packages/core/src/terminal.cj:1865:public let sixel: Bool
-packages/core/src/terminal.cj:1867:public let osc8: Bool
-packages/core/src/terminal.cj:1869:public let keyboardProtocol: KeyProtocol
-packages/core/src/terminal.cj:1871:public let keyUp: Bool
-packages/core/src/terminal.cj:1873:public let keyRepeat: Bool
-packages/core/src/terminal.cj:1875:public let recommendedFps: Int64
-packages/core/src/terminal.cj:1877:public let cellWidthPixels: Int64
-packages/core/src/terminal.cj:1879:public let cellHeightPixels: Int64
-packages/core/src/terminal.cj:1881:public let driverName: String
-packages/core/src/terminal.cj:1904:public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = "linux-glibc" )
-packages/core/src/terminal.cj:1946:public static func detect(backend!: Backend = AnsiBackend(), driverName!: String = "linux-glibc"): TerminalCapabilities
-packages/core/src/terminal.cj:2057:public struct RenderMetrics {
-packages/core/src/terminal.cj:2059:public let size: Rect
-packages/core/src/terminal.cj:2061:public let dirtyCells: Int64
-packages/core/src/terminal.cj:2063:public let diffWrites: Int64
-packages/core/src/terminal.cj:2065:public let mediaOps: Int64
-packages/core/src/terminal.cj:2067:public let fullRedraw: Bool
-packages/core/src/terminal.cj:2069:public let renderMillis: Int64
-packages/core/src/terminal.cj:2071:public let drawMillis: Int64
-packages/core/src/terminal.cj:2073:public let totalMillis: Int64
-packages/core/src/terminal.cj:2075:public let renderedCells: Int64
-packages/core/src/terminal.cj:2077:public let dirtyRects: Int64
-packages/core/src/terminal.cj:2079:public let copiedCells: Int64
-packages/core/src/terminal.cj:2081:public let bufferCellAttempts: Int64
-packages/core/src/terminal.cj:2083:public let bufferCellWrites: Int64
-packages/core/src/terminal.cj:2085:public let diffCells: Int64
-packages/core/src/terminal.cj:2087:public let diffSpans: Int64
-packages/core/src/terminal.cj:2089:public let renderNanos: Int64
-packages/core/src/terminal.cj:2091:public let diffNanos: Int64
-packages/core/src/terminal.cj:2093:public let writeNanos: Int64
-packages/core/src/terminal.cj:2095:public let totalNanos: Int64
-packages/core/src/terminal.cj:2097:public let ansiBytes: Int64
-packages/core/src/terminal.cj:2119:public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
-packages/core/src/terminal.cj:2162:public class DebugOverlay <: Widget {
-packages/core/src/terminal.cj:2166:public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
-packages/core/src/terminal.cj:2171:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/terminal.cj:2196:public class TerminalMode {
-packages/core/src/terminal.cj:2202:public static func lastError(): ?String
-packages/core/src/terminal.cj:2206:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:2246:public static func restore(): Unit
-packages/core/src/terminal.cj:2264:public static func size(): ?Rect
-packages/core/src/terminal.cj:2302:public class MacOSTerminalMode {
-packages/core/src/terminal.cj:2309:public static func lastError(): ?String
-packages/core/src/terminal.cj:2313:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:2359:public static func restore(): Unit
-packages/core/src/terminal.cj:2377:public static func size(): ?Rect
-packages/core/src/terminal.cj:2398:public class WindowsConsoleMode {
-packages/core/src/terminal.cj:2405:public static func lastError(): ?String
-packages/core/src/terminal.cj:2409:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:786:public enum KeyboardProtocolMode {
+packages/core/src/terminal.cj:789:Basic
+packages/core/src/terminal.cj:792:ModifyOtherKeys
+packages/core/src/terminal.cj:795:Kitty
+packages/core/src/terminal.cj:798:Auto
+packages/core/src/terminal.cj:803:public enum TerminalProbeMode {
+packages/core/src/terminal.cj:806:Disabled
+packages/core/src/terminal.cj:809:EnvOnly
+packages/core/src/terminal.cj:812:Active
+packages/core/src/terminal.cj:817:public struct KeyboardOptions {
+packages/core/src/terminal.cj:820:public let mode: KeyboardProtocolMode
+packages/core/src/terminal.cj:823:public let probe: TerminalProbeMode
+packages/core/src/terminal.cj:826:public let probeBudgetMillis: Int64
+packages/core/src/terminal.cj:829:public let escDelayMillis: Int64
+packages/core/src/terminal.cj:832:public let repeatHeldMillis: Int64
+packages/core/src/terminal.cj:841:public init( mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic, probe!: TerminalProbeMode = TerminalProbeMode.Disabled, probeBudgetMillis!: Int64 = 100, escDelayMillis!: Int64 = 25, repeatHeldMillis!: Int64 = 120 )
+packages/core/src/terminal.cj:858:public struct TerminalProbeResult {
+packages/core/src/terminal.cj:861:public let capabilities: TerminalCapabilities
+packages/core/src/terminal.cj:866:public let consumedBytes: Array<Byte>
+packages/core/src/terminal.cj:869:public let budgetMillis: Int64
+packages/core/src/terminal.cj:872:public let elapsedMillis: Int64
+packages/core/src/terminal.cj:880:public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64)
+packages/core/src/terminal.cj:890:public class TerminalProbe {
+packages/core/src/terminal.cj:898:public static func run( backend: Backend, inputSource: InputSource, base!: TerminalCapabilities = TerminalCapabilities.detect(backend: backend), budgetMillis!: Int64 = 100 ): TerminalProbeResult
+packages/core/src/terminal.cj:949:public class TerminalSession {
+packages/core/src/terminal.cj:976:public prop rawModeEnabled: Bool { get() { rawActive } }
+packages/core/src/terminal.cj:991:public init( backend: Backend, driver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions() )
+packages/core/src/terminal.cj:1020:public func probeResult(): ?TerminalProbeResult
+packages/core/src/terminal.cj:1038:public func start(): Bool
+packages/core/src/terminal.cj:1083:public func stop(): Unit
+packages/core/src/terminal.cj:1094:public func run(action: () -> Unit): Unit
+packages/core/src/terminal.cj:1365:public interface TerminalDriver {
+packages/core/src/terminal.cj:1366:func name(): String
+packages/core/src/terminal.cj:1367:func enterRawMode(): Bool
+packages/core/src/terminal.cj:1368:func restore(): Unit
+packages/core/src/terminal.cj:1369:func size(): ?Rect
+packages/core/src/terminal.cj:1370:func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1374:public class LinuxTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1375:public init()
+packages/core/src/terminal.cj:1377:public func name(): String
+packages/core/src/terminal.cj:1378:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1379:public func restore(): Unit
+packages/core/src/terminal.cj:1380:public func size(): ?Rect
+packages/core/src/terminal.cj:1381:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1386:public class FallbackTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1388:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1392:public func name(): String
+packages/core/src/terminal.cj:1393:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1394:public func restore(): Unit
+packages/core/src/terminal.cj:1395:public func size(): ?Rect
+packages/core/src/terminal.cj:1396:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1410:public class MacOSTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1413:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1417:public func name(): String
+packages/core/src/terminal.cj:1418:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1419:public func restore(): Unit
+packages/core/src/terminal.cj:1420:public func size(): ?Rect
+packages/core/src/terminal.cj:1421:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1435:public class MacOSTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1436:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1440:public func name(): String
+packages/core/src/terminal.cj:1441:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1442:public func restore(): Unit
+packages/core/src/terminal.cj:1443:public func size(): ?Rect
+packages/core/src/terminal.cj:1444:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1450:public class WindowsTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1453:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1457:public func name(): String
+packages/core/src/terminal.cj:1458:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1459:public func restore(): Unit
+packages/core/src/terminal.cj:1460:public func size(): ?Rect
+packages/core/src/terminal.cj:1461:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1475:public class WindowsTerminalDriver <: TerminalDriver {
+packages/core/src/terminal.cj:1476:public init(area!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1480:public func name(): String
+packages/core/src/terminal.cj:1481:public func enterRawMode(): Bool
+packages/core/src/terminal.cj:1482:public func restore(): Unit
+packages/core/src/terminal.cj:1483:public func size(): ?Rect
+packages/core/src/terminal.cj:1484:public func capabilities(backend: Backend): TerminalCapabilities
+packages/core/src/terminal.cj:1490:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1495:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1500:public func defaultTerminalDriver(): TerminalDriver
+packages/core/src/terminal.cj:1535:public class AnsiBackend <: Backend {
+packages/core/src/terminal.cj:1543:public init(output!: OutputStream = getStdOut(), driver!: TerminalDriver = defaultTerminalDriver(), fallbackArea!: Rect = Rect(0, 0, 80, 24))
+packages/core/src/terminal.cj:1549:public func clear(): Unit
+packages/core/src/terminal.cj:1553:public func moveTo(x: Int64, y: Int64): Unit
+packages/core/src/terminal.cj:1557:public func enterAlternateScreen(): Unit
+packages/core/src/terminal.cj:1558:public func leaveAlternateScreen(): Unit
+packages/core/src/terminal.cj:1559:public func hideCursor(): Unit
+packages/core/src/terminal.cj:1560:public func showCursor(): Unit
+packages/core/src/terminal.cj:1561:public func setCursorShape(shape: ?CursorShape): Unit
+packages/core/src/terminal.cj:1567:public func enableMouse(): Unit
+packages/core/src/terminal.cj:1568:public func disableMouse(): Unit
+packages/core/src/terminal.cj:1569:public func enableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1570:public func disableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1572:public func size(): Rect
+packages/core/src/terminal.cj:1579:public func draw(buffer: Buffer): Unit
+packages/core/src/terminal.cj:1603:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+packages/core/src/terminal.cj:1625:public func drawMedia(ops: Array<MediaOp>): Unit
+packages/core/src/terminal.cj:1635:public func write(text: String): Unit
+packages/core/src/terminal.cj:1641:public func setInstrumentationEnabled(enabled: Bool): Unit
+packages/core/src/terminal.cj:1645:public func diagnosticByteCount(): Int64
+packages/core/src/terminal.cj:1649:public func flush(): Unit
+packages/core/src/terminal.cj:1678:public class TestBackend <: Backend {
+packages/core/src/terminal.cj:1696:public init( area!: Rect = Rect(0, 0, 80, 24), captureSnapshots!: Bool = true )
+packages/core/src/terminal.cj:1705:public func clear(): Unit
+packages/core/src/terminal.cj:1713:public func moveTo(x: Int64, y: Int64): Unit
+packages/core/src/terminal.cj:1718:public func enterAlternateScreen(): Unit
+packages/core/src/terminal.cj:1720:public func leaveAlternateScreen(): Unit
+packages/core/src/terminal.cj:1722:public func hideCursor(): Unit
+packages/core/src/terminal.cj:1724:public func showCursor(): Unit
+packages/core/src/terminal.cj:1728:public func setCursorShape(shape: ?CursorShape): Unit
+packages/core/src/terminal.cj:1735:public func enableMouse(): Unit
+packages/core/src/terminal.cj:1737:public func disableMouse(): Unit
+packages/core/src/terminal.cj:1739:public func enableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1741:public func disableBracketedPaste(): Unit
+packages/core/src/terminal.cj:1746:public func size(): Rect
+packages/core/src/terminal.cj:1753:public func setSize(area: Rect): Unit
+packages/core/src/terminal.cj:1760:public func draw(buffer: Buffer): Unit
+packages/core/src/terminal.cj:1774:public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+packages/core/src/terminal.cj:1787:public func drawMedia(ops: Array<MediaOp>): Unit
+packages/core/src/terminal.cj:1797:public func write(text: String): Unit
+packages/core/src/terminal.cj:1804:public func flush(): Unit
+packages/core/src/terminal.cj:1809:public func output(): String
+packages/core/src/terminal.cj:1814:public func clearOutput(): Unit
+packages/core/src/terminal.cj:1823:public func lastBuffer(): ?Buffer
+packages/core/src/terminal.cj:1830:public func lastDiffOps(): Int64
+packages/core/src/terminal.cj:1837:public func lastDiffWrites(): Int64
+packages/core/src/terminal.cj:1844:public func lastMediaOps(): Array<MediaOp>
+packages/core/src/terminal.cj:1852:public func mediaFrameCount(): Int64
+packages/core/src/terminal.cj:1859:public func snapshot(): String
+packages/core/src/terminal.cj:1869:public func snapshots(): Array<String>
+packages/core/src/terminal.cj:1877:public func snapshotAt(index: Int64): String
+packages/core/src/terminal.cj:1889:public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool
+packages/core/src/terminal.cj:1902:public func assertSnapshot(expected: String): Bool
+packages/core/src/terminal.cj:1911:public func assertSnapshotAt(index: Int64, expected: String): Bool
+packages/core/src/terminal.cj:1919:public func assertLastMediaOpCount(expected: Int64): Bool
+packages/core/src/terminal.cj:1933:public struct TerminalCapabilities {
+packages/core/src/terminal.cj:1935:public let size: Rect
+packages/core/src/terminal.cj:1937:public let trueColor: Bool
+packages/core/src/terminal.cj:1939:public let colorLevel: Int64
+packages/core/src/terminal.cj:1941:public let mouse: Bool
+packages/core/src/terminal.cj:1943:public let mouseMove: Bool
+packages/core/src/terminal.cj:1945:public let focusEvents: Bool
+packages/core/src/terminal.cj:1947:public let bracketedPaste: Bool
+packages/core/src/terminal.cj:1949:public let alternateScreen: Bool
+packages/core/src/terminal.cj:1951:public let unicode: Bool
+packages/core/src/terminal.cj:1953:public let kittyGraphics: Bool
+packages/core/src/terminal.cj:1955:public let sixel: Bool
+packages/core/src/terminal.cj:1957:public let osc8: Bool
+packages/core/src/terminal.cj:1959:public let keyboardProtocol: KeyProtocol
+packages/core/src/terminal.cj:1961:public let keyUp: Bool
+packages/core/src/terminal.cj:1963:public let keyRepeat: Bool
+packages/core/src/terminal.cj:1965:public let recommendedFps: Int64
+packages/core/src/terminal.cj:1967:public let cellWidthPixels: Int64
+packages/core/src/terminal.cj:1969:public let cellHeightPixels: Int64
+packages/core/src/terminal.cj:1971:public let driverName: String
+packages/core/src/terminal.cj:1994:public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = "linux-glibc" )
+packages/core/src/terminal.cj:2036:public static func detect(backend!: Backend = AnsiBackend(), driverName!: String = "linux-glibc"): TerminalCapabilities
+packages/core/src/terminal.cj:2147:public struct RenderMetrics {
+packages/core/src/terminal.cj:2149:public let size: Rect
+packages/core/src/terminal.cj:2151:public let dirtyCells: Int64
+packages/core/src/terminal.cj:2153:public let diffWrites: Int64
+packages/core/src/terminal.cj:2155:public let mediaOps: Int64
+packages/core/src/terminal.cj:2157:public let fullRedraw: Bool
+packages/core/src/terminal.cj:2159:public let renderMillis: Int64
+packages/core/src/terminal.cj:2161:public let drawMillis: Int64
+packages/core/src/terminal.cj:2163:public let totalMillis: Int64
+packages/core/src/terminal.cj:2165:public let renderedCells: Int64
+packages/core/src/terminal.cj:2167:public let dirtyRects: Int64
+packages/core/src/terminal.cj:2169:public let copiedCells: Int64
+packages/core/src/terminal.cj:2171:public let bufferCellAttempts: Int64
+packages/core/src/terminal.cj:2173:public let bufferCellWrites: Int64
+packages/core/src/terminal.cj:2175:public let diffCells: Int64
+packages/core/src/terminal.cj:2177:public let diffSpans: Int64
+packages/core/src/terminal.cj:2179:public let renderNanos: Int64
+packages/core/src/terminal.cj:2181:public let diffNanos: Int64
+packages/core/src/terminal.cj:2183:public let writeNanos: Int64
+packages/core/src/terminal.cj:2185:public let totalNanos: Int64
+packages/core/src/terminal.cj:2187:public let ansiBytes: Int64
+packages/core/src/terminal.cj:2209:public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
+packages/core/src/terminal.cj:2252:public class DebugOverlay <: Widget {
+packages/core/src/terminal.cj:2256:public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+packages/core/src/terminal.cj:2261:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/terminal.cj:2286:public class TerminalMode {
+packages/core/src/terminal.cj:2292:public static func lastError(): ?String
+packages/core/src/terminal.cj:2296:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:2336:public static func restore(): Unit
+packages/core/src/terminal.cj:2354:public static func size(): ?Rect
+packages/core/src/terminal.cj:2392:public class MacOSTerminalMode {
+packages/core/src/terminal.cj:2399:public static func lastError(): ?String
+packages/core/src/terminal.cj:2403:public static func enterRawMode(): Bool
 packages/core/src/terminal.cj:2449:public static func restore(): Unit
 packages/core/src/terminal.cj:2467:public static func size(): ?Rect
+packages/core/src/terminal.cj:2488:public class WindowsConsoleMode {
+packages/core/src/terminal.cj:2495:public static func lastError(): ?String
+packages/core/src/terminal.cj:2499:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:2539:public static func restore(): Unit
+packages/core/src/terminal.cj:2557:public static func size(): ?Rect
 packages/core/src/text.cj:8:public enum AmbiguousWidth {
 packages/core/src/text.cj:10:Narrow
 packages/core/src/text.cj:12:Wide
