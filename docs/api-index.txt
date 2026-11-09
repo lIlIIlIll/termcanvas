@@ -1207,20 +1207,20 @@ packages/core/src/glyph_capability.cj:71:public func applyTo(theme: Theme): Them
 packages/core/src/glyph_capability.cj:74:public func setOverride(value: ?IconSet): Unit
 packages/core/src/glyph_capability.cj:82:public func requestProbe(): Unit
 packages/core/src/glyph_capability.cj:171:public func close(): Unit
-packages/core/src/keymap.cj:5:public class KeyBinding {
-packages/core/src/keymap.cj:6:public let keys: Array<KeyEvent>
-packages/core/src/keymap.cj:7:public let action: String
-packages/core/src/keymap.cj:8:public let description: String
-packages/core/src/keymap.cj:10:public init(keys: Array<KeyEvent>, action: String, description!: String = "")
-packages/core/src/keymap.cj:16:public func matches(key: KeyEvent): Bool
-packages/core/src/keymap.cj:24:public class KeyMap {
-packages/core/src/keymap.cj:27:public init(bindings!: Array<KeyBinding> = [])
-packages/core/src/keymap.cj:33:public func add(binding: KeyBinding): Unit
-packages/core/src/keymap.cj:37:public func actionFor(key: KeyEvent): ?String
-packages/core/src/keymap.cj:44:public func all(): Array<KeyBinding>
-packages/core/src/keymap.cj:49:public class HelpView <: Widget {
-packages/core/src/keymap.cj:54:public init(keymap: KeyMap, style!: Style = Style(fg: Color.Indexed(8)), separator!: String = " ")
-packages/core/src/keymap.cj:60:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/keymap.cj:6:public class KeyBinding {
+packages/core/src/keymap.cj:8:public let keys: Array<KeyEvent>
+packages/core/src/keymap.cj:10:public let action: String
+packages/core/src/keymap.cj:12:public let description: String
+packages/core/src/keymap.cj:19:public init(keys: Array<KeyEvent>, action: String, description!: String = "")
+packages/core/src/keymap.cj:29:public func matches(key: KeyEvent): Bool
+packages/core/src/keymap.cj:38:public class KeyMap {
+packages/core/src/keymap.cj:44:public init(bindings!: Array<KeyBinding> = [])
+packages/core/src/keymap.cj:53:public func add(binding: KeyBinding): Unit
+packages/core/src/keymap.cj:61:public func actionFor(key: KeyEvent): ?String
+packages/core/src/keymap.cj:71:public func all(): Array<KeyBinding>
+packages/core/src/keymap.cj:77:public class HelpView <: Widget {
+packages/core/src/keymap.cj:87:public init(keymap: KeyMap, style!: Style = Style(fg: Color.Indexed(8)), separator!: String = " ")
+packages/core/src/keymap.cj:97:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/lazy_tree.cj:5:public class LazyTreeNode {
 packages/core/src/lazy_tree.cj:6:public let id: String
 packages/core/src/lazy_tree.cj:7:public let label: String
@@ -1831,8 +1831,8 @@ packages/core/src/style.cj:437:Disabled
 packages/core/src/style.cj:438:Error
 packages/core/src/style.cj:439:Accent
 packages/core/src/styled_widget.cj:9:public class StyledWidget <: Widget {
-packages/core/src/styled_widget.cj:13:public init(child: Widget, override!: StyleOverride)
-packages/core/src/styled_widget.cj:19:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/styled_widget.cj:17:public init(child: Widget, override!: StyleOverride)
+packages/core/src/styled_widget.cj:26:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/task_activity.cj:5:public enum TaskStatus {
 packages/core/src/task_activity.cj:7:Pending
 packages/core/src/task_activity.cj:9:Queued
@@ -2384,7 +2384,7 @@ packages/core/src/text_model.cj:256:public func endUndoGroup(): Unit
 packages/core/src/text_model.cj:262:public func undo(): Bool
 packages/core/src/text_model.cj:271:public func redo(): Bool
 packages/core/src/text_model.cj:280:public func clearHistory(): Unit
-packages/core/src/theme_capabilities.cj:171:public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style
+packages/core/src/theme_capabilities.cj:175:public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style
 packages/core/src/vim_editor.cj:5:public enum VimMode {
 packages/core/src/vim_editor.cj:6:Normal
 packages/core/src/vim_editor.cj:7:Insert
@@ -2530,16 +2530,16 @@ packages/core/src/visual_widgets.cj:500:public class LogView <: Widget {
 packages/core/src/visual_widgets.cj:502:public var offset: Int64
 packages/core/src/visual_widgets.cj:506:public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
 packages/core/src/visual_widgets.cj:513:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widget_base.cj:5:public interface Widget {
-packages/core/src/widget_base.cj:6:func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widget_base.cj:30:public enum WrapMode {
-packages/core/src/widget_base.cj:31:NoWrap
-packages/core/src/widget_base.cj:32:Word
-packages/core/src/widget_base.cj:33:Character
-packages/core/src/widget_base.cj:36:public enum TextAlign {
-packages/core/src/widget_base.cj:37:Left
-packages/core/src/widget_base.cj:38:Center
-packages/core/src/widget_base.cj:39:Right
+packages/core/src/widget_base.cj:6:public interface Widget {
+packages/core/src/widget_base.cj:11:func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widget_base.cj:36:public enum WrapMode {
+packages/core/src/widget_base.cj:38:NoWrap
+packages/core/src/widget_base.cj:40:Word
+packages/core/src/widget_base.cj:42:Character
+packages/core/src/widget_base.cj:46:public enum TextAlign {
+packages/core/src/widget_base.cj:48:Left
+packages/core/src/widget_base.cj:50:Center
+packages/core/src/widget_base.cj:52:Right
 packages/core/src/widgets.cj:5:public enum BorderKind {
 packages/core/src/widgets.cj:6:Auto
 packages/core/src/widgets.cj:7:Ascii

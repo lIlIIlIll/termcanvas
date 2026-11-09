@@ -22008,7 +22008,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "class",
       "symbol": "KeyBinding",
@@ -22026,7 +22026,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 6,
+      "line": 8,
       "level": "member",
       "kind": "let",
       "symbol": "keys",
@@ -22044,7 +22044,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 7,
+      "line": 10,
       "level": "member",
       "kind": "let",
       "symbol": "action",
@@ -22062,7 +22062,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 8,
+      "line": 12,
       "level": "member",
       "kind": "let",
       "symbol": "description",
@@ -22080,7 +22080,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 10,
+      "line": 19,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -22098,7 +22098,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 16,
+      "line": 29,
       "level": "member",
       "kind": "func",
       "symbol": "matches",
@@ -22116,7 +22116,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 24,
+      "line": 38,
       "level": "top_level",
       "kind": "class",
       "symbol": "KeyMap",
@@ -22134,7 +22134,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 27,
+      "line": 44,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -22152,7 +22152,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 33,
+      "line": 53,
       "level": "member",
       "kind": "func",
       "symbol": "add",
@@ -22170,7 +22170,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 37,
+      "line": 61,
       "level": "member",
       "kind": "func",
       "symbol": "actionFor",
@@ -22188,7 +22188,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 44,
+      "line": 71,
       "level": "member",
       "kind": "func",
       "symbol": "all",
@@ -22206,7 +22206,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 49,
+      "line": 77,
       "level": "top_level",
       "kind": "class",
       "symbol": "HelpView",
@@ -22224,7 +22224,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 54,
+      "line": 87,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -22242,7 +22242,7 @@
     {
       "package": "core",
       "path": "packages/core/src/keymap.cj",
-      "line": 60,
+      "line": 97,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -33345,7 +33345,7 @@
     {
       "package": "core",
       "path": "packages/core/src/styled_widget.cj",
-      "line": 13,
+      "line": 17,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -33363,7 +33363,7 @@
     {
       "package": "core",
       "path": "packages/core/src/styled_widget.cj",
-      "line": 19,
+      "line": 26,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -43366,7 +43366,7 @@
     {
       "package": "core",
       "path": "packages/core/src/theme_capabilities.cj",
-      "line": 171,
+      "line": 175,
       "level": "top_level",
       "kind": "func",
       "symbol": "adaptStyleForCapabilities",
@@ -46020,7 +46020,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widget_base.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "interface",
       "symbol": "Widget",
@@ -46038,7 +46038,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widget_base.cj",
-      "line": 6,
+      "line": 11,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -46057,7 +46057,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widget_base.cj",
-      "line": 30,
+      "line": 36,
       "level": "top_level",
       "kind": "enum",
       "symbol": "WrapMode",
@@ -46075,7 +46075,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widget_base.cj",
-      "line": 31,
+      "line": 38,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -46094,7 +46094,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widget_base.cj",
-      "line": 32,
+      "line": 40,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -46113,7 +46113,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widget_base.cj",
-      "line": 33,
+      "line": 42,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -46132,7 +46132,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widget_base.cj",
-      "line": 36,
+      "line": 46,
       "level": "top_level",
       "kind": "enum",
       "symbol": "TextAlign",
@@ -46150,7 +46150,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widget_base.cj",
-      "line": 37,
+      "line": 48,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -46169,7 +46169,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widget_base.cj",
-      "line": 38,
+      "line": 50,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -46188,7 +46188,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widget_base.cj",
-      "line": 39,
+      "line": 52,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",

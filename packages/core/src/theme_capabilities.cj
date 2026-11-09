@@ -167,7 +167,11 @@ func semanticTheme(dark!: Bool, accent!: Color): Theme {
     )
 }
 
-/** Adapt a style without emitting colors the declared terminal tier cannot represent. */
+/** 将样式的前景色和背景色适配到终端声明的色彩能力，保留修饰属性。
+ * @param style 原始样式
+ * @param capabilities 终端能力
+ * @return 适配后的样式；真彩色终端返回原样式
+ */
 public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style {
     if (capabilities.trueColor) { return style }
     if (capabilities.colorLevel >= 256) {

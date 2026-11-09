@@ -1353,6 +1353,202 @@
           "signature": "public func framePresented(): Unit"
         }
       ]
+    },
+    {
+      "id": "core-keymap-help",
+      "source": "docs/api-examples/keymap.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyBinding",
+          "signature": "public class KeyBinding {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyBinding.keys",
+          "signature": "public let keys: Array<KeyEvent>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyBinding.action",
+          "signature": "public let action: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyBinding.description",
+          "signature": "public let description: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyBinding.init",
+          "signature": "public init(keys: Array<KeyEvent>, action: String, description!: String = \"\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyBinding.matches",
+          "signature": "public func matches(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyMap",
+          "signature": "public class KeyMap {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyMap.init",
+          "signature": "public init(bindings!: Array<KeyBinding> = [])"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyMap.add",
+          "signature": "public func add(binding: KeyBinding): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyMap.actionFor",
+          "signature": "public func actionFor(key: KeyEvent): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "KeyMap.all",
+          "signature": "public func all(): Array<KeyBinding>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "HelpView",
+          "signature": "public class HelpView <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "HelpView.init",
+          "signature": "public init(keymap: KeyMap, style!: Style = Style(fg: Color.Indexed(8)), separator!: String = \" \")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/keymap.cj",
+          "symbol": "HelpView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
+    },
+    {
+      "id": "core-widget-rendering",
+      "source": "docs/api-examples/widget.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/styled_widget.cj",
+          "symbol": "StyledWidget",
+          "signature": "public class StyledWidget <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/styled_widget.cj",
+          "symbol": "StyledWidget.init",
+          "signature": "public init(child: Widget, override!: StyleOverride)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/styled_widget.cj",
+          "symbol": "StyledWidget.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/theme_capabilities.cj",
+          "symbol": "adaptStyleForCapabilities",
+          "signature": "public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widget_base.cj",
+          "symbol": "Widget",
+          "signature": "public interface Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widget_base.cj",
+          "symbol": "Widget.render",
+          "signature": "func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widget_base.cj",
+          "symbol": "WrapMode",
+          "signature": "public enum WrapMode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widget_base.cj",
+          "symbol": "WrapMode.NoWrap",
+          "signature": "NoWrap"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widget_base.cj",
+          "symbol": "WrapMode.Word",
+          "signature": "Word"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widget_base.cj",
+          "symbol": "WrapMode.Character",
+          "signature": "Character"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widget_base.cj",
+          "symbol": "TextAlign",
+          "signature": "public enum TextAlign {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widget_base.cj",
+          "symbol": "TextAlign.Left",
+          "signature": "Left"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widget_base.cj",
+          "symbol": "TextAlign.Center",
+          "signature": "Center"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widget_base.cj",
+          "symbol": "TextAlign.Right",
+          "signature": "Right"
+        }
+      ]
     }
   ]
 }
