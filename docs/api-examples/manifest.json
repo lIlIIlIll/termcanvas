@@ -8853,6 +8853,254 @@
           "signature": "public func toUpdateResult(): UpdateResult"
         }
       ]
+    },
+    {
+      "id": "app-metrics",
+      "source": "docs/api-examples/app-metrics.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics",
+          "signature": "public struct FrameMetrics {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.frameIndex",
+          "signature": "public let frameIndex: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.fps",
+          "signature": "public let fps: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.renderMillis",
+          "signature": "public let renderMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.drawMillis",
+          "signature": "public let drawMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.totalMillis",
+          "signature": "public let totalMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.eventQueueLength",
+          "signature": "public let eventQueueLength: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.dirtyCells",
+          "signature": "public let dirtyCells: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.diffWrites",
+          "signature": "public let diffWrites: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.terminalSize",
+          "signature": "public let terminalSize: Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.droppedTicks",
+          "signature": "public let droppedTicks: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.tickDeltaMillis",
+          "signature": "public let tickDeltaMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.renderedCells",
+          "signature": "public let renderedCells: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.dirtyRects",
+          "signature": "public let dirtyRects: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.bufferCellAttempts",
+          "signature": "public let bufferCellAttempts: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.bufferCellWrites",
+          "signature": "public let bufferCellWrites: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.diffNanos",
+          "signature": "public let diffNanos: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.writeNanos",
+          "signature": "public let writeNanos: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.ansiBytes",
+          "signature": "public let ansiBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FrameMetrics.init",
+          "signature": "public init( frameIndex!: Int64 = 0, fps!: Int64 = 0, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, eventQueueLength!: Int64 = 0, dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, terminalSize!: Rect = Rect(0, 0, 0, 0), droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppMetrics",
+          "signature": "public class AppMetrics {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppMetrics.init",
+          "signature": "public init(maxFrames!: ?Int64 = Some(600))"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppMetrics.record",
+          "signature": "public func record(frame: FrameMetrics): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppMetrics.record",
+          "signature": "public func record( render: RenderMetrics, frameIndex!: Int64 = 0, eventQueueLength!: Int64 = 0, droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0 ): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppMetrics.lastFrame",
+          "signature": "public func lastFrame(): ?FrameMetrics"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppMetrics.frames",
+          "signature": "public func frames(): Array<FrameMetrics>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppMetrics.averageFps",
+          "signature": "public func averageFps(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppMetrics.droppedTicks",
+          "signature": "public func droppedTicks(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppMetrics.reset",
+          "signature": "public func reset(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppMetrics.runtime",
+          "signature": "public func runtime(): RuntimeMetricsSnapshot"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "RuntimeMetricsSnapshot",
+          "signature": "public struct RuntimeMetricsSnapshot {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "RuntimeMetricsSnapshot.queueEnqueued",
+          "signature": "public let queueEnqueued: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "RuntimeMetricsSnapshot.queueProcessed",
+          "signature": "public let queueProcessed: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "RuntimeMetricsSnapshot.maxQueueDepth",
+          "signature": "public let maxQueueDepth: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "RuntimeMetricsSnapshot.maxUpdateDepth",
+          "signature": "public let maxUpdateDepth: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "RuntimeMetricsSnapshot.yieldedTurns",
+          "signature": "public let yieldedTurns: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "RuntimeMetricsSnapshot.queueOverflows",
+          "signature": "public let queueOverflows: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "RuntimeMetricsSnapshot.scheduling",
+          "signature": "public let scheduling: FrameSchedulingSnapshot"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "RuntimeMetricsSnapshot.init",
+          "signature": "public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, yieldedTurns!: Int64 = 0, queueOverflows!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )"
+        }
+      ]
     }
   ]
 }

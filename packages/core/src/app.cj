@@ -231,26 +231,65 @@ class TerminalLifecycleRequests {
     }
 }
 
+/** 单帧应用渲染、输出和事件队列统计。 */
 public struct FrameMetrics {
+    /** 帧序号。 */
     public let frameIndex: Int64
+    /** 估算帧率。 */
     public let fps: Int64
+    /** 渲染回调耗时，单位毫秒。 */
     public let renderMillis: Int64
+    /** 差异计算和输出耗时，单位毫秒。 */
     public let drawMillis: Int64
+    /** 总耗时，单位毫秒。 */
     public let totalMillis: Int64
+    /** 事件队列长度。 */
     public let eventQueueLength: Int64
+    /** 差异单元格数。 */
     public let dirtyCells: Int64
+    /** 差异片段数。 */
     public let diffWrites: Int64
+    /** 终端区域。 */
     public let terminalSize: Rect
+    /** 丢弃的 tick 数。 */
     public let droppedTicks: Int64
+    /** tick 间隔，单位毫秒。 */
     public let tickDeltaMillis: Int64
+    /** 参与渲染的单元格数。 */
     public let renderedCells: Int64
+    /** 脏矩形数。 */
     public let dirtyRects: Int64
+    /** 缓冲区单元格写入尝试次数。 */
     public let bufferCellAttempts: Int64
+    /** 缓冲区实际单元格写入次数。 */
     public let bufferCellWrites: Int64
+    /** 差异计算耗时，单位纳秒。 */
     public let diffNanos: Int64
+    /** 终端写入耗时，单位纳秒。 */
     public let writeNanos: Int64
+    /** 输出字节数；-1 表示不可用。 */
     public let ansiBytes: Int64
 
+    /** 创建帧统计；除 ansiBytes 为 -1 表示不可用外，负数均限制为零。
+     * @param frameIndex 帧序号
+     * @param fps 估算帧率
+     * @param renderMillis 渲染回调耗时，单位毫秒
+     * @param drawMillis 差异计算和输出耗时，单位毫秒
+     * @param totalMillis 总耗时，单位毫秒
+     * @param eventQueueLength 事件队列长度
+     * @param dirtyCells 差异单元格数
+     * @param diffWrites 差异片段数
+     * @param terminalSize 终端区域
+     * @param droppedTicks 丢弃的 tick 数
+     * @param tickDeltaMillis tick 间隔，单位毫秒
+     * @param renderedCells 参与渲染的单元格数
+     * @param dirtyRects 脏矩形数
+     * @param bufferCellAttempts 缓冲区单元格写入尝试次数
+     * @param bufferCellWrites 缓冲区实际单元格写入次数
+     * @param diffNanos 差异计算耗时，单位纳秒
+     * @param writeNanos 终端写入耗时，单位纳秒
+     * @param ansiBytes 输出字节数；-1 表示不可用
+     */
     public init(
         frameIndex!: Int64 = 0,
         fps!: Int64 = 0,
@@ -292,6 +331,7 @@ public struct FrameMetrics {
     }
 }
 
+/** 记录近期帧和应用运行时统计。 */
 public class AppMetrics {
     private let values = ArrayList<FrameMetrics>()
     private let maxFramesValue: ?Int64
@@ -305,6 +345,9 @@ public class AppMetrics {
     private var queueOverflowValue: Int64 = 0
     private var schedulingValue = FrameSchedulingSnapshot()
 
+    /** 创建帧统计存储。
+     * @param maxFrames 最多保留的帧数，至少为一；None 表示不限制
+     */
     public init(maxFrames!: ?Int64 = Some(600)) {
         this.maxFramesValue = match (maxFrames) {
             case Some(limit) => Some(max(1, limit))
@@ -312,6 +355,9 @@ public class AppMetrics {
         }
     }
 
+    /** 记录一帧；达到容量后覆盖最早的帧。
+     * @param frame 帧统计
+     */
     public func record(frame: FrameMetrics): Unit {
         match (maxFramesValue) {
             case None => values.add(frame)
@@ -325,6 +371,13 @@ public class AppMetrics {
         }
     }
 
+    /** 从终端渲染统计记录一帧。
+     * @param render 终端渲染统计
+     * @param frameIndex 帧序号
+     * @param eventQueueLength 事件队列长度
+     * @param droppedTicks 丢弃的 tick 数
+     * @param tickDeltaMillis tick 间隔，正值用于计算帧率
+     */
     public func record(
         render: RenderMetrics,
         frameIndex!: Int64 = 0,
@@ -355,6 +408,9 @@ public class AppMetrics {
         ))
     }
 
+    /** 获取最近记录的帧。
+     * @return 最近一帧；无记录时为 None
+     */
     public func lastFrame(): ?FrameMetrics {
         if (values.size == 0) { return None }
         let lastIndex = match (maxFramesValue) {
@@ -366,6 +422,9 @@ public class AppMetrics {
         Some(values[lastIndex])
     }
 
+    /** 按记录顺序获取保留的帧。
+     * @return 从旧到新的帧数组
+     */
     public func frames(): Array<FrameMetrics> {
         match (maxFramesValue) {
             case None => values.toArray()
@@ -386,6 +445,9 @@ public class AppMetrics {
         }
     }
 
+    /** 计算保留帧中正帧率的整数平均值。
+     * @return 平均帧率；没有正帧率时为零
+     */
     public func averageFps(): Int64 {
         var total: Int64 = 0
         var count: Int64 = 0
@@ -399,6 +461,9 @@ public class AppMetrics {
         total / count
     }
 
+    /** 获取最近一帧记录的丢弃 tick 数。
+     * @return 丢弃 tick 数；无帧时为零
+     */
     public func droppedTicks(): Int64 {
         match (lastFrame()) {
             case Some(frame) => frame.droppedTicks
@@ -406,6 +471,7 @@ public class AppMetrics {
         }
     }
 
+    /** 清除帧与运行时统计。 */
     public func reset(): Unit {
         values.clear()
         nextFrameIndex = 0
@@ -435,6 +501,9 @@ public class AppMetrics {
         schedulingValue = snapshot
     }
 
+    /** 获取运行时统计快照。
+     * @return 当前队列和调度统计
+     */
     public func runtime(): RuntimeMetricsSnapshot {
         RuntimeMetricsSnapshot(
             queueEnqueued: queueEnqueuedValue,
@@ -448,15 +517,32 @@ public class AppMetrics {
     }
 }
 
+/** 应用事件队列与帧调度的统计快照。 */
 public struct RuntimeMetricsSnapshot {
+    /** 入队事件数。 */
     public let queueEnqueued: Int64
+    /** 已处理事件数。 */
     public let queueProcessed: Int64
+    /** 最大队列深度。 */
     public let maxQueueDepth: Int64
+    /** 最大更新深度。 */
     public let maxUpdateDepth: Int64
+    /** 主动让出执行的次数。 */
     public let yieldedTurns: Int64
+    /** 队列溢出次数。 */
     public let queueOverflows: Int64
+    /** 帧调度快照。 */
     public let scheduling: FrameSchedulingSnapshot
 
+    /** 创建运行时统计快照；计数负值限制为零。
+     * @param queueEnqueued 入队事件数
+     * @param queueProcessed 已处理事件数
+     * @param maxQueueDepth 最大队列深度
+     * @param maxUpdateDepth 最大更新深度
+     * @param yieldedTurns 主动让出执行的次数
+     * @param queueOverflows 队列溢出次数
+     * @param scheduling 帧调度快照
+     */
     public init(
         queueEnqueued!: Int64 = 0,
         queueProcessed!: Int64 = 0,

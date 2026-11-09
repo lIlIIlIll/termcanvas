@@ -1233,7 +1233,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 234,
+      "line": 235,
       "level": "top_level",
       "kind": "struct",
       "symbol": "FrameMetrics",
@@ -1251,7 +1251,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 235,
+      "line": 237,
       "level": "member",
       "kind": "let",
       "symbol": "frameIndex",
@@ -1269,7 +1269,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 236,
+      "line": 239,
       "level": "member",
       "kind": "let",
       "symbol": "fps",
@@ -1287,7 +1287,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 237,
+      "line": 241,
       "level": "member",
       "kind": "let",
       "symbol": "renderMillis",
@@ -1305,7 +1305,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 238,
+      "line": 243,
       "level": "member",
       "kind": "let",
       "symbol": "drawMillis",
@@ -1323,7 +1323,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 239,
+      "line": 245,
       "level": "member",
       "kind": "let",
       "symbol": "totalMillis",
@@ -1341,7 +1341,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 240,
+      "line": 247,
       "level": "member",
       "kind": "let",
       "symbol": "eventQueueLength",
@@ -1359,7 +1359,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 241,
+      "line": 249,
       "level": "member",
       "kind": "let",
       "symbol": "dirtyCells",
@@ -1377,7 +1377,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 242,
+      "line": 251,
       "level": "member",
       "kind": "let",
       "symbol": "diffWrites",
@@ -1395,7 +1395,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 243,
+      "line": 253,
       "level": "member",
       "kind": "let",
       "symbol": "terminalSize",
@@ -1413,7 +1413,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 244,
+      "line": 255,
       "level": "member",
       "kind": "let",
       "symbol": "droppedTicks",
@@ -1431,7 +1431,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 245,
+      "line": 257,
       "level": "member",
       "kind": "let",
       "symbol": "tickDeltaMillis",
@@ -1449,7 +1449,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 246,
+      "line": 259,
       "level": "member",
       "kind": "let",
       "symbol": "renderedCells",
@@ -1467,7 +1467,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 247,
+      "line": 261,
       "level": "member",
       "kind": "let",
       "symbol": "dirtyRects",
@@ -1485,7 +1485,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 248,
+      "line": 263,
       "level": "member",
       "kind": "let",
       "symbol": "bufferCellAttempts",
@@ -1503,7 +1503,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 249,
+      "line": 265,
       "level": "member",
       "kind": "let",
       "symbol": "bufferCellWrites",
@@ -1521,7 +1521,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 250,
+      "line": 267,
       "level": "member",
       "kind": "let",
       "symbol": "diffNanos",
@@ -1539,7 +1539,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 251,
+      "line": 269,
       "level": "member",
       "kind": "let",
       "symbol": "writeNanos",
@@ -1557,7 +1557,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 252,
+      "line": 271,
       "level": "member",
       "kind": "let",
       "symbol": "ansiBytes",
@@ -1575,7 +1575,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 254,
+      "line": 293,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -1593,7 +1593,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 295,
+      "line": 335,
       "level": "top_level",
       "kind": "class",
       "symbol": "AppMetrics",
@@ -1611,7 +1611,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 308,
+      "line": 351,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -1629,7 +1629,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 315,
+      "line": 361,
       "level": "member",
       "kind": "func",
       "symbol": "record",
@@ -1647,7 +1647,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 328,
+      "line": 381,
       "level": "member",
       "kind": "func",
       "symbol": "record",
@@ -1665,7 +1665,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 358,
+      "line": 414,
       "level": "member",
       "kind": "func",
       "symbol": "lastFrame",
@@ -1683,7 +1683,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 369,
+      "line": 428,
       "level": "member",
       "kind": "func",
       "symbol": "frames",
@@ -1701,7 +1701,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 389,
+      "line": 451,
       "level": "member",
       "kind": "func",
       "symbol": "averageFps",
@@ -1719,7 +1719,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 402,
+      "line": 467,
       "level": "member",
       "kind": "func",
       "symbol": "droppedTicks",
@@ -1737,7 +1737,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 409,
+      "line": 475,
       "level": "member",
       "kind": "func",
       "symbol": "reset",
@@ -1755,7 +1755,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 438,
+      "line": 507,
       "level": "member",
       "kind": "func",
       "symbol": "runtime",
@@ -1773,7 +1773,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 451,
+      "line": 521,
       "level": "top_level",
       "kind": "struct",
       "symbol": "RuntimeMetricsSnapshot",
@@ -1791,7 +1791,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 452,
+      "line": 523,
       "level": "member",
       "kind": "let",
       "symbol": "queueEnqueued",
@@ -1809,7 +1809,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 453,
+      "line": 525,
       "level": "member",
       "kind": "let",
       "symbol": "queueProcessed",
@@ -1827,7 +1827,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 454,
+      "line": 527,
       "level": "member",
       "kind": "let",
       "symbol": "maxQueueDepth",
@@ -1845,7 +1845,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 455,
+      "line": 529,
       "level": "member",
       "kind": "let",
       "symbol": "maxUpdateDepth",
@@ -1863,7 +1863,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 456,
+      "line": 531,
       "level": "member",
       "kind": "let",
       "symbol": "yieldedTurns",
@@ -1881,7 +1881,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 457,
+      "line": 533,
       "level": "member",
       "kind": "let",
       "symbol": "queueOverflows",
@@ -1899,7 +1899,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 458,
+      "line": 535,
       "level": "member",
       "kind": "let",
       "symbol": "scheduling",
@@ -1917,7 +1917,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 460,
+      "line": 546,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -1935,7 +1935,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 492,
+      "line": 578,
       "level": "top_level",
       "kind": "class",
       "symbol": "TimerRuntime",
@@ -1953,7 +1953,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 497,
+      "line": 583,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -1971,7 +1971,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 624,
+      "line": 710,
       "level": "top_level",
       "kind": "class",
       "symbol": "AsyncRuntime",
@@ -1989,7 +1989,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 631,
+      "line": 717,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -2007,7 +2007,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 636,
+      "line": 722,
       "level": "member",
       "kind": "func",
       "symbol": "start",
@@ -2025,7 +2025,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 658,
+      "line": 744,
       "level": "member",
       "kind": "func",
       "symbol": "startExec",
@@ -2043,7 +2043,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 662,
+      "line": 748,
       "level": "member",
       "kind": "func",
       "symbol": "startExecArgs",
@@ -2061,7 +2061,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 666,
+      "line": 752,
       "level": "member",
       "kind": "func",
       "symbol": "cancel",
@@ -2079,7 +2079,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 683,
+      "line": 769,
       "level": "member",
       "kind": "func",
       "symbol": "drain",
@@ -2097,7 +2097,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 715,
+      "line": 801,
       "level": "member",
       "kind": "func",
       "symbol": "pendingCount",
@@ -2115,7 +2115,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 719,
+      "line": 805,
       "level": "member",
       "kind": "func",
       "symbol": "eventSource",
@@ -2133,7 +2133,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 741,
+      "line": 827,
       "level": "top_level",
       "kind": "class",
       "symbol": "Subscription",
@@ -2151,7 +2151,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 742,
+      "line": 828,
       "level": "member",
       "kind": "let",
       "symbol": "interval",
@@ -2169,7 +2169,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 743,
+      "line": 829,
       "level": "member",
       "kind": "let",
       "symbol": "event",
@@ -2187,7 +2187,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 746,
+      "line": 832,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -2205,7 +2205,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 751,
+      "line": 837,
       "level": "member",
       "kind": "func",
       "symbol": "poll",
@@ -2223,7 +2223,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 762,
+      "line": 848,
       "level": "top_level",
       "kind": "interface",
       "symbol": "EventWaiter",
@@ -2241,7 +2241,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 763,
+      "line": 849,
       "level": "member",
       "kind": "func",
       "symbol": "wait",
@@ -2260,7 +2260,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 764,
+      "line": 850,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -2279,7 +2279,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 767,
+      "line": 853,
       "level": "top_level",
       "kind": "class",
       "symbol": "NoopEventWaiter",
@@ -2297,7 +2297,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 768,
+      "line": 854,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -2315,7 +2315,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 770,
+      "line": 856,
       "level": "member",
       "kind": "func",
       "symbol": "wait",
@@ -2333,7 +2333,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 774,
+      "line": 860,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -2351,7 +2351,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 778,
+      "line": 864,
       "level": "top_level",
       "kind": "func",
       "symbol": "defaultEventWaiter",
@@ -2369,7 +2369,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 783,
+      "line": 869,
       "level": "top_level",
       "kind": "func",
       "symbol": "defaultEventWaiter",
@@ -2387,7 +2387,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 788,
+      "line": 874,
       "level": "top_level",
       "kind": "func",
       "symbol": "defaultEventWaiter",
@@ -2405,7 +2405,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 793,
+      "line": 879,
       "level": "top_level",
       "kind": "class",
       "symbol": "WindowsConsoleEventWaiter",
@@ -2423,7 +2423,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 796,
+      "line": 882,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -2441,7 +2441,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 798,
+      "line": 884,
       "level": "member",
       "kind": "func",
       "symbol": "wait",
@@ -2459,7 +2459,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 821,
+      "line": 907,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -2477,7 +2477,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 827,
+      "line": 913,
       "level": "top_level",
       "kind": "struct",
       "symbol": "UpdateResult",
@@ -2495,7 +2495,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 829,
+      "line": 915,
       "level": "member",
       "kind": "let",
       "symbol": "flow",
@@ -2513,7 +2513,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 831,
+      "line": 917,
       "level": "member",
       "kind": "let",
       "symbol": "command",
@@ -2531,7 +2531,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 833,
+      "line": 919,
       "level": "member",
       "kind": "let",
       "symbol": "dirtyRects",
@@ -2549,7 +2549,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 839,
+      "line": 925,
       "level": "member",
       "kind": "let",
       "symbol": "renderRequested",
@@ -2567,7 +2567,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 847,
+      "line": 933,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -2585,7 +2585,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 862,
+      "line": 948,
       "level": "member",
       "kind": "func",
       "symbol": "next",
@@ -2603,7 +2603,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 869,
+      "line": 955,
       "level": "member",
       "kind": "func",
       "symbol": "unchanged",
@@ -2621,7 +2621,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 876,
+      "line": 962,
       "level": "member",
       "kind": "func",
       "symbol": "exit",
@@ -2639,7 +2639,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 884,
+      "line": 970,
       "level": "member",
       "kind": "func",
       "symbol": "withCommand",
@@ -2657,7 +2657,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 892,
+      "line": 978,
       "level": "member",
       "kind": "func",
       "symbol": "dirty",
@@ -2675,7 +2675,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 900,
+      "line": 986,
       "level": "member",
       "kind": "func",
       "symbol": "withDirty",
@@ -2693,7 +2693,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 911,
+      "line": 997,
       "level": "top_level",
       "kind": "struct",
       "symbol": "HandleResult",
@@ -2711,7 +2711,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 913,
+      "line": 999,
       "level": "member",
       "kind": "let",
       "symbol": "handled",
@@ -2729,7 +2729,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 915,
+      "line": 1001,
       "level": "member",
       "kind": "let",
       "symbol": "flow",
@@ -2747,7 +2747,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 917,
+      "line": 1003,
       "level": "member",
       "kind": "let",
       "symbol": "command",
@@ -2765,7 +2765,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 924,
+      "line": 1010,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -2783,7 +2783,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 933,
+      "line": 1019,
       "level": "member",
       "kind": "func",
       "symbol": "ignored",
@@ -2801,7 +2801,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 941,
+      "line": 1027,
       "level": "member",
       "kind": "func",
       "symbol": "consumed",
@@ -2819,7 +2819,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 948,
+      "line": 1034,
       "level": "member",
       "kind": "func",
       "symbol": "exit",
@@ -2837,7 +2837,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 956,
+      "line": 1042,
       "level": "member",
       "kind": "func",
       "symbol": "withCommand",
@@ -2855,7 +2855,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 963,
+      "line": 1049,
       "level": "member",
       "kind": "func",
       "symbol": "toUpdateResult",
@@ -2873,7 +2873,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 974,
+      "line": 1060,
       "level": "top_level",
       "kind": "class",
       "symbol": "EventScript",
@@ -2891,7 +2891,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 977,
+      "line": 1063,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -2909,7 +2909,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 983,
+      "line": 1069,
       "level": "member",
       "kind": "func",
       "symbol": "add",
@@ -2927,7 +2927,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 988,
+      "line": 1074,
       "level": "member",
       "kind": "func",
       "symbol": "key",
@@ -2945,7 +2945,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 992,
+      "line": 1078,
       "level": "member",
       "kind": "func",
       "symbol": "paste",
@@ -2963,7 +2963,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 996,
+      "line": 1082,
       "level": "member",
       "kind": "func",
       "symbol": "message",
@@ -2981,7 +2981,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1000,
+      "line": 1086,
       "level": "member",
       "kind": "func",
       "symbol": "tick",
@@ -2999,7 +2999,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1004,
+      "line": 1090,
       "level": "member",
       "kind": "func",
       "symbol": "resize",
@@ -3017,7 +3017,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1008,
+      "line": 1094,
       "level": "member",
       "kind": "func",
       "symbol": "size",
@@ -3035,7 +3035,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1012,
+      "line": 1098,
       "level": "member",
       "kind": "func",
       "symbol": "fromText",
@@ -3053,7 +3053,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1040,
+      "line": 1126,
       "level": "member",
       "kind": "func",
       "symbol": "run",
@@ -3071,7 +3071,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1050,
+      "line": 1136,
       "level": "member",
       "kind": "func",
       "symbol": "runWithCommands",
@@ -3089,7 +3089,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1073,
+      "line": 1159,
       "level": "top_level",
       "kind": "enum",
       "symbol": "ScenarioStep",
@@ -3107,7 +3107,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1074,
+      "line": 1160,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3126,7 +3126,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1075,
+      "line": 1161,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3145,7 +3145,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1076,
+      "line": 1162,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3164,7 +3164,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1077,
+      "line": 1163,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3183,7 +3183,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1080,
+      "line": 1166,
       "level": "top_level",
       "kind": "class",
       "symbol": "ScenarioResult",
@@ -3201,7 +3201,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1081,
+      "line": 1167,
       "level": "member",
       "kind": "let",
       "symbol": "name",
@@ -3219,7 +3219,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1082,
+      "line": 1168,
       "level": "member",
       "kind": "let",
       "symbol": "passed",
@@ -3237,7 +3237,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1083,
+      "line": 1169,
       "level": "member",
       "kind": "let",
       "symbol": "failures",
@@ -3255,7 +3255,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1084,
+      "line": 1170,
       "level": "member",
       "kind": "let",
       "symbol": "flow",
@@ -3273,7 +3273,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1086,
+      "line": 1172,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -3291,7 +3291,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1094,
+      "line": 1180,
       "level": "top_level",
       "kind": "struct",
       "symbol": "SnapshotDiffResult",
@@ -3309,7 +3309,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1095,
+      "line": 1181,
       "level": "member",
       "kind": "let",
       "symbol": "passed",
@@ -3327,7 +3327,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1096,
+      "line": 1182,
       "level": "member",
       "kind": "let",
       "symbol": "line",
@@ -3345,7 +3345,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1097,
+      "line": 1183,
       "level": "member",
       "kind": "let",
       "symbol": "column",
@@ -3363,7 +3363,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1098,
+      "line": 1184,
       "level": "member",
       "kind": "let",
       "symbol": "expectedLine",
@@ -3381,7 +3381,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1099,
+      "line": 1185,
       "level": "member",
       "kind": "let",
       "symbol": "actualLine",
@@ -3399,7 +3399,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1100,
+      "line": 1186,
       "level": "member",
       "kind": "let",
       "symbol": "message",
@@ -3417,7 +3417,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1102,
+      "line": 1188,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -3435,7 +3435,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1119,
+      "line": 1205,
       "level": "top_level",
       "kind": "class",
       "symbol": "SnapshotDiff",
@@ -3453,7 +3453,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1120,
+      "line": 1206,
       "level": "member",
       "kind": "func",
       "symbol": "text",
@@ -3471,7 +3471,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1145,
+      "line": 1231,
       "level": "member",
       "kind": "func",
       "symbol": "buffer",
@@ -3489,7 +3489,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1160,
+      "line": 1246,
       "level": "top_level",
       "kind": "class",
       "symbol": "EventScenario",
@@ -3507,7 +3507,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1161,
+      "line": 1247,
       "level": "member",
       "kind": "let",
       "symbol": "name",
@@ -3525,7 +3525,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1164,
+      "line": 1250,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -3543,7 +3543,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1168,
+      "line": 1254,
       "level": "member",
       "kind": "func",
       "symbol": "add",
@@ -3561,7 +3561,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1173,
+      "line": 1259,
       "level": "member",
       "kind": "func",
       "symbol": "event",
@@ -3579,7 +3579,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1177,
+      "line": 1263,
       "level": "member",
       "kind": "func",
       "symbol": "key",
@@ -3597,7 +3597,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1181,
+      "line": 1267,
       "level": "member",
       "kind": "func",
       "symbol": "paste",
@@ -3615,7 +3615,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1185,
+      "line": 1271,
       "level": "member",
       "kind": "func",
       "symbol": "message",
@@ -3633,7 +3633,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1189,
+      "line": 1275,
       "level": "member",
       "kind": "func",
       "symbol": "tick",
@@ -3651,7 +3651,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1193,
+      "line": 1279,
       "level": "member",
       "kind": "func",
       "symbol": "expectFlow",
@@ -3669,7 +3669,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1197,
+      "line": 1283,
       "level": "member",
       "kind": "func",
       "symbol": "expectSnapshot",
@@ -3687,7 +3687,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1201,
+      "line": 1287,
       "level": "member",
       "kind": "func",
       "symbol": "expectCell",
@@ -3705,7 +3705,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1205,
+      "line": 1291,
       "level": "member",
       "kind": "func",
       "symbol": "size",
@@ -3723,7 +3723,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1209,
+      "line": 1295,
       "level": "member",
       "kind": "func",
       "symbol": "fromText",
@@ -3741,7 +3741,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1251,
+      "line": 1337,
       "level": "member",
       "kind": "func",
       "symbol": "run",
@@ -3759,7 +3759,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1292,
+      "line": 1378,
       "level": "top_level",
       "kind": "enum",
       "symbol": "HeadlessStep",
@@ -3777,7 +3777,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1293,
+      "line": 1379,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3796,7 +3796,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1294,
+      "line": 1380,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3815,7 +3815,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1295,
+      "line": 1381,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3834,7 +3834,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1296,
+      "line": 1382,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3853,7 +3853,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1297,
+      "line": 1383,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3872,7 +3872,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1298,
+      "line": 1384,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3891,7 +3891,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1299,
+      "line": 1385,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -3910,7 +3910,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1302,
+      "line": 1388,
       "level": "top_level",
       "kind": "class",
       "symbol": "HeadlessScript",
@@ -3928,7 +3928,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1305,
+      "line": 1391,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -3946,7 +3946,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1311,
+      "line": 1397,
       "level": "member",
       "kind": "func",
       "symbol": "add",
@@ -3964,7 +3964,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1316,
+      "line": 1402,
       "level": "member",
       "kind": "func",
       "symbol": "event",
@@ -3982,7 +3982,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1317,
+      "line": 1403,
       "level": "member",
       "kind": "func",
       "symbol": "key",
@@ -4000,7 +4000,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1318,
+      "line": 1404,
       "level": "member",
       "kind": "func",
       "symbol": "mouse",
@@ -4018,7 +4018,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1319,
+      "line": 1405,
       "level": "member",
       "kind": "func",
       "symbol": "paste",
@@ -4036,7 +4036,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1320,
+      "line": 1406,
       "level": "member",
       "kind": "func",
       "symbol": "message",
@@ -4054,7 +4054,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1321,
+      "line": 1407,
       "level": "member",
       "kind": "func",
       "symbol": "resize",
@@ -4072,7 +4072,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1322,
+      "line": 1408,
       "level": "member",
       "kind": "func",
       "symbol": "tick",
@@ -4090,7 +4090,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1323,
+      "line": 1409,
       "level": "member",
       "kind": "func",
       "symbol": "waitMillis",
@@ -4108,7 +4108,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1326,
+      "line": 1412,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -4126,7 +4126,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1327,
+      "line": 1413,
       "level": "member",
       "kind": "func",
       "symbol": "expectSnapshot",
@@ -4144,7 +4144,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1328,
+      "line": 1414,
       "level": "member",
       "kind": "func",
       "symbol": "expectCell",
@@ -4162,7 +4162,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1330,
+      "line": 1416,
       "level": "member",
       "kind": "func",
       "symbol": "steps",
@@ -4180,7 +4180,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1335,
+      "line": 1421,
       "level": "top_level",
       "kind": "struct",
       "symbol": "HeadlessRunOptions",
@@ -4198,7 +4198,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1336,
+      "line": 1422,
       "level": "member",
       "kind": "let",
       "symbol": "area",
@@ -4216,7 +4216,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1337,
+      "line": 1423,
       "level": "member",
       "kind": "let",
       "symbol": "ticks",
@@ -4234,7 +4234,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1338,
+      "line": 1424,
       "level": "member",
       "kind": "let",
       "symbol": "tickDeltaMillis",
@@ -4252,7 +4252,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1339,
+      "line": 1425,
       "level": "member",
       "kind": "let",
       "symbol": "captureBuffers",
@@ -4270,7 +4270,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1340,
+      "line": 1426,
       "level": "member",
       "kind": "let",
       "symbol": "captureSnapshots",
@@ -4288,7 +4288,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1342,
+      "line": 1428,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -4306,7 +4306,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1357,
+      "line": 1443,
       "level": "top_level",
       "kind": "class",
       "symbol": "HeadlessRunResult",
@@ -4324,7 +4324,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1358,
+      "line": 1444,
       "level": "member",
       "kind": "let",
       "symbol": "flow",
@@ -4342,7 +4342,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1359,
+      "line": 1445,
       "level": "member",
       "kind": "let",
       "symbol": "frames",
@@ -4360,7 +4360,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1360,
+      "line": 1446,
       "level": "member",
       "kind": "let",
       "symbol": "snapshots",
@@ -4378,7 +4378,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1361,
+      "line": 1447,
       "level": "member",
       "kind": "let",
       "symbol": "metrics",
@@ -4396,7 +4396,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1362,
+      "line": 1448,
       "level": "member",
       "kind": "let",
       "symbol": "failures",
@@ -4414,7 +4414,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1364,
+      "line": 1450,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -4432,7 +4432,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1372,
+      "line": 1458,
       "level": "member",
       "kind": "func",
       "symbol": "passed",
@@ -4450,7 +4450,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1392,
+      "line": 1478,
       "level": "top_level",
       "kind": "class",
       "symbol": "AppTestRunner",
@@ -4468,7 +4468,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1393,
+      "line": 1479,
       "level": "member",
       "kind": "func",
       "symbol": "run",
@@ -4486,7 +4486,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1624,
+      "line": 1710,
       "level": "top_level",
       "kind": "class",
       "symbol": "App",
@@ -4504,7 +4504,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1656,
+      "line": 1742,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -4522,7 +4522,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1706,
+      "line": 1792,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -4540,7 +4540,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1811,
+      "line": 1897,
       "level": "member",
       "kind": "func",
       "symbol": "attachTraceSink",
@@ -4558,7 +4558,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1819,
+      "line": 1905,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -4576,7 +4576,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1825,
+      "line": 1911,
       "level": "member",
       "kind": "func",
       "symbol": "setTextWidthOptions",
@@ -4594,7 +4594,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1831,
+      "line": 1917,
       "level": "member",
       "kind": "func",
       "symbol": "attachAnimationScheduler",
@@ -4612,7 +4612,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1837,
+      "line": 1923,
       "level": "member",
       "kind": "func",
       "symbol": "attachGlyphCapabilitySession",
@@ -4630,7 +4630,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1846,
+      "line": 1932,
       "level": "member",
       "kind": "func",
       "symbol": "attachProcessRuntime",
@@ -4648,7 +4648,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1851,
+      "line": 1937,
       "level": "member",
       "kind": "func",
       "symbol": "attachPtyRuntime",
@@ -4666,7 +4666,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1858,
+      "line": 1944,
       "level": "member",
       "kind": "func",
       "symbol": "run",
@@ -4684,7 +4684,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1862,
+      "line": 1948,
       "level": "member",
       "kind": "func",
       "symbol": "runWithCommands",
@@ -4702,7 +4702,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 1869,
+      "line": 1955,
       "level": "member",
       "kind": "func",
       "symbol": "runWithExternalPort",
@@ -4720,7 +4720,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2554,
+      "line": 2640,
       "level": "member",
       "kind": "func",
       "symbol": "applyUpdateResult",
@@ -4738,7 +4738,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2566,
+      "line": 2652,
       "level": "member",
       "kind": "func",
       "symbol": "processCommands",
@@ -4756,7 +4756,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2578,
+      "line": 2664,
       "level": "member",
       "kind": "func",
       "symbol": "processCommandsWithEvents",
@@ -4774,7 +4774,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2826,
+      "line": 2912,
       "level": "member",
       "kind": "func",
       "symbol": "executeCommand",
@@ -4792,7 +4792,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2834,
+      "line": 2920,
       "level": "member",
       "kind": "func",
       "symbol": "executeCommandArgs",
@@ -4810,7 +4810,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2901,
+      "line": 2987,
       "level": "top_level",
       "kind": "func",
       "symbol": "defaultApp",
@@ -4828,7 +4828,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2905,
+      "line": 2991,
       "level": "top_level",
       "kind": "func",
       "symbol": "runApp",
@@ -4846,7 +4846,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2909,
+      "line": 2995,
       "level": "top_level",
       "kind": "func",
       "symbol": "runAppWithCommands",
@@ -4864,7 +4864,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2914,
+      "line": 3000,
       "level": "top_level",
       "kind": "class",
       "symbol": "LinuxEpollEventWaiter",
@@ -4882,7 +4882,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2920,
+      "line": 3006,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -4900,7 +4900,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 2946,
+      "line": 3032,
       "level": "member",
       "kind": "func",
       "symbol": "wait",
@@ -4918,7 +4918,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3082,
+      "line": 3168,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -4936,7 +4936,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3118,
+      "line": 3204,
       "level": "top_level",
       "kind": "class",
       "symbol": "MacOSPollEventWaiter",
@@ -4954,7 +4954,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3121,
+      "line": 3207,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -4972,7 +4972,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3123,
+      "line": 3209,
       "level": "member",
       "kind": "func",
       "symbol": "wait",
@@ -4990,7 +4990,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3160,
+      "line": 3246,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -5008,7 +5008,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3283,
+      "line": 3369,
       "level": "top_level",
       "kind": "class",
       "symbol": "FocusManager",
@@ -5026,7 +5026,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3289,
+      "line": 3375,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -5044,7 +5044,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3295,
+      "line": 3381,
       "level": "member",
       "kind": "func",
       "symbol": "add",
@@ -5062,7 +5062,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3306,
+      "line": 3392,
       "level": "member",
       "kind": "func",
       "symbol": "remove",
@@ -5080,7 +5080,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3324,
+      "line": 3410,
       "level": "member",
       "kind": "func",
       "symbol": "focus",
@@ -5098,7 +5098,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3336,
+      "line": 3422,
       "level": "member",
       "kind": "func",
       "symbol": "setEnabled",
@@ -5116,7 +5116,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3351,
+      "line": 3437,
       "level": "member",
       "kind": "func",
       "symbol": "current",
@@ -5134,7 +5134,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3360,
+      "line": 3446,
       "level": "member",
       "kind": "func",
       "symbol": "isFocused",
@@ -5152,7 +5152,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3370,
+      "line": 3456,
       "level": "member",
       "kind": "func",
       "symbol": "next",
@@ -5170,7 +5170,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3377,
+      "line": 3463,
       "level": "member",
       "kind": "func",
       "symbol": "previous",
@@ -5188,7 +5188,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3385,
+      "line": 3471,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
