@@ -1708,41 +1708,41 @@ packages/core/src/runtime_foundation.cj:883:public func fullCount(): Int64
 packages/core/src/runtime_foundation.cj:884:public func closedCount(): Int64
 packages/core/src/runtime_foundation.cj:885:public func wakeSignals(): Int64
 packages/core/src/runtime_foundation.cj:886:public func wakeCoalesced(): Int64
-packages/core/src/state_models.cj:5:public enum SelectionMode {
-packages/core/src/state_models.cj:6:NoSelection
-packages/core/src/state_models.cj:7:Single
-packages/core/src/state_models.cj:8:Multiple
-packages/core/src/state_models.cj:11:public class SelectionModel {
-packages/core/src/state_models.cj:12:public let mode: SelectionMode
-packages/core/src/state_models.cj:13:public var current: ?Int64
-packages/core/src/state_models.cj:16:public init(mode!: SelectionMode = SelectionMode.Single, current!: ?Int64 = None)
-packages/core/src/state_models.cj:26:public func clear(): Unit
-packages/core/src/state_models.cj:33:public func select(index: Int64): Unit
-packages/core/src/state_models.cj:45:public func toggle(index: Int64): Unit
-packages/core/src/state_models.cj:65:public func move(delta: Int64, total: Int64): ?Int64
-packages/core/src/state_models.cj:79:public func isSelected(index: Int64): Bool
-packages/core/src/state_models.cj:86:public func selectedIndices(): Array<Int64>
-packages/core/src/state_models.cj:91:public class ScrollState {
-packages/core/src/state_models.cj:92:public var offset: Int64
-packages/core/src/state_models.cj:94:public init(offset!: Int64 = 0)
-packages/core/src/state_models.cj:98:public func scroll(delta: Int64, total: Int64, viewport: Int64): Unit
-packages/core/src/state_models.cj:102:public func scrollTo(index: Int64, total: Int64, viewport: Int64): Unit
-packages/core/src/state_models.cj:106:public func ensureVisible(index: Int64, total: Int64, viewport: Int64): Unit
-packages/core/src/state_models.cj:120:public func handle(key: KeyEvent, total: Int64, viewport: Int64): Bool
-packages/core/src/state_models.cj:133:public class SortState {
-packages/core/src/state_models.cj:134:public var column: ?Int64
-packages/core/src/state_models.cj:135:public var descending: Bool
-packages/core/src/state_models.cj:137:public init(column!: ?Int64 = None, descending!: Bool = false)
-packages/core/src/state_models.cj:142:public func set(column: Int64, descending!: Bool = false): Unit
-packages/core/src/state_models.cj:147:public func clear(): Unit
-packages/core/src/state_models.cj:152:public func toggle(column: Int64): Unit
-packages/core/src/state_models.cj:165:public class FilterState {
-packages/core/src/state_models.cj:166:public var query: String
-packages/core/src/state_models.cj:167:public var active: Bool
-packages/core/src/state_models.cj:169:public init(query!: String = "", active!: Bool = false)
-packages/core/src/state_models.cj:174:public func set(query: String): Unit
-packages/core/src/state_models.cj:179:public func clear(): Unit
-packages/core/src/state_models.cj:184:public func matches(text: String): Bool
+packages/core/src/state_models.cj:6:public enum SelectionMode {
+packages/core/src/state_models.cj:8:NoSelection
+packages/core/src/state_models.cj:10:Single
+packages/core/src/state_models.cj:12:Multiple
+packages/core/src/state_models.cj:16:public class SelectionModel {
+packages/core/src/state_models.cj:18:public let mode: SelectionMode
+packages/core/src/state_models.cj:20:public var current: ?Int64
+packages/core/src/state_models.cj:27:public init(mode!: SelectionMode = SelectionMode.Single, current!: ?Int64 = None)
+packages/core/src/state_models.cj:38:public func clear(): Unit
+packages/core/src/state_models.cj:48:public func select(index: Int64): Unit
+packages/core/src/state_models.cj:63:public func toggle(index: Int64): Unit
+packages/core/src/state_models.cj:88:public func move(delta: Int64, total: Int64): ?Int64
+packages/core/src/state_models.cj:106:public func isSelected(index: Int64): Bool
+packages/core/src/state_models.cj:116:public func selectedIndices(): Array<Int64>
+packages/core/src/state_models.cj:122:public class ScrollState {
+packages/core/src/state_models.cj:124:public var offset: Int64
+packages/core/src/state_models.cj:129:public init(offset!: Int64 = 0)
+packages/core/src/state_models.cj:138:public func scroll(delta: Int64, total: Int64, viewport: Int64): Unit
+packages/core/src/state_models.cj:147:public func scrollTo(index: Int64, total: Int64, viewport: Int64): Unit
+packages/core/src/state_models.cj:156:public func ensureVisible(index: Int64, total: Int64, viewport: Int64): Unit
+packages/core/src/state_models.cj:176:public func handle(key: KeyEvent, total: Int64, viewport: Int64): Bool
+packages/core/src/state_models.cj:190:public class SortState {
+packages/core/src/state_models.cj:192:public var column: ?Int64
+packages/core/src/state_models.cj:194:public var descending: Bool
+packages/core/src/state_models.cj:200:public init(column!: ?Int64 = None, descending!: Bool = false)
+packages/core/src/state_models.cj:209:public func set(column: Int64, descending!: Bool = false): Unit
+packages/core/src/state_models.cj:215:public func clear(): Unit
+packages/core/src/state_models.cj:223:public func toggle(column: Int64): Unit
+packages/core/src/state_models.cj:237:public class FilterState {
+packages/core/src/state_models.cj:239:public var query: String
+packages/core/src/state_models.cj:241:public var active: Bool
+packages/core/src/state_models.cj:247:public init(query!: String = "", active!: Bool = false)
+packages/core/src/state_models.cj:255:public func set(query: String): Unit
+packages/core/src/state_models.cj:261:public func clear(): Unit
+packages/core/src/state_models.cj:270:public func matches(text: String): Bool
 packages/core/src/style.cj:5:public enum Color {
 packages/core/src/style.cj:8:Reset
 packages/core/src/style.cj:11:Black

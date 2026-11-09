@@ -31108,7 +31108,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "enum",
       "symbol": "SelectionMode",
@@ -31126,7 +31126,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 6,
+      "line": 8,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -31145,7 +31145,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 7,
+      "line": 10,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -31164,7 +31164,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 8,
+      "line": 12,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -31183,7 +31183,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 11,
+      "line": 16,
       "level": "top_level",
       "kind": "class",
       "symbol": "SelectionModel",
@@ -31201,7 +31201,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 12,
+      "line": 18,
       "level": "member",
       "kind": "let",
       "symbol": "mode",
@@ -31219,7 +31219,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 13,
+      "line": 20,
       "level": "member",
       "kind": "var",
       "symbol": "current",
@@ -31237,7 +31237,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 16,
+      "line": 27,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -31255,7 +31255,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 26,
+      "line": 38,
       "level": "member",
       "kind": "func",
       "symbol": "clear",
@@ -31273,7 +31273,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 33,
+      "line": 48,
       "level": "member",
       "kind": "func",
       "symbol": "select",
@@ -31291,7 +31291,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 45,
+      "line": 63,
       "level": "member",
       "kind": "func",
       "symbol": "toggle",
@@ -31309,7 +31309,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 65,
+      "line": 88,
       "level": "member",
       "kind": "func",
       "symbol": "move",
@@ -31327,7 +31327,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 79,
+      "line": 106,
       "level": "member",
       "kind": "func",
       "symbol": "isSelected",
@@ -31345,7 +31345,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 86,
+      "line": 116,
       "level": "member",
       "kind": "func",
       "symbol": "selectedIndices",
@@ -31363,7 +31363,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 91,
+      "line": 122,
       "level": "top_level",
       "kind": "class",
       "symbol": "ScrollState",
@@ -31381,7 +31381,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 92,
+      "line": 124,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -31399,7 +31399,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 94,
+      "line": 129,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -31417,7 +31417,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 98,
+      "line": 138,
       "level": "member",
       "kind": "func",
       "symbol": "scroll",
@@ -31435,7 +31435,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 102,
+      "line": 147,
       "level": "member",
       "kind": "func",
       "symbol": "scrollTo",
@@ -31453,7 +31453,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 106,
+      "line": 156,
       "level": "member",
       "kind": "func",
       "symbol": "ensureVisible",
@@ -31471,7 +31471,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 120,
+      "line": 176,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -31489,7 +31489,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 133,
+      "line": 190,
       "level": "top_level",
       "kind": "class",
       "symbol": "SortState",
@@ -31507,7 +31507,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 134,
+      "line": 192,
       "level": "member",
       "kind": "var",
       "symbol": "column",
@@ -31525,7 +31525,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 135,
+      "line": 194,
       "level": "member",
       "kind": "var",
       "symbol": "descending",
@@ -31543,7 +31543,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 137,
+      "line": 200,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -31561,7 +31561,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 142,
+      "line": 209,
       "level": "member",
       "kind": "func",
       "symbol": "set",
@@ -31579,7 +31579,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 147,
+      "line": 215,
       "level": "member",
       "kind": "func",
       "symbol": "clear",
@@ -31597,7 +31597,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 152,
+      "line": 223,
       "level": "member",
       "kind": "func",
       "symbol": "toggle",
@@ -31615,7 +31615,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 165,
+      "line": 237,
       "level": "top_level",
       "kind": "class",
       "symbol": "FilterState",
@@ -31633,7 +31633,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 166,
+      "line": 239,
       "level": "member",
       "kind": "var",
       "symbol": "query",
@@ -31651,7 +31651,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 167,
+      "line": 241,
       "level": "member",
       "kind": "var",
       "symbol": "active",
@@ -31669,7 +31669,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 169,
+      "line": 247,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -31687,7 +31687,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 174,
+      "line": 255,
       "level": "member",
       "kind": "func",
       "symbol": "set",
@@ -31705,7 +31705,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 179,
+      "line": 261,
       "level": "member",
       "kind": "func",
       "symbol": "clear",
@@ -31723,7 +31723,7 @@
     {
       "package": "core",
       "path": "packages/core/src/state_models.cj",
-      "line": 184,
+      "line": 270,
       "level": "member",
       "kind": "func",
       "symbol": "matches",

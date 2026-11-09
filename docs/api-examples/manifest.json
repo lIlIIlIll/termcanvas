@@ -2507,6 +2507,230 @@
           "signature": "public func replaceAll(needle: String, replacement: String): Int64"
         }
       ]
+    },
+    {
+      "id": "core-view-state",
+      "source": "docs/api-examples/state-models.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionMode",
+          "signature": "public enum SelectionMode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionMode.NoSelection",
+          "signature": "NoSelection"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionMode.Single",
+          "signature": "Single"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionMode.Multiple",
+          "signature": "Multiple"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionModel",
+          "signature": "public class SelectionModel {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionModel.mode",
+          "signature": "public let mode: SelectionMode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionModel.current",
+          "signature": "public var current: ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionModel.init",
+          "signature": "public init(mode!: SelectionMode = SelectionMode.Single, current!: ?Int64 = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionModel.clear",
+          "signature": "public func clear(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionModel.select",
+          "signature": "public func select(index: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionModel.toggle",
+          "signature": "public func toggle(index: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionModel.move",
+          "signature": "public func move(delta: Int64, total: Int64): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionModel.isSelected",
+          "signature": "public func isSelected(index: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SelectionModel.selectedIndices",
+          "signature": "public func selectedIndices(): Array<Int64>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "ScrollState",
+          "signature": "public class ScrollState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "ScrollState.offset",
+          "signature": "public var offset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "ScrollState.init",
+          "signature": "public init(offset!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "ScrollState.scroll",
+          "signature": "public func scroll(delta: Int64, total: Int64, viewport: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "ScrollState.scrollTo",
+          "signature": "public func scrollTo(index: Int64, total: Int64, viewport: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "ScrollState.ensureVisible",
+          "signature": "public func ensureVisible(index: Int64, total: Int64, viewport: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "ScrollState.handle",
+          "signature": "public func handle(key: KeyEvent, total: Int64, viewport: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SortState",
+          "signature": "public class SortState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SortState.column",
+          "signature": "public var column: ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SortState.descending",
+          "signature": "public var descending: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SortState.init",
+          "signature": "public init(column!: ?Int64 = None, descending!: Bool = false)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SortState.set",
+          "signature": "public func set(column: Int64, descending!: Bool = false): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SortState.clear",
+          "signature": "public func clear(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "SortState.toggle",
+          "signature": "public func toggle(column: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "FilterState",
+          "signature": "public class FilterState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "FilterState.query",
+          "signature": "public var query: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "FilterState.active",
+          "signature": "public var active: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "FilterState.init",
+          "signature": "public init(query!: String = \"\", active!: Bool = false)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "FilterState.set",
+          "signature": "public func set(query: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "FilterState.clear",
+          "signature": "public func clear(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/state_models.cj",
+          "symbol": "FilterState.matches",
+          "signature": "public func matches(text: String): Bool"
+        }
+      ]
     }
   ]
 }
