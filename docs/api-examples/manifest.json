@@ -8387,6 +8387,141 @@
           "signature": "public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame"
         }
       ]
+    },
+    {
+      "id": "media-adapter",
+      "source": "docs/api-examples/media-adapter.cj",
+      "dependencies": [
+        "core",
+        "media"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "MediaDecodeRequest",
+          "signature": "public class MediaDecodeRequest {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "MediaDecodeRequest.source",
+          "signature": "public let source: MediaSource"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "MediaDecodeRequest.area",
+          "signature": "public let area: Rect"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "MediaDecodeRequest.protocol",
+          "signature": "public let protocol: MediaProtocol"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "MediaDecodeRequest.frameIndex",
+          "signature": "public let frameIndex: Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "MediaDecodeRequest.init",
+          "signature": "public init(source: MediaSource, area: Rect, protocol: MediaProtocol, frameIndex!: Int64 = 0)"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "MediaAdapter",
+          "signature": "public interface MediaAdapter {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "MediaAdapter.decode",
+          "signature": "func decode(request: MediaDecodeRequest): MediaFrameData"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "FallbackMediaAdapter",
+          "signature": "public class FallbackMediaAdapter <: MediaAdapter {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "FallbackMediaAdapter.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "FallbackMediaAdapter.decode",
+          "signature": "public func decode(request: MediaDecodeRequest): MediaFrameData"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "ExternalMediaAdapter",
+          "signature": "public class ExternalMediaAdapter <: MediaAdapter {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "ExternalMediaAdapter.init",
+          "signature": "public init(magick!: String = \"magick\", ffmpeg!: String = \"ffmpeg\", sixelEncoder!: String = \"img2sixel\")"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "ExternalMediaAdapter.decode",
+          "signature": "public func decode(request: MediaDecodeRequest): MediaFrameData"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "ExternalMediaAdapter.commandFor",
+          "signature": "public func commandFor(request: MediaDecodeRequest): String"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimationView",
+          "signature": "public class AsciiAnimationView <: Widget {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimationView.init",
+          "signature": "public init( animation: AsciiAnimation, elapsedMillis!: Int64 = 0, zoom!: Int64 = 1, paused!: Bool = false, block!: ?Block = None, style!: ?Style = None, pausedStyle!: ?Style = None )"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimationView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "preferredMediaProtocol",
+          "signature": "public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "mediaPlacementWithAdapter",
+          "signature": "public func mediaPlacementWithAdapter( id: String, source: MediaSource, area: Rect, caps: TerminalCapabilities, adapter!: MediaAdapter = FallbackMediaAdapter(), fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0 ): MediaPlacement"
+        }
+      ]
     }
   ]
 }

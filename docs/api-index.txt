@@ -2859,66 +2859,66 @@ packages/markdown_adapter/src/themed_markdown_view.cj:58:public func setText(tex
 packages/markdown_adapter/src/themed_markdown_view.cj:90:public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool
 packages/markdown_adapter/src/themed_markdown_view.cj:100:public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
 packages/markdown_adapter/src/themed_markdown_view.cj:109:public func render(area: Rect, buffer: Buffer): Unit
-packages/media/src/media.cj:8:public class MediaDecodeRequest {
-packages/media/src/media.cj:9:public let source: MediaSource
-packages/media/src/media.cj:10:public let area: Rect
-packages/media/src/media.cj:11:public let protocol: MediaProtocol
-packages/media/src/media.cj:12:public let frameIndex: Int64
-packages/media/src/media.cj:14:public init(source: MediaSource, area: Rect, protocol: MediaProtocol, frameIndex!: Int64 = 0)
-packages/media/src/media.cj:22:public interface MediaAdapter {
-packages/media/src/media.cj:23:func decode(request: MediaDecodeRequest): MediaFrameData
-packages/media/src/media.cj:26:public class FallbackMediaAdapter <: MediaAdapter {
-packages/media/src/media.cj:27:public init()
-packages/media/src/media.cj:29:public func decode(request: MediaDecodeRequest): MediaFrameData
-packages/media/src/media.cj:34:public class ExternalMediaAdapter <: MediaAdapter {
-packages/media/src/media.cj:39:public init(magick!: String = "magick", ffmpeg!: String = "ffmpeg", sixelEncoder!: String = "img2sixel")
-packages/media/src/media.cj:45:public func decode(request: MediaDecodeRequest): MediaFrameData
-packages/media/src/media.cj:110:public func commandFor(request: MediaDecodeRequest): String
-packages/media/src/media.cj:133:public enum AsciiRenderMode {
-packages/media/src/media.cj:135:Ascii
-packages/media/src/media.cj:137:HalfBlock
-packages/media/src/media.cj:139:Braille
-packages/media/src/media.cj:143:public struct AsciiRenderOptions {
-packages/media/src/media.cj:145:public let width: Int64
-packages/media/src/media.cj:147:public let height: Int64
-packages/media/src/media.cj:149:public let fps: Int64
-packages/media/src/media.cj:151:public let ramp: String
-packages/media/src/media.cj:153:public let invert: Bool
-packages/media/src/media.cj:155:public let alphaThreshold: Int64
-packages/media/src/media.cj:157:public let mode: AsciiRenderMode
-packages/media/src/media.cj:159:public let color: Bool
-packages/media/src/media.cj:161:public let binaryThreshold: Int64
-packages/media/src/media.cj:174:public init( width!: Int64 = 80, height!: Int64 = 32, fps!: Int64 = 12, ramp!: String = " .:-=+*#%@", invert!: Bool = false, alphaThreshold!: Int64 = 16, mode!: AsciiRenderMode = AsciiRenderMode.Ascii, color!: Bool = false, binaryThreshold!: Int64 = 128 )
-packages/media/src/media.cj:199:public func frameMillis(): Int64
-packages/media/src/media.cj:206:public func sampleWidth(): Int64
-packages/media/src/media.cj:216:public func sampleHeight(): Int64
-packages/media/src/media.cj:226:public struct AsciiFrame {
-packages/media/src/media.cj:228:public let lines: Array<String>
-packages/media/src/media.cj:230:public let colors: Array<Array<Color>>
-packages/media/src/media.cj:232:public let durationMillis: Int64
-packages/media/src/media.cj:239:public init(lines: Array<String>, durationMillis!: Int64 = 83, colors!: Array<Array<Color>> = [])
-packages/media/src/media.cj:248:public func text(): String
-packages/media/src/media.cj:255:public func hasColors(): Bool
-packages/media/src/media.cj:264:public func colorAt(row: Int64, column: Int64): Color
-packages/media/src/media.cj:273:public class AsciiAnimation {
-packages/media/src/media.cj:280:public init(frames: Array<AsciiFrame>)
-packages/media/src/media.cj:288:public func frameCount(): Int64
-packages/media/src/media.cj:295:public func isEmpty(): Bool
-packages/media/src/media.cj:302:public func totalDurationMillis(): Int64
-packages/media/src/media.cj:314:public func frameAtIndex(index: Int64): AsciiFrame
-packages/media/src/media.cj:323:public func frameAtElapsed(elapsedMillis: Int64): AsciiFrame
-packages/media/src/media.cj:334:public interface AsciiAnimationDecoder {
-packages/media/src/media.cj:335:func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
-packages/media/src/media.cj:338:public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {
-packages/media/src/media.cj:341:public init(ffmpeg!: String = "ffmpeg")
-packages/media/src/media.cj:348:public func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
-packages/media/src/media.cj:355:public func commandFor(source: MediaSource, options: AsciiRenderOptions): String
-packages/media/src/media.cj:360:public class AsciiAnimationView <: Widget {
-packages/media/src/media.cj:371:public init( animation: AsciiAnimation, elapsedMillis!: Int64 = 0, zoom!: Int64 = 1, paused!: Bool = false, block!: ?Block = None, style!: ?Style = None, pausedStyle!: ?Style = None )
-packages/media/src/media.cj:389:public func render(area: Rect, buffer: Buffer): Unit
-packages/media/src/media.cj:431:public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame
-packages/media/src/media.cj:554:public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol
-packages/media/src/media.cj:560:public func mediaPlacementWithAdapter( id: String, source: MediaSource, area: Rect, caps: TerminalCapabilities, adapter!: MediaAdapter = FallbackMediaAdapter(), fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0 ): MediaPlacement
+packages/media/src/media.cj:9:public class MediaDecodeRequest {
+packages/media/src/media.cj:11:public let source: MediaSource
+packages/media/src/media.cj:13:public let area: Rect
+packages/media/src/media.cj:15:public let protocol: MediaProtocol
+packages/media/src/media.cj:17:public let frameIndex: Int64
+packages/media/src/media.cj:25:public init(source: MediaSource, area: Rect, protocol: MediaProtocol, frameIndex!: Int64 = 0)
+packages/media/src/media.cj:34:public interface MediaAdapter {
+packages/media/src/media.cj:39:func decode(request: MediaDecodeRequest): MediaFrameData
+packages/media/src/media.cj:43:public class FallbackMediaAdapter <: MediaAdapter {
+packages/media/src/media.cj:45:public init()
+packages/media/src/media.cj:51:public func decode(request: MediaDecodeRequest): MediaFrameData
+packages/media/src/media.cj:57:public class ExternalMediaAdapter <: MediaAdapter {
+packages/media/src/media.cj:67:public init(magick!: String = "magick", ffmpeg!: String = "ffmpeg", sixelEncoder!: String = "img2sixel")
+packages/media/src/media.cj:77:public func decode(request: MediaDecodeRequest): MediaFrameData
+packages/media/src/media.cj:146:public func commandFor(request: MediaDecodeRequest): String
+packages/media/src/media.cj:169:public enum AsciiRenderMode {
+packages/media/src/media.cj:171:Ascii
+packages/media/src/media.cj:173:HalfBlock
+packages/media/src/media.cj:175:Braille
+packages/media/src/media.cj:179:public struct AsciiRenderOptions {
+packages/media/src/media.cj:181:public let width: Int64
+packages/media/src/media.cj:183:public let height: Int64
+packages/media/src/media.cj:185:public let fps: Int64
+packages/media/src/media.cj:187:public let ramp: String
+packages/media/src/media.cj:189:public let invert: Bool
+packages/media/src/media.cj:191:public let alphaThreshold: Int64
+packages/media/src/media.cj:193:public let mode: AsciiRenderMode
+packages/media/src/media.cj:195:public let color: Bool
+packages/media/src/media.cj:197:public let binaryThreshold: Int64
+packages/media/src/media.cj:210:public init( width!: Int64 = 80, height!: Int64 = 32, fps!: Int64 = 12, ramp!: String = " .:-=+*#%@", invert!: Bool = false, alphaThreshold!: Int64 = 16, mode!: AsciiRenderMode = AsciiRenderMode.Ascii, color!: Bool = false, binaryThreshold!: Int64 = 128 )
+packages/media/src/media.cj:235:public func frameMillis(): Int64
+packages/media/src/media.cj:242:public func sampleWidth(): Int64
+packages/media/src/media.cj:252:public func sampleHeight(): Int64
+packages/media/src/media.cj:262:public struct AsciiFrame {
+packages/media/src/media.cj:264:public let lines: Array<String>
+packages/media/src/media.cj:266:public let colors: Array<Array<Color>>
+packages/media/src/media.cj:268:public let durationMillis: Int64
+packages/media/src/media.cj:275:public init(lines: Array<String>, durationMillis!: Int64 = 83, colors!: Array<Array<Color>> = [])
+packages/media/src/media.cj:284:public func text(): String
+packages/media/src/media.cj:291:public func hasColors(): Bool
+packages/media/src/media.cj:300:public func colorAt(row: Int64, column: Int64): Color
+packages/media/src/media.cj:309:public class AsciiAnimation {
+packages/media/src/media.cj:316:public init(frames: Array<AsciiFrame>)
+packages/media/src/media.cj:324:public func frameCount(): Int64
+packages/media/src/media.cj:331:public func isEmpty(): Bool
+packages/media/src/media.cj:338:public func totalDurationMillis(): Int64
+packages/media/src/media.cj:350:public func frameAtIndex(index: Int64): AsciiFrame
+packages/media/src/media.cj:359:public func frameAtElapsed(elapsedMillis: Int64): AsciiFrame
+packages/media/src/media.cj:370:public interface AsciiAnimationDecoder {
+packages/media/src/media.cj:371:func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
+packages/media/src/media.cj:374:public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {
+packages/media/src/media.cj:377:public init(ffmpeg!: String = "ffmpeg")
+packages/media/src/media.cj:384:public func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
+packages/media/src/media.cj:391:public func commandFor(source: MediaSource, options: AsciiRenderOptions): String
+packages/media/src/media.cj:397:public class AsciiAnimationView <: Widget {
+packages/media/src/media.cj:415:public init( animation: AsciiAnimation, elapsedMillis!: Int64 = 0, zoom!: Int64 = 1, paused!: Bool = false, block!: ?Block = None, style!: ?Style = None, pausedStyle!: ?Style = None )
+packages/media/src/media.cj:437:public func render(area: Rect, buffer: Buffer): Unit
+packages/media/src/media.cj:479:public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame
+packages/media/src/media.cj:606:public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol
+packages/media/src/media.cj:622:public func mediaPlacementWithAdapter( id: String, source: MediaSource, area: Rect, caps: TerminalCapabilities, adapter!: MediaAdapter = FallbackMediaAdapter(), fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0 ): MediaPlacement
 packages/terminal/src/terminal.cj:7:public enum AnsiTokenKind {
 packages/terminal/src/terminal.cj:9:Text
 packages/terminal/src/terminal.cj:11:Sgr

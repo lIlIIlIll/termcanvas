@@ -51973,7 +51973,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 8,
+      "line": 9,
       "level": "top_level",
       "kind": "class",
       "symbol": "MediaDecodeRequest",
@@ -51991,7 +51991,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 9,
+      "line": 11,
       "level": "member",
       "kind": "let",
       "symbol": "source",
@@ -52009,7 +52009,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 10,
+      "line": 13,
       "level": "member",
       "kind": "let",
       "symbol": "area",
@@ -52027,7 +52027,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 11,
+      "line": 15,
       "level": "member",
       "kind": "let",
       "symbol": "protocol",
@@ -52045,7 +52045,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 12,
+      "line": 17,
       "level": "member",
       "kind": "let",
       "symbol": "frameIndex",
@@ -52063,7 +52063,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 14,
+      "line": 25,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -52081,7 +52081,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 22,
+      "line": 34,
       "level": "top_level",
       "kind": "interface",
       "symbol": "MediaAdapter",
@@ -52099,7 +52099,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 23,
+      "line": 39,
       "level": "member",
       "kind": "func",
       "symbol": "decode",
@@ -52118,7 +52118,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 26,
+      "line": 43,
       "level": "top_level",
       "kind": "class",
       "symbol": "FallbackMediaAdapter",
@@ -52136,7 +52136,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 27,
+      "line": 45,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -52154,7 +52154,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 29,
+      "line": 51,
       "level": "member",
       "kind": "func",
       "symbol": "decode",
@@ -52172,7 +52172,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 34,
+      "line": 57,
       "level": "top_level",
       "kind": "class",
       "symbol": "ExternalMediaAdapter",
@@ -52190,7 +52190,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 39,
+      "line": 67,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -52208,7 +52208,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 45,
+      "line": 77,
       "level": "member",
       "kind": "func",
       "symbol": "decode",
@@ -52226,7 +52226,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 110,
+      "line": 146,
       "level": "member",
       "kind": "func",
       "symbol": "commandFor",
@@ -52244,7 +52244,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 133,
+      "line": 169,
       "level": "top_level",
       "kind": "enum",
       "symbol": "AsciiRenderMode",
@@ -52262,7 +52262,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 135,
+      "line": 171,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -52281,7 +52281,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 137,
+      "line": 173,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -52300,7 +52300,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 139,
+      "line": 175,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -52319,7 +52319,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 143,
+      "line": 179,
       "level": "top_level",
       "kind": "struct",
       "symbol": "AsciiRenderOptions",
@@ -52337,7 +52337,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 145,
+      "line": 181,
       "level": "member",
       "kind": "let",
       "symbol": "width",
@@ -52355,7 +52355,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 147,
+      "line": 183,
       "level": "member",
       "kind": "let",
       "symbol": "height",
@@ -52373,7 +52373,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 149,
+      "line": 185,
       "level": "member",
       "kind": "let",
       "symbol": "fps",
@@ -52391,7 +52391,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 151,
+      "line": 187,
       "level": "member",
       "kind": "let",
       "symbol": "ramp",
@@ -52409,7 +52409,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 153,
+      "line": 189,
       "level": "member",
       "kind": "let",
       "symbol": "invert",
@@ -52427,7 +52427,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 155,
+      "line": 191,
       "level": "member",
       "kind": "let",
       "symbol": "alphaThreshold",
@@ -52445,7 +52445,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 157,
+      "line": 193,
       "level": "member",
       "kind": "let",
       "symbol": "mode",
@@ -52463,7 +52463,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 159,
+      "line": 195,
       "level": "member",
       "kind": "let",
       "symbol": "color",
@@ -52481,7 +52481,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 161,
+      "line": 197,
       "level": "member",
       "kind": "let",
       "symbol": "binaryThreshold",
@@ -52499,7 +52499,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 174,
+      "line": 210,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -52517,7 +52517,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 199,
+      "line": 235,
       "level": "member",
       "kind": "func",
       "symbol": "frameMillis",
@@ -52535,7 +52535,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 206,
+      "line": 242,
       "level": "member",
       "kind": "func",
       "symbol": "sampleWidth",
@@ -52553,7 +52553,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 216,
+      "line": 252,
       "level": "member",
       "kind": "func",
       "symbol": "sampleHeight",
@@ -52571,7 +52571,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 226,
+      "line": 262,
       "level": "top_level",
       "kind": "struct",
       "symbol": "AsciiFrame",
@@ -52589,7 +52589,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 228,
+      "line": 264,
       "level": "member",
       "kind": "let",
       "symbol": "lines",
@@ -52607,7 +52607,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 230,
+      "line": 266,
       "level": "member",
       "kind": "let",
       "symbol": "colors",
@@ -52625,7 +52625,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 232,
+      "line": 268,
       "level": "member",
       "kind": "let",
       "symbol": "durationMillis",
@@ -52643,7 +52643,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 239,
+      "line": 275,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -52661,7 +52661,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 248,
+      "line": 284,
       "level": "member",
       "kind": "func",
       "symbol": "text",
@@ -52679,7 +52679,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 255,
+      "line": 291,
       "level": "member",
       "kind": "func",
       "symbol": "hasColors",
@@ -52697,7 +52697,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 264,
+      "line": 300,
       "level": "member",
       "kind": "func",
       "symbol": "colorAt",
@@ -52715,7 +52715,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 273,
+      "line": 309,
       "level": "top_level",
       "kind": "class",
       "symbol": "AsciiAnimation",
@@ -52733,7 +52733,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 280,
+      "line": 316,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -52751,7 +52751,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 288,
+      "line": 324,
       "level": "member",
       "kind": "func",
       "symbol": "frameCount",
@@ -52769,7 +52769,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 295,
+      "line": 331,
       "level": "member",
       "kind": "func",
       "symbol": "isEmpty",
@@ -52787,7 +52787,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 302,
+      "line": 338,
       "level": "member",
       "kind": "func",
       "symbol": "totalDurationMillis",
@@ -52805,7 +52805,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 314,
+      "line": 350,
       "level": "member",
       "kind": "func",
       "symbol": "frameAtIndex",
@@ -52823,7 +52823,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 323,
+      "line": 359,
       "level": "member",
       "kind": "func",
       "symbol": "frameAtElapsed",
@@ -52841,7 +52841,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 334,
+      "line": 370,
       "level": "top_level",
       "kind": "interface",
       "symbol": "AsciiAnimationDecoder",
@@ -52859,7 +52859,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 335,
+      "line": 371,
       "level": "member",
       "kind": "func",
       "symbol": "decode",
@@ -52878,7 +52878,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 338,
+      "line": 374,
       "level": "top_level",
       "kind": "class",
       "symbol": "FfmpegAsciiAnimationDecoder",
@@ -52896,7 +52896,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 341,
+      "line": 377,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -52914,7 +52914,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 348,
+      "line": 384,
       "level": "member",
       "kind": "func",
       "symbol": "decode",
@@ -52932,7 +52932,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 355,
+      "line": 391,
       "level": "member",
       "kind": "func",
       "symbol": "commandFor",
@@ -52950,7 +52950,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 360,
+      "line": 397,
       "level": "top_level",
       "kind": "class",
       "symbol": "AsciiAnimationView",
@@ -52968,7 +52968,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 371,
+      "line": 415,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -52986,7 +52986,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 389,
+      "line": 437,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -53004,7 +53004,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 431,
+      "line": 479,
       "level": "top_level",
       "kind": "func",
       "symbol": "rgbaToAsciiFrame",
@@ -53022,7 +53022,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 554,
+      "line": 606,
       "level": "top_level",
       "kind": "func",
       "symbol": "preferredMediaProtocol",
@@ -53040,7 +53040,7 @@
     {
       "package": "media",
       "path": "packages/media/src/media.cj",
-      "line": 560,
+      "line": 622,
       "level": "top_level",
       "kind": "func",
       "symbol": "mediaPlacementWithAdapter",

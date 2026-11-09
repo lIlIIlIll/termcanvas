@@ -5,12 +5,23 @@ import std.process.*
 import std.collection.*
 import std.time.*
 
+/** 媒体解码的来源、目标区域、协议和帧索引。 */
 public class MediaDecodeRequest {
+    /** 要解码的媒体来源。 */
     public let source: MediaSource
+    /** 目标终端区域。 */
     public let area: Rect
+    /** 请求的输出协议。 */
     public let protocol: MediaProtocol
+    /** 请求帧索引，至少为零。 */
     public let frameIndex: Int64
 
+    /** 创建解码请求。
+     * @param source 媒体来源
+     * @param area 目标区域
+     * @param protocol 输出协议
+     * @param frameIndex 帧索引，负值按零处理
+     */
     public init(source: MediaSource, area: Rect, protocol: MediaProtocol, frameIndex!: Int64 = 0) {
         this.source = source
         this.area = area
@@ -19,29 +30,50 @@ public class MediaDecodeRequest {
     }
 }
 
+/** 将媒体请求解码为可放置帧的接口。 */
 public interface MediaAdapter {
+    /** 解码媒体请求。
+     * @param request 媒体解码请求
+     * @return 解码后的帧
+     */
     func decode(request: MediaDecodeRequest): MediaFrameData
 }
 
+/** 始终返回媒体文本回退帧。 */
 public class FallbackMediaAdapter <: MediaAdapter {
+    /** 创建文本回退适配器。 */
     public init() {}
 
+    /** 将请求转换为文本回退帧。
+     * @param request 媒体请求
+     * @return 文本帧
+     */
     public func decode(request: MediaDecodeRequest): MediaFrameData {
         MediaFrameData.text(mediaFallbackText(request.source))
     }
 }
 
+/** 使用外部工具解码 Kitty 或 Sixel 图像；失败时返回文本回退。 */
 public class ExternalMediaAdapter <: MediaAdapter {
     private let magick: String
     private let ffmpeg: String
     private let sixelEncoder: String
 
+    /** 创建外部媒体适配器。
+     * @param magick 图片解码工具的可执行文件
+     * @param ffmpeg 视频和动画解码工具的可执行文件
+     * @param sixelEncoder Sixel 编码工具的可执行文件
+     */
     public init(magick!: String = "magick", ffmpeg!: String = "ffmpeg", sixelEncoder!: String = "img2sixel") {
         this.magick = magick
         this.ffmpeg = ffmpeg
         this.sixelEncoder = sixelEncoder
     }
 
+    /** 解码请求；文本协议或解码失败时返回文本回退。
+     * @param request 媒体请求
+     * @return 媒体帧
+     */
     public func decode(request: MediaDecodeRequest): MediaFrameData {
         match (request.protocol) {
             case MediaProtocol.Kitty => decodeKitty(request)
@@ -107,6 +139,10 @@ public class ExternalMediaAdapter <: MediaAdapter {
         }
     }
 
+    /** 生成供查看的外部工具命令文本；文本未经过 shell 转义。
+     * @param request 媒体解码请求
+     * @return 命令文本；无需工具或无法生成时为空字符串
+     */
     public func commandFor(request: MediaDecodeRequest): String {
         let (width, height) = match (mediaDimensions(request.area)) { case Some(size) => size; case None => return "" }
         match (request.protocol) {
@@ -357,6 +393,7 @@ public class FfmpegAsciiAnimationDecoder <: AsciiAnimationDecoder {
     }
 }
 
+/** 根据经过时间渲染字符动画的视图。 */
 public class AsciiAnimationView <: Widget {
     private let animation: AsciiAnimation
     private let elapsedMillis: Int64
@@ -367,6 +404,13 @@ public class AsciiAnimationView <: Widget {
     private let pausedStyle: ?Style
 
     /** 创建动画视图；经过时间下限为 0，缩放倍数限制在 1 到 4。未指定样式时使用应用主题的普通或警告角色，无主题时使用原有白色或黄色；显式样式和帧内颜色优先。
+     * @param animation 要显示的字符动画
+     * @param elapsedMillis 已经过的毫秒数
+     * @param zoom 字符缩放倍数
+     * @param paused 是否使用暂停样式
+     * @param block 可选的边框
+     * @param style 可选的播放样式
+     * @param pausedStyle 可选的暂停样式
      */
     public init(
         animation: AsciiAnimation,
@@ -386,6 +430,10 @@ public class AsciiAnimationView <: Widget {
         this.pausedStyle = pausedStyle
     }
 
+    /** 将当前动画帧绘制到目标区域。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
@@ -551,12 +599,26 @@ func indexOfAscii(text: String, target: Byte): Int64 {
     -1
 }
 
+/** 根据终端能力选择媒体协议，优先 Kitty，其次 Sixel，最后文本。
+ * @param caps 终端能力
+ * @return 首选媒体协议
+ */
 public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol {
     if (caps.kittyGraphics) { MediaProtocol.Kitty }
     else if (caps.sixel) { MediaProtocol.Sixel }
     else { MediaProtocol.Text }
 }
 
+/** 根据终端能力解码并创建媒体放置项。
+ * @param id 放置项标识
+ * @param source 媒体来源
+ * @param area 目标区域
+ * @param caps 终端能力
+ * @param adapter 媒体解码适配器
+ * @param fit 适配方式
+ * @param frameIndex 请求的帧索引
+ * @return 包含解码帧的媒体放置项
+ */
 public func mediaPlacementWithAdapter(
     id: String,
     source: MediaSource,
