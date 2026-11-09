@@ -31,9 +31,13 @@ public enum Color {
      */
     | White
     /** 表示以单字节索引指定的颜色，而不是具名颜色或 RGB 分量。
+     * @param _0 颜色索引
      */
     | Indexed(UInt8)
     /** 表示由红、绿、蓝三个单字节分量指定的颜色。
+     * @param _0 红色分量
+     * @param _1 绿色分量
+     * @param _2 蓝色分量
      */
     | Rgb(UInt8, UInt8, UInt8)
 }
@@ -59,10 +63,12 @@ public struct Modifier <: Equatable<Modifier> {
     public init() {}
 
     /** 返回四项样式标记均为 false 的值。
+     * @return 不含修饰的值
      */
     public static func none(): Modifier { Modifier() }
 
     /** 返回仅将粗体标记设为 true、其余标记仍为 false 的值。
+     * @return 粗体修饰
      */
     public static func strong(): Modifier {
         var m = Modifier()
@@ -71,6 +77,8 @@ public struct Modifier <: Equatable<Modifier> {
     }
 
     /** 逐一比较当前值与另一值的四项样式标记；全部相同才返回 true。
+     * @param other 待比较的修饰属性
+     * @return 四项标记均相同时为 true
      */
     public operator func ==(other: Modifier): Bool {
         bold == other.bold && italic == other.italic && underline == other.underline && reversed == other.reversed
@@ -91,6 +99,9 @@ public struct Style <: Equatable<Style> {
     public var modifier: Modifier = Modifier.none()
 
     /** 按给定前景色、背景色和修饰属性建立样式；未指定的属性分别使用重置色、重置色和无修饰。
+     * @param fg 前景色
+     * @param bg 背景色
+     * @param modifier 修饰属性
      */
     public init(fg!: Color = Color.Reset, bg!: Color = Color.Reset, modifier!: Modifier = Modifier.none()) {
         this.fg = fg
@@ -99,10 +110,13 @@ public struct Style <: Equatable<Style> {
     }
 
     /** 返回前景色和背景色均为 Color.Reset、修饰属性为 Modifier.none() 的样式。
+     * @return 默认样式
      */
     public static func default(): Style { Style() }
 
     /** 返回以前景色替换为指定颜色的样式，其余属性沿用当前样式。
+     * @param color 新前景色
+     * @return 修改后的样式
      */
     public func withFg(color: Color): Style {
         var s = this
@@ -111,6 +125,8 @@ public struct Style <: Equatable<Style> {
     }
 
     /** 返回以背景色替换为指定颜色的样式，其余属性沿用当前样式。
+     * @param color 新背景色
+     * @return 修改后的样式
      */
     public func withBg(color: Color): Style {
         var s = this
@@ -119,6 +135,8 @@ public struct Style <: Equatable<Style> {
     }
 
     /** 返回以指定修饰属性替换当前修饰属性的样式，其余属性沿用当前样式。
+     * @param modifier 新修饰属性
+     * @return 修改后的样式
      */
     public func withModifier(modifier: Modifier): Style {
         var s = this
@@ -127,6 +145,8 @@ public struct Style <: Equatable<Style> {
     }
 
     /** 以当前样式为基础生成样式：仅用另一样式中非 Color.Reset 的前景色和背景色、非 Modifier.none() 的修饰属性覆盖对应属性。
+     * @param other 要合并的样式
+     * @return 合并后的样式
      */
     public func patch(other: Style): Style {
         var s = this
@@ -143,6 +163,8 @@ public struct Style <: Equatable<Style> {
     }
 
     /** 仅当前景色和背景色分别经 colorEquals 比较相等，且修饰属性相等时返回 true。
+     * @param other 待比较的样式
+     * @return 前景、背景和修饰均相同时为 true
      */
     public operator func ==(other: Style): Bool {
         colorEquals(fg, other.fg) && colorEquals(bg, other.bg) && modifier == other.modifier
@@ -153,13 +175,27 @@ public struct Style <: Equatable<Style> {
  * 恢复终端默认背景并不表示缓冲区透明合成。
  */
 public struct StyleOverride {
+    /** 可选的前景色覆盖。 */
     public let fg: ?Color
+    /** 可选的背景色覆盖。 */
     public let bg: ?Color
+    /** 可选的粗体覆盖。 */
     public let bold: ?Bool
+    /** 可选的斜体覆盖。 */
     public let italic: ?Bool
+    /** 可选的下划线覆盖。 */
     public let underline: ?Bool
+    /** 可选的反转覆盖。 */
     public let reversed: ?Bool
 
+    /** 创建逐属性覆盖；None 保留基础值。
+     * @param fg 前景色覆盖
+     * @param bg 背景色覆盖
+     * @param bold 粗体覆盖
+     * @param italic 斜体覆盖
+     * @param underline 下划线覆盖
+     * @param reversed 反转覆盖
+     */
     public init(fg!: ?Color = None, bg!: ?Color = None, bold!: ?Bool = None,
         italic!: ?Bool = None, underline!: ?Bool = None, reversed!: ?Bool = None) {
         this.fg = fg
@@ -170,7 +206,10 @@ public struct StyleOverride {
         this.reversed = reversed
     }
 
-    /** 对基础样式逐项应用覆盖；未指定的属性保持原值。 */
+    /** 对基础样式逐项应用覆盖；未指定的属性保持原值。
+     * @param base 基础样式
+     * @return 应用覆盖后的样式
+     */
     public func apply(base: Style): Style {
         var result = base
         match (fg) { case Some(value) => result.fg = value; case None => () }
@@ -185,7 +224,12 @@ public struct StyleOverride {
     }
 }
 
-/** 在旧式非重置样式合并之后应用逐属性覆盖，支持显式恢复默认颜色或关闭修饰。 */
+/** 在旧式非重置样式合并之后应用逐属性覆盖，支持显式恢复默认颜色或关闭修饰。
+ * @param base 基础样式
+ * @param legacy 按非默认属性合并的样式
+ * @param override 可选的逐属性覆盖
+ * @return 最终样式
+ */
 public func resolveStyle(base: Style, legacy!: Style = Style.default(), override!: ?StyleOverride = None): Style {
     let resolved = base.patch(legacy)
     match (override) {
@@ -196,8 +240,11 @@ public func resolveStyle(base: Style, legacy!: Style = Style.default(), override
 
 /** 图标字符集；Nerd Font 需要应用显式选择并确保终端字体支持。 */
 public enum IconSet {
+    /** 使用 Unicode 图标。 */
     | Unicode
+    /** 使用需字体支持的 Nerd Font 图标。 */
     | NerdFont
+    /** 使用 ASCII 图标。 */
     | Ascii
 }
 
@@ -430,12 +477,19 @@ public struct Theme {
 }
 
 // Shared state value used by immediate experimental widgets.
+/** 组件的语义样式状态。 */
 public enum StyleState {
+    /** 普通状态。 */
     | Normal
+    /** 焦点状态。 */
     | Focused
+    /** 选中状态。 */
     | Selected
+    /** 禁用状态。 */
     | Disabled
+    /** 错误状态。 */
     | Error
+    /** 强调状态。 */
     | Accent
 }
 

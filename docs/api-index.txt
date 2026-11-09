@@ -1753,83 +1753,83 @@ packages/core/src/style.cj:23:Blue
 packages/core/src/style.cj:26:Magenta
 packages/core/src/style.cj:29:Cyan
 packages/core/src/style.cj:32:White
-packages/core/src/style.cj:35:Indexed(UInt8)
-packages/core/src/style.cj:38:Rgb(UInt8, UInt8, UInt8)
-packages/core/src/style.cj:43:public struct Modifier <: Equatable<Modifier> {
-packages/core/src/style.cj:46:public var bold: Bool = false
-packages/core/src/style.cj:49:public var italic: Bool = false
-packages/core/src/style.cj:52:public var underline: Bool = false
-packages/core/src/style.cj:55:public var reversed: Bool = false
-packages/core/src/style.cj:59:public init()
-packages/core/src/style.cj:63:public static func none(): Modifier
-packages/core/src/style.cj:67:public static func strong(): Modifier
-packages/core/src/style.cj:75:public operator func ==(other: Modifier): Bool
-packages/core/src/style.cj:82:public struct Style <: Equatable<Style> {
-packages/core/src/style.cj:85:public var fg: Color = Color.Reset
-packages/core/src/style.cj:88:public var bg: Color = Color.Reset
-packages/core/src/style.cj:91:public var modifier: Modifier = Modifier.none()
-packages/core/src/style.cj:95:public init(fg!: Color = Color.Reset, bg!: Color = Color.Reset, modifier!: Modifier = Modifier.none())
-packages/core/src/style.cj:103:public static func default(): Style
-packages/core/src/style.cj:107:public func withFg(color: Color): Style
-packages/core/src/style.cj:115:public func withBg(color: Color): Style
-packages/core/src/style.cj:123:public func withModifier(modifier: Modifier): Style
-packages/core/src/style.cj:131:public func patch(other: Style): Style
-packages/core/src/style.cj:147:public operator func ==(other: Style): Bool
-packages/core/src/style.cj:155:public struct StyleOverride {
-packages/core/src/style.cj:156:public let fg: ?Color
-packages/core/src/style.cj:157:public let bg: ?Color
-packages/core/src/style.cj:158:public let bold: ?Bool
-packages/core/src/style.cj:159:public let italic: ?Bool
-packages/core/src/style.cj:160:public let underline: ?Bool
-packages/core/src/style.cj:161:public let reversed: ?Bool
-packages/core/src/style.cj:163:public init(fg!: ?Color = None, bg!: ?Color = None, bold!: ?Bool = None, italic!: ?Bool = None, underline!: ?Bool = None, reversed!: ?Bool = None)
-packages/core/src/style.cj:174:public func apply(base: Style): Style
-packages/core/src/style.cj:189:public func resolveStyle(base: Style, legacy!: Style = Style.default(), override!: ?StyleOverride = None): Style
-packages/core/src/style.cj:198:public enum IconSet {
-packages/core/src/style.cj:199:Unicode
-packages/core/src/style.cj:200:NerdFont
-packages/core/src/style.cj:201:Ascii
-packages/core/src/style.cj:207:public struct Theme {
-packages/core/src/style.cj:209:public let normal: Style
-packages/core/src/style.cj:211:public let focused: Style
-packages/core/src/style.cj:213:public let selected: Style
-packages/core/src/style.cj:215:public let disabled: Style
-packages/core/src/style.cj:217:public let error: Style
-packages/core/src/style.cj:219:public let accent: Style
-packages/core/src/style.cj:221:public let success: Style
-packages/core/src/style.cj:223:public let warning: Style
-packages/core/src/style.cj:225:public let info: Style
-packages/core/src/style.cj:227:public let canvas: Style
-packages/core/src/style.cj:229:public let surface: Style
-packages/core/src/style.cj:231:public let raisedSurface: Style
-packages/core/src/style.cj:233:public let heading: Style
-packages/core/src/style.cj:235:public let secondary: Style
-packages/core/src/style.cj:237:public let border: Style
-packages/core/src/style.cj:239:public let strongBorder: Style
-packages/core/src/style.cj:241:public let iconSet: IconSet
-packages/core/src/style.cj:243:public let borderKind: BorderKind
-packages/core/src/style.cj:245:public let progressSymbols: ?ProgressBarSymbols
-packages/core/src/style.cj:247:public init( normal!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), focused!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(54, 50, 61), modifier: focusModifier()), selected!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(42, 44, 63), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), error!: Style = Style(fg: Color.Rgb(255, 122, 131), bg: Color.Rgb(19, 20, 34), modifier: errorModifier()), accent!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), success!: Style = Style(fg: Color.Rgb(111, 211, 162), bg: Color.Rgb(19, 20, 34)), warning!: Style = Style(fg: Color.Rgb(255, 198, 114), bg: Color.Rgb(19, 20, 34)), info!: Style = Style(fg: Color.Rgb(118, 193, 231), bg: Color.Rgb(19, 20, 34)), canvas!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), surface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(26, 27, 44)), raisedSurface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(36, 38, 57)), heading!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34), modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), border!: Style = Style(fg: Color.Rgb(88, 92, 115), bg: Color.Rgb(19, 20, 34)), strongBorder!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), iconSet!: IconSet = IconSet.Unicode, borderKind!: BorderKind = BorderKind.Auto, progressSymbols!: ?ProgressBarSymbols = None )
-packages/core/src/style.cj:289:public static func default(): Theme
-packages/core/src/style.cj:294:public func resolveState(focused!: Bool = false, selected!: Bool = false, disabled!: Bool = false, error!: Bool = false, override!: ?StyleOverride = None): Style
-packages/core/src/style.cj:301:public func withIconSet(value: IconSet): Theme
-packages/core/src/style.cj:310:public func withBorderKind(value: BorderKind): Theme
-packages/core/src/style.cj:319:public func withProgressSymbols(value: ?ProgressBarSymbols): Theme
-packages/core/src/style.cj:328:public func withTerminalBackground(): Theme
-packages/core/src/style.cj:340:public static func indigo(accent!: Color = Color.Rgb(244, 187, 96)): Theme
-packages/core/src/style.cj:347:public static func graphite(accent!: Color = Color.Cyan): Theme
-packages/core/src/style.cj:353:public static func light(): Theme
-packages/core/src/style.cj:357:public static func light(accent!: Color): Theme
-packages/core/src/style.cj:363:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: ?Color = None ): Theme
-packages/core/src/style.cj:378:public func adapted(capabilities: TerminalCapabilities): Theme
-packages/core/src/style.cj:418:public func serialize(): String
-packages/core/src/style.cj:433:public enum StyleState {
-packages/core/src/style.cj:434:Normal
-packages/core/src/style.cj:435:Focused
-packages/core/src/style.cj:436:Selected
-packages/core/src/style.cj:437:Disabled
-packages/core/src/style.cj:438:Error
-packages/core/src/style.cj:439:Accent
+packages/core/src/style.cj:36:Indexed(UInt8)
+packages/core/src/style.cj:42:Rgb(UInt8, UInt8, UInt8)
+packages/core/src/style.cj:47:public struct Modifier <: Equatable<Modifier> {
+packages/core/src/style.cj:50:public var bold: Bool = false
+packages/core/src/style.cj:53:public var italic: Bool = false
+packages/core/src/style.cj:56:public var underline: Bool = false
+packages/core/src/style.cj:59:public var reversed: Bool = false
+packages/core/src/style.cj:63:public init()
+packages/core/src/style.cj:68:public static func none(): Modifier
+packages/core/src/style.cj:73:public static func strong(): Modifier
+packages/core/src/style.cj:83:public operator func ==(other: Modifier): Bool
+packages/core/src/style.cj:90:public struct Style <: Equatable<Style> {
+packages/core/src/style.cj:93:public var fg: Color = Color.Reset
+packages/core/src/style.cj:96:public var bg: Color = Color.Reset
+packages/core/src/style.cj:99:public var modifier: Modifier = Modifier.none()
+packages/core/src/style.cj:106:public init(fg!: Color = Color.Reset, bg!: Color = Color.Reset, modifier!: Modifier = Modifier.none())
+packages/core/src/style.cj:115:public static func default(): Style
+packages/core/src/style.cj:121:public func withFg(color: Color): Style
+packages/core/src/style.cj:131:public func withBg(color: Color): Style
+packages/core/src/style.cj:141:public func withModifier(modifier: Modifier): Style
+packages/core/src/style.cj:151:public func patch(other: Style): Style
+packages/core/src/style.cj:169:public operator func ==(other: Style): Bool
+packages/core/src/style.cj:177:public struct StyleOverride {
+packages/core/src/style.cj:179:public let fg: ?Color
+packages/core/src/style.cj:181:public let bg: ?Color
+packages/core/src/style.cj:183:public let bold: ?Bool
+packages/core/src/style.cj:185:public let italic: ?Bool
+packages/core/src/style.cj:187:public let underline: ?Bool
+packages/core/src/style.cj:189:public let reversed: ?Bool
+packages/core/src/style.cj:199:public init(fg!: ?Color = None, bg!: ?Color = None, bold!: ?Bool = None, italic!: ?Bool = None, underline!: ?Bool = None, reversed!: ?Bool = None)
+packages/core/src/style.cj:213:public func apply(base: Style): Style
+packages/core/src/style.cj:233:public func resolveStyle(base: Style, legacy!: Style = Style.default(), override!: ?StyleOverride = None): Style
+packages/core/src/style.cj:242:public enum IconSet {
+packages/core/src/style.cj:244:Unicode
+packages/core/src/style.cj:246:NerdFont
+packages/core/src/style.cj:248:Ascii
+packages/core/src/style.cj:254:public struct Theme {
+packages/core/src/style.cj:256:public let normal: Style
+packages/core/src/style.cj:258:public let focused: Style
+packages/core/src/style.cj:260:public let selected: Style
+packages/core/src/style.cj:262:public let disabled: Style
+packages/core/src/style.cj:264:public let error: Style
+packages/core/src/style.cj:266:public let accent: Style
+packages/core/src/style.cj:268:public let success: Style
+packages/core/src/style.cj:270:public let warning: Style
+packages/core/src/style.cj:272:public let info: Style
+packages/core/src/style.cj:274:public let canvas: Style
+packages/core/src/style.cj:276:public let surface: Style
+packages/core/src/style.cj:278:public let raisedSurface: Style
+packages/core/src/style.cj:280:public let heading: Style
+packages/core/src/style.cj:282:public let secondary: Style
+packages/core/src/style.cj:284:public let border: Style
+packages/core/src/style.cj:286:public let strongBorder: Style
+packages/core/src/style.cj:288:public let iconSet: IconSet
+packages/core/src/style.cj:290:public let borderKind: BorderKind
+packages/core/src/style.cj:292:public let progressSymbols: ?ProgressBarSymbols
+packages/core/src/style.cj:294:public init( normal!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), focused!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(54, 50, 61), modifier: focusModifier()), selected!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(42, 44, 63), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), error!: Style = Style(fg: Color.Rgb(255, 122, 131), bg: Color.Rgb(19, 20, 34), modifier: errorModifier()), accent!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), success!: Style = Style(fg: Color.Rgb(111, 211, 162), bg: Color.Rgb(19, 20, 34)), warning!: Style = Style(fg: Color.Rgb(255, 198, 114), bg: Color.Rgb(19, 20, 34)), info!: Style = Style(fg: Color.Rgb(118, 193, 231), bg: Color.Rgb(19, 20, 34)), canvas!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), surface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(26, 27, 44)), raisedSurface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(36, 38, 57)), heading!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34), modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), border!: Style = Style(fg: Color.Rgb(88, 92, 115), bg: Color.Rgb(19, 20, 34)), strongBorder!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), iconSet!: IconSet = IconSet.Unicode, borderKind!: BorderKind = BorderKind.Auto, progressSymbols!: ?ProgressBarSymbols = None )
+packages/core/src/style.cj:336:public static func default(): Theme
+packages/core/src/style.cj:341:public func resolveState(focused!: Bool = false, selected!: Bool = false, disabled!: Bool = false, error!: Bool = false, override!: ?StyleOverride = None): Style
+packages/core/src/style.cj:348:public func withIconSet(value: IconSet): Theme
+packages/core/src/style.cj:357:public func withBorderKind(value: BorderKind): Theme
+packages/core/src/style.cj:366:public func withProgressSymbols(value: ?ProgressBarSymbols): Theme
+packages/core/src/style.cj:375:public func withTerminalBackground(): Theme
+packages/core/src/style.cj:387:public static func indigo(accent!: Color = Color.Rgb(244, 187, 96)): Theme
+packages/core/src/style.cj:394:public static func graphite(accent!: Color = Color.Cyan): Theme
+packages/core/src/style.cj:400:public static func light(): Theme
+packages/core/src/style.cj:404:public static func light(accent!: Color): Theme
+packages/core/src/style.cj:410:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: ?Color = None ): Theme
+packages/core/src/style.cj:425:public func adapted(capabilities: TerminalCapabilities): Theme
+packages/core/src/style.cj:465:public func serialize(): String
+packages/core/src/style.cj:481:public enum StyleState {
+packages/core/src/style.cj:483:Normal
+packages/core/src/style.cj:485:Focused
+packages/core/src/style.cj:487:Selected
+packages/core/src/style.cj:489:Disabled
+packages/core/src/style.cj:491:Error
+packages/core/src/style.cj:493:Accent
 packages/core/src/styled_widget.cj:9:public class StyledWidget <: Widget {
 packages/core/src/styled_widget.cj:17:public init(child: Widget, override!: StyleOverride)
 packages/core/src/styled_widget.cj:26:public func render(area: Rect, buffer: Buffer): Unit

@@ -3446,6 +3446,338 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "core-style-resolution",
+      "source": "docs/api-examples/styles.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color",
+          "signature": "public enum Color {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.Reset",
+          "signature": "Reset"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.Black",
+          "signature": "Black"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.Red",
+          "signature": "Red"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.Green",
+          "signature": "Green"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.Yellow",
+          "signature": "Yellow"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.Blue",
+          "signature": "Blue"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.Magenta",
+          "signature": "Magenta"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.Cyan",
+          "signature": "Cyan"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.White",
+          "signature": "White"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.Indexed",
+          "signature": "Indexed(UInt8)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Color.Rgb",
+          "signature": "Rgb(UInt8, UInt8, UInt8)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Modifier",
+          "signature": "public struct Modifier <: Equatable<Modifier> {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Modifier.bold",
+          "signature": "public var bold: Bool = false"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Modifier.italic",
+          "signature": "public var italic: Bool = false"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Modifier.underline",
+          "signature": "public var underline: Bool = false"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Modifier.reversed",
+          "signature": "public var reversed: Bool = false"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Modifier.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Modifier.none",
+          "signature": "public static func none(): Modifier"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Modifier.strong",
+          "signature": "public static func strong(): Modifier"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Modifier.operator_==",
+          "signature": "public operator func ==(other: Modifier): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style",
+          "signature": "public struct Style <: Equatable<Style> {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style.fg",
+          "signature": "public var fg: Color = Color.Reset"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style.bg",
+          "signature": "public var bg: Color = Color.Reset"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style.modifier",
+          "signature": "public var modifier: Modifier = Modifier.none()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style.init",
+          "signature": "public init(fg!: Color = Color.Reset, bg!: Color = Color.Reset, modifier!: Modifier = Modifier.none())"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style.default",
+          "signature": "public static func default(): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style.withFg",
+          "signature": "public func withFg(color: Color): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style.withBg",
+          "signature": "public func withBg(color: Color): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style.withModifier",
+          "signature": "public func withModifier(modifier: Modifier): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style.patch",
+          "signature": "public func patch(other: Style): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Style.operator_==",
+          "signature": "public operator func ==(other: Style): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleOverride",
+          "signature": "public struct StyleOverride {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleOverride.fg",
+          "signature": "public let fg: ?Color"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleOverride.bg",
+          "signature": "public let bg: ?Color"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleOverride.bold",
+          "signature": "public let bold: ?Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleOverride.italic",
+          "signature": "public let italic: ?Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleOverride.underline",
+          "signature": "public let underline: ?Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleOverride.reversed",
+          "signature": "public let reversed: ?Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleOverride.init",
+          "signature": "public init(fg!: ?Color = None, bg!: ?Color = None, bold!: ?Bool = None, italic!: ?Bool = None, underline!: ?Bool = None, reversed!: ?Bool = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleOverride.apply",
+          "signature": "public func apply(base: Style): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "resolveStyle",
+          "signature": "public func resolveStyle(base: Style, legacy!: Style = Style.default(), override!: ?StyleOverride = None): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "IconSet",
+          "signature": "public enum IconSet {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "IconSet.Unicode",
+          "signature": "Unicode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "IconSet.NerdFont",
+          "signature": "NerdFont"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "IconSet.Ascii",
+          "signature": "Ascii"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleState",
+          "signature": "public enum StyleState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleState.Normal",
+          "signature": "Normal"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleState.Focused",
+          "signature": "Focused"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleState.Selected",
+          "signature": "Selected"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleState.Disabled",
+          "signature": "Disabled"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleState.Error",
+          "signature": "Error"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "StyleState.Accent",
+          "signature": "Accent"
+        }
+      ]
     }
   ]
 }
