@@ -1,6 +1,6 @@
 # 生成中文 API 参考
 
-使用 cjdoc 生成 Termcanvas 生产包的 API 站点。生成器按 Linux、macOS 和 Windows 的条件编译配置分别生成页面，并保留 API 分类清单。当前页面和示例仍在补全，生成成功不代表全部应用 API 已有说明或通过示例验收。
+使用 cjdoc 生成 Termcanvas 生产包的 API 站点。生成器按 Linux、macOS 和 Windows 的条件编译配置分别生成页面，并保留 API 分类清单。生成成功不代表全部应用 API 已有说明或通过示例验收；请按下文分别核对。
 
 ## 准备工具
 
@@ -69,4 +69,4 @@ python3 scripts/run_cjdoc_examples.py --report target/cjdoc-example-results.json
 python3 scripts/test_cjdoc_examples.py
 ```
 
-该命令需要 `CANGJIE_SDK_ROOT` 指向可用的 SDK，且只验证这两个示例。其余应用 API、跨平台示例、完整站点的浏览器展示和线上发布仍需分别验收。
+该命令需要 `CANGJIE_SDK_ROOT` 指向可用的 SDK，且只验证这两个示例。应用 API 的覆盖、跨平台示例、完整站点的浏览器展示和线上发布需分别验证。
