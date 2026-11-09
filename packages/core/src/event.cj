@@ -5,7 +5,12 @@ import std.collection.*
 @FastNative
 foreign func read(fd: Int32, buf: CPointer<Unit>, count: UIntNative): IntNative
 
+/** 提供可用终端输入字节的来源。 */
 public interface InputSource {
+    /** 读取输入字节；具体输入源可能等待数据。
+    * @param maxBytes 希望读取的最大字节数
+    * @return 读取到的字节
+     */
     func readAvailable(maxBytes: Int64): Array<Byte>
 }
 
@@ -293,12 +298,23 @@ public struct MouseEvent {
     }
 }
 
+/** 描述一帧的时间与丢帧信息；数值在构造时限制为非负。 */
 public struct TickEvent {
+    /** 距上一帧的毫秒数。 */
     public let deltaMillis: Int64
+    /** 累计经过的毫秒数。 */
     public let elapsedMillis: Int64
+    /** 帧序号。 */
     public let frameIndex: Int64
+    /** 丢弃的帧数。 */
     public let droppedFrames: Int64
 
+    /** 创建帧时间事件。
+    * @param deltaMillis 帧间隔毫秒数，负值按零处理
+    * @param elapsedMillis 累计毫秒数，负值按零处理
+    * @param frameIndex 帧序号，负值按零处理
+    * @param droppedFrames 丢帧数，负值按零处理
+     */
     public init(deltaMillis!: Int64 = 0, elapsedMillis!: Int64 = 0, frameIndex!: Int64 = 0, droppedFrames!: Int64 = 0) {
         this.deltaMillis = max(0, deltaMillis)
         this.elapsedMillis = max(0, elapsedMillis)
@@ -307,22 +323,41 @@ public struct TickEvent {
     }
 }
 
+/** 定时器的触发方式。 */
 public enum TimerMode {
+    /** 触发一次。 */
     | OneShot
+    /** 重复触发。 */
     | Repeating
 }
 
+/** 处理未及时执行的帧或定时任务的策略。 */
 public enum FrameMissPolicy {
+    /** 丢弃错过的触发。 */
     | Drop
+    /** 补执行错过的触发。
+    * @param _0 补执行次数的上限
+     */
     | CatchUp(Int64)
 }
 
+/** 描述一次定时器触发。 */
 public struct TimerEvent {
+    /** 定时器标识。 */
     public let id: String
+    /** 累计经过的毫秒数。 */
     public let elapsedMillis: Int64
+    /** 触发次数，至少为一。 */
     public let firedCount: Int64
+    /** 丢弃的帧数。 */
     public let droppedFrames: Int64
 
+    /** 创建定时器事件。
+    * @param id 定时器标识
+    * @param elapsedMillis 累计毫秒数，负值按零处理
+    * @param firedCount 触发次数，小于一时按一处理
+    * @param droppedFrames 丢帧数，负值按零处理
+     */
     public init(id: String, elapsedMillis!: Int64 = 0, firedCount!: Int64 = 1, droppedFrames!: Int64 = 0) {
         this.id = id
         this.elapsedMillis = max(0, elapsedMillis)
@@ -331,9 +366,13 @@ public struct TimerEvent {
     }
 }
 
+/** 定时器任务的调度优先级。 */
 public enum TimerPriority {
+    /** 立即执行。 */
     | Immediate
+    /** 普通优先级。 */
     | Normal
+    /** 低优先级。 */
     | Low
 }
 
@@ -372,10 +411,17 @@ public enum Event {
     | Unknown(Array<Byte>)
 }
 
+/** 保存按下的按键及持续时间。 */
 public struct PressedKey {
+    /** 按键事件。 */
     public let key: KeyEvent
+    /** 持续按下的毫秒数。 */
     public let heldMillis: Int64
 
+    /** 创建按键状态快照。
+    * @param key 按键事件
+    * @param heldMillis 持续毫秒数，负值按零处理
+     */
     public init(key: KeyEvent, heldMillis!: Int64 = 0) {
         this.key = key
         this.heldMillis = max(0, heldMillis)
@@ -392,15 +438,23 @@ class InputKeyState {
     }
 }
 
+/** 跟踪按键、修饰键和按住时间。超时的按键会被移除。 */
 public class InputState {
     private let keys = ArrayList<InputKeyState>()
     private var mods: KeyModifier = KeyModifier.none()
     private let releaseAfterMillis: Int64
 
+    /** 创建输入状态。
+    * @param releaseAfterMillis 没有新按键事件时的释放超时，至少为一毫秒
+     */
     public init(releaseAfterMillis!: Int64 = 180) {
         this.releaseAfterMillis = max(1, releaseAfterMillis)
     }
 
+    /** 更新按键状态；重复按键额外产生按住事件。失焦时清空状态。
+    * @param event 输入事件
+    * @return 额外产生的事件
+     */
     public func handle(event: Event): Array<Event> {
         let generated = ArrayList<Event>()
         match (event) {
@@ -416,6 +470,10 @@ public class InputState {
         generated.toArray()
     }
 
+    /** 推进按住时间并移除超时按键。
+    * @param deltaMillis 增加的毫秒数，负值按零处理
+    * @return 仍按住的按键事件
+     */
     public func advance(deltaMillis: Int64): Array<Event> {
         let generated = ArrayList<Event>()
         var i: Int64 = 0
@@ -433,10 +491,17 @@ public class InputState {
         generated.toArray()
     }
 
+    /** 查询按键是否处于按下状态。
+    * @param key 要查询的按键
+    * @return 按下时为 true
+     */
     public func isPressed(key: KeyEvent): Bool {
         find(key) >= 0
     }
 
+    /** 获取当前按键状态快照。
+    * @return 按下的按键及持续时间
+     */
     public func pressedKeys(): Array<PressedKey> {
         let out = ArrayList<PressedKey>()
         for (state in keys) {
@@ -445,10 +510,14 @@ public class InputState {
         out.toArray()
     }
 
+    /** 获取当前按下按键的修饰键集合。
+    * @return 合并后的修饰键
+     */
     public func modifiers(): KeyModifier {
         mods
     }
 
+    /** 清空按键和修饰键状态。 */
     public func clear(): Unit {
         while (keys.size > 0) { keys.remove(at: 0) }
         mods = KeyModifier.none()
@@ -504,6 +573,7 @@ public class InputState {
     }
 }
 
+/** 增量解析输入字节为终端事件。 */
 public class EventParser {
     private let inputSource: InputSource
     private var pending = ArrayList<Byte>()
@@ -512,10 +582,17 @@ public class EventParser {
     private var pendingEscPolls: Int64 = 0
     private var inputDrainPending = false
 
+    /** 创建解析器；可注入输入源以便测试。
+    * @param inputSource 提供输入字节的来源
+     */
     public init(inputSource!: InputSource = StdinInputSource()) {
         this.inputSource = inputSource
     }
 
+    /** 追加字节并解析完整事件；不完整序列保留到下次输入。
+    * @param bytes 输入字节
+    * @return 当前解析出的事件
+     */
     public func push(bytes: Array<Byte>): Array<Event> {
         for (b in bytes) {
             pending.add(b)
@@ -530,6 +607,9 @@ public class EventParser {
         drainReady()
     }
 
+    /** 从输入源读取并解析当前可用事件；一次最多读取 65536 字节。
+    * @return 当前解析出的事件
+     */
     public func readEvents(): Array<Event> {
         // SGR mouse reports are commonly around ten bytes each.  Reading
         // only 64 bytes leaves a fast wheel gesture queued across many app
@@ -559,6 +639,9 @@ public class EventParser {
         drainReady()
     }
 
+    /** 读取一个事件；其余事件保留供后续读取。
+    * @return 下一个事件，无事件时为 None
+     */
     public func readEvent(): ?Event {
         if (ready.size == 0) {
             let events = readEvents()
@@ -574,10 +657,16 @@ public class EventParser {
         None
     }
 
+    /** 获取上次读取的字节数。
+    * @return 上次读取的字节数
+     */
     public func lastReadBytes(): Int64 {
         lastReadByteCount
     }
 
+    /** 判断上次读取是否达到单次读取上限。
+    * @return 达到上限时为 true
+     */
     public func hasPendingInputDrain(): Bool {
         inputDrainPending
     }
@@ -586,6 +675,9 @@ public class EventParser {
         pending.size == 1 && pending[0] == 0x1B
     }
 
+    /** 将单独等待中的 ESC 字节解析为 Escape 按键。
+    * @return 当前可交付的事件
+     */
     public func flushEsc(): Array<Event> {
         if (pending.size == 1 && pending[0] == 0x1B) {
             pending.remove(at: 0)
@@ -595,6 +687,10 @@ public class EventParser {
         drainReady()
     }
 
+    /** 多次轮询后将等待中的单独 ESC 解析为按键。
+    * @param polls 触发解析所需的轮询次数，至少为一
+    * @return 当前可交付的事件
+     */
     public func flushEscAfterPolls(polls: Int64): Array<Event> {
         if (pending.size == 1 && pending[0] == 0x1B) {
             pendingEscPolls++

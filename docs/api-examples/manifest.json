@@ -7347,6 +7347,266 @@
           "signature": "public init(kind: MouseKind, button: MouseButton, x: Int64, y: Int64, modifiers!: KeyModifier = KeyModifier.none())"
         }
       ]
+    },
+    {
+      "id": "input-state",
+      "source": "docs/api-examples/input-state.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "InputSource",
+          "signature": "public interface InputSource {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "InputSource.readAvailable",
+          "signature": "func readAvailable(maxBytes: Int64): Array<Byte>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TickEvent",
+          "signature": "public struct TickEvent {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TickEvent.deltaMillis",
+          "signature": "public let deltaMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TickEvent.elapsedMillis",
+          "signature": "public let elapsedMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TickEvent.frameIndex",
+          "signature": "public let frameIndex: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TickEvent.droppedFrames",
+          "signature": "public let droppedFrames: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TickEvent.init",
+          "signature": "public init(deltaMillis!: Int64 = 0, elapsedMillis!: Int64 = 0, frameIndex!: Int64 = 0, droppedFrames!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TimerMode",
+          "signature": "public enum TimerMode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TimerMode.OneShot",
+          "signature": "OneShot"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TimerMode.Repeating",
+          "signature": "Repeating"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "FrameMissPolicy",
+          "signature": "public enum FrameMissPolicy {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "FrameMissPolicy.Drop",
+          "signature": "Drop"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "FrameMissPolicy.CatchUp",
+          "signature": "CatchUp(Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TimerEvent",
+          "signature": "public struct TimerEvent {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TimerEvent.id",
+          "signature": "public let id: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TimerEvent.elapsedMillis",
+          "signature": "public let elapsedMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TimerEvent.firedCount",
+          "signature": "public let firedCount: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TimerEvent.droppedFrames",
+          "signature": "public let droppedFrames: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "TimerEvent.init",
+          "signature": "public init(id: String, elapsedMillis!: Int64 = 0, firedCount!: Int64 = 1, droppedFrames!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "PressedKey",
+          "signature": "public struct PressedKey {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "PressedKey.key",
+          "signature": "public let key: KeyEvent"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "PressedKey.heldMillis",
+          "signature": "public let heldMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "PressedKey.init",
+          "signature": "public init(key: KeyEvent, heldMillis!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "InputState",
+          "signature": "public class InputState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "InputState.init",
+          "signature": "public init(releaseAfterMillis!: Int64 = 180)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "InputState.handle",
+          "signature": "public func handle(event: Event): Array<Event>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "InputState.advance",
+          "signature": "public func advance(deltaMillis: Int64): Array<Event>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "InputState.isPressed",
+          "signature": "public func isPressed(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "InputState.pressedKeys",
+          "signature": "public func pressedKeys(): Array<PressedKey>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "InputState.modifiers",
+          "signature": "public func modifiers(): KeyModifier"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "InputState.clear",
+          "signature": "public func clear(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "EventParser",
+          "signature": "public class EventParser {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "EventParser.init",
+          "signature": "public init(inputSource!: InputSource = StdinInputSource())"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "EventParser.push",
+          "signature": "public func push(bytes: Array<Byte>): Array<Event>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "EventParser.readEvents",
+          "signature": "public func readEvents(): Array<Event>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "EventParser.readEvent",
+          "signature": "public func readEvent(): ?Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "EventParser.lastReadBytes",
+          "signature": "public func lastReadBytes(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "EventParser.hasPendingInputDrain",
+          "signature": "public func hasPendingInputDrain(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "EventParser.flushEsc",
+          "signature": "public func flushEsc(): Array<Event>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "EventParser.flushEscAfterPolls",
+          "signature": "public func flushEscAfterPolls(polls: Int64): Array<Event>"
+        }
+      ]
     }
   ]
 }
