@@ -11925,6 +11925,364 @@
           "signature": "public func markdownLineHighlights(text: String): Array<LineHighlight>"
         }
       ]
+    },
+    {
+      "id": "textarea-editing",
+      "source": "docs/api-examples/textarea-editing.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea",
+          "signature": "public class TextArea <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.value",
+          "signature": "public mut prop value: String {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.textModel",
+          "signature": "public prop textModel: EditableTextModel { get() { textModelValue } }"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.horizontalScroll",
+          "signature": "public var horizontalScroll: Int64 = 0"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.cursor",
+          "signature": "public var cursor: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.scroll",
+          "signature": "public var scroll: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.selectionStart",
+          "signature": "public var selectionStart: ?Int64 = None"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.selectionEnd",
+          "signature": "public var selectionEnd: ?Int64 = None"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.readOnly",
+          "signature": "public var readOnly: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.markdownEditing",
+          "signature": "public var markdownEditing: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.init",
+          "signature": "public init( value!: String = \"\", model!: ?EditableTextModel = None, cursor!: Int64 = 0, scroll!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), placeholder!: String = \"\", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), lineNumbers!: Bool = false, lineNumberStyle!: Style = Style(fg: Color.Indexed(8)), foldState!: ?DocumentViewState = None, readOnly!: Bool = false, markdownEditing!: Bool = false, decorations!: Array<TextDecoration> = [] )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.handleWithDirty",
+          "signature": "public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.handleVimNavigation",
+          "signature": "public func handleVimNavigation(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.setTextWidthOptions",
+          "signature": "public func setTextWidthOptions(options: TextWidthOptions): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.cursorPosition",
+          "signature": "public func cursorPosition(area: Rect, options!: TextWidthOptions): Position"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.cursorPosition",
+          "signature": "public func cursorPosition(area: Rect): Position"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.cursorPositions",
+          "signature": "public func cursorPositions(area: Rect): Array<Position>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.select",
+          "signature": "public func select(start: Int64, end: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.clearSelection",
+          "signature": "public func clearSelection(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.hasSelection",
+          "signature": "public func hasSelection(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.selectedText",
+          "signature": "public func selectedText(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.selectedRange",
+          "signature": "public func selectedRange(): ?(Int64, Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.carets",
+          "signature": "public func carets(): Array<TextAreaCaret>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.setCarets",
+          "signature": "public func setCarets(carets: Array<TextAreaCaret>): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.addCaret",
+          "signature": "public func addCaret(caret: TextAreaCaret): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.clearExtraCarets",
+          "signature": "public func clearExtraCarets(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.selectedTexts",
+          "signature": "public func selectedTexts(): Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.copySelectionTo",
+          "signature": "public func copySelectionTo(clipboard: Clipboard): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.cutSelectionTo",
+          "signature": "public func cutSelectionTo(clipboard: Clipboard): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.pasteFrom",
+          "signature": "public func pasteFrom(clipboard: Clipboard): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.deleteSelection",
+          "signature": "public func deleteSelection(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.paste",
+          "signature": "public func paste(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.setValue",
+          "signature": "public func setValue(value: String, cursor!: Int64 = -1): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.editRevision",
+          "signature": "public func editRevision(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.clearHistory",
+          "signature": "public func clearHistory(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.undo",
+          "signature": "public func undo(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.redo",
+          "signature": "public func redo(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.findNext",
+          "signature": "public func findNext(needle: String): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.findPrevious",
+          "signature": "public func findPrevious(needle: String): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.moveWordLeft",
+          "signature": "public func moveWordLeft(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.moveWordRight",
+          "signature": "public func moveWordRight(): Unit"
+        }
+      ]
+    },
+    {
+      "id": "textarea-completion",
+      "source": "docs/api-examples/textarea-completion.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.setDecorations",
+          "signature": "public func setDecorations(decorations: Array<TextDecoration>): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.setDecorationProviders",
+          "signature": "public func setDecorationProviders(providers: Array<TextDecorationProvider>): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.applyDecorationUpdate",
+          "signature": "public func applyDecorationUpdate(layer: String, update: TextDecorationUpdate): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.clearDecorationLayer",
+          "signature": "public func clearDecorationLayer(layer: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.beginCompletion",
+          "signature": "public func beginCompletion(requestId: String): TextCompletionRequest"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.completionCommand",
+          "signature": "public func completionCommand(requestId: String, provider: (TextCompletionRequest) -> TextCompletionResult): Command"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.handleCompletionEvent",
+          "signature": "public func handleCompletionEvent(event: Event): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.completionVisible",
+          "signature": "public func completionVisible(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.cancelCompletion",
+          "signature": "public func cancelCompletion(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.completionRows",
+          "signature": "public func completionRows(maximum!: Int64 = 5): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextArea.renderCompletionOverlay",
+          "signature": "public func renderCompletionOverlay(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

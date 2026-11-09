@@ -253,10 +253,12 @@ public class MarkdownHighlightCache {
     }
 }
 
+/** 多行文本编辑控件，支持选择、多个光标、补全和装饰。 */
 public class TextArea <: Widget {
     private let textModelValue: EditableTextModel
     // Explicit whole-document access remains convenient for small inputs.
     // Editing, movement and viewport rendering use the indexed model directly.
+    /** 完整文本；赋值替换文档并记录编辑历史。 */
     public mut prop value: String {
         get() { textModelValue.text() }
         set(next) {
@@ -268,7 +270,9 @@ public class TextArea <: Widget {
             clearRedo()
         }
     }
+    /** 底层可编辑文本模型。 */
     public prop textModel: EditableTextModel { get() { textModelValue } }
+    /** 水平显示列滚动偏移。 */
     public var horizontalScroll: Int64 = 0
     private var viewportHeight: Int64 = 1
     private var viewportWidth: Int64 = 0
@@ -276,9 +280,13 @@ public class TextArea <: Widget {
     private var preferredColumn: ?Int64 = None
     private var verticalColumns: Array<Int64> = []
     private var verticalOffsets: Array<Int64> = []
+    /** 主光标的 UTF-8 字节偏移。 */
     public var cursor: Int64
+    /** 垂直可见行滚动偏移。 */
     public var scroll: Int64
+    /** 主选择的可选起始字节偏移。 */
     public var selectionStart: ?Int64 = None
+    /** 主选择的可选结束字节偏移。 */
     public var selectionEnd: ?Int64 = None
     private let block: ?Block
     private let style: Style
@@ -288,7 +296,9 @@ public class TextArea <: Widget {
     private let lineNumbers: Bool
     private let lineNumberStyle: Style
     private let foldState: ?DocumentViewState
+    /** 是否拒绝交互式文本编辑。 */
     public var readOnly: Bool
+    /** 是否启用 Markdown 编辑辅助。 */
     public var markdownEditing: Bool
     private var decorationProviders: Array<TextDecorationProvider> = []
     private let decorationLayerNames = ArrayList<String>()
@@ -313,6 +323,23 @@ public class TextArea <: Widget {
     private var cachedFoldRevision: Int64 = -1
     private var cachedLineRebuilds: Int64 = 0
 
+    /** 创建多行文本区域；传入 model 时使用模型内容。
+     * @param value 未提供模型时的初始文本
+     * @param model 可选文本模型
+     * @param cursor 初始光标字节偏移
+     * @param scroll 初始垂直滚动行数
+     * @param block 可选边框
+     * @param style 文本样式
+     * @param selectedStyle 选中文本样式
+     * @param placeholder 空文本时的占位内容
+     * @param placeholderStyle 占位内容样式
+     * @param lineNumbers 是否显示行号
+     * @param lineNumberStyle 行号样式
+     * @param foldState 可选文档折叠状态
+     * @param readOnly 是否只读
+     * @param markdownEditing 是否启用 Markdown 编辑辅助
+     * @param decorations 初始文本装饰
+     */
     public init(
         value!: String = "",
         model!: ?EditableTextModel = None,
@@ -350,6 +377,10 @@ public class TextArea <: Widget {
         this.decorations = decorations
     }
 
+    /** 处理输入、导航、选择和编辑按键；只读时拒绝修改文本的操作。
+     * @param key 按键事件
+     * @return 识别并处理时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         synchronizeValue()
         if (completionOpen && handleCompletionKey(key)) { return true }
@@ -430,6 +461,11 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 处理按键并估算需要重绘的区域。
+     * @param key 按键事件
+     * @param area 文本区域
+     * @return 处理后的脏区域；未处理时为 None
+     */
     public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects {
         let beforeRevision = editRevision()
         let beforePosition = cursorPosition(area)
@@ -453,6 +489,10 @@ public class TextArea <: Widget {
         Some(dirty)
     }
 
+    /** 处理 h、j、k、l、w、b 等 Vim 导航键。
+     * @param key 按键事件
+     * @return 识别到导航键时为 true
+     */
     public func handleVimNavigation(key: KeyEvent): Bool {
         match (key.code) {
             case Char(r'h') => handle(KeyEvent(KeyCode.Left, modifiers: key.modifiers))
@@ -472,7 +512,9 @@ public class TextArea <: Widget {
         }
     }
 
-    /** 设置后续光标及鼠标定位所使用的文本宽度策略。绘制时会与缓冲区同步。 */
+    /** 设置后续光标及鼠标定位所使用的文本宽度策略。绘制时会与缓冲区同步。
+     * @param options 文本宽度策略
+     */
     public func setTextWidthOptions(options: TextWidthOptions): Unit {
         if (usesWideAmbiguous(options) != usesWideAmbiguous(textWidthOptionsValue)) {
             preferredColumn = None
@@ -482,6 +524,10 @@ public class TextArea <: Widget {
         textWidthOptionsValue = options
     }
 
+    /** 同步文本和宽度策略，绘制可见内容及补全菜单。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         setTextWidthOptions(buffer.textWidthOptions())
         synchronizeValue()
@@ -516,12 +562,20 @@ public class TextArea <: Widget {
         renderCompletion(area, textTarget, buffer)
     }
 
-    /** 使用指定宽度策略计算主光标位置，也将其用于后续定位与编辑。 */
+    /** 使用指定宽度策略计算主光标位置，也将其用于后续定位与编辑。
+     * @param area 文本区域
+     * @param options 文本宽度策略
+     * @return 主光标屏幕坐标
+     */
     public func cursorPosition(area: Rect, options!: TextWidthOptions): Position {
         setTextWidthOptions(options)
         cursorPosition(area)
     }
 
+    /** 计算主光标在区域中的屏幕位置，并调整滚动使其可见。
+     * @param area 文本区域
+     * @return 主光标屏幕坐标
+     */
     public func cursorPosition(area: Rect): Position {
         synchronizeValue()
         let target = textViewport(area)
@@ -535,6 +589,10 @@ public class TextArea <: Widget {
             target.y + clamp(row - scroll, 0, max(0, target.height - 1)))
     }
 
+    /** 获取主光标及可见附加光标的屏幕位置。
+     * @param area 文本区域
+     * @return 光标坐标数组
+     */
     public func cursorPositions(area: Rect): Array<Position> {
         let out = ArrayList<Position>()
         out.add(cursorPosition(area))
@@ -550,16 +608,24 @@ public class TextArea <: Widget {
         out.toArray()
     }
 
+    /** 设置主选择范围；偏移按文本模型边界规范化。
+     * @param start 起始字节偏移
+     * @param end 结束字节偏移
+     */
     public func select(start: Int64, end: Int64): Unit {
         selectionStart = Some(textModelValue.clampOffset(start))
         selectionEnd = Some(textModelValue.clampOffset(end))
     }
 
+    /** 清除主选择范围。 */
     public func clearSelection(): Unit {
         selectionStart = None
         selectionEnd = None
     }
 
+    /** 判断主选择是否为非空范围。
+     * @return 存在非空选择时为 true
+     */
     public func hasSelection(): Bool {
         match ((selectionStart, selectionEnd)) {
             case (Some(a), Some(b)) => a != b
@@ -567,6 +633,9 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 获取主选择的文本。
+     * @return 选中文本；无选择时为空字符串
+     */
     public func selectedText(): String {
         synchronizeValue()
         match (selectionBounds()) {
@@ -575,11 +644,17 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 获取按起止顺序排列的主选择范围。
+     * @return 字节偏移范围；无选择时为 None
+     */
     public func selectedRange(): ?(Int64, Int64) {
         synchronizeValue()
         selectionBounds()
     }
 
+    /** 获取主光标和附加光标的快照。
+     * @return 光标数组，主光标位于首项
+     */
     public func carets(): Array<TextAreaCaret> {
         let out = ArrayList<TextAreaCaret>()
         out.add(primaryCaret())
@@ -587,6 +662,9 @@ public class TextArea <: Widget {
         out.toArray()
     }
 
+    /** 设置主光标及附加光标；空数组保留主光标并清除选择与附加光标。
+     * @param carets 新光标数组
+     */
     public func setCarets(carets: Array<TextAreaCaret>): Unit {
         verticalColumns = []
         preferredColumn = None
@@ -604,6 +682,9 @@ public class TextArea <: Widget {
         extraCarets = extras.toArray()
     }
 
+    /** 添加一个按模型边界规范化的附加光标。
+     * @param caret 附加光标
+     */
     public func addCaret(caret: TextAreaCaret): Unit {
         verticalColumns = []
         preferredColumn = None
@@ -613,10 +694,14 @@ public class TextArea <: Widget {
         extraCarets = extras.toArray()
     }
 
+    /** 清除附加光标。 */
     public func clearExtraCarets(): Unit {
         extraCarets = []
     }
 
+    /** 获取所有具有非空选择的光标对应文本。
+     * @return 选中文本数组
+     */
     public func selectedTexts(): Array<String> {
         synchronizeValue()
         let out = ArrayList<String>()
@@ -629,11 +714,19 @@ public class TextArea <: Widget {
         out.toArray()
     }
 
+    /** 将主选择复制到剪贴板。
+     * @param clipboard 目标剪贴板
+     * @return 存在选择且写入成功时为 true
+     */
     public func copySelectionTo(clipboard: Clipboard): Bool {
         if (!hasSelection()) { return false }
         clipboard.writeText(selectedText()).isSuccess()
     }
 
+    /** 复制主选择，并在写入成功后删除；只读时拒绝。
+     * @param clipboard 目标剪贴板
+     * @return 成功剪切时为 true
+     */
     public func cutSelectionTo(clipboard: Clipboard): Bool {
         if (readOnly) { return false }
         if (!copySelectionTo(clipboard)) { return false }
@@ -641,11 +734,15 @@ public class TextArea <: Widget {
         true
     }
 
+    /** 读取剪贴板并粘贴成功读取的文本；只读时不会修改文本。
+     * @param clipboard 来源剪贴板
+     */
     public func pasteFrom(clipboard: Clipboard): Unit {
         let result = clipboard.readText()
         if (result.isSuccess()) { paste(result.text) }
     }
 
+    /** 删除主选择；只读或没有选择时不操作。 */
     public func deleteSelection(): Unit {
         if (readOnly) { return }
         if (!hasSelection()) { return }
@@ -655,20 +752,34 @@ public class TextArea <: Widget {
         clearRedo()
     }
 
+    /** 在光标处插入或替换选择；只读时不操作。
+     * @param text 要粘贴的文本
+     */
     public func paste(text: String): Unit {
         if (readOnly) { return }
         synchronizeValue()
         replaceSelectionOrInsert(text)
     }
 
+    /** 替换静态文本装饰。
+     * @param decorations 文本装饰
+     */
     public func setDecorations(decorations: Array<TextDecoration>): Unit {
         this.decorations = decorations
     }
 
+    /** 替换动态装饰提供方。
+     * @param providers 装饰提供方
+     */
     public func setDecorationProviders(providers: Array<TextDecorationProvider>): Unit {
         decorationProviders = providers
     }
 
+    /** 应用与当前文本修订和长度匹配的装饰层更新。
+     * @param layer 装饰层标识
+     * @param update 带修订号的装饰更新
+     * @return 更新被接受时为 true
+     */
     public func applyDecorationUpdate(layer: String, update: TextDecorationUpdate): Bool {
         synchronizeValue()
         if (update.revision != revision || update.end > textModelValue.byteLength()) { return false }
@@ -681,6 +792,10 @@ public class TextArea <: Widget {
         store.apply(update)
     }
 
+    /** 移除指定装饰层。
+     * @param layer 装饰层标识
+     * @return 找到并移除时为 true
+     */
     public func clearDecorationLayer(layer: String): Bool {
         for (i in 0..decorationLayerNames.size) {
             if (decorationLayerNames[i] == layer) {
@@ -701,6 +816,10 @@ public class TextArea <: Widget {
         for (store in decorationStores) { store.reset(textModelValue.revision()) }
     }
 
+    /** 替换全文、清除选择和编辑历史；默认将光标移到文本末尾。
+     * @param value 新文本
+     * @param cursor 光标字节偏移；负值表示文本末尾
+     */
     public func setValue(value: String, cursor!: Int64 = -1): Unit {
         textModelValue.replace(0, textModelValue.byteLength(), value)
         this.cursor = if (cursor < 0) { textModelValue.byteLength() } else { textModelValue.clampOffset(cursor) }
@@ -713,11 +832,19 @@ public class TextArea <: Widget {
         clearHistory()
     }
 
+    /** 同步并获取文本修订号。
+     * @return 当前修订号
+     */
     public func editRevision(): Int64 {
         synchronizeValue()
         revision
     }
 
+    /** 处理左键定位、拖动选择及修饰键多光标交互。
+     * @param mouse 鼠标事件
+     * @param area 文本区域
+     * @return 处理事件时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         synchronizeValue()
         match (mouse.button) {
@@ -767,6 +894,10 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 开始补全并记录当前修订与前缀。
+     * @param requestId 请求标识
+     * @return 提供方使用的请求快照
+     */
     public func beginCompletion(requestId: String): TextCompletionRequest {
         synchronizeValue()
         _ = cancelCompletion()
@@ -781,11 +912,20 @@ public class TextArea <: Widget {
         TextCompletionRequest(requestId, revision, source, cursor, start, cursor, textModelValue.slice(start, cursor), line, column)
     }
 
+    /** 创建运行补全提供方的异步命令，并开始对应请求。
+     * @param requestId 请求标识
+     * @param provider 补全提供方
+     * @return 异步补全命令
+     */
     public func completionCommand(requestId: String, provider: (TextCompletionRequest) -> TextCompletionResult): Command {
         let request = beginCompletion(requestId)
         Command.AsyncTask(requestId, { => Event.TextCompletion(requestId, provider(request)) })
     }
 
+    /** 接收匹配当前请求和修订的补全结果。
+     * @param event 补全事件或包含补全的异步结果
+     * @return 结果被接受且有候选项时为 true
+     */
     public func handleCompletionEvent(event: Event): Bool {
         match (event) {
             case Event.TextCompletion(_, result) => applyCompletionResult(result)
@@ -798,11 +938,17 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 判断补全候选列表是否打开。
+     * @return 打开时为 true
+     */
     public func completionVisible(): Bool {
         synchronizeValue()
         completionOpen
     }
 
+    /** 取消当前请求并关闭补全候选列表。
+     * @return 取消前列表打开时为 true
+     */
     public func cancelCompletion(): Bool {
         let wasOpen = completionOpen
         completionOpen = false
@@ -817,12 +963,20 @@ public class TextArea <: Widget {
         _ = cancelCompletion()
     }
 
+    /** 获取可显示的补全候选行数。
+     * @param maximum 最大行数，负值按零处理
+     * @return 候选行数
+     */
     public func completionRows(maximum!: Int64 = 5): Int64 {
         synchronizeValue()
         if (!completionOpen) { return 0 }
         min(max(0, maximum), completionItems.size)
     }
 
+    /** 在文本区域中单独绘制补全覆盖层。
+     * @param area 文本区域
+     * @param buffer 目标缓冲区
+     */
     public func renderCompletionOverlay(area: Rect, buffer: Buffer): Unit {
         synchronizeValue()
         var target = area
@@ -832,6 +986,7 @@ public class TextArea <: Widget {
         renderCompletion(area, textTarget, buffer)
     }
 
+    /** 清除撤销和重做历史。 */
     public func clearHistory(): Unit {
         undoGroupSnapshot = None
         textModelValue.clearHistory()
@@ -860,6 +1015,9 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 撤销一次文本编辑。
+     * @return 存在可撤销编辑并成功时为 true
+     */
     public func undo(): Bool {
         endUndoGroup()
         synchronizeValue()
@@ -871,6 +1029,9 @@ public class TextArea <: Widget {
         true
     }
 
+    /** 重做一次已撤销编辑。
+     * @return 存在可重做编辑并成功时为 true
+     */
     public func redo(): Bool {
         endUndoGroup()
         synchronizeValue()
@@ -892,6 +1053,10 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 从光标向后查找并选中匹配文本。
+     * @param needle 要查找的文本
+     * @return 匹配的字节偏移；未找到时为 None
+     */
     public func findNext(needle: String): ?Int64 {
         synchronizeValue()
         let idx = stringIndexOf(value, needle, cursor)
@@ -903,6 +1068,10 @@ public class TextArea <: Widget {
         None
     }
 
+    /** 从光标向前查找并选中匹配文本。
+     * @param needle 要查找的文本
+     * @return 匹配的字节偏移；未找到时为 None
+     */
     public func findPrevious(needle: String): ?Int64 {
         synchronizeValue()
         let idx = stringLastIndexOf(value, needle, cursor)
@@ -914,11 +1083,13 @@ public class TextArea <: Widget {
         None
     }
 
+    /** 将主光标移动到左侧词边界并清除主选择。 */
     public func moveWordLeft(): Unit {
         cursor = wordOffset(cursor, false)
         clearSelection()
     }
 
+    /** 将主光标移动到右侧词边界并清除主选择。 */
     public func moveWordRight(): Unit {
         cursor = wordOffset(cursor, true)
         clearSelection()

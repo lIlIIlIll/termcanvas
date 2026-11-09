@@ -2198,85 +2198,85 @@ packages/core/src/text_area.cj:215:public func lineHighlights(text: String): Arr
 packages/core/src/text_area.cj:226:public func visibleHighlights(text: String, firstLine!: Int64 = 0, lineCount!: Int64 = 40): Array<TextDecoration>
 packages/core/src/text_area.cj:244:public func recomputeCount(): Int64
 packages/core/src/text_area.cj:249:public func invalidate(): Unit
-packages/core/src/text_area.cj:256:public class TextArea <: Widget {
-packages/core/src/text_area.cj:260:public mut prop value: String {
-packages/core/src/text_area.cj:271:public prop textModel: EditableTextModel { get() { textModelValue } }
-packages/core/src/text_area.cj:272:public var horizontalScroll: Int64 = 0
-packages/core/src/text_area.cj:279:public var cursor: Int64
-packages/core/src/text_area.cj:280:public var scroll: Int64
-packages/core/src/text_area.cj:281:public var selectionStart: ?Int64 = None
-packages/core/src/text_area.cj:282:public var selectionEnd: ?Int64 = None
-packages/core/src/text_area.cj:291:public var readOnly: Bool
-packages/core/src/text_area.cj:292:public var markdownEditing: Bool
-packages/core/src/text_area.cj:316:public init( value!: String = "", model!: ?EditableTextModel = None, cursor!: Int64 = 0, scroll!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), lineNumbers!: Bool = false, lineNumberStyle!: Style = Style(fg: Color.Indexed(8)), foldState!: ?DocumentViewState = None, readOnly!: Bool = false, markdownEditing!: Bool = false, decorations!: Array<TextDecoration> = [] )
-packages/core/src/text_area.cj:353:public func handle(key: KeyEvent): Bool
-packages/core/src/text_area.cj:433:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
-packages/core/src/text_area.cj:456:public func handleVimNavigation(key: KeyEvent): Bool
-packages/core/src/text_area.cj:476:public func setTextWidthOptions(options: TextWidthOptions): Unit
-packages/core/src/text_area.cj:485:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/text_area.cj:520:public func cursorPosition(area: Rect, options!: TextWidthOptions): Position
-packages/core/src/text_area.cj:525:public func cursorPosition(area: Rect): Position
-packages/core/src/text_area.cj:538:public func cursorPositions(area: Rect): Array<Position>
-packages/core/src/text_area.cj:553:public func select(start: Int64, end: Int64): Unit
-packages/core/src/text_area.cj:558:public func clearSelection(): Unit
-packages/core/src/text_area.cj:563:public func hasSelection(): Bool
-packages/core/src/text_area.cj:570:public func selectedText(): String
-packages/core/src/text_area.cj:578:public func selectedRange(): ?(Int64, Int64)
-packages/core/src/text_area.cj:583:public func carets(): Array<TextAreaCaret>
-packages/core/src/text_area.cj:590:public func setCarets(carets: Array<TextAreaCaret>): Unit
-packages/core/src/text_area.cj:607:public func addCaret(caret: TextAreaCaret): Unit
-packages/core/src/text_area.cj:616:public func clearExtraCarets(): Unit
-packages/core/src/text_area.cj:620:public func selectedTexts(): Array<String>
-packages/core/src/text_area.cj:632:public func copySelectionTo(clipboard: Clipboard): Bool
-packages/core/src/text_area.cj:637:public func cutSelectionTo(clipboard: Clipboard): Bool
-packages/core/src/text_area.cj:644:public func pasteFrom(clipboard: Clipboard): Unit
-packages/core/src/text_area.cj:649:public func deleteSelection(): Unit
-packages/core/src/text_area.cj:658:public func paste(text: String): Unit
-packages/core/src/text_area.cj:664:public func setDecorations(decorations: Array<TextDecoration>): Unit
-packages/core/src/text_area.cj:668:public func setDecorationProviders(providers: Array<TextDecorationProvider>): Unit
-packages/core/src/text_area.cj:672:public func applyDecorationUpdate(layer: String, update: TextDecorationUpdate): Bool
-packages/core/src/text_area.cj:684:public func clearDecorationLayer(layer: String): Bool
-packages/core/src/text_area.cj:704:public func setValue(value: String, cursor!: Int64 = -1): Unit
-packages/core/src/text_area.cj:716:public func editRevision(): Int64
-packages/core/src/text_area.cj:721:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/text_area.cj:770:public func beginCompletion(requestId: String): TextCompletionRequest
-packages/core/src/text_area.cj:784:public func completionCommand(requestId: String, provider: (TextCompletionRequest) -> TextCompletionResult): Command
-packages/core/src/text_area.cj:789:public func handleCompletionEvent(event: Event): Bool
-packages/core/src/text_area.cj:801:public func completionVisible(): Bool
-packages/core/src/text_area.cj:806:public func cancelCompletion(): Bool
-packages/core/src/text_area.cj:820:public func completionRows(maximum!: Int64 = 5): Int64
-packages/core/src/text_area.cj:826:public func renderCompletionOverlay(area: Rect, buffer: Buffer): Unit
-packages/core/src/text_area.cj:835:public func clearHistory(): Unit
-packages/core/src/text_area.cj:863:public func undo(): Bool
-packages/core/src/text_area.cj:874:public func redo(): Bool
-packages/core/src/text_area.cj:895:public func findNext(needle: String): ?Int64
-packages/core/src/text_area.cj:906:public func findPrevious(needle: String): ?Int64
-packages/core/src/text_area.cj:917:public func moveWordLeft(): Unit
-packages/core/src/text_area.cj:922:public func moveWordRight(): Unit
-packages/core/src/text_area.cj:1450:public func lineCacheRebuildCount(): Int64
-packages/core/src/text_area.cj:1901:public func markdownDecorations(text: String): Array<TextDecoration>
-packages/core/src/text_area.cj:1928:public func markdownLineHighlights(text: String): Array<LineHighlight>
-packages/core/src/text_area.cj:2039:public class MarkdownEditorBehavior {
-packages/core/src/text_area.cj:2042:public init()
-packages/core/src/text_area.cj:2044:public func applyHighlights(area: TextArea): Unit
-packages/core/src/text_area.cj:2048:public func invalidate(): Unit
-packages/core/src/text_area.cj:2052:public func handle(area: TextArea, key: KeyEvent): Bool
-packages/core/src/text_area.cj:2085:public func toggleBold(area: TextArea): Bool
-packages/core/src/text_area.cj:2090:public func toggleItalic(area: TextArea): Bool
-packages/core/src/text_area.cj:2095:public func toggleCode(area: TextArea): Bool
-packages/core/src/text_area.cj:2100:public func insertLink(area: TextArea, url!: String = "https://example.com"): Bool
-packages/core/src/text_area.cj:2110:public func insertImage(area: TextArea, url!: String = "image.png", alt!: String = "alt"): Bool
-packages/core/src/text_area.cj:2128:public func insertReferenceLink(area: TextArea, id!: String = "ref"): Bool
-packages/core/src/text_area.cj:2138:public func insertReferenceDefinition(area: TextArea, id!: String = "ref", url!: String = "https://example.com", title!: String = ""): Bool
-packages/core/src/text_area.cj:2145:public func insertFrontmatter(area: TextArea, title!: String = "Untitled"): Bool
-packages/core/src/text_area.cj:2156:public func insertTable(area: TextArea): Bool
-packages/core/src/text_area.cj:2162:public func insertCodeFence(area: TextArea, language!: String = ""): Bool
-packages/core/src/text_area.cj:2169:public class MarkdownTextEditor <: Widget {
-packages/core/src/text_area.cj:2170:public let area: TextArea
-packages/core/src/text_area.cj:2171:public let behavior: MarkdownEditorBehavior
-packages/core/src/text_area.cj:2173:public init(value!: String = "", block!: ?Block = None, lineNumbers!: Bool = true)
-packages/core/src/text_area.cj:2178:public func handle(key: KeyEvent): Bool
-packages/core/src/text_area.cj:2182:public func render(areaRect: Rect, buffer: Buffer): Unit
+packages/core/src/text_area.cj:257:public class TextArea <: Widget {
+packages/core/src/text_area.cj:262:public mut prop value: String {
+packages/core/src/text_area.cj:274:public prop textModel: EditableTextModel { get() { textModelValue } }
+packages/core/src/text_area.cj:276:public var horizontalScroll: Int64 = 0
+packages/core/src/text_area.cj:284:public var cursor: Int64
+packages/core/src/text_area.cj:286:public var scroll: Int64
+packages/core/src/text_area.cj:288:public var selectionStart: ?Int64 = None
+packages/core/src/text_area.cj:290:public var selectionEnd: ?Int64 = None
+packages/core/src/text_area.cj:300:public var readOnly: Bool
+packages/core/src/text_area.cj:302:public var markdownEditing: Bool
+packages/core/src/text_area.cj:343:public init( value!: String = "", model!: ?EditableTextModel = None, cursor!: Int64 = 0, scroll!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), lineNumbers!: Bool = false, lineNumberStyle!: Style = Style(fg: Color.Indexed(8)), foldState!: ?DocumentViewState = None, readOnly!: Bool = false, markdownEditing!: Bool = false, decorations!: Array<TextDecoration> = [] )
+packages/core/src/text_area.cj:384:public func handle(key: KeyEvent): Bool
+packages/core/src/text_area.cj:469:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+packages/core/src/text_area.cj:496:public func handleVimNavigation(key: KeyEvent): Bool
+packages/core/src/text_area.cj:518:public func setTextWidthOptions(options: TextWidthOptions): Unit
+packages/core/src/text_area.cj:531:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/text_area.cj:570:public func cursorPosition(area: Rect, options!: TextWidthOptions): Position
+packages/core/src/text_area.cj:579:public func cursorPosition(area: Rect): Position
+packages/core/src/text_area.cj:596:public func cursorPositions(area: Rect): Array<Position>
+packages/core/src/text_area.cj:615:public func select(start: Int64, end: Int64): Unit
+packages/core/src/text_area.cj:621:public func clearSelection(): Unit
+packages/core/src/text_area.cj:629:public func hasSelection(): Bool
+packages/core/src/text_area.cj:639:public func selectedText(): String
+packages/core/src/text_area.cj:650:public func selectedRange(): ?(Int64, Int64)
+packages/core/src/text_area.cj:658:public func carets(): Array<TextAreaCaret>
+packages/core/src/text_area.cj:668:public func setCarets(carets: Array<TextAreaCaret>): Unit
+packages/core/src/text_area.cj:688:public func addCaret(caret: TextAreaCaret): Unit
+packages/core/src/text_area.cj:698:public func clearExtraCarets(): Unit
+packages/core/src/text_area.cj:705:public func selectedTexts(): Array<String>
+packages/core/src/text_area.cj:721:public func copySelectionTo(clipboard: Clipboard): Bool
+packages/core/src/text_area.cj:730:public func cutSelectionTo(clipboard: Clipboard): Bool
+packages/core/src/text_area.cj:740:public func pasteFrom(clipboard: Clipboard): Unit
+packages/core/src/text_area.cj:746:public func deleteSelection(): Unit
+packages/core/src/text_area.cj:758:public func paste(text: String): Unit
+packages/core/src/text_area.cj:767:public func setDecorations(decorations: Array<TextDecoration>): Unit
+packages/core/src/text_area.cj:774:public func setDecorationProviders(providers: Array<TextDecorationProvider>): Unit
+packages/core/src/text_area.cj:783:public func applyDecorationUpdate(layer: String, update: TextDecorationUpdate): Bool
+packages/core/src/text_area.cj:799:public func clearDecorationLayer(layer: String): Bool
+packages/core/src/text_area.cj:823:public func setValue(value: String, cursor!: Int64 = -1): Unit
+packages/core/src/text_area.cj:838:public func editRevision(): Int64
+packages/core/src/text_area.cj:848:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/text_area.cj:901:public func beginCompletion(requestId: String): TextCompletionRequest
+packages/core/src/text_area.cj:920:public func completionCommand(requestId: String, provider: (TextCompletionRequest) -> TextCompletionResult): Command
+packages/core/src/text_area.cj:929:public func handleCompletionEvent(event: Event): Bool
+packages/core/src/text_area.cj:944:public func completionVisible(): Bool
+packages/core/src/text_area.cj:952:public func cancelCompletion(): Bool
+packages/core/src/text_area.cj:970:public func completionRows(maximum!: Int64 = 5): Int64
+packages/core/src/text_area.cj:980:public func renderCompletionOverlay(area: Rect, buffer: Buffer): Unit
+packages/core/src/text_area.cj:990:public func clearHistory(): Unit
+packages/core/src/text_area.cj:1021:public func undo(): Bool
+packages/core/src/text_area.cj:1035:public func redo(): Bool
+packages/core/src/text_area.cj:1060:public func findNext(needle: String): ?Int64
+packages/core/src/text_area.cj:1075:public func findPrevious(needle: String): ?Int64
+packages/core/src/text_area.cj:1087:public func moveWordLeft(): Unit
+packages/core/src/text_area.cj:1093:public func moveWordRight(): Unit
+packages/core/src/text_area.cj:1621:public func lineCacheRebuildCount(): Int64
+packages/core/src/text_area.cj:2072:public func markdownDecorations(text: String): Array<TextDecoration>
+packages/core/src/text_area.cj:2099:public func markdownLineHighlights(text: String): Array<LineHighlight>
+packages/core/src/text_area.cj:2210:public class MarkdownEditorBehavior {
+packages/core/src/text_area.cj:2213:public init()
+packages/core/src/text_area.cj:2215:public func applyHighlights(area: TextArea): Unit
+packages/core/src/text_area.cj:2219:public func invalidate(): Unit
+packages/core/src/text_area.cj:2223:public func handle(area: TextArea, key: KeyEvent): Bool
+packages/core/src/text_area.cj:2256:public func toggleBold(area: TextArea): Bool
+packages/core/src/text_area.cj:2261:public func toggleItalic(area: TextArea): Bool
+packages/core/src/text_area.cj:2266:public func toggleCode(area: TextArea): Bool
+packages/core/src/text_area.cj:2271:public func insertLink(area: TextArea, url!: String = "https://example.com"): Bool
+packages/core/src/text_area.cj:2281:public func insertImage(area: TextArea, url!: String = "image.png", alt!: String = "alt"): Bool
+packages/core/src/text_area.cj:2299:public func insertReferenceLink(area: TextArea, id!: String = "ref"): Bool
+packages/core/src/text_area.cj:2309:public func insertReferenceDefinition(area: TextArea, id!: String = "ref", url!: String = "https://example.com", title!: String = ""): Bool
+packages/core/src/text_area.cj:2316:public func insertFrontmatter(area: TextArea, title!: String = "Untitled"): Bool
+packages/core/src/text_area.cj:2327:public func insertTable(area: TextArea): Bool
+packages/core/src/text_area.cj:2333:public func insertCodeFence(area: TextArea, language!: String = ""): Bool
+packages/core/src/text_area.cj:2340:public class MarkdownTextEditor <: Widget {
+packages/core/src/text_area.cj:2341:public let area: TextArea
+packages/core/src/text_area.cj:2342:public let behavior: MarkdownEditorBehavior
+packages/core/src/text_area.cj:2344:public init(value!: String = "", block!: ?Block = None, lineNumbers!: Bool = true)
+packages/core/src/text_area.cj:2349:public func handle(key: KeyEvent): Bool
+packages/core/src/text_area.cj:2353:public func render(areaRect: Rect, buffer: Buffer): Unit
 packages/core/src/text_buffer.cj:6:public struct TextPosition <: Equatable<TextPosition> {
 packages/core/src/text_buffer.cj:8:public let line: Int64
 packages/core/src/text_buffer.cj:10:public let column: Int64
