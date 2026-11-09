@@ -1111,85 +1111,85 @@ packages/core/src/form_widgets.cj:955:public func setVisualState( focused!: Bool
 packages/core/src/form_widgets.cj:971:public func value(): String
 packages/core/src/form_widgets.cj:975:public func handle(key: KeyEvent): Bool
 packages/core/src/form_widgets.cj:1007:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/geometry.cj:5:public struct Rect <: Equatable<Rect> {
-packages/core/src/geometry.cj:6:public var x: Int64
-packages/core/src/geometry.cj:7:public var y: Int64
-packages/core/src/geometry.cj:8:public var width: Int64
-packages/core/src/geometry.cj:9:public var height: Int64
-packages/core/src/geometry.cj:11:public init(x: Int64, y: Int64, width: Int64, height: Int64)
-packages/core/src/geometry.cj:18:public operator func ==(other: Rect): Bool
-packages/core/src/geometry.cj:22:public prop right: Int64 { get() { x + width } }
-packages/core/src/geometry.cj:23:public prop bottom: Int64 { get() { y + height } }
-packages/core/src/geometry.cj:26:public struct Position {
-packages/core/src/geometry.cj:27:public var x: Int64
-packages/core/src/geometry.cj:28:public var y: Int64
-packages/core/src/geometry.cj:29:public init(x: Int64, y: Int64)
-packages/core/src/geometry.cj:35:public enum Direction {
-packages/core/src/geometry.cj:36:Horizontal
-packages/core/src/geometry.cj:37:Vertical
-packages/core/src/geometry.cj:40:public enum Constraint {
-packages/core/src/geometry.cj:41:Length(Int64)
-packages/core/src/geometry.cj:42:Percent(Int64)
-packages/core/src/geometry.cj:43:Min(Int64)
-packages/core/src/geometry.cj:44:Max(Int64)
-packages/core/src/geometry.cj:45:Ratio(Int64, Int64)
-packages/core/src/geometry.cj:48:public enum Flex {
-packages/core/src/geometry.cj:49:Start
-packages/core/src/geometry.cj:50:Center
-packages/core/src/geometry.cj:51:End
-packages/core/src/geometry.cj:52:SpaceBetween
-packages/core/src/geometry.cj:55:public struct Spacing {
-packages/core/src/geometry.cj:56:public let left: Int64
-packages/core/src/geometry.cj:57:public let right: Int64
-packages/core/src/geometry.cj:58:public let top: Int64
-packages/core/src/geometry.cj:59:public let bottom: Int64
-packages/core/src/geometry.cj:61:public init(left!: Int64 = 0, right!: Int64 = 0, top!: Int64 = 0, bottom!: Int64 = 0)
-packages/core/src/geometry.cj:68:public static func zero(): Spacing
-packages/core/src/geometry.cj:72:public static func all(value: Int64): Spacing
-packages/core/src/geometry.cj:76:public static func symmetric(horizontal!: Int64 = 0, vertical!: Int64 = 0): Spacing
-packages/core/src/geometry.cj:80:public func inner(area: Rect): Rect
-packages/core/src/geometry.cj:90:public class Layout {
-packages/core/src/geometry.cj:97:public init( direction: Direction, constraints: Array<Constraint>, flex!: Flex = Flex.Start, gap!: Int64 = 0, margin!: Spacing = Spacing.zero() )
-packages/core/src/geometry.cj:111:public static func horizontal(constraints: Array<Constraint>): Layout
-packages/core/src/geometry.cj:115:public static func vertical(constraints: Array<Constraint>): Layout
-packages/core/src/geometry.cj:119:public func withFlex(flex: Flex): Layout
-packages/core/src/geometry.cj:123:public func withGap(gap: Int64): Layout
-packages/core/src/geometry.cj:127:public func withMargin(margin: Spacing): Layout
-packages/core/src/geometry.cj:131:public func split(area: Rect): Array<Rect>
-packages/core/src/geometry.cj:238:public struct SizeHint {
-packages/core/src/geometry.cj:239:public let minWidth: Int64
-packages/core/src/geometry.cj:240:public let minHeight: Int64
-packages/core/src/geometry.cj:241:public let preferredWidth: Int64
-packages/core/src/geometry.cj:242:public let preferredHeight: Int64
-packages/core/src/geometry.cj:243:public let maxWidth: Int64
-packages/core/src/geometry.cj:244:public let maxHeight: Int64
-packages/core/src/geometry.cj:246:public init( minWidth!: Int64 = 0, minHeight!: Int64 = 0, preferredWidth!: Int64 = 0, preferredHeight!: Int64 = 0, maxWidth!: Int64 = Int64.Max, maxHeight!: Int64 = Int64.Max )
-packages/core/src/geometry.cj:263:public interface Sizable {
-packages/core/src/geometry.cj:264:func sizeHint(): SizeHint
-packages/core/src/geometry.cj:267:public class Grid {
-packages/core/src/geometry.cj:273:public init(rows: Array<Constraint>, columns: Array<Constraint>, gap!: Int64 = 0, margin!: Spacing = Spacing.zero())
-packages/core/src/geometry.cj:280:public func split(area: Rect): Array<Array<Rect>>
-packages/core/src/geometry.cj:291:public struct FlexItem {
-packages/core/src/geometry.cj:292:public let basis: Int64
-packages/core/src/geometry.cj:293:public let grow: Int64
-packages/core/src/geometry.cj:294:public let shrink: Int64
-packages/core/src/geometry.cj:295:public let minSize: Int64
-packages/core/src/geometry.cj:296:public let maxSize: Int64
-packages/core/src/geometry.cj:298:public init( basis!: Int64 = 0, grow!: Int64 = 1, shrink!: Int64 = 1, minSize!: Int64 = 0, maxSize!: Int64 = Int64.Max )
-packages/core/src/geometry.cj:312:public static func fromSizeHint( hint: SizeHint, direction: Direction, grow!: Int64 = 1, shrink!: Int64 = 1 ): FlexItem
-packages/core/src/geometry.cj:325:public class FlexLayoutResult {
-packages/core/src/geometry.cj:326:public let rects: Array<Rect>
-packages/core/src/geometry.cj:328:public let constraintsSatisfied: Bool
-packages/core/src/geometry.cj:329:public let effectiveGap: Int64
-packages/core/src/geometry.cj:331:public init(rects: Array<Rect>, constraintsSatisfied: Bool, effectiveGap: Int64)
-packages/core/src/geometry.cj:338:public class FlexLayout {
-packages/core/src/geometry.cj:343:public init(direction: Direction, items: Array<FlexItem>, gap!: Int64 = 0)
-packages/core/src/geometry.cj:349:public func split(area: Rect): Array<Rect>
-packages/core/src/geometry.cj:351:public func resolve(area: Rect): FlexLayoutResult
-packages/core/src/geometry.cj:464:public class LayoutCache {
-packages/core/src/geometry.cj:469:public init()
-packages/core/src/geometry.cj:471:public func get(area: Rect, compute: (Rect) -> Array<Rect>): Array<Rect>
-packages/core/src/geometry.cj:484:public func invalidate(): Unit
+packages/core/src/geometry.cj:6:public struct Rect <: Equatable<Rect> {
+packages/core/src/geometry.cj:8:public var x: Int64
+packages/core/src/geometry.cj:10:public var y: Int64
+packages/core/src/geometry.cj:12:public var width: Int64
+packages/core/src/geometry.cj:14:public var height: Int64
+packages/core/src/geometry.cj:22:public init(x: Int64, y: Int64, width: Int64, height: Int64)
+packages/core/src/geometry.cj:33:public operator func ==(other: Rect): Bool
+packages/core/src/geometry.cj:38:public prop right: Int64 { get() { x + width } }
+packages/core/src/geometry.cj:40:public prop bottom: Int64 { get() { y + height } }
+packages/core/src/geometry.cj:44:public struct Position {
+packages/core/src/geometry.cj:46:public var x: Int64
+packages/core/src/geometry.cj:48:public var y: Int64
+packages/core/src/geometry.cj:53:public init(x: Int64, y: Int64)
+packages/core/src/geometry.cj:60:public enum Direction {
+packages/core/src/geometry.cj:62:Horizontal
+packages/core/src/geometry.cj:64:Vertical
+packages/core/src/geometry.cj:68:public enum Constraint {
+packages/core/src/geometry.cj:72:Length(Int64)
+packages/core/src/geometry.cj:76:Percent(Int64)
+packages/core/src/geometry.cj:80:Min(Int64)
+packages/core/src/geometry.cj:84:Max(Int64)
+packages/core/src/geometry.cj:89:Ratio(Int64, Int64)
+packages/core/src/geometry.cj:93:public enum Flex {
+packages/core/src/geometry.cj:95:Start
+packages/core/src/geometry.cj:97:Center
+packages/core/src/geometry.cj:99:End
+packages/core/src/geometry.cj:101:SpaceBetween
+packages/core/src/geometry.cj:105:public struct Spacing {
+packages/core/src/geometry.cj:107:public let left: Int64
+packages/core/src/geometry.cj:109:public let right: Int64
+packages/core/src/geometry.cj:111:public let top: Int64
+packages/core/src/geometry.cj:113:public let bottom: Int64
+packages/core/src/geometry.cj:121:public init(left!: Int64 = 0, right!: Int64 = 0, top!: Int64 = 0, bottom!: Int64 = 0)
+packages/core/src/geometry.cj:131:public static func zero(): Spacing
+packages/core/src/geometry.cj:139:public static func all(value: Int64): Spacing
+packages/core/src/geometry.cj:148:public static func symmetric(horizontal!: Int64 = 0, vertical!: Int64 = 0): Spacing
+packages/core/src/geometry.cj:156:public func inner(area: Rect): Rect
+packages/core/src/geometry.cj:167:public class Layout {
+packages/core/src/geometry.cj:181:public init( direction: Direction, constraints: Array<Constraint>, flex!: Flex = Flex.Start, gap!: Int64 = 0, margin!: Spacing = Spacing.zero() )
+packages/core/src/geometry.cj:199:public static func horizontal(constraints: Array<Constraint>): Layout
+packages/core/src/geometry.cj:207:public static func vertical(constraints: Array<Constraint>): Layout
+packages/core/src/geometry.cj:215:public func withFlex(flex: Flex): Layout
+packages/core/src/geometry.cj:223:public func withGap(gap: Int64): Layout
+packages/core/src/geometry.cj:231:public func withMargin(margin: Spacing): Layout
+packages/core/src/geometry.cj:239:public func split(area: Rect): Array<Rect>
+packages/core/src/geometry.cj:346:public struct SizeHint {
+packages/core/src/geometry.cj:347:public let minWidth: Int64
+packages/core/src/geometry.cj:348:public let minHeight: Int64
+packages/core/src/geometry.cj:349:public let preferredWidth: Int64
+packages/core/src/geometry.cj:350:public let preferredHeight: Int64
+packages/core/src/geometry.cj:351:public let maxWidth: Int64
+packages/core/src/geometry.cj:352:public let maxHeight: Int64
+packages/core/src/geometry.cj:354:public init( minWidth!: Int64 = 0, minHeight!: Int64 = 0, preferredWidth!: Int64 = 0, preferredHeight!: Int64 = 0, maxWidth!: Int64 = Int64.Max, maxHeight!: Int64 = Int64.Max )
+packages/core/src/geometry.cj:371:public interface Sizable {
+packages/core/src/geometry.cj:372:func sizeHint(): SizeHint
+packages/core/src/geometry.cj:375:public class Grid {
+packages/core/src/geometry.cj:381:public init(rows: Array<Constraint>, columns: Array<Constraint>, gap!: Int64 = 0, margin!: Spacing = Spacing.zero())
+packages/core/src/geometry.cj:388:public func split(area: Rect): Array<Array<Rect>>
+packages/core/src/geometry.cj:399:public struct FlexItem {
+packages/core/src/geometry.cj:400:public let basis: Int64
+packages/core/src/geometry.cj:401:public let grow: Int64
+packages/core/src/geometry.cj:402:public let shrink: Int64
+packages/core/src/geometry.cj:403:public let minSize: Int64
+packages/core/src/geometry.cj:404:public let maxSize: Int64
+packages/core/src/geometry.cj:406:public init( basis!: Int64 = 0, grow!: Int64 = 1, shrink!: Int64 = 1, minSize!: Int64 = 0, maxSize!: Int64 = Int64.Max )
+packages/core/src/geometry.cj:420:public static func fromSizeHint( hint: SizeHint, direction: Direction, grow!: Int64 = 1, shrink!: Int64 = 1 ): FlexItem
+packages/core/src/geometry.cj:433:public class FlexLayoutResult {
+packages/core/src/geometry.cj:434:public let rects: Array<Rect>
+packages/core/src/geometry.cj:436:public let constraintsSatisfied: Bool
+packages/core/src/geometry.cj:437:public let effectiveGap: Int64
+packages/core/src/geometry.cj:439:public init(rects: Array<Rect>, constraintsSatisfied: Bool, effectiveGap: Int64)
+packages/core/src/geometry.cj:446:public class FlexLayout {
+packages/core/src/geometry.cj:451:public init(direction: Direction, items: Array<FlexItem>, gap!: Int64 = 0)
+packages/core/src/geometry.cj:457:public func split(area: Rect): Array<Rect>
+packages/core/src/geometry.cj:459:public func resolve(area: Rect): FlexLayoutResult
+packages/core/src/geometry.cj:572:public class LayoutCache {
+packages/core/src/geometry.cj:577:public init()
+packages/core/src/geometry.cj:579:public func get(area: Rect, compute: (Rect) -> Array<Rect>): Array<Rect>
+packages/core/src/geometry.cj:592:public func invalidate(): Unit
 packages/core/src/glyph_capability.cj:4:public enum GlyphCapability {
 packages/core/src/glyph_capability.cj:5:Unknown
 packages/core/src/glyph_capability.cj:6:VerifiedSupported

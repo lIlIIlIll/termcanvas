@@ -472,6 +472,290 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "core-geometry-layout",
+      "source": "docs/api-examples/geometry.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Rect",
+          "signature": "public struct Rect <: Equatable<Rect> {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Rect.x",
+          "signature": "public var x: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Rect.y",
+          "signature": "public var y: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Rect.width",
+          "signature": "public var width: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Rect.height",
+          "signature": "public var height: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Rect.init",
+          "signature": "public init(x: Int64, y: Int64, width: Int64, height: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Rect.operator_==",
+          "signature": "public operator func ==(other: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Rect.right",
+          "signature": "public prop right: Int64 { get() { x + width } }"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Rect.bottom",
+          "signature": "public prop bottom: Int64 { get() { y + height } }"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Position",
+          "signature": "public struct Position {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Position.x",
+          "signature": "public var x: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Position.y",
+          "signature": "public var y: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Position.init",
+          "signature": "public init(x: Int64, y: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Direction",
+          "signature": "public enum Direction {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Direction.Horizontal",
+          "signature": "Horizontal"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Direction.Vertical",
+          "signature": "Vertical"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Constraint",
+          "signature": "public enum Constraint {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Constraint.Length",
+          "signature": "Length(Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Constraint.Percent",
+          "signature": "Percent(Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Constraint.Min",
+          "signature": "Min(Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Constraint.Max",
+          "signature": "Max(Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Constraint.Ratio",
+          "signature": "Ratio(Int64, Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Flex",
+          "signature": "public enum Flex {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Flex.Start",
+          "signature": "Start"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Flex.Center",
+          "signature": "Center"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Flex.End",
+          "signature": "End"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Flex.SpaceBetween",
+          "signature": "SpaceBetween"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Spacing",
+          "signature": "public struct Spacing {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Spacing.left",
+          "signature": "public let left: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Spacing.right",
+          "signature": "public let right: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Spacing.top",
+          "signature": "public let top: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Spacing.bottom",
+          "signature": "public let bottom: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Spacing.init",
+          "signature": "public init(left!: Int64 = 0, right!: Int64 = 0, top!: Int64 = 0, bottom!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Spacing.zero",
+          "signature": "public static func zero(): Spacing"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Spacing.all",
+          "signature": "public static func all(value: Int64): Spacing"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Spacing.symmetric",
+          "signature": "public static func symmetric(horizontal!: Int64 = 0, vertical!: Int64 = 0): Spacing"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Spacing.inner",
+          "signature": "public func inner(area: Rect): Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Layout",
+          "signature": "public class Layout {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Layout.init",
+          "signature": "public init( direction: Direction, constraints: Array<Constraint>, flex!: Flex = Flex.Start, gap!: Int64 = 0, margin!: Spacing = Spacing.zero() )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Layout.horizontal",
+          "signature": "public static func horizontal(constraints: Array<Constraint>): Layout"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Layout.vertical",
+          "signature": "public static func vertical(constraints: Array<Constraint>): Layout"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Layout.withFlex",
+          "signature": "public func withFlex(flex: Flex): Layout"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Layout.withGap",
+          "signature": "public func withGap(gap: Int64): Layout"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Layout.withMargin",
+          "signature": "public func withMargin(margin: Spacing): Layout"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Layout.split",
+          "signature": "public func split(area: Rect): Array<Rect>"
+        }
+      ]
     }
   ]
 }
