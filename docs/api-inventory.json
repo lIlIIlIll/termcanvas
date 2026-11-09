@@ -13787,7 +13787,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1338,
+      "line": 1340,
       "level": "top_level",
       "kind": "class",
       "symbol": "FilePicker",
@@ -13805,7 +13805,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1339,
+      "line": 1343,
       "level": "member",
       "kind": "var",
       "symbol": "path",
@@ -13823,7 +13823,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1343,
+      "line": 1349,
       "level": "member",
       "kind": "var",
       "symbol": "searchText",
@@ -13841,7 +13841,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1344,
+      "line": 1352,
       "level": "member",
       "kind": "var",
       "symbol": "showHidden",
@@ -13859,7 +13859,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1346,
+      "line": 1359,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -13877,7 +13877,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1353,
+      "line": 1368,
       "level": "member",
       "kind": "func",
       "symbol": "refresh",
@@ -13895,7 +13895,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1376,
+      "line": 1394,
       "level": "member",
       "kind": "func",
       "symbol": "selectedEntry",
@@ -13913,7 +13913,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1384,
+      "line": 1405,
       "level": "member",
       "kind": "func",
       "symbol": "selectedPath",
@@ -13931,7 +13931,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1391,
+      "line": 1415,
       "level": "member",
       "kind": "func",
       "symbol": "chooseSelected",
@@ -13949,7 +13949,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1395,
+      "line": 1422,
       "level": "member",
       "kind": "func",
       "symbol": "setSearch",
@@ -13967,7 +13967,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1402,
+      "line": 1431,
       "level": "member",
       "kind": "func",
       "symbol": "toggleHidden",
@@ -13985,7 +13985,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1407,
+      "line": 1439,
       "level": "member",
       "kind": "func",
       "symbol": "selectedInfo",
@@ -14003,7 +14003,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1416,
+      "line": 1451,
       "level": "member",
       "kind": "func",
       "symbol": "enterSelected",
@@ -14021,7 +14021,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1431,
+      "line": 1469,
       "level": "member",
       "kind": "func",
       "symbol": "parent",
@@ -14039,7 +14039,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1441,
+      "line": 1484,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -14057,7 +14057,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1469,
+      "line": 1516,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -14075,7 +14075,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1474,
+      "line": 1523,
       "level": "top_level",
       "kind": "class",
       "symbol": "FileEntryInfo",
@@ -14093,7 +14093,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1475,
+      "line": 1526,
       "level": "member",
       "kind": "let",
       "symbol": "name",
@@ -14111,7 +14111,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1476,
+      "line": 1529,
       "level": "member",
       "kind": "let",
       "symbol": "path",
@@ -14129,7 +14129,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1477,
+      "line": 1532,
       "level": "member",
       "kind": "let",
       "symbol": "isDir",
@@ -14147,7 +14147,7 @@
     {
       "package": "core",
       "path": "packages/core/src/data_widgets.cj",
-      "line": 1479,
+      "line": 1539,
       "level": "member",
       "kind": "init",
       "symbol": "init",

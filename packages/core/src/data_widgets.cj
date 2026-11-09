@@ -1335,14 +1335,27 @@ func compareStrings(left: String, right: String): Int64 {
     0
 }
 
+/** 浏览目录并选择文件或目录。
+ */
 public class FilePicker <: Widget {
+    /** 当前目录路径；直接修改后需调用 refresh。
+     */
     public var path: String
     private let extension: String
     private let state = ListState(selected: Some(0))
     private var entries: Array<String> = []
+    /** 按名称包含关系过滤的搜索文本。
+     */
     public var searchText: String = ""
+    /** 是否显示以点开头的项目。
+     */
     public var showHidden: Bool = false
 
+    /** 创建选择器并读取目录。
+     * @param path 初始目录
+     * @param extension 文件名后缀过滤条件；空字符串不过滤
+     * @param showHidden 是否显示隐藏项目
+     */
     public init(path!: String = ".", extension!: String = "", showHidden!: Bool = false) {
         this.path = path
         this.extension = extension
@@ -1350,6 +1363,8 @@ public class FilePicker <: Widget {
         refresh()
     }
 
+    /** 重新读取当前目录，目录排在文件前；读取失败时仍保留父目录项。
+     */
     public func refresh(): Unit {
         let dirs = ArrayList<String>()
         let files = ArrayList<String>()
@@ -1373,6 +1388,9 @@ public class FilePicker <: Widget {
         entries = dirs.toArray()
     }
 
+    /** 获取选中项目的名称。
+     * @return 名称或 None。
+     */
     public func selectedEntry(): ?String {
         match (state.selected) {
             case Some(index) =>
@@ -1381,6 +1399,9 @@ public class FilePicker <: Widget {
         }
     }
 
+    /** 获取选中项目路径；父目录项解析为父目录。
+     * @return 路径或 None。
+     */
     public func selectedPath(): ?String {
         match (selectedEntry()) {
             case Some(entry) => Some(if (entry == "..") { parentPath(path) } else { joinPath(path, entry) })
@@ -1388,10 +1409,16 @@ public class FilePicker <: Widget {
         }
     }
 
+    /** 取得当前选择的路径。
+     * @return 路径或 None。
+     */
     public func chooseSelected(): ?String {
         selectedPath()
     }
 
+    /** 设置搜索文本、重置选择并刷新目录。
+     * @param text 名称包含的文本
+     */
     public func setSearch(text: String): Unit {
         searchText = text
         state.select(Some(0))
@@ -1399,11 +1426,16 @@ public class FilePicker <: Widget {
         refresh()
     }
 
+    /** 切换隐藏项目的显示并刷新目录。
+     */
     public func toggleHidden(): Unit {
         showHidden = !showHidden
         refresh()
     }
 
+    /** 取得选中项目的名称、路径及目录标记。
+     * @return 项目信息或 None。
+     */
     public func selectedInfo(): ?FileEntryInfo {
         match (selectedEntry()) {
             case Some(entry) =>
@@ -1413,6 +1445,9 @@ public class FilePicker <: Widget {
         }
     }
 
+    /** 当选中项为目录时进入并刷新。
+     * @return 成功进入目录时为 true。
+     */
     public func enterSelected(): Bool {
         match (selectedPath()) {
             case Some(nextPath) =>
@@ -1428,6 +1463,9 @@ public class FilePicker <: Widget {
         }
     }
 
+    /** 切换到父目录并刷新。
+     * @return 路径变化时为 true。
+     */
     public func parent(): Bool {
         let nextPath = parentPath(path)
         if (nextPath == path) { return false }
@@ -1438,6 +1476,11 @@ public class FilePicker <: Widget {
         true
     }
 
+    /** 处理选择移动、翻页和进入目录按键。
+     * @param key 键盘事件
+     * @param viewportHeight 列表可见行数
+     * @return 支持的导航键返回 true；回车返回进入目录的结果。
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
         match (key.code) {
             case KeyCode.Up =>
@@ -1466,16 +1509,33 @@ public class FilePicker <: Widget {
         }
     }
 
+    /** 在区域内绘制文件列表。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         List(entries, state: Some(state), block: Block(title: path)).render(area, buffer)
     }
 }
 
+/** 文件选择器中项目的基本信息。
+ */
 public class FileEntryInfo {
+    /** 项目名称。
+     */
     public let name: String
+    /** 项目路径。
+     */
     public let path: String
+    /** 项目是否为目录。
+     */
     public let isDir: Bool
 
+    /** 创建项目信息。
+     * @param name 项目名称
+     * @param path 项目路径
+     * @param isDir 是否为目录
+     */
     public init(name: String, path: String, isDir: Bool) {
         this.name = name
         this.path = path

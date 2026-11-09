@@ -14045,6 +14045,146 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "file-picker",
+      "source": "docs/api-examples/file-picker.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker",
+          "signature": "public class FilePicker <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.path",
+          "signature": "public var path: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.searchText",
+          "signature": "public var searchText: String = \"\""
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.showHidden",
+          "signature": "public var showHidden: Bool = false"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.init",
+          "signature": "public init(path!: String = \".\", extension!: String = \"\", showHidden!: Bool = false)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.refresh",
+          "signature": "public func refresh(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.selectedEntry",
+          "signature": "public func selectedEntry(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.selectedPath",
+          "signature": "public func selectedPath(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.chooseSelected",
+          "signature": "public func chooseSelected(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.setSearch",
+          "signature": "public func setSearch(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.toggleHidden",
+          "signature": "public func toggleHidden(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.selectedInfo",
+          "signature": "public func selectedInfo(): ?FileEntryInfo"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.enterSelected",
+          "signature": "public func enterSelected(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.parent",
+          "signature": "public func parent(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.handle",
+          "signature": "public func handle(key: KeyEvent, viewportHeight: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FilePicker.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FileEntryInfo",
+          "signature": "public class FileEntryInfo {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FileEntryInfo.name",
+          "signature": "public let name: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FileEntryInfo.path",
+          "signature": "public let path: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FileEntryInfo.isDir",
+          "signature": "public let isDir: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "FileEntryInfo.init",
+          "signature": "public init(name: String, path: String, isDir: Bool)"
+        }
+      ]
     }
   ]
 }
