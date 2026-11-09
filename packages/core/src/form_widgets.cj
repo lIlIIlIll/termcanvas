@@ -343,8 +343,11 @@ private func formVisualStyle(style: Style, focusedStyle: ?Style, disabledStyle: 
     themedNormal(style, theme)
 }
 
+/** 按行显示单选项，支持键盘导航和鼠标选择。 */
 public class RadioGroup <: Widget {
+    /** 选中项索引；绘制时限制在有效范围内。 */
     public var selected: Int64
+    /** 首个可见选项的索引。 */
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1
     private let items: Array<String>
@@ -358,6 +361,18 @@ public class RadioGroup <: Widget {
     private let theme: ?Theme
     private var renderedTheme: ?Theme = None
 
+    /** 创建单选组。
+     * @param items 选项文本
+     * @param selected 初始选中索引
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param block 可选边框
+     * @param style 普通样式
+     * @param focusedStyle 聚焦样式
+     * @param selectedStyle 选中样式
+     * @param disabledStyle 禁用样式
+     * @param theme 可选语义主题
+     */
     public init(
         items: Array<String>,
         selected!: Int64 = 0,
@@ -382,6 +397,10 @@ public class RadioGroup <: Widget {
         this.theme = theme
     }
 
+    /** 处理方向、首尾、翻页及确认按键；禁用或没有选项时返回 false。
+     * @param key 按键事件
+     * @return 识别到按键时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         if (disabled || items.size == 0) { return false }
         if (let Some(index) <- selectionNavigation(key, selected, items.size, viewportHeight)) {
@@ -400,9 +419,19 @@ public class RadioGroup <: Widget {
         }
     }
 
-    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    /** 使用已有主题信息计算交互区域并处理鼠标事件。
+     * @param mouse 鼠标事件
+     * @param area 控件区域
+     * @return 处理鼠标事件时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
 
+    /** 处理鼠标选择或滚轮，并使用布局主题计算可见区域。
+     * @param mouse 鼠标事件
+     * @param area 控件区域
+     * @param layoutTheme 可选布局主题
+     * @return 处理鼠标事件时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
         if (disabled) { return false }
         let target = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
@@ -414,6 +443,10 @@ public class RadioGroup <: Widget {
         false
     }
 
+    /** 绘制可见选项并使选中项保持可见。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         renderedTheme = buffer.resolveTheme(None)
         var target = area
@@ -460,6 +493,7 @@ public class Select <: Widget {
     /** 当前选项的索引；在有效范围内时可用于获取选项文字，并决定绘制时哪一行使用选中样式。
      */
     public var selected: Int64
+    /** 首个可见选项的索引。 */
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1
     private let block: ?Block
@@ -467,6 +501,13 @@ public class Select <: Widget {
     private let style: Style
     private let selectedStyle: ?Style
 
+    /** 创建选项列表。
+     * @param items 选项文本
+     * @param selected 初始选中索引
+     * @param block 可选边框
+     * @param style 普通样式
+     * @param selectedStyle 选中样式
+     */
     public init(
         items: Array<String>,
         selected!: Int64 = 0,
@@ -481,10 +522,17 @@ public class Select <: Widget {
         this.selectedStyle = selectedStyle
     }
 
+    /** 获取当前选中项文本；无效索引返回 None。
+     * @return 选中项文本
+     */
     public func selectedValue(): ?String {
         if (selected >= 0 && selected < items.size) { Some(items[selected]) } else { None }
     }
 
+    /** 导航按键移动选中项；回车或空格确认当前项。
+     * @param key 按键事件
+     * @return 确认的选项；导航或未处理时为 None
+     */
     public func handle(key: KeyEvent): ?String {
         if (items.size == 0) { return None }
         if (let Some(index) <- selectionNavigation(key, selected, items.size, viewportHeight)) {
@@ -509,9 +557,19 @@ public class Select <: Widget {
         }
     }
 
-    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    /** 使用已有主题信息计算交互区域并处理鼠标事件。
+     * @param mouse 鼠标事件
+     * @param area 控件区域
+     * @return 点击选项时返回其文本；滚轮或未命中时为 None
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?String { handleMouse(mouse, area, layoutTheme: None) }
 
+    /** 处理鼠标选择或滚轮，并使用布局主题计算可见区域。
+     * @param mouse 鼠标事件
+     * @param area 控件区域
+     * @param layoutTheme 可选布局主题
+     * @return 点击选项时返回其文本；滚轮或未命中时为 None
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): ?String {
         let target = controlBlockArea(area, block, Option<Theme>.None, layoutTheme, renderedTheme)
         offset = selectionViewportOffset(offset, selected, items.size, target.height)
@@ -522,6 +580,10 @@ public class Select <: Widget {
         None
     }
 
+    /** 绘制可见选项并使选中项保持可见。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         renderedTheme = buffer.resolveTheme(None)
         var target = area
