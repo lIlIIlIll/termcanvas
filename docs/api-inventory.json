@@ -8958,7 +8958,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 552,
+      "line": 553,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -8976,7 +8976,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 575,
+      "line": 576,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -8994,7 +8994,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 579,
+      "line": 580,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -9012,7 +9012,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 594,
+      "line": 595,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -9030,7 +9030,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 615,
+      "line": 616,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -9048,7 +9048,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 651,
+      "line": 653,
       "level": "top_level",
       "kind": "class",
       "symbol": "ConfirmDialog",
@@ -9066,7 +9066,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 653,
+      "line": 655,
       "level": "member",
       "kind": "var",
       "symbol": "confirmed",
@@ -9084,7 +9084,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 655,
+      "line": 657,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9102,7 +9102,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 673,
+      "line": 675,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -9120,7 +9120,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 677,
+      "line": 679,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -9138,7 +9138,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 697,
+      "line": 699,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -9156,7 +9156,7 @@
     {
       "package": "core",
       "path": "packages/core/src/command_widgets.cj",
-      "line": 706,
+      "line": 708,
       "level": "member",
       "kind": "func",
       "symbol": "render",

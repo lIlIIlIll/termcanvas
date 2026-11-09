@@ -548,6 +548,7 @@ public class Dialog <: Widget {
     private let style: ?Style
     private let selectedStyle: ?Style
     private var theme: ?Theme = None
+    private var renderedTheme: ?Theme = None
 
     public init(
         title!: String = "",
@@ -601,7 +602,7 @@ public class Dialog <: Widget {
         let actualHeight = min(height, area.height)
         let outer = Rect(area.x + max(0, (area.width - actualWidth) / 2),
             area.y + max(0, (area.height - actualHeight) / 2), actualWidth, actualHeight)
-        let inner = Block(title: title).inner(outer)
+        let inner = controlBlockArea(outer, Some(Block(title: title)), theme, None, renderedTheme)
         if (!widgetHitTest(mouse, inner) || mouse.y != outer.bottom - 2) { return None }
         var x = inner.x
         for (i in 0..buttons.size) {
@@ -614,6 +615,7 @@ public class Dialog <: Widget {
 
     public func render(area: Rect, buffer: Buffer): Unit {
         textWidthOptionsValue = buffer.textWidthOptions()
+        renderedTheme = buffer.resolveTheme(None)
         normalizeSelected()
         let actualWidth = min(width, area.width)
         let actualHeight = min(height, area.height)
