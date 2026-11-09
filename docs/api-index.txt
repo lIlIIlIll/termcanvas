@@ -332,48 +332,48 @@ packages/core/src/buffer.cj:745:public let x: Int64
 packages/core/src/buffer.cj:746:public let y: Int64
 packages/core/src/buffer.cj:747:public let cell: Cell
 packages/core/src/buffer.cj:749:public init(x: Int64, y: Int64, cell: Cell)
-packages/core/src/canvas.cj:5:public enum ResizePolicy {
-packages/core/src/canvas.cj:6:Stretch
-packages/core/src/canvas.cj:7:Letterbox
-packages/core/src/canvas.cj:8:Pillarbox
-packages/core/src/canvas.cj:9:Center
-packages/core/src/canvas.cj:12:public struct ViewportFit {
-packages/core/src/canvas.cj:13:public let area: Rect
-packages/core/src/canvas.cj:14:public let content: Rect
-packages/core/src/canvas.cj:15:public let tooSmall: Bool
-packages/core/src/canvas.cj:16:public let scaleX: Float64
-packages/core/src/canvas.cj:17:public let scaleY: Float64
-packages/core/src/canvas.cj:19:public init(area: Rect, content: Rect, tooSmall!: Bool = false, scaleX!: Float64 = 1.0, scaleY!: Float64 = 1.0)
-packages/core/src/canvas.cj:28:public class SizeGuard {
-packages/core/src/canvas.cj:29:public let minWidth: Int64
-packages/core/src/canvas.cj:30:public let minHeight: Int64
-packages/core/src/canvas.cj:32:public init(minWidth: Int64, minHeight: Int64)
-packages/core/src/canvas.cj:37:public func fit(area: Rect, policy!: ResizePolicy = ResizePolicy.Center): ViewportFit
-packages/core/src/canvas.cj:50:public class Surface {
-packages/core/src/canvas.cj:51:public let area: Rect
-packages/core/src/canvas.cj:52:public let zIndex: Int64
-packages/core/src/canvas.cj:55:public init(area: Rect, zIndex!: Int64 = 0)
-packages/core/src/canvas.cj:61:public func canvas(): Canvas
-packages/core/src/canvas.cj:65:public func bufferView(): Buffer
-packages/core/src/canvas.cj:70:public class Canvas {
-packages/core/src/canvas.cj:76:public init(buffer: Buffer, clip: Rect, translateX!: Int64 = 0, translateY!: Int64 = 0)
-packages/core/src/canvas.cj:84:public func textWidthOptions(): TextWidthOptions
-packages/core/src/canvas.cj:91:public func createSurface(area: Rect, zIndex!: Int64 = 0): Surface
-packages/core/src/canvas.cj:97:public func withClip(area: Rect): Canvas
-packages/core/src/canvas.cj:101:public func translated(x: Int64, y: Int64): Canvas
-packages/core/src/canvas.cj:105:public func viewport(camera: Position): Canvas
-packages/core/src/canvas.cj:109:public func fillRect(area: Rect, style: Style): Unit
-packages/core/src/canvas.cj:115:public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit
-packages/core/src/canvas.cj:119:public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit
-packages/core/src/canvas.cj:126:public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit
-packages/core/src/canvas.cj:138:public func strokeRect(area: Rect, style: Style, horizontal!: String = "-", vertical!: String = "|", corner!: String = "+"): Unit
-packages/core/src/canvas.cj:151:public func strokeBorder(area: Rect, style: Style, border!: ?BorderSet = None): Unit
-packages/core/src/canvas.cj:176:public func drawLine(x1: Int64, y1: Int64, x2: Int64, y2: Int64, symbol: String, style: Style): Unit
-packages/core/src/canvas.cj:199:public func drawText(x: Int64, y: Int64, text: String, style: Style): Unit
-packages/core/src/canvas.cj:258:public func drawSprite(x: Int64, y: Int64, lines: Array<String>, style: Style): Unit
-packages/core/src/canvas.cj:264:public func render(widget: Widget, area: Rect): Unit
-packages/core/src/canvas.cj:276:public func composite(surface: Surface): Unit
-packages/core/src/canvas.cj:283:public func centeredViewport(area: Rect, width: Int64, height: Int64): Rect
+packages/core/src/canvas.cj:6:public enum ResizePolicy {
+packages/core/src/canvas.cj:8:Stretch
+packages/core/src/canvas.cj:10:Letterbox
+packages/core/src/canvas.cj:12:Pillarbox
+packages/core/src/canvas.cj:14:Center
+packages/core/src/canvas.cj:18:public struct ViewportFit {
+packages/core/src/canvas.cj:20:public let area: Rect
+packages/core/src/canvas.cj:22:public let content: Rect
+packages/core/src/canvas.cj:24:public let tooSmall: Bool
+packages/core/src/canvas.cj:26:public let scaleX: Float64
+packages/core/src/canvas.cj:28:public let scaleY: Float64
+packages/core/src/canvas.cj:37:public init(area: Rect, content: Rect, tooSmall!: Bool = false, scaleX!: Float64 = 1.0, scaleY!: Float64 = 1.0)
+packages/core/src/canvas.cj:47:public class SizeGuard {
+packages/core/src/canvas.cj:49:public let minWidth: Int64
+packages/core/src/canvas.cj:51:public let minHeight: Int64
+packages/core/src/canvas.cj:57:public init(minWidth: Int64, minHeight: Int64)
+packages/core/src/canvas.cj:67:public func fit(area: Rect, policy!: ResizePolicy = ResizePolicy.Center): ViewportFit
+packages/core/src/canvas.cj:81:public class Surface {
+packages/core/src/canvas.cj:83:public let area: Rect
+packages/core/src/canvas.cj:85:public let zIndex: Int64
+packages/core/src/canvas.cj:92:public init(area: Rect, zIndex!: Int64 = 0)
+packages/core/src/canvas.cj:101:public func canvas(): Canvas
+packages/core/src/canvas.cj:108:public func bufferView(): Buffer
+packages/core/src/canvas.cj:114:public class Canvas {
+packages/core/src/canvas.cj:126:public init(buffer: Buffer, clip: Rect, translateX!: Int64 = 0, translateY!: Int64 = 0)
+packages/core/src/canvas.cj:136:public func textWidthOptions(): TextWidthOptions
+packages/core/src/canvas.cj:146:public func createSurface(area: Rect, zIndex!: Int64 = 0): Surface
+packages/core/src/canvas.cj:156:public func withClip(area: Rect): Canvas
+packages/core/src/canvas.cj:165:public func translated(x: Int64, y: Int64): Canvas
+packages/core/src/canvas.cj:173:public func viewport(camera: Position): Canvas
+packages/core/src/canvas.cj:181:public func fillRect(area: Rect, style: Style): Unit
+packages/core/src/canvas.cj:194:public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit
+packages/core/src/canvas.cj:205:public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit
+packages/core/src/canvas.cj:219:public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit
+packages/core/src/canvas.cj:238:public func strokeRect(area: Rect, style: Style, horizontal!: String = "-", vertical!: String = "|", corner!: String = "+"): Unit
+packages/core/src/canvas.cj:255:public func strokeBorder(area: Rect, style: Style, border!: ?BorderSet = None): Unit
+packages/core/src/canvas.cj:288:public func drawLine(x1: Int64, y1: Int64, x2: Int64, y2: Int64, symbol: String, style: Style): Unit
+packages/core/src/canvas.cj:317:public func drawText(x: Int64, y: Int64, text: String, style: Style): Unit
+packages/core/src/canvas.cj:382:public func drawSprite(x: Int64, y: Int64, lines: Array<String>, style: Style): Unit
+packages/core/src/canvas.cj:392:public func render(widget: Widget, area: Rect): Unit
+packages/core/src/canvas.cj:406:public func composite(surface: Surface): Unit
+packages/core/src/canvas.cj:419:public func centeredViewport(area: Rect, width: Int64, height: Int64): Rect
 packages/core/src/clipboard.cj:10:public enum ClipboardStatus {
 packages/core/src/clipboard.cj:11:Success
 packages/core/src/clipboard.cj:12:Unavailable

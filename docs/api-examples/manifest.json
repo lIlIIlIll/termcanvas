@@ -3996,6 +3996,272 @@
           "signature": "public func serialize(): String"
         }
       ]
+    },
+    {
+      "id": "core-canvas-and-surface",
+      "source": "docs/api-examples/canvas.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ResizePolicy",
+          "signature": "public enum ResizePolicy {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ResizePolicy.Stretch",
+          "signature": "Stretch"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ResizePolicy.Letterbox",
+          "signature": "Letterbox"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ResizePolicy.Pillarbox",
+          "signature": "Pillarbox"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ResizePolicy.Center",
+          "signature": "Center"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ViewportFit",
+          "signature": "public struct ViewportFit {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ViewportFit.area",
+          "signature": "public let area: Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ViewportFit.content",
+          "signature": "public let content: Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ViewportFit.tooSmall",
+          "signature": "public let tooSmall: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ViewportFit.scaleX",
+          "signature": "public let scaleX: Float64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ViewportFit.scaleY",
+          "signature": "public let scaleY: Float64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "ViewportFit.init",
+          "signature": "public init(area: Rect, content: Rect, tooSmall!: Bool = false, scaleX!: Float64 = 1.0, scaleY!: Float64 = 1.0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "SizeGuard",
+          "signature": "public class SizeGuard {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "SizeGuard.minWidth",
+          "signature": "public let minWidth: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "SizeGuard.minHeight",
+          "signature": "public let minHeight: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "SizeGuard.init",
+          "signature": "public init(minWidth: Int64, minHeight: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "SizeGuard.fit",
+          "signature": "public func fit(area: Rect, policy!: ResizePolicy = ResizePolicy.Center): ViewportFit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Surface",
+          "signature": "public class Surface {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Surface.area",
+          "signature": "public let area: Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Surface.zIndex",
+          "signature": "public let zIndex: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Surface.init",
+          "signature": "public init(area: Rect, zIndex!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Surface.canvas",
+          "signature": "public func canvas(): Canvas"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Surface.bufferView",
+          "signature": "public func bufferView(): Buffer"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas",
+          "signature": "public class Canvas {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.init",
+          "signature": "public init(buffer: Buffer, clip: Rect, translateX!: Int64 = 0, translateY!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.textWidthOptions",
+          "signature": "public func textWidthOptions(): TextWidthOptions"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.createSurface",
+          "signature": "public func createSurface(area: Rect, zIndex!: Int64 = 0): Surface"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.withClip",
+          "signature": "public func withClip(area: Rect): Canvas"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.translated",
+          "signature": "public func translated(x: Int64, y: Int64): Canvas"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.viewport",
+          "signature": "public func viewport(camera: Position): Canvas"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.fillRect",
+          "signature": "public func fillRect(area: Rect, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.fillRect",
+          "signature": "public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.hline",
+          "signature": "public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.vline",
+          "signature": "public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.strokeRect",
+          "signature": "public func strokeRect(area: Rect, style: Style, horizontal!: String = \"-\", vertical!: String = \"|\", corner!: String = \"+\"): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.strokeBorder",
+          "signature": "public func strokeBorder(area: Rect, style: Style, border!: ?BorderSet = None): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.drawLine",
+          "signature": "public func drawLine(x1: Int64, y1: Int64, x2: Int64, y2: Int64, symbol: String, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.drawText",
+          "signature": "public func drawText(x: Int64, y: Int64, text: String, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.drawSprite",
+          "signature": "public func drawSprite(x: Int64, y: Int64, lines: Array<String>, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.render",
+          "signature": "public func render(widget: Widget, area: Rect): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "Canvas.composite",
+          "signature": "public func composite(surface: Surface): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/canvas.cj",
+          "symbol": "centeredViewport",
+          "signature": "public func centeredViewport(area: Rect, width: Int64, height: Int64): Rect"
+        }
+      ]
     }
   ]
 }

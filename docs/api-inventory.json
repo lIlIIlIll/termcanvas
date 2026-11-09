@@ -6109,7 +6109,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "enum",
       "symbol": "ResizePolicy",
@@ -6127,7 +6127,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 6,
+      "line": 8,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -6146,7 +6146,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 7,
+      "line": 10,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -6165,7 +6165,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 8,
+      "line": 12,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -6184,7 +6184,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 9,
+      "line": 14,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -6203,7 +6203,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 12,
+      "line": 18,
       "level": "top_level",
       "kind": "struct",
       "symbol": "ViewportFit",
@@ -6221,7 +6221,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 13,
+      "line": 20,
       "level": "member",
       "kind": "let",
       "symbol": "area",
@@ -6239,7 +6239,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 14,
+      "line": 22,
       "level": "member",
       "kind": "let",
       "symbol": "content",
@@ -6257,7 +6257,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 15,
+      "line": 24,
       "level": "member",
       "kind": "let",
       "symbol": "tooSmall",
@@ -6275,7 +6275,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 16,
+      "line": 26,
       "level": "member",
       "kind": "let",
       "symbol": "scaleX",
@@ -6293,7 +6293,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 17,
+      "line": 28,
       "level": "member",
       "kind": "let",
       "symbol": "scaleY",
@@ -6311,7 +6311,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 19,
+      "line": 37,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -6329,7 +6329,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 28,
+      "line": 47,
       "level": "top_level",
       "kind": "class",
       "symbol": "SizeGuard",
@@ -6347,7 +6347,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 29,
+      "line": 49,
       "level": "member",
       "kind": "let",
       "symbol": "minWidth",
@@ -6365,7 +6365,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 30,
+      "line": 51,
       "level": "member",
       "kind": "let",
       "symbol": "minHeight",
@@ -6383,7 +6383,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 32,
+      "line": 57,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -6401,7 +6401,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 37,
+      "line": 67,
       "level": "member",
       "kind": "func",
       "symbol": "fit",
@@ -6419,7 +6419,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 50,
+      "line": 81,
       "level": "top_level",
       "kind": "class",
       "symbol": "Surface",
@@ -6437,7 +6437,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 51,
+      "line": 83,
       "level": "member",
       "kind": "let",
       "symbol": "area",
@@ -6455,7 +6455,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 52,
+      "line": 85,
       "level": "member",
       "kind": "let",
       "symbol": "zIndex",
@@ -6473,7 +6473,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 55,
+      "line": 92,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -6491,7 +6491,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 61,
+      "line": 101,
       "level": "member",
       "kind": "func",
       "symbol": "canvas",
@@ -6509,7 +6509,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 65,
+      "line": 108,
       "level": "member",
       "kind": "func",
       "symbol": "bufferView",
@@ -6527,7 +6527,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 70,
+      "line": 114,
       "level": "top_level",
       "kind": "class",
       "symbol": "Canvas",
@@ -6545,7 +6545,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 76,
+      "line": 126,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -6563,7 +6563,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 84,
+      "line": 136,
       "level": "member",
       "kind": "func",
       "symbol": "textWidthOptions",
@@ -6581,7 +6581,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 91,
+      "line": 146,
       "level": "member",
       "kind": "func",
       "symbol": "createSurface",
@@ -6599,7 +6599,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 97,
+      "line": 156,
       "level": "member",
       "kind": "func",
       "symbol": "withClip",
@@ -6617,7 +6617,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 101,
+      "line": 165,
       "level": "member",
       "kind": "func",
       "symbol": "translated",
@@ -6635,7 +6635,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 105,
+      "line": 173,
       "level": "member",
       "kind": "func",
       "symbol": "viewport",
@@ -6653,7 +6653,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 109,
+      "line": 181,
       "level": "member",
       "kind": "func",
       "symbol": "fillRect",
@@ -6671,7 +6671,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 115,
+      "line": 194,
       "level": "member",
       "kind": "func",
       "symbol": "fillRect",
@@ -6689,7 +6689,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 119,
+      "line": 205,
       "level": "member",
       "kind": "func",
       "symbol": "hline",
@@ -6707,7 +6707,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 126,
+      "line": 219,
       "level": "member",
       "kind": "func",
       "symbol": "vline",
@@ -6725,7 +6725,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 138,
+      "line": 238,
       "level": "member",
       "kind": "func",
       "symbol": "strokeRect",
@@ -6743,7 +6743,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 151,
+      "line": 255,
       "level": "member",
       "kind": "func",
       "symbol": "strokeBorder",
@@ -6761,7 +6761,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 176,
+      "line": 288,
       "level": "member",
       "kind": "func",
       "symbol": "drawLine",
@@ -6779,7 +6779,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 199,
+      "line": 317,
       "level": "member",
       "kind": "func",
       "symbol": "drawText",
@@ -6797,7 +6797,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 258,
+      "line": 382,
       "level": "member",
       "kind": "func",
       "symbol": "drawSprite",
@@ -6815,7 +6815,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 264,
+      "line": 392,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -6833,7 +6833,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 276,
+      "line": 406,
       "level": "member",
       "kind": "func",
       "symbol": "composite",
@@ -6851,7 +6851,7 @@
     {
       "package": "core",
       "path": "packages/core/src/canvas.cj",
-      "line": 283,
+      "line": 419,
       "level": "top_level",
       "kind": "func",
       "symbol": "centeredViewport",
