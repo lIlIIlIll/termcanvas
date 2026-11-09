@@ -8653,6 +8653,206 @@
           "signature": "public func handle(key: KeyEvent): Bool"
         }
       ]
+    },
+    {
+      "id": "update-results",
+      "source": "docs/api-examples/update-results.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "ControlFlow",
+          "signature": "public enum ControlFlow {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "ControlFlow.Continue",
+          "signature": "Continue"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "ControlFlow.Exit",
+          "signature": "Exit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "TimerSpec",
+          "signature": "public struct TimerSpec {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "TimerSpec.id",
+          "signature": "public let id: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "TimerSpec.every",
+          "signature": "public let every: Duration"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "TimerSpec.mode",
+          "signature": "public let mode: TimerMode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "TimerSpec.missPolicy",
+          "signature": "public let missPolicy: FrameMissPolicy"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "TimerSpec.init",
+          "signature": "public init(id: String, every: Duration, mode!: TimerMode = TimerMode.Repeating, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult",
+          "signature": "public struct UpdateResult {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.flow",
+          "signature": "public let flow: ControlFlow"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.command",
+          "signature": "public let command: Command"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.dirtyRects",
+          "signature": "public let dirtyRects: ?DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.renderRequested",
+          "signature": "public let renderRequested: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.init",
+          "signature": "public init( flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop, dirtyRects!: ?DirtyRects = None, renderRequested!: Bool = true )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.next",
+          "signature": "public static func next(): UpdateResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.unchanged",
+          "signature": "public static func unchanged(): UpdateResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.exit",
+          "signature": "public static func exit(): UpdateResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.withCommand",
+          "signature": "public static func withCommand(command: Command): UpdateResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.dirty",
+          "signature": "public static func dirty(area: Rect): UpdateResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "UpdateResult.withDirty",
+          "signature": "public func withDirty(area: Rect): UpdateResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "HandleResult",
+          "signature": "public struct HandleResult {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "HandleResult.handled",
+          "signature": "public let handled: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "HandleResult.flow",
+          "signature": "public let flow: ControlFlow"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "HandleResult.command",
+          "signature": "public let command: Command"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "HandleResult.init",
+          "signature": "public init(handled!: Bool = false, flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "HandleResult.ignored",
+          "signature": "public static func ignored(): HandleResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "HandleResult.consumed",
+          "signature": "public static func consumed(command!: Command = Command.Noop): HandleResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "HandleResult.exit",
+          "signature": "public static func exit(): HandleResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "HandleResult.withCommand",
+          "signature": "public static func withCommand(command: Command): HandleResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "HandleResult.toUpdateResult",
+          "signature": "public func toUpdateResult(): UpdateResult"
+        }
+      ]
     }
   ]
 }

@@ -18,270 +18,270 @@ packages/core/src/animation.cj:152:public func removeScope(scope: String): Unit
 packages/core/src/animation.cj:165:public func sample(scope: String, id: String): ?AnimationSample
 packages/core/src/animation.cj:178:public func nextTimeoutMillis(): ?Int64
 packages/core/src/animation.cj:193:public func framePresented(): Unit
-packages/core/src/app.cj:85:public enum ControlFlow {
-packages/core/src/app.cj:86:Continue
-packages/core/src/app.cj:87:Exit
-packages/core/src/app.cj:93:public interface AppTraceSink {
-packages/core/src/app.cj:96:func externalDequeued(_: Int64): Unit
-packages/core/src/app.cj:97:func inputReceived(event: Event, eventQueueLength: Int64): Unit
-packages/core/src/app.cj:98:func eventDispatchCompleted(): Unit
-packages/core/src/app.cj:99:func stateUpdateCompleted(): Unit
-packages/core/src/app.cj:100:func renderStarted(): Unit
-packages/core/src/app.cj:103:func frameScheduling(_: FrameSchedulingSnapshot): Unit
-packages/core/src/app.cj:107:func frameCompleted(_: RenderMetrics): Unit
-packages/core/src/app.cj:108:func eventLoopStall(task: String, durationNanos: Int64): Unit
-packages/core/src/app.cj:111:public struct TimerSpec {
-packages/core/src/app.cj:112:public let id: String
-packages/core/src/app.cj:113:public let every: Duration
-packages/core/src/app.cj:114:public let mode: TimerMode
-packages/core/src/app.cj:115:public let missPolicy: FrameMissPolicy
-packages/core/src/app.cj:117:public init(id: String, every: Duration, mode!: TimerMode = TimerMode.Repeating, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop)
-packages/core/src/app.cj:125:public enum Command {
-packages/core/src/app.cj:126:Noop
-packages/core/src/app.cj:127:Quit
-packages/core/src/app.cj:128:Emit(Event)
-packages/core/src/app.cj:129:Message(String)
-packages/core/src/app.cj:130:Async(String)
-packages/core/src/app.cj:131:AsyncTask(String, () -> Event)
-packages/core/src/app.cj:132:AsyncExec(String, String)
-packages/core/src/app.cj:133:AsyncExecArgs(String, String, Array<String>)
-packages/core/src/app.cj:134:CancelAsync(String)
-packages/core/src/app.cj:135:ProcessStart(String, ProcessSpec)
-packages/core/src/app.cj:136:ProcessCancel(String)
-packages/core/src/app.cj:137:PtyStart(String, PtySpec)
-packages/core/src/app.cj:138:PtyWrite(String, Array<Byte>)
-packages/core/src/app.cj:139:PtyResize(String, PtySize)
-packages/core/src/app.cj:140:PtySendSignal(String, PtySignal)
-packages/core/src/app.cj:141:PtyClose(String)
-packages/core/src/app.cj:142:StartTimer(TimerSpec)
-packages/core/src/app.cj:143:StopTimer(String)
-packages/core/src/app.cj:144:RestartTimer(TimerSpec)
-packages/core/src/app.cj:145:Exec(String)
-packages/core/src/app.cj:146:ExecArgs(String, String, Array<String>)
-packages/core/src/app.cj:147:ResetTerminal
-packages/core/src/app.cj:148:SetCapabilitiesOverride(?TerminalCapabilities)
-packages/core/src/app.cj:149:Suspend
-packages/core/src/app.cj:150:Batch(Array<Command>)
-packages/core/src/app.cj:220:public struct FrameMetrics {
-packages/core/src/app.cj:221:public let frameIndex: Int64
-packages/core/src/app.cj:222:public let fps: Int64
-packages/core/src/app.cj:223:public let renderMillis: Int64
-packages/core/src/app.cj:224:public let drawMillis: Int64
-packages/core/src/app.cj:225:public let totalMillis: Int64
-packages/core/src/app.cj:226:public let eventQueueLength: Int64
-packages/core/src/app.cj:227:public let dirtyCells: Int64
-packages/core/src/app.cj:228:public let diffWrites: Int64
-packages/core/src/app.cj:229:public let terminalSize: Rect
-packages/core/src/app.cj:230:public let droppedTicks: Int64
-packages/core/src/app.cj:231:public let tickDeltaMillis: Int64
-packages/core/src/app.cj:232:public let renderedCells: Int64
-packages/core/src/app.cj:233:public let dirtyRects: Int64
-packages/core/src/app.cj:234:public let bufferCellAttempts: Int64
-packages/core/src/app.cj:235:public let bufferCellWrites: Int64
-packages/core/src/app.cj:236:public let diffNanos: Int64
-packages/core/src/app.cj:237:public let writeNanos: Int64
-packages/core/src/app.cj:238:public let ansiBytes: Int64
-packages/core/src/app.cj:240:public init( frameIndex!: Int64 = 0, fps!: Int64 = 0, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, eventQueueLength!: Int64 = 0, dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, terminalSize!: Rect = Rect(0, 0, 0, 0), droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
-packages/core/src/app.cj:281:public class AppMetrics {
-packages/core/src/app.cj:294:public init(maxFrames!: ?Int64 = Some(600))
-packages/core/src/app.cj:301:public func record(frame: FrameMetrics): Unit
-packages/core/src/app.cj:314:public func record( render: RenderMetrics, frameIndex!: Int64 = 0, eventQueueLength!: Int64 = 0, droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0 ): Unit
-packages/core/src/app.cj:344:public func lastFrame(): ?FrameMetrics
-packages/core/src/app.cj:355:public func frames(): Array<FrameMetrics>
-packages/core/src/app.cj:375:public func averageFps(): Int64
-packages/core/src/app.cj:388:public func droppedTicks(): Int64
-packages/core/src/app.cj:395:public func reset(): Unit
-packages/core/src/app.cj:424:public func runtime(): RuntimeMetricsSnapshot
-packages/core/src/app.cj:437:public struct RuntimeMetricsSnapshot {
-packages/core/src/app.cj:438:public let queueEnqueued: Int64
-packages/core/src/app.cj:439:public let queueProcessed: Int64
-packages/core/src/app.cj:440:public let maxQueueDepth: Int64
-packages/core/src/app.cj:441:public let maxUpdateDepth: Int64
-packages/core/src/app.cj:442:public let yieldedTurns: Int64
-packages/core/src/app.cj:443:public let queueOverflows: Int64
-packages/core/src/app.cj:444:public let scheduling: FrameSchedulingSnapshot
-packages/core/src/app.cj:446:public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, yieldedTurns!: Int64 = 0, queueOverflows!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )
-packages/core/src/app.cj:478:public class TimerRuntime {
-packages/core/src/app.cj:483:public init(clock!: RuntimeClock = MonotonicRuntimeClock())
-packages/core/src/app.cj:610:public class AsyncRuntime {
-packages/core/src/app.cj:617:public init(maxPendingTasks!: Int64 = 256)
-packages/core/src/app.cj:622:public func start(id: String, task: () -> Event): Event
-packages/core/src/app.cj:644:public func startExec(id: String, commandLine: String): Event
-packages/core/src/app.cj:648:public func startExecArgs(id: String, program: String, args: Array<String>): Event
-packages/core/src/app.cj:652:public func cancel(id: String): Bool
-packages/core/src/app.cj:669:public func drain(): Array<Event>
-packages/core/src/app.cj:701:public func pendingCount(): Int64
-packages/core/src/app.cj:705:public func eventSource(): EventSource
-packages/core/src/app.cj:727:public class Subscription {
-packages/core/src/app.cj:728:public let interval: Int64
-packages/core/src/app.cj:729:public let event: Event
-packages/core/src/app.cj:732:public init(interval: Int64, event: Event)
-packages/core/src/app.cj:737:public func poll(step!: Int64 = 1): ?Event
-packages/core/src/app.cj:748:public interface EventWaiter {
-packages/core/src/app.cj:749:func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit
-packages/core/src/app.cj:750:func close(): Unit
-packages/core/src/app.cj:753:public class NoopEventWaiter <: EventWaiter {
-packages/core/src/app.cj:754:public init()
-packages/core/src/app.cj:756:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit
-packages/core/src/app.cj:760:public func close(): Unit
-packages/core/src/app.cj:764:public func defaultEventWaiter(): EventWaiter
-packages/core/src/app.cj:769:public func defaultEventWaiter(): EventWaiter
-packages/core/src/app.cj:774:public func defaultEventWaiter(): EventWaiter
-packages/core/src/app.cj:779:public class WindowsConsoleEventWaiter <: EventWaiter {
-packages/core/src/app.cj:782:public init()
-packages/core/src/app.cj:784:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
-packages/core/src/app.cj:807:public func close(): Unit
-packages/core/src/app.cj:812:public struct UpdateResult {
-packages/core/src/app.cj:813:public let flow: ControlFlow
-packages/core/src/app.cj:814:public let command: Command
-packages/core/src/app.cj:815:public let dirtyRects: ?DirtyRects
-packages/core/src/app.cj:820:public let renderRequested: Bool
-packages/core/src/app.cj:822:public init( flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop, dirtyRects!: ?DirtyRects = None, renderRequested!: Bool = true )
-packages/core/src/app.cj:834:public static func next(): UpdateResult
-packages/core/src/app.cj:838:public static func unchanged(): UpdateResult
-packages/core/src/app.cj:842:public static func exit(): UpdateResult
-packages/core/src/app.cj:846:public static func withCommand(command: Command): UpdateResult
-packages/core/src/app.cj:850:public static func dirty(area: Rect): UpdateResult
-packages/core/src/app.cj:854:public func withDirty(area: Rect): UpdateResult
-packages/core/src/app.cj:864:public struct HandleResult {
-packages/core/src/app.cj:865:public let handled: Bool
-packages/core/src/app.cj:866:public let flow: ControlFlow
-packages/core/src/app.cj:867:public let command: Command
-packages/core/src/app.cj:869:public init(handled!: Bool = false, flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop)
-packages/core/src/app.cj:875:public static func ignored(): HandleResult
-packages/core/src/app.cj:879:public static func consumed(command!: Command = Command.Noop): HandleResult
-packages/core/src/app.cj:883:public static func exit(): HandleResult
-packages/core/src/app.cj:887:public static func withCommand(command: Command): HandleResult
-packages/core/src/app.cj:891:public func toUpdateResult(): UpdateResult
-packages/core/src/app.cj:902:public class EventScript {
-packages/core/src/app.cj:905:public init(events!: Array<Event> = [])
-packages/core/src/app.cj:911:public func add(event: Event): EventScript
-packages/core/src/app.cj:916:public func key(key: KeyEvent): EventScript
-packages/core/src/app.cj:920:public func paste(text: String): EventScript
-packages/core/src/app.cj:924:public func message(text: String): EventScript
-packages/core/src/app.cj:928:public func tick(): EventScript
-packages/core/src/app.cj:932:public func resize(area: Rect): EventScript
-packages/core/src/app.cj:936:public func size(): Int64
-packages/core/src/app.cj:940:public static func fromText(text: String): EventScript
-packages/core/src/app.cj:968:public func run(update: (Event) -> ControlFlow): ControlFlow
-packages/core/src/app.cj:978:public func runWithCommands(update: (Event) -> UpdateResult): ControlFlow
-packages/core/src/app.cj:1001:public enum ScenarioStep {
-packages/core/src/app.cj:1002:Input(Event)
-packages/core/src/app.cj:1003:ExpectFlow(ControlFlow)
-packages/core/src/app.cj:1004:ExpectSnapshot(String)
-packages/core/src/app.cj:1005:ExpectCell(Int64, Int64, String)
-packages/core/src/app.cj:1008:public class ScenarioResult {
-packages/core/src/app.cj:1009:public let name: String
-packages/core/src/app.cj:1010:public let passed: Bool
-packages/core/src/app.cj:1011:public let failures: Array<String>
-packages/core/src/app.cj:1012:public let flow: ControlFlow
-packages/core/src/app.cj:1014:public init(name: String, passed: Bool, failures: Array<String>, flow: ControlFlow)
-packages/core/src/app.cj:1022:public struct SnapshotDiffResult {
-packages/core/src/app.cj:1023:public let passed: Bool
-packages/core/src/app.cj:1024:public let line: Int64
-packages/core/src/app.cj:1025:public let column: Int64
-packages/core/src/app.cj:1026:public let expectedLine: String
-packages/core/src/app.cj:1027:public let actualLine: String
-packages/core/src/app.cj:1028:public let message: String
-packages/core/src/app.cj:1030:public init( passed: Bool, line!: Int64 = -1, column!: Int64 = -1, expectedLine!: String = "", actualLine!: String = "", message!: String = "" )
-packages/core/src/app.cj:1047:public class SnapshotDiff {
-packages/core/src/app.cj:1048:public static func text(expected: String, actual: String): SnapshotDiffResult
-packages/core/src/app.cj:1073:public static func buffer(expected: Buffer, actual: Buffer): SnapshotDiffResult
-packages/core/src/app.cj:1088:public class EventScenario {
-packages/core/src/app.cj:1089:public let name: String
-packages/core/src/app.cj:1092:public init(name!: String = "scenario")
-packages/core/src/app.cj:1096:public func add(step: ScenarioStep): EventScenario
-packages/core/src/app.cj:1101:public func event(event: Event): EventScenario
-packages/core/src/app.cj:1105:public func key(key: KeyEvent): EventScenario
-packages/core/src/app.cj:1109:public func paste(text: String): EventScenario
-packages/core/src/app.cj:1113:public func message(text: String): EventScenario
-packages/core/src/app.cj:1117:public func tick(): EventScenario
-packages/core/src/app.cj:1121:public func expectFlow(flow: ControlFlow): EventScenario
-packages/core/src/app.cj:1125:public func expectSnapshot(snapshot: String): EventScenario
-packages/core/src/app.cj:1129:public func expectCell(x: Int64, y: Int64, symbol: String): EventScenario
-packages/core/src/app.cj:1133:public func size(): Int64
-packages/core/src/app.cj:1137:public static func fromText(text: String): EventScenario
-packages/core/src/app.cj:1179:public func run(backend: TestBackend, render: (Frame) -> Unit, update: (Event) -> UpdateResult): ScenarioResult
-packages/core/src/app.cj:1220:public enum HeadlessStep {
-packages/core/src/app.cj:1221:Input(Event)
-packages/core/src/app.cj:1222:Tick(Int64)
-packages/core/src/app.cj:1223:WaitMillis(Int64)
-packages/core/src/app.cj:1224:Resize(Rect)
-packages/core/src/app.cj:1225:Render
-packages/core/src/app.cj:1226:ExpectSnapshot(String)
-packages/core/src/app.cj:1227:ExpectCell(Int64, Int64, String)
-packages/core/src/app.cj:1230:public class HeadlessScript {
-packages/core/src/app.cj:1233:public init(steps!: Array<HeadlessStep> = [])
-packages/core/src/app.cj:1239:public func add(step: HeadlessStep): HeadlessScript
-packages/core/src/app.cj:1244:public func event(event: Event): HeadlessScript
-packages/core/src/app.cj:1245:public func key(key: KeyEvent): HeadlessScript
-packages/core/src/app.cj:1246:public func mouse(event: MouseEvent): HeadlessScript
-packages/core/src/app.cj:1247:public func paste(text: String): HeadlessScript
-packages/core/src/app.cj:1248:public func message(text: String): HeadlessScript
-packages/core/src/app.cj:1249:public func resize(area: Rect): HeadlessScript
-packages/core/src/app.cj:1250:public func tick(count!: Int64 = 1): HeadlessScript
-packages/core/src/app.cj:1251:public func waitMillis(milliseconds: Int64): HeadlessScript
-packages/core/src/app.cj:1254:public func render(): HeadlessScript
-packages/core/src/app.cj:1255:public func expectSnapshot(snapshot: String): HeadlessScript
-packages/core/src/app.cj:1256:public func expectCell(x: Int64, y: Int64, symbol: String): HeadlessScript
-packages/core/src/app.cj:1258:public func steps(): Array<HeadlessStep>
-packages/core/src/app.cj:1263:public struct HeadlessRunOptions {
-packages/core/src/app.cj:1264:public let area: Rect
-packages/core/src/app.cj:1265:public let ticks: Int64
-packages/core/src/app.cj:1266:public let tickDeltaMillis: Int64
-packages/core/src/app.cj:1267:public let captureBuffers: Bool
-packages/core/src/app.cj:1268:public let captureSnapshots: Bool
-packages/core/src/app.cj:1270:public init( area!: Rect = Rect(0, 0, 80, 24), ticks!: Int64 = 0, tickDeltaMillis!: Int64 = 16, captureBuffers!: Bool = true, captureSnapshots!: Bool = true )
-packages/core/src/app.cj:1285:public class HeadlessRunResult {
-packages/core/src/app.cj:1286:public let flow: ControlFlow
-packages/core/src/app.cj:1287:public let frames: Array<Buffer>
-packages/core/src/app.cj:1288:public let snapshots: Array<String>
-packages/core/src/app.cj:1289:public let metrics: AppMetrics
-packages/core/src/app.cj:1290:public let failures: Array<String>
-packages/core/src/app.cj:1292:public init(flow: ControlFlow, frames: Array<Buffer>, snapshots: Array<String>, metrics: AppMetrics, failures: Array<String>)
-packages/core/src/app.cj:1300:public func passed(): Bool
-packages/core/src/app.cj:1320:public class AppTestRunner {
-packages/core/src/app.cj:1321:public static func run(script: HeadlessScript, render: (Frame) -> Unit, update: (Event) -> UpdateResult, options!: HeadlessRunOptions = HeadlessRunOptions()): HeadlessRunResult
-packages/core/src/app.cj:1552:public class App {
-packages/core/src/app.cj:1584:public init( inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
-packages/core/src/app.cj:1634:public init( backend!: Backend, inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
-packages/core/src/app.cj:1739:public func attachTraceSink(traceSink: AppTraceSink): Unit
-packages/core/src/app.cj:1747:public func setTheme(theme: ?Theme): Unit
-packages/core/src/app.cj:1753:public func setTextWidthOptions(options: TextWidthOptions): Unit
-packages/core/src/app.cj:1759:public func attachAnimationScheduler(scheduler: AnimationScheduler): Unit
-packages/core/src/app.cj:1765:public func attachGlyphCapabilitySession(session: GlyphCapabilitySession): Unit
-packages/core/src/app.cj:1774:public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit
-packages/core/src/app.cj:1779:public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit
-packages/core/src/app.cj:1786:public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
-packages/core/src/app.cj:1790:public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit
-packages/core/src/app.cj:1797:public func runWithExternalPort( port: ExternalPort<Event>, render: (Frame) -> Unit, update: (Event) -> UpdateResult ): Unit
-packages/core/src/app.cj:2482:public static func applyUpdateResult(result: UpdateResult, commandQueue: ArrayList<Command>, dirtySink!: ?DirtyRects = None): Bool
-packages/core/src/app.cj:2494:public static func processCommands( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(), timerRuntime!: TimerRuntime = TimerRuntime() ): Bool
-packages/core/src/app.cj:2506:public static func processCommandsWithEvents( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(), timerRuntime!: TimerRuntime = TimerRuntime(), dirtySink!: ?DirtyRects = None ): (Bool, Bool)
-packages/core/src/app.cj:2754:public static func executeCommand(commandLine: String): Event
-packages/core/src/app.cj:2762:public static func executeCommandArgs(id: String, program: String, args: Array<String>): Event
-packages/core/src/app.cj:2829:public func defaultApp(): App
-packages/core/src/app.cj:2833:public func runApp(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
-packages/core/src/app.cj:2837:public func runAppWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit
-packages/core/src/app.cj:2842:public class LinuxEpollEventWaiter <: EventWaiter {
-packages/core/src/app.cj:2848:public init()
-packages/core/src/app.cj:2874:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
-packages/core/src/app.cj:3010:public func close(): Unit
-packages/core/src/app.cj:3046:public class MacOSPollEventWaiter <: EventWaiter {
-packages/core/src/app.cj:3049:public init()
-packages/core/src/app.cj:3051:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
-packages/core/src/app.cj:3088:public func close(): Unit
-packages/core/src/app.cj:3211:public class FocusManager {
-packages/core/src/app.cj:3217:public init()
-packages/core/src/app.cj:3223:public func add(id: String, enabled!: Bool = true): Unit
-packages/core/src/app.cj:3234:public func remove(id: String): Unit
-packages/core/src/app.cj:3252:public func focus(id: String): Bool
-packages/core/src/app.cj:3264:public func setEnabled(id: String, value: Bool): Bool
-packages/core/src/app.cj:3279:public func current(): ?String
-packages/core/src/app.cj:3288:public func isFocused(id: String): Bool
-packages/core/src/app.cj:3298:public func next(): ?String
-packages/core/src/app.cj:3305:public func previous(): ?String
-packages/core/src/app.cj:3313:public func handle(key: KeyEvent): Bool
+packages/core/src/app.cj:86:public enum ControlFlow {
+packages/core/src/app.cj:88:Continue
+packages/core/src/app.cj:90:Exit
+packages/core/src/app.cj:96:public interface AppTraceSink {
+packages/core/src/app.cj:99:func externalDequeued(_: Int64): Unit
+packages/core/src/app.cj:100:func inputReceived(event: Event, eventQueueLength: Int64): Unit
+packages/core/src/app.cj:101:func eventDispatchCompleted(): Unit
+packages/core/src/app.cj:102:func stateUpdateCompleted(): Unit
+packages/core/src/app.cj:103:func renderStarted(): Unit
+packages/core/src/app.cj:106:func frameScheduling(_: FrameSchedulingSnapshot): Unit
+packages/core/src/app.cj:110:func frameCompleted(_: RenderMetrics): Unit
+packages/core/src/app.cj:111:func eventLoopStall(task: String, durationNanos: Int64): Unit
+packages/core/src/app.cj:115:public struct TimerSpec {
+packages/core/src/app.cj:117:public let id: String
+packages/core/src/app.cj:119:public let every: Duration
+packages/core/src/app.cj:121:public let mode: TimerMode
+packages/core/src/app.cj:123:public let missPolicy: FrameMissPolicy
+packages/core/src/app.cj:131:public init(id: String, every: Duration, mode!: TimerMode = TimerMode.Repeating, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop)
+packages/core/src/app.cj:139:public enum Command {
+packages/core/src/app.cj:140:Noop
+packages/core/src/app.cj:141:Quit
+packages/core/src/app.cj:142:Emit(Event)
+packages/core/src/app.cj:143:Message(String)
+packages/core/src/app.cj:144:Async(String)
+packages/core/src/app.cj:145:AsyncTask(String, () -> Event)
+packages/core/src/app.cj:146:AsyncExec(String, String)
+packages/core/src/app.cj:147:AsyncExecArgs(String, String, Array<String>)
+packages/core/src/app.cj:148:CancelAsync(String)
+packages/core/src/app.cj:149:ProcessStart(String, ProcessSpec)
+packages/core/src/app.cj:150:ProcessCancel(String)
+packages/core/src/app.cj:151:PtyStart(String, PtySpec)
+packages/core/src/app.cj:152:PtyWrite(String, Array<Byte>)
+packages/core/src/app.cj:153:PtyResize(String, PtySize)
+packages/core/src/app.cj:154:PtySendSignal(String, PtySignal)
+packages/core/src/app.cj:155:PtyClose(String)
+packages/core/src/app.cj:156:StartTimer(TimerSpec)
+packages/core/src/app.cj:157:StopTimer(String)
+packages/core/src/app.cj:158:RestartTimer(TimerSpec)
+packages/core/src/app.cj:159:Exec(String)
+packages/core/src/app.cj:160:ExecArgs(String, String, Array<String>)
+packages/core/src/app.cj:161:ResetTerminal
+packages/core/src/app.cj:162:SetCapabilitiesOverride(?TerminalCapabilities)
+packages/core/src/app.cj:163:Suspend
+packages/core/src/app.cj:164:Batch(Array<Command>)
+packages/core/src/app.cj:234:public struct FrameMetrics {
+packages/core/src/app.cj:235:public let frameIndex: Int64
+packages/core/src/app.cj:236:public let fps: Int64
+packages/core/src/app.cj:237:public let renderMillis: Int64
+packages/core/src/app.cj:238:public let drawMillis: Int64
+packages/core/src/app.cj:239:public let totalMillis: Int64
+packages/core/src/app.cj:240:public let eventQueueLength: Int64
+packages/core/src/app.cj:241:public let dirtyCells: Int64
+packages/core/src/app.cj:242:public let diffWrites: Int64
+packages/core/src/app.cj:243:public let terminalSize: Rect
+packages/core/src/app.cj:244:public let droppedTicks: Int64
+packages/core/src/app.cj:245:public let tickDeltaMillis: Int64
+packages/core/src/app.cj:246:public let renderedCells: Int64
+packages/core/src/app.cj:247:public let dirtyRects: Int64
+packages/core/src/app.cj:248:public let bufferCellAttempts: Int64
+packages/core/src/app.cj:249:public let bufferCellWrites: Int64
+packages/core/src/app.cj:250:public let diffNanos: Int64
+packages/core/src/app.cj:251:public let writeNanos: Int64
+packages/core/src/app.cj:252:public let ansiBytes: Int64
+packages/core/src/app.cj:254:public init( frameIndex!: Int64 = 0, fps!: Int64 = 0, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, eventQueueLength!: Int64 = 0, dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, terminalSize!: Rect = Rect(0, 0, 0, 0), droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
+packages/core/src/app.cj:295:public class AppMetrics {
+packages/core/src/app.cj:308:public init(maxFrames!: ?Int64 = Some(600))
+packages/core/src/app.cj:315:public func record(frame: FrameMetrics): Unit
+packages/core/src/app.cj:328:public func record( render: RenderMetrics, frameIndex!: Int64 = 0, eventQueueLength!: Int64 = 0, droppedTicks!: Int64 = 0, tickDeltaMillis!: Int64 = 0 ): Unit
+packages/core/src/app.cj:358:public func lastFrame(): ?FrameMetrics
+packages/core/src/app.cj:369:public func frames(): Array<FrameMetrics>
+packages/core/src/app.cj:389:public func averageFps(): Int64
+packages/core/src/app.cj:402:public func droppedTicks(): Int64
+packages/core/src/app.cj:409:public func reset(): Unit
+packages/core/src/app.cj:438:public func runtime(): RuntimeMetricsSnapshot
+packages/core/src/app.cj:451:public struct RuntimeMetricsSnapshot {
+packages/core/src/app.cj:452:public let queueEnqueued: Int64
+packages/core/src/app.cj:453:public let queueProcessed: Int64
+packages/core/src/app.cj:454:public let maxQueueDepth: Int64
+packages/core/src/app.cj:455:public let maxUpdateDepth: Int64
+packages/core/src/app.cj:456:public let yieldedTurns: Int64
+packages/core/src/app.cj:457:public let queueOverflows: Int64
+packages/core/src/app.cj:458:public let scheduling: FrameSchedulingSnapshot
+packages/core/src/app.cj:460:public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, yieldedTurns!: Int64 = 0, queueOverflows!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )
+packages/core/src/app.cj:492:public class TimerRuntime {
+packages/core/src/app.cj:497:public init(clock!: RuntimeClock = MonotonicRuntimeClock())
+packages/core/src/app.cj:624:public class AsyncRuntime {
+packages/core/src/app.cj:631:public init(maxPendingTasks!: Int64 = 256)
+packages/core/src/app.cj:636:public func start(id: String, task: () -> Event): Event
+packages/core/src/app.cj:658:public func startExec(id: String, commandLine: String): Event
+packages/core/src/app.cj:662:public func startExecArgs(id: String, program: String, args: Array<String>): Event
+packages/core/src/app.cj:666:public func cancel(id: String): Bool
+packages/core/src/app.cj:683:public func drain(): Array<Event>
+packages/core/src/app.cj:715:public func pendingCount(): Int64
+packages/core/src/app.cj:719:public func eventSource(): EventSource
+packages/core/src/app.cj:741:public class Subscription {
+packages/core/src/app.cj:742:public let interval: Int64
+packages/core/src/app.cj:743:public let event: Event
+packages/core/src/app.cj:746:public init(interval: Int64, event: Event)
+packages/core/src/app.cj:751:public func poll(step!: Int64 = 1): ?Event
+packages/core/src/app.cj:762:public interface EventWaiter {
+packages/core/src/app.cj:763:func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit
+packages/core/src/app.cj:764:func close(): Unit
+packages/core/src/app.cj:767:public class NoopEventWaiter <: EventWaiter {
+packages/core/src/app.cj:768:public init()
+packages/core/src/app.cj:770:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64, sources!: Array<EventSource>): Unit
+packages/core/src/app.cj:774:public func close(): Unit
+packages/core/src/app.cj:778:public func defaultEventWaiter(): EventWaiter
+packages/core/src/app.cj:783:public func defaultEventWaiter(): EventWaiter
+packages/core/src/app.cj:788:public func defaultEventWaiter(): EventWaiter
+packages/core/src/app.cj:793:public class WindowsConsoleEventWaiter <: EventWaiter {
+packages/core/src/app.cj:796:public init()
+packages/core/src/app.cj:798:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
+packages/core/src/app.cj:821:public func close(): Unit
+packages/core/src/app.cj:827:public struct UpdateResult {
+packages/core/src/app.cj:829:public let flow: ControlFlow
+packages/core/src/app.cj:831:public let command: Command
+packages/core/src/app.cj:833:public let dirtyRects: ?DirtyRects
+packages/core/src/app.cj:839:public let renderRequested: Bool
+packages/core/src/app.cj:847:public init( flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop, dirtyRects!: ?DirtyRects = None, renderRequested!: Bool = true )
+packages/core/src/app.cj:862:public static func next(): UpdateResult
+packages/core/src/app.cj:869:public static func unchanged(): UpdateResult
+packages/core/src/app.cj:876:public static func exit(): UpdateResult
+packages/core/src/app.cj:884:public static func withCommand(command: Command): UpdateResult
+packages/core/src/app.cj:892:public static func dirty(area: Rect): UpdateResult
+packages/core/src/app.cj:900:public func withDirty(area: Rect): UpdateResult
+packages/core/src/app.cj:911:public struct HandleResult {
+packages/core/src/app.cj:913:public let handled: Bool
+packages/core/src/app.cj:915:public let flow: ControlFlow
+packages/core/src/app.cj:917:public let command: Command
+packages/core/src/app.cj:924:public init(handled!: Bool = false, flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop)
+packages/core/src/app.cj:933:public static func ignored(): HandleResult
+packages/core/src/app.cj:941:public static func consumed(command!: Command = Command.Noop): HandleResult
+packages/core/src/app.cj:948:public static func exit(): HandleResult
+packages/core/src/app.cj:956:public static func withCommand(command: Command): HandleResult
+packages/core/src/app.cj:963:public func toUpdateResult(): UpdateResult
+packages/core/src/app.cj:974:public class EventScript {
+packages/core/src/app.cj:977:public init(events!: Array<Event> = [])
+packages/core/src/app.cj:983:public func add(event: Event): EventScript
+packages/core/src/app.cj:988:public func key(key: KeyEvent): EventScript
+packages/core/src/app.cj:992:public func paste(text: String): EventScript
+packages/core/src/app.cj:996:public func message(text: String): EventScript
+packages/core/src/app.cj:1000:public func tick(): EventScript
+packages/core/src/app.cj:1004:public func resize(area: Rect): EventScript
+packages/core/src/app.cj:1008:public func size(): Int64
+packages/core/src/app.cj:1012:public static func fromText(text: String): EventScript
+packages/core/src/app.cj:1040:public func run(update: (Event) -> ControlFlow): ControlFlow
+packages/core/src/app.cj:1050:public func runWithCommands(update: (Event) -> UpdateResult): ControlFlow
+packages/core/src/app.cj:1073:public enum ScenarioStep {
+packages/core/src/app.cj:1074:Input(Event)
+packages/core/src/app.cj:1075:ExpectFlow(ControlFlow)
+packages/core/src/app.cj:1076:ExpectSnapshot(String)
+packages/core/src/app.cj:1077:ExpectCell(Int64, Int64, String)
+packages/core/src/app.cj:1080:public class ScenarioResult {
+packages/core/src/app.cj:1081:public let name: String
+packages/core/src/app.cj:1082:public let passed: Bool
+packages/core/src/app.cj:1083:public let failures: Array<String>
+packages/core/src/app.cj:1084:public let flow: ControlFlow
+packages/core/src/app.cj:1086:public init(name: String, passed: Bool, failures: Array<String>, flow: ControlFlow)
+packages/core/src/app.cj:1094:public struct SnapshotDiffResult {
+packages/core/src/app.cj:1095:public let passed: Bool
+packages/core/src/app.cj:1096:public let line: Int64
+packages/core/src/app.cj:1097:public let column: Int64
+packages/core/src/app.cj:1098:public let expectedLine: String
+packages/core/src/app.cj:1099:public let actualLine: String
+packages/core/src/app.cj:1100:public let message: String
+packages/core/src/app.cj:1102:public init( passed: Bool, line!: Int64 = -1, column!: Int64 = -1, expectedLine!: String = "", actualLine!: String = "", message!: String = "" )
+packages/core/src/app.cj:1119:public class SnapshotDiff {
+packages/core/src/app.cj:1120:public static func text(expected: String, actual: String): SnapshotDiffResult
+packages/core/src/app.cj:1145:public static func buffer(expected: Buffer, actual: Buffer): SnapshotDiffResult
+packages/core/src/app.cj:1160:public class EventScenario {
+packages/core/src/app.cj:1161:public let name: String
+packages/core/src/app.cj:1164:public init(name!: String = "scenario")
+packages/core/src/app.cj:1168:public func add(step: ScenarioStep): EventScenario
+packages/core/src/app.cj:1173:public func event(event: Event): EventScenario
+packages/core/src/app.cj:1177:public func key(key: KeyEvent): EventScenario
+packages/core/src/app.cj:1181:public func paste(text: String): EventScenario
+packages/core/src/app.cj:1185:public func message(text: String): EventScenario
+packages/core/src/app.cj:1189:public func tick(): EventScenario
+packages/core/src/app.cj:1193:public func expectFlow(flow: ControlFlow): EventScenario
+packages/core/src/app.cj:1197:public func expectSnapshot(snapshot: String): EventScenario
+packages/core/src/app.cj:1201:public func expectCell(x: Int64, y: Int64, symbol: String): EventScenario
+packages/core/src/app.cj:1205:public func size(): Int64
+packages/core/src/app.cj:1209:public static func fromText(text: String): EventScenario
+packages/core/src/app.cj:1251:public func run(backend: TestBackend, render: (Frame) -> Unit, update: (Event) -> UpdateResult): ScenarioResult
+packages/core/src/app.cj:1292:public enum HeadlessStep {
+packages/core/src/app.cj:1293:Input(Event)
+packages/core/src/app.cj:1294:Tick(Int64)
+packages/core/src/app.cj:1295:WaitMillis(Int64)
+packages/core/src/app.cj:1296:Resize(Rect)
+packages/core/src/app.cj:1297:Render
+packages/core/src/app.cj:1298:ExpectSnapshot(String)
+packages/core/src/app.cj:1299:ExpectCell(Int64, Int64, String)
+packages/core/src/app.cj:1302:public class HeadlessScript {
+packages/core/src/app.cj:1305:public init(steps!: Array<HeadlessStep> = [])
+packages/core/src/app.cj:1311:public func add(step: HeadlessStep): HeadlessScript
+packages/core/src/app.cj:1316:public func event(event: Event): HeadlessScript
+packages/core/src/app.cj:1317:public func key(key: KeyEvent): HeadlessScript
+packages/core/src/app.cj:1318:public func mouse(event: MouseEvent): HeadlessScript
+packages/core/src/app.cj:1319:public func paste(text: String): HeadlessScript
+packages/core/src/app.cj:1320:public func message(text: String): HeadlessScript
+packages/core/src/app.cj:1321:public func resize(area: Rect): HeadlessScript
+packages/core/src/app.cj:1322:public func tick(count!: Int64 = 1): HeadlessScript
+packages/core/src/app.cj:1323:public func waitMillis(milliseconds: Int64): HeadlessScript
+packages/core/src/app.cj:1326:public func render(): HeadlessScript
+packages/core/src/app.cj:1327:public func expectSnapshot(snapshot: String): HeadlessScript
+packages/core/src/app.cj:1328:public func expectCell(x: Int64, y: Int64, symbol: String): HeadlessScript
+packages/core/src/app.cj:1330:public func steps(): Array<HeadlessStep>
+packages/core/src/app.cj:1335:public struct HeadlessRunOptions {
+packages/core/src/app.cj:1336:public let area: Rect
+packages/core/src/app.cj:1337:public let ticks: Int64
+packages/core/src/app.cj:1338:public let tickDeltaMillis: Int64
+packages/core/src/app.cj:1339:public let captureBuffers: Bool
+packages/core/src/app.cj:1340:public let captureSnapshots: Bool
+packages/core/src/app.cj:1342:public init( area!: Rect = Rect(0, 0, 80, 24), ticks!: Int64 = 0, tickDeltaMillis!: Int64 = 16, captureBuffers!: Bool = true, captureSnapshots!: Bool = true )
+packages/core/src/app.cj:1357:public class HeadlessRunResult {
+packages/core/src/app.cj:1358:public let flow: ControlFlow
+packages/core/src/app.cj:1359:public let frames: Array<Buffer>
+packages/core/src/app.cj:1360:public let snapshots: Array<String>
+packages/core/src/app.cj:1361:public let metrics: AppMetrics
+packages/core/src/app.cj:1362:public let failures: Array<String>
+packages/core/src/app.cj:1364:public init(flow: ControlFlow, frames: Array<Buffer>, snapshots: Array<String>, metrics: AppMetrics, failures: Array<String>)
+packages/core/src/app.cj:1372:public func passed(): Bool
+packages/core/src/app.cj:1392:public class AppTestRunner {
+packages/core/src/app.cj:1393:public static func run(script: HeadlessScript, render: (Frame) -> Unit, update: (Event) -> UpdateResult, options!: HeadlessRunOptions = HeadlessRunOptions()): HeadlessRunResult
+packages/core/src/app.cj:1624:public class App {
+packages/core/src/app.cj:1656:public init( inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
+packages/core/src/app.cj:1706:public init( backend!: Backend, inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
+packages/core/src/app.cj:1811:public func attachTraceSink(traceSink: AppTraceSink): Unit
+packages/core/src/app.cj:1819:public func setTheme(theme: ?Theme): Unit
+packages/core/src/app.cj:1825:public func setTextWidthOptions(options: TextWidthOptions): Unit
+packages/core/src/app.cj:1831:public func attachAnimationScheduler(scheduler: AnimationScheduler): Unit
+packages/core/src/app.cj:1837:public func attachGlyphCapabilitySession(session: GlyphCapabilitySession): Unit
+packages/core/src/app.cj:1846:public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit
+packages/core/src/app.cj:1851:public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit
+packages/core/src/app.cj:1858:public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
+packages/core/src/app.cj:1862:public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit
+packages/core/src/app.cj:1869:public func runWithExternalPort( port: ExternalPort<Event>, render: (Frame) -> Unit, update: (Event) -> UpdateResult ): Unit
+packages/core/src/app.cj:2554:public static func applyUpdateResult(result: UpdateResult, commandQueue: ArrayList<Command>, dirtySink!: ?DirtyRects = None): Bool
+packages/core/src/app.cj:2566:public static func processCommands( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(), timerRuntime!: TimerRuntime = TimerRuntime() ): Bool
+packages/core/src/app.cj:2578:public static func processCommandsWithEvents( update: (Event) -> UpdateResult, commandQueue: ArrayList<Command>, asyncRuntime!: AsyncRuntime = transientAsyncRuntime(), ptyRuntime!: PtyRuntime = UnsupportedPtyRuntime(), processRuntime!: ProcessRuntime = UnsupportedProcessRuntime(), timerRuntime!: TimerRuntime = TimerRuntime(), dirtySink!: ?DirtyRects = None ): (Bool, Bool)
+packages/core/src/app.cj:2826:public static func executeCommand(commandLine: String): Event
+packages/core/src/app.cj:2834:public static func executeCommandArgs(id: String, program: String, args: Array<String>): Event
+packages/core/src/app.cj:2901:public func defaultApp(): App
+packages/core/src/app.cj:2905:public func runApp(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
+packages/core/src/app.cj:2909:public func runAppWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit
+packages/core/src/app.cj:2914:public class LinuxEpollEventWaiter <: EventWaiter {
+packages/core/src/app.cj:2920:public init()
+packages/core/src/app.cj:2946:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
+packages/core/src/app.cj:3082:public func close(): Unit
+packages/core/src/app.cj:3118:public class MacOSPollEventWaiter <: EventWaiter {
+packages/core/src/app.cj:3121:public init()
+packages/core/src/app.cj:3123:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
+packages/core/src/app.cj:3160:public func close(): Unit
+packages/core/src/app.cj:3283:public class FocusManager {
+packages/core/src/app.cj:3289:public init()
+packages/core/src/app.cj:3295:public func add(id: String, enabled!: Bool = true): Unit
+packages/core/src/app.cj:3306:public func remove(id: String): Unit
+packages/core/src/app.cj:3324:public func focus(id: String): Bool
+packages/core/src/app.cj:3336:public func setEnabled(id: String, value: Bool): Bool
+packages/core/src/app.cj:3351:public func current(): ?String
+packages/core/src/app.cj:3360:public func isFocused(id: String): Bool
+packages/core/src/app.cj:3370:public func next(): ?String
+packages/core/src/app.cj:3377:public func previous(): ?String
+packages/core/src/app.cj:3385:public func handle(key: KeyEvent): Bool
 packages/core/src/buffer.cj:6:public enum CellKind {
 packages/core/src/buffer.cj:8:Normal
 packages/core/src/buffer.cj:10:WideLead

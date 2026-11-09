@@ -82,8 +82,11 @@ let WAIT_FAILED_RESULT: UInt32 = 0xFFFF_FFFFu32
 @When[os == "Windows"]
 let INFINITE_WAIT: UInt32 = 0xFFFF_FFFFu32
 
+/** 更新后应用事件循环应采取的动作。 */
 public enum ControlFlow {
+    /** 继续运行。 */
     | Continue
+    /** 退出应用。 */
     | Exit
 }
 
@@ -108,12 +111,23 @@ public interface AppTraceSink {
     func eventLoopStall(task: String, durationNanos: Int64): Unit
 }
 
+/** 配置应用定时器的周期、模式和错过触发时的策略。 */
 public struct TimerSpec {
+    /** 定时器标识。 */
     public let id: String
+    /** 定时器周期。 */
     public let every: Duration
+    /** 一次性或重复触发模式。 */
     public let mode: TimerMode
+    /** 错过触发时的处理策略。 */
     public let missPolicy: FrameMissPolicy
 
+    /** 创建定时器配置；非正周期按一毫秒处理。
+     * @param id 定时器标识
+     * @param every 触发周期
+     * @param mode 触发模式
+     * @param missPolicy 错过触发时的策略
+     */
     public init(id: String, every: Duration, mode!: TimerMode = TimerMode.Repeating, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop) {
         this.id = id
         this.every = if (every <= Duration.Zero) { Duration.millisecond } else { every }
@@ -809,16 +823,27 @@ public class WindowsConsoleEventWaiter <: EventWaiter {
     }
 }
 
+/** 向事件循环返回更新后的控制流、命令及重绘请求。 */
 public struct UpdateResult {
+    /** 更新后的控制流。 */
     public let flow: ControlFlow
+    /** 要执行的命令。 */
     public let command: Command
+    /** 需要重绘的区域；None 使用应用的默认重绘行为。 */
     public let dirtyRects: ?DirtyRects
     // Most existing update handlers mutate state and rely on the app loop's
     // compatibility full redraw when no dirty rectangles are supplied.  Keep
     // that default, but let boundary/no-op handlers explicitly suppress a
     // frame so buffered input cannot build an expensive redraw backlog.
+    /** 是否请求绘制下一帧。 */
     public let renderRequested: Bool
 
+    /** 创建更新结果。
+     * @param flow 控制流
+     * @param command 要执行的命令
+     * @param dirtyRects 可选的脏区域
+     * @param renderRequested 是否请求绘制
+     */
     public init(
         flow!: ControlFlow = ControlFlow.Continue,
         command!: Command = Command.Noop,
@@ -831,26 +856,47 @@ public struct UpdateResult {
         this.renderRequested = renderRequested
     }
 
+    /** 创建继续运行并请求默认重绘的结果。
+     * @return 更新结果
+     */
     public static func next(): UpdateResult {
         UpdateResult()
     }
 
+    /** 创建不请求重绘的继续运行结果。
+     * @return 更新结果
+     */
     public static func unchanged(): UpdateResult {
         UpdateResult(renderRequested: false)
     }
 
+    /** 创建退出结果。
+     * @return 更新结果
+     */
     public static func exit(): UpdateResult {
         UpdateResult(flow: ControlFlow.Exit)
     }
 
+    /** 创建携带命令的继续运行结果。
+     * @param command 要执行的命令
+     * @return 更新结果
+     */
     public static func withCommand(command: Command): UpdateResult {
         UpdateResult(command: command)
     }
 
+    /** 创建包含一个脏区域的更新结果。
+     * @param area 要重绘的区域
+     * @return 更新结果
+     */
     public static func dirty(area: Rect): UpdateResult {
         UpdateResult(dirtyRects: Some(DirtyRects.full(area)))
     }
 
+    /** 复制现有脏区域并添加区域，同时请求重绘。
+     * @param area 要添加的区域
+     * @return 新的更新结果
+     */
     public func withDirty(area: Rect): UpdateResult {
         let rects = match (dirtyRects) {
             case Some(existing) => existing.copy()
@@ -861,33 +907,59 @@ public struct UpdateResult {
     }
 }
 
+/** 表示事件是否被处理，以及后续控制流和命令。 */
 public struct HandleResult {
+    /** 事件是否已被处理。 */
     public let handled: Bool
+    /** 事件处理后的控制流。 */
     public let flow: ControlFlow
+    /** 要执行的命令。 */
     public let command: Command
 
+    /** 创建事件处理结果。
+     * @param handled 事件是否已处理
+     * @param flow 控制流
+     * @param command 要执行的命令
+     */
     public init(handled!: Bool = false, flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop) {
         this.handled = handled
         this.flow = flow
         this.command = command
     }
 
+    /** 创建未处理事件的结果。
+     * @return 处理结果
+     */
     public static func ignored(): HandleResult {
         HandleResult()
     }
 
+    /** 创建已处理事件的结果。
+     * @param command 要执行的命令
+     * @return 处理结果
+     */
     public static func consumed(command!: Command = Command.Noop): HandleResult {
         HandleResult(handled: true, command: command)
     }
 
+    /** 创建已处理并请求退出的结果。
+     * @return 处理结果
+     */
     public static func exit(): HandleResult {
         HandleResult(handled: true, flow: ControlFlow.Exit)
     }
 
+    /** 创建已处理且携带命令的结果。
+     * @param command 要执行的命令
+     * @return 处理结果
+     */
     public static func withCommand(command: Command): HandleResult {
         HandleResult(handled: true, command: command)
     }
 
+    /** 将控制流与命令转换为默认重绘的更新结果。
+     * @return 更新结果
+     */
     public func toUpdateResult(): UpdateResult {
         UpdateResult(flow: flow, command: command)
     }
