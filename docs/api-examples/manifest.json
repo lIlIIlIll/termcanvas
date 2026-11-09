@@ -16463,60 +16463,6 @@
         {
           "package": "core",
           "path": "packages/core/src/app.cj",
-          "symbol": "AppTraceSink",
-          "signature": "public interface AppTraceSink {"
-        },
-        {
-          "package": "core",
-          "path": "packages/core/src/app.cj",
-          "symbol": "AppTraceSink.externalDequeued",
-          "signature": "func externalDequeued(_: Int64): Unit"
-        },
-        {
-          "package": "core",
-          "path": "packages/core/src/app.cj",
-          "symbol": "AppTraceSink.inputReceived",
-          "signature": "func inputReceived(event: Event, eventQueueLength: Int64): Unit"
-        },
-        {
-          "package": "core",
-          "path": "packages/core/src/app.cj",
-          "symbol": "AppTraceSink.eventDispatchCompleted",
-          "signature": "func eventDispatchCompleted(): Unit"
-        },
-        {
-          "package": "core",
-          "path": "packages/core/src/app.cj",
-          "symbol": "AppTraceSink.stateUpdateCompleted",
-          "signature": "func stateUpdateCompleted(): Unit"
-        },
-        {
-          "package": "core",
-          "path": "packages/core/src/app.cj",
-          "symbol": "AppTraceSink.renderStarted",
-          "signature": "func renderStarted(): Unit"
-        },
-        {
-          "package": "core",
-          "path": "packages/core/src/app.cj",
-          "symbol": "AppTraceSink.frameScheduling",
-          "signature": "func frameScheduling(_: FrameSchedulingSnapshot): Unit"
-        },
-        {
-          "package": "core",
-          "path": "packages/core/src/app.cj",
-          "symbol": "AppTraceSink.frameCompleted",
-          "signature": "func frameCompleted(_: RenderMetrics): Unit"
-        },
-        {
-          "package": "core",
-          "path": "packages/core/src/app.cj",
-          "symbol": "AppTraceSink.eventLoopStall",
-          "signature": "func eventLoopStall(task: String, durationNanos: Int64): Unit"
-        },
-        {
-          "package": "core",
-          "path": "packages/core/src/app.cj",
           "symbol": "Command",
           "signature": "public enum Command {"
         },
@@ -16669,6 +16615,188 @@
           "path": "packages/core/src/app.cj",
           "symbol": "Command.Batch",
           "signature": "Batch(Array<Command>)"
+        }
+      ]
+    },
+    {
+      "id": "app-runtime",
+      "source": "docs/api-examples/app-runtime.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App",
+          "signature": "public class App {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.init",
+          "signature": "public init( inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.init",
+          "signature": "public init( backend!: Backend, inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.attachTraceSink",
+          "signature": "public func attachTraceSink(traceSink: AppTraceSink): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.setTheme",
+          "signature": "public func setTheme(theme: ?Theme): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.setTextWidthOptions",
+          "signature": "public func setTextWidthOptions(options: TextWidthOptions): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.attachAnimationScheduler",
+          "signature": "public func attachAnimationScheduler(scheduler: AnimationScheduler): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.attachGlyphCapabilitySession",
+          "signature": "public func attachGlyphCapabilitySession(session: GlyphCapabilitySession): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.attachProcessRuntime",
+          "signature": "public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.attachPtyRuntime",
+          "signature": "public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.run",
+          "signature": "public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.runWithCommands",
+          "signature": "public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.runWithExternalPort",
+          "signature": "public func runWithExternalPort( port: ExternalPort<Event>, render: (Frame) -> Unit, update: (Event) -> UpdateResult ): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.applyUpdateResult",
+          "signature": "public static func applyUpdateResult(result: UpdateResult, commandQueue: ArrayList<Command>, dirtySink!: ?DirtyRects = None): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.executeCommand",
+          "signature": "public static func executeCommand(commandLine: String): Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "App.executeCommandArgs",
+          "signature": "public static func executeCommandArgs(id: String, program: String, args: Array<String>): Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "defaultApp",
+          "signature": "public func defaultApp(): App"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "runApp",
+          "signature": "public func runApp(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "runAppWithCommands",
+          "signature": "public func runAppWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink",
+          "signature": "public interface AppTraceSink {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.externalDequeued",
+          "signature": "func externalDequeued(_: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.inputReceived",
+          "signature": "func inputReceived(event: Event, eventQueueLength: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.eventDispatchCompleted",
+          "signature": "func eventDispatchCompleted(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.stateUpdateCompleted",
+          "signature": "func stateUpdateCompleted(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.renderStarted",
+          "signature": "func renderStarted(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.frameScheduling",
+          "signature": "func frameScheduling(_: FrameSchedulingSnapshot): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.frameCompleted",
+          "signature": "func frameCompleted(_: RenderMetrics): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.eventLoopStall",
+          "signature": "func eventLoopStall(task: String, durationNanos: Int64): Unit"
         }
       ]
     }

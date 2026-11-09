@@ -1816,6 +1816,8 @@ func sameFlow(left: ControlFlow, right: ControlFlow): Bool {
     }
 }
 
+/** 管理终端会话、事件更新、命令和绘制的应用运行时。
+ */
 public class App {
     private let backend: Backend
     private let inputSource: InputSource
@@ -1848,6 +1850,28 @@ public class App {
     private var themeValue: ?Theme = None
     private var themePending: Bool = false
 
+    /** 使用默认终端后端创建应用。
+     * @param inputSource 终端输入源
+     * @param terminalDriver 终端模式和尺寸驱动
+     * @param probeInputSource 主动探测输入源
+     * @param renderMode 渲染模式
+     * @param rawMode 是否启用原始模式
+     * @param alternateScreen 是否启用备用屏幕
+     * @param mouse 是否启用鼠标
+     * @param mouseMove 是否启用鼠标移动事件
+     * @param focusEvents 是否启用焦点事件
+     * @param bracketedPaste 是否启用括号粘贴
+     * @param hideCursor 是否隐藏光标
+     * @param keyboard 键盘选项
+     * @param resize 是否监听尺寸变化
+     * @param tickEvery 可选帧周期，优先于目标帧率
+     * @param targetFps 可选目标帧率
+     * @param missPolicy 错过帧时的策略
+     * @param idleSleep 空闲等待时间
+     * @param resizePollEvery 尺寸轮询周期
+     * @param metrics 可选应用指标
+     * @param instrumentationEnabled 是否启用渲染诊断计数
+     */
     public init(
         inputSource!: InputSource = StdinInputSource(),
         terminalDriver!: TerminalDriver = defaultTerminalDriver(),
@@ -1898,6 +1922,29 @@ public class App {
 
     // Stable Backend injection remains available without exposing the
     // concrete default backend in the public construction contract.
+    /** 使用指定后端创建应用。
+     * @param backend 终端后端
+     * @param inputSource 终端输入源
+     * @param terminalDriver 终端模式和尺寸驱动
+     * @param probeInputSource 主动探测输入源
+     * @param renderMode 渲染模式
+     * @param rawMode 是否启用原始模式
+     * @param alternateScreen 是否启用备用屏幕
+     * @param mouse 是否启用鼠标
+     * @param mouseMove 是否启用鼠标移动事件
+     * @param focusEvents 是否启用焦点事件
+     * @param bracketedPaste 是否启用括号粘贴
+     * @param hideCursor 是否隐藏光标
+     * @param keyboard 键盘选项
+     * @param resize 是否监听尺寸变化
+     * @param tickEvery 可选帧周期，优先于目标帧率
+     * @param targetFps 可选目标帧率
+     * @param missPolicy 错过帧时的策略
+     * @param idleSleep 空闲等待时间
+     * @param resizePollEvery 尺寸轮询周期
+     * @param metrics 可选应用指标
+     * @param instrumentationEnabled 是否启用渲染诊断计数
+     */
     public init(
         backend!: Backend,
         inputSource!: InputSource = StdinInputSource(),
@@ -2003,6 +2050,9 @@ public class App {
     // Experimental observability must be attached before run. The sink stays
     // scoped to this App instance and does not participate in normal App
     // construction or runtime state transitions.
+    /** 接入诊断回调；须在运行前调用。
+     * @param traceSink 跟踪回调
+     */
     public func attachTraceSink(traceSink: AppTraceSink): Unit {
         if (runStarted) {
             throw Exception("trace sink must be attached before App.run")
@@ -2010,25 +2060,33 @@ public class App {
         this.traceSink = Some(traceSink)
     }
 
-    /** 设置应用主题；None 恢复组件默认样式。运行中只能从应用事件循环线程调用；下一帧完整重绘。后台线程应通过事件端口交给 update 设置主题。 */
+    /** 设置应用主题并请求下一帧完整重绘；运行中须从事件循环线程调用。
+     * @param theme 主题；None 恢复默认样式
+     */
     public func setTheme(theme: ?Theme): Unit {
         themeValue = theme
         themePending = true
     }
 
-    /** 在运行前设置应用所有帧的文本宽度策略。 */
+    /** 在运行前设置应用所有帧的文本宽度策略。
+     * @param options 文本宽度选项
+     */
     public func setTextWidthOptions(options: TextWidthOptions): Unit {
         if (runStarted) { throw Exception("text width options must be set before App.run") }
         textWidthOptionsValue = options
     }
 
-    /** 为应用接入动画调度器；须在运行前调用，且只在应用事件循环线程访问调度器。 */
+    /** 在运行前接入动画调度器；只在事件循环线程访问。
+     * @param scheduler 动画调度器
+     */
     public func attachAnimationScheduler(scheduler: AnimationScheduler): Unit {
         if (runStarted) { throw Exception("animation scheduler must be attached before App.run") }
         animationScheduler = Some(scheduler)
     }
 
-    /** 接入后台图标能力协商；须在运行前调用。渲染时使用 session.applyTo(theme)。 */
+    /** 在运行前接入后台图标能力协商；渲染时可用 session.applyTo(theme)。
+     * @param session 能力协商会话
+     */
     public func attachGlyphCapabilitySession(session: GlyphCapabilitySession): Unit {
         if (runStarted) { throw Exception("glyph capability session must be attached before App.run") }
         if (glyphCapabilitySession.isSome()) { throw Exception("glyph capability session already attached") }
@@ -2038,11 +2096,17 @@ public class App {
 
     // Experimental PTY support is an explicit pre-run capability. Normal App
     // construction keeps the unsupported default as an implementation detail.
+    /** 接入管道进程运行时；须在运行前调用。
+     * @param processRuntime 进程运行时
+     */
     public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit {
         if (runStarted) { throw Exception("process runtime must be attached before App.run") }
         this.processRuntime = processRuntime
     }
 
+    /** 接入伪终端运行时；须在运行前调用。
+     * @param ptyRuntime 伪终端运行时
+     */
     public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit {
         if (runStarted) {
             throw Exception("PTY runtime must be attached before App.run")
@@ -2050,10 +2114,18 @@ public class App {
         this.ptyRuntime = ptyRuntime
     }
 
+    /** 运行事件循环，更新函数只返回继续或退出。
+     * @param render 帧绘制函数
+     * @param update 事件更新函数
+     */
     public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit {
         runWithCommands(render, { event => UpdateResult(flow: update(event)) })
     }
 
+    /** 运行事件循环，更新函数可返回命令和脏区域。
+     * @param render 帧绘制函数
+     * @param update 事件更新函数
+     */
     public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit {
         runWithRuntime(render, update, None)
     }
@@ -2061,6 +2133,11 @@ public class App {
     // External producers enqueue Events through the stable bounded port. The
     // App imports them into the same ordered run-to-completion runtime; this is
     // not a second event bus and Accepted does not imply update completion.
+    /** 运行事件循环并接收外部端口事件；入队成功不代表更新已完成。
+     * @param port 外部事件端口
+     * @param render 帧绘制函数
+     * @param update 事件更新函数
+     */
     public func runWithExternalPort(
         port: ExternalPort<Event>,
         render: (Frame) -> Unit,
@@ -2746,6 +2823,12 @@ public class App {
         }
     }
 
+    /** 将更新结果的命令加入队列并合并脏区域。
+     * @param result 更新结果
+     * @param commandQueue 命令队列
+     * @param dirtySink 可选脏区域集合
+     * @return 继续运行时为 true，退出时为 false。
+     */
     public static func applyUpdateResult(result: UpdateResult, commandQueue: ArrayList<Command>, dirtySink!: ?DirtyRects = None): Bool {
         App.enqueue(result.command, commandQueue)
         match ((dirtySink, result.dirtyRects)) {
@@ -3018,6 +3101,10 @@ public class App {
         None
     }
 
+    /** 同步解析并执行命令行；调用会等待进程结束。
+     * @param commandLine 命令行
+     * @return 包含退出码及输出或错误信息的事件。
+     */
     public static func executeCommand(commandLine: String): Event {
         let parts = splitCommandLine(commandLine)
         if (parts.size == 0) {
@@ -3026,6 +3113,12 @@ public class App {
         App.executeCommandArgs(commandLine, parts[0], parts[1..])
     }
 
+    /** 同步执行程序和参数；调用会等待进程结束。
+     * @param id 结果标识
+     * @param program 可执行程序
+     * @param args 参数数组
+     * @return 包含退出码及合并输出或错误信息的事件。
+     */
     public static func executeCommandArgs(id: String, program: String, args: Array<String>): Event {
         if (program.isEmpty()) {
             return Event.ExecResult(id, 127, "empty command")
@@ -3093,14 +3186,25 @@ func coalescePendingScrollReversal(events: Array<Event>): Array<Event> {
     result.toArray()
 }
 
+/** 使用默认配置创建应用。
+ * @return 应用实例。
+ */
 public func defaultApp(): App {
     App()
 }
 
+/** 使用默认配置运行应用。
+ * @param render 帧绘制函数
+ * @param update 事件更新函数
+ */
 public func runApp(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit {
     defaultApp().run(render, update)
 }
 
+/** 使用默认配置运行支持命令的应用。
+ * @param render 帧绘制函数
+ * @param update 事件更新函数
+ */
 public func runAppWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit {
     defaultApp().runWithCommands(render, update)
 }
