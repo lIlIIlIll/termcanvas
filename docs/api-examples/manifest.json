@@ -1731,6 +1731,182 @@
           "signature": "public func nextGraphemeOffset(text: String, offset: Int64): Int64"
         }
       ]
+    },
+    {
+      "id": "core-text-decorations",
+      "source": "docs/api-examples/text-decorations.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextEditDelta",
+          "signature": "public struct TextEditDelta {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextEditDelta.start",
+          "signature": "public let start: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextEditDelta.end",
+          "signature": "public let end: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextEditDelta.insertedBytes",
+          "signature": "public let insertedBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextEditDelta.beforeRevision",
+          "signature": "public let beforeRevision: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextEditDelta.afterRevision",
+          "signature": "public let afterRevision: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextEditDelta.init",
+          "signature": "public init(start: Int64, end: Int64, insertedBytes: Int64, beforeRevision: Int64, afterRevision: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationProvider",
+          "signature": "public interface TextDecorationProvider {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationProvider.revision",
+          "signature": "func revision(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationProvider.query",
+          "signature": "func query(start: Int64, end: Int64): Array<TextDecoration>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationProvider.onEdit",
+          "signature": "func onEdit(edit: TextEditDelta): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationUpdate",
+          "signature": "public class TextDecorationUpdate {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationUpdate.revision",
+          "signature": "public let revision: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationUpdate.start",
+          "signature": "public let start: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationUpdate.end",
+          "signature": "public let end: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationUpdate.spans",
+          "signature": "public let spans: Array<TextDecoration>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationUpdate.init",
+          "signature": "public init(revision: Int64, start: Int64, end: Int64, spans: Array<TextDecoration>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationStore",
+          "signature": "public class TextDecorationStore <: TextDecorationProvider {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationStore.init",
+          "signature": "public init(revision!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationStore.revision",
+          "signature": "public func revision(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationStore.cachedRanges",
+          "signature": "public func cachedRanges(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationStore.invalidatedRanges",
+          "signature": "public func invalidatedRanges(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationStore.queryCount",
+          "signature": "public func queryCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationStore.apply",
+          "signature": "public func apply(update: TextDecorationUpdate): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationStore.query",
+          "signature": "public func query(start: Int64, end: Int64): Array<TextDecoration>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationStore.onEdit",
+          "signature": "public func onEdit(edit: TextEditDelta): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_decorations.cj",
+          "symbol": "TextDecorationStore.reset",
+          "signature": "public func reset(revision: Int64): Unit"
+        }
+      ]
     }
   ]
 }

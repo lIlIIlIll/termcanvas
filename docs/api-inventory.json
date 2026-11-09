@@ -42069,7 +42069,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 6,
+      "line": 7,
       "level": "top_level",
       "kind": "struct",
       "symbol": "TextEditDelta",
@@ -42087,7 +42087,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 7,
+      "line": 9,
       "level": "member",
       "kind": "let",
       "symbol": "start",
@@ -42105,7 +42105,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 8,
+      "line": 11,
       "level": "member",
       "kind": "let",
       "symbol": "end",
@@ -42123,7 +42123,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 9,
+      "line": 13,
       "level": "member",
       "kind": "let",
       "symbol": "insertedBytes",
@@ -42141,7 +42141,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 10,
+      "line": 15,
       "level": "member",
       "kind": "let",
       "symbol": "beforeRevision",
@@ -42159,7 +42159,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 11,
+      "line": 17,
       "level": "member",
       "kind": "let",
       "symbol": "afterRevision",
@@ -42177,7 +42177,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 12,
+      "line": 25,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -42195,7 +42195,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 21,
+      "line": 35,
       "level": "top_level",
       "kind": "interface",
       "symbol": "TextDecorationProvider",
@@ -42213,7 +42213,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 22,
+      "line": 39,
       "level": "member",
       "kind": "func",
       "symbol": "revision",
@@ -42232,7 +42232,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 23,
+      "line": 45,
       "level": "member",
       "kind": "func",
       "symbol": "query",
@@ -42251,7 +42251,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 24,
+      "line": 49,
       "level": "member",
       "kind": "func",
       "symbol": "onEdit",
@@ -42270,7 +42270,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 27,
+      "line": 53,
       "level": "top_level",
       "kind": "class",
       "symbol": "TextDecorationUpdate",
@@ -42288,7 +42288,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 28,
+      "line": 55,
       "level": "member",
       "kind": "let",
       "symbol": "revision",
@@ -42306,7 +42306,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 29,
+      "line": 57,
       "level": "member",
       "kind": "let",
       "symbol": "start",
@@ -42324,7 +42324,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 30,
+      "line": 59,
       "level": "member",
       "kind": "let",
       "symbol": "end",
@@ -42342,7 +42342,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 31,
+      "line": 61,
       "level": "member",
       "kind": "let",
       "symbol": "spans",
@@ -42360,7 +42360,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 32,
+      "line": 68,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -42378,7 +42378,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 56,
+      "line": 93,
       "level": "top_level",
       "kind": "class",
       "symbol": "TextDecorationStore",
@@ -42396,7 +42396,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 61,
+      "line": 101,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -42414,7 +42414,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 62,
+      "line": 105,
       "level": "member",
       "kind": "func",
       "symbol": "revision",
@@ -42432,7 +42432,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 63,
+      "line": 109,
       "level": "member",
       "kind": "func",
       "symbol": "cachedRanges",
@@ -42450,7 +42450,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 64,
+      "line": 113,
       "level": "member",
       "kind": "func",
       "symbol": "invalidatedRanges",
@@ -42468,7 +42468,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 65,
+      "line": 117,
       "level": "member",
       "kind": "func",
       "symbol": "queryCount",
@@ -42486,7 +42486,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 67,
+      "line": 123,
       "level": "member",
       "kind": "func",
       "symbol": "apply",
@@ -42504,7 +42504,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 84,
+      "line": 145,
       "level": "member",
       "kind": "func",
       "symbol": "query",
@@ -42522,7 +42522,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 107,
+      "line": 171,
       "level": "member",
       "kind": "func",
       "symbol": "onEdit",
@@ -42540,7 +42540,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_decorations.cj",
-      "line": 128,
+      "line": 195,
       "level": "member",
       "kind": "func",
       "symbol": "reset",
