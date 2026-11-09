@@ -1221,34 +1221,34 @@ packages/core/src/keymap.cj:71:public func all(): Array<KeyBinding>
 packages/core/src/keymap.cj:77:public class HelpView <: Widget {
 packages/core/src/keymap.cj:87:public init(keymap: KeyMap, style!: Style = Style(fg: Color.Indexed(8)), separator!: String = " ")
 packages/core/src/keymap.cj:97:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/lazy_tree.cj:5:public class LazyTreeNode {
-packages/core/src/lazy_tree.cj:6:public let id: String
-packages/core/src/lazy_tree.cj:7:public let label: String
-packages/core/src/lazy_tree.cj:8:public let childCount: Int64
-packages/core/src/lazy_tree.cj:9:public init(id: String, label: String, childCount!: Int64 = 0)
-packages/core/src/lazy_tree.cj:16:public interface TreeDataSource {
-packages/core/src/lazy_tree.cj:17:func rootCount(): Int64
-packages/core/src/lazy_tree.cj:18:func nodeAt(path: Array<Int64>): ?LazyTreeNode
-packages/core/src/lazy_tree.cj:19:func pathForId(id: String): ?Array<Int64>
-packages/core/src/lazy_tree.cj:22:public class LazyTreeRow {
-packages/core/src/lazy_tree.cj:23:public let node: LazyTreeNode
-packages/core/src/lazy_tree.cj:24:public let depth: Int64
-packages/core/src/lazy_tree.cj:25:public let expanded: Bool
-packages/core/src/lazy_tree.cj:26:public let index: Int64
-packages/core/src/lazy_tree.cj:46:public class LazyTreeModel {
-packages/core/src/lazy_tree.cj:50:public init(source: TreeDataSource)
-packages/core/src/lazy_tree.cj:54:public func visibleCount(): Int64
-packages/core/src/lazy_tree.cj:55:public func selectedId(): ?String
-packages/core/src/lazy_tree.cj:56:public func findById(id: String): ?LazyTreeNode
-packages/core/src/lazy_tree.cj:62:public func selectedIndex(): ?Int64
-packages/core/src/lazy_tree.cj:68:public func selectById(id: String): Bool
-packages/core/src/lazy_tree.cj:75:public func selectIndex(index: Int64): Bool
-packages/core/src/lazy_tree.cj:79:public func rowAt(index: Int64): ?LazyTreeRow
-packages/core/src/lazy_tree.cj:83:public func rows(offset: Int64, height: Int64): Array<LazyTreeRow>
-packages/core/src/lazy_tree.cj:93:public func setExpanded(id: String, expanded: Bool): Bool
-packages/core/src/lazy_tree.cj:122:public func toggleSelected(): Bool
-packages/core/src/lazy_tree.cj:128:public func collapseAll(): Unit
-packages/core/src/lazy_tree.cj:130:public func refresh(): Unit
+packages/core/src/lazy_tree.cj:6:public class LazyTreeNode {
+packages/core/src/lazy_tree.cj:8:public let id: String
+packages/core/src/lazy_tree.cj:10:public let label: String
+packages/core/src/lazy_tree.cj:12:public let childCount: Int64
+packages/core/src/lazy_tree.cj:18:public init(id: String, label: String, childCount!: Int64 = 0)
+packages/core/src/lazy_tree.cj:26:public interface TreeDataSource {
+packages/core/src/lazy_tree.cj:30:func rootCount(): Int64
+packages/core/src/lazy_tree.cj:35:func nodeAt(path: Array<Int64>): ?LazyTreeNode
+packages/core/src/lazy_tree.cj:40:func pathForId(id: String): ?Array<Int64>
+packages/core/src/lazy_tree.cj:44:public class LazyTreeRow {
+packages/core/src/lazy_tree.cj:46:public let node: LazyTreeNode
+packages/core/src/lazy_tree.cj:48:public let depth: Int64
+packages/core/src/lazy_tree.cj:50:public let expanded: Bool
+packages/core/src/lazy_tree.cj:52:public let index: Int64
+packages/core/src/lazy_tree.cj:73:public class LazyTreeModel {
+packages/core/src/lazy_tree.cj:80:public init(source: TreeDataSource)
+packages/core/src/lazy_tree.cj:87:public func visibleCount(): Int64
+packages/core/src/lazy_tree.cj:91:public func selectedId(): ?String
+packages/core/src/lazy_tree.cj:96:public func findById(id: String): ?LazyTreeNode
+packages/core/src/lazy_tree.cj:105:public func selectedIndex(): ?Int64
+packages/core/src/lazy_tree.cj:115:public func selectById(id: String): Bool
+packages/core/src/lazy_tree.cj:126:public func selectIndex(index: Int64): Bool
+packages/core/src/lazy_tree.cj:134:public func rowAt(index: Int64): ?LazyTreeRow
+packages/core/src/lazy_tree.cj:143:public func rows(offset: Int64, height: Int64): Array<LazyTreeRow>
+packages/core/src/lazy_tree.cj:158:public func setExpanded(id: String, expanded: Bool): Bool
+packages/core/src/lazy_tree.cj:190:public func toggleSelected(): Bool
+packages/core/src/lazy_tree.cj:197:public func collapseAll(): Unit
+packages/core/src/lazy_tree.cj:200:public func refresh(): Unit
 packages/core/src/media.cj:5:public enum MediaKind {
 packages/core/src/media.cj:6:Image
 packages/core/src/media.cj:7:Animation

@@ -1907,6 +1907,188 @@
           "signature": "public func reset(revision: Int64): Unit"
         }
       ]
+    },
+    {
+      "id": "core-lazy-tree",
+      "source": "docs/api-examples/lazy-tree.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeNode",
+          "signature": "public class LazyTreeNode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeNode.id",
+          "signature": "public let id: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeNode.label",
+          "signature": "public let label: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeNode.childCount",
+          "signature": "public let childCount: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeNode.init",
+          "signature": "public init(id: String, label: String, childCount!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "TreeDataSource",
+          "signature": "public interface TreeDataSource {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "TreeDataSource.rootCount",
+          "signature": "func rootCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "TreeDataSource.nodeAt",
+          "signature": "func nodeAt(path: Array<Int64>): ?LazyTreeNode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "TreeDataSource.pathForId",
+          "signature": "func pathForId(id: String): ?Array<Int64>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeRow",
+          "signature": "public class LazyTreeRow {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeRow.node",
+          "signature": "public let node: LazyTreeNode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeRow.depth",
+          "signature": "public let depth: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeRow.expanded",
+          "signature": "public let expanded: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeRow.index",
+          "signature": "public let index: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel",
+          "signature": "public class LazyTreeModel {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.init",
+          "signature": "public init(source: TreeDataSource)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.visibleCount",
+          "signature": "public func visibleCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.selectedId",
+          "signature": "public func selectedId(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.findById",
+          "signature": "public func findById(id: String): ?LazyTreeNode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.selectedIndex",
+          "signature": "public func selectedIndex(): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.selectById",
+          "signature": "public func selectById(id: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.selectIndex",
+          "signature": "public func selectIndex(index: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.rowAt",
+          "signature": "public func rowAt(index: Int64): ?LazyTreeRow"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.rows",
+          "signature": "public func rows(offset: Int64, height: Int64): Array<LazyTreeRow>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.setExpanded",
+          "signature": "public func setExpanded(id: String, expanded: Bool): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.toggleSelected",
+          "signature": "public func toggleSelected(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.collapseAll",
+          "signature": "public func collapseAll(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/lazy_tree.cj",
+          "symbol": "LazyTreeModel.refresh",
+          "signature": "public func refresh(): Unit"
+        }
+      ]
     }
   ]
 }

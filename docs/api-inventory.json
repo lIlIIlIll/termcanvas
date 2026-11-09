@@ -22260,7 +22260,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "class",
       "symbol": "LazyTreeNode",
@@ -22278,7 +22278,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 6,
+      "line": 8,
       "level": "member",
       "kind": "let",
       "symbol": "id",
@@ -22296,7 +22296,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 7,
+      "line": 10,
       "level": "member",
       "kind": "let",
       "symbol": "label",
@@ -22314,7 +22314,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 8,
+      "line": 12,
       "level": "member",
       "kind": "let",
       "symbol": "childCount",
@@ -22332,7 +22332,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 9,
+      "line": 18,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -22350,7 +22350,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 16,
+      "line": 26,
       "level": "top_level",
       "kind": "interface",
       "symbol": "TreeDataSource",
@@ -22368,7 +22368,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 17,
+      "line": 30,
       "level": "member",
       "kind": "func",
       "symbol": "rootCount",
@@ -22387,7 +22387,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 18,
+      "line": 35,
       "level": "member",
       "kind": "func",
       "symbol": "nodeAt",
@@ -22406,7 +22406,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 19,
+      "line": 40,
       "level": "member",
       "kind": "func",
       "symbol": "pathForId",
@@ -22425,7 +22425,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 22,
+      "line": 44,
       "level": "top_level",
       "kind": "class",
       "symbol": "LazyTreeRow",
@@ -22443,7 +22443,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 23,
+      "line": 46,
       "level": "member",
       "kind": "let",
       "symbol": "node",
@@ -22461,7 +22461,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 24,
+      "line": 48,
       "level": "member",
       "kind": "let",
       "symbol": "depth",
@@ -22479,7 +22479,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 25,
+      "line": 50,
       "level": "member",
       "kind": "let",
       "symbol": "expanded",
@@ -22497,7 +22497,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 26,
+      "line": 52,
       "level": "member",
       "kind": "let",
       "symbol": "index",
@@ -22515,7 +22515,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 46,
+      "line": 73,
       "level": "top_level",
       "kind": "class",
       "symbol": "LazyTreeModel",
@@ -22533,7 +22533,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 50,
+      "line": 80,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -22551,7 +22551,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 54,
+      "line": 87,
       "level": "member",
       "kind": "func",
       "symbol": "visibleCount",
@@ -22569,7 +22569,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 55,
+      "line": 91,
       "level": "member",
       "kind": "func",
       "symbol": "selectedId",
@@ -22587,7 +22587,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 56,
+      "line": 96,
       "level": "member",
       "kind": "func",
       "symbol": "findById",
@@ -22605,7 +22605,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 62,
+      "line": 105,
       "level": "member",
       "kind": "func",
       "symbol": "selectedIndex",
@@ -22623,7 +22623,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 68,
+      "line": 115,
       "level": "member",
       "kind": "func",
       "symbol": "selectById",
@@ -22641,7 +22641,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 75,
+      "line": 126,
       "level": "member",
       "kind": "func",
       "symbol": "selectIndex",
@@ -22659,7 +22659,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 79,
+      "line": 134,
       "level": "member",
       "kind": "func",
       "symbol": "rowAt",
@@ -22677,7 +22677,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 83,
+      "line": 143,
       "level": "member",
       "kind": "func",
       "symbol": "rows",
@@ -22695,7 +22695,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 93,
+      "line": 158,
       "level": "member",
       "kind": "func",
       "symbol": "setExpanded",
@@ -22713,7 +22713,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 122,
+      "line": 190,
       "level": "member",
       "kind": "func",
       "symbol": "toggleSelected",
@@ -22731,7 +22731,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 128,
+      "line": 197,
       "level": "member",
       "kind": "func",
       "symbol": "collapseAll",
@@ -22749,7 +22749,7 @@
     {
       "package": "core",
       "path": "packages/core/src/lazy_tree.cj",
-      "line": 130,
+      "line": 200,
       "level": "member",
       "kind": "func",
       "symbol": "refresh",
