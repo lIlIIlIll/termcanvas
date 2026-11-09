@@ -501,35 +501,35 @@ packages/core/src/command_widgets.cj:676:public func setTheme(theme: ?Theme): Un
 packages/core/src/command_widgets.cj:680:public func handle(key: KeyEvent): ?Bool
 packages/core/src/command_widgets.cj:700:public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
 packages/core/src/command_widgets.cj:709:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/container_widgets.cj:5:public class VBox <: Widget {
-packages/core/src/container_widgets.cj:10:public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())
-packages/core/src/container_widgets.cj:16:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/container_widgets.cj:33:public class HBox <: Widget {
-packages/core/src/container_widgets.cj:38:public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())
-packages/core/src/container_widgets.cj:44:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/container_widgets.cj:61:public class Stack <: Widget {
-packages/core/src/container_widgets.cj:64:public init(children: Array<Widget>)
-packages/core/src/container_widgets.cj:68:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/container_widgets.cj:75:public class Overlay <: Widget {
-packages/core/src/container_widgets.cj:79:public init(base: Widget, overlays!: Array<Widget> = [])
-packages/core/src/container_widgets.cj:84:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/container_widgets.cj:92:public class Padding <: Widget {
-packages/core/src/container_widgets.cj:96:public init(child: Widget, spacing: Spacing)
-packages/core/src/container_widgets.cj:101:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/container_widgets.cj:106:public class Margin <: Widget {
-packages/core/src/container_widgets.cj:110:public init(child: Widget, spacing: Spacing)
-packages/core/src/container_widgets.cj:115:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/container_widgets.cj:120:public class Centered <: Widget {
-packages/core/src/container_widgets.cj:125:public init(child: Widget, width: Int64, height: Int64)
-packages/core/src/container_widgets.cj:131:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/container_widgets.cj:136:public class Dock <: Widget {
-packages/core/src/container_widgets.cj:147:public init( top!: ?Widget = None, bottom!: ?Widget = None, left!: ?Widget = None, right!: ?Widget = None, center!: ?Widget = None, topHeight!: Int64 = 1, bottomHeight!: Int64 = 1, leftWidth!: Int64 = 16, rightWidth!: Int64 = 16 )
-packages/core/src/container_widgets.cj:169:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/container_widgets.cj:206:public class Scrollable <: Widget {
-packages/core/src/container_widgets.cj:212:public init(lines: Array<String>, state!: ScrollState = ScrollState(), style!: Style = Style.default(), scrollbarStyle!: Style = Style(fg: Color.Indexed(8)))
-packages/core/src/container_widgets.cj:219:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/container_widgets.cj:223:public func handleMouse(mouse: MouseEvent, area: Rect, capture: PointerCapture, owner: String): Bool
-packages/core/src/container_widgets.cj:234:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/container_widgets.cj:6:public class VBox <: Widget {
+packages/core/src/container_widgets.cj:16:public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())
+packages/core/src/container_widgets.cj:26:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/container_widgets.cj:44:public class HBox <: Widget {
+packages/core/src/container_widgets.cj:54:public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())
+packages/core/src/container_widgets.cj:64:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/container_widgets.cj:82:public class Stack <: Widget {
+packages/core/src/container_widgets.cj:88:public init(children: Array<Widget>)
+packages/core/src/container_widgets.cj:96:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/container_widgets.cj:104:public class Overlay <: Widget {
+packages/core/src/container_widgets.cj:112:public init(base: Widget, overlays!: Array<Widget> = [])
+packages/core/src/container_widgets.cj:121:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/container_widgets.cj:130:public class Padding <: Widget {
+packages/core/src/container_widgets.cj:138:public init(child: Widget, spacing: Spacing)
+packages/core/src/container_widgets.cj:147:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/container_widgets.cj:153:public class Margin <: Widget {
+packages/core/src/container_widgets.cj:161:public init(child: Widget, spacing: Spacing)
+packages/core/src/container_widgets.cj:170:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/container_widgets.cj:176:public class Centered <: Widget {
+packages/core/src/container_widgets.cj:186:public init(child: Widget, width: Int64, height: Int64)
+packages/core/src/container_widgets.cj:196:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/container_widgets.cj:202:public class Dock <: Widget {
+packages/core/src/container_widgets.cj:224:public init( top!: ?Widget = None, bottom!: ?Widget = None, left!: ?Widget = None, right!: ?Widget = None, center!: ?Widget = None, topHeight!: Int64 = 1, bottomHeight!: Int64 = 1, leftWidth!: Int64 = 16, rightWidth!: Int64 = 16 )
+packages/core/src/container_widgets.cj:250:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/container_widgets.cj:288:public class Scrollable <: Widget {
+packages/core/src/container_widgets.cj:300:public init(lines: Array<String>, state!: ScrollState = ScrollState(), style!: Style = Style.default(), scrollbarStyle!: Style = Style(fg: Color.Indexed(8)))
+packages/core/src/container_widgets.cj:312:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/container_widgets.cj:323:public func handleMouse(mouse: MouseEvent, area: Rect, capture: PointerCapture, owner: String): Bool
+packages/core/src/container_widgets.cj:338:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/content_widgets.cj:6:public enum TranscriptItemKind {
 packages/core/src/content_widgets.cj:7:Text
 packages/core/src/content_widgets.cj:8:Code

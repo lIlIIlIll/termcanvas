@@ -2089,6 +2089,194 @@
           "signature": "public func refresh(): Unit"
         }
       ]
+    },
+    {
+      "id": "core-container-layouts",
+      "source": "docs/api-examples/containers.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "VBox",
+          "signature": "public class VBox <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "VBox.init",
+          "signature": "public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "VBox.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "HBox",
+          "signature": "public class HBox <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "HBox.init",
+          "signature": "public init(children: Array<Widget>, gap!: Int64 = 0, padding!: Spacing = Spacing.zero())"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "HBox.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Stack",
+          "signature": "public class Stack <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Stack.init",
+          "signature": "public init(children: Array<Widget>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Stack.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Overlay",
+          "signature": "public class Overlay <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Overlay.init",
+          "signature": "public init(base: Widget, overlays!: Array<Widget> = [])"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Overlay.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Padding",
+          "signature": "public class Padding <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Padding.init",
+          "signature": "public init(child: Widget, spacing: Spacing)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Padding.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Margin",
+          "signature": "public class Margin <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Margin.init",
+          "signature": "public init(child: Widget, spacing: Spacing)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Margin.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Centered",
+          "signature": "public class Centered <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Centered.init",
+          "signature": "public init(child: Widget, width: Int64, height: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Centered.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Dock",
+          "signature": "public class Dock <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Dock.init",
+          "signature": "public init( top!: ?Widget = None, bottom!: ?Widget = None, left!: ?Widget = None, right!: ?Widget = None, center!: ?Widget = None, topHeight!: Int64 = 1, bottomHeight!: Int64 = 1, leftWidth!: Int64 = 16, rightWidth!: Int64 = 16 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Dock.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Scrollable",
+          "signature": "public class Scrollable <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Scrollable.init",
+          "signature": "public init(lines: Array<String>, state!: ScrollState = ScrollState(), style!: Style = Style.default(), scrollbarStyle!: Style = Style(fg: Color.Indexed(8)))"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Scrollable.handle",
+          "signature": "public func handle(key: KeyEvent, viewportHeight: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Scrollable.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect, capture: PointerCapture, owner: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/container_widgets.cj",
+          "symbol": "Scrollable.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

@@ -9174,7 +9174,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "class",
       "symbol": "VBox",
@@ -9192,7 +9192,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 10,
+      "line": 16,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9210,7 +9210,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 16,
+      "line": 26,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -9228,7 +9228,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 33,
+      "line": 44,
       "level": "top_level",
       "kind": "class",
       "symbol": "HBox",
@@ -9246,7 +9246,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 38,
+      "line": 54,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9264,7 +9264,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 44,
+      "line": 64,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -9282,7 +9282,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 61,
+      "line": 82,
       "level": "top_level",
       "kind": "class",
       "symbol": "Stack",
@@ -9300,7 +9300,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 64,
+      "line": 88,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9318,7 +9318,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 68,
+      "line": 96,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -9336,7 +9336,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 75,
+      "line": 104,
       "level": "top_level",
       "kind": "class",
       "symbol": "Overlay",
@@ -9354,7 +9354,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 79,
+      "line": 112,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9372,7 +9372,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 84,
+      "line": 121,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -9390,7 +9390,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 92,
+      "line": 130,
       "level": "top_level",
       "kind": "class",
       "symbol": "Padding",
@@ -9408,7 +9408,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 96,
+      "line": 138,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9426,7 +9426,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 101,
+      "line": 147,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -9444,7 +9444,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 106,
+      "line": 153,
       "level": "top_level",
       "kind": "class",
       "symbol": "Margin",
@@ -9462,7 +9462,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 110,
+      "line": 161,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9480,7 +9480,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 115,
+      "line": 170,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -9498,7 +9498,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 120,
+      "line": 176,
       "level": "top_level",
       "kind": "class",
       "symbol": "Centered",
@@ -9516,7 +9516,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 125,
+      "line": 186,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9534,7 +9534,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 131,
+      "line": 196,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -9552,7 +9552,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 136,
+      "line": 202,
       "level": "top_level",
       "kind": "class",
       "symbol": "Dock",
@@ -9570,7 +9570,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 147,
+      "line": 224,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9588,7 +9588,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 169,
+      "line": 250,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -9606,7 +9606,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 206,
+      "line": 288,
       "level": "top_level",
       "kind": "class",
       "symbol": "Scrollable",
@@ -9624,7 +9624,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 212,
+      "line": 300,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -9642,7 +9642,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 219,
+      "line": 312,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -9660,7 +9660,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 223,
+      "line": 323,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -9678,7 +9678,7 @@
     {
       "package": "core",
       "path": "packages/core/src/container_widgets.cj",
-      "line": 234,
+      "line": 338,
       "level": "member",
       "kind": "func",
       "symbol": "render",
