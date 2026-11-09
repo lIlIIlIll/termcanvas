@@ -15819,6 +15819,290 @@
           "signature": "public func run(action: () -> Unit): Unit"
         }
       ]
+    },
+    {
+      "id": "terminal-driver",
+      "source": "docs/api-examples/terminal-driver.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalDriver",
+          "signature": "public interface TerminalDriver {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalDriver.name",
+          "signature": "func name(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalDriver.enterRawMode",
+          "signature": "func enterRawMode(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalDriver.restore",
+          "signature": "func restore(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalDriver.size",
+          "signature": "func size(): ?Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalDriver.capabilities",
+          "signature": "func capabilities(backend: Backend): TerminalCapabilities"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "FallbackTerminalDriver",
+          "signature": "public class FallbackTerminalDriver <: TerminalDriver {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "FallbackTerminalDriver.init",
+          "signature": "public init(area!: Rect = Rect(0, 0, 80, 24))"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "FallbackTerminalDriver.name",
+          "signature": "public func name(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "FallbackTerminalDriver.enterRawMode",
+          "signature": "public func enterRawMode(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "FallbackTerminalDriver.restore",
+          "signature": "public func restore(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "FallbackTerminalDriver.size",
+          "signature": "public func size(): ?Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "FallbackTerminalDriver.capabilities",
+          "signature": "public func capabilities(backend: Backend): TerminalCapabilities"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "MacOSTerminalDriver",
+          "signature": "public class MacOSTerminalDriver <: TerminalDriver {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "MacOSTerminalDriver.init",
+          "signature": "public init(area!: Rect = Rect(0, 0, 80, 24))"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "MacOSTerminalDriver.name",
+          "signature": "public func name(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "MacOSTerminalDriver.enterRawMode",
+          "signature": "public func enterRawMode(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "MacOSTerminalDriver.restore",
+          "signature": "public func restore(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "MacOSTerminalDriver.size",
+          "signature": "public func size(): ?Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "MacOSTerminalDriver.capabilities",
+          "signature": "public func capabilities(backend: Backend): TerminalCapabilities"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "WindowsTerminalDriver",
+          "signature": "public class WindowsTerminalDriver <: TerminalDriver {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "WindowsTerminalDriver.init",
+          "signature": "public init(area!: Rect = Rect(0, 0, 80, 24))"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "WindowsTerminalDriver.name",
+          "signature": "public func name(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "WindowsTerminalDriver.enterRawMode",
+          "signature": "public func enterRawMode(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "WindowsTerminalDriver.restore",
+          "signature": "public func restore(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "WindowsTerminalDriver.size",
+          "signature": "public func size(): ?Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "WindowsTerminalDriver.capabilities",
+          "signature": "public func capabilities(backend: Backend): TerminalCapabilities"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "defaultTerminalDriver",
+          "signature": "public func defaultTerminalDriver(): TerminalDriver"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "DebugOverlay",
+          "signature": "public class DebugOverlay <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "DebugOverlay.init",
+          "signature": "public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "DebugOverlay.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
+    },
+    {
+      "id": "linux-terminal-driver",
+      "source": "docs/api-examples/linux-terminal-driver.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "LinuxTerminalDriver",
+          "signature": "public class LinuxTerminalDriver <: TerminalDriver {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "LinuxTerminalDriver.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "LinuxTerminalDriver.name",
+          "signature": "public func name(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "LinuxTerminalDriver.enterRawMode",
+          "signature": "public func enterRawMode(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "LinuxTerminalDriver.restore",
+          "signature": "public func restore(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "LinuxTerminalDriver.size",
+          "signature": "public func size(): ?Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "LinuxTerminalDriver.capabilities",
+          "signature": "public func capabilities(backend: Backend): TerminalCapabilities"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalMode",
+          "signature": "public class TerminalMode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalMode.lastError",
+          "signature": "public static func lastError(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalMode.enterRawMode",
+          "signature": "public static func enterRawMode(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalMode.restore",
+          "signature": "public static func restore(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalMode.size",
+          "signature": "public static func size(): ?Rect"
+        }
+      ]
     }
   ]
 }

@@ -1362,37 +1362,93 @@ class TerminalSignalGuard {
     }
 }
 
+/** 终端原始模式、尺寸和能力的驱动接口。
+ */
 public interface TerminalDriver {
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     func name(): String
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true。
+     */
     func enterRawMode(): Bool
+    /** 恢复原始模式之前的终端状态。
+     */
     func restore(): Unit
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     func size(): ?Rect
+    /** 获取终端能力。
+     * @param backend 用于获取能力的后端
+     * @return 能力信息。
+     */
     func capabilities(backend: Backend): TerminalCapabilities
 }
 
+/** Linux 原生终端驱动。
+ */
 @When[os == "Linux"]
 public class LinuxTerminalDriver <: TerminalDriver {
+    /** 创建驱动。
+     */
     public init() {}
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "linux-glibc" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true。
+     */
     public func enterRawMode(): Bool { TerminalMode.enterRawMode() }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit { TerminalMode.restore() }
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { TerminalMode.size() }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities.detect(backend: backend, driverName: name())
     }
 }
 
+/** 不启用原始模式的后备终端驱动。
+ */
 public class FallbackTerminalDriver <: TerminalDriver {
     private let area: Rect
+    /** 创建驱动；后备实现使用给定区域。
+     * @param area 后备终端区域
+     */
     public init(area!: Rect = Rect(0, 0, 80, 24)) {
         this.area = area
     }
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "fallback" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true；后备实现返回 false。
+     */
     public func enterRawMode(): Bool { false }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit {}
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { Some(area) }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities(
             size: backend.size(),
@@ -1406,18 +1462,38 @@ public class FallbackTerminalDriver <: TerminalDriver {
     }
 }
 
+/** macOS 终端驱动；其他平台使用后备实现。
+ */
 @When[os != "macOS"]
 public class MacOSTerminalDriver <: TerminalDriver {
     private let fallback: FallbackTerminalDriver
 
+    /** 创建驱动；后备实现使用给定区域。
+     * @param area 后备终端区域
+     */
     public init(area!: Rect = Rect(0, 0, 80, 24)) {
         fallback = FallbackTerminalDriver(area: area)
     }
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "macos-fallback" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true；后备实现返回 false。
+     */
     public func enterRawMode(): Bool { false }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit {}
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { fallback.size() }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities(
             size: backend.size(),
@@ -1431,33 +1507,73 @@ public class MacOSTerminalDriver <: TerminalDriver {
     }
 }
 
+/** macOS 终端驱动；其他平台使用后备实现。
+ */
 @When[os == "macOS"]
 public class MacOSTerminalDriver <: TerminalDriver {
+    /** 创建驱动；后备实现使用给定区域。
+     * @param area 后备终端区域
+     */
     public init(area!: Rect = Rect(0, 0, 80, 24)) {
         if (area.width < 0) { return }
     }
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "macos-termios" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true；后备实现返回 false。
+     */
     public func enterRawMode(): Bool { MacOSTerminalMode.enterRawMode() }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit { MacOSTerminalMode.restore() }
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { MacOSTerminalMode.size() }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities.detect(backend: backend, driverName: name())
     }
 }
 
+/** Windows 终端驱动；其他平台使用后备实现。
+ */
 @When[os != "Windows"]
 public class WindowsTerminalDriver <: TerminalDriver {
     private let fallback: FallbackTerminalDriver
 
+    /** 创建驱动；后备实现使用给定区域。
+     * @param area 后备终端区域
+     */
     public init(area!: Rect = Rect(0, 0, 80, 24)) {
         fallback = FallbackTerminalDriver(area: area)
     }
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "windows-fallback" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true；后备实现返回 false。
+     */
     public func enterRawMode(): Bool { false }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit {}
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { fallback.size() }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities(
             size: backend.size(),
@@ -1471,31 +1587,60 @@ public class WindowsTerminalDriver <: TerminalDriver {
     }
 }
 
+/** Windows 终端驱动；其他平台使用后备实现。
+ */
 @When[os == "Windows"]
 public class WindowsTerminalDriver <: TerminalDriver {
+    /** 创建驱动；后备实现使用给定区域。
+     * @param area 后备终端区域
+     */
     public init(area!: Rect = Rect(0, 0, 80, 24)) {
         if (area.width < 0) { return }
     }
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "windows-vt" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true；后备实现返回 false。
+     */
     public func enterRawMode(): Bool { WindowsConsoleMode.enterRawMode() }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit { WindowsConsoleMode.restore() }
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { WindowsConsoleMode.size() }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities.detect(backend: backend, driverName: name())
     }
 }
 
+/** 创建当前平台的默认终端驱动。
+ * @return 平台终端驱动。
+ */
 @When[os == "Linux"]
 public func defaultTerminalDriver(): TerminalDriver {
     LinuxTerminalDriver()
 }
 
+/** 创建当前平台的默认终端驱动。
+ * @return 平台终端驱动。
+ */
 @When[os == "macOS"]
 public func defaultTerminalDriver(): TerminalDriver {
     MacOSTerminalDriver()
 }
 
+/** 创建当前平台的默认终端驱动。
+ * @return 平台终端驱动。
+ */
 @When[os == "Windows"]
 public func defaultTerminalDriver(): TerminalDriver {
     WindowsTerminalDriver()
@@ -2249,15 +2394,25 @@ public struct RenderMetrics {
     }
 }
 
+/** 显示最近一帧运行指标的单行覆盖层。
+ */
 public class DebugOverlay <: Widget {
     private let metrics: AppMetrics
     private let style: Style
 
+    /** 创建覆盖层。
+     * @param metrics 应用指标
+     * @param style 显示样式
+     */
     public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow)) {
         this.metrics = metrics
         this.style = style
     }
 
+    /** 绘制最近一帧指标；没有帧数据时显示零值。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let frame = metrics.lastFrame()
@@ -2282,6 +2437,8 @@ func bufferSnapshot(buffer: Buffer): String {
     join(lines.toArray(), "\n")
 }
 
+/** Linux 标准输入原始模式和尺寸辅助工具。
+ */
 @When[os == "Linux"]
 public class TerminalMode {
     private static var saved: ?Array<UInt8> = None
@@ -2289,10 +2446,16 @@ public class TerminalMode {
     private static var depth: Int64 = 0
     private static var lastErrorValue: ?String = None
 
+    /** 获取最近一次原始模式操作错误。
+     * @return 错误文本或 None。
+     */
     public static func lastError(): ?String {
         lastErrorValue
     }
 
+    /** 尝试启用原始模式；支持嵌套调用。
+     * @return 成功时为 true。
+     */
     public static func enterRawMode(): Bool {
         if (active) {
             depth++
@@ -2333,6 +2496,8 @@ public class TerminalMode {
         true
     }
 
+    /** 恢复一次原始模式嵌套；最后一次恢复终端状态。
+     */
     public static func restore(): Unit {
         if (!active) { return }
         if (depth > 1) {
@@ -2351,6 +2516,9 @@ public class TerminalMode {
         saved = None
     }
 
+    /** 获取终端尺寸。
+     * @return 尺寸区域或 None。
+     */
     public static func size(): ?Rect {
         if (unsafe { isatty(STDOUT_FILENO) } == 0) {
             return None
