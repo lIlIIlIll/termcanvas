@@ -183,6 +183,7 @@ public class TranscriptView <: Widget {
     private let cardTheme: TranscriptCardTheme
     private let explicitCardTheme: Bool
     private var viewportWidth: Int64 = 0
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
 
     public init(
         transcript: Transcript,
@@ -254,6 +255,7 @@ public class TranscriptView <: Widget {
             widgetRoleStyle(selectedStyle, applicationTheme, ThemeRole.Selected, Style(fg: Color.Black, bg: Color.White))
         }
         viewportWidth = target.width
+        textWidthOptionsValue = buffer.textWidthOptions()
         ensureTranscriptVisible(target.height)
         var y = target.y
         var index = offset
@@ -283,6 +285,7 @@ public class TranscriptView <: Widget {
                         None
                     }
                     let view = DocumentView(document, theme: documentTheme, cacheLayout: true)
+                    view.setTextWidthOptions(textWidthOptionsValue)
                     let height = min(target.bottom - y, max(1, view.renderedLineCount(target.width)))
                     view.render(
                         Rect(target.x, y, target.width, height),
@@ -322,7 +325,9 @@ public class TranscriptView <: Widget {
             case Some(item) =>
                 let document = transcriptCardDocument(item, theme: cardTheme)
                 if (viewportWidth <= 0) { return max(1, document.lines.size) }
-                max(1, DocumentView(document).renderedLineCount(viewportWidth))
+                let view = DocumentView(document)
+                view.setTextWidthOptions(textWidthOptionsValue)
+                max(1, view.renderedLineCount(viewportWidth))
             case None => 0
         }
     }

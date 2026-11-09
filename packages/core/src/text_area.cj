@@ -386,7 +386,14 @@ public class TextArea <: Widget {
     }
 
     /** 设置后续光标及鼠标定位所使用的文本宽度策略。绘制时会与缓冲区同步。 */
-    public func setTextWidthOptions(options: TextWidthOptions): Unit { textWidthOptionsValue = options }
+    public func setTextWidthOptions(options: TextWidthOptions): Unit {
+        if (usesWideAmbiguous(options) != usesWideAmbiguous(textWidthOptionsValue)) {
+            preferredColumn = None
+            verticalColumns = []
+            verticalOffsets = []
+        }
+        textWidthOptionsValue = options
+    }
 
     public func render(area: Rect, buffer: Buffer): Unit {
         setTextWidthOptions(buffer.textWidthOptions())

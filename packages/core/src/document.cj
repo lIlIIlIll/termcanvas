@@ -690,7 +690,8 @@ public class MarkdownView <: Widget {
         scroll!: Int64 = 0,
         wrap!: WrapMode = WrapMode.Word
     ) {
-        this.view = DocumentView(Document.plain(text), block: block, style: style, headingStyle: headingStyle, theme: theme, scroll: scroll, wrap: wrap)
+        let textStyle = match (style) { case Some(value) => value; case None => Style.default() }
+        this.view = DocumentView(Document.plain(text, style: textStyle), block: block, style: style, headingStyle: headingStyle, theme: theme, scroll: scroll, wrap: wrap)
     }
 
     public init(
