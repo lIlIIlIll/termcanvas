@@ -37981,7 +37981,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2056,
+      "line": 2057,
       "level": "top_level",
       "kind": "struct",
       "symbol": "RenderMetrics",
@@ -37999,7 +37999,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2057,
+      "line": 2059,
       "level": "member",
       "kind": "let",
       "symbol": "size",
@@ -38017,7 +38017,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2058,
+      "line": 2061,
       "level": "member",
       "kind": "let",
       "symbol": "dirtyCells",
@@ -38035,7 +38035,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2059,
+      "line": 2063,
       "level": "member",
       "kind": "let",
       "symbol": "diffWrites",
@@ -38053,7 +38053,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2060,
+      "line": 2065,
       "level": "member",
       "kind": "let",
       "symbol": "mediaOps",
@@ -38071,7 +38071,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2061,
+      "line": 2067,
       "level": "member",
       "kind": "let",
       "symbol": "fullRedraw",
@@ -38089,7 +38089,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2062,
+      "line": 2069,
       "level": "member",
       "kind": "let",
       "symbol": "renderMillis",
@@ -38107,7 +38107,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2063,
+      "line": 2071,
       "level": "member",
       "kind": "let",
       "symbol": "drawMillis",
@@ -38125,7 +38125,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2064,
+      "line": 2073,
       "level": "member",
       "kind": "let",
       "symbol": "totalMillis",
@@ -38143,7 +38143,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2065,
+      "line": 2075,
       "level": "member",
       "kind": "let",
       "symbol": "renderedCells",
@@ -38161,7 +38161,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2066,
+      "line": 2077,
       "level": "member",
       "kind": "let",
       "symbol": "dirtyRects",
@@ -38179,7 +38179,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2067,
+      "line": 2079,
       "level": "member",
       "kind": "let",
       "symbol": "copiedCells",
@@ -38197,7 +38197,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2068,
+      "line": 2081,
       "level": "member",
       "kind": "let",
       "symbol": "bufferCellAttempts",
@@ -38215,7 +38215,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2069,
+      "line": 2083,
       "level": "member",
       "kind": "let",
       "symbol": "bufferCellWrites",
@@ -38233,7 +38233,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2070,
+      "line": 2085,
       "level": "member",
       "kind": "let",
       "symbol": "diffCells",
@@ -38251,7 +38251,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2071,
+      "line": 2087,
       "level": "member",
       "kind": "let",
       "symbol": "diffSpans",
@@ -38269,7 +38269,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2072,
+      "line": 2089,
       "level": "member",
       "kind": "let",
       "symbol": "renderNanos",
@@ -38287,7 +38287,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2073,
+      "line": 2091,
       "level": "member",
       "kind": "let",
       "symbol": "diffNanos",
@@ -38305,7 +38305,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2074,
+      "line": 2093,
       "level": "member",
       "kind": "let",
       "symbol": "writeNanos",
@@ -38323,7 +38323,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2075,
+      "line": 2095,
       "level": "member",
       "kind": "let",
       "symbol": "totalNanos",
@@ -38341,7 +38341,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2076,
+      "line": 2097,
       "level": "member",
       "kind": "let",
       "symbol": "ansiBytes",
@@ -38359,7 +38359,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2078,
+      "line": 2119,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -38377,7 +38377,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2121,
+      "line": 2162,
       "level": "top_level",
       "kind": "class",
       "symbol": "DebugOverlay",
@@ -38395,7 +38395,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2125,
+      "line": 2166,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -38413,7 +38413,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2130,
+      "line": 2171,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -38431,7 +38431,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2155,
+      "line": 2196,
       "level": "top_level",
       "kind": "class",
       "symbol": "TerminalMode",
@@ -38449,7 +38449,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2161,
+      "line": 2202,
       "level": "member",
       "kind": "func",
       "symbol": "lastError",
@@ -38467,7 +38467,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2165,
+      "line": 2206,
       "level": "member",
       "kind": "func",
       "symbol": "enterRawMode",
@@ -38485,7 +38485,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2205,
+      "line": 2246,
       "level": "member",
       "kind": "func",
       "symbol": "restore",
@@ -38503,7 +38503,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2223,
+      "line": 2264,
       "level": "member",
       "kind": "func",
       "symbol": "size",
@@ -38521,7 +38521,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2261,
+      "line": 2302,
       "level": "top_level",
       "kind": "class",
       "symbol": "MacOSTerminalMode",
@@ -38539,7 +38539,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2268,
+      "line": 2309,
       "level": "member",
       "kind": "func",
       "symbol": "lastError",
@@ -38557,7 +38557,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2272,
+      "line": 2313,
       "level": "member",
       "kind": "func",
       "symbol": "enterRawMode",
@@ -38575,7 +38575,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2318,
+      "line": 2359,
       "level": "member",
       "kind": "func",
       "symbol": "restore",
@@ -38593,7 +38593,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2336,
+      "line": 2377,
       "level": "member",
       "kind": "func",
       "symbol": "size",
@@ -38611,7 +38611,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2357,
+      "line": 2398,
       "level": "top_level",
       "kind": "class",
       "symbol": "WindowsConsoleMode",
@@ -38629,7 +38629,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2364,
+      "line": 2405,
       "level": "member",
       "kind": "func",
       "symbol": "lastError",
@@ -38647,7 +38647,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2368,
+      "line": 2409,
       "level": "member",
       "kind": "func",
       "symbol": "enterRawMode",
@@ -38665,7 +38665,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2408,
+      "line": 2449,
       "level": "member",
       "kind": "func",
       "symbol": "restore",
@@ -38683,7 +38683,7 @@
     {
       "package": "core",
       "path": "packages/core/src/terminal.cj",
-      "line": 2426,
+      "line": 2467,
       "level": "member",
       "kind": "func",
       "symbol": "size",

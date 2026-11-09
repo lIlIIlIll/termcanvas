@@ -2086,46 +2086,46 @@ packages/core/src/terminal.cj:1879:public let cellHeightPixels: Int64
 packages/core/src/terminal.cj:1881:public let driverName: String
 packages/core/src/terminal.cj:1904:public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = "linux-glibc" )
 packages/core/src/terminal.cj:1946:public static func detect(backend!: Backend = AnsiBackend(), driverName!: String = "linux-glibc"): TerminalCapabilities
-packages/core/src/terminal.cj:2056:public struct RenderMetrics {
-packages/core/src/terminal.cj:2057:public let size: Rect
-packages/core/src/terminal.cj:2058:public let dirtyCells: Int64
-packages/core/src/terminal.cj:2059:public let diffWrites: Int64
-packages/core/src/terminal.cj:2060:public let mediaOps: Int64
-packages/core/src/terminal.cj:2061:public let fullRedraw: Bool
-packages/core/src/terminal.cj:2062:public let renderMillis: Int64
-packages/core/src/terminal.cj:2063:public let drawMillis: Int64
-packages/core/src/terminal.cj:2064:public let totalMillis: Int64
-packages/core/src/terminal.cj:2065:public let renderedCells: Int64
-packages/core/src/terminal.cj:2066:public let dirtyRects: Int64
-packages/core/src/terminal.cj:2067:public let copiedCells: Int64
-packages/core/src/terminal.cj:2068:public let bufferCellAttempts: Int64
-packages/core/src/terminal.cj:2069:public let bufferCellWrites: Int64
-packages/core/src/terminal.cj:2070:public let diffCells: Int64
-packages/core/src/terminal.cj:2071:public let diffSpans: Int64
-packages/core/src/terminal.cj:2072:public let renderNanos: Int64
-packages/core/src/terminal.cj:2073:public let diffNanos: Int64
-packages/core/src/terminal.cj:2074:public let writeNanos: Int64
-packages/core/src/terminal.cj:2075:public let totalNanos: Int64
-packages/core/src/terminal.cj:2076:public let ansiBytes: Int64
-packages/core/src/terminal.cj:2078:public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
-packages/core/src/terminal.cj:2121:public class DebugOverlay <: Widget {
-packages/core/src/terminal.cj:2125:public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
-packages/core/src/terminal.cj:2130:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/terminal.cj:2155:public class TerminalMode {
-packages/core/src/terminal.cj:2161:public static func lastError(): ?String
-packages/core/src/terminal.cj:2165:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:2205:public static func restore(): Unit
-packages/core/src/terminal.cj:2223:public static func size(): ?Rect
-packages/core/src/terminal.cj:2261:public class MacOSTerminalMode {
-packages/core/src/terminal.cj:2268:public static func lastError(): ?String
-packages/core/src/terminal.cj:2272:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:2318:public static func restore(): Unit
-packages/core/src/terminal.cj:2336:public static func size(): ?Rect
-packages/core/src/terminal.cj:2357:public class WindowsConsoleMode {
-packages/core/src/terminal.cj:2364:public static func lastError(): ?String
-packages/core/src/terminal.cj:2368:public static func enterRawMode(): Bool
-packages/core/src/terminal.cj:2408:public static func restore(): Unit
-packages/core/src/terminal.cj:2426:public static func size(): ?Rect
+packages/core/src/terminal.cj:2057:public struct RenderMetrics {
+packages/core/src/terminal.cj:2059:public let size: Rect
+packages/core/src/terminal.cj:2061:public let dirtyCells: Int64
+packages/core/src/terminal.cj:2063:public let diffWrites: Int64
+packages/core/src/terminal.cj:2065:public let mediaOps: Int64
+packages/core/src/terminal.cj:2067:public let fullRedraw: Bool
+packages/core/src/terminal.cj:2069:public let renderMillis: Int64
+packages/core/src/terminal.cj:2071:public let drawMillis: Int64
+packages/core/src/terminal.cj:2073:public let totalMillis: Int64
+packages/core/src/terminal.cj:2075:public let renderedCells: Int64
+packages/core/src/terminal.cj:2077:public let dirtyRects: Int64
+packages/core/src/terminal.cj:2079:public let copiedCells: Int64
+packages/core/src/terminal.cj:2081:public let bufferCellAttempts: Int64
+packages/core/src/terminal.cj:2083:public let bufferCellWrites: Int64
+packages/core/src/terminal.cj:2085:public let diffCells: Int64
+packages/core/src/terminal.cj:2087:public let diffSpans: Int64
+packages/core/src/terminal.cj:2089:public let renderNanos: Int64
+packages/core/src/terminal.cj:2091:public let diffNanos: Int64
+packages/core/src/terminal.cj:2093:public let writeNanos: Int64
+packages/core/src/terminal.cj:2095:public let totalNanos: Int64
+packages/core/src/terminal.cj:2097:public let ansiBytes: Int64
+packages/core/src/terminal.cj:2119:public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )
+packages/core/src/terminal.cj:2162:public class DebugOverlay <: Widget {
+packages/core/src/terminal.cj:2166:public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))
+packages/core/src/terminal.cj:2171:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/terminal.cj:2196:public class TerminalMode {
+packages/core/src/terminal.cj:2202:public static func lastError(): ?String
+packages/core/src/terminal.cj:2206:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:2246:public static func restore(): Unit
+packages/core/src/terminal.cj:2264:public static func size(): ?Rect
+packages/core/src/terminal.cj:2302:public class MacOSTerminalMode {
+packages/core/src/terminal.cj:2309:public static func lastError(): ?String
+packages/core/src/terminal.cj:2313:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:2359:public static func restore(): Unit
+packages/core/src/terminal.cj:2377:public static func size(): ?Rect
+packages/core/src/terminal.cj:2398:public class WindowsConsoleMode {
+packages/core/src/terminal.cj:2405:public static func lastError(): ?String
+packages/core/src/terminal.cj:2409:public static func enterRawMode(): Bool
+packages/core/src/terminal.cj:2449:public static func restore(): Unit
+packages/core/src/terminal.cj:2467:public static func size(): ?Rect
 packages/core/src/text.cj:8:public enum AmbiguousWidth {
 packages/core/src/text.cj:10:Narrow
 packages/core/src/text.cj:12:Wide

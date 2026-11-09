@@ -6815,6 +6815,138 @@
           "path": "packages/core/src/terminal.cj",
           "symbol": "TerminalCapabilities.init",
           "signature": "public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = \"linux-glibc\" )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics",
+          "signature": "public struct RenderMetrics {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.size",
+          "signature": "public let size: Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.dirtyCells",
+          "signature": "public let dirtyCells: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.diffWrites",
+          "signature": "public let diffWrites: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.mediaOps",
+          "signature": "public let mediaOps: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.fullRedraw",
+          "signature": "public let fullRedraw: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.renderMillis",
+          "signature": "public let renderMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.drawMillis",
+          "signature": "public let drawMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.totalMillis",
+          "signature": "public let totalMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.renderedCells",
+          "signature": "public let renderedCells: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.dirtyRects",
+          "signature": "public let dirtyRects: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.copiedCells",
+          "signature": "public let copiedCells: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.bufferCellAttempts",
+          "signature": "public let bufferCellAttempts: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.bufferCellWrites",
+          "signature": "public let bufferCellWrites: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.diffCells",
+          "signature": "public let diffCells: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.diffSpans",
+          "signature": "public let diffSpans: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.renderNanos",
+          "signature": "public let renderNanos: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.diffNanos",
+          "signature": "public let diffNanos: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.writeNanos",
+          "signature": "public let writeNanos: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.totalNanos",
+          "signature": "public let totalNanos: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.ansiBytes",
+          "signature": "public let ansiBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMetrics.init",
+          "signature": "public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )"
         }
       ]
     }

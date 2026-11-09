@@ -2053,28 +2053,69 @@ func probedCapabilities(base: TerminalCapabilities, bytes: Array<Byte>): Termina
     )
 }
 
+/** 单帧渲染、差异计算和输出的指标快照；部分计数依赖可选统计或后端支持。 */
 public struct RenderMetrics {
+    /** 帧区域。 */
     public let size: Rect
+    /** 本帧差异单元格数；完整重绘时为区域单元格数。 */
     public let dirtyCells: Int64
+    /** 本帧输出的差异片段数；完整重绘时按行数记录。 */
     public let diffWrites: Int64
+    /** 媒体操作数。 */
     public let mediaOps: Int64
+    /** 是否使用完整重绘。 */
     public let fullRedraw: Bool
+    /** 绘制回调耗时，单位为毫秒。 */
     public let renderMillis: Int64
+    /** 差异计算和后端输出耗时，单位为毫秒。 */
     public let drawMillis: Int64
+    /** 本帧总耗时，单位为毫秒。 */
     public let totalMillis: Int64
+    /** 参与渲染的单元格区域数量。 */
     public let renderedCells: Int64
+    /** 本帧使用的脏矩形数。 */
     public let dirtyRects: Int64
+    /** 缓冲区快照或准备过程涉及的单元格数。 */
     public let copiedCells: Int64
+    /** 缓冲区单元格写入尝试数；依赖可选统计。 */
     public let bufferCellAttempts: Int64
+    /** 缓冲区实际单元格写入数；依赖可选统计。 */
     public let bufferCellWrites: Int64
+    /** 与 dirtyCells 相同的差异单元格数。 */
     public let diffCells: Int64
+    /** 与 diffWrites 相同的差异片段数。 */
     public let diffSpans: Int64
+    /** 绘制回调耗时，单位为纳秒。 */
     public let renderNanos: Int64
+    /** 差异计划计算耗时，单位为纳秒。 */
     public let diffNanos: Int64
+    /** 后端输出阶段扣除差异计算的耗时，单位为纳秒。 */
     public let writeNanos: Int64
+    /** 本帧总耗时，单位为纳秒。 */
     public let totalNanos: Int64
+    /** 后端报告的输出字节数；-1 表示不可用。 */
     public let ansiBytes: Int64
 
+    /** 创建渲染指标；计数和耗时的负值置零，负的输出字节数记为 -1。
+     * @param size 帧区域
+     * @param dirtyCells 本帧差异单元格数；完整重绘时为区域单元格数
+     * @param diffWrites 本帧输出的差异片段数；完整重绘时按行数记录
+     * @param mediaOps 媒体操作数
+     * @param fullRedraw 是否使用完整重绘
+     * @param renderMillis 绘制回调耗时，单位为毫秒
+     * @param drawMillis 差异计算和后端输出耗时，单位为毫秒
+     * @param totalMillis 本帧总耗时，单位为毫秒
+     * @param renderedCells 参与渲染的单元格区域数量
+     * @param dirtyRects 本帧使用的脏矩形数
+     * @param copiedCells 缓冲区快照或准备过程涉及的单元格数
+     * @param bufferCellAttempts 缓冲区单元格写入尝试数；依赖可选统计
+     * @param bufferCellWrites 缓冲区实际单元格写入数；依赖可选统计
+     * @param renderNanos 绘制回调耗时，单位为纳秒
+     * @param diffNanos 差异计划计算耗时，单位为纳秒
+     * @param writeNanos 后端输出阶段扣除差异计算的耗时，单位为纳秒
+     * @param totalNanos 本帧总耗时，单位为纳秒
+     * @param ansiBytes 后端报告的输出字节数；-1 表示不可用
+     */
     public init(
         size!: Rect = Rect(0, 0, 0, 0),
         dirtyCells!: Int64 = 0,

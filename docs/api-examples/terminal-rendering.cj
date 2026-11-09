@@ -31,6 +31,16 @@ main(): Int64 {
     if (first.size != size || second.size != size || !backend.snapshot().contains("Hi")) {
         throw IllegalStateException("terminal render failed")
     }
+    let metrics = RenderMetrics(size: size, dirtyCells: 2, diffWrites: 1, mediaOps: 0, fullRedraw: false,
+        renderMillis: 1, drawMillis: 2, totalMillis: 3, renderedCells: 2, dirtyRects: 1, copiedCells: 2,
+        bufferCellAttempts: 3, bufferCellWrites: 2, renderNanos: 4, diffNanos: 5, writeNanos: 6,
+        totalNanos: 15, ansiBytes: -1)
+    if (metrics.size != size || metrics.dirtyCells != 2 || metrics.diffWrites != 1 || metrics.mediaOps != 0 ||
+        metrics.fullRedraw || metrics.renderMillis != 1 || metrics.drawMillis != 2 || metrics.totalMillis != 3 ||
+        metrics.renderedCells != 2 || metrics.dirtyRects != 1 || metrics.copiedCells != 2 ||
+        metrics.bufferCellAttempts != 3 || metrics.bufferCellWrites != 2 || metrics.diffCells != 2 ||
+        metrics.diffSpans != 1 || metrics.renderNanos != 4 || metrics.diffNanos != 5 || metrics.writeNanos != 6 ||
+        metrics.totalNanos != 15 || metrics.ansiBytes != -1) { throw IllegalStateException("incorrect render metrics") }
     terminal.clear()
     let full = Terminal(TestBackend(area: size), renderMode: RenderMode.Full)
     _ = full.draw({ frame => frame.renderWidget(Paragraph("Full"), frame.area) })
