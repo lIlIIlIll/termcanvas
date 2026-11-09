@@ -93,21 +93,46 @@ public enum ControlFlow {
 // Optional, low-overhead hooks for end-to-end latency tracing.  The default
 // App path keeps this disabled; applications opt in explicitly when running a
 // diagnostic session.
+/** 可选的应用事件循环和帧诊断回调；运行前显式接入。
+ */
 public interface AppTraceSink {
     // ExternalPort accept to runtime import. This excludes the following
     // application update and frame work, which retain their existing stages.
+    /** 外部事件从端口取出时调用。
+     * @param _ 排队等待时间，单位为纳秒
+     */
     func externalDequeued(_: Int64): Unit {}
+    /** 接收输入事件时调用。
+     * @param event 输入事件
+     * @param eventQueueLength 事件队列长度
+     */
     func inputReceived(event: Event, eventQueueLength: Int64): Unit
+    /** 事件分发结束时调用。
+     */
     func eventDispatchCompleted(): Unit
+    /** 状态更新结束时调用。
+     */
     func stateUpdateCompleted(): Unit
+    /** 开始绘制时调用。
+     */
     func renderStarted(): Unit
     // Presentation-only scheduling attribution. Application update ordering
     // is already fixed before this hook runs.
+    /** 记录帧调度信息。
+     * @param _ 帧调度快照
+     */
     func frameScheduling(_: FrameSchedulingSnapshot): Unit {}
     // Called after Terminal.draw returns so one diagnostic record can bind
     // application timing to the Buffer/diff/transport metrics of that same
     // completed frame. The default preserves existing trace sinks.
+    /** 一帧绘制完成时调用。
+     * @param _ 绘制指标
+     */
     func frameCompleted(_: RenderMetrics): Unit {}
+    /** 记录事件循环阻塞。
+     * @param task 任务名称
+     * @param durationNanos 持续时间，单位为纳秒
+     */
     func eventLoopStall(task: String, durationNanos: Int64): Unit
 }
 
@@ -136,31 +161,115 @@ public struct TimerSpec {
     }
 }
 
+/** 事件更新后由应用执行的动作。
+ */
 public enum Command {
+    /** 不执行动作。
+     */
     | Noop
+    /** 请求退出应用。
+     */
     | Quit
+    /** 向事件循环发送事件。
+     * @param _0 事件
+     */
     | Emit(Event)
+    /** 发送消息事件。
+     * @param _0 消息文本
+     */
     | Message(String)
+    /** 启动返回固定消息的异步任务。
+     * @param _0 任务标识
+     */
     | Async(String)
+    /** 执行返回事件的异步任务。
+     * @param _0 任务标识
+     * @param _1 任务函数
+     */
     | AsyncTask(String, () -> Event)
+    /** 异步执行命令行。
+     * @param _0 任务标识
+     * @param _1 命令行
+     */
     | AsyncExec(String, String)
+    /** 异步执行程序及参数。
+     * @param _0 任务标识
+     * @param _1 程序
+     * @param _2 参数数组
+     */
     | AsyncExecArgs(String, String, Array<String>)
+    /** 请求取消异步任务。
+     * @param _0 任务标识
+     */
     | CancelAsync(String)
+    /** 启动管道子进程。
+     * @param _0 进程标识
+     * @param _1 进程配置
+     */
     | ProcessStart(String, ProcessSpec)
+    /** 请求取消管道子进程。
+     * @param _0 进程标识
+     */
     | ProcessCancel(String)
+    /** 启动伪终端进程。
+     * @param _0 进程标识
+     * @param _1 伪终端配置
+     */
     | PtyStart(String, PtySpec)
+    /** 向伪终端写入字节。
+     * @param _0 进程标识
+     * @param _1 输入字节
+     */
     | PtyWrite(String, Array<Byte>)
+    /** 调整伪终端尺寸。
+     * @param _0 进程标识
+     * @param _1 新尺寸
+     */
     | PtyResize(String, PtySize)
+    /** 向伪终端进程发送信号。
+     * @param _0 进程标识
+     * @param _1 信号
+     */
     | PtySendSignal(String, PtySignal)
+    /** 关闭伪终端进程。
+     * @param _0 进程标识
+     */
     | PtyClose(String)
+    /** 启动定时器。
+     * @param _0 定时器配置
+     */
     | StartTimer(TimerSpec)
+    /** 停止定时器。
+     * @param _0 定时器标识
+     */
     | StopTimer(String)
+    /** 停止并重新启动定时器。
+     * @param _0 定时器配置
+     */
     | RestartTimer(TimerSpec)
+    /** 同步执行命令行并发送结果事件。
+     * @param _0 命令行
+     */
     | Exec(String)
+    /** 同步执行程序及参数并发送结果事件。
+     * @param _0 结果标识
+     * @param _1 程序
+     * @param _2 参数数组
+     */
     | ExecArgs(String, String, Array<String>)
+    /** 请求重置终端并重绘。
+     */
     | ResetTerminal
+    /** 设置或清除终端能力覆盖并请求重绘。
+     * @param _0 能力覆盖；None 清除
+     */
     | SetCapabilitiesOverride(?TerminalCapabilities)
+    /** 请求挂起应用。
+     */
     | Suspend
+    /** 按顺序提交一组命令。
+     * @param _0 命令数组
+     */
     | Batch(Array<Command>)
 }
 

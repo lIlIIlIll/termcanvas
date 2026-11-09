@@ -16447,6 +16447,230 @@
           "signature": "public init(queuedBytes: Int64, peakQueuedBytes: Int64, backpressureCount: Int64)"
         }
       ]
+    },
+    {
+      "id": "app-commands",
+      "source": "docs/api-examples/app-commands.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink",
+          "signature": "public interface AppTraceSink {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.externalDequeued",
+          "signature": "func externalDequeued(_: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.inputReceived",
+          "signature": "func inputReceived(event: Event, eventQueueLength: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.eventDispatchCompleted",
+          "signature": "func eventDispatchCompleted(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.stateUpdateCompleted",
+          "signature": "func stateUpdateCompleted(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.renderStarted",
+          "signature": "func renderStarted(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.frameScheduling",
+          "signature": "func frameScheduling(_: FrameSchedulingSnapshot): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.frameCompleted",
+          "signature": "func frameCompleted(_: RenderMetrics): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "AppTraceSink.eventLoopStall",
+          "signature": "func eventLoopStall(task: String, durationNanos: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command",
+          "signature": "public enum Command {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.Noop",
+          "signature": "Noop"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.Quit",
+          "signature": "Quit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.Emit",
+          "signature": "Emit(Event)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.Message",
+          "signature": "Message(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.Async",
+          "signature": "Async(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.AsyncTask",
+          "signature": "AsyncTask(String, () -> Event)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.AsyncExec",
+          "signature": "AsyncExec(String, String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.AsyncExecArgs",
+          "signature": "AsyncExecArgs(String, String, Array<String>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.CancelAsync",
+          "signature": "CancelAsync(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.ProcessStart",
+          "signature": "ProcessStart(String, ProcessSpec)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.ProcessCancel",
+          "signature": "ProcessCancel(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.PtyStart",
+          "signature": "PtyStart(String, PtySpec)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.PtyWrite",
+          "signature": "PtyWrite(String, Array<Byte>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.PtyResize",
+          "signature": "PtyResize(String, PtySize)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.PtySendSignal",
+          "signature": "PtySendSignal(String, PtySignal)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.PtyClose",
+          "signature": "PtyClose(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.StartTimer",
+          "signature": "StartTimer(TimerSpec)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.StopTimer",
+          "signature": "StopTimer(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.RestartTimer",
+          "signature": "RestartTimer(TimerSpec)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.Exec",
+          "signature": "Exec(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.ExecArgs",
+          "signature": "ExecArgs(String, String, Array<String>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.ResetTerminal",
+          "signature": "ResetTerminal"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.SetCapabilitiesOverride",
+          "signature": "SetCapabilitiesOverride(?TerminalCapabilities)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.Suspend",
+          "signature": "Suspend"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "Command.Batch",
+          "signature": "Batch(Array<Command>)"
+        }
+      ]
     }
   ]
 }
