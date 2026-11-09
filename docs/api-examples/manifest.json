@@ -974,6 +974,141 @@
           "signature": "public func invalidate(): Unit"
         }
       ]
+    },
+    {
+      "id": "testing-headless-scenario",
+      "source": "docs/api-examples/testing.cj",
+      "dependencies": [
+        "core",
+        "testing"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestReport",
+          "signature": "public class TestReport {"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestReport.passed",
+          "signature": "public let passed: Bool"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestReport.exited",
+          "signature": "public let exited: Bool"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestReport.frames",
+          "signature": "public let frames: Array<Buffer>"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestReport.snapshots",
+          "signature": "public let snapshots: Array<String>"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestReport.failures",
+          "signature": "public let failures: Array<String>"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestReport.init",
+          "signature": "public init(passed: Bool, exited: Bool, frames: Array<Buffer>, snapshots: Array<String>, failures: Array<String>)"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestReport.lastSnapshot",
+          "signature": "public func lastSnapshot(): String"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario",
+          "signature": "public class TestScenario {"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.event",
+          "signature": "public func event(value: Event): TestScenario"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.key",
+          "signature": "public func key(value: KeyEvent): TestScenario"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.paste",
+          "signature": "public func paste(text: String): TestScenario"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.message",
+          "signature": "public func message(text: String): TestScenario"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.render",
+          "signature": "public func render(): TestScenario"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.resize",
+          "signature": "public func resize(width: Int64, height: Int64): TestScenario"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.tick",
+          "signature": "public func tick(count!: Int64 = 1): TestScenario"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.expectSnapshot",
+          "signature": "public func expectSnapshot(text: String): TestScenario"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.expectCell",
+          "signature": "public func expectCell(x: Int64, y: Int64, symbol: String): TestScenario"
+        },
+        {
+          "package": "cjtui_testing",
+          "path": "packages/testing/src/testing.cj",
+          "symbol": "TestScenario.run",
+          "signature": "public func run( render: (Frame) -> Unit, update: (Event) -> UpdateResult, width!: Int64 = 80, height!: Int64 = 24, tickDeltaMillis!: Int64 = 16 ): TestReport"
+        }
+      ]
     }
   ]
 }
