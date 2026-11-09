@@ -173,29 +173,74 @@ public class Document {
     }
 }
 
+/** 文档各语义元素使用的样式集合。 */
 public struct DocumentTheme {
+    /** 段落样式。 */
     public let paragraph: Style
+    /** 通用标题样式。 */
     public let heading: Style
+    /** 一级标题样式。 */
     public let heading1: Style
+    /** 二级标题样式。 */
     public let heading2: Style
+    /** 三级标题样式。 */
     public let heading3: Style
+    /** 四级标题样式。 */
     public let heading4: Style
+    /** 五级标题样式。 */
     public let heading5: Style
+    /** 六级标题样式。 */
     public let heading6: Style
+    /** 列表样式。 */
     public let list: Style
+    /** 引用样式。 */
     public let quoteStyle: Style
+    /** 代码块样式。 */
     public let code: Style
+    /** 表格样式。 */
     public let table: Style
+    /** 链接样式。 */
     public let link: Style
+    /** 强调样式。 */
     public let emphasis: Style
+    /** 加重样式。 */
     public let strong: Style
+    /** 行内代码样式。 */
     public let inlineCode: Style
+    /** 图片文本样式。 */
     public let image: Style
+    /** 诊断信息样式。 */
     public let diagnostic: Style
+    /** HTML 样式。 */
     public let html: Style
+    /** 删除线内容样式。 */
     public let strikethrough: Style
+    /** 表头样式。 */
     public let tableHeader: Style
 
+    /** 创建文档主题。一级标题缺省使用 heading；二至六级各有独立默认样式。
+     * @param paragraph 段落样式
+     * @param heading 通用标题样式
+     * @param heading1 一级标题样式
+     * @param heading2 二级标题样式
+     * @param heading3 三级标题样式
+     * @param heading4 四级标题样式
+     * @param heading5 五级标题样式
+     * @param heading6 六级标题样式
+     * @param list 列表样式
+     * @param quoteStyle 引用样式
+     * @param code 代码块样式
+     * @param table 表格样式
+     * @param link 链接样式
+     * @param emphasis 强调样式
+     * @param strong 加重样式
+     * @param inlineCode 行内代码样式
+     * @param image 图片文本样式
+     * @param diagnostic 诊断信息样式
+     * @param html HTML 样式
+     * @param strikethrough 删除线内容样式
+     * @param tableHeader 表头样式
+     */
     public init(
         paragraph!: Style = Style.default(),
         heading!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()),
@@ -260,6 +305,10 @@ public struct DocumentTheme {
         this.tableHeader = tableHeader
     }
 
+    /** 获取指定标题级别的样式。
+     * @param level 标题级别
+     * @return 一级至六级对应的样式，其他级别返回通用标题样式
+     */
     public func headingStyle(level: Int64): Style {
         match (level) {
             case 1 => heading1
@@ -273,7 +322,9 @@ public struct DocumentTheme {
     }
 }
 
+/** 文档主题的 Markdown 兼容别名。 */
 public type MarkdownTheme = DocumentTheme
+/** 文档模型的 Markdown 兼容别名。 */
 public type MarkdownDocument = Document
 
 /** 文档中按查询文本应用的高亮。 */
@@ -318,14 +369,25 @@ public class DocumentFoldRange {
     }
 }
 
+/** 保存文档视图的滚动、光标、链接、搜索和折叠状态。 */
 public class DocumentViewState {
+    /** 渲染行滚动偏移。 */
     public var scroll: Int64
+    /** 可选的源文本光标偏移。 */
     public var cursorSourceOffset: ?Int64
+    /** 当前链接索引。 */
     public var selectedLinkIndex: Int64
+    /** 当前搜索匹配索引。 */
     public var searchMatchIndex: Int64
     private let foldedRanges = ArrayList<DocumentFoldRange>()
     private var foldVersion: Int64 = 0
 
+    /** 创建视图状态；数字索引的负值限制为零。
+     * @param scroll 初始滚动行数
+     * @param cursorSourceOffset 可选源文本光标偏移
+     * @param selectedLinkIndex 初始链接索引
+     * @param searchMatchIndex 初始搜索匹配索引
+     */
     public init(scroll!: Int64 = 0, cursorSourceOffset!: ?Int64 = None, selectedLinkIndex!: Int64 = 0, searchMatchIndex!: Int64 = 0) {
         this.scroll = max(0, scroll)
         this.cursorSourceOffset = cursorSourceOffset
@@ -333,10 +395,14 @@ public class DocumentViewState {
         this.searchMatchIndex = max(0, searchMatchIndex)
     }
 
+    /** 获取折叠范围快照。
+     * @return 已折叠范围
+     */
     public func folds(): Array<DocumentFoldRange> {
         foldedRanges.toArray()
     }
 
+    /** 清除所有折叠范围。 */
     public func clearFolds(): Unit {
         if (foldedRanges.size == 0) { return }
         while (foldedRanges.size > 0) { foldedRanges.remove(at: 0) }
@@ -347,6 +413,11 @@ public class DocumentViewState {
         foldVersion
     }
 
+    /** 以原样提供的起止偏移精确匹配折叠范围。
+     * @param startOffset 起始偏移
+     * @param endOffset 结束偏移
+     * @return 存在精确匹配时为 true
+     */
     public func isFolded(startOffset: Int64, endOffset: Int64): Bool {
         for (range in foldedRanges) {
             if (range.startOffset == startOffset && range.endOffset == endOffset) { return true }
@@ -354,6 +425,11 @@ public class DocumentViewState {
         false
     }
 
+    /** 设置折叠状态；起点限制为非负，终点限制为不小于起点。
+     * @param startOffset 起始偏移
+     * @param endOffset 结束偏移
+     * @param folded 是否折叠
+     */
     public func setFolded(startOffset: Int64, endOffset: Int64, folded: Bool): Unit {
         let start = max(0, startOffset)
         let end = max(start, endOffset)
@@ -373,6 +449,11 @@ public class DocumentViewState {
         }
     }
 
+    /** 切换给定范围的折叠状态；请传入非负且终点不小于起点的偏移。
+     * @param startOffset 起始偏移
+     * @param endOffset 结束偏移
+     * @return 请求设置的新折叠状态
+     */
     public func toggleFold(startOffset: Int64, endOffset: Int64): Bool {
         let folded = !isFolded(startOffset, endOffset)
         setFolded(startOffset, endOffset, folded)

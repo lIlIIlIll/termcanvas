@@ -10737,6 +10737,242 @@
           "signature": "public func contains(offset: Int64): Bool"
         }
       ]
+    },
+    {
+      "id": "document-state",
+      "source": "docs/api-examples/document-state.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme",
+          "signature": "public struct DocumentTheme {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.paragraph",
+          "signature": "public let paragraph: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.heading",
+          "signature": "public let heading: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.heading1",
+          "signature": "public let heading1: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.heading2",
+          "signature": "public let heading2: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.heading3",
+          "signature": "public let heading3: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.heading4",
+          "signature": "public let heading4: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.heading5",
+          "signature": "public let heading5: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.heading6",
+          "signature": "public let heading6: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.list",
+          "signature": "public let list: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.quoteStyle",
+          "signature": "public let quoteStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.code",
+          "signature": "public let code: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.table",
+          "signature": "public let table: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.link",
+          "signature": "public let link: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.emphasis",
+          "signature": "public let emphasis: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.strong",
+          "signature": "public let strong: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.inlineCode",
+          "signature": "public let inlineCode: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.image",
+          "signature": "public let image: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.diagnostic",
+          "signature": "public let diagnostic: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.html",
+          "signature": "public let html: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.strikethrough",
+          "signature": "public let strikethrough: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.tableHeader",
+          "signature": "public let tableHeader: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.init",
+          "signature": "public init( paragraph!: Style = Style.default(), heading!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), heading1!: ?Style = None, heading2!: ?Style = None, heading3!: ?Style = None, heading4!: ?Style = None, heading5!: ?Style = None, heading6!: ?Style = None, list!: Style = Style(fg: Color.Cyan), quoteStyle!: Style = Style(fg: Color.Green), code!: Style = Style(fg: Color.Magenta), table!: Style = Style(fg: Color.Cyan), link!: Style = Style(fg: Color.Blue), emphasis!: Style = Style(fg: Color.White, modifier: italicModifier()), strong!: Style = Style(fg: Color.White, modifier: Modifier.strong()), inlineCode!: Style = Style(fg: Color.Magenta), image!: Style = Style(fg: Color.Cyan), diagnostic!: Style = Style(fg: Color.Red), html!: Style = Style(fg: Color.Indexed(8)), strikethrough!: Style = Style(fg: Color.Indexed(8)), tableHeader!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()) )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentTheme.headingStyle",
+          "signature": "public func headingStyle(level: Int64): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "MarkdownTheme",
+          "signature": "public type MarkdownTheme = DocumentTheme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "MarkdownDocument",
+          "signature": "public type MarkdownDocument = Document"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState",
+          "signature": "public class DocumentViewState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState.scroll",
+          "signature": "public var scroll: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState.cursorSourceOffset",
+          "signature": "public var cursorSourceOffset: ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState.selectedLinkIndex",
+          "signature": "public var selectedLinkIndex: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState.searchMatchIndex",
+          "signature": "public var searchMatchIndex: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState.init",
+          "signature": "public init(scroll!: Int64 = 0, cursorSourceOffset!: ?Int64 = None, selectedLinkIndex!: Int64 = 0, searchMatchIndex!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState.folds",
+          "signature": "public func folds(): Array<DocumentFoldRange>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState.clearFolds",
+          "signature": "public func clearFolds(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState.isFolded",
+          "signature": "public func isFolded(startOffset: Int64, endOffset: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState.setFolded",
+          "signature": "public func setFolded(startOffset: Int64, endOffset: Int64, folded: Bool): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentViewState.toggleFold",
+          "signature": "public func toggleFold(startOffset: Int64, endOffset: Int64): Bool"
+        }
+      ]
     }
   ]
 }

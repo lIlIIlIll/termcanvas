@@ -829,68 +829,68 @@ packages/core/src/document.cj:151:public class Document {
 packages/core/src/document.cj:153:public let lines: Array<DocumentLine>
 packages/core/src/document.cj:158:public init(lines: Array<DocumentLine>)
 packages/core/src/document.cj:167:public static func plain(text: String, style!: Style = Style.default()): Document
-packages/core/src/document.cj:176:public struct DocumentTheme {
-packages/core/src/document.cj:177:public let paragraph: Style
-packages/core/src/document.cj:178:public let heading: Style
-packages/core/src/document.cj:179:public let heading1: Style
-packages/core/src/document.cj:180:public let heading2: Style
-packages/core/src/document.cj:181:public let heading3: Style
-packages/core/src/document.cj:182:public let heading4: Style
-packages/core/src/document.cj:183:public let heading5: Style
-packages/core/src/document.cj:184:public let heading6: Style
-packages/core/src/document.cj:185:public let list: Style
-packages/core/src/document.cj:186:public let quoteStyle: Style
-packages/core/src/document.cj:187:public let code: Style
-packages/core/src/document.cj:188:public let table: Style
-packages/core/src/document.cj:189:public let link: Style
-packages/core/src/document.cj:190:public let emphasis: Style
-packages/core/src/document.cj:191:public let strong: Style
-packages/core/src/document.cj:192:public let inlineCode: Style
-packages/core/src/document.cj:193:public let image: Style
-packages/core/src/document.cj:194:public let diagnostic: Style
-packages/core/src/document.cj:195:public let html: Style
-packages/core/src/document.cj:196:public let strikethrough: Style
-packages/core/src/document.cj:197:public let tableHeader: Style
-packages/core/src/document.cj:199:public init( paragraph!: Style = Style.default(), heading!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), heading1!: ?Style = None, heading2!: ?Style = None, heading3!: ?Style = None, heading4!: ?Style = None, heading5!: ?Style = None, heading6!: ?Style = None, list!: Style = Style(fg: Color.Cyan), quoteStyle!: Style = Style(fg: Color.Green), code!: Style = Style(fg: Color.Magenta), table!: Style = Style(fg: Color.Cyan), link!: Style = Style(fg: Color.Blue), emphasis!: Style = Style(fg: Color.White, modifier: italicModifier()), strong!: Style = Style(fg: Color.White, modifier: Modifier.strong()), inlineCode!: Style = Style(fg: Color.Magenta), image!: Style = Style(fg: Color.Cyan), diagnostic!: Style = Style(fg: Color.Red), html!: Style = Style(fg: Color.Indexed(8)), strikethrough!: Style = Style(fg: Color.Indexed(8)), tableHeader!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()) )
-packages/core/src/document.cj:263:public func headingStyle(level: Int64): Style
-packages/core/src/document.cj:276:public type MarkdownTheme = DocumentTheme
-packages/core/src/document.cj:277:public type MarkdownDocument = Document
-packages/core/src/document.cj:280:public class DocumentHighlight {
-packages/core/src/document.cj:282:public let query: String
-packages/core/src/document.cj:284:public let style: Style
-packages/core/src/document.cj:290:public init(query: String, style!: Style = Style(bg: Color.Yellow))
-packages/core/src/document.cj:297:public class DocumentFoldRange {
-packages/core/src/document.cj:299:public let startOffset: Int64
-packages/core/src/document.cj:301:public let endOffset: Int64
-packages/core/src/document.cj:307:public init(startOffset: Int64, endOffset: Int64)
-packages/core/src/document.cj:316:public func contains(offset: Int64): Bool
-packages/core/src/document.cj:321:public class DocumentViewState {
-packages/core/src/document.cj:322:public var scroll: Int64
-packages/core/src/document.cj:323:public var cursorSourceOffset: ?Int64
-packages/core/src/document.cj:324:public var selectedLinkIndex: Int64
-packages/core/src/document.cj:325:public var searchMatchIndex: Int64
-packages/core/src/document.cj:329:public init(scroll!: Int64 = 0, cursorSourceOffset!: ?Int64 = None, selectedLinkIndex!: Int64 = 0, searchMatchIndex!: Int64 = 0)
-packages/core/src/document.cj:336:public func folds(): Array<DocumentFoldRange>
-packages/core/src/document.cj:340:public func clearFolds(): Unit
-packages/core/src/document.cj:350:public func isFolded(startOffset: Int64, endOffset: Int64): Bool
-packages/core/src/document.cj:357:public func setFolded(startOffset: Int64, endOffset: Int64, folded: Bool): Unit
-packages/core/src/document.cj:376:public func toggleFold(startOffset: Int64, endOffset: Int64): Bool
-packages/core/src/document.cj:383:public class DocumentView <: Widget {
-packages/core/src/document.cj:404:public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], state!: ?DocumentViewState = None, currentSourceStyle!: ?Style = None, cacheLayout!: Bool = false )
-packages/core/src/document.cj:438:public func setTextWidthOptions(options: TextWidthOptions): Unit
-packages/core/src/document.cj:443:public func renderedLineCount(width: Int64): Int64
-packages/core/src/document.cj:447:public func sourceOffsetForRenderedLine(width: Int64, renderedLine: Int64): ?Int64
-packages/core/src/document.cj:459:public func sourceOffsetAtRenderedLine(width: Int64, renderedLine: Int64): ?Int64
-packages/core/src/document.cj:463:public func sourceOffsetsForRenderedLines(width: Int64): Array<Int64>
-packages/core/src/document.cj:478:public func renderedLineForSourceOffset(width: Int64, sourceOffset: Int64): Int64
-packages/core/src/document.cj:500:public func linkAtRenderedLine(width: Int64, renderedLine: Int64): ?String
-packages/core/src/document.cj:512:public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool
-packages/core/src/document.cj:541:public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
-packages/core/src/document.cj:552:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/document.cj:775:public class MarkdownView <: Widget {
-packages/core/src/document.cj:778:public init( text: String, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
-packages/core/src/document.cj:791:public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
-packages/core/src/document.cj:803:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/document.cj:177:public struct DocumentTheme {
+packages/core/src/document.cj:179:public let paragraph: Style
+packages/core/src/document.cj:181:public let heading: Style
+packages/core/src/document.cj:183:public let heading1: Style
+packages/core/src/document.cj:185:public let heading2: Style
+packages/core/src/document.cj:187:public let heading3: Style
+packages/core/src/document.cj:189:public let heading4: Style
+packages/core/src/document.cj:191:public let heading5: Style
+packages/core/src/document.cj:193:public let heading6: Style
+packages/core/src/document.cj:195:public let list: Style
+packages/core/src/document.cj:197:public let quoteStyle: Style
+packages/core/src/document.cj:199:public let code: Style
+packages/core/src/document.cj:201:public let table: Style
+packages/core/src/document.cj:203:public let link: Style
+packages/core/src/document.cj:205:public let emphasis: Style
+packages/core/src/document.cj:207:public let strong: Style
+packages/core/src/document.cj:209:public let inlineCode: Style
+packages/core/src/document.cj:211:public let image: Style
+packages/core/src/document.cj:213:public let diagnostic: Style
+packages/core/src/document.cj:215:public let html: Style
+packages/core/src/document.cj:217:public let strikethrough: Style
+packages/core/src/document.cj:219:public let tableHeader: Style
+packages/core/src/document.cj:244:public init( paragraph!: Style = Style.default(), heading!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), heading1!: ?Style = None, heading2!: ?Style = None, heading3!: ?Style = None, heading4!: ?Style = None, heading5!: ?Style = None, heading6!: ?Style = None, list!: Style = Style(fg: Color.Cyan), quoteStyle!: Style = Style(fg: Color.Green), code!: Style = Style(fg: Color.Magenta), table!: Style = Style(fg: Color.Cyan), link!: Style = Style(fg: Color.Blue), emphasis!: Style = Style(fg: Color.White, modifier: italicModifier()), strong!: Style = Style(fg: Color.White, modifier: Modifier.strong()), inlineCode!: Style = Style(fg: Color.Magenta), image!: Style = Style(fg: Color.Cyan), diagnostic!: Style = Style(fg: Color.Red), html!: Style = Style(fg: Color.Indexed(8)), strikethrough!: Style = Style(fg: Color.Indexed(8)), tableHeader!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()) )
+packages/core/src/document.cj:312:public func headingStyle(level: Int64): Style
+packages/core/src/document.cj:326:public type MarkdownTheme = DocumentTheme
+packages/core/src/document.cj:328:public type MarkdownDocument = Document
+packages/core/src/document.cj:331:public class DocumentHighlight {
+packages/core/src/document.cj:333:public let query: String
+packages/core/src/document.cj:335:public let style: Style
+packages/core/src/document.cj:341:public init(query: String, style!: Style = Style(bg: Color.Yellow))
+packages/core/src/document.cj:348:public class DocumentFoldRange {
+packages/core/src/document.cj:350:public let startOffset: Int64
+packages/core/src/document.cj:352:public let endOffset: Int64
+packages/core/src/document.cj:358:public init(startOffset: Int64, endOffset: Int64)
+packages/core/src/document.cj:367:public func contains(offset: Int64): Bool
+packages/core/src/document.cj:373:public class DocumentViewState {
+packages/core/src/document.cj:375:public var scroll: Int64
+packages/core/src/document.cj:377:public var cursorSourceOffset: ?Int64
+packages/core/src/document.cj:379:public var selectedLinkIndex: Int64
+packages/core/src/document.cj:381:public var searchMatchIndex: Int64
+packages/core/src/document.cj:391:public init(scroll!: Int64 = 0, cursorSourceOffset!: ?Int64 = None, selectedLinkIndex!: Int64 = 0, searchMatchIndex!: Int64 = 0)
+packages/core/src/document.cj:401:public func folds(): Array<DocumentFoldRange>
+packages/core/src/document.cj:406:public func clearFolds(): Unit
+packages/core/src/document.cj:421:public func isFolded(startOffset: Int64, endOffset: Int64): Bool
+packages/core/src/document.cj:433:public func setFolded(startOffset: Int64, endOffset: Int64, folded: Bool): Unit
+packages/core/src/document.cj:457:public func toggleFold(startOffset: Int64, endOffset: Int64): Bool
+packages/core/src/document.cj:464:public class DocumentView <: Widget {
+packages/core/src/document.cj:485:public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], state!: ?DocumentViewState = None, currentSourceStyle!: ?Style = None, cacheLayout!: Bool = false )
+packages/core/src/document.cj:519:public func setTextWidthOptions(options: TextWidthOptions): Unit
+packages/core/src/document.cj:524:public func renderedLineCount(width: Int64): Int64
+packages/core/src/document.cj:528:public func sourceOffsetForRenderedLine(width: Int64, renderedLine: Int64): ?Int64
+packages/core/src/document.cj:540:public func sourceOffsetAtRenderedLine(width: Int64, renderedLine: Int64): ?Int64
+packages/core/src/document.cj:544:public func sourceOffsetsForRenderedLines(width: Int64): Array<Int64>
+packages/core/src/document.cj:559:public func renderedLineForSourceOffset(width: Int64, sourceOffset: Int64): Int64
+packages/core/src/document.cj:581:public func linkAtRenderedLine(width: Int64, renderedLine: Int64): ?String
+packages/core/src/document.cj:593:public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool
+packages/core/src/document.cj:622:public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
+packages/core/src/document.cj:633:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/document.cj:856:public class MarkdownView <: Widget {
+packages/core/src/document.cj:859:public init( text: String, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
+packages/core/src/document.cj:872:public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
+packages/core/src/document.cj:884:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/event.cj:9:public interface InputSource {
 packages/core/src/event.cj:14:func readAvailable(maxBytes: Int64): Array<Byte>
 packages/core/src/event.cj:17:public class StdinInputSource <: InputSource {
