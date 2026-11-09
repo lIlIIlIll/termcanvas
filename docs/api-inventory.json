@@ -41043,7 +41043,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2210,
+      "line": 2211,
       "level": "top_level",
       "kind": "class",
       "symbol": "MarkdownEditorBehavior",
@@ -41061,7 +41061,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2213,
+      "line": 2215,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -41079,7 +41079,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2215,
+      "line": 2220,
       "level": "member",
       "kind": "func",
       "symbol": "applyHighlights",
@@ -41097,7 +41097,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2219,
+      "line": 2225,
       "level": "member",
       "kind": "func",
       "symbol": "invalidate",
@@ -41115,7 +41115,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2223,
+      "line": 2234,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -41133,7 +41133,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2256,
+      "line": 2271,
       "level": "member",
       "kind": "func",
       "symbol": "toggleBold",
@@ -41151,7 +41151,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2261,
+      "line": 2280,
       "level": "member",
       "kind": "func",
       "symbol": "toggleItalic",
@@ -41169,7 +41169,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2266,
+      "line": 2289,
       "level": "member",
       "kind": "func",
       "symbol": "toggleCode",
@@ -41187,7 +41187,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2271,
+      "line": 2299,
       "level": "member",
       "kind": "func",
       "symbol": "insertLink",
@@ -41205,7 +41205,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2281,
+      "line": 2315,
       "level": "member",
       "kind": "func",
       "symbol": "insertImage",
@@ -41223,7 +41223,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2299,
+      "line": 2338,
       "level": "member",
       "kind": "func",
       "symbol": "insertReferenceLink",
@@ -41241,7 +41241,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2309,
+      "line": 2355,
       "level": "member",
       "kind": "func",
       "symbol": "insertReferenceDefinition",
@@ -41259,7 +41259,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2316,
+      "line": 2367,
       "level": "member",
       "kind": "func",
       "symbol": "insertFrontmatter",
@@ -41277,7 +41277,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2327,
+      "line": 2382,
       "level": "member",
       "kind": "func",
       "symbol": "insertTable",
@@ -41295,7 +41295,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2333,
+      "line": 2393,
       "level": "member",
       "kind": "func",
       "symbol": "insertCodeFence",
@@ -41313,7 +41313,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2340,
+      "line": 2401,
       "level": "top_level",
       "kind": "class",
       "symbol": "MarkdownTextEditor",
@@ -41331,7 +41331,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2341,
+      "line": 2403,
       "level": "member",
       "kind": "let",
       "symbol": "area",
@@ -41349,7 +41349,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2342,
+      "line": 2405,
       "level": "member",
       "kind": "let",
       "symbol": "behavior",
@@ -41367,7 +41367,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2344,
+      "line": 2412,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -41385,7 +41385,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2349,
+      "line": 2421,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -41403,7 +41403,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2353,
+      "line": 2429,
       "level": "member",
       "kind": "func",
       "symbol": "render",

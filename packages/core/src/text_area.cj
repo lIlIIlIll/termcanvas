@@ -2207,19 +2207,30 @@ func strongItalicModifier(): Modifier {
     modifier
 }
 
+/** 为文本区域提供轻量 Markdown 编辑和高亮行为。 */
 public class MarkdownEditorBehavior {
     private let highlighter = MarkdownHighlightCache()
 
+    /** 创建 Markdown 编辑行为。 */
     public init() {}
 
+    /** 计算高亮并替换文本区域的静态装饰。
+     * @param area 目标文本区域
+     */
     public func applyHighlights(area: TextArea): Unit {
         area.setDecorations(highlighter.highlights(area.value))
     }
 
+    /** 清除内部高亮缓存。 */
     public func invalidate(): Unit {
         highlighter.invalidate()
     }
 
+    /** 处理 Markdown 配对标记、列表回车和普通文本按键。
+     * @param area 目标文本区域
+     * @param key 按键事件
+     * @return 处理按键时为 true
+     */
     public func handle(area: TextArea, key: KeyEvent): Bool {
         if (area.readOnly) { return area.handle(key) }
         area.markdownEditing = true
@@ -2253,21 +2264,38 @@ public class MarkdownEditorBehavior {
         }
     }
 
+    /** 为选择或当前词切换粗体标记；只读时拒绝。
+     * @param area 目标文本区域
+     * @return 完成编辑时为 true
+     */
     public func toggleBold(area: TextArea): Bool {
         if (area.readOnly) { return false }
         wrapSelectionOrWord(area, "**", "**")
     }
 
+    /** 为选择或当前词切换斜体标记；只读时拒绝。
+     * @param area 目标文本区域
+     * @return 完成编辑时为 true
+     */
     public func toggleItalic(area: TextArea): Bool {
         if (area.readOnly) { return false }
         wrapSelectionOrWord(area, "*", "*")
     }
 
+    /** 为选择或当前词切换行内代码标记；只读时拒绝。
+     * @param area 目标文本区域
+     * @return 完成编辑时为 true
+     */
     public func toggleCode(area: TextArea): Bool {
         if (area.readOnly) { return false }
         wrapSelectionOrWord(area, "`", "`")
     }
 
+    /** 插入链接，或将选择包装为链接；只读时拒绝。
+     * @param area 目标文本区域
+     * @param url 链接地址
+     * @return 完成编辑时为 true
+     */
     public func insertLink(area: TextArea, url!: String = "https://example.com"): Bool {
         if (area.readOnly) { return false }
         if (area.hasSelection()) {
@@ -2278,6 +2306,12 @@ public class MarkdownEditorBehavior {
         }
     }
 
+    /** 插入图片标记；有选择时使用选中文本作为替代文本。
+     * @param area 目标文本区域
+     * @param url 图片地址
+     * @param alt 无选择时使用的替代文本
+     * @return 完成编辑时为 true
+     */
     public func insertImage(area: TextArea, url!: String = "image.png", alt!: String = "alt"): Bool {
         if (area.readOnly) { return false }
         if (area.hasSelection()) {
@@ -2296,6 +2330,11 @@ public class MarkdownEditorBehavior {
         }
     }
 
+    /** 插入引用式链接；有选择时使用选中文本。
+     * @param area 目标文本区域
+     * @param id 引用标识
+     * @return 完成编辑时为 true
+     */
     public func insertReferenceLink(area: TextArea, id!: String = "ref"): Bool {
         if (area.readOnly) { return false }
         if (area.hasSelection()) {
@@ -2306,6 +2345,13 @@ public class MarkdownEditorBehavior {
         }
     }
 
+    /** 在光标处插入引用定义。
+     * @param area 目标文本区域
+     * @param id 引用标识
+     * @param url 链接地址
+     * @param title 可选标题
+     * @return 完成编辑时为 true
+     */
     public func insertReferenceDefinition(area: TextArea, id!: String = "ref", url!: String = "https://example.com", title!: String = ""): Bool {
         if (area.readOnly) { return false }
         let suffix = if (title.isEmpty()) { "" } else { " \"${title}\"" }
@@ -2313,6 +2359,11 @@ public class MarkdownEditorBehavior {
         true
     }
 
+    /** 在文档开头插入 frontmatter。
+     * @param area 目标文本区域
+     * @param title 标题值
+     * @return 完成编辑时为 true
+     */
     public func insertFrontmatter(area: TextArea, title!: String = "Untitled"): Bool {
         if (area.readOnly) { return false }
         let oldCursor = area.cursor
@@ -2324,12 +2375,21 @@ public class MarkdownEditorBehavior {
         true
     }
 
+    /** 插入示例表格；只读时拒绝。
+     * @param area 目标文本区域
+     * @return 完成编辑时为 true
+     */
     public func insertTable(area: TextArea): Bool {
         if (area.readOnly) { return false }
         area.paste("| Name | Value |\n| --- | --- |\n| item | value |\n")
         true
     }
 
+    /** 插入代码围栏；只读时拒绝。
+     * @param area 目标文本区域
+     * @param language 代码语言
+     * @return 完成编辑时为 true
+     */
     public func insertCodeFence(area: TextArea, language!: String = ""): Bool {
         if (area.readOnly) { return false }
         area.paste("```" + language + "\n\n```\n")
@@ -2337,19 +2397,35 @@ public class MarkdownEditorBehavior {
     }
 }
 
+/** 组合文本区域和 Markdown 编辑行为的控件。 */
 public class MarkdownTextEditor <: Widget {
+    /** 内部文本区域。 */
     public let area: TextArea
+    /** Markdown 编辑行为。 */
     public let behavior: MarkdownEditorBehavior
 
+    /** 创建 Markdown 文本编辑器。
+     * @param value 初始文本
+     * @param block 可选边框
+     * @param lineNumbers 是否显示行号
+     */
     public init(value!: String = "", block!: ?Block = None, lineNumbers!: Bool = true) {
         area = TextArea(value: value, block: block, lineNumbers: lineNumbers, markdownEditing: true)
         behavior = MarkdownEditorBehavior()
     }
 
+    /** 使用 Markdown 行为处理按键。
+     * @param key 按键事件
+     * @return 处理按键时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         behavior.handle(area, key)
     }
 
+    /** 刷新高亮并绘制编辑器。
+     * @param areaRect 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(areaRect: Rect, buffer: Buffer): Unit {
         behavior.applyHighlights(area)
         area.render(areaRect, buffer)

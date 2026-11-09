@@ -12283,6 +12283,146 @@
           "signature": "public func renderCompletionOverlay(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "markdown-editor",
+      "source": "docs/api-examples/markdown-editor.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior",
+          "signature": "public class MarkdownEditorBehavior {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.applyHighlights",
+          "signature": "public func applyHighlights(area: TextArea): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.invalidate",
+          "signature": "public func invalidate(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.handle",
+          "signature": "public func handle(area: TextArea, key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.toggleBold",
+          "signature": "public func toggleBold(area: TextArea): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.toggleItalic",
+          "signature": "public func toggleItalic(area: TextArea): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.toggleCode",
+          "signature": "public func toggleCode(area: TextArea): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.insertLink",
+          "signature": "public func insertLink(area: TextArea, url!: String = \"https://example.com\"): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.insertImage",
+          "signature": "public func insertImage(area: TextArea, url!: String = \"image.png\", alt!: String = \"alt\"): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.insertReferenceLink",
+          "signature": "public func insertReferenceLink(area: TextArea, id!: String = \"ref\"): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.insertReferenceDefinition",
+          "signature": "public func insertReferenceDefinition(area: TextArea, id!: String = \"ref\", url!: String = \"https://example.com\", title!: String = \"\"): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.insertFrontmatter",
+          "signature": "public func insertFrontmatter(area: TextArea, title!: String = \"Untitled\"): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.insertTable",
+          "signature": "public func insertTable(area: TextArea): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownEditorBehavior.insertCodeFence",
+          "signature": "public func insertCodeFence(area: TextArea, language!: String = \"\"): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownTextEditor",
+          "signature": "public class MarkdownTextEditor <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownTextEditor.area",
+          "signature": "public let area: TextArea"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownTextEditor.behavior",
+          "signature": "public let behavior: MarkdownEditorBehavior"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownTextEditor.init",
+          "signature": "public init(value!: String = \"\", block!: ?Block = None, lineNumbers!: Bool = true)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownTextEditor.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownTextEditor.render",
+          "signature": "public func render(areaRect: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }
