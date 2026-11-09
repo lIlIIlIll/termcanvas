@@ -2428,68 +2428,68 @@ packages/core/src/virtual_transcript.cj:389:public let id: String
 packages/core/src/virtual_transcript.cj:390:public let top: Int64
 packages/core/src/virtual_transcript.cj:391:public let bottom: Int64
 packages/core/src/virtual_transcript.cj:393:public init(id: String, top: Int64, bottom: Int64)
-packages/core/src/virtual_transcript.cj:402:public class VirtualTranscriptMetrics {
-packages/core/src/virtual_transcript.cj:403:public let materialized: Int64
-packages/core/src/virtual_transcript.cj:404:public let cacheEntries: Int64
-packages/core/src/virtual_transcript.cj:405:public let measuredEntries: Int64
-packages/core/src/virtual_transcript.cj:406:public let cachedRows: Int64
-packages/core/src/virtual_transcript.cj:407:public let appendOnlyFullLayouts: Int64
-packages/core/src/virtual_transcript.cj:408:public let appendOnlyIncrementalLayouts: Int64
-packages/core/src/virtual_transcript.cj:409:public let appendOnlyRewrappedBytes: Int64
-packages/core/src/virtual_transcript.cj:410:public let syncCountCalls: Int64
-packages/core/src/virtual_transcript.cj:411:public let metadataTouches: Int64
-packages/core/src/virtual_transcript.cj:412:public let heightIndexResetEntries: Int64
-packages/core/src/virtual_transcript.cj:413:public let heightIndexUpdateCalls: Int64
-packages/core/src/virtual_transcript.cj:414:public let heightIndexNodesTouched: Int64
-packages/core/src/virtual_transcript.cj:415:public let heightIndexGrowOperations: Int64
-packages/core/src/virtual_transcript.cj:416:public let heightMetadataEntries: Int64
-packages/core/src/virtual_transcript.cj:417:public let heightIndexNodes: Int64
-packages/core/src/virtual_transcript.cj:418:public let cacheLookups: Int64
-packages/core/src/virtual_transcript.cj:419:public let cacheHits: Int64
-packages/core/src/virtual_transcript.cj:420:public let cacheMisses: Int64
-packages/core/src/virtual_transcript.cj:421:public let layoutCalls: Int64
-packages/core/src/virtual_transcript.cj:422:public let documentRequests: Int64
-packages/core/src/virtual_transcript.cj:423:public let documentsMaterialized: Int64
-packages/core/src/virtual_transcript.cj:424:public let wrapInputBytes: Int64
-packages/core/src/virtual_transcript.cj:425:public let measurementInvalidations: Int64
-packages/core/src/virtual_transcript.cj:426:public let measurementGenerationBumps: Int64
-packages/core/src/virtual_transcript.cj:427:public let staleEntriesEncountered: Int64
-packages/core/src/virtual_transcript.cj:428:public let entriesRemeasured: Int64
-packages/core/src/virtual_transcript.cj:429:public let estimateCorrections: Int64
-packages/core/src/virtual_transcript.cj:430:public let anchorCorrections: Int64
-packages/core/src/virtual_transcript.cj:435:public let visibleItems: Int64
-packages/core/src/virtual_transcript.cj:436:public let itemsVisited: Int64
-packages/core/src/virtual_transcript.cj:437:public let itemsPainted: Int64
-packages/core/src/virtual_transcript.cj:438:public let rowsVisited: Int64
-packages/core/src/virtual_transcript.cj:439:public let rowsPainted: Int64
-packages/core/src/virtual_transcript.cj:440:public let changedItems: Int64
-packages/core/src/virtual_transcript.cj:441:public let itemPaintCellAttempts: Int64
-packages/core/src/virtual_transcript.cj:442:public let rowPaintCellAttempts: Int64
-packages/core/src/virtual_transcript.cj:443:public let itemBackgroundCellAttempts: Int64
-packages/core/src/virtual_transcript.cj:444:public let contentCellAttempts: Int64
-packages/core/src/virtual_transcript.cj:445:public let layoutRowsRequested: Int64
-packages/core/src/virtual_transcript.cj:446:public let cachedRowsUsed: Int64
-packages/core/src/virtual_transcript.cj:447:public let selectiveItemInvalidations: Int64
-packages/core/src/virtual_transcript.cj:448:public let selectiveOffscreenInvalidations: Int64
-packages/core/src/virtual_transcript.cj:449:public let fallbackFullViewportPaints: Int64
-packages/core/src/virtual_transcript.cj:451:public init( materialized: Int64, cacheEntries: Int64, measuredEntries: Int64, cachedRows: Int64, appendOnlyFullLayouts!: Int64 = 0, appendOnlyIncrementalLayouts!: Int64 = 0, appendOnlyRewrappedBytes!: Int64 = 0, syncCountCalls!: Int64 = 0, metadataTouches!: Int64 = 0, heightIndexResetEntries!: Int64 = 0, heightIndexUpdateCalls!: Int64 = 0, heightIndexNodesTouched!: Int64 = 0, heightIndexGrowOperations!: Int64 = 0, heightMetadataEntries!: Int64 = 0, heightIndexNodes!: Int64 = 0, cacheLookups!: Int64 = 0, cacheHits!: Int64 = 0, cacheMisses!: Int64 = 0, layoutCalls!: Int64 = 0, documentRequests!: Int64 = 0, documentsMaterialized!: Int64 = 0, wrapInputBytes!: Int64 = 0, measurementInvalidations!: Int64 = 0, measurementGenerationBumps!: Int64 = 0, staleEntriesEncountered!: Int64 = 0, entriesRemeasured!: Int64 = 0, estimateCorrections!: Int64 = 0, anchorCorrections!: Int64 = 0, visibleItems!: Int64 = 0, itemsVisited!: Int64 = 0, itemsPainted!: Int64 = 0, rowsVisited!: Int64 = 0, rowsPainted!: Int64 = 0, changedItems!: Int64 = 0, itemPaintCellAttempts!: Int64 = 0, rowPaintCellAttempts!: Int64 = 0, itemBackgroundCellAttempts!: Int64 = 0, contentCellAttempts!: Int64 = 0, layoutRowsRequested!: Int64 = 0, cachedRowsUsed!: Int64 = 0, selectiveItemInvalidations!: Int64 = 0, selectiveOffscreenInvalidations!: Int64 = 0, fallbackFullViewportPaints!: Int64 = 0 )
-packages/core/src/virtual_transcript.cj:543:public class VirtualTranscriptView <: Widget {
-packages/core/src/virtual_transcript.cj:546:public let state: VirtualTranscriptState
-packages/core/src/virtual_transcript.cj:606:public let lastVisibleRanges = ArrayList<VisibleRange>()
-packages/core/src/virtual_transcript.cj:617:public init( source: VirtualTranscriptSource, state!: VirtualTranscriptState = VirtualTranscriptState(), themeKey!: String = "default", overscanViewports!: Int64 = 2, backgroundBatch!: Int64 = 0, instrumentationEnabled!: Bool = false )
-packages/core/src/virtual_transcript.cj:637:public func setThemeKey(value: String): Unit
-packages/core/src/virtual_transcript.cj:646:public func setCardChrome(enabled: Bool): Unit
-packages/core/src/virtual_transcript.cj:657:public func setUnicode(enabled: Bool): Unit
-packages/core/src/virtual_transcript.cj:666:public func setCardTheme(theme: TranscriptCardTheme): Unit
-packages/core/src/virtual_transcript.cj:672:public func clearCardTheme(): Unit
-packages/core/src/virtual_transcript.cj:695:public func invalidateItem(id: String): Bool
-packages/core/src/virtual_transcript.cj:713:public func totalRows(): Int64
-packages/core/src/virtual_transcript.cj:721:public func materializedCount(): Int64
-packages/core/src/virtual_transcript.cj:726:public func metrics(): VirtualTranscriptMetrics
-packages/core/src/virtual_transcript.cj:782:public func instrumentationMetrics(): VirtualTranscriptMetrics
-packages/core/src/virtual_transcript.cj:838:public func dirtyRectForItemRevision(id: String): ?Rect
-packages/core/src/virtual_transcript.cj:867:public func handle(key: KeyEvent): Bool
-packages/core/src/virtual_transcript.cj:884:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/virtual_transcript.cj:403:public class VirtualTranscriptMetrics {
+packages/core/src/virtual_transcript.cj:405:public let materialized: Int64
+packages/core/src/virtual_transcript.cj:407:public let cacheEntries: Int64
+packages/core/src/virtual_transcript.cj:409:public let measuredEntries: Int64
+packages/core/src/virtual_transcript.cj:411:public let cachedRows: Int64
+packages/core/src/virtual_transcript.cj:413:public let appendOnlyFullLayouts: Int64
+packages/core/src/virtual_transcript.cj:415:public let appendOnlyIncrementalLayouts: Int64
+packages/core/src/virtual_transcript.cj:417:public let appendOnlyRewrappedBytes: Int64
+packages/core/src/virtual_transcript.cj:419:public let syncCountCalls: Int64
+packages/core/src/virtual_transcript.cj:421:public let metadataTouches: Int64
+packages/core/src/virtual_transcript.cj:423:public let heightIndexResetEntries: Int64
+packages/core/src/virtual_transcript.cj:425:public let heightIndexUpdateCalls: Int64
+packages/core/src/virtual_transcript.cj:427:public let heightIndexNodesTouched: Int64
+packages/core/src/virtual_transcript.cj:429:public let heightIndexGrowOperations: Int64
+packages/core/src/virtual_transcript.cj:431:public let heightMetadataEntries: Int64
+packages/core/src/virtual_transcript.cj:433:public let heightIndexNodes: Int64
+packages/core/src/virtual_transcript.cj:435:public let cacheLookups: Int64
+packages/core/src/virtual_transcript.cj:437:public let cacheHits: Int64
+packages/core/src/virtual_transcript.cj:439:public let cacheMisses: Int64
+packages/core/src/virtual_transcript.cj:441:public let layoutCalls: Int64
+packages/core/src/virtual_transcript.cj:443:public let documentRequests: Int64
+packages/core/src/virtual_transcript.cj:445:public let documentsMaterialized: Int64
+packages/core/src/virtual_transcript.cj:447:public let wrapInputBytes: Int64
+packages/core/src/virtual_transcript.cj:449:public let measurementInvalidations: Int64
+packages/core/src/virtual_transcript.cj:451:public let measurementGenerationBumps: Int64
+packages/core/src/virtual_transcript.cj:453:public let staleEntriesEncountered: Int64
+packages/core/src/virtual_transcript.cj:455:public let entriesRemeasured: Int64
+packages/core/src/virtual_transcript.cj:457:public let estimateCorrections: Int64
+packages/core/src/virtual_transcript.cj:459:public let anchorCorrections: Int64
+packages/core/src/virtual_transcript.cj:465:public let visibleItems: Int64
+packages/core/src/virtual_transcript.cj:467:public let itemsVisited: Int64
+packages/core/src/virtual_transcript.cj:469:public let itemsPainted: Int64
+packages/core/src/virtual_transcript.cj:471:public let rowsVisited: Int64
+packages/core/src/virtual_transcript.cj:473:public let rowsPainted: Int64
+packages/core/src/virtual_transcript.cj:475:public let changedItems: Int64
+packages/core/src/virtual_transcript.cj:477:public let itemPaintCellAttempts: Int64
+packages/core/src/virtual_transcript.cj:479:public let rowPaintCellAttempts: Int64
+packages/core/src/virtual_transcript.cj:481:public let itemBackgroundCellAttempts: Int64
+packages/core/src/virtual_transcript.cj:483:public let contentCellAttempts: Int64
+packages/core/src/virtual_transcript.cj:485:public let layoutRowsRequested: Int64
+packages/core/src/virtual_transcript.cj:487:public let cachedRowsUsed: Int64
+packages/core/src/virtual_transcript.cj:489:public let selectiveItemInvalidations: Int64
+packages/core/src/virtual_transcript.cj:491:public let selectiveOffscreenInvalidations: Int64
+packages/core/src/virtual_transcript.cj:493:public let fallbackFullViewportPaints: Int64
+packages/core/src/virtual_transcript.cj:540:public init( materialized: Int64, cacheEntries: Int64, measuredEntries: Int64, cachedRows: Int64, appendOnlyFullLayouts!: Int64 = 0, appendOnlyIncrementalLayouts!: Int64 = 0, appendOnlyRewrappedBytes!: Int64 = 0, syncCountCalls!: Int64 = 0, metadataTouches!: Int64 = 0, heightIndexResetEntries!: Int64 = 0, heightIndexUpdateCalls!: Int64 = 0, heightIndexNodesTouched!: Int64 = 0, heightIndexGrowOperations!: Int64 = 0, heightMetadataEntries!: Int64 = 0, heightIndexNodes!: Int64 = 0, cacheLookups!: Int64 = 0, cacheHits!: Int64 = 0, cacheMisses!: Int64 = 0, layoutCalls!: Int64 = 0, documentRequests!: Int64 = 0, documentsMaterialized!: Int64 = 0, wrapInputBytes!: Int64 = 0, measurementInvalidations!: Int64 = 0, measurementGenerationBumps!: Int64 = 0, staleEntriesEncountered!: Int64 = 0, entriesRemeasured!: Int64 = 0, estimateCorrections!: Int64 = 0, anchorCorrections!: Int64 = 0, visibleItems!: Int64 = 0, itemsVisited!: Int64 = 0, itemsPainted!: Int64 = 0, rowsVisited!: Int64 = 0, rowsPainted!: Int64 = 0, changedItems!: Int64 = 0, itemPaintCellAttempts!: Int64 = 0, rowPaintCellAttempts!: Int64 = 0, itemBackgroundCellAttempts!: Int64 = 0, contentCellAttempts!: Int64 = 0, layoutRowsRequested!: Int64 = 0, cachedRowsUsed!: Int64 = 0, selectiveItemInvalidations!: Int64 = 0, selectiveOffscreenInvalidations!: Int64 = 0, fallbackFullViewportPaints!: Int64 = 0 )
+packages/core/src/virtual_transcript.cj:632:public class VirtualTranscriptView <: Widget {
+packages/core/src/virtual_transcript.cj:635:public let state: VirtualTranscriptState
+packages/core/src/virtual_transcript.cj:695:public let lastVisibleRanges = ArrayList<VisibleRange>()
+packages/core/src/virtual_transcript.cj:706:public init( source: VirtualTranscriptSource, state!: VirtualTranscriptState = VirtualTranscriptState(), themeKey!: String = "default", overscanViewports!: Int64 = 2, backgroundBatch!: Int64 = 0, instrumentationEnabled!: Bool = false )
+packages/core/src/virtual_transcript.cj:726:public func setThemeKey(value: String): Unit
+packages/core/src/virtual_transcript.cj:735:public func setCardChrome(enabled: Bool): Unit
+packages/core/src/virtual_transcript.cj:746:public func setUnicode(enabled: Bool): Unit
+packages/core/src/virtual_transcript.cj:755:public func setCardTheme(theme: TranscriptCardTheme): Unit
+packages/core/src/virtual_transcript.cj:761:public func clearCardTheme(): Unit
+packages/core/src/virtual_transcript.cj:784:public func invalidateItem(id: String): Bool
+packages/core/src/virtual_transcript.cj:802:public func totalRows(): Int64
+packages/core/src/virtual_transcript.cj:810:public func materializedCount(): Int64
+packages/core/src/virtual_transcript.cj:815:public func metrics(): VirtualTranscriptMetrics
+packages/core/src/virtual_transcript.cj:871:public func instrumentationMetrics(): VirtualTranscriptMetrics
+packages/core/src/virtual_transcript.cj:927:public func dirtyRectForItemRevision(id: String): ?Rect
+packages/core/src/virtual_transcript.cj:956:public func handle(key: KeyEvent): Bool
+packages/core/src/virtual_transcript.cj:973:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/visual_widgets.cj:7:public enum ProgressBarDirection {
 packages/core/src/visual_widgets.cj:10:Horizontal
 packages/core/src/visual_widgets.cj:13:Vertical

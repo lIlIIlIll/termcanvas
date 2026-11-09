@@ -11351,6 +11351,290 @@
           "signature": "func itemCardTheme(_: Int64): ?TranscriptCardTheme"
         }
       ]
+    },
+    {
+      "id": "transcript-metrics",
+      "source": "docs/api-examples/transcript-metrics.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics",
+          "signature": "public class VirtualTranscriptMetrics {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.materialized",
+          "signature": "public let materialized: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.cacheEntries",
+          "signature": "public let cacheEntries: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.measuredEntries",
+          "signature": "public let measuredEntries: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.cachedRows",
+          "signature": "public let cachedRows: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.appendOnlyFullLayouts",
+          "signature": "public let appendOnlyFullLayouts: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.appendOnlyIncrementalLayouts",
+          "signature": "public let appendOnlyIncrementalLayouts: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.appendOnlyRewrappedBytes",
+          "signature": "public let appendOnlyRewrappedBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.syncCountCalls",
+          "signature": "public let syncCountCalls: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.metadataTouches",
+          "signature": "public let metadataTouches: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.heightIndexResetEntries",
+          "signature": "public let heightIndexResetEntries: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.heightIndexUpdateCalls",
+          "signature": "public let heightIndexUpdateCalls: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.heightIndexNodesTouched",
+          "signature": "public let heightIndexNodesTouched: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.heightIndexGrowOperations",
+          "signature": "public let heightIndexGrowOperations: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.heightMetadataEntries",
+          "signature": "public let heightMetadataEntries: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.heightIndexNodes",
+          "signature": "public let heightIndexNodes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.cacheLookups",
+          "signature": "public let cacheLookups: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.cacheHits",
+          "signature": "public let cacheHits: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.cacheMisses",
+          "signature": "public let cacheMisses: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.layoutCalls",
+          "signature": "public let layoutCalls: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.documentRequests",
+          "signature": "public let documentRequests: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.documentsMaterialized",
+          "signature": "public let documentsMaterialized: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.wrapInputBytes",
+          "signature": "public let wrapInputBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.measurementInvalidations",
+          "signature": "public let measurementInvalidations: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.measurementGenerationBumps",
+          "signature": "public let measurementGenerationBumps: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.staleEntriesEncountered",
+          "signature": "public let staleEntriesEncountered: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.entriesRemeasured",
+          "signature": "public let entriesRemeasured: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.estimateCorrections",
+          "signature": "public let estimateCorrections: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.anchorCorrections",
+          "signature": "public let anchorCorrections: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.visibleItems",
+          "signature": "public let visibleItems: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.itemsVisited",
+          "signature": "public let itemsVisited: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.itemsPainted",
+          "signature": "public let itemsPainted: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.rowsVisited",
+          "signature": "public let rowsVisited: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.rowsPainted",
+          "signature": "public let rowsPainted: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.changedItems",
+          "signature": "public let changedItems: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.itemPaintCellAttempts",
+          "signature": "public let itemPaintCellAttempts: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.rowPaintCellAttempts",
+          "signature": "public let rowPaintCellAttempts: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.itemBackgroundCellAttempts",
+          "signature": "public let itemBackgroundCellAttempts: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.contentCellAttempts",
+          "signature": "public let contentCellAttempts: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.layoutRowsRequested",
+          "signature": "public let layoutRowsRequested: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.cachedRowsUsed",
+          "signature": "public let cachedRowsUsed: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.selectiveItemInvalidations",
+          "signature": "public let selectiveItemInvalidations: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.selectiveOffscreenInvalidations",
+          "signature": "public let selectiveOffscreenInvalidations: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.fallbackFullViewportPaints",
+          "signature": "public let fallbackFullViewportPaints: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptMetrics.init",
+          "signature": "public init( materialized: Int64, cacheEntries: Int64, measuredEntries: Int64, cachedRows: Int64, appendOnlyFullLayouts!: Int64 = 0, appendOnlyIncrementalLayouts!: Int64 = 0, appendOnlyRewrappedBytes!: Int64 = 0, syncCountCalls!: Int64 = 0, metadataTouches!: Int64 = 0, heightIndexResetEntries!: Int64 = 0, heightIndexUpdateCalls!: Int64 = 0, heightIndexNodesTouched!: Int64 = 0, heightIndexGrowOperations!: Int64 = 0, heightMetadataEntries!: Int64 = 0, heightIndexNodes!: Int64 = 0, cacheLookups!: Int64 = 0, cacheHits!: Int64 = 0, cacheMisses!: Int64 = 0, layoutCalls!: Int64 = 0, documentRequests!: Int64 = 0, documentsMaterialized!: Int64 = 0, wrapInputBytes!: Int64 = 0, measurementInvalidations!: Int64 = 0, measurementGenerationBumps!: Int64 = 0, staleEntriesEncountered!: Int64 = 0, entriesRemeasured!: Int64 = 0, estimateCorrections!: Int64 = 0, anchorCorrections!: Int64 = 0, visibleItems!: Int64 = 0, itemsVisited!: Int64 = 0, itemsPainted!: Int64 = 0, rowsVisited!: Int64 = 0, rowsPainted!: Int64 = 0, changedItems!: Int64 = 0, itemPaintCellAttempts!: Int64 = 0, rowPaintCellAttempts!: Int64 = 0, itemBackgroundCellAttempts!: Int64 = 0, contentCellAttempts!: Int64 = 0, layoutRowsRequested!: Int64 = 0, cachedRowsUsed!: Int64 = 0, selectiveItemInvalidations!: Int64 = 0, selectiveOffscreenInvalidations!: Int64 = 0, fallbackFullViewportPaints!: Int64 = 0 )"
+        }
+      ]
     }
   ]
 }

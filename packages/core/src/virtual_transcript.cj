@@ -399,55 +399,144 @@ public class VisibleRange {
 
 // A narrow, read-only diagnostics contract for profiling hosts. Keeping the
 // counters in one snapshot avoids growing the view API for every new probe.
+/** 虚拟对话视图的缓存、排版和绘制诊断快照。 */
 public class VirtualTranscriptMetrics {
+    /** 自最近一次非空绘制开始后实例化的条目数。 */
     public let materialized: Int64
+    /** 条目缓存数量。 */
     public let cacheEntries: Int64
+    /** 当前测量代数中已测量的条目数。 */
     public let measuredEntries: Int64
+    /** 已测量条目保存的渲染行数。 */
     public let cachedRows: Int64
+    /** 追加文本完整排版次数。 */
     public let appendOnlyFullLayouts: Int64
+    /** 追加文本增量排版次数。 */
     public let appendOnlyIncrementalLayouts: Int64
+    /** 追加文本重新换行处理的字节数。 */
     public let appendOnlyRewrappedBytes: Int64
+    /** 同步条目数量的调用次数。 */
     public let syncCountCalls: Int64
+    /** 处理条目元数据的数量。 */
     public let metadataTouches: Int64
+    /** 重建高度索引时处理的条目数。 */
     public let heightIndexResetEntries: Int64
+    /** 更新高度索引的次数。 */
     public let heightIndexUpdateCalls: Int64
+    /** 高度索引访问的节点数。 */
     public let heightIndexNodesTouched: Int64
+    /** 高度索引扩展次数。 */
     public let heightIndexGrowOperations: Int64
+    /** 高度元数据条目数。 */
     public let heightMetadataEntries: Int64
+    /** 高度索引节点数。 */
     public let heightIndexNodes: Int64
+    /** 缓存查找次数。 */
     public let cacheLookups: Int64
+    /** 缓存命中次数。 */
     public let cacheHits: Int64
+    /** 缓存未命中次数。 */
     public let cacheMisses: Int64
+    /** 排版调用次数。 */
     public let layoutCalls: Int64
+    /** 向来源请求文档的次数。 */
     public let documentRequests: Int64
+    /** 实例化的文档数。 */
     public let documentsMaterialized: Int64
+    /** 换行处理的输入字节数。 */
     public let wrapInputBytes: Int64
+    /** 测量失效次数。 */
     public let measurementInvalidations: Int64
+    /** 测量代数更新次数。 */
     public let measurementGenerationBumps: Int64
+    /** 遇到过期条目的次数。 */
     public let staleEntriesEncountered: Int64
+    /** 重新测量条目的次数。 */
     public let entriesRemeasured: Int64
+    /** 修正高度估计的次数。 */
     public let estimateCorrections: Int64
+    /** 修正滚动锚点的次数。 */
     public let anchorCorrections: Int64
     // Paint attribution is cumulative and instrumentation-only. "Visited"
     // counts work entering the viewport paint loop; "painted" counts work
     // that emitted at least one visible row. Cell-attempt counters are deltas
     // from Buffer's existing Step-0 counter, never an independent cell probe.
+    /** 可见条目数。 */
     public let visibleItems: Int64
+    /** 绘制循环访问的条目数。 */
     public let itemsVisited: Int64
+    /** 实际绘制可见行的条目数。 */
     public let itemsPainted: Int64
+    /** 绘制循环访问的行数。 */
     public let rowsVisited: Int64
+    /** 实际绘制的行数。 */
     public let rowsPainted: Int64
+    /** 变化的条目数。 */
     public let changedItems: Int64
+    /** 条目绘制的单元格写入尝试数。 */
     public let itemPaintCellAttempts: Int64
+    /** 行绘制的单元格写入尝试数。 */
     public let rowPaintCellAttempts: Int64
+    /** 条目背景的单元格写入尝试数。 */
     public let itemBackgroundCellAttempts: Int64
+    /** 内容的单元格写入尝试数。 */
     public let contentCellAttempts: Int64
+    /** 请求排版的行数。 */
     public let layoutRowsRequested: Int64
+    /** 使用的缓存行数。 */
     public let cachedRowsUsed: Int64
+    /** 可见条目选择性失效次数。 */
     public let selectiveItemInvalidations: Int64
+    /** 屏外条目选择性失效次数。 */
     public let selectiveOffscreenInvalidations: Int64
+    /** 因条目高度变化回退到整视口重绘的次数。 */
     public let fallbackFullViewportPaints: Int64
 
+    /** 创建指标快照；字段值按传入值保存。详细工作计数依赖视图的 instrumentationEnabled 配置。
+     * @param materialized 自最近一次非空绘制开始后实例化的条目数
+     * @param cacheEntries 条目缓存数量
+     * @param measuredEntries 当前测量代数中已测量的条目数
+     * @param cachedRows 已测量条目保存的渲染行数
+     * @param appendOnlyFullLayouts 追加文本完整排版次数
+     * @param appendOnlyIncrementalLayouts 追加文本增量排版次数
+     * @param appendOnlyRewrappedBytes 追加文本重新换行处理的字节数
+     * @param syncCountCalls 同步条目数量的调用次数
+     * @param metadataTouches 处理条目元数据的数量
+     * @param heightIndexResetEntries 重建高度索引时处理的条目数
+     * @param heightIndexUpdateCalls 更新高度索引的次数
+     * @param heightIndexNodesTouched 高度索引访问的节点数
+     * @param heightIndexGrowOperations 高度索引扩展次数
+     * @param heightMetadataEntries 高度元数据条目数
+     * @param heightIndexNodes 高度索引节点数
+     * @param cacheLookups 缓存查找次数
+     * @param cacheHits 缓存命中次数
+     * @param cacheMisses 缓存未命中次数
+     * @param layoutCalls 排版调用次数
+     * @param documentRequests 向来源请求文档的次数
+     * @param documentsMaterialized 实例化的文档数
+     * @param wrapInputBytes 换行处理的输入字节数
+     * @param measurementInvalidations 测量失效次数
+     * @param measurementGenerationBumps 测量代数更新次数
+     * @param staleEntriesEncountered 遇到过期条目的次数
+     * @param entriesRemeasured 重新测量条目的次数
+     * @param estimateCorrections 修正高度估计的次数
+     * @param anchorCorrections 修正滚动锚点的次数
+     * @param visibleItems 可见条目数
+     * @param itemsVisited 绘制循环访问的条目数
+     * @param itemsPainted 实际绘制可见行的条目数
+     * @param rowsVisited 绘制循环访问的行数
+     * @param rowsPainted 实际绘制的行数
+     * @param changedItems 变化的条目数
+     * @param itemPaintCellAttempts 条目绘制的单元格写入尝试数
+     * @param rowPaintCellAttempts 行绘制的单元格写入尝试数
+     * @param itemBackgroundCellAttempts 条目背景的单元格写入尝试数
+     * @param contentCellAttempts 内容的单元格写入尝试数
+     * @param layoutRowsRequested 请求排版的行数
+     * @param cachedRowsUsed 使用的缓存行数
+     * @param selectiveItemInvalidations 可见条目选择性失效次数
+     * @param selectiveOffscreenInvalidations 屏外条目选择性失效次数
+     * @param fallbackFullViewportPaints 因条目高度变化回退到整视口重绘的次数
+     */
     public init(
         materialized: Int64,
         cacheEntries: Int64,
@@ -715,7 +804,7 @@ public class VirtualTranscriptView <: Widget {
         heights.total()
     }
 
-    /** 获取累计实例化的条目数。
+    /** 获取自最近一次非空绘制开始后实例化的条目数。
      * @return 实例化次数
      */
     public func materializedCount(): Int64 { materializedCountValue }
