@@ -10235,6 +10235,224 @@
           "signature": "public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit"
         }
       ]
+    },
+    {
+      "id": "game-physics",
+      "source": "docs/api-examples/game-physics.cj",
+      "dependencies": [
+        "game"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ColliderKind",
+          "signature": "public enum ColliderKind {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ColliderKind.Solid",
+          "signature": "Solid"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ColliderKind.Sensor",
+          "signature": "Sensor"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Collider2D",
+          "signature": "public struct Collider2D {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Collider2D.kind",
+          "signature": "public let kind: ColliderKind"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Collider2D.bounds",
+          "signature": "public let bounds: Aabb"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Collider2D.layer",
+          "signature": "public let layer: Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Collider2D.mask",
+          "signature": "public let mask: Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Collider2D.init",
+          "signature": "public init(kind!: ColliderKind = ColliderKind.Solid, bounds!: Aabb = Aabb(width: 1.0, height: 1.0), layer!: Int64 = 1, mask!: Int64 = Int64.Max)"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "BodyType",
+          "signature": "public enum BodyType {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "BodyType.Static",
+          "signature": "Static"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "BodyType.Kinematic",
+          "signature": "Kinematic"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "BodyType.Dynamic",
+          "signature": "Dynamic"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "RigidBody2D",
+          "signature": "public struct RigidBody2D {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "RigidBody2D.bodyType",
+          "signature": "public let bodyType: BodyType"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "RigidBody2D.mass",
+          "signature": "public let mass: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "RigidBody2D.gravityScale",
+          "signature": "public let gravityScale: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "RigidBody2D.damping",
+          "signature": "public let damping: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "RigidBody2D.init",
+          "signature": "public init(bodyType!: BodyType = BodyType.Dynamic, mass!: Float64 = 1.0, gravityScale!: Float64 = 1.0, damping!: Float64 = 0.0)"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "CollisionEvent",
+          "signature": "public struct CollisionEvent {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "CollisionEvent.entity",
+          "signature": "public let entity: EntityId"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "CollisionEvent.other",
+          "signature": "public let other: EntityId"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "CollisionEvent.normal",
+          "signature": "public let normal: Vec2"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "CollisionEvent.time",
+          "signature": "public let time: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "CollisionEvent.hitX",
+          "signature": "public let hitX: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "CollisionEvent.hitY",
+          "signature": "public let hitY: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "CollisionEvent.init",
+          "signature": "public init(entity: EntityId, other: EntityId, normal: Vec2, time: Float64, hitX: Float64, hitY: Float64)"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "PhysicsWorld",
+          "signature": "public class PhysicsWorld {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "PhysicsWorld.gravity",
+          "signature": "public var gravity: Vec2"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "PhysicsWorld.maxSubSteps",
+          "signature": "public var maxSubSteps: Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "PhysicsWorld.skin",
+          "signature": "public var skin: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "PhysicsWorld.init",
+          "signature": "public init(gravity!: Vec2 = Vec2(x: 0.0, y: 30.0), maxSubSteps!: Int64 = 4, skin!: Float64 = 0.001)"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "PhysicsWorld.step",
+          "signature": "public func step( world: EntityWorld, transforms: ComponentStore<Transform2D>, velocities: ComponentStore<Velocity2D>, colliders: ComponentStore<Collider2D>, bodies: ComponentStore<RigidBody2D>, deltaMillis: Int64 ): Array<CollisionEvent>"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "PhysicsWorld.overlaps",
+          "signature": "public func overlaps( world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>, id: EntityId ): Array<CollisionEvent>"
+        }
+      ]
     }
   ]
 }

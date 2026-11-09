@@ -425,17 +425,31 @@ public struct Camera2D {
     }
 }
 
+/** 碰撞体的运动响应类型。 */
 public enum ColliderKind {
+    /** 参与运动阻挡。 */
     | Solid
+    /** 用于重叠查询，不阻挡运动。 */
     | Sensor
 }
 
+/** 碰撞体的局部包围盒及过滤配置。 */
 public struct Collider2D {
+    /** 碰撞响应类型。 */
     public let kind: ColliderKind
+    /** 相对实体位置的局部边界。 */
     public let bounds: Aabb
+    /** 碰撞层位掩码。 */
     public let layer: Int64
+    /** 允许交互的碰撞层位掩码。 */
     public let mask: Int64
 
+    /** 创建碰撞体；两侧的 mask 与对方 layer 均匹配时才检测碰撞。
+     * @param kind 碰撞响应类型
+     * @param bounds 局部边界
+     * @param layer 自身碰撞层
+     * @param mask 允许交互的层
+     */
     public init(kind!: ColliderKind = ColliderKind.Solid, bounds!: Aabb = Aabb(width: 1.0, height: 1.0), layer!: Int64 = 1, mask!: Int64 = Int64.Max) {
         this.kind = kind
         this.bounds = bounds
@@ -444,18 +458,33 @@ public struct Collider2D {
     }
 }
 
+/** 物理世界中实体的运动方式。 */
 public enum BodyType {
+    /** 不由物理步进移动。 */
     | Static
+    /** 按速度移动，不受重力加速。 */
     | Kinematic
+    /** 按速度及重力移动。 */
     | Dynamic
 }
 
+/** 实体物理运动参数。 */
 public struct RigidBody2D {
+    /** 实体运动方式。 */
     public let bodyType: BodyType
+    /** 保存的质量，至少为 0.001；当前物理步进不使用该值。 */
     public let mass: Float64
+    /** 动态实体的重力倍率。 */
     public let gravityScale: Float64
+    /** 速度阻尼，范围为 0 到 1。 */
     public let damping: Float64
 
+    /** 创建刚体参数。
+     * @param bodyType 运动方式
+     * @param mass 质量，至少为 0.001
+     * @param gravityScale 重力倍率
+     * @param damping 阻尼，限制在 0 到 1
+     */
     public init(bodyType!: BodyType = BodyType.Dynamic, mass!: Float64 = 1.0, gravityScale!: Float64 = 1.0, damping!: Float64 = 0.0) {
         this.bodyType = bodyType
         this.mass = fmax(0.001, mass)
@@ -464,14 +493,29 @@ public struct RigidBody2D {
     }
 }
 
+/** 描述一个实体与另一实体的碰撞或重叠。 */
 public struct CollisionEvent {
+    /** 发起检测的实体。 */
     public let entity: EntityId
+    /** 另一实体。 */
     public let other: EntityId
+    /** 碰撞法向量。 */
     public let normal: Vec2
+    /** 运动子步中的归一化碰撞时间，范围为 0 到 1。 */
     public let time: Float64
+    /** 碰撞位置横坐标。 */
     public let hitX: Float64
+    /** 碰撞位置纵坐标。 */
     public let hitY: Float64
 
+    /** 创建碰撞事件。
+     * @param entity 发起检测的实体
+     * @param other 另一实体
+     * @param normal 法向量
+     * @param time 归一化碰撞时间，限制为 0 到 1
+     * @param hitX 碰撞位置横坐标
+     * @param hitY 碰撞位置纵坐标
+     */
     public init(entity: EntityId, other: EntityId, normal: Vec2, time: Float64, hitX: Float64, hitY: Float64) {
         this.entity = entity
         this.other = other
@@ -511,18 +555,36 @@ public struct TileMarker <: Equatable<TileMarker> {
     }
 }
 
+/** 按组件存储推进简单二维运动，并查询实体重叠。 */
 public class PhysicsWorld {
+    /** 动态实体使用的重力加速度。 */
     public var gravity: Vec2
+    /** 每次步进的最大子步数；构造时至少为一。 */
     public var maxSubSteps: Int64
+    /** 碰撞运动时间使用的回退量；构造时至少为零。 */
     public var skin: Float64
     private let collisions = ArrayList<CollisionEvent>()
 
+    /** 创建物理世界。
+     * @param gravity 重力加速度
+     * @param maxSubSteps 最大子步数，至少为一
+     * @param skin 碰撞回退量，至少为零
+     */
     public init(gravity!: Vec2 = Vec2(x: 0.0, y: 30.0), maxSubSteps!: Int64 = 4, skin!: Float64 = 0.001) {
         this.gravity = gravity
         this.maxSubSteps = max(1, maxSubSteps)
         this.skin = fmax(0.0, skin)
     }
 
+    /** 推进运动并更新变换和速度组件。非正时间不推进；传感器不阻挡运动。
+     * @param world 实体世界
+     * @param transforms 变换组件存储
+     * @param velocities 速度组件存储
+     * @param colliders 碰撞组件存储
+     * @param bodies 刚体组件存储
+     * @param deltaMillis 推进的毫秒数
+     * @return 本次运动中检测到的碰撞事件
+     */
     public func step(
         world: EntityWorld,
         transforms: ComponentStore<Transform2D>,
@@ -542,6 +604,13 @@ public class PhysicsWorld {
         collisions.toArray()
     }
 
+    /** 查询指定存活实体与其他碰撞体的当前重叠。
+     * @param world 实体世界
+     * @param transforms 变换组件存储
+     * @param colliders 碰撞组件存储
+     * @param id 要查询的实体
+     * @return 符合层过滤规则的重叠事件
+     */
     public func overlaps(
         world: EntityWorld,
         transforms: ComponentStore<Transform2D>,
