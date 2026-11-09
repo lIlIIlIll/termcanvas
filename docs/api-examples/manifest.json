@@ -5765,6 +5765,326 @@
           "signature": "public init(x: Int64, y: Int64, cell: Cell)"
         }
       ]
+    },
+    {
+      "id": "core-media-model",
+      "source": "docs/api-examples/media-model.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaKind",
+          "signature": "public enum MediaKind {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaKind.Image",
+          "signature": "Image"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaKind.Animation",
+          "signature": "Animation"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaKind.Video",
+          "signature": "Video"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaKind.Html",
+          "signature": "Html"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaKind.Diagram",
+          "signature": "Diagram"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaKind.Math",
+          "signature": "Math"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaProtocol",
+          "signature": "public enum MediaProtocol {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaProtocol.Text",
+          "signature": "Text"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaProtocol.Kitty",
+          "signature": "Kitty"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaProtocol.Sixel",
+          "signature": "Sixel"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFit",
+          "signature": "public enum MediaFit {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFit.Contain",
+          "signature": "Contain"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFit.Cover",
+          "signature": "Cover"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFit.Fill",
+          "signature": "Fill"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFit.Original",
+          "signature": "Original"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaSource",
+          "signature": "public class MediaSource {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaSource.id",
+          "signature": "public let id: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaSource.uri",
+          "signature": "public let uri: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaSource.kind",
+          "signature": "public let kind: MediaKind"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaSource.alt",
+          "signature": "public let alt: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaSource.init",
+          "signature": "public init(id: String, uri: String, kind!: MediaKind = MediaKind.Image, alt!: String = \"\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFrameData",
+          "signature": "public class MediaFrameData {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFrameData.protocol",
+          "signature": "public let protocol: MediaProtocol"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFrameData.payload",
+          "signature": "public let payload: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFrameData.widthPixels",
+          "signature": "public let widthPixels: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFrameData.heightPixels",
+          "signature": "public let heightPixels: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFrameData.durationMillis",
+          "signature": "public let durationMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFrameData.init",
+          "signature": "public init( protocol: MediaProtocol, payload: String, widthPixels!: Int64 = 0, heightPixels!: Int64 = 0, durationMillis!: Int64 = 0 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFrameData.text",
+          "signature": "public static func text(text: String): MediaFrameData"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFrameData.kitty",
+          "signature": "public static func kitty(rawBytes: Array<Byte>, widthPixels!: Int64 = 0, heightPixels!: Int64 = 0): MediaFrameData"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaFrameData.sixel",
+          "signature": "public static func sixel(payload: String, widthPixels!: Int64 = 0, heightPixels!: Int64 = 0): MediaFrameData"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaPlacement",
+          "signature": "public class MediaPlacement {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaPlacement.id",
+          "signature": "public let id: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaPlacement.source",
+          "signature": "public let source: MediaSource"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaPlacement.area",
+          "signature": "public let area: Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaPlacement.fit",
+          "signature": "public let fit: MediaFit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaPlacement.frameIndex",
+          "signature": "public let frameIndex: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaPlacement.frame",
+          "signature": "public let frame: MediaFrameData"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaPlacement.init",
+          "signature": "public init( id: String, source: MediaSource, area: Rect, fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0, frame!: ?MediaFrameData = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaPlacement.sameRenderContent",
+          "signature": "public func sameRenderContent(other: MediaPlacement): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaOpKind",
+          "signature": "public enum MediaOpKind {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaOpKind.Draw",
+          "signature": "Draw"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaOpKind.Clear",
+          "signature": "Clear"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaOp",
+          "signature": "public class MediaOp {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaOp.kind",
+          "signature": "public let kind: MediaOpKind"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaOp.placement",
+          "signature": "public let placement: MediaPlacement"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "MediaOp.init",
+          "signature": "public init(kind: MediaOpKind, placement: MediaPlacement)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "diffMediaPlacements",
+          "signature": "public func diffMediaPlacements(previous: Array<MediaPlacement>, next: Array<MediaPlacement>): Array<MediaOp>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "mediaFallbackText",
+          "signature": "public func mediaFallbackText(source: MediaSource): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/media.cj",
+          "symbol": "mediaProtocolName",
+          "signature": "public func mediaProtocolName(protocol: MediaProtocol): String"
+        }
+      ]
     }
   ]
 }

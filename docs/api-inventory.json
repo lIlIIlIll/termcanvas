@@ -22767,7 +22767,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "enum",
       "symbol": "MediaKind",
@@ -22785,7 +22785,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 6,
+      "line": 8,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -22804,7 +22804,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 7,
+      "line": 10,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -22823,7 +22823,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 8,
+      "line": 12,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -22842,7 +22842,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 9,
+      "line": 14,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -22861,7 +22861,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 10,
+      "line": 16,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -22880,7 +22880,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 11,
+      "line": 18,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -22899,7 +22899,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 14,
+      "line": 22,
       "level": "top_level",
       "kind": "enum",
       "symbol": "MediaProtocol",
@@ -22917,7 +22917,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 15,
+      "line": 24,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -22936,7 +22936,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 16,
+      "line": 26,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -22955,7 +22955,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 17,
+      "line": 28,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -22974,7 +22974,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 20,
+      "line": 32,
       "level": "top_level",
       "kind": "enum",
       "symbol": "MediaFit",
@@ -22992,7 +22992,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 21,
+      "line": 34,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -23011,7 +23011,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 22,
+      "line": 36,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -23030,7 +23030,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 23,
+      "line": 38,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -23049,7 +23049,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 24,
+      "line": 40,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -23068,7 +23068,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 27,
+      "line": 44,
       "level": "top_level",
       "kind": "class",
       "symbol": "MediaSource",
@@ -23086,7 +23086,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 28,
+      "line": 46,
       "level": "member",
       "kind": "let",
       "symbol": "id",
@@ -23104,7 +23104,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 29,
+      "line": 48,
       "level": "member",
       "kind": "let",
       "symbol": "uri",
@@ -23122,7 +23122,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 30,
+      "line": 50,
       "level": "member",
       "kind": "let",
       "symbol": "kind",
@@ -23140,7 +23140,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 31,
+      "line": 52,
       "level": "member",
       "kind": "let",
       "symbol": "alt",
@@ -23158,7 +23158,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 33,
+      "line": 60,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -23176,7 +23176,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 41,
+      "line": 69,
       "level": "top_level",
       "kind": "class",
       "symbol": "MediaFrameData",
@@ -23194,7 +23194,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 42,
+      "line": 71,
       "level": "member",
       "kind": "let",
       "symbol": "protocol",
@@ -23212,7 +23212,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 43,
+      "line": 73,
       "level": "member",
       "kind": "let",
       "symbol": "payload",
@@ -23230,7 +23230,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 44,
+      "line": 75,
       "level": "member",
       "kind": "let",
       "symbol": "widthPixels",
@@ -23248,7 +23248,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 45,
+      "line": 77,
       "level": "member",
       "kind": "let",
       "symbol": "heightPixels",
@@ -23266,7 +23266,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 46,
+      "line": 79,
       "level": "member",
       "kind": "let",
       "symbol": "durationMillis",
@@ -23284,7 +23284,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 48,
+      "line": 88,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -23302,7 +23302,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 62,
+      "line": 106,
       "level": "member",
       "kind": "func",
       "symbol": "text",
@@ -23320,7 +23320,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 66,
+      "line": 116,
       "level": "member",
       "kind": "func",
       "symbol": "kitty",
@@ -23338,7 +23338,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 70,
+      "line": 126,
       "level": "member",
       "kind": "func",
       "symbol": "sixel",
@@ -23356,7 +23356,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 75,
+      "line": 132,
       "level": "top_level",
       "kind": "class",
       "symbol": "MediaPlacement",
@@ -23374,7 +23374,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 76,
+      "line": 134,
       "level": "member",
       "kind": "let",
       "symbol": "id",
@@ -23392,7 +23392,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 77,
+      "line": 136,
       "level": "member",
       "kind": "let",
       "symbol": "source",
@@ -23410,7 +23410,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 78,
+      "line": 138,
       "level": "member",
       "kind": "let",
       "symbol": "area",
@@ -23428,7 +23428,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 79,
+      "line": 140,
       "level": "member",
       "kind": "let",
       "symbol": "fit",
@@ -23446,7 +23446,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 80,
+      "line": 142,
       "level": "member",
       "kind": "let",
       "symbol": "frameIndex",
@@ -23464,7 +23464,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 81,
+      "line": 144,
       "level": "member",
       "kind": "let",
       "symbol": "frame",
@@ -23482,7 +23482,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 83,
+      "line": 154,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -23500,7 +23500,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 102,
+      "line": 177,
       "level": "member",
       "kind": "func",
       "symbol": "sameRenderContent",
@@ -23518,7 +23518,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 113,
+      "line": 189,
       "level": "top_level",
       "kind": "enum",
       "symbol": "MediaOpKind",
@@ -23536,7 +23536,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 114,
+      "line": 191,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -23555,7 +23555,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 115,
+      "line": 193,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -23574,7 +23574,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 118,
+      "line": 197,
       "level": "top_level",
       "kind": "class",
       "symbol": "MediaOp",
@@ -23592,7 +23592,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 119,
+      "line": 199,
       "level": "member",
       "kind": "let",
       "symbol": "kind",
@@ -23610,7 +23610,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 120,
+      "line": 201,
       "level": "member",
       "kind": "let",
       "symbol": "placement",
@@ -23628,7 +23628,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 122,
+      "line": 207,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -23646,7 +23646,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 128,
+      "line": 218,
       "level": "top_level",
       "kind": "func",
       "symbol": "diffMediaPlacements",
@@ -23664,7 +23664,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 148,
+      "line": 242,
       "level": "top_level",
       "kind": "func",
       "symbol": "mediaFallbackText",
@@ -23682,7 +23682,7 @@
     {
       "package": "core",
       "path": "packages/core/src/media.cj",
-      "line": 154,
+      "line": 252,
       "level": "top_level",
       "kind": "func",
       "symbol": "mediaProtocolName",

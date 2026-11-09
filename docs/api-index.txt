@@ -1249,57 +1249,57 @@ packages/core/src/lazy_tree.cj:158:public func setExpanded(id: String, expanded:
 packages/core/src/lazy_tree.cj:190:public func toggleSelected(): Bool
 packages/core/src/lazy_tree.cj:197:public func collapseAll(): Unit
 packages/core/src/lazy_tree.cj:200:public func refresh(): Unit
-packages/core/src/media.cj:5:public enum MediaKind {
-packages/core/src/media.cj:6:Image
-packages/core/src/media.cj:7:Animation
-packages/core/src/media.cj:8:Video
-packages/core/src/media.cj:9:Html
-packages/core/src/media.cj:10:Diagram
-packages/core/src/media.cj:11:Math
-packages/core/src/media.cj:14:public enum MediaProtocol {
-packages/core/src/media.cj:15:Text
-packages/core/src/media.cj:16:Kitty
-packages/core/src/media.cj:17:Sixel
-packages/core/src/media.cj:20:public enum MediaFit {
-packages/core/src/media.cj:21:Contain
-packages/core/src/media.cj:22:Cover
-packages/core/src/media.cj:23:Fill
-packages/core/src/media.cj:24:Original
-packages/core/src/media.cj:27:public class MediaSource {
-packages/core/src/media.cj:28:public let id: String
-packages/core/src/media.cj:29:public let uri: String
-packages/core/src/media.cj:30:public let kind: MediaKind
-packages/core/src/media.cj:31:public let alt: String
-packages/core/src/media.cj:33:public init(id: String, uri: String, kind!: MediaKind = MediaKind.Image, alt!: String = "")
-packages/core/src/media.cj:41:public class MediaFrameData {
-packages/core/src/media.cj:42:public let protocol: MediaProtocol
-packages/core/src/media.cj:43:public let payload: String
-packages/core/src/media.cj:44:public let widthPixels: Int64
-packages/core/src/media.cj:45:public let heightPixels: Int64
-packages/core/src/media.cj:46:public let durationMillis: Int64
-packages/core/src/media.cj:48:public init( protocol: MediaProtocol, payload: String, widthPixels!: Int64 = 0, heightPixels!: Int64 = 0, durationMillis!: Int64 = 0 )
-packages/core/src/media.cj:62:public static func text(text: String): MediaFrameData
-packages/core/src/media.cj:66:public static func kitty(rawBytes: Array<Byte>, widthPixels!: Int64 = 0, heightPixels!: Int64 = 0): MediaFrameData
-packages/core/src/media.cj:70:public static func sixel(payload: String, widthPixels!: Int64 = 0, heightPixels!: Int64 = 0): MediaFrameData
-packages/core/src/media.cj:75:public class MediaPlacement {
-packages/core/src/media.cj:76:public let id: String
-packages/core/src/media.cj:77:public let source: MediaSource
-packages/core/src/media.cj:78:public let area: Rect
-packages/core/src/media.cj:79:public let fit: MediaFit
-packages/core/src/media.cj:80:public let frameIndex: Int64
-packages/core/src/media.cj:81:public let frame: MediaFrameData
-packages/core/src/media.cj:83:public init( id: String, source: MediaSource, area: Rect, fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0, frame!: ?MediaFrameData = None )
-packages/core/src/media.cj:102:public func sameRenderContent(other: MediaPlacement): Bool
-packages/core/src/media.cj:113:public enum MediaOpKind {
-packages/core/src/media.cj:114:Draw
-packages/core/src/media.cj:115:Clear
-packages/core/src/media.cj:118:public class MediaOp {
-packages/core/src/media.cj:119:public let kind: MediaOpKind
-packages/core/src/media.cj:120:public let placement: MediaPlacement
-packages/core/src/media.cj:122:public init(kind: MediaOpKind, placement: MediaPlacement)
-packages/core/src/media.cj:128:public func diffMediaPlacements(previous: Array<MediaPlacement>, next: Array<MediaPlacement>): Array<MediaOp>
-packages/core/src/media.cj:148:public func mediaFallbackText(source: MediaSource): String
-packages/core/src/media.cj:154:public func mediaProtocolName(protocol: MediaProtocol): String
+packages/core/src/media.cj:6:public enum MediaKind {
+packages/core/src/media.cj:8:Image
+packages/core/src/media.cj:10:Animation
+packages/core/src/media.cj:12:Video
+packages/core/src/media.cj:14:Html
+packages/core/src/media.cj:16:Diagram
+packages/core/src/media.cj:18:Math
+packages/core/src/media.cj:22:public enum MediaProtocol {
+packages/core/src/media.cj:24:Text
+packages/core/src/media.cj:26:Kitty
+packages/core/src/media.cj:28:Sixel
+packages/core/src/media.cj:32:public enum MediaFit {
+packages/core/src/media.cj:34:Contain
+packages/core/src/media.cj:36:Cover
+packages/core/src/media.cj:38:Fill
+packages/core/src/media.cj:40:Original
+packages/core/src/media.cj:44:public class MediaSource {
+packages/core/src/media.cj:46:public let id: String
+packages/core/src/media.cj:48:public let uri: String
+packages/core/src/media.cj:50:public let kind: MediaKind
+packages/core/src/media.cj:52:public let alt: String
+packages/core/src/media.cj:60:public init(id: String, uri: String, kind!: MediaKind = MediaKind.Image, alt!: String = "")
+packages/core/src/media.cj:69:public class MediaFrameData {
+packages/core/src/media.cj:71:public let protocol: MediaProtocol
+packages/core/src/media.cj:73:public let payload: String
+packages/core/src/media.cj:75:public let widthPixels: Int64
+packages/core/src/media.cj:77:public let heightPixels: Int64
+packages/core/src/media.cj:79:public let durationMillis: Int64
+packages/core/src/media.cj:88:public init( protocol: MediaProtocol, payload: String, widthPixels!: Int64 = 0, heightPixels!: Int64 = 0, durationMillis!: Int64 = 0 )
+packages/core/src/media.cj:106:public static func text(text: String): MediaFrameData
+packages/core/src/media.cj:116:public static func kitty(rawBytes: Array<Byte>, widthPixels!: Int64 = 0, heightPixels!: Int64 = 0): MediaFrameData
+packages/core/src/media.cj:126:public static func sixel(payload: String, widthPixels!: Int64 = 0, heightPixels!: Int64 = 0): MediaFrameData
+packages/core/src/media.cj:132:public class MediaPlacement {
+packages/core/src/media.cj:134:public let id: String
+packages/core/src/media.cj:136:public let source: MediaSource
+packages/core/src/media.cj:138:public let area: Rect
+packages/core/src/media.cj:140:public let fit: MediaFit
+packages/core/src/media.cj:142:public let frameIndex: Int64
+packages/core/src/media.cj:144:public let frame: MediaFrameData
+packages/core/src/media.cj:154:public init( id: String, source: MediaSource, area: Rect, fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0, frame!: ?MediaFrameData = None )
+packages/core/src/media.cj:177:public func sameRenderContent(other: MediaPlacement): Bool
+packages/core/src/media.cj:189:public enum MediaOpKind {
+packages/core/src/media.cj:191:Draw
+packages/core/src/media.cj:193:Clear
+packages/core/src/media.cj:197:public class MediaOp {
+packages/core/src/media.cj:199:public let kind: MediaOpKind
+packages/core/src/media.cj:201:public let placement: MediaPlacement
+packages/core/src/media.cj:207:public init(kind: MediaOpKind, placement: MediaPlacement)
+packages/core/src/media.cj:218:public func diffMediaPlacements(previous: Array<MediaPlacement>, next: Array<MediaPlacement>): Array<MediaOp>
+packages/core/src/media.cj:242:public func mediaFallbackText(source: MediaSource): String
+packages/core/src/media.cj:252:public func mediaProtocolName(protocol: MediaProtocol): String
 packages/core/src/navigation.cj:35:public class Tabs <: Widget {
 packages/core/src/navigation.cj:40:public var selected: Int64
 packages/core/src/navigation.cj:48:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: ?Style = None )
