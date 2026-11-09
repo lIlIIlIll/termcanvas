@@ -357,8 +357,10 @@ func galleryButton(app: WorkbenchApp, label: String, variant: Int64, id: String,
         case _ => app.theme.disabled
     }
     let marker = if (app.focus.isFocused(id)) { "> " } else if (app.hovered == Some(id)) { "~ " } else { "" }
-    Button(marker + label, focused: app.focus.isFocused(id), disabled: disabled || variant == 4, style: style,
+    let button = Button(marker + label, focused: app.focus.isFocused(id), disabled: disabled || variant == 4, style: style,
         focusedStyle: app.theme.focused, disabledStyle: app.theme.disabled, theme: Some(app.theme))
+    if (variant == 2) { button.setGhost(true) }
+    button
 }
 
 func galleryBlock(app: WorkbenchApp, title: String, border: BorderKind,
