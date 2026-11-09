@@ -129,23 +129,48 @@ public class ExternalMediaAdapter <: MediaAdapter {
     }
 }
 
+/** 将像素转换为终端字符的方式。 */
 public enum AsciiRenderMode {
+    /** 使用亮度字符梯度。 */
     | Ascii
+    /** 用半块字符表示上下两个像素。 */
     | HalfBlock
+    /** 用盲文点阵表示像素。 */
     | Braille
 }
 
+/** 控制字符帧尺寸、采样和颜色的配置。 */
 public struct AsciiRenderOptions {
+    /** 目标字符宽度，范围为 1 到 240。 */
     public let width: Int64
+    /** 目标字符高度，范围为 1 到 120。 */
     public let height: Int64
+    /** 目标帧率，范围为 1 到 30。 */
     public let fps: Int64
+    /** ASCII 模式从暗到亮使用的字符梯度。 */
     public let ramp: String
+    /** 是否反转亮度。 */
     public let invert: Bool
+    /** 透明度阈值，范围为 0 到 255。 */
     public let alphaThreshold: Int64
+    /** 字符采样模式。 */
     public let mode: AsciiRenderMode
+    /** 是否保存每个字符的颜色。 */
     public let color: Bool
+    /** 半块和盲文模式的亮度阈值，范围为 0 到 255。 */
     public let binaryThreshold: Int64
 
+    /** 创建字符渲染配置；尺寸、帧率和阈值会限制在允许范围内。
+     * @param width 目标字符宽度
+     * @param height 目标字符高度
+     * @param fps 目标帧率
+     * @param ramp ASCII 亮度梯度；空字符串使用默认值
+     * @param invert 是否反转亮度
+     * @param alphaThreshold 透明度阈值
+     * @param mode 字符采样模式
+     * @param color 是否保留颜色
+     * @param binaryThreshold 半块及盲文的亮度阈值
+     */
     public init(
         width!: Int64 = 80,
         height!: Int64 = 32,
@@ -168,10 +193,16 @@ public struct AsciiRenderOptions {
         this.binaryThreshold = clampLocal(binaryThreshold, 0, 255)
     }
 
+    /** 获取帧持续时间。
+     * @return 按帧率计算的毫秒数，至少为一
+     */
     public func frameMillis(): Int64 {
         max(1, 1000 / fps)
     }
 
+    /** 获取输入采样宽度。
+     * @return 盲文模式为字符宽度的两倍，其他模式为字符宽度
+     */
     public func sampleWidth(): Int64 {
         match (mode) {
             case AsciiRenderMode.Braille => width * 2
@@ -179,6 +210,9 @@ public struct AsciiRenderOptions {
         }
     }
 
+    /** 获取输入采样高度。
+     * @return 半块模式为字符高度的两倍，盲文模式为四倍，其他模式为字符高度
+     */
     public func sampleHeight(): Int64 {
         match (mode) {
             case AsciiRenderMode.HalfBlock => height * 2
@@ -188,25 +222,45 @@ public struct AsciiRenderOptions {
     }
 }
 
+/** 包含文本行、可选颜色和帧持续时间。 */
 public struct AsciiFrame {
+    /** 字符帧的文本行。 */
     public let lines: Array<String>
+    /** 各文本行对应的颜色数组；可为空。 */
     public let colors: Array<Array<Color>>
+    /** 帧持续时间，至少为一毫秒。 */
     public let durationMillis: Int64
 
+    /** 创建字符帧。
+     * @param lines 文本行
+     * @param durationMillis 帧持续毫秒数，至少为一
+     * @param colors 可选的逐行颜色
+     */
     public init(lines: Array<String>, durationMillis!: Int64 = 83, colors!: Array<Array<Color>> = []) {
         this.lines = lines
         this.colors = colors
         this.durationMillis = max(1, durationMillis)
     }
 
+    /** 将文本行用换行符连接。
+     * @return 字符帧文本
+     */
     public func text(): String {
         joinLocal(lines, "\n")
     }
 
+    /** 判断是否提供了颜色行。
+     * @return 颜色数组非空时为 true
+     */
     public func hasColors(): Bool {
         colors.size > 0
     }
 
+    /** 获取一个字符位置的颜色。
+     * @param row 颜色行索引
+     * @param column 列索引
+     * @return 对应颜色；超出范围时为 Color.Reset
+     */
     public func colorAt(row: Int64, column: Int64): Color {
         if (row < 0 || column < 0 || row >= colors.size || column >= colors[row].size) {
             return Color.Reset
@@ -215,23 +269,36 @@ public struct AsciiFrame {
     }
 }
 
+/** 按顺序循环播放字符帧的动画。 */
 public class AsciiAnimation {
     private let frames: Array<AsciiFrame>
     private let fallback: AsciiFrame
 
+    /** 创建字符动画。
+     * @param frames 顺序播放的帧
+     */
     public init(frames: Array<AsciiFrame>) {
         this.frames = frames
         this.fallback = AsciiFrame([""], durationMillis: 1000)
     }
 
+    /** 获取帧数。
+     * @return 帧数
+     */
     public func frameCount(): Int64 {
         frames.size
     }
 
+    /** 判断动画是否没有帧。
+     * @return 无帧时为 true
+     */
     public func isEmpty(): Bool {
         frames.size == 0
     }
 
+    /** 计算一轮动画的持续时间。
+     * @return 帧时长之和；空动画返回一毫秒
+     */
     public func totalDurationMillis(): Int64 {
         var total: Int64 = 0
         for (frame in frames) {
@@ -240,11 +307,19 @@ public class AsciiAnimation {
         max(1, total)
     }
 
+    /** 按索引循环选择帧；空动画返回默认空帧。
+     * @param index 帧索引，可为负数
+     * @return 选中的帧
+     */
     public func frameAtIndex(index: Int64): AsciiFrame {
         if (frames.size == 0) { return fallback }
         frames[modPositive(index, frames.size)]
     }
 
+    /** 根据经过的时间循环选择帧；空动画返回默认空帧。
+     * @param elapsedMillis 经过的毫秒数，负值按零处理
+     * @return 选中的帧
+     */
     public func frameAtElapsed(elapsedMillis: Int64): AsciiFrame {
         if (frames.size == 0) { return fallback }
         var remaining = modPositive(max(0, elapsedMillis), totalDurationMillis())
@@ -346,6 +421,13 @@ public class AsciiAnimationView <: Widget {
     }
 }
 
+/** 将行优先的 RGBA 字节转换为字符帧；尺寸无效或数据不足时返回空帧。
+ * @param bytes 每像素四字节的 RGBA 数据
+ * @param width 输入像素宽度
+ * @param height 输入像素高度
+ * @param options 渲染配置
+ * @return 转换后的字符帧
+ */
 public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame {
     let targetWidth = max(0, width)
     let targetHeight = max(0, height)

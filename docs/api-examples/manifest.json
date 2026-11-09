@@ -8168,6 +8168,225 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "ascii-animation",
+      "source": "docs/api-examples/ascii-animation.cj",
+      "dependencies": [
+        "core",
+        "media"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderMode",
+          "signature": "public enum AsciiRenderMode {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderMode.Ascii",
+          "signature": "Ascii"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderMode.HalfBlock",
+          "signature": "HalfBlock"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderMode.Braille",
+          "signature": "Braille"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions",
+          "signature": "public struct AsciiRenderOptions {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.width",
+          "signature": "public let width: Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.height",
+          "signature": "public let height: Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.fps",
+          "signature": "public let fps: Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.ramp",
+          "signature": "public let ramp: String"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.invert",
+          "signature": "public let invert: Bool"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.alphaThreshold",
+          "signature": "public let alphaThreshold: Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.mode",
+          "signature": "public let mode: AsciiRenderMode"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.color",
+          "signature": "public let color: Bool"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.binaryThreshold",
+          "signature": "public let binaryThreshold: Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.init",
+          "signature": "public init( width!: Int64 = 80, height!: Int64 = 32, fps!: Int64 = 12, ramp!: String = \" .:-=+*#%@\", invert!: Bool = false, alphaThreshold!: Int64 = 16, mode!: AsciiRenderMode = AsciiRenderMode.Ascii, color!: Bool = false, binaryThreshold!: Int64 = 128 )"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.frameMillis",
+          "signature": "public func frameMillis(): Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.sampleWidth",
+          "signature": "public func sampleWidth(): Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiRenderOptions.sampleHeight",
+          "signature": "public func sampleHeight(): Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiFrame",
+          "signature": "public struct AsciiFrame {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiFrame.lines",
+          "signature": "public let lines: Array<String>"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiFrame.colors",
+          "signature": "public let colors: Array<Array<Color>>"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiFrame.durationMillis",
+          "signature": "public let durationMillis: Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiFrame.init",
+          "signature": "public init(lines: Array<String>, durationMillis!: Int64 = 83, colors!: Array<Array<Color>> = [])"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiFrame.text",
+          "signature": "public func text(): String"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiFrame.hasColors",
+          "signature": "public func hasColors(): Bool"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiFrame.colorAt",
+          "signature": "public func colorAt(row: Int64, column: Int64): Color"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimation",
+          "signature": "public class AsciiAnimation {"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimation.init",
+          "signature": "public init(frames: Array<AsciiFrame>)"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimation.frameCount",
+          "signature": "public func frameCount(): Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimation.isEmpty",
+          "signature": "public func isEmpty(): Bool"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimation.totalDurationMillis",
+          "signature": "public func totalDurationMillis(): Int64"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimation.frameAtIndex",
+          "signature": "public func frameAtIndex(index: Int64): AsciiFrame"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "AsciiAnimation.frameAtElapsed",
+          "signature": "public func frameAtElapsed(elapsedMillis: Int64): AsciiFrame"
+        },
+        {
+          "package": "media",
+          "path": "packages/media/src/media.cj",
+          "symbol": "rgbaToAsciiFrame",
+          "signature": "public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame"
+        }
+      ]
     }
   ]
 }
