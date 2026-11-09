@@ -23,9 +23,12 @@ public enum TaskStatus {
  */
 public enum TaskProgress {
     /** 按顺序显示各子任务的独立状态。
+     * @param _0 按顺序排列的子任务状态
      */
     | Items(Array<TaskStatus>)
     /** 显示完成数与总数，越界数值在 TaskActivity 创建时限制到有效范围。
+     * @param _0 已完成数量
+     * @param _1 子任务总数
      */
     | Counts(Int64, Int64)
 }
@@ -127,6 +130,12 @@ public class TaskActivityView <: Widget {
     /** 创建任务 Widget；负帧序号按零处理，默认使用展开布局，根据终端能力和主题选择标记；显式 unicode 参数覆盖自动选择。
      * 展开布局将耗时对齐到最多 88 列的标题行，maxHeaderWidth 为零时使用整个宽度；
      * 长标题需要更多空间时会扩展该宽度，空间不足时优先显示标题。
+     * @param activity 要显示的任务
+     * @param layout 紧凑或展开布局
+     * @param activityFrame 动画帧序号
+     * @param theme 可选主题
+     * @param unicode 显式指定是否使用 Unicode 标记
+     * @param maxHeaderWidth 展开布局的首选标题宽度，零表示整个区域
      */
     public init(
         activity: TaskActivity,
@@ -145,6 +154,8 @@ public class TaskActivityView <: Widget {
     }
 
     /** 在指定区域绘制任务；空区域不绘制，文本按字素簇省略；进度溢出时显示隐藏数，空间不足时显示省略符。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
@@ -386,9 +397,15 @@ public class TaskActivityView <: Widget {
 
 /** 一个任务及其紧凑或展开显示方式。 */
 public class TaskActivityListEntry {
+    /** 要显示的任务数据。 */
     public let activity: TaskActivity
+    /** 该任务的布局方式。 */
     public let layout: TaskActivityLayout
 
+    /** 创建任务列表项。
+     * @param activity 任务数据
+     * @param layout 紧凑或展开布局
+     */
     public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded) {
         this.activity = activity
         this.layout = layout
@@ -418,6 +435,14 @@ public class TaskActivityList <: Widget {
     private let unicode: ?Bool
     private let maxHeaderWidth: Int64
 
+    /** 创建只读活动列表并复制列表项数组；偏移限制到有效的任务索引范围。
+     * @param entries 按顺序显示的任务项
+     * @param offset 首个显示任务的索引
+     * @param activityFrame 任务动画帧序号
+     * @param theme 可选主题
+     * @param unicode 显式指定是否使用 Unicode 标记
+     * @param maxHeaderWidth 展开布局的首选标题宽度，零表示整个区域
+     */
     public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0,
         theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88) {
         this.entries = Array<TaskActivityListEntry>(entries.size, { i => entries[i] })
@@ -428,6 +453,10 @@ public class TaskActivityList <: Widget {
         this.maxHeaderWidth = max(0, maxHeaderWidth)
     }
 
+    /** 在区域内绘制可见任务，并在必要时显示隐藏任务提示。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0 || entries.size == 0) { return }
         let theme = widgetTheme(buffer, this.theme)

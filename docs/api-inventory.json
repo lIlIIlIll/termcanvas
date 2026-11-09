@@ -33550,7 +33550,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 27,
+      "line": 28,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -33569,7 +33569,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 30,
+      "line": 33,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -33588,7 +33588,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 35,
+      "line": 38,
       "level": "top_level",
       "kind": "enum",
       "symbol": "TaskActivityLayout",
@@ -33606,7 +33606,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 38,
+      "line": 41,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -33625,7 +33625,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 41,
+      "line": 44,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -33644,7 +33644,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 46,
+      "line": 49,
       "level": "top_level",
       "kind": "class",
       "symbol": "TaskActivity",
@@ -33662,7 +33662,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 49,
+      "line": 52,
       "level": "member",
       "kind": "let",
       "symbol": "title",
@@ -33680,7 +33680,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 52,
+      "line": 55,
       "level": "member",
       "kind": "let",
       "symbol": "status",
@@ -33698,7 +33698,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 55,
+      "line": 58,
       "level": "member",
       "kind": "let",
       "symbol": "id",
@@ -33716,7 +33716,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 58,
+      "line": 61,
       "level": "member",
       "kind": "let",
       "symbol": "prefix",
@@ -33734,7 +33734,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 61,
+      "line": 64,
       "level": "member",
       "kind": "let",
       "symbol": "statusText",
@@ -33752,7 +33752,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 64,
+      "line": 67,
       "level": "member",
       "kind": "let",
       "symbol": "duration",
@@ -33770,7 +33770,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 67,
+      "line": 70,
       "level": "member",
       "kind": "let",
       "symbol": "detail",
@@ -33788,7 +33788,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 70,
+      "line": 73,
       "level": "member",
       "kind": "let",
       "symbol": "progressLabel",
@@ -33806,7 +33806,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 85,
+      "line": 88,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -33824,7 +33824,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 119,
+      "line": 122,
       "level": "top_level",
       "kind": "class",
       "symbol": "TaskActivityView",
@@ -33842,7 +33842,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 131,
+      "line": 140,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -33860,7 +33860,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 149,
+      "line": 160,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -33878,7 +33878,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 388,
+      "line": 399,
       "level": "top_level",
       "kind": "class",
       "symbol": "TaskActivityListEntry",
@@ -33896,7 +33896,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 389,
+      "line": 401,
       "level": "member",
       "kind": "let",
       "symbol": "activity",
@@ -33914,7 +33914,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 390,
+      "line": 403,
       "level": "member",
       "kind": "let",
       "symbol": "layout",
@@ -33932,7 +33932,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 392,
+      "line": 409,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -33950,7 +33950,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 413,
+      "line": 430,
       "level": "top_level",
       "kind": "class",
       "symbol": "TaskActivityList",
@@ -33968,7 +33968,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 421,
+      "line": 446,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -33986,7 +33986,7 @@
     {
       "package": "core",
       "path": "packages/core/src/task_activity.cj",
-      "line": 431,
+      "line": 460,
       "level": "member",
       "kind": "func",
       "symbol": "render",

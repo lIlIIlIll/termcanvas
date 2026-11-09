@@ -1842,31 +1842,31 @@ packages/core/src/task_activity.cj:15:Done
 packages/core/src/task_activity.cj:17:Failed
 packages/core/src/task_activity.cj:19:Cancelled
 packages/core/src/task_activity.cj:24:public enum TaskProgress {
-packages/core/src/task_activity.cj:27:Items(Array<TaskStatus>)
-packages/core/src/task_activity.cj:30:Counts(Int64, Int64)
-packages/core/src/task_activity.cj:35:public enum TaskActivityLayout {
-packages/core/src/task_activity.cj:38:Compact
-packages/core/src/task_activity.cj:41:Expanded
-packages/core/src/task_activity.cj:46:public class TaskActivity {
-packages/core/src/task_activity.cj:49:public let title: String
-packages/core/src/task_activity.cj:52:public let status: TaskStatus
-packages/core/src/task_activity.cj:55:public let id: String
-packages/core/src/task_activity.cj:58:public let prefix: String
-packages/core/src/task_activity.cj:61:public let statusText: String
-packages/core/src/task_activity.cj:64:public let duration: String
-packages/core/src/task_activity.cj:67:public let detail: String
-packages/core/src/task_activity.cj:70:public let progressLabel: String
-packages/core/src/task_activity.cj:85:public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
-packages/core/src/task_activity.cj:119:public class TaskActivityView <: Widget {
-packages/core/src/task_activity.cj:131:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
-packages/core/src/task_activity.cj:149:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/task_activity.cj:388:public class TaskActivityListEntry {
-packages/core/src/task_activity.cj:389:public let activity: TaskActivity
-packages/core/src/task_activity.cj:390:public let layout: TaskActivityLayout
-packages/core/src/task_activity.cj:392:public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded)
-packages/core/src/task_activity.cj:413:public class TaskActivityList <: Widget {
-packages/core/src/task_activity.cj:421:public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
-packages/core/src/task_activity.cj:431:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/task_activity.cj:28:Items(Array<TaskStatus>)
+packages/core/src/task_activity.cj:33:Counts(Int64, Int64)
+packages/core/src/task_activity.cj:38:public enum TaskActivityLayout {
+packages/core/src/task_activity.cj:41:Compact
+packages/core/src/task_activity.cj:44:Expanded
+packages/core/src/task_activity.cj:49:public class TaskActivity {
+packages/core/src/task_activity.cj:52:public let title: String
+packages/core/src/task_activity.cj:55:public let status: TaskStatus
+packages/core/src/task_activity.cj:58:public let id: String
+packages/core/src/task_activity.cj:61:public let prefix: String
+packages/core/src/task_activity.cj:64:public let statusText: String
+packages/core/src/task_activity.cj:67:public let duration: String
+packages/core/src/task_activity.cj:70:public let detail: String
+packages/core/src/task_activity.cj:73:public let progressLabel: String
+packages/core/src/task_activity.cj:88:public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
+packages/core/src/task_activity.cj:122:public class TaskActivityView <: Widget {
+packages/core/src/task_activity.cj:140:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
+packages/core/src/task_activity.cj:160:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/task_activity.cj:399:public class TaskActivityListEntry {
+packages/core/src/task_activity.cj:401:public let activity: TaskActivity
+packages/core/src/task_activity.cj:403:public let layout: TaskActivityLayout
+packages/core/src/task_activity.cj:409:public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded)
+packages/core/src/task_activity.cj:430:public class TaskActivityList <: Widget {
+packages/core/src/task_activity.cj:446:public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
+packages/core/src/task_activity.cj:460:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/terminal.cj:122:public enum CursorShape {
 packages/core/src/terminal.cj:123:Block
 packages/core/src/terminal.cj:124:Bar

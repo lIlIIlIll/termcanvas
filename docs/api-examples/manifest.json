@@ -3227,6 +3227,225 @@
           "signature": "public func wakeCoalesced(): Int64"
         }
       ]
+    },
+    {
+      "id": "core-task-activity",
+      "source": "docs/api-examples/task-activity.cj",
+      "dependencies": [
+        "core",
+        "testing"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskStatus",
+          "signature": "public enum TaskStatus {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskStatus.Pending",
+          "signature": "Pending"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskStatus.Queued",
+          "signature": "Queued"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskStatus.Running",
+          "signature": "Running"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskStatus.Paused",
+          "signature": "Paused"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskStatus.Done",
+          "signature": "Done"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskStatus.Failed",
+          "signature": "Failed"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskStatus.Cancelled",
+          "signature": "Cancelled"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskProgress",
+          "signature": "public enum TaskProgress {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskProgress.Items",
+          "signature": "Items(Array<TaskStatus>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskProgress.Counts",
+          "signature": "Counts(Int64, Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityLayout",
+          "signature": "public enum TaskActivityLayout {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityLayout.Compact",
+          "signature": "Compact"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityLayout.Expanded",
+          "signature": "Expanded"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivity",
+          "signature": "public class TaskActivity {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivity.title",
+          "signature": "public let title: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivity.status",
+          "signature": "public let status: TaskStatus"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivity.id",
+          "signature": "public let id: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivity.prefix",
+          "signature": "public let prefix: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivity.statusText",
+          "signature": "public let statusText: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivity.duration",
+          "signature": "public let duration: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivity.detail",
+          "signature": "public let detail: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivity.progressLabel",
+          "signature": "public let progressLabel: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivity.init",
+          "signature": "public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = \"\", prefix!: String = \"\", statusText!: String = \"\", duration!: String = \"\", detail!: String = \"\", progressLabel!: String = \"\", progress!: ?TaskProgress = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityView",
+          "signature": "public class TaskActivityView <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityView.init",
+          "signature": "public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityListEntry",
+          "signature": "public class TaskActivityListEntry {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityListEntry.activity",
+          "signature": "public let activity: TaskActivity"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityListEntry.layout",
+          "signature": "public let layout: TaskActivityLayout"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityListEntry.init",
+          "signature": "public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityList",
+          "signature": "public class TaskActivityList <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityList.init",
+          "signature": "public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/task_activity.cj",
+          "symbol": "TaskActivityList.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }
