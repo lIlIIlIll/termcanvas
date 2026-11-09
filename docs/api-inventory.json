@@ -16323,7 +16323,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 39,
+      "line": 40,
       "level": "top_level",
       "kind": "enum",
       "symbol": "KeyCode",
@@ -16341,7 +16341,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 40,
+      "line": 44,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16360,7 +16360,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 41,
+      "line": 46,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16379,7 +16379,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 42,
+      "line": 48,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16398,7 +16398,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 43,
+      "line": 50,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16417,7 +16417,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 44,
+      "line": 52,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16436,7 +16436,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 45,
+      "line": 54,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16455,7 +16455,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 46,
+      "line": 56,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16474,7 +16474,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 47,
+      "line": 58,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16493,7 +16493,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 48,
+      "line": 60,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16512,7 +16512,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 49,
+      "line": 62,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16531,7 +16531,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 50,
+      "line": 64,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16550,7 +16550,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 51,
+      "line": 66,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16569,7 +16569,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 52,
+      "line": 68,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16588,7 +16588,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 53,
+      "line": 70,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16607,7 +16607,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 54,
+      "line": 72,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16626,7 +16626,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 55,
+      "line": 74,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16645,7 +16645,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 56,
+      "line": 76,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16664,7 +16664,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 57,
+      "line": 80,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16683,7 +16683,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 60,
+      "line": 84,
       "level": "top_level",
       "kind": "enum",
       "symbol": "KeyProtocol",
@@ -16701,7 +16701,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 61,
+      "line": 86,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16720,7 +16720,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 62,
+      "line": 88,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16739,7 +16739,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 63,
+      "line": 90,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -16758,7 +16758,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 66,
+      "line": 94,
       "level": "top_level",
       "kind": "struct",
       "symbol": "KeyModifier",
@@ -16776,7 +16776,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 67,
+      "line": 96,
       "level": "member",
       "kind": "let",
       "symbol": "shift",
@@ -16794,7 +16794,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 68,
+      "line": 98,
       "level": "member",
       "kind": "let",
       "symbol": "alt",
@@ -16812,7 +16812,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 69,
+      "line": 100,
       "level": "member",
       "kind": "let",
       "symbol": "ctrl",
@@ -16830,7 +16830,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 70,
+      "line": 102,
       "level": "member",
       "kind": "let",
       "symbol": "superKey",
@@ -16848,7 +16848,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 71,
+      "line": 104,
       "level": "member",
       "kind": "let",
       "symbol": "meta",
@@ -16866,7 +16866,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 72,
+      "line": 106,
       "level": "member",
       "kind": "let",
       "symbol": "hyper",
@@ -16884,7 +16884,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 73,
+      "line": 108,
       "level": "member",
       "kind": "let",
       "symbol": "capsLock",
@@ -16902,7 +16902,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 74,
+      "line": 110,
       "level": "member",
       "kind": "let",
       "symbol": "numLock",
@@ -16920,7 +16920,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 76,
+      "line": 122,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -16938,7 +16938,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 96,
+      "line": 145,
       "level": "member",
       "kind": "func",
       "symbol": "none",
@@ -16956,7 +16956,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 100,
+      "line": 153,
       "level": "member",
       "kind": "func",
       "symbol": "fromCsiParam",
@@ -16974,7 +16974,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 126,
+      "line": 183,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_==",
@@ -16992,7 +16992,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 137,
+      "line": 198,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_!=",
@@ -17010,7 +17010,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 142,
+      "line": 204,
       "level": "top_level",
       "kind": "struct",
       "symbol": "KeyEvent",
@@ -17028,7 +17028,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 143,
+      "line": 206,
       "level": "member",
       "kind": "let",
       "symbol": "code",
@@ -17046,7 +17046,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 144,
+      "line": 208,
       "level": "member",
       "kind": "let",
       "symbol": "modifiers",
@@ -17064,7 +17064,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 145,
+      "line": 210,
       "level": "member",
       "kind": "let",
       "symbol": "text",
@@ -17082,7 +17082,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 146,
+      "line": 212,
       "level": "member",
       "kind": "let",
       "symbol": "protocol",
@@ -17100,7 +17100,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 147,
+      "line": 214,
       "level": "member",
       "kind": "let",
       "symbol": "nativeRepeat",
@@ -17118,7 +17118,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 149,
+      "line": 223,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -17136,7 +17136,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 164,
+      "line": 239,
       "level": "top_level",
       "kind": "enum",
       "symbol": "MouseButton",
@@ -17154,7 +17154,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 165,
+      "line": 241,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17173,7 +17173,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 166,
+      "line": 243,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17192,7 +17192,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 167,
+      "line": 245,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17211,7 +17211,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 168,
+      "line": 247,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17230,7 +17230,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 169,
+      "line": 249,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17249,7 +17249,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 170,
+      "line": 251,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17268,7 +17268,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 173,
+      "line": 255,
       "level": "top_level",
       "kind": "enum",
       "symbol": "MouseKind",
@@ -17286,7 +17286,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 174,
+      "line": 257,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17305,7 +17305,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 175,
+      "line": 259,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17324,7 +17324,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 176,
+      "line": 261,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17343,7 +17343,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 177,
+      "line": 263,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17362,7 +17362,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 178,
+      "line": 265,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17381,7 +17381,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 181,
+      "line": 269,
       "level": "top_level",
       "kind": "struct",
       "symbol": "MouseEvent",
@@ -17399,7 +17399,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 182,
+      "line": 271,
       "level": "member",
       "kind": "let",
       "symbol": "kind",
@@ -17417,7 +17417,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 183,
+      "line": 273,
       "level": "member",
       "kind": "let",
       "symbol": "button",
@@ -17435,7 +17435,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 184,
+      "line": 275,
       "level": "member",
       "kind": "let",
       "symbol": "x",
@@ -17453,7 +17453,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 185,
+      "line": 277,
       "level": "member",
       "kind": "let",
       "symbol": "y",
@@ -17471,7 +17471,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 186,
+      "line": 279,
       "level": "member",
       "kind": "let",
       "symbol": "modifiers",
@@ -17489,7 +17489,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 187,
+      "line": 287,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -17507,7 +17507,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 196,
+      "line": 296,
       "level": "top_level",
       "kind": "struct",
       "symbol": "TickEvent",
@@ -17525,7 +17525,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 197,
+      "line": 297,
       "level": "member",
       "kind": "let",
       "symbol": "deltaMillis",
@@ -17543,7 +17543,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 198,
+      "line": 298,
       "level": "member",
       "kind": "let",
       "symbol": "elapsedMillis",
@@ -17561,7 +17561,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 199,
+      "line": 299,
       "level": "member",
       "kind": "let",
       "symbol": "frameIndex",
@@ -17579,7 +17579,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 200,
+      "line": 300,
       "level": "member",
       "kind": "let",
       "symbol": "droppedFrames",
@@ -17597,7 +17597,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 202,
+      "line": 302,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -17615,7 +17615,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 210,
+      "line": 310,
       "level": "top_level",
       "kind": "enum",
       "symbol": "TimerMode",
@@ -17633,7 +17633,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 211,
+      "line": 311,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17652,7 +17652,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 212,
+      "line": 312,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17671,7 +17671,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 215,
+      "line": 315,
       "level": "top_level",
       "kind": "enum",
       "symbol": "FrameMissPolicy",
@@ -17689,7 +17689,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 216,
+      "line": 316,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17708,7 +17708,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 217,
+      "line": 317,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17727,7 +17727,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 220,
+      "line": 320,
       "level": "top_level",
       "kind": "struct",
       "symbol": "TimerEvent",
@@ -17745,7 +17745,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 221,
+      "line": 321,
       "level": "member",
       "kind": "let",
       "symbol": "id",
@@ -17763,7 +17763,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 222,
+      "line": 322,
       "level": "member",
       "kind": "let",
       "symbol": "elapsedMillis",
@@ -17781,7 +17781,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 223,
+      "line": 323,
       "level": "member",
       "kind": "let",
       "symbol": "firedCount",
@@ -17799,7 +17799,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 224,
+      "line": 324,
       "level": "member",
       "kind": "let",
       "symbol": "droppedFrames",
@@ -17817,7 +17817,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 226,
+      "line": 326,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -17835,7 +17835,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 234,
+      "line": 334,
       "level": "top_level",
       "kind": "enum",
       "symbol": "TimerPriority",
@@ -17853,7 +17853,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 235,
+      "line": 335,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17872,7 +17872,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 236,
+      "line": 336,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17891,7 +17891,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 237,
+      "line": 337,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17910,7 +17910,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 240,
+      "line": 340,
       "level": "top_level",
       "kind": "enum",
       "symbol": "Event",
@@ -17928,7 +17928,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 241,
+      "line": 341,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17947,7 +17947,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 242,
+      "line": 342,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17966,7 +17966,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 243,
+      "line": 343,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -17985,7 +17985,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 244,
+      "line": 344,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18004,7 +18004,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 245,
+      "line": 345,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18023,7 +18023,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 246,
+      "line": 346,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18042,7 +18042,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 247,
+      "line": 347,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18061,7 +18061,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 248,
+      "line": 348,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18080,7 +18080,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 249,
+      "line": 349,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18099,7 +18099,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 250,
+      "line": 350,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18118,7 +18118,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 251,
+      "line": 351,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18137,7 +18137,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 252,
+      "line": 352,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18156,7 +18156,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 253,
+      "line": 353,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18175,7 +18175,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 254,
+      "line": 354,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18194,7 +18194,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 255,
+      "line": 355,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18213,7 +18213,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 256,
+      "line": 356,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18232,7 +18232,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 257,
+      "line": 357,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18251,7 +18251,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 258,
+      "line": 358,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18270,7 +18270,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 259,
+      "line": 359,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18289,7 +18289,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 260,
+      "line": 360,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18308,7 +18308,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 261,
+      "line": 361,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18327,7 +18327,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 262,
+      "line": 362,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18346,7 +18346,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 263,
+      "line": 363,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18365,7 +18365,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 264,
+      "line": 364,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18384,7 +18384,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 265,
+      "line": 365,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18403,7 +18403,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 266,
+      "line": 366,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18422,7 +18422,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 267,
+      "line": 367,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18441,7 +18441,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 268,
+      "line": 368,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18460,7 +18460,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 269,
+      "line": 369,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18479,7 +18479,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 270,
+      "line": 370,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18498,7 +18498,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 271,
+      "line": 371,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18517,7 +18517,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 272,
+      "line": 372,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -18536,7 +18536,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 275,
+      "line": 375,
       "level": "top_level",
       "kind": "struct",
       "symbol": "PressedKey",
@@ -18554,7 +18554,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 276,
+      "line": 376,
       "level": "member",
       "kind": "let",
       "symbol": "key",
@@ -18572,7 +18572,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 277,
+      "line": 377,
       "level": "member",
       "kind": "let",
       "symbol": "heldMillis",
@@ -18590,7 +18590,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 279,
+      "line": 379,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -18608,7 +18608,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 295,
+      "line": 395,
       "level": "top_level",
       "kind": "class",
       "symbol": "InputState",
@@ -18626,7 +18626,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 300,
+      "line": 400,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -18644,7 +18644,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 304,
+      "line": 404,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -18662,7 +18662,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 319,
+      "line": 419,
       "level": "member",
       "kind": "func",
       "symbol": "advance",
@@ -18680,7 +18680,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 336,
+      "line": 436,
       "level": "member",
       "kind": "func",
       "symbol": "isPressed",
@@ -18698,7 +18698,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 340,
+      "line": 440,
       "level": "member",
       "kind": "func",
       "symbol": "pressedKeys",
@@ -18716,7 +18716,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 348,
+      "line": 448,
       "level": "member",
       "kind": "func",
       "symbol": "modifiers",
@@ -18734,7 +18734,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 352,
+      "line": 452,
       "level": "member",
       "kind": "func",
       "symbol": "clear",
@@ -18752,7 +18752,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 407,
+      "line": 507,
       "level": "top_level",
       "kind": "class",
       "symbol": "EventParser",
@@ -18770,7 +18770,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 415,
+      "line": 515,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -18788,7 +18788,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 419,
+      "line": 519,
       "level": "member",
       "kind": "func",
       "symbol": "push",
@@ -18806,7 +18806,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 433,
+      "line": 533,
       "level": "member",
       "kind": "func",
       "symbol": "readEvents",
@@ -18824,7 +18824,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 462,
+      "line": 562,
       "level": "member",
       "kind": "func",
       "symbol": "readEvent",
@@ -18842,7 +18842,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 477,
+      "line": 577,
       "level": "member",
       "kind": "func",
       "symbol": "lastReadBytes",
@@ -18860,7 +18860,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 481,
+      "line": 581,
       "level": "member",
       "kind": "func",
       "symbol": "hasPendingInputDrain",
@@ -18878,7 +18878,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 489,
+      "line": 589,
       "level": "member",
       "kind": "func",
       "symbol": "flushEsc",
@@ -18896,7 +18896,7 @@
     {
       "package": "core",
       "path": "packages/core/src/event.cj",
-      "line": 498,
+      "line": 598,
       "level": "member",
       "kind": "func",
       "symbol": "flushEscAfterPolls",

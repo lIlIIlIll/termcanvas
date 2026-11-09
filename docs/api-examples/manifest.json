@@ -6949,6 +6949,404 @@
           "signature": "public init( size!: Rect = Rect(0, 0, 0, 0), dirtyCells!: Int64 = 0, diffWrites!: Int64 = 0, mediaOps!: Int64 = 0, fullRedraw!: Bool = false, renderMillis!: Int64 = 0, drawMillis!: Int64 = 0, totalMillis!: Int64 = 0, renderedCells!: Int64 = 0, dirtyRects!: Int64 = 0, copiedCells!: Int64 = 0, bufferCellAttempts!: Int64 = 0, bufferCellWrites!: Int64 = 0, renderNanos!: Int64 = 0, diffNanos!: Int64 = 0, writeNanos!: Int64 = 0, totalNanos!: Int64 = 0, ansiBytes!: Int64 = -1 )"
         }
       ]
+    },
+    {
+      "id": "core-input-events",
+      "source": "docs/api-examples/input-events.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode",
+          "signature": "public enum KeyCode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Char",
+          "signature": "Char(Rune)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.CtrlC",
+          "signature": "CtrlC"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Esc",
+          "signature": "Esc"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Tab",
+          "signature": "Tab"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.BackTab",
+          "signature": "BackTab"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Enter",
+          "signature": "Enter"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Backspace",
+          "signature": "Backspace"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Delete",
+          "signature": "Delete"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Insert",
+          "signature": "Insert"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Up",
+          "signature": "Up"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Down",
+          "signature": "Down"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Left",
+          "signature": "Left"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Right",
+          "signature": "Right"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.Home",
+          "signature": "Home"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.End",
+          "signature": "End"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.PageUp",
+          "signature": "PageUp"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.PageDown",
+          "signature": "PageDown"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyCode.F",
+          "signature": "F(Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyProtocol",
+          "signature": "public enum KeyProtocol {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyProtocol.Basic",
+          "signature": "Basic"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyProtocol.ModifyOtherKeys",
+          "signature": "ModifyOtherKeys"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyProtocol.Kitty",
+          "signature": "Kitty"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier",
+          "signature": "public struct KeyModifier <: Equatable<KeyModifier> {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.shift",
+          "signature": "public let shift: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.alt",
+          "signature": "public let alt: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.ctrl",
+          "signature": "public let ctrl: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.superKey",
+          "signature": "public let superKey: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.meta",
+          "signature": "public let meta: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.hyper",
+          "signature": "public let hyper: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.capsLock",
+          "signature": "public let capsLock: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.numLock",
+          "signature": "public let numLock: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.init",
+          "signature": "public init( shift!: Bool = false, alt!: Bool = false, ctrl!: Bool = false, superKey!: Bool = false, meta!: Bool = false, hyper!: Bool = false, capsLock!: Bool = false, numLock!: Bool = false )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.none",
+          "signature": "public static func none(): KeyModifier"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.fromCsiParam",
+          "signature": "public static func fromCsiParam(value: Int64): KeyModifier"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.operator_==",
+          "signature": "public operator func ==(other: KeyModifier): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyModifier.operator_!=",
+          "signature": "public operator func !=(other: KeyModifier): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyEvent",
+          "signature": "public struct KeyEvent {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyEvent.code",
+          "signature": "public let code: KeyCode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyEvent.modifiers",
+          "signature": "public let modifiers: KeyModifier"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyEvent.text",
+          "signature": "public let text: ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyEvent.protocol",
+          "signature": "public let protocol: KeyProtocol"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyEvent.nativeRepeat",
+          "signature": "public let nativeRepeat: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "KeyEvent.init",
+          "signature": "public init( code: KeyCode, modifiers!: KeyModifier = KeyModifier.none(), text!: ?String = None, protocol!: KeyProtocol = KeyProtocol.Basic, nativeRepeat!: Bool = false )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseButton",
+          "signature": "public enum MouseButton {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseButton.Left",
+          "signature": "Left"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseButton.Middle",
+          "signature": "Middle"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseButton.Right",
+          "signature": "Right"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseButton.WheelUp",
+          "signature": "WheelUp"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseButton.WheelDown",
+          "signature": "WheelDown"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseButton.None",
+          "signature": "None"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseKind",
+          "signature": "public enum MouseKind {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseKind.Down",
+          "signature": "Down"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseKind.Up",
+          "signature": "Up"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseKind.Drag",
+          "signature": "Drag"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseKind.Move",
+          "signature": "Move"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseKind.Scroll",
+          "signature": "Scroll"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseEvent",
+          "signature": "public struct MouseEvent {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseEvent.kind",
+          "signature": "public let kind: MouseKind"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseEvent.button",
+          "signature": "public let button: MouseButton"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseEvent.x",
+          "signature": "public let x: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseEvent.y",
+          "signature": "public let y: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseEvent.modifiers",
+          "signature": "public let modifiers: KeyModifier"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "MouseEvent.init",
+          "signature": "public init(kind: MouseKind, button: MouseButton, x: Int64, y: Int64, modifiers!: KeyModifier = KeyModifier.none())"
+        }
+      ]
     }
   ]
 }

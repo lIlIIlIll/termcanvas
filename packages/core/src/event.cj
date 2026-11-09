@@ -36,43 +36,89 @@ public class StdinInputSource <: InputSource {
     }
 }
 
+/** 键盘按键代码。 */
 public enum KeyCode {
+    /** 字符按键。
+     * @param _0 输入字符
+     */
     | Char(Rune)
+    /** Ctrl+C 按键。 */
     | CtrlC
+    /** Escape 按键。 */
     | Esc
+    /** Tab 按键。 */
     | Tab
+    /** 反向 Tab 按键。 */
     | BackTab
+    /** 回车按键。 */
     | Enter
+    /** 退格按键。 */
     | Backspace
+    /** 向前删除按键。 */
     | Delete
+    /** 插入按键。 */
     | Insert
+    /** 上方向键。 */
     | Up
+    /** 下方向键。 */
     | Down
+    /** 左方向键。 */
     | Left
+    /** 右方向键。 */
     | Right
+    /** Home 按键。 */
     | Home
+    /** End 按键。 */
     | End
+    /** 向上翻页键。 */
     | PageUp
+    /** 向下翻页键。 */
     | PageDown
+    /** 功能键。
+     * @param _0 功能键编号
+     */
     | F(Int64)
 }
 
+/** 键盘输入使用的终端协议。 */
 public enum KeyProtocol {
+    /** 基础键盘协议。 */
     | Basic
+    /** ModifyOtherKeys 协议。 */
     | ModifyOtherKeys
+    /** Kitty 键盘协议。 */
     | Kitty
 }
 
+/** 键盘或鼠标事件携带的修饰键及锁定状态。 */
 public struct KeyModifier <: Equatable<KeyModifier> {
+    /** Shift 状态。 */
     public let shift: Bool
+    /** Alt 状态。 */
     public let alt: Bool
+    /** Ctrl 状态。 */
     public let ctrl: Bool
+    /** Super 状态。 */
     public let superKey: Bool
+    /** Meta 状态。 */
     public let meta: Bool
+    /** Hyper 状态。 */
     public let hyper: Bool
+    /** 大写锁定状态。 */
     public let capsLock: Bool
+    /** 数字锁定状态。 */
     public let numLock: Bool
 
+    /** 创建修饰键状态。
+     * @param shift Shift 状态
+     * @param alt Alt 状态
+     * @param ctrl Ctrl 状态
+     * @param superKey Super 状态
+     * @param meta Meta 状态
+     * @param hyper Hyper 状态
+     * @param capsLock 大写锁定状态
+     * @param numLock 数字锁定状态
+     */
     public init(
         shift!: Bool = false,
         alt!: Bool = false,
@@ -93,10 +139,17 @@ public struct KeyModifier <: Equatable<KeyModifier> {
         this.numLock = numLock
     }
 
+    /** 创建所有修饰键均关闭的状态。
+     * @return 无修饰状态
+     */
     public static func none(): KeyModifier {
         KeyModifier()
     }
 
+    /** 解码 CSI 修饰参数；值先按至少 1 处理，扩展位可表示更多修饰与锁定状态。
+     * @param value CSI 修饰参数
+     * @return 解码后的状态
+     */
     public static func fromCsiParam(value: Int64): KeyModifier {
         let encoded = max(1, value) - 1
         if (encoded > 7) {
@@ -123,6 +176,10 @@ public struct KeyModifier <: Equatable<KeyModifier> {
         }
     }
 
+    /** 比较所有修饰与锁定状态。
+     * @param other 待比较状态
+     * @return 状态相同时为 true
+     */
     public operator func ==(other: KeyModifier): Bool {
         shift == other.shift &&
             alt == other.alt &&
@@ -134,18 +191,35 @@ public struct KeyModifier <: Equatable<KeyModifier> {
             numLock == other.numLock
     }
 
+    /** 比较所有修饰与锁定状态。
+     * @param other 待比较状态
+     * @return 状态不同时为 true
+     */
     public operator func !=(other: KeyModifier): Bool {
         !(this == other)
     }
 }
 
+/** 键盘事件的按键、修饰键、文本与协议元数据。 */
 public struct KeyEvent {
+    /** 按键代码。 */
     public let code: KeyCode
+    /** 修饰键状态。 */
     public let modifiers: KeyModifier
+    /** 可选的输入文本。 */
     public let text: ?String
+    /** 键盘协议。 */
     public let protocol: KeyProtocol
+    /** 是否由原生输入标记为重复。 */
     public let nativeRepeat: Bool
 
+    /** 创建键盘事件。
+     * @param code 按键代码
+     * @param modifiers 修饰键状态
+     * @param text 可选输入文本
+     * @param protocol 键盘协议
+     * @param nativeRepeat 是否为原生重复事件
+     */
     public init(
         code: KeyCode,
         modifiers!: KeyModifier = KeyModifier.none(),
@@ -161,29 +235,55 @@ public struct KeyEvent {
     }
 }
 
+/** 鼠标事件关联的按键或滚轮方向。 */
 public enum MouseButton {
+    /** 左键。 */
     | Left
+    /** 中键。 */
     | Middle
+    /** 右键。 */
     | Right
+    /** 滚轮向上。 */
     | WheelUp
+    /** 滚轮向下。 */
     | WheelDown
+    /** 没有关联按键。 */
     | None
 }
 
+/** 鼠标事件类型。 */
 public enum MouseKind {
+    /** 按下。 */
     | Down
+    /** 释放。 */
     | Up
+    /** 拖动。 */
     | Drag
+    /** 移动。 */
     | Move
+    /** 滚动。 */
     | Scroll
 }
 
+/** 包含位置、按键和修饰键状态的鼠标事件。 */
 public struct MouseEvent {
+    /** 事件类型。 */
     public let kind: MouseKind
+    /** 关联按键或滚轮方向。 */
     public let button: MouseButton
+    /** 终端单元格横坐标。 */
     public let x: Int64
+    /** 终端单元格纵坐标。 */
     public let y: Int64
+    /** 修饰键状态。 */
     public let modifiers: KeyModifier
+    /** 创建鼠标事件。
+     * @param kind 事件类型
+     * @param button 关联按键或滚轮方向
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param modifiers 修饰键状态
+     */
     public init(kind: MouseKind, button: MouseButton, x: Int64, y: Int64, modifiers!: KeyModifier = KeyModifier.none()) {
         this.kind = kind
         this.button = button
