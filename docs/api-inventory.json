@@ -42558,7 +42558,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 10,
+      "line": 11,
       "level": "top_level",
       "kind": "interface",
       "symbol": "TextModel",
@@ -42576,7 +42576,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 11,
+      "line": 15,
       "level": "member",
       "kind": "func",
       "symbol": "byteLength",
@@ -42595,7 +42595,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 12,
+      "line": 19,
       "level": "member",
       "kind": "func",
       "symbol": "lineCount",
@@ -42614,7 +42614,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 13,
+      "line": 24,
       "level": "member",
       "kind": "func",
       "symbol": "line",
@@ -42633,7 +42633,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 14,
+      "line": 29,
       "level": "member",
       "kind": "func",
       "symbol": "lineStart",
@@ -42652,7 +42652,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 15,
+      "line": 34,
       "level": "member",
       "kind": "func",
       "symbol": "lineForOffset",
@@ -42671,7 +42671,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 16,
+      "line": 40,
       "level": "member",
       "kind": "func",
       "symbol": "slice",
@@ -42690,7 +42690,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 17,
+      "line": 46,
       "level": "member",
       "kind": "func",
       "symbol": "replace",
@@ -42709,7 +42709,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 18,
+      "line": 50,
       "level": "member",
       "kind": "func",
       "symbol": "text",
@@ -42728,7 +42728,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 19,
+      "line": 54,
       "level": "member",
       "kind": "func",
       "symbol": "revision",
@@ -42747,7 +42747,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 21,
+      "line": 59,
       "level": "member",
       "kind": "func",
       "symbol": "metrics",
@@ -42766,7 +42766,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 23,
+      "line": 65,
       "level": "member",
       "kind": "func",
       "symbol": "clampOffset",
@@ -42785,7 +42785,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 26,
+      "line": 69,
       "level": "top_level",
       "kind": "interface",
       "symbol": "EditableTextModel",
@@ -42803,7 +42803,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 28,
+      "line": 72,
       "level": "member",
       "kind": "func",
       "symbol": "beginUndoGroup",
@@ -42822,7 +42822,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 29,
+      "line": 74,
       "level": "member",
       "kind": "func",
       "symbol": "endUndoGroup",
@@ -42841,7 +42841,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 30,
+      "line": 78,
       "level": "member",
       "kind": "func",
       "symbol": "undo",
@@ -42860,7 +42860,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 31,
+      "line": 82,
       "level": "member",
       "kind": "func",
       "symbol": "redo",
@@ -42879,7 +42879,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 32,
+      "line": 84,
       "level": "member",
       "kind": "func",
       "symbol": "clearHistory",
@@ -42898,7 +42898,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 40,
+      "line": 93,
       "level": "top_level",
       "kind": "struct",
       "symbol": "TextModelMetrics",
@@ -42916,7 +42916,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 41,
+      "line": 95,
       "level": "member",
       "kind": "let",
       "symbol": "nodeVisits",
@@ -42934,7 +42934,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 42,
+      "line": 97,
       "level": "member",
       "kind": "let",
       "symbol": "bytesScanned",
@@ -42952,7 +42952,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 43,
+      "line": 99,
       "level": "member",
       "kind": "let",
       "symbol": "bytesCopied",
@@ -42970,7 +42970,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 44,
+      "line": 101,
       "level": "member",
       "kind": "let",
       "symbol": "materializations",
@@ -42988,7 +42988,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 45,
+      "line": 103,
       "level": "member",
       "kind": "let",
       "symbol": "pieceCount",
@@ -43006,7 +43006,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 46,
+      "line": 105,
       "level": "member",
       "kind": "let",
       "symbol": "treeHeight",
@@ -43024,7 +43024,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 48,
+      "line": 115,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -43042,7 +43042,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 142,
+      "line": 210,
       "level": "top_level",
       "kind": "class",
       "symbol": "PieceTableTextModel",
@@ -43060,7 +43060,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 155,
+      "line": 226,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -43078,7 +43078,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 163,
+      "line": 237,
       "level": "member",
       "kind": "func",
       "symbol": "byteLength",
@@ -43096,7 +43096,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 167,
+      "line": 244,
       "level": "member",
       "kind": "func",
       "symbol": "lineCount",
@@ -43114,7 +43114,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 171,
+      "line": 252,
       "level": "member",
       "kind": "func",
       "symbol": "line",
@@ -43132,7 +43132,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 178,
+      "line": 263,
       "level": "member",
       "kind": "func",
       "symbol": "lineStart",
@@ -43150,7 +43150,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 184,
+      "line": 273,
       "level": "member",
       "kind": "func",
       "symbol": "lineForOffset",
@@ -43168,7 +43168,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 192,
+      "line": 285,
       "level": "member",
       "kind": "func",
       "symbol": "clampOffset",
@@ -43186,7 +43186,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 204,
+      "line": 302,
       "level": "member",
       "kind": "func",
       "symbol": "slice",
@@ -43204,7 +43204,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 210,
+      "line": 313,
       "level": "member",
       "kind": "func",
       "symbol": "replace",
@@ -43222,7 +43222,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 232,
+      "line": 338,
       "level": "member",
       "kind": "func",
       "symbol": "text",
@@ -43240,7 +43240,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 237,
+      "line": 346,
       "level": "member",
       "kind": "func",
       "symbol": "revision",
@@ -43258,7 +43258,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 239,
+      "line": 351,
       "level": "member",
       "kind": "func",
       "symbol": "metrics",
@@ -43276,7 +43276,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 248,
+      "line": 361,
       "level": "member",
       "kind": "func",
       "symbol": "beginUndoGroup",
@@ -43294,7 +43294,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 256,
+      "line": 370,
       "level": "member",
       "kind": "func",
       "symbol": "endUndoGroup",
@@ -43312,7 +43312,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 262,
+      "line": 379,
       "level": "member",
       "kind": "func",
       "symbol": "undo",
@@ -43330,7 +43330,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 271,
+      "line": 391,
       "level": "member",
       "kind": "func",
       "symbol": "redo",
@@ -43348,7 +43348,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_model.cj",
-      "line": 280,
+      "line": 401,
       "level": "member",
       "kind": "func",
       "symbol": "clearHistory",

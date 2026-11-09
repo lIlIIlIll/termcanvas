@@ -2731,6 +2731,284 @@
           "signature": "public func matches(text: String): Bool"
         }
       ]
+    },
+    {
+      "id": "core-editable-text-model",
+      "source": "docs/api-examples/text-model.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel",
+          "signature": "public interface TextModel {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.byteLength",
+          "signature": "func byteLength(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.lineCount",
+          "signature": "func lineCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.line",
+          "signature": "func line(index: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.lineStart",
+          "signature": "func lineStart(index: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.lineForOffset",
+          "signature": "func lineForOffset(offset: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.slice",
+          "signature": "func slice(start: Int64, end: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.replace",
+          "signature": "func replace(start: Int64, end: Int64, text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.text",
+          "signature": "func text(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.revision",
+          "signature": "func revision(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.metrics",
+          "signature": "func metrics(): TextModelMetrics"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModel.clampOffset",
+          "signature": "func clampOffset(offset: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "EditableTextModel",
+          "signature": "public interface EditableTextModel <: TextModel {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "EditableTextModel.beginUndoGroup",
+          "signature": "func beginUndoGroup(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "EditableTextModel.endUndoGroup",
+          "signature": "func endUndoGroup(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "EditableTextModel.undo",
+          "signature": "func undo(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "EditableTextModel.redo",
+          "signature": "func redo(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "EditableTextModel.clearHistory",
+          "signature": "func clearHistory(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModelMetrics",
+          "signature": "public struct TextModelMetrics {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModelMetrics.nodeVisits",
+          "signature": "public let nodeVisits: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModelMetrics.bytesScanned",
+          "signature": "public let bytesScanned: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModelMetrics.bytesCopied",
+          "signature": "public let bytesCopied: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModelMetrics.materializations",
+          "signature": "public let materializations: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModelMetrics.pieceCount",
+          "signature": "public let pieceCount: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModelMetrics.treeHeight",
+          "signature": "public let treeHeight: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "TextModelMetrics.init",
+          "signature": "public init(nodeVisits!: Int64 = 0, bytesScanned!: Int64 = 0, bytesCopied!: Int64 = 0, materializations!: Int64 = 0, pieceCount!: Int64 = 0, treeHeight!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel",
+          "signature": "public class PieceTableTextModel <: EditableTextModel {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.init",
+          "signature": "public init(text!: String = \"\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.byteLength",
+          "signature": "public func byteLength(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.lineCount",
+          "signature": "public func lineCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.line",
+          "signature": "public func line(index: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.lineStart",
+          "signature": "public func lineStart(index: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.lineForOffset",
+          "signature": "public func lineForOffset(offset: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.clampOffset",
+          "signature": "public func clampOffset(offset: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.slice",
+          "signature": "public func slice(start: Int64, end: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.replace",
+          "signature": "public func replace(start: Int64, end: Int64, text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.text",
+          "signature": "public func text(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.revision",
+          "signature": "public func revision(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.metrics",
+          "signature": "public func metrics(): TextModelMetrics"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.beginUndoGroup",
+          "signature": "public func beginUndoGroup(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.endUndoGroup",
+          "signature": "public func endUndoGroup(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.undo",
+          "signature": "public func undo(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.redo",
+          "signature": "public func redo(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_model.cj",
+          "symbol": "PieceTableTextModel.clearHistory",
+          "signature": "public func clearHistory(): Unit"
+        }
+      ]
     }
   ]
 }

@@ -2340,50 +2340,50 @@ packages/core/src/text_decorations.cj:123:public func apply(update: TextDecorati
 packages/core/src/text_decorations.cj:145:public func query(start: Int64, end: Int64): Array<TextDecoration>
 packages/core/src/text_decorations.cj:171:public func onEdit(edit: TextEditDelta): Unit
 packages/core/src/text_decorations.cj:195:public func reset(revision: Int64): Unit
-packages/core/src/text_model.cj:10:public interface TextModel {
-packages/core/src/text_model.cj:11:func byteLength(): Int64
-packages/core/src/text_model.cj:12:func lineCount(): Int64
-packages/core/src/text_model.cj:13:func line(index: Int64): String
-packages/core/src/text_model.cj:14:func lineStart(index: Int64): Int64
-packages/core/src/text_model.cj:15:func lineForOffset(offset: Int64): Int64
-packages/core/src/text_model.cj:16:func slice(start: Int64, end: Int64): String
-packages/core/src/text_model.cj:17:func replace(start: Int64, end: Int64, text: String): Unit
-packages/core/src/text_model.cj:18:func text(): String
-packages/core/src/text_model.cj:19:func revision(): Int64
-packages/core/src/text_model.cj:21:func metrics(): TextModelMetrics
-packages/core/src/text_model.cj:23:func clampOffset(offset: Int64): Int64
-packages/core/src/text_model.cj:26:public interface EditableTextModel <: TextModel {
-packages/core/src/text_model.cj:28:func beginUndoGroup(): Unit
-packages/core/src/text_model.cj:29:func endUndoGroup(): Unit
-packages/core/src/text_model.cj:30:func undo(): Bool
-packages/core/src/text_model.cj:31:func redo(): Bool
-packages/core/src/text_model.cj:32:func clearHistory(): Unit
-packages/core/src/text_model.cj:40:public struct TextModelMetrics {
-packages/core/src/text_model.cj:41:public let nodeVisits: Int64
-packages/core/src/text_model.cj:42:public let bytesScanned: Int64
-packages/core/src/text_model.cj:43:public let bytesCopied: Int64
-packages/core/src/text_model.cj:44:public let materializations: Int64
-packages/core/src/text_model.cj:45:public let pieceCount: Int64
-packages/core/src/text_model.cj:46:public let treeHeight: Int64
-packages/core/src/text_model.cj:48:public init(nodeVisits!: Int64 = 0, bytesScanned!: Int64 = 0, bytesCopied!: Int64 = 0, materializations!: Int64 = 0, pieceCount!: Int64 = 0, treeHeight!: Int64 = 0)
-packages/core/src/text_model.cj:142:public class PieceTableTextModel <: EditableTextModel {
-packages/core/src/text_model.cj:155:public init(text!: String = "")
-packages/core/src/text_model.cj:163:public func byteLength(): Int64
-packages/core/src/text_model.cj:167:public func lineCount(): Int64
-packages/core/src/text_model.cj:171:public func line(index: Int64): String
-packages/core/src/text_model.cj:178:public func lineStart(index: Int64): Int64
-packages/core/src/text_model.cj:184:public func lineForOffset(offset: Int64): Int64
-packages/core/src/text_model.cj:192:public func clampOffset(offset: Int64): Int64
-packages/core/src/text_model.cj:204:public func slice(start: Int64, end: Int64): String
-packages/core/src/text_model.cj:210:public func replace(start: Int64, end: Int64, text: String): Unit
-packages/core/src/text_model.cj:232:public func text(): String
-packages/core/src/text_model.cj:237:public func revision(): Int64
-packages/core/src/text_model.cj:239:public func metrics(): TextModelMetrics
-packages/core/src/text_model.cj:248:public func beginUndoGroup(): Unit
-packages/core/src/text_model.cj:256:public func endUndoGroup(): Unit
-packages/core/src/text_model.cj:262:public func undo(): Bool
-packages/core/src/text_model.cj:271:public func redo(): Bool
-packages/core/src/text_model.cj:280:public func clearHistory(): Unit
+packages/core/src/text_model.cj:11:public interface TextModel {
+packages/core/src/text_model.cj:15:func byteLength(): Int64
+packages/core/src/text_model.cj:19:func lineCount(): Int64
+packages/core/src/text_model.cj:24:func line(index: Int64): String
+packages/core/src/text_model.cj:29:func lineStart(index: Int64): Int64
+packages/core/src/text_model.cj:34:func lineForOffset(offset: Int64): Int64
+packages/core/src/text_model.cj:40:func slice(start: Int64, end: Int64): String
+packages/core/src/text_model.cj:46:func replace(start: Int64, end: Int64, text: String): Unit
+packages/core/src/text_model.cj:50:func text(): String
+packages/core/src/text_model.cj:54:func revision(): Int64
+packages/core/src/text_model.cj:59:func metrics(): TextModelMetrics
+packages/core/src/text_model.cj:65:func clampOffset(offset: Int64): Int64
+packages/core/src/text_model.cj:69:public interface EditableTextModel <: TextModel {
+packages/core/src/text_model.cj:72:func beginUndoGroup(): Unit
+packages/core/src/text_model.cj:74:func endUndoGroup(): Unit
+packages/core/src/text_model.cj:78:func undo(): Bool
+packages/core/src/text_model.cj:82:func redo(): Bool
+packages/core/src/text_model.cj:84:func clearHistory(): Unit
+packages/core/src/text_model.cj:93:public struct TextModelMetrics {
+packages/core/src/text_model.cj:95:public let nodeVisits: Int64
+packages/core/src/text_model.cj:97:public let bytesScanned: Int64
+packages/core/src/text_model.cj:99:public let bytesCopied: Int64
+packages/core/src/text_model.cj:101:public let materializations: Int64
+packages/core/src/text_model.cj:103:public let pieceCount: Int64
+packages/core/src/text_model.cj:105:public let treeHeight: Int64
+packages/core/src/text_model.cj:115:public init(nodeVisits!: Int64 = 0, bytesScanned!: Int64 = 0, bytesCopied!: Int64 = 0, materializations!: Int64 = 0, pieceCount!: Int64 = 0, treeHeight!: Int64 = 0)
+packages/core/src/text_model.cj:210:public class PieceTableTextModel <: EditableTextModel {
+packages/core/src/text_model.cj:226:public init(text!: String = "")
+packages/core/src/text_model.cj:237:public func byteLength(): Int64
+packages/core/src/text_model.cj:244:public func lineCount(): Int64
+packages/core/src/text_model.cj:252:public func line(index: Int64): String
+packages/core/src/text_model.cj:263:public func lineStart(index: Int64): Int64
+packages/core/src/text_model.cj:273:public func lineForOffset(offset: Int64): Int64
+packages/core/src/text_model.cj:285:public func clampOffset(offset: Int64): Int64
+packages/core/src/text_model.cj:302:public func slice(start: Int64, end: Int64): String
+packages/core/src/text_model.cj:313:public func replace(start: Int64, end: Int64, text: String): Unit
+packages/core/src/text_model.cj:338:public func text(): String
+packages/core/src/text_model.cj:346:public func revision(): Int64
+packages/core/src/text_model.cj:351:public func metrics(): TextModelMetrics
+packages/core/src/text_model.cj:361:public func beginUndoGroup(): Unit
+packages/core/src/text_model.cj:370:public func endUndoGroup(): Unit
+packages/core/src/text_model.cj:379:public func undo(): Bool
+packages/core/src/text_model.cj:391:public func redo(): Bool
+packages/core/src/text_model.cj:401:public func clearHistory(): Unit
 packages/core/src/theme_capabilities.cj:175:public func adaptStyleForCapabilities(style: Style, capabilities: TerminalCapabilities): Style
 packages/core/src/vim_editor.cj:5:public enum VimMode {
 packages/core/src/vim_editor.cj:6:Normal

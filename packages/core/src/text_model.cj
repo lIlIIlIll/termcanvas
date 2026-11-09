@@ -7,28 +7,80 @@ import std.collection.*
 // slice/replace normalize reversed ranges. line returns "" for invalid rows;
 // lineStart clamps negative rows to 0 and rows past the last to byteLength.
 // revision changes on an effective edit or history traversal, not a no-op.
+/** 按 UTF-8 字节偏移访问文本的模型。LF 分隔行，末尾 LF 后包含空行；编辑和切片的端点会回退到字符边界。 */
 public interface TextModel {
+    /** 返回 UTF-8 字节长度。
+     * @return 文本字节数
+     */
     func byteLength(): Int64
+    /** 返回行数；空文本也有一行。
+     * @return 行数
+     */
     func lineCount(): Int64
+    /** 读取不含行分隔符的一行；越界时返回空字符串。
+     * @param index 零起始行号
+     * @return 行文本
+     */
     func line(index: Int64): String
+    /** 获取一行的起始字节偏移；行号越界时限制到文本两端。
+     * @param index 零起始行号
+     * @return 全文 UTF-8 字节偏移
+     */
     func lineStart(index: Int64): Int64
+    /** 获取给定全文字节偏移所在行。
+     * @param offset 全文 UTF-8 字节偏移
+     * @return 零起始行号
+     */
     func lineForOffset(offset: Int64): Int64
+    /** 读取两个字节偏移之间的文本；反向端点会交换。
+     * @param start 一个 UTF-8 字节端点
+     * @param end 另一个 UTF-8 字节端点
+     * @return 半开范围内的文本
+     */
     func slice(start: Int64, end: Int64): String
+    /** 替换两个字节偏移之间的文本；反向端点会交换。
+     * @param start 一个 UTF-8 字节端点
+     * @param end 另一个 UTF-8 字节端点
+     * @param text 替换文本
+     */
     func replace(start: Int64, end: Int64, text: String): Unit
+    /** 获取完整文本。
+     * @return 当前文本
+     */
     func text(): String
+    /** 获取当前修订号；有效编辑或历史操作会改变修订号。
+     * @return 当前修订号
+     */
     func revision(): Int64
     // Instrumentation is optional for application-supplied text models.
+    /** 返回工作计数快照；默认实现返回零值。
+     * @return 模型计数器
+     */
     func metrics(): TextModelMetrics { TextModelMetrics() }
     // Override this fallback to keep boundary checks local for large models.
+    /** 将字节偏移限制在文本范围内并回退到字符边界。
+     * @param offset 全文 UTF-8 字节偏移
+     * @return 有效字节偏移
+     */
     func clampOffset(offset: Int64): Int64 { clampToRuneBoundary(text(), offset) }
 }
 
+/** 支持分组撤销、重做和清除历史的文本模型。 */
 public interface EditableTextModel <: TextModel {
     // Nested groups commit at the outermost end. undo/redo seal an open group.
+    /** 开始撤销分组；可嵌套。 */
     func beginUndoGroup(): Unit
+    /** 结束一层撤销分组；最外层结束时提交分组。 */
     func endUndoGroup(): Unit
+    /** 撤销最近编辑或分组，并结束打开的分组。
+     * @return 撤销成功时为 true
+     */
     func undo(): Bool
+    /** 重做最近撤销的编辑或分组，并结束打开的分组。
+     * @return 重做成功时为 true
+     */
     func redo(): Bool
+    /** 清除撤销和重做历史。 */
     func clearHistory(): Unit
 }
 
@@ -37,14 +89,29 @@ public interface EditableTextModel <: TextModel {
 // bytesScanned counts input indexing and byte comparisons; bytesCopied counts
 // bytes emitted into requested output, not allocator-internal copies or
 // retained immutable source views.
+/** 文本模型的工作计数快照；除片段数和树高外，其余字段为累计值。 */
 public struct TextModelMetrics {
+    /** 访问的树节点次数。 */
     public let nodeVisits: Int64
+    /** 建立索引和比较时扫描的字节数。 */
     public let bytesScanned: Int64
+    /** 输出结果时复制的字节数，不含分配器内部复制。 */
     public let bytesCopied: Int64
+    /** 请求完整文本的次数。 */
     public let materializations: Int64
+    /** 当前文本树的片段数量。 */
     public let pieceCount: Int64
+    /** 当前文本树的高度。 */
     public let treeHeight: Int64
 
+    /** 创建计数快照。
+     * @param nodeVisits 访问节点次数
+     * @param bytesScanned 扫描字节数
+     * @param bytesCopied 输出复制字节数
+     * @param materializations 完整文本请求次数
+     * @param pieceCount 当前片段数
+     * @param treeHeight 当前树高
+     */
     public init(nodeVisits!: Int64 = 0, bytesScanned!: Int64 = 0, bytesCopied!: Int64 = 0,
         materializations!: Int64 = 0, pieceCount!: Int64 = 0, treeHeight!: Int64 = 0) {
         this.nodeVisits = nodeVisits
@@ -139,6 +206,7 @@ class PieceTextNode {
 // Histories retain roots and O(log P) new path nodes per edit, not whole-text
 // snapshots. Source storage stays alive while any current/history piece uses
 // it; clearHistory releases history roots (it does not compact live sources).
+/** 基于持久片段树的可编辑文本模型，支持增量编辑和历史记录。 */
 public class PieceTableTextModel <: EditableTextModel {
     private var root: ?PieceTextNode = None
     private let undoRoots = ArrayList<?PieceTextNode>()
@@ -152,6 +220,9 @@ public class PieceTableTextModel <: EditableTextModel {
     private var copied: Int64 = 0
     private var flattened: Int64 = 0
 
+    /** 以给定文本创建模型。
+     * @param text 初始文本
+     */
     public init(text!: String = "") {
         if (!text.isEmpty()) {
             let source = PieceTextSource(text)
@@ -160,14 +231,24 @@ public class PieceTableTextModel <: EditableTextModel {
         }
     }
 
+    /** 返回 UTF-8 字节长度。
+     * @return 文本字节数
+     */
     public func byteLength(): Int64 {
         match (root) { case Some(node) => node.bytes; case None => 0 }
     }
 
+    /** 返回行数；空文本也有一行。
+     * @return 行数
+     */
     public func lineCount(): Int64 {
         match (root) { case Some(node) => node.lineBreaks + 1; case None => 1 }
     }
 
+    /** 读取不含行分隔符的一行；越界时返回空字符串。
+     * @param index 零起始行号
+     * @return 行文本
+     */
     public func line(index: Int64): String {
         if (index < 0 || index >= lineCount()) { return "" }
         let start = lineStart(index)
@@ -175,12 +256,20 @@ public class PieceTableTextModel <: EditableTextModel {
         rangeText(start, end)
     }
 
+    /** 获取一行的起始字节偏移；行号越界时限制到文本两端。
+     * @param index 零起始行号
+     * @return 全文 UTF-8 字节偏移
+     */
     public func lineStart(index: Int64): Int64 {
         if (index <= 0) { return 0 }
         if (index >= lineCount()) { return byteLength() }
         newlineOffset(root.getOrThrow(), index - 1) + 1
     }
 
+    /** 获取给定全文字节偏移所在行。
+     * @param offset 全文 UTF-8 字节偏移
+     * @return 零起始行号
+     */
     public func lineForOffset(offset: Int64): Int64 {
         let position = clamp(offset, 0, byteLength())
         match (root) {
@@ -189,6 +278,10 @@ public class PieceTableTextModel <: EditableTextModel {
         }
     }
 
+    /** 将字节偏移限制在文本范围内并回退到字符边界。
+     * @param offset 全文 UTF-8 字节偏移
+     * @return 有效字节偏移
+     */
     public func clampOffset(offset: Int64): Int64 {
         var position = clamp(offset, 0, byteLength())
         if (position == byteLength()) { return position }
@@ -201,12 +294,22 @@ public class PieceTableTextModel <: EditableTextModel {
         position
     }
 
+    /** 读取两个字节偏移之间的文本；反向端点会交换。
+     * @param start 一个 UTF-8 字节端点
+     * @param end 另一个 UTF-8 字节端点
+     * @return 半开范围内的文本
+     */
     public func slice(start: Int64, end: Int64): String {
         let first = clampOffset(min(start, end))
         let last = clampOffset(max(start, end))
         rangeText(first, last)
     }
 
+    /** 替换两个字节偏移之间的文本；反向端点会交换。
+     * @param start 一个 UTF-8 字节端点
+     * @param end 另一个 UTF-8 字节端点
+     * @param text 替换文本
+     */
     public func replace(start: Int64, end: Int64, text: String): Unit {
         let first = clampOffset(min(start, end))
         let last = clampOffset(max(start, end))
@@ -229,13 +332,22 @@ public class PieceTableTextModel <: EditableTextModel {
         generation++
     }
 
+    /** 获取完整文本。
+     * @return 当前文本
+     */
     public func text(): String {
         flattened++
         rangeText(0, byteLength())
     }
 
+    /** 获取当前修订号；有效编辑或历史操作会改变修订号。
+     * @return 当前修订号
+     */
     public func revision(): Int64 { generation }
 
+    /** 返回当前模型工作计数和树状态快照。
+     * @return 模型计数器
+     */
     public func metrics(): TextModelMetrics {
         let (pieces, height) = match (root) {
             case Some(node) => (node.pieces, node.height)
@@ -245,6 +357,7 @@ public class PieceTableTextModel <: EditableTextModel {
             materializations: flattened, pieceCount: pieces, treeHeight: height)
     }
 
+    /** 开始撤销分组；可嵌套。 */
     public func beginUndoGroup(): Unit {
         if (groupDepth == 0) {
             groupRoot = root
@@ -253,12 +366,16 @@ public class PieceTableTextModel <: EditableTextModel {
         groupDepth++
     }
 
+    /** 结束一层撤销分组；最外层结束时提交分组。 */
     public func endUndoGroup(): Unit {
         if (groupDepth == 0) { return }
         groupDepth--
         if (groupDepth == 0) { sealGroup() }
     }
 
+    /** 撤销最近编辑或分组，并结束打开的分组。
+     * @return 撤销成功时为 true
+     */
     public func undo(): Bool {
         sealGroup()
         if (undoRoots.isEmpty()) { return false }
@@ -268,6 +385,9 @@ public class PieceTableTextModel <: EditableTextModel {
         true
     }
 
+    /** 重做最近撤销的编辑或分组，并结束打开的分组。
+     * @return 重做成功时为 true
+     */
     public func redo(): Bool {
         sealGroup()
         if (redoRoots.isEmpty()) { return false }
@@ -277,6 +397,7 @@ public class PieceTableTextModel <: EditableTextModel {
         true
     }
 
+    /** 清除撤销和重做历史。 */
     public func clearHistory(): Unit {
         undoRoots.clear()
         redoRoots.clear()
