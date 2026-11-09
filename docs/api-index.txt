@@ -2637,28 +2637,28 @@ packages/core/src/widgets.cj:1325:public func render(area: Rect, buffer: Buffer)
 packages/core/src/widgets.cj:1364:public class Input <: Widget {
 packages/core/src/widgets.cj:1367:public var value: String
 packages/core/src/widgets.cj:1370:public var cursor: Int64
-packages/core/src/widgets.cj:1386:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: ?Style = None, showBoundary!: Bool = true )
-packages/core/src/widgets.cj:1405:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/widgets.cj:1419:public func paste(text: String): Unit
-packages/core/src/widgets.cj:1427:public func handle(key: KeyEvent): Bool
-packages/core/src/widgets.cj:1458:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
-packages/core/src/widgets.cj:1460:public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects
-packages/core/src/widgets.cj:1475:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/widgets.cj:1477:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
-packages/core/src/widgets.cj:1491:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:1564:public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position
-packages/core/src/widgets.cj:1571:public func cursorPosition(area: Rect): Position
-packages/core/src/widgets.cj:1573:public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position
-packages/core/src/widgets.cj:1590:public func setValue(value: String, cursor!: Int64 = -1): Unit
-packages/core/src/widgets.cj:1596:public func clear(): Unit
-packages/core/src/widgets.cj:1602:public func moveToStart(): Unit
-packages/core/src/widgets.cj:1607:public func moveToEnd(): Unit
-packages/core/src/widgets.cj:1659:public class FileDialog <: Widget {
-packages/core/src/widgets.cj:1660:public let picker: FilePicker
-packages/core/src/widgets.cj:1662:public init(path!: String = ".", extension!: String = "", title!: String = "Files")
-packages/core/src/widgets.cj:1666:public func selectedPath(): ?String
-packages/core/src/widgets.cj:1667:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/widgets.cj:1668:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:1393:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: ?Style = None, showBoundary!: Bool = true )
+packages/core/src/widgets.cj:1416:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/widgets.cj:1431:public func paste(text: String): Unit
+packages/core/src/widgets.cj:1441:public func handle(key: KeyEvent): Bool
+packages/core/src/widgets.cj:1477:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+packages/core/src/widgets.cj:1485:public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects
+packages/core/src/widgets.cj:1504:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:1512:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
+packages/core/src/widgets.cj:1530:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:1608:public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position
+packages/core/src/widgets.cj:1617:public func cursorPosition(area: Rect): Position
+packages/core/src/widgets.cj:1624:public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position
+packages/core/src/widgets.cj:1645:public func setValue(value: String, cursor!: Int64 = -1): Unit
+packages/core/src/widgets.cj:1652:public func clear(): Unit
+packages/core/src/widgets.cj:1659:public func moveToStart(): Unit
+packages/core/src/widgets.cj:1665:public func moveToEnd(): Unit
+packages/core/src/widgets.cj:1718:public class FileDialog <: Widget {
+packages/core/src/widgets.cj:1720:public let picker: FilePicker
+packages/core/src/widgets.cj:1727:public init(path!: String = ".", extension!: String = "", title!: String = "Files")
+packages/core/src/widgets.cj:1734:public func selectedPath(): ?String
+packages/core/src/widgets.cj:1740:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/widgets.cj:1745:public func render(area: Rect, buffer: Buffer): Unit
 packages/diff/src/diff.cj:7:public enum DiffLineKind {
 packages/diff/src/diff.cj:9:Context
 packages/diff/src/diff.cj:11:Add

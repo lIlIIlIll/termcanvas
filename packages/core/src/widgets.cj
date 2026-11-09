@@ -1365,7 +1365,7 @@ public class Input <: Widget {
     /** 输入控件当前保存的文本内容。
      */
     public var value: String
-    /** 当前光标在输入文本中的偏移量；通过构造器设置时会调整到字符边界。
+    /** 当前光标在输入文本中的 UTF-8 字节偏移；通过构造器设置时会调整到字符边界。
      */
     public var cursor: Int64
     private var viewportOffset: Int64 = 0
@@ -1382,6 +1382,13 @@ public class Input <: Widget {
     private var renderedTheme: ?Theme = None
 
     /** 建立输入控件并保存文本、边框及显示样式；初始光标位置会调整到文本的字符边界。
+     * @param value 初始文本
+     * @param cursor 初始 UTF-8 字节光标偏移
+     * @param block 可选外围区块
+     * @param style 文本样式
+     * @param placeholder 空文本时显示的占位文字
+     * @param placeholderStyle 可选占位样式
+     * @param showBoundary 无区块时是否绘制输入边界
      */
     public init(
         value!: String = "",
@@ -1401,6 +1408,10 @@ public class Input <: Widget {
         this.showBoundary = showBoundary
     }
     /** 设置聚焦、禁用或错误状态及其语义主题；状态优先级为禁用、错误、聚焦，全部关闭时为普通状态。
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param error 是否为错误状态
+     * @param theme 可选语义主题
      */
     public func setVisualState(
         focused!: Bool = false,
@@ -1415,6 +1426,7 @@ public class Input <: Widget {
     }
 
     /** 在当前光标处插入文本；非空文本插入前会将光标限制到文本范围及 UTF-8 字符边界；禁用状态或空文本时不改变文本和光标。
+     * @param text 待插入文本
      */
     public func paste(text: String): Unit {
         if (disabled || text.isEmpty()) { return }
@@ -1423,6 +1435,8 @@ public class Input <: Widget {
     }
 
     /** 按键事件处理字符输入、退格、向前删除及光标移动等操作；已展示的这些按键分支返回 true。
+     * @param key 输入按键
+     * @return 按键被处理时为 true；禁用时为 false
      */
     public func handle(key: KeyEvent): Bool {
         if (disabled) { return false }
@@ -1455,8 +1469,19 @@ public class Input <: Widget {
         }
     }
 
+    /** 处理按键并计算脏区域。
+     * @param key 输入按键
+     * @param area 输入组件区域
+     * @return 处理时返回脏区域，否则返回 None
+     */
     public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects { handleWithDirty(key, area, layoutTheme: None) }
 
+    /** 处理按键并按布局主题计算内容行的脏区域。
+     * @param key 输入按键
+     * @param area 输入组件区域
+     * @param layoutTheme 可选布局主题
+     * @return 处理时返回脏区域，否则返回 None
+     */
     public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects {
         let beforeViewport = viewportOffset
         let beforeEmpty = value.isEmpty()
@@ -1471,9 +1496,19 @@ public class Input <: Widget {
         Some(dirty)
     }
 
-    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    /** 使用已知主题处理鼠标定位。
+     * @param mouse 鼠标事件
+     * @param area 输入组件区域
+     * @return 更新光标时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
 
+    /** 按布局主题计算内容区域并处理鼠标定位；显式主题优先。
+     * @param mouse 鼠标事件
+     * @param area 输入组件区域
+     * @param layoutTheme 可选布局主题
+     * @return 更新光标时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
         if (disabled) { return false }
         let outer = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
@@ -1488,6 +1523,10 @@ public class Input <: Widget {
         }
     }
 
+    /** 在区域内绘制输入、占位文字及可选边界。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -1560,16 +1599,28 @@ public class Input <: Widget {
         }
     }
 
-    /** 使用指定宽度策略计算光标位置，也将其用于后续的鼠标命中及视口调整。 */
+    /** 使用指定宽度策略计算光标位置，也将其用于后续的鼠标命中及视口调整。
+     * @param area 输入组件区域
+     * @param options 文本宽度策略
+     * @param layoutTheme 可选布局主题
+     * @return 屏幕单元格位置
+     */
     public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position {
         textWidthOptionsValue = options
         cursorPosition(area, layoutTheme: layoutTheme)
     }
 
-    /** 按内容区域宽度调整文本视口，并返回光标在该区域首行的显示位置；有外围区块时使用其内部区域。绘制前可用 layoutTheme 指定应用主题。
+    /** 按内容区域宽度调整文本视口，并返回光标在该区域首行的显示位置。
+     * @param area 输入组件区域
+     * @return 屏幕单元格位置
      */
     public func cursorPosition(area: Rect): Position { cursorPosition(area, layoutTheme: None) }
 
+    /** 按可选布局主题计算内容区并返回光标显示位置。
+     * @param area 输入组件区域
+     * @param layoutTheme 可选布局主题
+     * @return 屏幕单元格位置
+     */
     public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position {
         var target = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         let outer = target
@@ -1587,23 +1638,30 @@ public class Input <: Widget {
         }
     }
 
+    /** 替换文本并重置视口；负光标偏移表示文本末尾。
+     * @param value 新文本
+     * @param cursor UTF-8 字节光标偏移
+     */
     public func setValue(value: String, cursor!: Int64 = -1): Unit {
         this.value = value
         this.cursor = if (cursor < 0) { value.size } else { clampToRuneBoundary(value, cursor) }
         viewportOffset = 0
     }
 
+    /** 清空文本并重置光标和视口。 */
     public func clear(): Unit {
         value = ""
         cursor = 0
         viewportOffset = 0
     }
 
+    /** 将光标和视口移到文本开头。 */
     public func moveToStart(): Unit {
         cursor = 0
         viewportOffset = 0
     }
 
+    /** 将光标移到文本末尾。 */
     public func moveToEnd(): Unit {
         cursor = value.size
     }
@@ -1656,15 +1714,34 @@ func addListRowDirty(dirty: DirtyRects, area: Rect, selected: ?Int64, offset: In
     }
 }
 
+/** 使用文件选择器并绘制外围标题的对话框组件。 */
 public class FileDialog <: Widget {
+    /** 对话框使用的文件选择器。 */
     public let picker: FilePicker
     private let title: String
+    /** 创建文件对话框。
+     * @param path 初始目录路径
+     * @param extension 文件扩展名过滤条件
+     * @param title 区块标题
+     */
     public init(path!: String = ".", extension!: String = "", title!: String = "Files") {
         picker = FilePicker(path: path, extension: extension)
         this.title = title
     }
+    /** 获取文件选择器当前路径。
+     * @return 存在选择时返回路径，否则返回 None
+     */
     public func selectedPath(): ?String { picker.selectedPath() }
+    /** 将按键交给文件选择器。
+     * @param key 输入按键
+     * @param viewportHeight 可见行数
+     * @return 按键被处理时为 true
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool { picker.handle(key, viewportHeight) }
+    /** 绘制文件选择器和外围区块。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         picker.render(area, buffer)
         Block(title: title).render(area, buffer)

@@ -5225,6 +5225,170 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "core-input-and-file-dialog",
+      "source": "docs/api-examples/input-and-file-dialog.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input",
+          "signature": "public class Input <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.value",
+          "signature": "public var value: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.cursor",
+          "signature": "public var cursor: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.init",
+          "signature": "public init( value!: String = \"\", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = \"\", placeholderStyle!: ?Style = None, showBoundary!: Bool = true )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.setVisualState",
+          "signature": "public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.paste",
+          "signature": "public func paste(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.handleWithDirty",
+          "signature": "public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.handleWithDirty",
+          "signature": "public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.cursorPosition",
+          "signature": "public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.cursorPosition",
+          "signature": "public func cursorPosition(area: Rect): Position"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.cursorPosition",
+          "signature": "public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.setValue",
+          "signature": "public func setValue(value: String, cursor!: Int64 = -1): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.clear",
+          "signature": "public func clear(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.moveToStart",
+          "signature": "public func moveToStart(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Input.moveToEnd",
+          "signature": "public func moveToEnd(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "FileDialog",
+          "signature": "public class FileDialog <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "FileDialog.picker",
+          "signature": "public let picker: FilePicker"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "FileDialog.init",
+          "signature": "public init(path!: String = \".\", extension!: String = \"\", title!: String = \"Files\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "FileDialog.selectedPath",
+          "signature": "public func selectedPath(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "FileDialog.handle",
+          "signature": "public func handle(key: KeyEvent, viewportHeight: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "FileDialog.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

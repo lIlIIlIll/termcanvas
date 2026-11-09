@@ -47968,7 +47968,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1386,
+      "line": 1393,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -47986,7 +47986,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1405,
+      "line": 1416,
       "level": "member",
       "kind": "func",
       "symbol": "setVisualState",
@@ -48004,7 +48004,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1419,
+      "line": 1431,
       "level": "member",
       "kind": "func",
       "symbol": "paste",
@@ -48022,7 +48022,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1427,
+      "line": 1441,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -48040,7 +48040,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1458,
+      "line": 1477,
       "level": "member",
       "kind": "func",
       "symbol": "handleWithDirty",
@@ -48058,7 +48058,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1460,
+      "line": 1485,
       "level": "member",
       "kind": "func",
       "symbol": "handleWithDirty",
@@ -48076,7 +48076,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1475,
+      "line": 1504,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -48094,7 +48094,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1477,
+      "line": 1512,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -48112,7 +48112,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1491,
+      "line": 1530,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -48130,7 +48130,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1564,
+      "line": 1608,
       "level": "member",
       "kind": "func",
       "symbol": "cursorPosition",
@@ -48148,7 +48148,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1571,
+      "line": 1617,
       "level": "member",
       "kind": "func",
       "symbol": "cursorPosition",
@@ -48166,7 +48166,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1573,
+      "line": 1624,
       "level": "member",
       "kind": "func",
       "symbol": "cursorPosition",
@@ -48184,7 +48184,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1590,
+      "line": 1645,
       "level": "member",
       "kind": "func",
       "symbol": "setValue",
@@ -48202,7 +48202,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1596,
+      "line": 1652,
       "level": "member",
       "kind": "func",
       "symbol": "clear",
@@ -48220,7 +48220,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1602,
+      "line": 1659,
       "level": "member",
       "kind": "func",
       "symbol": "moveToStart",
@@ -48238,7 +48238,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1607,
+      "line": 1665,
       "level": "member",
       "kind": "func",
       "symbol": "moveToEnd",
@@ -48256,7 +48256,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1659,
+      "line": 1718,
       "level": "top_level",
       "kind": "class",
       "symbol": "FileDialog",
@@ -48274,7 +48274,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1660,
+      "line": 1720,
       "level": "member",
       "kind": "let",
       "symbol": "picker",
@@ -48292,7 +48292,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1662,
+      "line": 1727,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -48310,7 +48310,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1666,
+      "line": 1734,
       "level": "member",
       "kind": "func",
       "symbol": "selectedPath",
@@ -48328,7 +48328,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1667,
+      "line": 1740,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -48346,7 +48346,7 @@
     {
       "package": "core",
       "path": "packages/core/src/widgets.cj",
-      "line": 1668,
+      "line": 1745,
       "level": "member",
       "kind": "func",
       "symbol": "render",
