@@ -7985,6 +7985,189 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "markdown",
+      "source": "docs/api-examples/markdown.cj",
+      "dependencies": [
+        "core",
+        "markdown_adapter"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "documentThemeFromTheme",
+          "signature": "public func documentThemeFromTheme(theme: Theme): DocumentTheme"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "markdownDocument",
+          "signature": "public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "markdownAstToDocument",
+          "signature": "public func markdownAstToDocument( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "MarkdownPresentation",
+          "signature": "public class MarkdownPresentation {"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "MarkdownPresentation.document",
+          "signature": "public let document: Document"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "MarkdownPresentation.decorations",
+          "signature": "public let decorations: Array<TextDecoration>"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "markdownAstToPresentation",
+          "signature": "public func markdownAstToPresentation( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None ): MarkdownPresentation"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "OutlineNode",
+          "signature": "public class OutlineNode {"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "OutlineNode.level",
+          "signature": "public let level: Int64"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "OutlineNode.title",
+          "signature": "public let title: String"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "OutlineNode.sourceOffset",
+          "signature": "public let sourceOffset: Int64"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "OutlineNode.children",
+          "signature": "public let children: Array<OutlineNode>"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "OutlineNode.init",
+          "signature": "public init(level: Int64, title: String, sourceOffset: Int64, children!: Array<OutlineNode> = [])"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "MarkdownPreviewIndex",
+          "signature": "public class MarkdownPreviewIndex {"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "MarkdownPreviewIndex.init",
+          "signature": "public init(sourceOffsets: Array<Int64>)"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "MarkdownPreviewIndex.renderedLineCount",
+          "signature": "public func renderedLineCount(): Int64"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "MarkdownPreviewIndex.sourceOffsetForRenderedLine",
+          "signature": "public func sourceOffsetForRenderedLine(line: Int64): ?Int64"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "MarkdownPreviewIndex.renderedLineForSourceOffset",
+          "signature": "public func renderedLineForSourceOffset(offset: Int64): Int64"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "markdownOutline",
+          "signature": "public func markdownOutline(result: ParseResult): Array<OutlineNode>"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/markdown.cj",
+          "symbol": "markdownPreviewIndex",
+          "signature": "public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/syntax_config.cj",
+          "symbol": "SyntaxHighlightConfig",
+          "signature": "public class SyntaxHighlightConfig {"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/syntax_config.cj",
+          "symbol": "parseSyntaxHighlightConfig",
+          "signature": "public func parseSyntaxHighlightConfig(text: String): SyntaxHighlightConfig"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
+          "symbol": "ThemedMarkdownView",
+          "signature": "public class ThemedMarkdownView <: Widget {"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
+          "symbol": "ThemedMarkdownView.init",
+          "signature": "public init(text: String, theme!: ?DocumentTheme = None, preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None, block!: ?Block = None, state!: ?DocumentViewState = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], cacheLayout!: Bool = false)"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
+          "symbol": "ThemedMarkdownView.setText",
+          "signature": "public func setText(text: String): Unit"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
+          "symbol": "ThemedMarkdownView.handleKey",
+          "signature": "public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
+          "symbol": "ThemedMarkdownView.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64"
+        },
+        {
+          "package": "markdown_adapter",
+          "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
+          "symbol": "ThemedMarkdownView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

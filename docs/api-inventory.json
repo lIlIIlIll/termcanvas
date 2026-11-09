@@ -51469,7 +51469,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 9,
+      "line": 11,
       "level": "top_level",
       "kind": "func",
       "symbol": "documentThemeFromTheme",
@@ -51487,7 +51487,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 21,
+      "line": 29,
       "level": "top_level",
       "kind": "func",
       "symbol": "markdownDocument",
@@ -51505,7 +51505,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 30,
+      "line": 44,
       "level": "top_level",
       "kind": "func",
       "symbol": "markdownAstToDocument",
@@ -51523,7 +51523,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 39,
+      "line": 54,
       "level": "top_level",
       "kind": "class",
       "symbol": "MarkdownPresentation",
@@ -51541,7 +51541,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 40,
+      "line": 56,
       "level": "member",
       "kind": "let",
       "symbol": "document",
@@ -51559,7 +51559,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 41,
+      "line": 58,
       "level": "member",
       "kind": "let",
       "symbol": "decorations",
@@ -51577,7 +51577,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 49,
+      "line": 73,
       "level": "top_level",
       "kind": "func",
       "symbol": "markdownAstToPresentation",
@@ -51595,7 +51595,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 86,
+      "line": 111,
       "level": "top_level",
       "kind": "class",
       "symbol": "OutlineNode",
@@ -51613,7 +51613,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 87,
+      "line": 113,
       "level": "member",
       "kind": "let",
       "symbol": "level",
@@ -51631,7 +51631,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 88,
+      "line": 115,
       "level": "member",
       "kind": "let",
       "symbol": "title",
@@ -51649,7 +51649,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 89,
+      "line": 117,
       "level": "member",
       "kind": "let",
       "symbol": "sourceOffset",
@@ -51667,7 +51667,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 90,
+      "line": 119,
       "level": "member",
       "kind": "let",
       "symbol": "children",
@@ -51685,7 +51685,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 92,
+      "line": 127,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -51703,7 +51703,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 100,
+      "line": 136,
       "level": "top_level",
       "kind": "class",
       "symbol": "MarkdownPreviewIndex",
@@ -51721,7 +51721,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 103,
+      "line": 142,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -51739,7 +51739,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 107,
+      "line": 149,
       "level": "member",
       "kind": "func",
       "symbol": "renderedLineCount",
@@ -51757,7 +51757,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 111,
+      "line": 157,
       "level": "member",
       "kind": "func",
       "symbol": "sourceOffsetForRenderedLine",
@@ -51775,7 +51775,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 118,
+      "line": 168,
       "level": "member",
       "kind": "func",
       "symbol": "renderedLineForSourceOffset",
@@ -51793,7 +51793,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 129,
+      "line": 183,
       "level": "top_level",
       "kind": "func",
       "symbol": "markdownOutline",
@@ -51811,7 +51811,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/markdown.cj",
-      "line": 135,
+      "line": 194,
       "level": "top_level",
       "kind": "func",
       "symbol": "markdownPreviewIndex",
@@ -51829,7 +51829,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/syntax_config.cj",
-      "line": 64,
+      "line": 65,
       "level": "top_level",
       "kind": "class",
       "symbol": "SyntaxHighlightConfig",
@@ -51847,7 +51847,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/syntax_config.cj",
-      "line": 198,
+      "line": 203,
       "level": "top_level",
       "kind": "func",
       "symbol": "parseSyntaxHighlightConfig",
@@ -51883,7 +51883,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
-      "line": 27,
+      "line": 38,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -51901,7 +51901,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
-      "line": 45,
+      "line": 58,
       "level": "member",
       "kind": "func",
       "symbol": "setText",
@@ -51919,7 +51919,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
-      "line": 72,
+      "line": 90,
       "level": "member",
       "kind": "func",
       "symbol": "handleKey",
@@ -51937,7 +51937,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
-      "line": 78,
+      "line": 100,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -51955,7 +51955,7 @@
     {
       "package": "markdown_adapter",
       "path": "packages/markdown_adapter/src/themed_markdown_view.cj",
-      "line": 84,
+      "line": 109,
       "level": "member",
       "kind": "func",
       "symbol": "render",

@@ -11,6 +11,7 @@ import platform
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 from api_contract import CLASSIFICATION, ROOT, load_json, production_files
 from cjdoc_examples import load_examples
@@ -44,6 +45,14 @@ def run_scenario(scenario: dict, sdk: Path, env: dict[str, str], packages: set[s
                 continue
             path = dependency_path(ROOT / "packages" / package, app, "relative")
             text += f'\n  {json.dumps(package)} = {{ path = {json.dumps(path)}, output-type = "static" }}\n'
+        if "markdown_adapter" in dependencies:
+            adapter = tomllib.loads((ROOT / "packages/markdown_adapter/cjpm.toml").read_text(encoding="utf-8"))
+            markdown = adapter.get("dependencies", {}).get("markdown")
+            if not isinstance(markdown, dict) or set(markdown) != {"git", "tag", "output-type"} or not all(
+                    isinstance(value, str) and value for value in markdown.values()):
+                raise ValueError("unsupported markdown adapter dependency")
+            fields = ", ".join(f"{json.dumps(key)} = {json.dumps(value)}" for key, value in markdown.items())
+            text += f'\n  "markdown" = {{ {fields} }}\n'
         manifest.write_text(text, encoding="utf-8")
         (app / "src/main.cj").write_bytes(source.read_bytes())
         build = work / "build"

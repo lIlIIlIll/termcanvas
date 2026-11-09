@@ -5,6 +5,8 @@ import core.{Document, DocumentLine, DocumentLineKind, DocumentTheme, DocumentVi
 import std.collection.*
 
 /** 以应用的语义主题构建文档主题；代码语法高亮的独立配色仍由语法配置决定。
+ * @param theme 应用主题
+ * @return 转换后的文档主题
  */
 public func documentThemeFromTheme(theme: Theme): DocumentTheme {
     let emphasis = StyleOverride(italic: Some(true)).apply(theme.normal)
@@ -18,6 +20,12 @@ public func documentThemeFromTheme(theme: Theme): DocumentTheme {
         html: theme.secondary, strikethrough: theme.secondary, tableHeader: theme.heading)
 }
 
+/** 解析 Markdown 文本并转换为文档。
+ * @param text Markdown 源文本
+ * @param theme 文档主题
+ * @param preserveSoftBreaks 是否将软换行保留为行分隔
+ * @return 转换后的文档
+ */
 public func markdownDocument(
     text: String,
     theme!: DocumentTheme = DocumentTheme(),
@@ -27,6 +35,12 @@ public func markdownDocument(
         preserveSoftBreaks: preserveSoftBreaks)
 }
 
+/** 将已解析的 Markdown 转换为文档。
+ * @param result Markdown 解析结果
+ * @param theme 文档主题
+ * @param preserveSoftBreaks 是否保留软换行
+ * @return 转换后的文档
+ */
 public func markdownAstToDocument(
     result: ParseResult,
     theme!: DocumentTheme = DocumentTheme(),
@@ -36,8 +50,11 @@ public func markdownAstToDocument(
     convertMarkdown(result, theme, preserveSoftBreaks, false, syntax).document
 }
 
+/** 保存转换后的文档及源文本装饰。 */
 public class MarkdownPresentation {
+    /** 转换后的文档。 */
     public let document: Document
+    /** 对应源文本的装饰，包含代码高亮信息。 */
     public let decorations: Array<TextDecoration>
 
     init(document: Document, decorations: Array<TextDecoration>) {
@@ -46,6 +63,13 @@ public class MarkdownPresentation {
     }
 }
 
+/** 转换 Markdown 并收集可用于源文本编辑器的装饰。
+ * @param result Markdown 解析结果
+ * @param theme 文档主题
+ * @param preserveSoftBreaks 是否保留软换行
+ * @param syntax 可选语法高亮配置
+ * @return 文档与源文本装饰
+ */
 public func markdownAstToPresentation(
     result: ParseResult,
     theme!: DocumentTheme = DocumentTheme(),
@@ -83,12 +107,23 @@ func convertMarkdown(result: ParseResult, theme: DocumentTheme, preserveSoftBrea
     MarkdownPresentation(Document(lines.toArray()), context.decorations())
 }
 
+/** Markdown 标题大纲节点。 */
 public class OutlineNode {
+    /** 标题级别。 */
     public let level: Int64
+    /** 标题的纯文本内容。 */
     public let title: String
+    /** 标题在源文本中的字节偏移。 */
     public let sourceOffset: Int64
+    /** 下级标题节点。 */
     public let children: Array<OutlineNode>
 
+    /** 创建大纲节点。
+     * @param level 标题级别
+     * @param title 标题文本
+     * @param sourceOffset 源字节偏移，负值按零处理
+     * @param children 下级标题
+     */
     public init(level: Int64, title: String, sourceOffset: Int64, children!: Array<OutlineNode> = []) {
         this.level = level
         this.title = title
@@ -97,17 +132,28 @@ public class OutlineNode {
     }
 }
 
+/** 保存渲染行与源字节偏移之间的映射。 */
 public class MarkdownPreviewIndex {
     private let sourceOffsets: Array<Int64>
 
+    /** 根据各渲染行的源偏移创建索引。
+     * @param sourceOffsets 各渲染行的源字节偏移
+     */
     public init(sourceOffsets: Array<Int64>) {
         this.sourceOffsets = sourceOffsets
     }
 
+    /** 获取已索引的渲染行数。
+     * @return 渲染行数
+     */
     public func renderedLineCount(): Int64 {
         sourceOffsets.size
     }
 
+    /** 查询渲染行对应的源偏移。
+     * @param line 渲染行索引
+     * @return 源字节偏移；索引无效时为 None
+     */
     public func sourceOffsetForRenderedLine(line: Int64): ?Int64 {
         if (line < 0 || line >= sourceOffsets.size) {
             return None
@@ -115,6 +161,10 @@ public class MarkdownPreviewIndex {
         Some(sourceOffsets[line])
     }
 
+    /** 查找源偏移之前最后一个匹配的渲染行。
+     * @param offset 源字节偏移
+     * @return 最后一个偏移不大于输入值的行索引；无匹配时为零
+     */
     public func renderedLineForSourceOffset(offset: Int64): Int64 {
         var best: Int64 = 0
         for (i in 0..sourceOffsets.size) {
@@ -126,12 +176,21 @@ public class MarkdownPreviewIndex {
     }
 }
 
+/** 从解析结果提取嵌套标题大纲。
+ * @param result Markdown 解析结果
+ * @return 大纲根节点
+ */
 public func markdownOutline(result: ParseResult): Array<OutlineNode> {
     let flat = ArrayList<OutlineNode>()
     collectOutline(result.document.root(), flat)
     nestOutline(flat.toArray())
 }
 
+/** 为指定宽度的文档生成预览行索引。
+ * @param document 转换后的文档
+ * @param width 预览宽度
+ * @return 行与源偏移的索引
+ */
 public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex {
     MarkdownPreviewIndex(DocumentView(document).sourceOffsetsForRenderedLines(width))
 }

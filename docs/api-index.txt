@@ -2831,34 +2831,34 @@ packages/game/src/game.cj:653:public func findAny(symbols: Array<String>): Array
 packages/game/src/game.cj:666:public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
 packages/game/src/game.cj:683:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style): Unit
 packages/game/src/game.cj:687:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit
-packages/markdown_adapter/src/markdown.cj:9:public func documentThemeFromTheme(theme: Theme): DocumentTheme
-packages/markdown_adapter/src/markdown.cj:21:public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-packages/markdown_adapter/src/markdown.cj:30:public func markdownAstToDocument( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
-packages/markdown_adapter/src/markdown.cj:39:public class MarkdownPresentation {
-packages/markdown_adapter/src/markdown.cj:40:public let document: Document
-packages/markdown_adapter/src/markdown.cj:41:public let decorations: Array<TextDecoration>
-packages/markdown_adapter/src/markdown.cj:49:public func markdownAstToPresentation( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None ): MarkdownPresentation
-packages/markdown_adapter/src/markdown.cj:86:public class OutlineNode {
-packages/markdown_adapter/src/markdown.cj:87:public let level: Int64
-packages/markdown_adapter/src/markdown.cj:88:public let title: String
-packages/markdown_adapter/src/markdown.cj:89:public let sourceOffset: Int64
-packages/markdown_adapter/src/markdown.cj:90:public let children: Array<OutlineNode>
-packages/markdown_adapter/src/markdown.cj:92:public init(level: Int64, title: String, sourceOffset: Int64, children!: Array<OutlineNode> = [])
-packages/markdown_adapter/src/markdown.cj:100:public class MarkdownPreviewIndex {
-packages/markdown_adapter/src/markdown.cj:103:public init(sourceOffsets: Array<Int64>)
-packages/markdown_adapter/src/markdown.cj:107:public func renderedLineCount(): Int64
-packages/markdown_adapter/src/markdown.cj:111:public func sourceOffsetForRenderedLine(line: Int64): ?Int64
-packages/markdown_adapter/src/markdown.cj:118:public func renderedLineForSourceOffset(offset: Int64): Int64
-packages/markdown_adapter/src/markdown.cj:129:public func markdownOutline(result: ParseResult): Array<OutlineNode>
-packages/markdown_adapter/src/markdown.cj:135:public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex
-packages/markdown_adapter/src/syntax_config.cj:64:public class SyntaxHighlightConfig {
-packages/markdown_adapter/src/syntax_config.cj:198:public func parseSyntaxHighlightConfig(text: String): SyntaxHighlightConfig
+packages/markdown_adapter/src/markdown.cj:11:public func documentThemeFromTheme(theme: Theme): DocumentTheme
+packages/markdown_adapter/src/markdown.cj:29:public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
+packages/markdown_adapter/src/markdown.cj:44:public func markdownAstToDocument( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
+packages/markdown_adapter/src/markdown.cj:54:public class MarkdownPresentation {
+packages/markdown_adapter/src/markdown.cj:56:public let document: Document
+packages/markdown_adapter/src/markdown.cj:58:public let decorations: Array<TextDecoration>
+packages/markdown_adapter/src/markdown.cj:73:public func markdownAstToPresentation( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None ): MarkdownPresentation
+packages/markdown_adapter/src/markdown.cj:111:public class OutlineNode {
+packages/markdown_adapter/src/markdown.cj:113:public let level: Int64
+packages/markdown_adapter/src/markdown.cj:115:public let title: String
+packages/markdown_adapter/src/markdown.cj:117:public let sourceOffset: Int64
+packages/markdown_adapter/src/markdown.cj:119:public let children: Array<OutlineNode>
+packages/markdown_adapter/src/markdown.cj:127:public init(level: Int64, title: String, sourceOffset: Int64, children!: Array<OutlineNode> = [])
+packages/markdown_adapter/src/markdown.cj:136:public class MarkdownPreviewIndex {
+packages/markdown_adapter/src/markdown.cj:142:public init(sourceOffsets: Array<Int64>)
+packages/markdown_adapter/src/markdown.cj:149:public func renderedLineCount(): Int64
+packages/markdown_adapter/src/markdown.cj:157:public func sourceOffsetForRenderedLine(line: Int64): ?Int64
+packages/markdown_adapter/src/markdown.cj:168:public func renderedLineForSourceOffset(offset: Int64): Int64
+packages/markdown_adapter/src/markdown.cj:183:public func markdownOutline(result: ParseResult): Array<OutlineNode>
+packages/markdown_adapter/src/markdown.cj:194:public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex
+packages/markdown_adapter/src/syntax_config.cj:65:public class SyntaxHighlightConfig {
+packages/markdown_adapter/src/syntax_config.cj:203:public func parseSyntaxHighlightConfig(text: String): SyntaxHighlightConfig
 packages/markdown_adapter/src/themed_markdown_view.cj:11:public class ThemedMarkdownView <: Widget {
-packages/markdown_adapter/src/themed_markdown_view.cj:27:public init(text: String, theme!: ?DocumentTheme = None, preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None, block!: ?Block = None, state!: ?DocumentViewState = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], cacheLayout!: Bool = false)
-packages/markdown_adapter/src/themed_markdown_view.cj:45:public func setText(text: String): Unit
-packages/markdown_adapter/src/themed_markdown_view.cj:72:public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool
-packages/markdown_adapter/src/themed_markdown_view.cj:78:public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
-packages/markdown_adapter/src/themed_markdown_view.cj:84:public func render(area: Rect, buffer: Buffer): Unit
+packages/markdown_adapter/src/themed_markdown_view.cj:38:public init(text: String, theme!: ?DocumentTheme = None, preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None, block!: ?Block = None, state!: ?DocumentViewState = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], cacheLayout!: Bool = false)
+packages/markdown_adapter/src/themed_markdown_view.cj:58:public func setText(text: String): Unit
+packages/markdown_adapter/src/themed_markdown_view.cj:90:public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool
+packages/markdown_adapter/src/themed_markdown_view.cj:100:public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
+packages/markdown_adapter/src/themed_markdown_view.cj:109:public func render(area: Rect, buffer: Buffer): Unit
 packages/media/src/media.cj:8:public class MediaDecodeRequest {
 packages/media/src/media.cj:9:public let source: MediaSource
 packages/media/src/media.cj:10:public let area: Rect

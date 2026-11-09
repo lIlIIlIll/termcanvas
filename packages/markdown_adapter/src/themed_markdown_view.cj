@@ -23,7 +23,18 @@ public class ThemedMarkdownView <: Widget {
     private var cachedTheme: ?DocumentTheme = None
     private var cachedView: ?DocumentView = None
 
-    /** 创建主题感知视图；未指定 theme 时读取每次绘制的应用主题，无应用主题时沿用 DocumentTheme 默认值。 */
+    /** 创建主题感知视图；未指定 theme 时读取每次绘制的应用主题，无应用主题时沿用 DocumentTheme 默认值。
+     * @param text Markdown 源文本
+     * @param theme 可选的显式文档主题
+     * @param preserveSoftBreaks 是否保留软换行
+     * @param syntax 可选语法高亮配置
+     * @param block 可选边框
+     * @param state 可选滚动状态
+     * @param scroll 未提供状态时的起始滚动偏移
+     * @param wrap 文本换行模式
+     * @param highlights 文档高亮范围
+     * @param cacheLayout 是否缓存布局
+     */
     public init(text: String, theme!: ?DocumentTheme = None, preserveSoftBreaks!: Bool = false,
         syntax!: ?SyntaxHighlightConfig = None, block!: ?Block = None, state!: ?DocumentViewState = None,
         scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [],
@@ -41,7 +52,9 @@ public class ThemedMarkdownView <: Widget {
         this.cacheLayout = cacheLayout
     }
 
-    /** 替换源文本；相同文本不会重新解析，视图状态对象保持不变。 */
+    /** 替换源文本；相同文本不会重新解析，视图状态对象保持不变。
+     * @param text 新的 Markdown 源文本
+     */
     public func setText(text: String): Unit {
         if (text == source) { return }
         source = text
@@ -68,19 +81,31 @@ public class ThemedMarkdownView <: Widget {
         match (explicitTheme) { case Some(value) => value; case None => DocumentTheme() }
     }
 
-    /** 使用最近一次绘制的视图处理滚动键；未传入状态对象时返回 false。 */
+    /** 使用最近一次绘制的视图处理滚动键；未传入状态对象时返回 false。
+     * @param key 按键事件
+     * @param width 视图宽度
+     * @param viewportHeight 视口高度
+     * @return 处理了滚动按键时为 true
+     */
     public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool {
         let view = match (cachedView) { case Some(value) => value; case None => viewFor(defaultTheme()) }
         view.handleKey(key, width, viewportHeight)
     }
 
-    /** 使用最近一次绘制的视图将鼠标位置映射到源偏移。 */
+    /** 使用最近一次绘制的视图将鼠标位置映射到源偏移。
+     * @param mouse 鼠标事件
+     * @param area 绘制区域
+     * @return 源字节偏移；未命中时为 None
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64 {
         let view = match (cachedView) { case Some(value) => value; case None => viewFor(defaultTheme()) }
         view.handleMouse(mouse, area)
     }
 
-    /** 使用目标缓冲区的主题和宽度策略绘制；不修改已提供的显式文档主题。 */
+    /** 使用目标缓冲区的主题和宽度策略绘制；不修改已提供的显式文档主题。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         let theme = match (explicitTheme) {
             case Some(value) => value
