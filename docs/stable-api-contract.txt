@@ -521,6 +521,7 @@ core|EventParser.flushEsc|func|public func flushEsc(): Array<Event>
 core|EventParser.flushEscAfterPolls|func|public func flushEscAfterPolls(polls: Int64): Array<Event>
 core|Button|class|public class Button <: Widget {
 core|Button.init|init|public init( label: String, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
+core|Button.setGhost|func|public func setGhost(value: Bool): Unit
 core|Button.handle|func|public func handle(key: KeyEvent): Bool
 core|Button.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 core|Button.handleMouse|func|public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool

@@ -1038,6 +1038,7 @@ packages/core/src/event.cj:public func flushEsc(): Array<Event>
 packages/core/src/event.cj:public func flushEscAfterPolls(polls: Int64): Array<Event>
 packages/core/src/form_widgets.cj:public class Button <: Widget {
 packages/core/src/form_widgets.cj:public init( label: String, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:public func setGhost(value: Bool): Unit
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool

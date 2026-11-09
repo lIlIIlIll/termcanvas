@@ -12,8 +12,9 @@ public class Button <: Widget {
     private let disabledStyle: ?Style
     private let theme: ?Theme
     private var renderedTheme: ?Theme = None
+    private var ghost: Bool = false
 
-    /** 保存按钮文字、状态和样式配置，供绘制时使用。未传入焦点或禁用样式时采用主题对应角色；无主题时使用内置样式。显式样式优先。
+    /** 保存按钮文字、状态和样式配置，供绘制时使用。主题下空样式采用凸起表面及可见边界；指定具体样式优先。无主题时保持原有外观。
      */
     public init(
         label: String,
@@ -34,6 +35,9 @@ public class Button <: Widget {
         this.disabledStyle = disabledStyle
         this.theme = theme
     }
+
+    /** 控制空样式按钮是否使用无边界的主题 normal 样式；具体样式不受影响。 */
+    public func setGhost(value: Bool): Unit { ghost = value }
 
     public func handle(key: KeyEvent): Bool {
         if (disabled) { return false }
@@ -76,7 +80,11 @@ public class Button <: Widget {
                 }
             }
         } else {
-            themedNormal(style, activeTheme)
+            if (!ghost && style == Style.default()) {
+                match (activeTheme) { case Some(value) => value.raisedSurface; case None => style }
+            } else {
+                themedNormal(style, activeTheme)
+            }
         }
         // Keep the built-in focus and disabled cues, while respecting all
         // explicitly supplied label styles.
@@ -95,8 +103,14 @@ public class Button <: Widget {
         buffer.fillRect(target, style: labelStyle.withModifier(fillModifier))
         let textWidth = if (displayWidth(label, options: buffer.textWidthOptions()) <= target.width - 2) { target.width - 2 } else { target.width }
         let text = truncate(label, textWidth, options: buffer.textWidthOptions())
-        let x = alignedX(target, displayWidth(text, options: buffer.textWidthOptions()), TextAlign.Center)
+        let textColumns = displayWidth(text, options: buffer.textWidthOptions())
+        let x = alignedX(target, textColumns, TextAlign.Center)
         let y = target.y + (target.height - 1) / 2
+        if (!ghost && style == Style.default() && activeTheme.isSome() && x > target.x && x + textColumns < target.right) {
+            let boundaryStyle = labelStyle.withModifier(fillModifier)
+            buffer.setString(x - 1, y, "[", style: boundaryStyle)
+            buffer.setString(x + textColumns, y, "]", style: boundaryStyle)
+        }
         buffer.setString(x, y, text, style: labelStyle)
     }
 }

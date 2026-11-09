@@ -14,13 +14,13 @@
     "Nested generic payload dependencies are resolved by exact top-level symbol names within the declaring package."
   ],
   "counts": {
-    "production_public_declarations": 2971,
+    "production_public_declarations": 2972,
     "production_public_top_level": 449,
     "test_source_public_declarations_excluded": 1,
     "by_stability": {
       "EXPERIMENTAL": 1090,
       "INTERNAL": 227,
-      "STABLE": 1530,
+      "STABLE": 1531,
       "TEST_ONLY": 124
     },
     "top_level_by_stability": {
@@ -18932,7 +18932,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 18,
+      "line": 19,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -18950,7 +18950,25 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 38,
+      "line": 40,
+      "level": "member",
+      "kind": "func",
+      "symbol": "setGhost",
+      "owner_symbol": "Button",
+      "qualified_symbol": "Button.setGhost",
+      "signature": "public func setGhost(value: Bool): Unit",
+      "visibility": "public",
+      "visibility_origin": "explicit",
+      "stability": "STABLE",
+      "classification_rule": "core-primitive-widgets-stable",
+      "subsystem": "widgets",
+      "architecture_owner": "core/widgets",
+      "disposition": "keep"
+    },
+    {
+      "package": "core",
+      "path": "packages/core/src/form_widgets.cj",
+      "line": 42,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -18968,7 +18986,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 44,
+      "line": 48,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -18986,7 +19004,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 46,
+      "line": 50,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -19004,7 +19022,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 53,
+      "line": 57,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -19022,7 +19040,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 104,
+      "line": 118,
       "level": "top_level",
       "kind": "class",
       "symbol": "Checkbox",
@@ -19040,7 +19058,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 105,
+      "line": 119,
       "level": "member",
       "kind": "var",
       "symbol": "checked",
@@ -19058,7 +19076,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 114,
+      "line": 128,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -19076,7 +19094,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 134,
+      "line": 148,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -19094,7 +19112,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 144,
+      "line": 158,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -19112,7 +19130,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 152,
+      "line": 166,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -19130,7 +19148,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 162,
+      "line": 176,
       "level": "top_level",
       "kind": "class",
       "symbol": "Switch",
@@ -19148,7 +19166,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 165,
+      "line": 179,
       "level": "member",
       "kind": "var",
       "symbol": "checked",
@@ -19166,7 +19184,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 176,
+      "line": 190,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -19184,7 +19202,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 198,
+      "line": 212,
       "level": "member",
       "kind": "func",
       "symbol": "setVisualState",
@@ -19202,7 +19220,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 210,
+      "line": 224,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -19220,7 +19238,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 222,
+      "line": 236,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -19238,7 +19256,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 233,
+      "line": 247,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -19256,7 +19274,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 262,
+      "line": 276,
       "level": "top_level",
       "kind": "class",
       "symbol": "RadioGroup",
@@ -19274,7 +19292,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 263,
+      "line": 277,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -19292,7 +19310,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 264,
+      "line": 278,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -19310,7 +19328,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 277,
+      "line": 291,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -19328,7 +19346,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 301,
+      "line": 315,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -19346,7 +19364,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 320,
+      "line": 334,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -19364,7 +19382,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 322,
+      "line": 336,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -19382,7 +19400,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 333,
+      "line": 347,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -19400,7 +19418,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 374,
+      "line": 388,
       "level": "top_level",
       "kind": "class",
       "symbol": "Select",
@@ -19418,7 +19436,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 378,
+      "line": 392,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -19436,7 +19454,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 379,
+      "line": 393,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -19454,7 +19472,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 386,
+      "line": 400,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -19472,7 +19490,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 400,
+      "line": 414,
       "level": "member",
       "kind": "func",
       "symbol": "selectedValue",
@@ -19490,7 +19508,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 404,
+      "line": 418,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -19508,7 +19526,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 429,
+      "line": 443,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -19526,7 +19544,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 431,
+      "line": 445,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -19544,7 +19562,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 441,
+      "line": 455,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -19562,7 +19580,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 463,
+      "line": 477,
       "level": "top_level",
       "kind": "class",
       "symbol": "Dropdown",
@@ -19580,7 +19598,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 465,
+      "line": 479,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -19598,7 +19616,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 466,
+      "line": 480,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -19616,7 +19634,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 468,
+      "line": 482,
       "level": "member",
       "kind": "var",
       "symbol": "open",
@@ -19634,7 +19652,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 479,
+      "line": 493,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -19652,7 +19670,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 497,
+      "line": 511,
       "level": "member",
       "kind": "func",
       "symbol": "setVisualState",
@@ -19670,7 +19688,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 509,
+      "line": 523,
       "level": "member",
       "kind": "func",
       "symbol": "setTransactionalSelection",
@@ -19688,7 +19706,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 523,
+      "line": 537,
       "level": "member",
       "kind": "func",
       "symbol": "cancelSelection",
@@ -19706,7 +19724,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 583,
+      "line": 597,
       "level": "member",
       "kind": "func",
       "symbol": "selectedValue",
@@ -19724,7 +19742,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 589,
+      "line": 603,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -19742,7 +19760,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 619,
+      "line": 633,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -19760,7 +19778,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 651,
+      "line": 665,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -19778,7 +19796,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 680,
+      "line": 694,
       "level": "top_level",
       "kind": "class",
       "symbol": "ColorPicker",
@@ -19796,7 +19814,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 687,
+      "line": 701,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -19814,7 +19832,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 691,
+      "line": 705,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -19832,7 +19850,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 698,
+      "line": 712,
       "level": "member",
       "kind": "func",
       "symbol": "setVisualState",
@@ -19850,7 +19868,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 710,
+      "line": 724,
       "level": "member",
       "kind": "func",
       "symbol": "selectedColor",
@@ -19868,7 +19886,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 716,
+      "line": 730,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -19886,7 +19904,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 741,
+      "line": 755,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -19904,7 +19922,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 759,
+      "line": 773,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -19922,7 +19940,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 828,
+      "line": 842,
       "level": "top_level",
       "kind": "class",
       "symbol": "MultiSelect",
@@ -19940,7 +19958,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 833,
+      "line": 847,
       "level": "member",
       "kind": "var",
       "symbol": "cursor",
@@ -19958,7 +19976,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 834,
+      "line": 848,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -19976,7 +19994,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 842,
+      "line": 856,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -19994,7 +20012,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 856,
+      "line": 870,
       "level": "member",
       "kind": "func",
       "symbol": "selectedIndices",
@@ -20012,7 +20030,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 858,
+      "line": 872,
       "level": "member",
       "kind": "func",
       "symbol": "toggle",
@@ -20030,7 +20048,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 869,
+      "line": 883,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -20048,7 +20066,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 882,
+      "line": 896,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -20066,7 +20084,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 892,
+      "line": 906,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -20084,7 +20102,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 914,
+      "line": 928,
       "level": "top_level",
       "kind": "class",
       "symbol": "DatePicker",
@@ -20102,7 +20120,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 915,
+      "line": 929,
       "level": "member",
       "kind": "var",
       "symbol": "year",
@@ -20120,7 +20138,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 916,
+      "line": 930,
       "level": "member",
       "kind": "var",
       "symbol": "month",
@@ -20138,7 +20156,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 917,
+      "line": 931,
       "level": "member",
       "kind": "var",
       "symbol": "day",
@@ -20156,7 +20174,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 923,
+      "line": 937,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -20174,7 +20192,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 941,
+      "line": 955,
       "level": "member",
       "kind": "func",
       "symbol": "setVisualState",
@@ -20192,7 +20210,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 957,
+      "line": 971,
       "level": "member",
       "kind": "func",
       "symbol": "value",
@@ -20210,7 +20228,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 961,
+      "line": 975,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -20228,7 +20246,7 @@
     {
       "package": "core",
       "path": "packages/core/src/form_widgets.cj",
-      "line": 993,
+      "line": 1007,
       "level": "member",
       "kind": "func",
       "symbol": "render",

@@ -21,6 +21,12 @@ explicit theme takes precedence over its parent's theme and the application
 theme. Controls that receive input before their first render can pass the
 known `layoutTheme` when calculating hit targets or cursor positions.
 
+A themed `Button` with an empty normal `style` now uses `Theme.raisedSurface`
+in its normal state and shows brackets around the label when space permits.
+The brackets also identify the button in monochrome. Call
+`button.setGhost(true)` to keep the previous borderless appearance. A nonempty
+normal style and unthemed buttons keep their existing appearance.
+
 `StyleOverride` distinguishes an omitted attribute from an explicit reset:
 `Some(Color.Reset)` restores the terminal default color, and `Some(false)`
 clears a modifier. `StyledWidget` applies an override to the character cells
