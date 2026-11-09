@@ -21716,7 +21716,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 5,
+      "line": 6,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -21735,7 +21735,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 6,
+      "line": 8,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -21754,7 +21754,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 7,
+      "line": 10,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -21773,7 +21773,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 14,
+      "line": 17,
       "level": "top_level",
       "kind": "interface",
       "symbol": "GlyphCapabilityProvider",
@@ -21791,7 +21791,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 15,
+      "line": 22,
       "level": "member",
       "kind": "func",
       "symbol": "probe",
@@ -21810,7 +21810,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 19,
+      "line": 26,
       "level": "top_level",
       "kind": "class",
       "symbol": "UnknownGlyphCapabilityProvider",
@@ -21828,7 +21828,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 20,
+      "line": 28,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -21846,7 +21846,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 21,
+      "line": 33,
       "level": "member",
       "kind": "func",
       "symbol": "probe",
@@ -21864,7 +21864,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 31,
+      "line": 43,
       "level": "top_level",
       "kind": "class",
       "symbol": "GlyphCapabilitySession",
@@ -21882,7 +21882,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 50,
+      "line": 66,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -21900,7 +21900,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 57,
+      "line": 75,
       "level": "member",
       "kind": "func",
       "symbol": "iconSet",
@@ -21918,7 +21918,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 68,
+      "line": 88,
       "level": "member",
       "kind": "func",
       "symbol": "detected",
@@ -21936,7 +21936,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 71,
+      "line": 94,
       "level": "member",
       "kind": "func",
       "symbol": "applyTo",
@@ -21954,7 +21954,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 74,
+      "line": 99,
       "level": "member",
       "kind": "func",
       "symbol": "setOverride",
@@ -21972,7 +21972,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 82,
+      "line": 107,
       "level": "member",
       "kind": "func",
       "symbol": "requestProbe",
@@ -21990,7 +21990,7 @@
     {
       "package": "core",
       "path": "packages/core/src/glyph_capability.cj",
-      "line": 171,
+      "line": 196,
       "level": "member",
       "kind": "func",
       "symbol": "close",

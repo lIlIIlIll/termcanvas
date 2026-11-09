@@ -4517,6 +4517,122 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "core-glyph-capability",
+      "source": "docs/api-examples/glyph-capability.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapability",
+          "signature": "public enum GlyphCapability {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapability.Unknown",
+          "signature": "Unknown"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapability.VerifiedSupported",
+          "signature": "VerifiedSupported"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapability.Unsupported",
+          "signature": "Unsupported"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapabilityProvider",
+          "signature": "public interface GlyphCapabilityProvider {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapabilityProvider.probe",
+          "signature": "func probe(budgetMillis: Int64): GlyphCapability"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "UnknownGlyphCapabilityProvider",
+          "signature": "public class UnknownGlyphCapabilityProvider <: GlyphCapabilityProvider {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "UnknownGlyphCapabilityProvider.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "UnknownGlyphCapabilityProvider.probe",
+          "signature": "public func probe(_: Int64): GlyphCapability"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapabilitySession",
+          "signature": "public class GlyphCapabilitySession {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapabilitySession.init",
+          "signature": "public init(provider!: GlyphCapabilityProvider = UnknownGlyphCapabilityProvider(), timeoutMillis!: Int64 = 150, clock!: RuntimeClock = MonotonicRuntimeClock())"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapabilitySession.iconSet",
+          "signature": "public func iconSet(): IconSet"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapabilitySession.detected",
+          "signature": "public func detected(): GlyphCapability"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapabilitySession.applyTo",
+          "signature": "public func applyTo(theme: Theme): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapabilitySession.setOverride",
+          "signature": "public func setOverride(value: ?IconSet): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapabilitySession.requestProbe",
+          "signature": "public func requestProbe(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/glyph_capability.cj",
+          "symbol": "GlyphCapabilitySession.close",
+          "signature": "public func close(): Unit"
+        }
+      ]
     }
   ]
 }

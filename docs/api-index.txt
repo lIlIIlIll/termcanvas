@@ -1191,22 +1191,22 @@ packages/core/src/geometry.cj:651:public init()
 packages/core/src/geometry.cj:658:public func get(area: Rect, compute: (Rect) -> Array<Rect>): Array<Rect>
 packages/core/src/geometry.cj:672:public func invalidate(): Unit
 packages/core/src/glyph_capability.cj:4:public enum GlyphCapability {
-packages/core/src/glyph_capability.cj:5:Unknown
-packages/core/src/glyph_capability.cj:6:VerifiedSupported
-packages/core/src/glyph_capability.cj:7:Unsupported
-packages/core/src/glyph_capability.cj:14:public interface GlyphCapabilityProvider {
-packages/core/src/glyph_capability.cj:15:func probe(budgetMillis: Int64): GlyphCapability
-packages/core/src/glyph_capability.cj:19:public class UnknownGlyphCapabilityProvider <: GlyphCapabilityProvider {
-packages/core/src/glyph_capability.cj:20:public init()
-packages/core/src/glyph_capability.cj:21:public func probe(_: Int64): GlyphCapability
-packages/core/src/glyph_capability.cj:31:public class GlyphCapabilitySession {
-packages/core/src/glyph_capability.cj:50:public init(provider!: GlyphCapabilityProvider = UnknownGlyphCapabilityProvider(), timeoutMillis!: Int64 = 150, clock!: RuntimeClock = MonotonicRuntimeClock())
-packages/core/src/glyph_capability.cj:57:public func iconSet(): IconSet
-packages/core/src/glyph_capability.cj:68:public func detected(): GlyphCapability
-packages/core/src/glyph_capability.cj:71:public func applyTo(theme: Theme): Theme
-packages/core/src/glyph_capability.cj:74:public func setOverride(value: ?IconSet): Unit
-packages/core/src/glyph_capability.cj:82:public func requestProbe(): Unit
-packages/core/src/glyph_capability.cj:171:public func close(): Unit
+packages/core/src/glyph_capability.cj:6:Unknown
+packages/core/src/glyph_capability.cj:8:VerifiedSupported
+packages/core/src/glyph_capability.cj:10:Unsupported
+packages/core/src/glyph_capability.cj:17:public interface GlyphCapabilityProvider {
+packages/core/src/glyph_capability.cj:22:func probe(budgetMillis: Int64): GlyphCapability
+packages/core/src/glyph_capability.cj:26:public class UnknownGlyphCapabilityProvider <: GlyphCapabilityProvider {
+packages/core/src/glyph_capability.cj:28:public init()
+packages/core/src/glyph_capability.cj:33:public func probe(_: Int64): GlyphCapability
+packages/core/src/glyph_capability.cj:43:public class GlyphCapabilitySession {
+packages/core/src/glyph_capability.cj:66:public init(provider!: GlyphCapabilityProvider = UnknownGlyphCapabilityProvider(), timeoutMillis!: Int64 = 150, clock!: RuntimeClock = MonotonicRuntimeClock())
+packages/core/src/glyph_capability.cj:75:public func iconSet(): IconSet
+packages/core/src/glyph_capability.cj:88:public func detected(): GlyphCapability
+packages/core/src/glyph_capability.cj:94:public func applyTo(theme: Theme): Theme
+packages/core/src/glyph_capability.cj:99:public func setOverride(value: ?IconSet): Unit
+packages/core/src/glyph_capability.cj:107:public func requestProbe(): Unit
+packages/core/src/glyph_capability.cj:196:public func close(): Unit
 packages/core/src/keymap.cj:6:public class KeyBinding {
 packages/core/src/keymap.cj:8:public let keys: Array<KeyEvent>
 packages/core/src/keymap.cj:10:public let action: String
