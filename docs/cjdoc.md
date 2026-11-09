@@ -26,6 +26,8 @@ python3 scripts/generate_cjdoc.py
 
 成功后，入口位于 `target/doc/index.html`；各包和平台的 HTML、Doc IR 以及覆盖报告位于 `target/doc/packages/`。`api-inventory.json` 包含项目的稳定性分类。站点上的 cjdoc 语言可见性与项目的稳定性分类是两个不同维度。
 
+生成器会修复 cjdoc 0.7.7 对同一声明中多个匿名参数的说明关联：只有全部匿名参数都按顺序写有 `@param _0`、`@param _1` 等标记时，才将说明填入 Doc IR 和对应 HTML 页面。修复记录保存在声明的 `termcanvasAnonymousParameterRepair` 字段及站点标记中；原始 cjdoc 覆盖报告和 agent Markdown 保持工具原样。审计会同时检查修复后的页面内容。
+
 使用 `--cjdoc` 指定可执行文件路径，使用 `--output` 指定输出位置。脚本只会替换由它创建并带有有效标记的输出目录；不受管理的已有目录会被保留。生成失败时会保留旧站点，不会将半成品替换为成功产物。
 
 开发期间可选择部分包和平台。例如：

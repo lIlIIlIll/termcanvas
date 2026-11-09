@@ -93,7 +93,7 @@ def main() -> int:
         packages = {Path(root).parts[1] for root in metadata["source_roots"]}
         inputs = production_files(metadata) + sources + [CLASSIFICATION, ROOT / "docs/api-inventory.json",
             ROOT / "scripts/api_contract.py", ROOT / "scripts/generate_cjdoc.py", ROOT / "scripts/native_sdk.py",
-            ROOT / "scripts/new_example.py", ROOT / "scripts/cjdoc_examples.py", ROOT / "scripts/audit_cjdoc.py",
+            ROOT / "scripts/new_example.py", ROOT / "scripts/cjdoc_examples.py", ROOT / "scripts/normalize_cjdoc_parameters.py", ROOT / "scripts/audit_cjdoc.py",
             ROOT / "scripts/check_cjdoc_completion.py", ROOT / "scripts/check_cjdoc_links.py",
             ROOT / "scripts/bundle_cjdoc.py", ROOT / "scripts/prepare_cjdoc_publication.py",
             ROOT / ".github/workflows/api-docs.yml", Path(__file__).resolve()] + [

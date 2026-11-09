@@ -16,6 +16,7 @@ import tempfile
 
 from api_contract import CLASSIFICATION, ROOT, load_json, production_files
 from native_sdk import sdk_environment, verify_sdk
+from normalize_cjdoc_parameters import normalize as normalize_anonymous_parameters
 from cjdoc_examples import link_examples, load_examples
 
 VERSION = "0.7.7"
@@ -125,6 +126,7 @@ def generate(cjdoc: Path, output: Path, package_names: list[str], targets: list[
     members = {Path(root).parts[1]: ROOT / Path(*Path(root).parts[:2]) for root in metadata["source_roots"]}
     inputs = all_sources + [CLASSIFICATION, ROOT / "docs/api-inventory.json",
                             ROOT / "scripts/api_contract.py", ROOT / "scripts/native_sdk.py", ROOT / "scripts/cjdoc_examples.py",
+                            ROOT / "scripts/normalize_cjdoc_parameters.py",
                             Path(__file__).resolve()] + example_sources + [
                                 member / "cjpm.toml" for member in members.values()]
     before = source_snapshot(inputs)
@@ -154,13 +156,15 @@ def generate(cjdoc: Path, output: Path, package_names: list[str], targets: list[
                 result = subprocess.run(command, env=env, check=False, capture_output=True, text=True, timeout=600)
                 if result.returncode:
                     raise GenerationError(f"cjdoc failed for {name} ({target}): exit {result.returncode}\n{result.stderr[-4000:]}")
+                normalized = normalize_anonymous_parameters(destination)
                 doc = load_json(destination / "docs.json")
                 files = {item["path"] for item in doc["files"]}
                 errors = [item for item in doc["diagnostics"] if item.get("severity") == "error"]
                 if doc.get("status") != "complete" or errors or files != expected:
                     raise GenerationError(f"incomplete source inventory for {name} ({target}); missing={sorted(expected-files)} extra={sorted(files-expected)} errors={len(errors)}")
                 coverage = load_json(destination / "coverage" / "coverage.json")
-                sites.append({"package": name, "platform": target, "symbols": coverage["metrics"]["symbols"]})
+                sites.append({"package": name, "platform": target, "symbols": coverage["metrics"]["symbols"],
+                              "anonymous_parameter_repairs": normalized})
         link_examples(built, sites, examples)
         if source_snapshot(inputs) != before:
             raise GenerationError("production inputs changed while generating documentation")

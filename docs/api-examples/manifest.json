@@ -11247,6 +11247,110 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "transcript-source",
+      "source": "docs/api-examples/transcript-source.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource",
+          "signature": "public interface VirtualTranscriptSource {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.size",
+          "signature": "func size(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.generation",
+          "signature": "func generation(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.itemId",
+          "signature": "func itemId(index: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.itemTitle",
+          "signature": "func itemTitle(_: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.itemUsesCardChrome",
+          "signature": "func itemUsesCardChrome(_: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.itemTitleForWidth",
+          "signature": "func itemTitleForWidth(index: Int64, width: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.itemFooter",
+          "signature": "func itemFooter(_: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.itemUsesCompactCardChrome",
+          "signature": "func itemUsesCompactCardChrome(_: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.revision",
+          "signature": "func revision(index: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.itemAppendOnlyText",
+          "signature": "func itemAppendOnlyText( _: Int64, _: Int64, _: String ): ?VirtualTranscriptAppendOnlyText"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.itemAppendOnlyTextWithTheme",
+          "signature": "func itemAppendOnlyTextWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): ?VirtualTranscriptAppendOnlyText"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.document",
+          "signature": "func document(index: Int64, width: Int64, themeKey: String): Document"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.documentWithTheme",
+          "signature": "func documentWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): Document"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptSource.itemCardTheme",
+          "signature": "func itemCardTheme(_: Int64): ?TranscriptCardTheme"
+        }
+      ]
     }
   ]
 }

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+import html
 import json
 from pathlib import Path
 import re
@@ -31,6 +32,28 @@ def return_documented(declaration: dict) -> bool:
     doc = declaration.get("documentation") or {}
     return any(tag.get("name") == "return" and CHINESE.search(tag.get("description") or "")
                for tag in doc.get("tags", []))
+
+
+
+def parameters_documented(declaration: dict, page: Path | None) -> bool:
+    parameters = declaration.get("parameters", [])
+    if not all(CHINESE.search(parameter.get("documentation") or "") for parameter in parameters):
+        return False
+    repair = declaration.get("termcanvasAnonymousParameterRepair")
+    if repair is None:
+        return True
+    if repair.get("generator") != "cjdoc-0.7.7" or not isinstance(repair.get("descriptions"), dict) or page is None or not page.is_file():
+        return False
+    descriptions = repair["descriptions"]
+    if set(descriptions) != {str(index) for index in range(len(parameters))}:
+        return False
+    contents = page.read_text(encoding="utf-8")
+    for index, parameter in enumerate(parameters):
+        description = descriptions[str(index)]
+        marker = (f'data-termcanvas-anonymous-index="{index}"><p>' + html.escape(description) + '</p></dd>')
+        if parameter.get("name") != "_" or parameter.get("documentation") != description or contents.count(marker) != 1:
+            return False
+    return True
 
 
 def audit(portal: Path) -> dict:
@@ -111,7 +134,8 @@ def audit(portal: Path) -> dict:
             continue
         counters["mapped"] += 1
         docs = [declaration.get("documentation") or {} for _, declaration in candidates]
-        if all(all(CHINESE.search(parameter.get("documentation") or "") for parameter in declaration.get("parameters", [])) for _, declaration in candidates):
+        if all(parameters_documented(declaration, symbol_pages.get((package, target, declaration.get("id"))))
+               for target, declaration in candidates):
             counters["parameters_documented"] += 1
         else:
             missing.append({"symbol": qualified, "path": item["path"], "line": item["line"], "reason": "missing parameter documentation"})

@@ -58,50 +58,114 @@ public struct VirtualTranscriptAppendOnlyText {
 
 // A product supplies already-themed, single-card documents. The core owns
 // viewport selection, measurement and cache invalidation only.
+/** 为虚拟对话视图提供稳定条目标识、修订号和文档内容。 */
 public interface VirtualTranscriptSource {
+    /** 获取条目数量。
+     * @return 条目数量
+     */
     func size(): Int64
     // Hosts that replace a whole snapshot while retaining item ids/revisions
     // must bump this generation so cached rows cannot cross source lifetimes.
+    /** 获取整个来源的代数；替换快照且保留条目标识时应递增。默认返回零。
+     * @return 来源代数
+     */
     func generation(): Int64 { 0 }
+    /** 获取条目的稳定标识。
+     * @param index 条目索引
+     * @return 条目标识
+     */
     func itemId(index: Int64): String
+    /** 获取条目标题；默认返回空字符串。
+     * @param _ 条目索引
+     * @return 标题文本
+     */
     func itemTitle(_: Int64): String { "" }
     // Hosts may keep ordinary conversation rows as plain transcript text
     // while giving structured events the left event rail.  The default keeps
     // the historical card behaviour for existing cjtui clients.
+    /** 判断条目是否使用卡片边饰；默认启用。
+     * @param _ 条目索引
+     * @return 使用卡片边饰时为 true
+     */
     func itemUsesCardChrome(_: Int64): Bool { true }
     // The title is measured/rendered with the live terminal width so a host
     // can preserve the useful tail of a path or command before truncation.
+    /** 为可用宽度生成标题；默认调用 itemTitle。
+     * @param index 条目索引
+     * @param width 可用宽度
+     * @return 标题文本
+     */
     func itemTitleForWidth(index: Int64, width: Int64): String {
         let _ = width
         itemTitle(index)
     }
+    /** 获取条目页脚；默认返回空字符串。
+     * @param _ 条目索引
+     * @return 页脚文本
+     */
     func itemFooter(_: Int64): String { "" }
     // A structured event with no visible body or footer may use only the
     // title rail. This avoids spending a second terminal row on an empty
     // `╰─` while preserving the normal two-ended rail for meaningful
     // summaries and expanded content.
+    /** 判断是否使用紧凑卡片边饰；默认不使用。
+     * @param _ 条目索引
+     * @return 使用紧凑边饰时为 true
+     */
     func itemUsesCompactCardChrome(_: Int64): Bool { false }
+    /** 获取条目内容修订号；内容改变时应更新。
+     * @param index 条目索引
+     * @return 修订号
+     */
     func revision(index: Int64): Int64
     // Plain append-only bodies can bypass Document/DocumentView completely.
     // Existing sources keep the historical document path through this
     // default.  appendEpoch must change whenever text is replaced rather than
     // appended.
+    /** 获取可增量排版的只追加文本；替换内容时来源需更改 appendEpoch。默认不提供。
+     * @param _0 条目索引
+     * @param _1 可用宽度
+     * @param _2 主题标识
+     * @return 追加文本快照；未提供时为 None
+     */
     func itemAppendOnlyText(
         _: Int64,
         _: Int64,
         _: String
     ): ?VirtualTranscriptAppendOnlyText { None }
-    /** 可使用当前应用主题创建追加文本；默认保留原有来源提供的样式。 */
+    /** 可使用当前应用主题创建追加文本；默认保留原有来源提供的样式。
+     * @param index 条目索引
+     * @param width 可用宽度
+     * @param themeKey 主题标识
+     * @param _ 可选应用主题
+     * @return 追加文本快照；未提供时为 None
+     */
     func itemAppendOnlyTextWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): ?VirtualTranscriptAppendOnlyText {
         itemAppendOnlyText(index, width, themeKey)
     }
+    /** 按宽度和主题标识构建条目文档。
+     * @param index 条目索引
+     * @param width 可用宽度
+     * @param themeKey 主题标识
+     * @return 条目文档
+     */
     func document(index: Int64, width: Int64, themeKey: String): Document
-    /** 可使用应用主题创建文档；默认保留原有 document 返回的已着色内容。 */
+    /** 可使用应用主题创建文档；默认保留原有 document 返回的已着色内容。
+     * @param index 条目索引
+     * @param width 可用宽度
+     * @param themeKey 主题标识
+     * @param _ 可选应用主题
+     * @return 条目文档
+     */
     func documentWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): Document {
         document(index, width, themeKey)
     }
     // Per-entry border theme; falls back to the view-wide card theme when
     // None, so hosts can color borders by card kind.
+    /** 获取条目的可选卡片主题；默认使用视图主题。
+     * @param _ 条目索引
+     * @return 条目主题，或 None
+     */
     func itemCardTheme(_: Int64): ?TranscriptCardTheme { None }
 }
 
