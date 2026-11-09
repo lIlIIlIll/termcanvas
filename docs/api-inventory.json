@@ -14453,7 +14453,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "class",
       "symbol": "RichSpan",
@@ -14471,7 +14471,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 6,
+      "line": 8,
       "level": "member",
       "kind": "let",
       "symbol": "text",
@@ -14489,7 +14489,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 7,
+      "line": 10,
       "level": "member",
       "kind": "let",
       "symbol": "style",
@@ -14507,7 +14507,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 8,
+      "line": 12,
       "level": "member",
       "kind": "let",
       "symbol": "linkUrl",
@@ -14525,7 +14525,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 9,
+      "line": 14,
       "level": "member",
       "kind": "let",
       "symbol": "sourceRange",
@@ -14543,7 +14543,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 11,
+      "line": 22,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -14561,7 +14561,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 19,
+      "line": 31,
       "level": "top_level",
       "kind": "enum",
       "symbol": "DocumentLineKind",
@@ -14579,7 +14579,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 20,
+      "line": 33,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14598,7 +14598,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 21,
+      "line": 37,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14617,7 +14617,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 22,
+      "line": 41,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14636,7 +14636,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 23,
+      "line": 43,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14655,7 +14655,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 24,
+      "line": 45,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14674,7 +14674,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 25,
+      "line": 47,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14693,7 +14693,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 26,
+      "line": 49,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14712,7 +14712,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 27,
+      "line": 51,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14731,7 +14731,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 28,
+      "line": 55,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14750,7 +14750,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 29,
+      "line": 57,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14769,7 +14769,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 30,
+      "line": 59,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14788,7 +14788,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 31,
+      "line": 61,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14807,7 +14807,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 32,
+      "line": 63,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14826,7 +14826,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 33,
+      "line": 67,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14845,7 +14845,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 34,
+      "line": 69,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -14864,7 +14864,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 37,
+      "line": 73,
       "level": "top_level",
       "kind": "class",
       "symbol": "DocumentLine",
@@ -14882,7 +14882,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 38,
+      "line": 75,
       "level": "member",
       "kind": "let",
       "symbol": "kind",
@@ -14900,7 +14900,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 39,
+      "line": 77,
       "level": "member",
       "kind": "let",
       "symbol": "spans",
@@ -14918,7 +14918,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 40,
+      "line": 79,
       "level": "member",
       "kind": "let",
       "symbol": "quoteDepth",
@@ -14936,7 +14936,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 41,
+      "line": 81,
       "level": "member",
       "kind": "let",
       "symbol": "media",
@@ -14954,7 +14954,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 42,
+      "line": 83,
       "level": "member",
       "kind": "let",
       "symbol": "mediaFit",
@@ -14972,7 +14972,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 43,
+      "line": 85,
       "level": "member",
       "kind": "let",
       "symbol": "mediaHeight",
@@ -14990,7 +14990,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 45,
+      "line": 95,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -15008,7 +15008,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 61,
+      "line": 120,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -15026,7 +15026,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 78,
+      "line": 144,
       "level": "member",
       "kind": "func",
       "symbol": "image",
@@ -15044,7 +15044,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 84,
+      "line": 151,
       "level": "top_level",
       "kind": "class",
       "symbol": "Document",
@@ -15062,7 +15062,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 85,
+      "line": 153,
       "level": "member",
       "kind": "let",
       "symbol": "lines",
@@ -15080,7 +15080,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 87,
+      "line": 158,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -15098,7 +15098,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 91,
+      "line": 167,
       "level": "member",
       "kind": "func",
       "symbol": "plain",
@@ -15116,7 +15116,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 100,
+      "line": 176,
       "level": "top_level",
       "kind": "struct",
       "symbol": "DocumentTheme",
@@ -15134,7 +15134,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 101,
+      "line": 177,
       "level": "member",
       "kind": "let",
       "symbol": "paragraph",
@@ -15152,7 +15152,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 102,
+      "line": 178,
       "level": "member",
       "kind": "let",
       "symbol": "heading",
@@ -15170,7 +15170,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 103,
+      "line": 179,
       "level": "member",
       "kind": "let",
       "symbol": "heading1",
@@ -15188,7 +15188,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 104,
+      "line": 180,
       "level": "member",
       "kind": "let",
       "symbol": "heading2",
@@ -15206,7 +15206,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 105,
+      "line": 181,
       "level": "member",
       "kind": "let",
       "symbol": "heading3",
@@ -15224,7 +15224,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 106,
+      "line": 182,
       "level": "member",
       "kind": "let",
       "symbol": "heading4",
@@ -15242,7 +15242,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 107,
+      "line": 183,
       "level": "member",
       "kind": "let",
       "symbol": "heading5",
@@ -15260,7 +15260,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 108,
+      "line": 184,
       "level": "member",
       "kind": "let",
       "symbol": "heading6",
@@ -15278,7 +15278,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 109,
+      "line": 185,
       "level": "member",
       "kind": "let",
       "symbol": "list",
@@ -15296,7 +15296,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 110,
+      "line": 186,
       "level": "member",
       "kind": "let",
       "symbol": "quoteStyle",
@@ -15314,7 +15314,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 111,
+      "line": 187,
       "level": "member",
       "kind": "let",
       "symbol": "code",
@@ -15332,7 +15332,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 112,
+      "line": 188,
       "level": "member",
       "kind": "let",
       "symbol": "table",
@@ -15350,7 +15350,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 113,
+      "line": 189,
       "level": "member",
       "kind": "let",
       "symbol": "link",
@@ -15368,7 +15368,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 114,
+      "line": 190,
       "level": "member",
       "kind": "let",
       "symbol": "emphasis",
@@ -15386,7 +15386,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 115,
+      "line": 191,
       "level": "member",
       "kind": "let",
       "symbol": "strong",
@@ -15404,7 +15404,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 116,
+      "line": 192,
       "level": "member",
       "kind": "let",
       "symbol": "inlineCode",
@@ -15422,7 +15422,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 117,
+      "line": 193,
       "level": "member",
       "kind": "let",
       "symbol": "image",
@@ -15440,7 +15440,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 118,
+      "line": 194,
       "level": "member",
       "kind": "let",
       "symbol": "diagnostic",
@@ -15458,7 +15458,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 119,
+      "line": 195,
       "level": "member",
       "kind": "let",
       "symbol": "html",
@@ -15476,7 +15476,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 120,
+      "line": 196,
       "level": "member",
       "kind": "let",
       "symbol": "strikethrough",
@@ -15494,7 +15494,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 121,
+      "line": 197,
       "level": "member",
       "kind": "let",
       "symbol": "tableHeader",
@@ -15512,7 +15512,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 123,
+      "line": 199,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -15530,7 +15530,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 187,
+      "line": 263,
       "level": "member",
       "kind": "func",
       "symbol": "headingStyle",
@@ -15548,7 +15548,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 200,
+      "line": 276,
       "level": "top_level",
       "kind": "type",
       "symbol": "MarkdownTheme",
@@ -15566,7 +15566,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 201,
+      "line": 277,
       "level": "top_level",
       "kind": "type",
       "symbol": "MarkdownDocument",
@@ -15584,7 +15584,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 203,
+      "line": 280,
       "level": "top_level",
       "kind": "class",
       "symbol": "DocumentHighlight",
@@ -15602,7 +15602,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 204,
+      "line": 282,
       "level": "member",
       "kind": "let",
       "symbol": "query",
@@ -15620,7 +15620,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 205,
+      "line": 284,
       "level": "member",
       "kind": "let",
       "symbol": "style",
@@ -15638,7 +15638,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 207,
+      "line": 290,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -15656,7 +15656,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 213,
+      "line": 297,
       "level": "top_level",
       "kind": "class",
       "symbol": "DocumentFoldRange",
@@ -15674,7 +15674,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 214,
+      "line": 299,
       "level": "member",
       "kind": "let",
       "symbol": "startOffset",
@@ -15692,7 +15692,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 215,
+      "line": 301,
       "level": "member",
       "kind": "let",
       "symbol": "endOffset",
@@ -15710,7 +15710,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 217,
+      "line": 307,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -15728,7 +15728,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 222,
+      "line": 316,
       "level": "member",
       "kind": "func",
       "symbol": "contains",
@@ -15746,7 +15746,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 227,
+      "line": 321,
       "level": "top_level",
       "kind": "class",
       "symbol": "DocumentViewState",
@@ -15764,7 +15764,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 228,
+      "line": 322,
       "level": "member",
       "kind": "var",
       "symbol": "scroll",
@@ -15782,7 +15782,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 229,
+      "line": 323,
       "level": "member",
       "kind": "var",
       "symbol": "cursorSourceOffset",
@@ -15800,7 +15800,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 230,
+      "line": 324,
       "level": "member",
       "kind": "var",
       "symbol": "selectedLinkIndex",
@@ -15818,7 +15818,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 231,
+      "line": 325,
       "level": "member",
       "kind": "var",
       "symbol": "searchMatchIndex",
@@ -15836,7 +15836,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 235,
+      "line": 329,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -15854,7 +15854,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 242,
+      "line": 336,
       "level": "member",
       "kind": "func",
       "symbol": "folds",
@@ -15872,7 +15872,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 246,
+      "line": 340,
       "level": "member",
       "kind": "func",
       "symbol": "clearFolds",
@@ -15890,7 +15890,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 256,
+      "line": 350,
       "level": "member",
       "kind": "func",
       "symbol": "isFolded",
@@ -15908,7 +15908,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 263,
+      "line": 357,
       "level": "member",
       "kind": "func",
       "symbol": "setFolded",
@@ -15926,7 +15926,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 282,
+      "line": 376,
       "level": "member",
       "kind": "func",
       "symbol": "toggleFold",
@@ -15944,7 +15944,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 289,
+      "line": 383,
       "level": "top_level",
       "kind": "class",
       "symbol": "DocumentView",
@@ -15962,7 +15962,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 310,
+      "line": 404,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -15980,7 +15980,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 344,
+      "line": 438,
       "level": "member",
       "kind": "func",
       "symbol": "setTextWidthOptions",
@@ -15998,7 +15998,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 349,
+      "line": 443,
       "level": "member",
       "kind": "func",
       "symbol": "renderedLineCount",
@@ -16016,7 +16016,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 353,
+      "line": 447,
       "level": "member",
       "kind": "func",
       "symbol": "sourceOffsetForRenderedLine",
@@ -16034,7 +16034,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 365,
+      "line": 459,
       "level": "member",
       "kind": "func",
       "symbol": "sourceOffsetAtRenderedLine",
@@ -16052,7 +16052,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 369,
+      "line": 463,
       "level": "member",
       "kind": "func",
       "symbol": "sourceOffsetsForRenderedLines",
@@ -16070,7 +16070,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 384,
+      "line": 478,
       "level": "member",
       "kind": "func",
       "symbol": "renderedLineForSourceOffset",
@@ -16088,7 +16088,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 406,
+      "line": 500,
       "level": "member",
       "kind": "func",
       "symbol": "linkAtRenderedLine",
@@ -16106,7 +16106,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 418,
+      "line": 512,
       "level": "member",
       "kind": "func",
       "symbol": "handleKey",
@@ -16124,7 +16124,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 447,
+      "line": 541,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -16142,7 +16142,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 458,
+      "line": 552,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -16160,7 +16160,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 681,
+      "line": 775,
       "level": "top_level",
       "kind": "class",
       "symbol": "MarkdownView",
@@ -16178,7 +16178,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 684,
+      "line": 778,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -16196,7 +16196,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 697,
+      "line": 791,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -16214,7 +16214,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 709,
+      "line": 803,
       "level": "member",
       "kind": "func",
       "symbol": "render",

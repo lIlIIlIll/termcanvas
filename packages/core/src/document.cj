@@ -2,12 +2,23 @@ package core
 
 import std.collection.*
 
+/** 带样式、可选链接和源位置的文本片段。 */
 public class RichSpan {
+    /** 片段文本。 */
     public let text: String
+    /** 文本样式。 */
     public let style: Style
+    /** 可选的链接地址。 */
     public let linkUrl: ?String
+    /** 可选的源字节范围字符串，格式为起点:终点。 */
     public let sourceRange: ?String
 
+    /** 创建文本片段。
+     * @param text 片段文本
+     * @param style 文本样式
+     * @param linkUrl 可选链接地址
+     * @param sourceRange 可选的源字节范围
+     */
     public init(text: String, style!: Style = Style.default(), linkUrl!: ?String = None, sourceRange!: ?String = None) {
         this.text = text
         this.style = style
@@ -16,32 +27,71 @@ public class RichSpan {
     }
 }
 
+/** 文档行的语义类型。 */
 public enum DocumentLineKind {
+    /** 段落。 */
     | Paragraph
+    /** 标题
+     * @param _0 标题级别
+     */
     | Heading(Int64)
+    /** 列表项
+     * @param _0 是否为有序列表
+     */
     | ListItem(Bool)
+    /** 引用。 */
     | Quote
+    /** 代码块。 */
     | CodeBlock
+    /** 表格行。 */
     | TableRow
+    /** 表头。 */
     | TableHeader
+    /** 分隔线。 */
     | HorizontalRule
+    /** 任务列表项
+     * @param _0 是否已完成
+     */
     | TaskListItem(Bool)
+    /** 图片。 */
     | Image
+    /** 诊断信息。 */
     | Diagnostic
+    /** HTML 内容。 */
     | Html
+    /** 删除线内容。 */
     | Strikethrough
+    /** 代码围栏信息
+     * @param _0 语言或围栏信息
+     */
     | CodeFenceInfo(String)
+    /** 空行。 */
     | Blank
 }
 
+/** 包含语义类型、文本片段和可选媒体的文档行。 */
 public class DocumentLine {
+    /** 文档行类型。 */
     public let kind: DocumentLineKind
+    /** 文本片段。 */
     public let spans: Array<RichSpan>
+    /** 引用嵌套深度，至少为零。 */
     public let quoteDepth: Int64
+    /** 可选媒体来源。 */
     public let media: ?MediaSource
+    /** 媒体适配方式。 */
     public let mediaFit: MediaFit
+    /** 媒体高度，至少为一行。 */
     public let mediaHeight: Int64
 
+    /** 根据文本片段创建文档行。
+     * @param kind 行类型
+     * @param spans 文本片段
+     * @param quoteDepth 引用深度，负值按零处理
+     * @param media 可选媒体来源
+     * @param mediaFit 媒体适配方式
+     * @param mediaHeight 媒体高度，至少为一
+     */
     public init(
         kind: DocumentLineKind,
         spans: Array<RichSpan>,
@@ -58,6 +108,15 @@ public class DocumentLine {
         this.mediaHeight = max(1, mediaHeight)
     }
 
+    /** 根据纯文本创建文档行。
+     * @param kind 行类型
+     * @param text 文本
+     * @param style 文本样式
+     * @param quoteDepth 引用深度，负值按零处理
+     * @param media 可选媒体来源
+     * @param mediaFit 媒体适配方式
+     * @param mediaHeight 媒体高度，至少为一
+     */
     public init(
         kind: DocumentLineKind,
         text: String,
@@ -75,19 +134,36 @@ public class DocumentLine {
         this.mediaHeight = max(1, mediaHeight)
     }
 
+    /** 创建图片文档行；空替代文本使用媒体回退文本。
+     * @param source 媒体来源
+     * @param alt 替代文本
+     * @param style 文本样式
+     * @param mediaHeight 媒体高度
+     * @return 图片文档行
+     */
     public static func image(source: MediaSource, alt!: String = "", style!: Style = Style(fg: Color.Cyan), mediaHeight!: Int64 = 6): DocumentLine {
         let label = if (alt.isEmpty()) { mediaFallbackText(source) } else { alt }
         DocumentLine(DocumentLineKind.Image, [RichSpan(label, style: style, linkUrl: Some(source.uri))], media: Some(source), mediaHeight: mediaHeight)
     }
 }
 
+/** 由文档行组成的可渲染文档。 */
 public class Document {
+    /** 按顺序排列的文档行。 */
     public let lines: Array<DocumentLine>
 
+    /** 创建文档。
+     * @param lines 文档行
+     */
     public init(lines: Array<DocumentLine>) {
         this.lines = lines
     }
 
+    /** 将纯文本按行转换为段落文档。
+     * @param text 纯文本
+     * @param style 文本样式
+     * @return 段落文档
+     */
     public static func plain(text: String, style!: Style = Style.default()): Document {
         let lines = ArrayList<DocumentLine>()
         for (line in splitLines(text)) {
@@ -200,25 +276,43 @@ public struct DocumentTheme {
 public type MarkdownTheme = DocumentTheme
 public type MarkdownDocument = Document
 
+/** 文档中按查询文本应用的高亮。 */
 public class DocumentHighlight {
+    /** 要高亮的文本。 */
     public let query: String
+    /** 高亮样式。 */
     public let style: Style
 
+    /** 创建高亮规则。
+     * @param query 要匹配的文本
+     * @param style 高亮样式
+     */
     public init(query: String, style!: Style = Style(bg: Color.Yellow)) {
         this.query = query
         this.style = style
     }
 }
 
+/** 以源偏移定义的闭区间折叠范围。 */
 public class DocumentFoldRange {
+    /** 起始偏移，至少为零。 */
     public let startOffset: Int64
+    /** 结束偏移，不小于起点。 */
     public let endOffset: Int64
 
+    /** 创建折叠范围。
+     * @param startOffset 起始偏移，负值按零处理
+     * @param endOffset 结束偏移，小于起点时按起点处理
+     */
     public init(startOffset: Int64, endOffset: Int64) {
         this.startOffset = max(0, startOffset)
         this.endOffset = max(this.startOffset, endOffset)
     }
 
+    /** 判断偏移是否位于闭区间内。
+     * @param offset 要查询的偏移
+     * @return 位于范围内时为 true
+     */
     public func contains(offset: Int64): Bool {
         startOffset <= offset && offset <= endOffset
     }

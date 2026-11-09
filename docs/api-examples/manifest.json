@@ -10453,6 +10453,290 @@
           "signature": "public func overlaps( world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>, id: EntityId ): Array<CollisionEvent>"
         }
       ]
+    },
+    {
+      "id": "document-model",
+      "source": "docs/api-examples/document-model.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "RichSpan",
+          "signature": "public class RichSpan {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "RichSpan.text",
+          "signature": "public let text: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "RichSpan.style",
+          "signature": "public let style: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "RichSpan.linkUrl",
+          "signature": "public let linkUrl: ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "RichSpan.sourceRange",
+          "signature": "public let sourceRange: ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "RichSpan.init",
+          "signature": "public init(text: String, style!: Style = Style.default(), linkUrl!: ?String = None, sourceRange!: ?String = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind",
+          "signature": "public enum DocumentLineKind {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.Paragraph",
+          "signature": "Paragraph"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.Heading",
+          "signature": "Heading(Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.ListItem",
+          "signature": "ListItem(Bool)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.Quote",
+          "signature": "Quote"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.CodeBlock",
+          "signature": "CodeBlock"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.TableRow",
+          "signature": "TableRow"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.TableHeader",
+          "signature": "TableHeader"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.HorizontalRule",
+          "signature": "HorizontalRule"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.TaskListItem",
+          "signature": "TaskListItem(Bool)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.Image",
+          "signature": "Image"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.Diagnostic",
+          "signature": "Diagnostic"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.Html",
+          "signature": "Html"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.Strikethrough",
+          "signature": "Strikethrough"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.CodeFenceInfo",
+          "signature": "CodeFenceInfo(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLineKind.Blank",
+          "signature": "Blank"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLine",
+          "signature": "public class DocumentLine {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLine.kind",
+          "signature": "public let kind: DocumentLineKind"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLine.spans",
+          "signature": "public let spans: Array<RichSpan>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLine.quoteDepth",
+          "signature": "public let quoteDepth: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLine.media",
+          "signature": "public let media: ?MediaSource"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLine.mediaFit",
+          "signature": "public let mediaFit: MediaFit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLine.mediaHeight",
+          "signature": "public let mediaHeight: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLine.init",
+          "signature": "public init( kind: DocumentLineKind, spans: Array<RichSpan>, quoteDepth!: Int64 = 0, media!: ?MediaSource = None, mediaFit!: MediaFit = MediaFit.Contain, mediaHeight!: Int64 = 6 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLine.init",
+          "signature": "public init( kind: DocumentLineKind, text: String, style!: Style = Style.default(), quoteDepth!: Int64 = 0, media!: ?MediaSource = None, mediaFit!: MediaFit = MediaFit.Contain, mediaHeight!: Int64 = 6 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentLine.image",
+          "signature": "public static func image(source: MediaSource, alt!: String = \"\", style!: Style = Style(fg: Color.Cyan), mediaHeight!: Int64 = 6): DocumentLine"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "Document",
+          "signature": "public class Document {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "Document.lines",
+          "signature": "public let lines: Array<DocumentLine>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "Document.init",
+          "signature": "public init(lines: Array<DocumentLine>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "Document.plain",
+          "signature": "public static func plain(text: String, style!: Style = Style.default()): Document"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentHighlight",
+          "signature": "public class DocumentHighlight {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentHighlight.query",
+          "signature": "public let query: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentHighlight.style",
+          "signature": "public let style: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentHighlight.init",
+          "signature": "public init(query: String, style!: Style = Style(bg: Color.Yellow))"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentFoldRange",
+          "signature": "public class DocumentFoldRange {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentFoldRange.startOffset",
+          "signature": "public let startOffset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentFoldRange.endOffset",
+          "signature": "public let endOffset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentFoldRange.init",
+          "signature": "public init(startOffset: Int64, endOffset: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentFoldRange.contains",
+          "signature": "public func contains(offset: Int64): Bool"
+        }
+      ]
     }
   ]
 }
