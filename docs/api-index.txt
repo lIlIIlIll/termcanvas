@@ -613,27 +613,27 @@ packages/core/src/content_widgets.cj:710:public func cancelCompletion(): Bool
 packages/core/src/content_widgets.cj:719:public func visualHeight(width: Int64, maximum: Int64): Int64
 packages/core/src/content_widgets.cj:731:public func cursorPosition(areaRect: Rect): Position
 packages/core/src/content_widgets.cj:756:public func render(areaRect: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:988:public class ActivityStep {
-packages/core/src/content_widgets.cj:989:public let title: String
-packages/core/src/content_widgets.cj:990:public let status: TranscriptItemStatus
-packages/core/src/content_widgets.cj:991:public let detail: String
-packages/core/src/content_widgets.cj:992:public let duration: String
-packages/core/src/content_widgets.cj:994:public init(title: String, status!: TranscriptItemStatus = TranscriptItemStatus.Pending, detail!: String = "", duration!: String = "")
-packages/core/src/content_widgets.cj:1002:public class ActivityTimeline <: Widget {
-packages/core/src/content_widgets.cj:1006:public init(steps: Array<ActivityStep>, block!: ?Block = None)
-packages/core/src/content_widgets.cj:1011:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:1027:public class RequestDialog <: Widget {
-packages/core/src/content_widgets.cj:1033:public var selected: Int64
-packages/core/src/content_widgets.cj:1038:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
-packages/core/src/content_widgets.cj:1051:public func setTheme(theme: ?Theme): Unit
-packages/core/src/content_widgets.cj:1055:public func handle(key: KeyEvent): ?String
-packages/core/src/content_widgets.cj:1067:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:1078:public type DecisionDialog = RequestDialog
-packages/core/src/content_widgets.cj:1080:public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
-packages/core/src/content_widgets.cj:1119:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
-packages/core/src/content_widgets.cj:1124:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style
-packages/core/src/content_widgets.cj:1157:public func transcriptStatusLabel(status: TranscriptItemStatus): String
-packages/core/src/content_widgets.cj:1175:public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
+packages/core/src/content_widgets.cj:990:public class ActivityStep {
+packages/core/src/content_widgets.cj:993:public let title: String
+packages/core/src/content_widgets.cj:996:public let status: TranscriptItemStatus
+packages/core/src/content_widgets.cj:999:public let detail: String
+packages/core/src/content_widgets.cj:1002:public let duration: String
+packages/core/src/content_widgets.cj:1010:public init(title: String, status!: TranscriptItemStatus = TranscriptItemStatus.Pending, detail!: String = "", duration!: String = "")
+packages/core/src/content_widgets.cj:1020:public class ActivityTimeline <: Widget {
+packages/core/src/content_widgets.cj:1028:public init(steps: Array<ActivityStep>, block!: ?Block = None)
+packages/core/src/content_widgets.cj:1037:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/content_widgets.cj:1055:public class RequestDialog <: Widget {
+packages/core/src/content_widgets.cj:1063:public var selected: Int64
+packages/core/src/content_widgets.cj:1079:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
+packages/core/src/content_widgets.cj:1093:public func setTheme(theme: ?Theme): Unit
+packages/core/src/content_widgets.cj:1101:public func handle(key: KeyEvent): ?String
+packages/core/src/content_widgets.cj:1117:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/content_widgets.cj:1130:public type DecisionDialog = RequestDialog
+packages/core/src/content_widgets.cj:1137:public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
+packages/core/src/content_widgets.cj:1181:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
+packages/core/src/content_widgets.cj:1191:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style
+packages/core/src/content_widgets.cj:1228:public func transcriptStatusLabel(status: TranscriptItemStatus): String
+packages/core/src/content_widgets.cj:1251:public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
 packages/core/src/dashboard_widgets.cj:6:public class MetricCard <: Widget {
 packages/core/src/dashboard_widgets.cj:22:public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: ?Style = None, valueStyle!: ?Style = None )
 packages/core/src/dashboard_widgets.cj:42:public func render(area: Rect, buffer: Buffer): Unit

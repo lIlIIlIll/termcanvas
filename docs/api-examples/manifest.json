@@ -13615,6 +13615,146 @@
           "signature": "public func render(areaRect: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "activity",
+      "source": "docs/api-examples/activity.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ActivityStep",
+          "signature": "public class ActivityStep {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ActivityStep.title",
+          "signature": "public let title: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ActivityStep.status",
+          "signature": "public let status: TranscriptItemStatus"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ActivityStep.detail",
+          "signature": "public let detail: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ActivityStep.duration",
+          "signature": "public let duration: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ActivityStep.init",
+          "signature": "public init(title: String, status!: TranscriptItemStatus = TranscriptItemStatus.Pending, detail!: String = \"\", duration!: String = \"\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ActivityTimeline",
+          "signature": "public class ActivityTimeline <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ActivityTimeline.init",
+          "signature": "public init(steps: Array<ActivityStep>, block!: ?Block = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ActivityTimeline.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "RequestDialog",
+          "signature": "public class RequestDialog <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "RequestDialog.selected",
+          "signature": "public var selected: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "RequestDialog.init",
+          "signature": "public init(title!: String = \"Request\", body!: String = \"\", detail!: Document = Document([]), risk!: String = \"\", buttons!: Array<String> = [\"Cancel\", \"Confirm\"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "RequestDialog.setTheme",
+          "signature": "public func setTheme(theme: ?Theme): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "RequestDialog.handle",
+          "signature": "public func handle(key: KeyEvent): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "RequestDialog.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "DecisionDialog",
+          "signature": "public type DecisionDialog = RequestDialog"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "statusMark",
+          "signature": "public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "transcriptStatusStyle",
+          "signature": "public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "transcriptStatusStyle",
+          "signature": "public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "transcriptStatusLabel",
+          "signature": "public func transcriptStatusLabel(status: TranscriptItemStatus): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "transcriptCardDocument",
+          "signature": "public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document"
+        }
+      ]
     }
   ]
 }

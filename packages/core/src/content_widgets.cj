@@ -985,12 +985,28 @@ func composerChangedRange(before: String, after: String): (Int64, Int64) {
     (prefix, before.size - suffix)
 }
 
+/** 活动时间线中的一步。
+ */
 public class ActivityStep {
+    /** 步骤标题。
+     */
     public let title: String
+    /** 步骤状态。
+     */
     public let status: TranscriptItemStatus
+    /** 步骤详情。
+     */
     public let detail: String
+    /** 耗时文本。
+     */
     public let duration: String
 
+    /** 创建活动步骤。
+     * @param title 步骤标题
+     * @param status 步骤状态
+     * @param detail 详情文本
+     * @param duration 耗时文本
+     */
     public init(title: String, status!: TranscriptItemStatus = TranscriptItemStatus.Pending, detail!: String = "", duration!: String = "") {
         this.title = title
         this.status = status
@@ -999,15 +1015,25 @@ public class ActivityStep {
     }
 }
 
+/** 按行绘制活动步骤及状态。
+ */
 public class ActivityTimeline <: Widget {
     private let steps: Array<ActivityStep>
     private let block: ?Block
 
+    /** 创建时间线。
+     * @param steps 按显示顺序排列的步骤
+     * @param block 可选外框
+     */
     public init(steps: Array<ActivityStep>, block!: ?Block = None) {
         this.steps = steps
         this.block = block
     }
 
+    /** 按可见高度绘制步骤。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
@@ -1024,17 +1050,32 @@ public class ActivityTimeline <: Widget {
     }
 }
 
+/** 显示请求、风险说明和操作按钮的对话框。
+ */
 public class RequestDialog <: Widget {
     private let title: String
     private let body: String
     private let detail: Document
     private let risk: String
     private let buttons: Array<String>
+    /** 当前选中的按钮索引。
+     */
     public var selected: Int64
     private let style: ?Style
     private let selectedStyle: ?Style
     private var theme: ?Theme = None
 
+    /** 创建请求对话框。
+     * @param title 对话框标题
+     * @param body 请求内容
+     * @param detail 可选详情文档
+     * @param risk 可选风险说明
+     * @param buttons 操作按钮文本
+     * @param selected 初始按钮索引，会限制在有效范围
+     * @param style 可选正文样式
+     * @param selectedStyle 可选按钮选中样式
+     * @param theme 可选语义主题
+     */
     public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None) {
         this.title = title
         this.body = body
@@ -1046,12 +1087,17 @@ public class RequestDialog <: Widget {
         this.selectedStyle = selectedStyle
         this.theme = theme
     }
-    /** 设置请求对话框使用的语义主题；None 清除主题。
+    /** 设置或清除语义主题。
+     * @param theme 新主题；None 表示清除
      */
     public func setTheme(theme: ?Theme): Unit {
         this.theme = theme
     }
 
+    /** 处理左右选择和回车。
+     * @param key 键盘事件
+     * @return 回车且存在按钮时返回选中按钮文本，否则返回 None。
+     */
     public func handle(key: KeyEvent): ?String {
         let dialog = Dialog(title: title, body: body, buttons: buttons, selected: selected, style: style, selectedStyle: selectedStyle, theme: theme)
         match (dialog.handle(key)) {
@@ -1064,6 +1110,10 @@ public class RequestDialog <: Widget {
         }
     }
 
+    /** 绘制对话框；区域足够大时绘制详情文档。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withParentTheme(theme) { =>
             Dialog(title: title, body: if (risk.isEmpty()) { body } else { risk + "\n" + body }, buttons: buttons, selected: selected, style: style, selectedStyle: selectedStyle, theme: theme).render(area, buffer)
@@ -1075,8 +1125,15 @@ public class RequestDialog <: Widget {
     }
 }
 
+/** 请求对话框的别名。
+ */
 public type DecisionDialog = RequestDialog
 
+/** 获取状态对应的符号；运行和流式状态按帧变化。
+ * @param status 记录状态
+ * @param activityFrame 活动状态的动画帧
+ * @return 状态符号。
+ */
 public func statusMark(
     status: TranscriptItemStatus,
     activityFrame!: Int64 = 0
@@ -1116,11 +1173,21 @@ func streamingStatusMark(frame: Int64): String {
     }
 }
 
+/** 按状态修补基础样式；设置 NO_COLOR 时保留基础样式。
+ * @param status 记录状态
+ * @param base 基础样式
+ * @return 状态样式。
+ */
 public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style {
     transcriptStatusStyle(status, base, theme: None)
 }
 
-/** 根据显式主题解析状态样式；未提供主题时沿用原有无主题行为。 */
+/** 按语义主题或无主题配色修补基础样式。
+ * @param status 记录状态
+ * @param base 基础样式
+ * @param theme 可选语义主题
+ * @return 状态样式；没有主题且设置 NO_COLOR 时为基础样式。
+ */
 public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style {
     match (theme) {
         case Some(value) =>
@@ -1154,6 +1221,10 @@ public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, the
     }
 }
 
+/** 获取状态默认的英文标签。
+ * @param status 记录状态
+ * @return 状态标签。
+ */
 public func transcriptStatusLabel(status: TranscriptItemStatus): String {
     match (status) {
         case TranscriptItemStatus.Pending => "pending"
@@ -1172,6 +1243,11 @@ public func transcriptStatusLabel(status: TranscriptItemStatus): String {
     }
 }
 
+/** 将记录转换为可绘制的卡片文档。
+ * @param item 记录项
+ * @param theme 卡片样式和布局
+ * @return 包含标题及可见正文、选项和页脚的文档。
+ */
 public func transcriptCardDocument(
     item: TranscriptItem,
     theme!: TranscriptCardTheme = TranscriptCardTheme()

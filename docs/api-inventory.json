@@ -11209,7 +11209,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 988,
+      "line": 990,
       "level": "top_level",
       "kind": "class",
       "symbol": "ActivityStep",
@@ -11227,7 +11227,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 989,
+      "line": 993,
       "level": "member",
       "kind": "let",
       "symbol": "title",
@@ -11245,7 +11245,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 990,
+      "line": 996,
       "level": "member",
       "kind": "let",
       "symbol": "status",
@@ -11263,7 +11263,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 991,
+      "line": 999,
       "level": "member",
       "kind": "let",
       "symbol": "detail",
@@ -11281,7 +11281,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 992,
+      "line": 1002,
       "level": "member",
       "kind": "let",
       "symbol": "duration",
@@ -11299,7 +11299,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 994,
+      "line": 1010,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11317,7 +11317,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1002,
+      "line": 1020,
       "level": "top_level",
       "kind": "class",
       "symbol": "ActivityTimeline",
@@ -11335,7 +11335,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1006,
+      "line": 1028,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11353,7 +11353,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1011,
+      "line": 1037,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11371,7 +11371,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1027,
+      "line": 1055,
       "level": "top_level",
       "kind": "class",
       "symbol": "RequestDialog",
@@ -11389,7 +11389,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1033,
+      "line": 1063,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -11407,7 +11407,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1038,
+      "line": 1079,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11425,7 +11425,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1051,
+      "line": 1093,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -11443,7 +11443,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1055,
+      "line": 1101,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -11461,7 +11461,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1067,
+      "line": 1117,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11479,7 +11479,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1078,
+      "line": 1130,
       "level": "top_level",
       "kind": "type",
       "symbol": "DecisionDialog",
@@ -11497,7 +11497,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1080,
+      "line": 1137,
       "level": "top_level",
       "kind": "func",
       "symbol": "statusMark",
@@ -11515,7 +11515,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1119,
+      "line": 1181,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptStatusStyle",
@@ -11533,7 +11533,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1124,
+      "line": 1191,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptStatusStyle",
@@ -11551,7 +11551,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1157,
+      "line": 1228,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptStatusLabel",
@@ -11569,7 +11569,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1175,
+      "line": 1251,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptCardDocument",
