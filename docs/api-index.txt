@@ -1336,26 +1336,26 @@ packages/core/src/navigation.cj:493:public init(lines: Array<String>, offset!: I
 packages/core/src/navigation.cj:500:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 packages/core/src/navigation.cj:512:public func scroll(delta: Int64, viewportHeight: Int64): Unit
 packages/core/src/navigation.cj:516:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:537:public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/navigation.cj:542:public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64
-packages/core/src/navigation.cj:548:public func mouseScrollDelta(mouse: MouseEvent): Int64
-packages/core/src/navigation.cj:559:public class PointerCapture {
-packages/core/src/navigation.cj:564:public init()
-packages/core/src/navigation.cj:566:public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool
-packages/core/src/navigation.cj:578:public func owns(owner: String): Bool
-packages/core/src/navigation.cj:579:public func activeOwner(): ?String
-packages/core/src/navigation.cj:580:public func origin(): Position
-packages/core/src/navigation.cj:581:public func initialValue(): Int64
-packages/core/src/navigation.cj:583:public func release(owner: String, mouse: MouseEvent): Bool
-packages/core/src/navigation.cj:591:public func cancel(): Unit
-packages/core/src/navigation.cj:609:public class ModalFocusState {
-packages/core/src/navigation.cj:614:public init(base: FocusManager, keymap!: KeyMap = KeyMap())
-packages/core/src/navigation.cj:619:public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
-packages/core/src/navigation.cj:626:public func active(): ?String
-packages/core/src/navigation.cj:630:public func focus(): FocusManager
-packages/core/src/navigation.cj:634:public func close(): ?String
-packages/core/src/navigation.cj:645:public func handle(key: KeyEvent): Bool
-packages/core/src/navigation.cj:653:public func actionFor(key: KeyEvent): ?String
+packages/core/src/navigation.cj:542:public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:554:public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64
+packages/core/src/navigation.cj:564:public func mouseScrollDelta(mouse: MouseEvent): Int64
+packages/core/src/navigation.cj:576:public class PointerCapture {
+packages/core/src/navigation.cj:582:public init()
+packages/core/src/navigation.cj:591:public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool
+packages/core/src/navigation.cj:607:public func owns(owner: String): Bool
+packages/core/src/navigation.cj:611:public func activeOwner(): ?String
+packages/core/src/navigation.cj:615:public func origin(): Position
+packages/core/src/navigation.cj:619:public func initialValue(): Int64
+packages/core/src/navigation.cj:626:public func release(owner: String, mouse: MouseEvent): Bool
+packages/core/src/navigation.cj:635:public func cancel(): Unit
+packages/core/src/navigation.cj:654:public class ModalFocusState {
+packages/core/src/navigation.cj:663:public init(base: FocusManager, keymap!: KeyMap = KeyMap())
+packages/core/src/navigation.cj:674:public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
+packages/core/src/navigation.cj:684:public func active(): ?String
+packages/core/src/navigation.cj:691:public func focus(): FocusManager
+packages/core/src/navigation.cj:698:public func close(): ?String
+packages/core/src/navigation.cj:713:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:725:public func actionFor(key: KeyEvent): ?String
 packages/core/src/paged_table.cj:5:public class TableDataRow {
 packages/core/src/paged_table.cj:6:public let id: String
 packages/core/src/paged_table.cj:7:public let cells: Array<String>

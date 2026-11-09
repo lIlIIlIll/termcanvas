@@ -534,17 +534,33 @@ public class Viewport <: Widget {
 
 // Geometry helpers do not dispatch events. Applications choose the active
 // surface before calling a widget, so overlays cannot click through.
+/** 判断鼠标坐标是否位于非空区域内；不检查事件种类。
+ * @param mouse 鼠标事件
+ * @param area 命中区域
+ * @return 坐标位于区域内时为 true
+ */
 public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool {
     area.width > 0 && area.height > 0 && mouse.x >= area.x && mouse.x < area.right &&
         mouse.y >= area.y && mouse.y < area.bottom
 }
 
+/** 将区域内的鼠标坐标换算为列表行索引。
+ * @param mouse 鼠标事件
+ * @param area 列表区域
+ * @param offset 首个可见行索引
+ * @param total 行总数
+ * @return 命中的行索引；无效或区域外时为 None
+ */
 public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64 {
     if (!widgetHitTest(mouse, area) || offset < 0 || offset >= total) { return None }
     let row = mouse.y - area.y
     if (row >= total - offset) { None } else { Some(offset + row) }
 }
 
+/** 将滚轮事件转换为行方向。
+ * @param mouse 鼠标事件
+ * @return 向上为 -1，向下为 1，其他事件为 0
+ */
 public func mouseScrollDelta(mouse: MouseEvent): Int64 {
     match (mouse.kind) {
         case MouseKind.Scroll => match (mouse.button) {
@@ -556,13 +572,22 @@ public func mouseScrollDelta(mouse: MouseEvent): Int64 {
     }
 }
 
+/** 跟踪单个鼠标拖动的拥有者、起点和初始值。 */
 public class PointerCapture {
     private var owner: ?String = None
     private var start: Position = Position(0, 0)
     private var value: Int64 = 0
 
+    /** 创建空的鼠标捕获状态。 */
     public init() {}
 
+    /** 在区域内左键按下时开始捕获；已有拥有者时拒绝。
+     * @param owner 非空的拥有者标识
+     * @param mouse 鼠标事件
+     * @param area 允许开始捕获的区域
+     * @param value 拖动开始时的应用值
+     * @return 成功捕获时为 true
+     */
     public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool {
         if (owner.isEmpty() || this.owner.isSome() || !widgetHitTest(mouse, area)) { return false }
         match ((mouse.kind, mouse.button)) {
@@ -575,11 +600,29 @@ public class PointerCapture {
         }
     }
 
+    /** 判断指定标识是否拥有捕获。
+     * @param owner 拥有者标识
+     * @return 拥有捕获时为 true
+     */
     public func owns(owner: String): Bool { this.owner == Some(owner) }
+    /** 获取当前拥有者。
+     * @return 拥有者标识；无捕获时为 None
+     */
     public func activeOwner(): ?String { owner }
+    /** 获取最近一次捕获开始的坐标。
+     * @return 起始坐标
+     */
     public func origin(): Position { start }
+    /** 获取最近一次捕获保存的应用值。
+     * @return 起始值
+     */
     public func initialValue(): Int64 { value }
 
+    /** 由拥有者在左键释放时结束捕获；释放位置可以在原区域外。
+     * @param owner 拥有者标识
+     * @param mouse 鼠标事件
+     * @return 结束捕获时为 true
+     */
     public func release(owner: String, mouse: MouseEvent): Bool {
         if (!owns(owner)) { return false }
         match ((mouse.kind, mouse.button)) {
@@ -588,6 +631,7 @@ public class PointerCapture {
         }
     }
 
+    /** 取消当前捕获。 */
     public func cancel(): Unit { owner = None }
 }
 
@@ -606,16 +650,27 @@ class ModalFocusLayer {
 
 // Application-owned focus/key policy only: no render tree, callbacks, effects
 // or event loop. A lower layer remains untouched while a modal is active.
+/** 管理基础焦点和可嵌套的模态焦点与快捷键层。 */
 public class ModalFocusState {
     private let base: FocusManager
     private let baseKeys: KeyMap
     private let layers = ArrayList<ModalFocusLayer>()
 
+    /** 创建模态焦点状态。
+     * @param base 基础焦点管理器
+     * @param keymap 基础层快捷键映射
+     */
     public init(base: FocusManager, keymap!: KeyMap = KeyMap()) {
         this.base = base
         this.baseKeys = keymap
     }
 
+    /** 打开新模态层并保存当前焦点；空标识和重复标识会被拒绝。
+     * @param id 模态层标识
+     * @param focusIds 新层的焦点条目
+     * @param keymap 新层快捷键映射
+     * @return 成功打开时为 true
+     */
     public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool {
         if (id.isEmpty()) { return false }
         for (layer in layers) { if (layer.id == id) { return false } }
@@ -623,14 +678,23 @@ public class ModalFocusState {
         true
     }
 
+    /** 获取最上层模态标识。
+     * @return 模态标识；无模态层时为 None
+     */
     public func active(): ?String {
         if (layers.isEmpty()) { None } else { Some(layers[layers.size - 1].id) }
     }
 
+    /** 获取当前层的焦点管理器。
+     * @return 模态层或基础层的焦点管理器
+     */
     public func focus(): FocusManager {
         if (layers.isEmpty()) { base } else { layers[layers.size - 1].focus }
     }
 
+    /** 关闭最上层并尝试恢复先前焦点。
+     * @return 关闭的模态标识；无模态层时为 None
+     */
     public func close(): ?String {
         if (layers.isEmpty()) { return None }
         let layer = layers[layers.size - 1]
@@ -642,6 +706,10 @@ public class ModalFocusState {
         Some(layer.id)
     }
 
+    /** 将按键交给当前焦点层；Escape 关闭最上层模态。
+     * @param key 按键事件
+     * @return 事件被处理时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         match (key.code) {
             case KeyCode.Esc =>
@@ -650,6 +718,10 @@ public class ModalFocusState {
         }
     }
 
+    /** 只查询当前层的快捷键映射。
+     * @param key 按键事件
+     * @return 对应动作；未绑定时为 None
+     */
     public func actionFor(key: KeyEvent): ?String {
         if (layers.isEmpty()) { baseKeys.actionFor(key) } else { layers[layers.size - 1].keys.actionFor(key) }
     }

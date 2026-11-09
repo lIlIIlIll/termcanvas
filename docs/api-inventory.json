@@ -24348,7 +24348,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 537,
+      "line": 542,
       "level": "top_level",
       "kind": "func",
       "symbol": "widgetHitTest",
@@ -24366,7 +24366,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 542,
+      "line": 554,
       "level": "top_level",
       "kind": "func",
       "symbol": "widgetRowAt",
@@ -24384,7 +24384,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 548,
+      "line": 564,
       "level": "top_level",
       "kind": "func",
       "symbol": "mouseScrollDelta",
@@ -24402,7 +24402,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 559,
+      "line": 576,
       "level": "top_level",
       "kind": "class",
       "symbol": "PointerCapture",
@@ -24420,7 +24420,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 564,
+      "line": 582,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -24438,7 +24438,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 566,
+      "line": 591,
       "level": "member",
       "kind": "func",
       "symbol": "begin",
@@ -24456,7 +24456,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 578,
+      "line": 607,
       "level": "member",
       "kind": "func",
       "symbol": "owns",
@@ -24474,7 +24474,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 579,
+      "line": 611,
       "level": "member",
       "kind": "func",
       "symbol": "activeOwner",
@@ -24492,7 +24492,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 580,
+      "line": 615,
       "level": "member",
       "kind": "func",
       "symbol": "origin",
@@ -24510,7 +24510,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 581,
+      "line": 619,
       "level": "member",
       "kind": "func",
       "symbol": "initialValue",
@@ -24528,7 +24528,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 583,
+      "line": 626,
       "level": "member",
       "kind": "func",
       "symbol": "release",
@@ -24546,7 +24546,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 591,
+      "line": 635,
       "level": "member",
       "kind": "func",
       "symbol": "cancel",
@@ -24564,7 +24564,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 609,
+      "line": 654,
       "level": "top_level",
       "kind": "class",
       "symbol": "ModalFocusState",
@@ -24582,7 +24582,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 614,
+      "line": 663,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -24600,7 +24600,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 619,
+      "line": 674,
       "level": "member",
       "kind": "func",
       "symbol": "open",
@@ -24618,7 +24618,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 626,
+      "line": 684,
       "level": "member",
       "kind": "func",
       "symbol": "active",
@@ -24636,7 +24636,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 630,
+      "line": 691,
       "level": "member",
       "kind": "func",
       "symbol": "focus",
@@ -24654,7 +24654,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 634,
+      "line": 698,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -24672,7 +24672,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 645,
+      "line": 713,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -24690,7 +24690,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 653,
+      "line": 725,
       "level": "member",
       "kind": "func",
       "symbol": "actionFor",

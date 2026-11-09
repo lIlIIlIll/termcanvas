@@ -7607,6 +7607,140 @@
           "signature": "public func flushEscAfterPolls(polls: Int64): Array<Event>"
         }
       ]
+    },
+    {
+      "id": "pointer-modal",
+      "source": "docs/api-examples/pointer-modal.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "widgetHitTest",
+          "signature": "public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "widgetRowAt",
+          "signature": "public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "mouseScrollDelta",
+          "signature": "public func mouseScrollDelta(mouse: MouseEvent): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "PointerCapture",
+          "signature": "public class PointerCapture {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "PointerCapture.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "PointerCapture.begin",
+          "signature": "public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "PointerCapture.owns",
+          "signature": "public func owns(owner: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "PointerCapture.activeOwner",
+          "signature": "public func activeOwner(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "PointerCapture.origin",
+          "signature": "public func origin(): Position"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "PointerCapture.initialValue",
+          "signature": "public func initialValue(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "PointerCapture.release",
+          "signature": "public func release(owner: String, mouse: MouseEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "PointerCapture.cancel",
+          "signature": "public func cancel(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "ModalFocusState",
+          "signature": "public class ModalFocusState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "ModalFocusState.init",
+          "signature": "public init(base: FocusManager, keymap!: KeyMap = KeyMap())"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "ModalFocusState.open",
+          "signature": "public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "ModalFocusState.active",
+          "signature": "public func active(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "ModalFocusState.focus",
+          "signature": "public func focus(): FocusManager"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "ModalFocusState.close",
+          "signature": "public func close(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "ModalFocusState.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "ModalFocusState.actionFor",
+          "signature": "public func actionFor(key: KeyEvent): ?String"
+        }
+      ]
     }
   ]
 }
