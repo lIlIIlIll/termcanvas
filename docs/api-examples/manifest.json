@@ -11635,6 +11635,296 @@
           "signature": "public init( materialized: Int64, cacheEntries: Int64, measuredEntries: Int64, cachedRows: Int64, appendOnlyFullLayouts!: Int64 = 0, appendOnlyIncrementalLayouts!: Int64 = 0, appendOnlyRewrappedBytes!: Int64 = 0, syncCountCalls!: Int64 = 0, metadataTouches!: Int64 = 0, heightIndexResetEntries!: Int64 = 0, heightIndexUpdateCalls!: Int64 = 0, heightIndexNodesTouched!: Int64 = 0, heightIndexGrowOperations!: Int64 = 0, heightMetadataEntries!: Int64 = 0, heightIndexNodes!: Int64 = 0, cacheLookups!: Int64 = 0, cacheHits!: Int64 = 0, cacheMisses!: Int64 = 0, layoutCalls!: Int64 = 0, documentRequests!: Int64 = 0, documentsMaterialized!: Int64 = 0, wrapInputBytes!: Int64 = 0, measurementInvalidations!: Int64 = 0, measurementGenerationBumps!: Int64 = 0, staleEntriesEncountered!: Int64 = 0, entriesRemeasured!: Int64 = 0, estimateCorrections!: Int64 = 0, anchorCorrections!: Int64 = 0, visibleItems!: Int64 = 0, itemsVisited!: Int64 = 0, itemsPainted!: Int64 = 0, rowsVisited!: Int64 = 0, rowsPainted!: Int64 = 0, changedItems!: Int64 = 0, itemPaintCellAttempts!: Int64 = 0, rowPaintCellAttempts!: Int64 = 0, itemBackgroundCellAttempts!: Int64 = 0, contentCellAttempts!: Int64 = 0, layoutRowsRequested!: Int64 = 0, cachedRowsUsed!: Int64 = 0, selectiveItemInvalidations!: Int64 = 0, selectiveOffscreenInvalidations!: Int64 = 0, fallbackFullViewportPaints!: Int64 = 0 )"
         }
       ]
+    },
+    {
+      "id": "editor-completion",
+      "source": "docs/api-examples/editor-completion.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextAreaCaret",
+          "signature": "public class TextAreaCaret {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextAreaCaret.offset",
+          "signature": "public let offset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextAreaCaret.anchor",
+          "signature": "public let anchor: ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextAreaCaret.init",
+          "signature": "public init(offset: Int64, anchor!: ?Int64 = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest",
+          "signature": "public class TextCompletionRequest {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest.requestId",
+          "signature": "public let requestId: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest.revision",
+          "signature": "public let revision: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest.value",
+          "signature": "public let value: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest.cursor",
+          "signature": "public let cursor: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest.prefixStart",
+          "signature": "public let prefixStart: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest.prefixEnd",
+          "signature": "public let prefixEnd: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest.prefix",
+          "signature": "public let prefix: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest.line",
+          "signature": "public let line: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest.column",
+          "signature": "public let column: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionRequest.init",
+          "signature": "public init(requestId: String, revision: Int64, value: String, cursor: Int64, prefixStart: Int64, prefixEnd: Int64, prefix: String, line: Int64, column: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionItem",
+          "signature": "public class TextCompletionItem {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionItem.label",
+          "signature": "public let label: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionItem.insertText",
+          "signature": "public let insertText: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionItem.detail",
+          "signature": "public let detail: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionItem.init",
+          "signature": "public init(label: String, insertText!: String = \"\", detail!: String = \"\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionResult",
+          "signature": "public class TextCompletionResult {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionResult.requestId",
+          "signature": "public let requestId: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionResult.revision",
+          "signature": "public let revision: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionResult.replaceStart",
+          "signature": "public let replaceStart: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionResult.replaceEnd",
+          "signature": "public let replaceEnd: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionResult.items",
+          "signature": "public let items: Array<TextCompletionItem>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextCompletionResult.init",
+          "signature": "public init(requestId: String, revision: Int64, replaceStart: Int64, replaceEnd: Int64, items: Array<TextCompletionItem>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextDecoration",
+          "signature": "public class TextDecoration {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextDecoration.start",
+          "signature": "public let start: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextDecoration.end",
+          "signature": "public let end: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextDecoration.style",
+          "signature": "public let style: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "TextDecoration.init",
+          "signature": "public init(start: Int64, end: Int64, style: Style)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "HighlightSpan",
+          "signature": "public type HighlightSpan = TextDecoration"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "LineHighlight",
+          "signature": "public class LineHighlight {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "LineHighlight.line",
+          "signature": "public let line: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "LineHighlight.spans",
+          "signature": "public let spans: Array<TextDecoration>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "LineHighlight.init",
+          "signature": "public init(line: Int64, spans: Array<TextDecoration>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownHighlightCache",
+          "signature": "public class MarkdownHighlightCache {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownHighlightCache.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownHighlightCache.highlights",
+          "signature": "public func highlights(text: String): Array<TextDecoration>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownHighlightCache.lineHighlights",
+          "signature": "public func lineHighlights(text: String): Array<LineHighlight>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownHighlightCache.visibleHighlights",
+          "signature": "public func visibleHighlights(text: String, firstLine!: Int64 = 0, lineCount!: Int64 = 40): Array<TextDecoration>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownHighlightCache.recomputeCount",
+          "signature": "public func recomputeCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "MarkdownHighlightCache.invalidate",
+          "signature": "public func invalidate(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "markdownDecorations",
+          "signature": "public func markdownDecorations(text: String): Array<TextDecoration>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_area.cj",
+          "symbol": "markdownLineHighlights",
+          "signature": "public func markdownLineHighlights(text: String): Array<LineHighlight>"
+        }
+      ]
     }
   ]
 }

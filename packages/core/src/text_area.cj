@@ -32,27 +32,55 @@ class TextAreaEdit {
     }
 }
 
+/** 文本区域中的光标和可选选择锚点。 */
 public class TextAreaCaret {
+    /** 光标的 UTF-8 字节偏移，至少为零。 */
     public let offset: Int64
+    /** 可选的选择锚点字节偏移。 */
     public let anchor: ?Int64
 
+    /** 创建光标；offset 的负值按零处理。
+     * @param offset 光标字节偏移
+     * @param anchor 可选选择锚点
+     */
     public init(offset: Int64, anchor!: ?Int64 = None) {
         this.offset = max(0, offset)
         this.anchor = anchor
     }
 }
 
+/** 向补全提供方传递的文本与光标快照。 */
 public class TextCompletionRequest {
+    /** 补全请求标识。 */
     public let requestId: String
+    /** 请求对应的文本修订号。 */
     public let revision: Int64
+    /** 请求时的完整文本。 */
     public let value: String
+    /** 光标的 UTF-8 字节偏移。 */
     public let cursor: Int64
+    /** 补全前缀起始字节偏移。 */
     public let prefixStart: Int64
+    /** 补全前缀结束字节偏移。 */
     public let prefixEnd: Int64
+    /** 补全前缀文本。 */
     public let prefix: String
+    /** 光标所在行索引。 */
     public let line: Int64
+    /** 光标所在行的显示单元格列。 */
     public let column: Int64
 
+    /** 创建补全请求；各字段按传入值保存。
+     * @param requestId 补全请求标识
+     * @param revision 请求对应的文本修订号
+     * @param value 请求时的完整文本
+     * @param cursor 光标的 UTF-8 字节偏移
+     * @param prefixStart 补全前缀起始字节偏移
+     * @param prefixEnd 补全前缀结束字节偏移
+     * @param prefix 补全前缀文本
+     * @param line 光标所在行索引
+     * @param column 光标所在行的显示单元格列
+     */
     public init(requestId: String, revision: Int64, value: String, cursor: Int64, prefixStart: Int64, prefixEnd: Int64, prefix: String, line: Int64, column: Int64) {
         this.requestId = requestId
         this.revision = revision
@@ -66,11 +94,20 @@ public class TextCompletionRequest {
     }
 }
 
+/** 补全列表中的候选项。 */
 public class TextCompletionItem {
+    /** 显示标签。 */
     public let label: String
+    /** 确认后插入的文本。 */
     public let insertText: String
+    /** 候选项附加说明。 */
     public let detail: String
 
+    /** 创建候选项；插入文本为空时使用标签。
+     * @param label 显示标签
+     * @param insertText 插入文本
+     * @param detail 附加说明
+     */
     public init(label: String, insertText!: String = "", detail!: String = "") {
         this.label = label
         this.insertText = if (insertText.isEmpty()) { label } else { insertText }
@@ -78,13 +115,26 @@ public class TextCompletionItem {
     }
 }
 
+/** 补全提供方返回的候选项及替换范围。 */
 public class TextCompletionResult {
+    /** 对应请求标识。 */
     public let requestId: String
+    /** 对应文本修订号。 */
     public let revision: Int64
+    /** 替换范围起始 UTF-8 字节偏移。 */
     public let replaceStart: Int64
+    /** 替换范围结束 UTF-8 字节偏移。 */
     public let replaceEnd: Int64
+    /** 候选项。 */
     public let items: Array<TextCompletionItem>
 
+    /** 创建补全结果；起点限制为非负，终点限制为不小于起点。
+     * @param requestId 对应请求标识
+     * @param revision 对应文本修订号
+     * @param replaceStart 替换起始字节偏移
+     * @param replaceEnd 替换结束字节偏移
+     * @param items 候选项
+     */
     public init(requestId: String, revision: Int64, replaceStart: Int64, replaceEnd: Int64, items: Array<TextCompletionItem>) {
         this.requestId = requestId
         this.revision = revision
@@ -94,11 +144,20 @@ public class TextCompletionResult {
     }
 }
 
+/** 为 UTF-8 字节范围指定样式的装饰。 */
 public class TextDecoration {
+    /** 起始字节偏移，至少为零。 */
     public let start: Int64
+    /** 结束字节偏移，不小于起点。 */
     public let end: Int64
+    /** 装饰样式。 */
     public let style: Style
 
+    /** 创建文本装饰。
+     * @param start 起始字节偏移，负值按零处理
+     * @param end 结束字节偏移，小于起点时按起点处理
+     * @param style 装饰样式
+     */
     public init(start: Int64, end: Int64, style: Style) {
         this.start = max(0, start)
         this.end = max(this.start, end)
@@ -106,26 +165,40 @@ public class TextDecoration {
     }
 }
 
+/** 文本装饰的兼容别名。 */
 public type HighlightSpan = TextDecoration
 
+/** 某一文本行的装饰集合。 */
 public class LineHighlight {
+    /** 行索引，至少为零。 */
     public let line: Int64
+    /** 相对于该行的装饰范围。 */
     public let spans: Array<TextDecoration>
 
+    /** 创建行高亮。
+     * @param line 行索引，负值按零处理
+     * @param spans 行内装饰
+     */
     public init(line: Int64, spans: Array<TextDecoration>) {
         this.line = max(0, line)
         this.spans = spans
     }
 }
 
+/** 缓存基于文本的轻量 Markdown 高亮结果。 */
 public class MarkdownHighlightCache {
     private var cachedText: String = ""
     private var cachedSpans: Array<TextDecoration> = []
     private var cachedLines: Array<LineHighlight> = []
     private var recomputes: Int64 = 0
 
+    /** 创建空高亮缓存。 */
     public init() {}
 
+    /** 获取全文字节偏移的装饰；文本变化时重新计算。
+     * @param text Markdown 文本
+     * @return 全文装饰
+     */
     public func highlights(text: String): Array<TextDecoration> {
         if (text == cachedText) { return cachedSpans }
         cachedText = text
@@ -135,11 +208,21 @@ public class MarkdownHighlightCache {
         cachedSpans
     }
 
+    /** 获取按行分组的装饰。
+     * @param text Markdown 文本
+     * @return 行高亮数组
+     */
     public func lineHighlights(text: String): Array<LineHighlight> {
         if (text != cachedText) { _ = highlights(text) }
         cachedLines
     }
 
+    /** 获取指定行窗口的装饰，并转换为全文字节偏移。
+     * @param text Markdown 文本
+     * @param firstLine 起始行索引
+     * @param lineCount 最多获取的行数
+     * @return 窗口内的全文装饰
+     */
     public func visibleHighlights(text: String, firstLine!: Int64 = 0, lineCount!: Int64 = 40): Array<TextDecoration> {
         let lines = lineHighlights(text)
         let offsets = lineStartOffsets(text)
@@ -155,10 +238,14 @@ public class MarkdownHighlightCache {
         out.toArray()
     }
 
+    /** 获取缓存重新计算次数。
+     * @return 重新计算次数
+     */
     public func recomputeCount(): Int64 {
         recomputes
     }
 
+    /** 清除缓存文本和高亮结果。 */
     public func invalidate(): Unit {
         cachedText = ""
         cachedSpans = []
@@ -1807,6 +1894,10 @@ func isMarkdownFenceLine(line: String, start: Int64): Bool {
     matchesAsciiNeedleAt(line, "```", start) || matchesAsciiNeedleAt(line, "~~~", start)
 }
 
+/** 计算轻量 Markdown 全文高亮；范围使用全文字节偏移。
+ * @param text Markdown 文本
+ * @return 文本装饰
+ */
 public func markdownDecorations(text: String): Array<TextDecoration> {
     let out = ArrayList<TextDecoration>()
     let lines = splitLines(text)
@@ -1830,6 +1921,10 @@ public func markdownDecorations(text: String): Array<TextDecoration> {
     out.toArray()
 }
 
+/** 计算轻量 Markdown 按行高亮；每个范围相对于对应行。
+ * @param text Markdown 文本
+ * @return 按行分组的装饰
+ */
 public func markdownLineHighlights(text: String): Array<LineHighlight> {
     let out = ArrayList<LineHighlight>()
     let lines = splitLines(text)

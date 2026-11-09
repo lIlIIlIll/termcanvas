@@ -39207,7 +39207,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 35,
+      "line": 36,
       "level": "top_level",
       "kind": "class",
       "symbol": "TextAreaCaret",
@@ -39225,7 +39225,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 36,
+      "line": 38,
       "level": "member",
       "kind": "let",
       "symbol": "offset",
@@ -39243,7 +39243,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 37,
+      "line": 40,
       "level": "member",
       "kind": "let",
       "symbol": "anchor",
@@ -39261,7 +39261,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 39,
+      "line": 46,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -39279,7 +39279,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 45,
+      "line": 53,
       "level": "top_level",
       "kind": "class",
       "symbol": "TextCompletionRequest",
@@ -39297,7 +39297,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 46,
+      "line": 55,
       "level": "member",
       "kind": "let",
       "symbol": "requestId",
@@ -39315,7 +39315,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 47,
+      "line": 57,
       "level": "member",
       "kind": "let",
       "symbol": "revision",
@@ -39333,7 +39333,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 48,
+      "line": 59,
       "level": "member",
       "kind": "let",
       "symbol": "value",
@@ -39351,7 +39351,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 49,
+      "line": 61,
       "level": "member",
       "kind": "let",
       "symbol": "cursor",
@@ -39369,7 +39369,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 50,
+      "line": 63,
       "level": "member",
       "kind": "let",
       "symbol": "prefixStart",
@@ -39387,7 +39387,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 51,
+      "line": 65,
       "level": "member",
       "kind": "let",
       "symbol": "prefixEnd",
@@ -39405,7 +39405,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 52,
+      "line": 67,
       "level": "member",
       "kind": "let",
       "symbol": "prefix",
@@ -39423,7 +39423,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 53,
+      "line": 69,
       "level": "member",
       "kind": "let",
       "symbol": "line",
@@ -39441,7 +39441,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 54,
+      "line": 71,
       "level": "member",
       "kind": "let",
       "symbol": "column",
@@ -39459,7 +39459,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 56,
+      "line": 84,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -39477,7 +39477,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 69,
+      "line": 98,
       "level": "top_level",
       "kind": "class",
       "symbol": "TextCompletionItem",
@@ -39495,7 +39495,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 70,
+      "line": 100,
       "level": "member",
       "kind": "let",
       "symbol": "label",
@@ -39513,7 +39513,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 71,
+      "line": 102,
       "level": "member",
       "kind": "let",
       "symbol": "insertText",
@@ -39531,7 +39531,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 72,
+      "line": 104,
       "level": "member",
       "kind": "let",
       "symbol": "detail",
@@ -39549,7 +39549,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 74,
+      "line": 111,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -39567,7 +39567,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 81,
+      "line": 119,
       "level": "top_level",
       "kind": "class",
       "symbol": "TextCompletionResult",
@@ -39585,7 +39585,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 82,
+      "line": 121,
       "level": "member",
       "kind": "let",
       "symbol": "requestId",
@@ -39603,7 +39603,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 83,
+      "line": 123,
       "level": "member",
       "kind": "let",
       "symbol": "revision",
@@ -39621,7 +39621,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 84,
+      "line": 125,
       "level": "member",
       "kind": "let",
       "symbol": "replaceStart",
@@ -39639,7 +39639,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 85,
+      "line": 127,
       "level": "member",
       "kind": "let",
       "symbol": "replaceEnd",
@@ -39657,7 +39657,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 86,
+      "line": 129,
       "level": "member",
       "kind": "let",
       "symbol": "items",
@@ -39675,7 +39675,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 88,
+      "line": 138,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -39693,7 +39693,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 97,
+      "line": 148,
       "level": "top_level",
       "kind": "class",
       "symbol": "TextDecoration",
@@ -39711,7 +39711,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 98,
+      "line": 150,
       "level": "member",
       "kind": "let",
       "symbol": "start",
@@ -39729,7 +39729,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 99,
+      "line": 152,
       "level": "member",
       "kind": "let",
       "symbol": "end",
@@ -39747,7 +39747,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 100,
+      "line": 154,
       "level": "member",
       "kind": "let",
       "symbol": "style",
@@ -39765,7 +39765,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 102,
+      "line": 161,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -39783,7 +39783,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 109,
+      "line": 169,
       "level": "top_level",
       "kind": "type",
       "symbol": "HighlightSpan",
@@ -39801,7 +39801,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 111,
+      "line": 172,
       "level": "top_level",
       "kind": "class",
       "symbol": "LineHighlight",
@@ -39819,7 +39819,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 112,
+      "line": 174,
       "level": "member",
       "kind": "let",
       "symbol": "line",
@@ -39837,7 +39837,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 113,
+      "line": 176,
       "level": "member",
       "kind": "let",
       "symbol": "spans",
@@ -39855,7 +39855,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 115,
+      "line": 182,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -39873,7 +39873,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 121,
+      "line": 189,
       "level": "top_level",
       "kind": "class",
       "symbol": "MarkdownHighlightCache",
@@ -39891,7 +39891,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 127,
+      "line": 196,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -39909,7 +39909,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 129,
+      "line": 202,
       "level": "member",
       "kind": "func",
       "symbol": "highlights",
@@ -39927,7 +39927,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 138,
+      "line": 215,
       "level": "member",
       "kind": "func",
       "symbol": "lineHighlights",
@@ -39945,7 +39945,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 143,
+      "line": 226,
       "level": "member",
       "kind": "func",
       "symbol": "visibleHighlights",
@@ -39963,7 +39963,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 158,
+      "line": 244,
       "level": "member",
       "kind": "func",
       "symbol": "recomputeCount",
@@ -39981,7 +39981,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 162,
+      "line": 249,
       "level": "member",
       "kind": "func",
       "symbol": "invalidate",
@@ -39999,7 +39999,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 169,
+      "line": 256,
       "level": "top_level",
       "kind": "class",
       "symbol": "TextArea",
@@ -40017,7 +40017,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 173,
+      "line": 260,
       "level": "member",
       "kind": "prop",
       "symbol": "value",
@@ -40035,7 +40035,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 184,
+      "line": 271,
       "level": "member",
       "kind": "prop",
       "symbol": "textModel",
@@ -40053,7 +40053,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 185,
+      "line": 272,
       "level": "member",
       "kind": "var",
       "symbol": "horizontalScroll",
@@ -40071,7 +40071,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 192,
+      "line": 279,
       "level": "member",
       "kind": "var",
       "symbol": "cursor",
@@ -40089,7 +40089,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 193,
+      "line": 280,
       "level": "member",
       "kind": "var",
       "symbol": "scroll",
@@ -40107,7 +40107,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 194,
+      "line": 281,
       "level": "member",
       "kind": "var",
       "symbol": "selectionStart",
@@ -40125,7 +40125,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 195,
+      "line": 282,
       "level": "member",
       "kind": "var",
       "symbol": "selectionEnd",
@@ -40143,7 +40143,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 204,
+      "line": 291,
       "level": "member",
       "kind": "var",
       "symbol": "readOnly",
@@ -40161,7 +40161,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 205,
+      "line": 292,
       "level": "member",
       "kind": "var",
       "symbol": "markdownEditing",
@@ -40179,7 +40179,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 229,
+      "line": 316,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -40197,7 +40197,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 266,
+      "line": 353,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -40215,7 +40215,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 346,
+      "line": 433,
       "level": "member",
       "kind": "func",
       "symbol": "handleWithDirty",
@@ -40233,7 +40233,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 369,
+      "line": 456,
       "level": "member",
       "kind": "func",
       "symbol": "handleVimNavigation",
@@ -40251,7 +40251,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 389,
+      "line": 476,
       "level": "member",
       "kind": "func",
       "symbol": "setTextWidthOptions",
@@ -40269,7 +40269,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 398,
+      "line": 485,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -40287,7 +40287,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 433,
+      "line": 520,
       "level": "member",
       "kind": "func",
       "symbol": "cursorPosition",
@@ -40305,7 +40305,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 438,
+      "line": 525,
       "level": "member",
       "kind": "func",
       "symbol": "cursorPosition",
@@ -40323,7 +40323,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 451,
+      "line": 538,
       "level": "member",
       "kind": "func",
       "symbol": "cursorPositions",
@@ -40341,7 +40341,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 466,
+      "line": 553,
       "level": "member",
       "kind": "func",
       "symbol": "select",
@@ -40359,7 +40359,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 471,
+      "line": 558,
       "level": "member",
       "kind": "func",
       "symbol": "clearSelection",
@@ -40377,7 +40377,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 476,
+      "line": 563,
       "level": "member",
       "kind": "func",
       "symbol": "hasSelection",
@@ -40395,7 +40395,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 483,
+      "line": 570,
       "level": "member",
       "kind": "func",
       "symbol": "selectedText",
@@ -40413,7 +40413,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 491,
+      "line": 578,
       "level": "member",
       "kind": "func",
       "symbol": "selectedRange",
@@ -40431,7 +40431,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 496,
+      "line": 583,
       "level": "member",
       "kind": "func",
       "symbol": "carets",
@@ -40449,7 +40449,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 503,
+      "line": 590,
       "level": "member",
       "kind": "func",
       "symbol": "setCarets",
@@ -40467,7 +40467,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 520,
+      "line": 607,
       "level": "member",
       "kind": "func",
       "symbol": "addCaret",
@@ -40485,7 +40485,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 529,
+      "line": 616,
       "level": "member",
       "kind": "func",
       "symbol": "clearExtraCarets",
@@ -40503,7 +40503,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 533,
+      "line": 620,
       "level": "member",
       "kind": "func",
       "symbol": "selectedTexts",
@@ -40521,7 +40521,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 545,
+      "line": 632,
       "level": "member",
       "kind": "func",
       "symbol": "copySelectionTo",
@@ -40539,7 +40539,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 550,
+      "line": 637,
       "level": "member",
       "kind": "func",
       "symbol": "cutSelectionTo",
@@ -40557,7 +40557,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 557,
+      "line": 644,
       "level": "member",
       "kind": "func",
       "symbol": "pasteFrom",
@@ -40575,7 +40575,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 562,
+      "line": 649,
       "level": "member",
       "kind": "func",
       "symbol": "deleteSelection",
@@ -40593,7 +40593,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 571,
+      "line": 658,
       "level": "member",
       "kind": "func",
       "symbol": "paste",
@@ -40611,7 +40611,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 577,
+      "line": 664,
       "level": "member",
       "kind": "func",
       "symbol": "setDecorations",
@@ -40629,7 +40629,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 581,
+      "line": 668,
       "level": "member",
       "kind": "func",
       "symbol": "setDecorationProviders",
@@ -40647,7 +40647,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 585,
+      "line": 672,
       "level": "member",
       "kind": "func",
       "symbol": "applyDecorationUpdate",
@@ -40665,7 +40665,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 597,
+      "line": 684,
       "level": "member",
       "kind": "func",
       "symbol": "clearDecorationLayer",
@@ -40683,7 +40683,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 617,
+      "line": 704,
       "level": "member",
       "kind": "func",
       "symbol": "setValue",
@@ -40701,7 +40701,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 629,
+      "line": 716,
       "level": "member",
       "kind": "func",
       "symbol": "editRevision",
@@ -40719,7 +40719,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 634,
+      "line": 721,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -40737,7 +40737,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 683,
+      "line": 770,
       "level": "member",
       "kind": "func",
       "symbol": "beginCompletion",
@@ -40755,7 +40755,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 697,
+      "line": 784,
       "level": "member",
       "kind": "func",
       "symbol": "completionCommand",
@@ -40773,7 +40773,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 702,
+      "line": 789,
       "level": "member",
       "kind": "func",
       "symbol": "handleCompletionEvent",
@@ -40791,7 +40791,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 714,
+      "line": 801,
       "level": "member",
       "kind": "func",
       "symbol": "completionVisible",
@@ -40809,7 +40809,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 719,
+      "line": 806,
       "level": "member",
       "kind": "func",
       "symbol": "cancelCompletion",
@@ -40827,7 +40827,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 733,
+      "line": 820,
       "level": "member",
       "kind": "func",
       "symbol": "completionRows",
@@ -40845,7 +40845,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 739,
+      "line": 826,
       "level": "member",
       "kind": "func",
       "symbol": "renderCompletionOverlay",
@@ -40863,7 +40863,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 748,
+      "line": 835,
       "level": "member",
       "kind": "func",
       "symbol": "clearHistory",
@@ -40881,7 +40881,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 776,
+      "line": 863,
       "level": "member",
       "kind": "func",
       "symbol": "undo",
@@ -40899,7 +40899,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 787,
+      "line": 874,
       "level": "member",
       "kind": "func",
       "symbol": "redo",
@@ -40917,7 +40917,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 808,
+      "line": 895,
       "level": "member",
       "kind": "func",
       "symbol": "findNext",
@@ -40935,7 +40935,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 819,
+      "line": 906,
       "level": "member",
       "kind": "func",
       "symbol": "findPrevious",
@@ -40953,7 +40953,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 830,
+      "line": 917,
       "level": "member",
       "kind": "func",
       "symbol": "moveWordLeft",
@@ -40971,7 +40971,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 835,
+      "line": 922,
       "level": "member",
       "kind": "func",
       "symbol": "moveWordRight",
@@ -40989,7 +40989,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 1363,
+      "line": 1450,
       "level": "member",
       "kind": "func",
       "symbol": "lineCacheRebuildCount",
@@ -41007,7 +41007,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 1810,
+      "line": 1901,
       "level": "top_level",
       "kind": "func",
       "symbol": "markdownDecorations",
@@ -41025,7 +41025,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 1833,
+      "line": 1928,
       "level": "top_level",
       "kind": "func",
       "symbol": "markdownLineHighlights",
@@ -41043,7 +41043,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 1944,
+      "line": 2039,
       "level": "top_level",
       "kind": "class",
       "symbol": "MarkdownEditorBehavior",
@@ -41061,7 +41061,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 1947,
+      "line": 2042,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -41079,7 +41079,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 1949,
+      "line": 2044,
       "level": "member",
       "kind": "func",
       "symbol": "applyHighlights",
@@ -41097,7 +41097,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 1953,
+      "line": 2048,
       "level": "member",
       "kind": "func",
       "symbol": "invalidate",
@@ -41115,7 +41115,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 1957,
+      "line": 2052,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -41133,7 +41133,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 1990,
+      "line": 2085,
       "level": "member",
       "kind": "func",
       "symbol": "toggleBold",
@@ -41151,7 +41151,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 1995,
+      "line": 2090,
       "level": "member",
       "kind": "func",
       "symbol": "toggleItalic",
@@ -41169,7 +41169,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2000,
+      "line": 2095,
       "level": "member",
       "kind": "func",
       "symbol": "toggleCode",
@@ -41187,7 +41187,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2005,
+      "line": 2100,
       "level": "member",
       "kind": "func",
       "symbol": "insertLink",
@@ -41205,7 +41205,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2015,
+      "line": 2110,
       "level": "member",
       "kind": "func",
       "symbol": "insertImage",
@@ -41223,7 +41223,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2033,
+      "line": 2128,
       "level": "member",
       "kind": "func",
       "symbol": "insertReferenceLink",
@@ -41241,7 +41241,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2043,
+      "line": 2138,
       "level": "member",
       "kind": "func",
       "symbol": "insertReferenceDefinition",
@@ -41259,7 +41259,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2050,
+      "line": 2145,
       "level": "member",
       "kind": "func",
       "symbol": "insertFrontmatter",
@@ -41277,7 +41277,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2061,
+      "line": 2156,
       "level": "member",
       "kind": "func",
       "symbol": "insertTable",
@@ -41295,7 +41295,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2067,
+      "line": 2162,
       "level": "member",
       "kind": "func",
       "symbol": "insertCodeFence",
@@ -41313,7 +41313,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2074,
+      "line": 2169,
       "level": "top_level",
       "kind": "class",
       "symbol": "MarkdownTextEditor",
@@ -41331,7 +41331,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2075,
+      "line": 2170,
       "level": "member",
       "kind": "let",
       "symbol": "area",
@@ -41349,7 +41349,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2076,
+      "line": 2171,
       "level": "member",
       "kind": "let",
       "symbol": "behavior",
@@ -41367,7 +41367,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2078,
+      "line": 2173,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -41385,7 +41385,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2083,
+      "line": 2178,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -41403,7 +41403,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_area.cj",
-      "line": 2087,
+      "line": 2182,
       "level": "member",
       "kind": "func",
       "symbol": "render",
