@@ -271,17 +271,17 @@ packages/core/src/app.cj:3046:public class MacOSPollEventWaiter <: EventWaiter {
 packages/core/src/app.cj:3049:public init()
 packages/core/src/app.cj:3051:public func wait(timeoutMillis: Int64, previousReadBytes!: Int64 = 1, sources!: Array<EventSource> = []): Unit
 packages/core/src/app.cj:3088:public func close(): Unit
-packages/core/src/app.cj:3210:public class FocusManager {
-packages/core/src/app.cj:3215:public init()
-packages/core/src/app.cj:3217:public func add(id: String, enabled!: Bool = true): Unit
-packages/core/src/app.cj:3225:public func remove(id: String): Unit
-packages/core/src/app.cj:3239:public func focus(id: String): Bool
-packages/core/src/app.cj:3247:public func setEnabled(id: String, value: Bool): Bool
-packages/core/src/app.cj:3259:public func current(): ?String
-packages/core/src/app.cj:3264:public func isFocused(id: String): Bool
-packages/core/src/app.cj:3271:public func next(): ?String
-packages/core/src/app.cj:3275:public func previous(): ?String
-packages/core/src/app.cj:3279:public func handle(key: KeyEvent): Bool
+packages/core/src/app.cj:3211:public class FocusManager {
+packages/core/src/app.cj:3217:public init()
+packages/core/src/app.cj:3223:public func add(id: String, enabled!: Bool = true): Unit
+packages/core/src/app.cj:3234:public func remove(id: String): Unit
+packages/core/src/app.cj:3252:public func focus(id: String): Bool
+packages/core/src/app.cj:3264:public func setEnabled(id: String, value: Bool): Bool
+packages/core/src/app.cj:3279:public func current(): ?String
+packages/core/src/app.cj:3288:public func isFocused(id: String): Bool
+packages/core/src/app.cj:3298:public func next(): ?String
+packages/core/src/app.cj:3305:public func previous(): ?String
+packages/core/src/app.cj:3313:public func handle(key: KeyEvent): Bool
 packages/core/src/buffer.cj:6:public enum CellKind {
 packages/core/src/buffer.cj:8:Normal
 packages/core/src/buffer.cj:10:WideLead

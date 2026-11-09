@@ -8573,6 +8573,86 @@
           "signature": "public func commandFor(source: MediaSource, options: AsciiRenderOptions): String"
         }
       ]
+    },
+    {
+      "id": "focus",
+      "source": "docs/api-examples/focus.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager",
+          "signature": "public class FocusManager {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager.add",
+          "signature": "public func add(id: String, enabled!: Bool = true): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager.remove",
+          "signature": "public func remove(id: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager.focus",
+          "signature": "public func focus(id: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager.setEnabled",
+          "signature": "public func setEnabled(id: String, value: Bool): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager.current",
+          "signature": "public func current(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager.isFocused",
+          "signature": "public func isFocused(id: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager.next",
+          "signature": "public func next(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager.previous",
+          "signature": "public func previous(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/app.cj",
+          "symbol": "FocusManager.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        }
+      ]
     }
   ]
 }

@@ -3207,13 +3207,19 @@ func splitCommandLine(commandLine: String): Array<String> {
     parts.toArray()
 }
 
+/** 按注册顺序管理焦点，并在启用的条目之间循环切换。 */
 public class FocusManager {
     private let ids = ArrayList<String>()
     private let enabled = ArrayList<Bool>()
     private var currentIndex: Int64 = -1
 
+    /** 创建空的焦点管理器。 */
     public init() {}
 
+    /** 注册焦点条目；尚无焦点时，首个启用条目获得焦点。允许重复标识。
+     * @param id 条目标识
+     * @param enabled 是否启用
+     */
     public func add(id: String, enabled!: Bool = true): Unit {
         ids.add(id)
         this.enabled.add(enabled)
@@ -3222,6 +3228,9 @@ public class FocusManager {
         }
     }
 
+    /** 移除首个匹配的条目；当前条目被移除时尝试聚焦下一个启用条目。
+     * @param id 条目标识
+     */
     public func remove(id: String): Unit {
         let index = indexOf(id)
         if (index < 0) { return }
@@ -3236,6 +3245,10 @@ public class FocusManager {
         }
     }
 
+    /** 聚焦首个匹配且启用的条目。
+     * @param id 条目标识
+     * @return 成功聚焦时为 true
+     */
     public func focus(id: String): Bool {
         let index = indexOf(id)
         if (index < 0 || !enabled[index]) { return false }
@@ -3243,7 +3256,11 @@ public class FocusManager {
         true
     }
 
-    /** 更新首个匹配条目的启用状态；不存在时返回 false。禁用当前条目时焦点移到下一个启用条目，全部禁用则清除焦点。重新启用且没有焦点时聚焦该条目。 */
+    /** 更新首个匹配条目的启用状态；不存在时返回 false。禁用当前条目时焦点移到下一个启用条目，全部禁用则清除焦点。重新启用且没有焦点时聚焦该条目。
+     * @param id 条目标识
+     * @param value 是否启用
+     * @return 找到条目时为 true
+     */
     public func setEnabled(id: String, value: Bool): Bool {
         let index = indexOf(id)
         if (index < 0) { return false }
@@ -3256,11 +3273,18 @@ public class FocusManager {
         true
     }
 
+    /** 获取当前焦点标识。
+     * @return 焦点标识；没有焦点时为 None
+     */
     public func current(): ?String {
         if (currentIndex < 0 || currentIndex >= ids.size) { return None }
         Some(ids[currentIndex])
     }
 
+    /** 判断指定标识是否为当前焦点。
+     * @param id 条目标识
+     * @return 标识匹配时为 true
+     */
     public func isFocused(id: String): Bool {
         match (current()) {
             case Some(v) => v == id
@@ -3268,14 +3292,24 @@ public class FocusManager {
         }
     }
 
+    /** 向后循环移动到下一个启用条目。
+     * @return 新焦点；没有启用条目时为 None
+     */
     public func next(): ?String {
         move(1)
     }
 
+    /** 向前循环移动到上一个启用条目。
+     * @return 新焦点；没有启用条目时为 None
+     */
     public func previous(): ?String {
         move(-1)
     }
 
+    /** 处理 Tab、Shift+Tab 和 BackTab 焦点切换。
+     * @param key 按键事件
+     * @return 识别到切换按键时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         match (key.code) {
             case KeyCode.Tab =>

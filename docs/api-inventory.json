@@ -5008,7 +5008,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3210,
+      "line": 3211,
       "level": "top_level",
       "kind": "class",
       "symbol": "FocusManager",
@@ -5026,7 +5026,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3215,
+      "line": 3217,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -5044,7 +5044,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3217,
+      "line": 3223,
       "level": "member",
       "kind": "func",
       "symbol": "add",
@@ -5062,7 +5062,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3225,
+      "line": 3234,
       "level": "member",
       "kind": "func",
       "symbol": "remove",
@@ -5080,7 +5080,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3239,
+      "line": 3252,
       "level": "member",
       "kind": "func",
       "symbol": "focus",
@@ -5098,7 +5098,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3247,
+      "line": 3264,
       "level": "member",
       "kind": "func",
       "symbol": "setEnabled",
@@ -5116,7 +5116,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3259,
+      "line": 3279,
       "level": "member",
       "kind": "func",
       "symbol": "current",
@@ -5134,7 +5134,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3264,
+      "line": 3288,
       "level": "member",
       "kind": "func",
       "symbol": "isFocused",
@@ -5152,7 +5152,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3271,
+      "line": 3298,
       "level": "member",
       "kind": "func",
       "symbol": "next",
@@ -5170,7 +5170,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3275,
+      "line": 3305,
       "level": "member",
       "kind": "func",
       "symbol": "previous",
@@ -5188,7 +5188,7 @@
     {
       "package": "core",
       "path": "packages/core/src/app.cj",
-      "line": 3279,
+      "line": 3313,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
