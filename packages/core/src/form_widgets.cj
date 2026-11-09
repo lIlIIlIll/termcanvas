@@ -606,11 +606,15 @@ public class Select <: Widget {
     }
 }
 
+/** 可展开的单选列表，支持可选的选择事务。 */
 public class Dropdown <: Widget {
     private let items: Array<String>
+    /** 当前选项索引；交互和绘制时限制到有效范围。 */
     public var selected: Int64
+    /** 展开列表的首个可见选项索引。 */
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1
+    /** 列表是否展开。 */
     public var open: Bool
     private let placeholder: String
     private let style: Style
@@ -622,6 +626,14 @@ public class Dropdown <: Widget {
     private var transactionActive: Bool = false
     private var originalSelection: Int64 = 0
 
+    /** 创建下拉列表。
+     * @param items 选项文本
+     * @param selected 初始索引
+     * @param open 是否初始展开
+     * @param placeholder 没有有效选项时显示的文本
+     * @param style 普通样式
+     * @param selectedStyle 选中项样式
+     */
     public init(
         items: Array<String>,
         selected!: Int64 = 0,
@@ -639,6 +651,9 @@ public class Dropdown <: Widget {
     }
 
     /** 设置聚焦、禁用状态和语义主题；禁用时拒绝键盘与鼠标输入。省略 selectedStyle 或显式传入 Style.default() 时使用主题选中角色，其余显式选中样式保持优先。
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param theme 可选的语义主题
      */
     public func setVisualState(
         focused!: Bool = false,
@@ -651,6 +666,7 @@ public class Dropdown <: Widget {
     }
 
     /** 启用后，展开时保存原选项；导航和滚轮仅预览，Enter、空格及可见选项点击提交，Esc、标题折叠和 cancelSelection() 恢复。默认关闭以保留旧行为；关闭事务模式会取消进行中的事务。
+     * @param enabled 是否启用事务选择
      */
     public func setTransactionalSelection(enabled!: Bool): Unit {
         if (transactionalSelection == enabled) { return }
@@ -726,11 +742,16 @@ public class Dropdown <: Widget {
         if (focused) { addFocusedModifiers(base, Style.default(), theme) } else { base }
     }
 
+    /** 获取当前选项文本。
+     * @return 索引有效时的选项，否则为 None
+     */
     public func selectedValue(): ?String {
         if (selected >= 0 && selected < items.size) { Some(items[selected]) } else { None }
     }
 
     /** 关闭时按回车或空格会展开；默认非事务模式下 Esc 关闭但保留预览索引。启用事务模式后，导航仅预览，回车或空格提交，Esc 恢复展开前索引。
+     * @param key 按键事件
+     * @return 提交的选项；其他情况为 None
      */
     public func handle(key: KeyEvent): ?String {
         observeTransactionState()
@@ -761,6 +782,9 @@ public class Dropdown <: Widget {
         }
     }
     /** 标题点击切换展开状态；事务模式下可见选项点击提交，滚轮只预览当前选项。
+     * @param mouse 鼠标事件
+     * @param area 控件区域
+     * @return 点击提交的选项；其他情况为 None
      */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
         if (open) { viewportHeight = max(0, area.height - 1) }
@@ -794,6 +818,10 @@ public class Dropdown <: Widget {
     }
 
 
+    /** 绘制标题和可选的展开列表。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         if (open) { viewportHeight = max(0, area.height - 1) }
@@ -833,6 +861,8 @@ public class ColorPicker <: Widget {
     public var selected: Int64
 
     /** 保存候选颜色并限制初始索引；空候选数组的索引为 0，且不会产生选中颜色。
+     * @param colors 候选颜色
+     * @param selected 初始选中索引
      */
     public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0) {
         this.colors = colors
@@ -840,6 +870,9 @@ public class ColorPicker <: Widget {
     }
 
     /** 设置聚焦、禁用状态和语义主题；禁用时拒绝键盘与鼠标输入。
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param theme 可选的语义主题
      */
     public func setVisualState(
         focused!: Bool = false,
@@ -852,12 +885,15 @@ public class ColorPicker <: Widget {
     }
 
     /** 当前索引有效时返回对应颜色；空候选数组或直接赋值的无效索引返回 None。
+     * @return 当前颜色，或 None
      */
     public func selectedColor(): ?Color {
         if (selected >= 0 && selected < colors.size) { Some(colors[selected]) } else { None }
     }
 
     /** 左右键在边界处停留，Home/End 选择首尾颜色；支持的按键先规范化索引。禁用、空候选数组或不支持的按键返回 false 且不修改状态。
+     * @param key 按键事件
+     * @return 处理按键时为 true
      */
     public func handle(key: KeyEvent): Bool {
         if (disabled || colors.size == 0) { return false }
@@ -883,6 +919,9 @@ public class ColorPicker <: Widget {
     }
 
     /** 左键按下仅选择当前可见且两格完整的色块；间隔、释放、区域外、禁用或空候选数组均不修改状态。
+     * @param mouse 鼠标事件
+     * @param area 控件区域
+     * @return 选中色块时为 true
      */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         if (disabled || colors.size == 0 || !widgetHitTest(mouse, area) || mouse.y != area.y) { return false }
@@ -901,6 +940,8 @@ public class ColorPicker <: Widget {
     }
 
     /** 在指定区域裁剪绘制颜色候选项；规范化索引并保持选中色块在可见窗口内。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
@@ -977,6 +1018,7 @@ public class MultiSelect <: Widget {
     /** 当前指向的条目索引，用于切换该项的选中状态，并决定绘制时哪一行使用光标样式。
      */
     public var cursor: Int64
+    /** 首个可见条目的索引。 */
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1
     private let style: ?Style
@@ -984,6 +1026,12 @@ public class MultiSelect <: Widget {
     private let theme: ?Theme
 
     /** 保存条目与两种绘制样式，将光标限制在 0 到最后一个条目索引之间，并按传入顺序保存有效且不重复的初始选中索引。省略样式时使用主题角色，显式样式优先。
+     * @param items 条目文本
+     * @param cursor 初始光标索引
+     * @param selected 初始选中索引
+     * @param style 普通样式
+     * @param selectedStyle 光标行样式
+     * @param theme 可选语义主题
      */
     public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: ?Style = None,
         selectedStyle!: ?Style = None, theme!: ?Theme = None) {
@@ -999,8 +1047,12 @@ public class MultiSelect <: Widget {
         }
     }
 
+    /** 按选中顺序获取条目索引。
+     * @return 已选索引数组
+     */
     public func selectedIndices(): Array<Int64> { selectedItems.toArray() }
 
+    /** 切换光标条目的选中状态；光标无效时不操作。 */
     public func toggle(): Unit {
         if (cursor < 0 || cursor >= items.size) { return }
         for (i in 0..selectedItems.size) {
@@ -1012,6 +1064,10 @@ public class MultiSelect <: Widget {
         selectedItems.add(cursor)
     }
 
+    /** 使用导航键移动光标，使用回车或空格切换当前条目。
+     * @param key 按键事件
+     * @return 识别到按键时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         if (let Some(index) <- selectionNavigation(key, cursor, items.size, viewportHeight)) {
             cursor = index
@@ -1025,6 +1081,11 @@ public class MultiSelect <: Widget {
         }
     }
 
+    /** 鼠标点击切换对应条目，滚轮移动光标。
+     * @param mouse 鼠标事件
+     * @param area 控件区域
+     * @return 处理鼠标事件时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         offset = selectionViewportOffset(offset, cursor, items.size, area.height)
         if (let Some(index) <- selectionMouse(mouse, area, offset, items.size, cursor)) {
@@ -1035,6 +1096,10 @@ public class MultiSelect <: Widget {
         false
     }
 
+    /** 绘制可见条目及选中标记，并保持光标可见。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         viewportHeight = max(1, area.height)
         cursor = clamp(cursor, 0, max(0, items.size - 1))
@@ -1057,15 +1122,26 @@ public class MultiSelect <: Widget {
     }
 }
 
+/** 显示并通过键盘调整年月日。 */
 public class DatePicker <: Widget {
+    /** 年份；支持的键盘操作会将其规范化为至少 1。 */
     public var year: Int64
+    /** 月份；支持的键盘操作会将其规范化到 1 到 12。 */
     public var month: Int64
+    /** 日期；支持的键盘操作会限制到对应月份的有效范围。 */
     public var day: Int64
     private var focused: Bool
     private var disabled: Bool
     private let style: Style
     private var theme: ?Theme
 
+    /** 创建日期选择器，并将日期限制到有效范围。
+     * @param year 年份，至少为 1
+     * @param month 月份，限制为 1 到 12
+     * @param day 日期，限制到月份有效范围
+     * @param style 日期样式
+     * @param theme 可选语义主题
+     */
     public init(
         year!: Int64 = 2026,
         month!: Int64 = 1,
@@ -1083,6 +1159,9 @@ public class DatePicker <: Widget {
     }
 
     /** 设置聚焦、禁用状态及语义主题；禁用时拒绝日期键盘操作。
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param theme 可选的语义主题
      */
     public func setVisualState(
         focused!: Bool = false,
@@ -1100,9 +1179,14 @@ public class DatePicker <: Widget {
         day = clamp(day, 1, datePickerDaysInMonth(year, month))
     }
 
+    /** 将当前字段格式化为年-月-日文本；不会先规范化直接修改的字段。
+     * @return 格式化的日期
+     */
     public func value(): String { "${year}-${pad2(month)}-${pad2(day)}" }
 
     /** 左右键调整日，上下键调整月，PageUp/PageDown 调整年；支持的操作先校正公开日期字段。禁用或不支持的按键返回 false 且不修改状态。
+     * @param key 按键事件
+     * @return 识别到日期调整按键时为 true
      */
     public func handle(key: KeyEvent): Bool {
         if (disabled) { return false }
@@ -1135,6 +1219,8 @@ public class DatePicker <: Widget {
     }
 
     /** 在非空区域首行绘制截断后的日期文本；样式按视觉状态和主题解析，默认保持青色前景。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }

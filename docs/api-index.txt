@@ -1073,44 +1073,44 @@ packages/core/src/form_widgets.cj:536:public func handle(key: KeyEvent): ?String
 packages/core/src/form_widgets.cj:565:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/form_widgets.cj:573:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): ?String
 packages/core/src/form_widgets.cj:587:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:609:public class Dropdown <: Widget {
-packages/core/src/form_widgets.cj:611:public var selected: Int64
-packages/core/src/form_widgets.cj:612:public var offset: Int64 = 0
-packages/core/src/form_widgets.cj:614:public var open: Bool
-packages/core/src/form_widgets.cj:625:public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: ?Style = None )
-packages/core/src/form_widgets.cj:643:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/form_widgets.cj:655:public func setTransactionalSelection(enabled!: Bool): Unit
-packages/core/src/form_widgets.cj:669:public func cancelSelection(): Unit
-packages/core/src/form_widgets.cj:729:public func selectedValue(): ?String
-packages/core/src/form_widgets.cj:735:public func handle(key: KeyEvent): ?String
-packages/core/src/form_widgets.cj:765:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
-packages/core/src/form_widgets.cj:797:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:826:public class ColorPicker <: Widget {
-packages/core/src/form_widgets.cj:833:public var selected: Int64
-packages/core/src/form_widgets.cj:837:public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)
-packages/core/src/form_widgets.cj:844:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/form_widgets.cj:856:public func selectedColor(): ?Color
-packages/core/src/form_widgets.cj:862:public func handle(key: KeyEvent): Bool
-packages/core/src/form_widgets.cj:887:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/form_widgets.cj:905:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:974:public class MultiSelect <: Widget {
-packages/core/src/form_widgets.cj:979:public var cursor: Int64
-packages/core/src/form_widgets.cj:980:public var offset: Int64 = 0
-packages/core/src/form_widgets.cj:988:public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
-packages/core/src/form_widgets.cj:1002:public func selectedIndices(): Array<Int64>
-packages/core/src/form_widgets.cj:1004:public func toggle(): Unit
-packages/core/src/form_widgets.cj:1015:public func handle(key: KeyEvent): Bool
-packages/core/src/form_widgets.cj:1028:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/form_widgets.cj:1038:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/form_widgets.cj:1060:public class DatePicker <: Widget {
-packages/core/src/form_widgets.cj:1061:public var year: Int64
-packages/core/src/form_widgets.cj:1062:public var month: Int64
-packages/core/src/form_widgets.cj:1063:public var day: Int64
-packages/core/src/form_widgets.cj:1069:public init( year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1, style!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None )
-packages/core/src/form_widgets.cj:1087:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/form_widgets.cj:1103:public func value(): String
-packages/core/src/form_widgets.cj:1107:public func handle(key: KeyEvent): Bool
-packages/core/src/form_widgets.cj:1139:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:610:public class Dropdown <: Widget {
+packages/core/src/form_widgets.cj:613:public var selected: Int64
+packages/core/src/form_widgets.cj:615:public var offset: Int64 = 0
+packages/core/src/form_widgets.cj:618:public var open: Bool
+packages/core/src/form_widgets.cj:637:public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: ?Style = None )
+packages/core/src/form_widgets.cj:658:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/form_widgets.cj:671:public func setTransactionalSelection(enabled!: Bool): Unit
+packages/core/src/form_widgets.cj:685:public func cancelSelection(): Unit
+packages/core/src/form_widgets.cj:748:public func selectedValue(): ?String
+packages/core/src/form_widgets.cj:756:public func handle(key: KeyEvent): ?String
+packages/core/src/form_widgets.cj:789:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
+packages/core/src/form_widgets.cj:825:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:854:public class ColorPicker <: Widget {
+packages/core/src/form_widgets.cj:861:public var selected: Int64
+packages/core/src/form_widgets.cj:867:public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)
+packages/core/src/form_widgets.cj:877:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/form_widgets.cj:890:public func selectedColor(): ?Color
+packages/core/src/form_widgets.cj:898:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:926:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/form_widgets.cj:946:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:1015:public class MultiSelect <: Widget {
+packages/core/src/form_widgets.cj:1020:public var cursor: Int64
+packages/core/src/form_widgets.cj:1022:public var offset: Int64 = 0
+packages/core/src/form_widgets.cj:1036:public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
+packages/core/src/form_widgets.cj:1053:public func selectedIndices(): Array<Int64>
+packages/core/src/form_widgets.cj:1056:public func toggle(): Unit
+packages/core/src/form_widgets.cj:1071:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:1089:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/form_widgets.cj:1103:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/form_widgets.cj:1126:public class DatePicker <: Widget {
+packages/core/src/form_widgets.cj:1128:public var year: Int64
+packages/core/src/form_widgets.cj:1130:public var month: Int64
+packages/core/src/form_widgets.cj:1132:public var day: Int64
+packages/core/src/form_widgets.cj:1145:public init( year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1, style!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:1166:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/form_widgets.cj:1185:public func value(): String
+packages/core/src/form_widgets.cj:1191:public func handle(key: KeyEvent): Bool
+packages/core/src/form_widgets.cj:1225:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/geometry.cj:6:public struct Rect <: Equatable<Rect> {
 packages/core/src/geometry.cj:8:public var x: Int64
 packages/core/src/geometry.cj:10:public var y: Int64

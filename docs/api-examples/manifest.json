@@ -9351,6 +9351,262 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "dropdown-color",
+      "source": "docs/api-examples/dropdown-color.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown",
+          "signature": "public class Dropdown <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.selected",
+          "signature": "public var selected: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.offset",
+          "signature": "public var offset: Int64 = 0"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.open",
+          "signature": "public var open: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.init",
+          "signature": "public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = \"Select\", style!: Style = Style.default(), selectedStyle!: ?Style = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.setVisualState",
+          "signature": "public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.setTransactionalSelection",
+          "signature": "public func setTransactionalSelection(enabled!: Bool): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.cancelSelection",
+          "signature": "public func cancelSelection(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.selectedValue",
+          "signature": "public func selectedValue(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.handle",
+          "signature": "public func handle(key: KeyEvent): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Dropdown.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "ColorPicker",
+          "signature": "public class ColorPicker <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "ColorPicker.selected",
+          "signature": "public var selected: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "ColorPicker.init",
+          "signature": "public init(colors!: Array<Color> = [Color.Red, Color.Green, Color.Yellow, Color.Blue, Color.Magenta, Color.Cyan], selected!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "ColorPicker.setVisualState",
+          "signature": "public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "ColorPicker.selectedColor",
+          "signature": "public func selectedColor(): ?Color"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "ColorPicker.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "ColorPicker.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "ColorPicker.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
+    },
+    {
+      "id": "multiselect-date",
+      "source": "docs/api-examples/multiselect-date.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "MultiSelect",
+          "signature": "public class MultiSelect <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "MultiSelect.cursor",
+          "signature": "public var cursor: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "MultiSelect.offset",
+          "signature": "public var offset: Int64 = 0"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "MultiSelect.init",
+          "signature": "public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "MultiSelect.selectedIndices",
+          "signature": "public func selectedIndices(): Array<Int64>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "MultiSelect.toggle",
+          "signature": "public func toggle(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "MultiSelect.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "MultiSelect.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "MultiSelect.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "DatePicker",
+          "signature": "public class DatePicker <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "DatePicker.year",
+          "signature": "public var year: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "DatePicker.month",
+          "signature": "public var month: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "DatePicker.day",
+          "signature": "public var day: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "DatePicker.init",
+          "signature": "public init( year!: Int64 = 2026, month!: Int64 = 1, day!: Int64 = 1, style!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "DatePicker.setVisualState",
+          "signature": "public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "DatePicker.value",
+          "signature": "public func value(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "DatePicker.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "DatePicker.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }
