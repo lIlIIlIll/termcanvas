@@ -1809,27 +1809,27 @@ packages/core/src/style.cj:286:public let strongBorder: Style
 packages/core/src/style.cj:288:public let iconSet: IconSet
 packages/core/src/style.cj:290:public let borderKind: BorderKind
 packages/core/src/style.cj:292:public let progressSymbols: ?ProgressBarSymbols
-packages/core/src/style.cj:294:public init( normal!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), focused!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(54, 50, 61), modifier: focusModifier()), selected!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(42, 44, 63), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), error!: Style = Style(fg: Color.Rgb(255, 122, 131), bg: Color.Rgb(19, 20, 34), modifier: errorModifier()), accent!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), success!: Style = Style(fg: Color.Rgb(111, 211, 162), bg: Color.Rgb(19, 20, 34)), warning!: Style = Style(fg: Color.Rgb(255, 198, 114), bg: Color.Rgb(19, 20, 34)), info!: Style = Style(fg: Color.Rgb(118, 193, 231), bg: Color.Rgb(19, 20, 34)), canvas!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), surface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(26, 27, 44)), raisedSurface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(36, 38, 57)), heading!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34), modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), border!: Style = Style(fg: Color.Rgb(88, 92, 115), bg: Color.Rgb(19, 20, 34)), strongBorder!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), iconSet!: IconSet = IconSet.Unicode, borderKind!: BorderKind = BorderKind.Auto, progressSymbols!: ?ProgressBarSymbols = None )
-packages/core/src/style.cj:336:public static func default(): Theme
-packages/core/src/style.cj:341:public func resolveState(focused!: Bool = false, selected!: Bool = false, disabled!: Bool = false, error!: Bool = false, override!: ?StyleOverride = None): Style
-packages/core/src/style.cj:348:public func withIconSet(value: IconSet): Theme
-packages/core/src/style.cj:357:public func withBorderKind(value: BorderKind): Theme
-packages/core/src/style.cj:366:public func withProgressSymbols(value: ?ProgressBarSymbols): Theme
-packages/core/src/style.cj:375:public func withTerminalBackground(): Theme
-packages/core/src/style.cj:387:public static func indigo(accent!: Color = Color.Rgb(244, 187, 96)): Theme
-packages/core/src/style.cj:394:public static func graphite(accent!: Color = Color.Cyan): Theme
-packages/core/src/style.cj:400:public static func light(): Theme
-packages/core/src/style.cj:404:public static func light(accent!: Color): Theme
-packages/core/src/style.cj:410:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: ?Color = None ): Theme
-packages/core/src/style.cj:425:public func adapted(capabilities: TerminalCapabilities): Theme
-packages/core/src/style.cj:465:public func serialize(): String
-packages/core/src/style.cj:481:public enum StyleState {
-packages/core/src/style.cj:483:Normal
-packages/core/src/style.cj:485:Focused
-packages/core/src/style.cj:487:Selected
-packages/core/src/style.cj:489:Disabled
-packages/core/src/style.cj:491:Error
-packages/core/src/style.cj:493:Accent
+packages/core/src/style.cj:315:public init( normal!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), focused!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(54, 50, 61), modifier: focusModifier()), selected!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(42, 44, 63), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), error!: Style = Style(fg: Color.Rgb(255, 122, 131), bg: Color.Rgb(19, 20, 34), modifier: errorModifier()), accent!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), success!: Style = Style(fg: Color.Rgb(111, 211, 162), bg: Color.Rgb(19, 20, 34)), warning!: Style = Style(fg: Color.Rgb(255, 198, 114), bg: Color.Rgb(19, 20, 34)), info!: Style = Style(fg: Color.Rgb(118, 193, 231), bg: Color.Rgb(19, 20, 34)), canvas!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), surface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(26, 27, 44)), raisedSurface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(36, 38, 57)), heading!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34), modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), border!: Style = Style(fg: Color.Rgb(88, 92, 115), bg: Color.Rgb(19, 20, 34)), strongBorder!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), iconSet!: IconSet = IconSet.Unicode, borderKind!: BorderKind = BorderKind.Auto, progressSymbols!: ?ProgressBarSymbols = None )
+packages/core/src/style.cj:360:public static func default(): Theme
+packages/core/src/style.cj:372:public func resolveState(focused!: Bool = false, selected!: Bool = false, disabled!: Bool = false, error!: Bool = false, override!: ?StyleOverride = None): Style
+packages/core/src/style.cj:383:public func withIconSet(value: IconSet): Theme
+packages/core/src/style.cj:395:public func withBorderKind(value: BorderKind): Theme
+packages/core/src/style.cj:407:public func withProgressSymbols(value: ?ProgressBarSymbols): Theme
+packages/core/src/style.cj:418:public func withTerminalBackground(): Theme
+packages/core/src/style.cj:433:public static func indigo(accent!: Color = Color.Rgb(244, 187, 96)): Theme
+packages/core/src/style.cj:442:public static func graphite(accent!: Color = Color.Cyan): Theme
+packages/core/src/style.cj:449:public static func light(): Theme
+packages/core/src/style.cj:457:public static func light(accent!: Color): Theme
+packages/core/src/style.cj:467:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: ?Color = None ): Theme
+packages/core/src/style.cj:484:public func adapted(capabilities: TerminalCapabilities): Theme
+packages/core/src/style.cj:527:public func serialize(): String
+packages/core/src/style.cj:543:public enum StyleState {
+packages/core/src/style.cj:545:Normal
+packages/core/src/style.cj:547:Focused
+packages/core/src/style.cj:549:Selected
+packages/core/src/style.cj:551:Disabled
+packages/core/src/style.cj:553:Error
+packages/core/src/style.cj:555:Accent
 packages/core/src/styled_widget.cj:9:public class StyledWidget <: Widget {
 packages/core/src/styled_widget.cj:17:public init(child: Widget, override!: StyleOverride)
 packages/core/src/styled_widget.cj:26:public func render(area: Rect, buffer: Buffer): Unit

@@ -3778,6 +3778,224 @@
           "signature": "Accent"
         }
       ]
+    },
+    {
+      "id": "core-semantic-theme",
+      "source": "docs/api-examples/theme.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme",
+          "signature": "public struct Theme {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.normal",
+          "signature": "public let normal: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.focused",
+          "signature": "public let focused: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.selected",
+          "signature": "public let selected: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.disabled",
+          "signature": "public let disabled: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.error",
+          "signature": "public let error: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.accent",
+          "signature": "public let accent: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.success",
+          "signature": "public let success: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.warning",
+          "signature": "public let warning: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.info",
+          "signature": "public let info: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.canvas",
+          "signature": "public let canvas: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.surface",
+          "signature": "public let surface: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.raisedSurface",
+          "signature": "public let raisedSurface: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.heading",
+          "signature": "public let heading: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.secondary",
+          "signature": "public let secondary: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.border",
+          "signature": "public let border: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.strongBorder",
+          "signature": "public let strongBorder: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.iconSet",
+          "signature": "public let iconSet: IconSet"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.borderKind",
+          "signature": "public let borderKind: BorderKind"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.progressSymbols",
+          "signature": "public let progressSymbols: ?ProgressBarSymbols"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.init",
+          "signature": "public init( normal!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), focused!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(54, 50, 61), modifier: focusModifier()), selected!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(42, 44, 63), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), error!: Style = Style(fg: Color.Rgb(255, 122, 131), bg: Color.Rgb(19, 20, 34), modifier: errorModifier()), accent!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), success!: Style = Style(fg: Color.Rgb(111, 211, 162), bg: Color.Rgb(19, 20, 34)), warning!: Style = Style(fg: Color.Rgb(255, 198, 114), bg: Color.Rgb(19, 20, 34)), info!: Style = Style(fg: Color.Rgb(118, 193, 231), bg: Color.Rgb(19, 20, 34)), canvas!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), surface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(26, 27, 44)), raisedSurface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(36, 38, 57)), heading!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34), modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), border!: Style = Style(fg: Color.Rgb(88, 92, 115), bg: Color.Rgb(19, 20, 34)), strongBorder!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), iconSet!: IconSet = IconSet.Unicode, borderKind!: BorderKind = BorderKind.Auto, progressSymbols!: ?ProgressBarSymbols = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.default",
+          "signature": "public static func default(): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.resolveState",
+          "signature": "public func resolveState(focused!: Bool = false, selected!: Bool = false, disabled!: Bool = false, error!: Bool = false, override!: ?StyleOverride = None): Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.withIconSet",
+          "signature": "public func withIconSet(value: IconSet): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.withBorderKind",
+          "signature": "public func withBorderKind(value: BorderKind): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.withProgressSymbols",
+          "signature": "public func withProgressSymbols(value: ?ProgressBarSymbols): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.withTerminalBackground",
+          "signature": "public func withTerminalBackground(): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.indigo",
+          "signature": "public static func indigo(accent!: Color = Color.Rgb(244, 187, 96)): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.graphite",
+          "signature": "public static func graphite(accent!: Color = Color.Cyan): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.light",
+          "signature": "public static func light(): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.light",
+          "signature": "public static func light(accent!: Color): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.forCapabilities",
+          "signature": "public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: ?Color = None ): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.adapted",
+          "signature": "public func adapted(capabilities: TerminalCapabilities): Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/style.cj",
+          "symbol": "Theme.serialize",
+          "signature": "public func serialize(): String"
+        }
+      ]
     }
   ]
 }

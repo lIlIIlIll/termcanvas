@@ -291,6 +291,27 @@ public struct Theme {
     /** 进度条的可选默认符号；未设置时由终端能力选择。 */
     public let progressSymbols: ?ProgressBarSymbols
 
+    /** 创建包含语义样式角色和默认外观的主题。
+     * @param normal 普通内容样式
+     * @param focused 焦点样式
+     * @param selected 选中样式
+     * @param disabled 禁用样式
+     * @param error 错误样式
+     * @param accent 强调样式
+     * @param success 成功样式
+     * @param warning 警告样式
+     * @param info 信息样式
+     * @param canvas 应用背景样式
+     * @param surface 普通面板样式
+     * @param raisedSurface 抬升面板样式
+     * @param heading 标题样式
+     * @param secondary 次级文字样式
+     * @param border 普通边框样式
+     * @param strongBorder 强调边框样式
+     * @param iconSet 默认图标字符集
+     * @param borderKind 默认边框类型
+     * @param progressSymbols 可选的进度条符号
+     */
     public init(
         normal!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)),
         focused!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(54, 50, 61), modifier: focusModifier()),
@@ -333,11 +354,21 @@ public struct Theme {
         this.progressSymbols = progressSymbols
     }
 
+    /** 创建默认主题。
+     * @return 默认主题
+     */
     public static func default(): Theme {
         Theme()
     }
 
-    /** 根据状态组合解析样式；禁用优先，错误保留颜色，其余状态通过修饰属性叠加。 */
+    /** 根据状态组合解析样式；禁用优先，错误保留颜色，其余状态通过修饰属性叠加。
+     * @param focused 是否有焦点
+     * @param selected 是否选中
+     * @param disabled 是否禁用
+     * @param error 是否为错误状态
+     * @param override 可选的逐属性覆盖
+     * @return 解析后的样式
+     */
     public func resolveState(focused!: Bool = false, selected!: Bool = false, disabled!: Bool = false,
         error!: Bool = false, override!: ?StyleOverride = None): Style {
         let base = resolvedSemanticStateStyle(Style.default(), Style.default(), Style.default(),
@@ -345,6 +376,10 @@ public struct Theme {
         resolveStyle(base, override: override)
     }
 
+    /** 返回使用指定图标字符集的主题。
+     * @param value 图标字符集
+     * @return 修改后的主题
+     */
     public func withIconSet(value: IconSet): Theme {
         Theme(normal: normal, focused: focused, selected: selected, disabled: disabled, error: error,
             accent: accent, success: success, warning: warning, info: info, canvas: canvas,
@@ -353,7 +388,10 @@ public struct Theme {
             progressSymbols: progressSymbols)
     }
 
-    /** 设置使用本主题的区块默认边框；区块显式设置优先。 */
+    /** 设置使用本主题的区块默认边框；区块显式设置优先。
+     * @param value 默认边框类型
+     * @return 修改后的主题
+     */
     public func withBorderKind(value: BorderKind): Theme {
         Theme(normal: normal, focused: focused, selected: selected, disabled: disabled, error: error,
             accent: accent, success: success, warning: warning, info: info, canvas: canvas,
@@ -362,7 +400,10 @@ public struct Theme {
             progressSymbols: progressSymbols)
     }
 
-    /** 设置本主题的进度条默认符号；None 恢复自动选择。 */
+    /** 设置本主题的进度条默认符号；None 恢复自动选择。
+     * @param value 可选的进度条符号
+     * @return 修改后的主题
+     */
     public func withProgressSymbols(value: ?ProgressBarSymbols): Theme {
         Theme(normal: normal, focused: focused, selected: selected, disabled: disabled, error: error,
             accent: accent, success: success, warning: warning, info: info, canvas: canvas,
@@ -371,7 +412,9 @@ public struct Theme {
             progressSymbols: value)
     }
 
-    /** 使用终端默认背景；此设置不会启用单元格透明合成。 */
+    /** 使用终端默认背景；此设置不会启用单元格透明合成。
+     * @return 修改后的主题
+     */
     public func withTerminalBackground(): Theme {
         let clear = StyleOverride(bg: Some(Color.Reset))
         Theme(normal: clear.apply(normal), focused: clear.apply(focused), selected: clear.apply(selected),
@@ -383,29 +426,43 @@ public struct Theme {
             progressSymbols: progressSymbols)
     }
 
-    /** 深靛蓝底色与琥珀强调色的主题，成功、警告、错误保留独立语义色。 */
+    /** 深靛蓝底色的主题，默认使用琥珀强调色；成功、警告、错误保留独立语义色。
+     * @param accent 强调色
+     * @return 深色主题
+     */
     public static func indigo(accent!: Color = Color.Rgb(244, 187, 96)): Theme {
         let bg = Color.Rgb(19, 20, 34)
         Theme(accent: Style(fg: accent, bg: bg), strongBorder: Style(fg: accent, bg: bg))
     }
 
     /** 返回石墨色语义主题，并将指定颜色用作强调色。
+     * @param accent 强调色
+     * @return 石墨色主题
      */
     public static func graphite(accent!: Color = Color.Cyan): Theme {
         semanticTheme(dark: true, accent: accent)
     }
 
-    /** 返回浅色语义主题，并将指定颜色用作强调色。
+    /** 返回使用默认强调色的浅色语义主题。
+     * @return 浅色主题
      */
     public static func light(): Theme {
         semanticTheme(dark: false, accent: Color.Rgb(0, 109, 129))
     }
 
+    /** 返回使用指定强调色的浅色语义主题。
+     * @param accent 强调色
+     * @return 浅色主题
+     */
     public static func light(accent!: Color): Theme {
         semanticTheme(dark: false, accent: accent)
     }
 
-    /** 按终端支持的颜色能力适配语义主题中的全部样式。
+    /** 按终端能力创建并适配深色或浅色主题。
+     * @param capabilities 终端能力
+     * @param dark 是否使用深色主题
+     * @param accent 可选的强调色
+     * @return 适配后的主题
      */
     public static func forCapabilities(
         capabilities: TerminalCapabilities,
@@ -421,6 +478,8 @@ public struct Theme {
 
     /** 将当前主题的颜色和图标集适配到终端能力，保留样式修饰。
      * 当原本不同的普通和禁用样式在适配后重合时，尽可能添加一个状态修饰以区分它们。
+     * @param capabilities 终端能力
+     * @return 适配后的主题
      */
     public func adapted(capabilities: TerminalCapabilities): Theme {
         let adaptedNormal = adaptStyleForCapabilities(normal, capabilities)
@@ -462,6 +521,9 @@ public struct Theme {
         )
     }
 
+    /** 生成主题角色和图标设置的文本表示。
+     * @return 逐行排列的主题描述
+     */
     public func serialize(): String {
         let icons = match (iconSet) {
             case IconSet.Unicode => "unicode"

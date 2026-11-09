@@ -32943,7 +32943,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 294,
+      "line": 315,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -32961,7 +32961,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 336,
+      "line": 360,
       "level": "member",
       "kind": "func",
       "symbol": "default",
@@ -32979,7 +32979,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 341,
+      "line": 372,
       "level": "member",
       "kind": "func",
       "symbol": "resolveState",
@@ -32997,7 +32997,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 348,
+      "line": 383,
       "level": "member",
       "kind": "func",
       "symbol": "withIconSet",
@@ -33015,7 +33015,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 357,
+      "line": 395,
       "level": "member",
       "kind": "func",
       "symbol": "withBorderKind",
@@ -33033,7 +33033,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 366,
+      "line": 407,
       "level": "member",
       "kind": "func",
       "symbol": "withProgressSymbols",
@@ -33051,7 +33051,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 375,
+      "line": 418,
       "level": "member",
       "kind": "func",
       "symbol": "withTerminalBackground",
@@ -33069,7 +33069,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 387,
+      "line": 433,
       "level": "member",
       "kind": "func",
       "symbol": "indigo",
@@ -33087,7 +33087,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 394,
+      "line": 442,
       "level": "member",
       "kind": "func",
       "symbol": "graphite",
@@ -33105,7 +33105,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 400,
+      "line": 449,
       "level": "member",
       "kind": "func",
       "symbol": "light",
@@ -33123,7 +33123,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 404,
+      "line": 457,
       "level": "member",
       "kind": "func",
       "symbol": "light",
@@ -33141,7 +33141,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 410,
+      "line": 467,
       "level": "member",
       "kind": "func",
       "symbol": "forCapabilities",
@@ -33159,7 +33159,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 425,
+      "line": 484,
       "level": "member",
       "kind": "func",
       "symbol": "adapted",
@@ -33177,7 +33177,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 465,
+      "line": 527,
       "level": "member",
       "kind": "func",
       "symbol": "serialize",
@@ -33195,7 +33195,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 481,
+      "line": 543,
       "level": "top_level",
       "kind": "enum",
       "symbol": "StyleState",
@@ -33213,7 +33213,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 483,
+      "line": 545,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -33232,7 +33232,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 485,
+      "line": 547,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -33251,7 +33251,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 487,
+      "line": 549,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -33270,7 +33270,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 489,
+      "line": 551,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -33289,7 +33289,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 491,
+      "line": 553,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -33308,7 +33308,7 @@
     {
       "package": "core",
       "path": "packages/core/src/style.cj",
-      "line": 493,
+      "line": 555,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
