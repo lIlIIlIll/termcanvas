@@ -27,8 +27,11 @@ def load_examples(inventory: dict) -> tuple[list[dict], list[Path]]:
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
     if data.get("format_version") != 1 or not isinstance(data.get("scenarios"), list):
         raise ValueError("invalid documentation example manifest")
-    eligible = {(item["package"], item["path"], item["qualified_symbol"], item["signature"]): item
-                for item in inventory["symbols"] if item["stability"] in ("STABLE", "EXPERIMENTAL")}
+    eligible: dict[tuple[str, str, str, str], list[dict]] = {}
+    for item in inventory["symbols"]:
+        if item["stability"] in ("STABLE", "EXPERIMENTAL"):
+            key = (item["package"], item["path"], item["qualified_symbol"], item["signature"])
+            eligible.setdefault(key, []).append(item)
     packages = {Path(item["path"]).parts[1] for item in inventory["symbols"]
                 if len(Path(item["path"]).parts) >= 3 and Path(item["path"]).parts[0] == "packages"}
     seen_ids: set[str] = set()
@@ -98,36 +101,36 @@ def link_examples(built: Path, sites: list[dict], scenarios: list[dict]) -> None
             if target not in scenario["platforms"]:
                 continue
             for binding in scenario["declarations"]:
-                item = binding["_inventory"]
-                path = Path(item["path"])
-                if len(path.parts) < 4 or path.parts[1] != package:
-                    continue
-                qualified = item["package"] + "." + item["qualified_symbol"].replace(".operator_", ".")
-                candidates = by_name.get((qualified, Path(*path.parts[2:]).as_posix(), KINDS[item["kind"]]), [])
-                matches = [entry for entry in candidates if entry["source"]["start"]["line"] <= item["line"] <= entry["source"]["end"]["line"]]
-                if len(matches) > 1:
-                    raise ValueError(f"ambiguous example link for {qualified}")
-                if not matches:
-                    continue
-                href = urlsplit(matches[0]["href"])
-                page = (site_root / unquote(href.path)).resolve()
-                if href.scheme or href.netloc or not page.is_relative_to(site_root.resolve()) or not page.is_file():
-                    raise ValueError(f"invalid generated page for {qualified}")
-                example = examples / f'{scenario["id"]}.html'
-                relative = Path(os.path.relpath(example, page.parent)).as_posix()
-                marker = f'termcanvas-example-{scenario["id"]}'
-                text = page.read_text(encoding="utf-8")
-                if marker not in text:
-                    if text.count("</main>") != 1:
-                        raise ValueError(f"unexpected page layout for {qualified}")
-                    section = (f'<section id="{marker}"><h2>共享示例</h2>'
-                               f'<p><a href="{html.escape(relative, quote=True)}">'
-                               f'{html.escape(scenario["id"])}</a></p></section>')
-                    page.write_text(text.replace("</main>", section + "</main>", 1), encoding="utf-8")
-                linked[declaration_key(binding)] += 1
+                for item in binding["_inventory"]:
+                    path = Path(item["path"])
+                    if len(path.parts) < 4 or path.parts[1] != package:
+                        continue
+                    qualified = item["package"] + "." + item["qualified_symbol"].replace(".operator_", ".")
+                    candidates = by_name.get((qualified, Path(*path.parts[2:]).as_posix(), KINDS[item["kind"]]), [])
+                    matches = [entry for entry in candidates if entry["source"]["start"]["line"] <= item["line"] <= entry["source"]["end"]["line"]]
+                    if len(matches) > 1:
+                        raise ValueError(f"ambiguous example link for {qualified}")
+                    if not matches:
+                        continue
+                    href = urlsplit(matches[0]["href"])
+                    page = (site_root / unquote(href.path)).resolve()
+                    if href.scheme or href.netloc or not page.is_relative_to(site_root.resolve()) or not page.is_file():
+                        raise ValueError(f"invalid generated page for {qualified}")
+                    example = examples / f'{scenario["id"]}.html'
+                    relative = Path(os.path.relpath(example, page.parent)).as_posix()
+                    marker = f'termcanvas-example-{scenario["id"]}'
+                    text = page.read_text(encoding="utf-8")
+                    if marker not in text:
+                        if text.count("</main>") != 1:
+                            raise ValueError(f"unexpected page layout for {qualified}")
+                        section = (f'<section id="{marker}"><h2>共享示例</h2>'
+                                   f'<p><a href="{html.escape(relative, quote=True)}">'
+                                   f'{html.escape(scenario["id"])}</a></p></section>')
+                        page.write_text(text.replace("</main>", section + "</main>", 1), encoding="utf-8")
+                    linked[declaration_key(binding)] += 1
     selected_packages = {site["package"] for site in sites}
     for scenario in scenarios:
         for binding in scenario["declarations"]:
-            item = binding["_inventory"]
+            item = binding["_inventory"][0]
             if Path(item["path"]).parts[1] in selected_packages and not linked[declaration_key(binding)]:
                 raise ValueError(f'example binding has no generated page: {item["qualified_symbol"]}')

@@ -57,6 +57,26 @@ class ExampleLinkTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "invalid source"):
             load_examples(self.inventory)
 
+    def test_conditional_implementations_link_on_each_platform(self):
+        second = dict(self.inventory["symbols"][0], line=20)
+        self.inventory["symbols"].append(second)
+        self.data["scenarios"][0]["platforms"] = ["linux", "windows"]
+        self.write_manifest()
+        scenarios, _ = load_examples(self.inventory)
+        sites = []
+        for platform, line in (("linux", 1), ("windows", 20)):
+            html_root = self.output / "packages" / "core" / platform / "html"
+            html_root.mkdir(parents=True)
+            (html_root / "item.html").write_text("<main></main>", encoding="utf-8")
+            entry = {"qualifiedName": "core.Item", "kind": "class", "href": "item.html",
+                     "source": {"path": "src/item.cj", "start": {"line": line}, "end": {"line": line}}}
+            (html_root / "symbol-index.json").write_text(json.dumps({"entries": [entry]}), encoding="utf-8")
+            sites.append({"package": "core", "platform": platform})
+        link_examples(self.output, sites, scenarios)
+        for site in sites:
+            page = self.output / "packages" / "core" / site["platform"] / "html" / "item.html"
+            self.assertIn("termcanvas-example-item-example", page.read_text(encoding="utf-8"))
+
     def test_link_points_to_shared_offline_example(self):
         scenarios, _ = load_examples(self.inventory)
         html_root = self.output / "packages/core/linux/html"
