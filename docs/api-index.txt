@@ -875,22 +875,22 @@ packages/core/src/document.cj:406:public func clearFolds(): Unit
 packages/core/src/document.cj:421:public func isFolded(startOffset: Int64, endOffset: Int64): Bool
 packages/core/src/document.cj:433:public func setFolded(startOffset: Int64, endOffset: Int64, folded: Bool): Unit
 packages/core/src/document.cj:457:public func toggleFold(startOffset: Int64, endOffset: Int64): Bool
-packages/core/src/document.cj:464:public class DocumentView <: Widget {
-packages/core/src/document.cj:485:public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], state!: ?DocumentViewState = None, currentSourceStyle!: ?Style = None, cacheLayout!: Bool = false )
-packages/core/src/document.cj:519:public func setTextWidthOptions(options: TextWidthOptions): Unit
-packages/core/src/document.cj:524:public func renderedLineCount(width: Int64): Int64
-packages/core/src/document.cj:528:public func sourceOffsetForRenderedLine(width: Int64, renderedLine: Int64): ?Int64
-packages/core/src/document.cj:540:public func sourceOffsetAtRenderedLine(width: Int64, renderedLine: Int64): ?Int64
-packages/core/src/document.cj:544:public func sourceOffsetsForRenderedLines(width: Int64): Array<Int64>
-packages/core/src/document.cj:559:public func renderedLineForSourceOffset(width: Int64, sourceOffset: Int64): Int64
-packages/core/src/document.cj:581:public func linkAtRenderedLine(width: Int64, renderedLine: Int64): ?String
-packages/core/src/document.cj:593:public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool
-packages/core/src/document.cj:622:public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
-packages/core/src/document.cj:633:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/document.cj:856:public class MarkdownView <: Widget {
-packages/core/src/document.cj:859:public init( text: String, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
-packages/core/src/document.cj:872:public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
-packages/core/src/document.cj:884:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/document.cj:465:public class DocumentView <: Widget {
+packages/core/src/document.cj:499:public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], state!: ?DocumentViewState = None, currentSourceStyle!: ?Style = None, cacheLayout!: Bool = false )
+packages/core/src/document.cj:535:public func setTextWidthOptions(options: TextWidthOptions): Unit
+packages/core/src/document.cj:544:public func renderedLineCount(width: Int64): Int64
+packages/core/src/document.cj:553:public func sourceOffsetForRenderedLine(width: Int64, renderedLine: Int64): ?Int64
+packages/core/src/document.cj:570:public func sourceOffsetAtRenderedLine(width: Int64, renderedLine: Int64): ?Int64
+packages/core/src/document.cj:578:public func sourceOffsetsForRenderedLines(width: Int64): Array<Int64>
+packages/core/src/document.cj:598:public func renderedLineForSourceOffset(width: Int64, sourceOffset: Int64): Int64
+packages/core/src/document.cj:625:public func linkAtRenderedLine(width: Int64, renderedLine: Int64): ?String
+packages/core/src/document.cj:643:public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool
+packages/core/src/document.cj:677:public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
+packages/core/src/document.cj:692:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/document.cj:916:public class MarkdownView <: Widget {
+packages/core/src/document.cj:928:public init( text: String, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
+packages/core/src/document.cj:950:public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
+packages/core/src/document.cj:966:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/event.cj:9:public interface InputSource {
 packages/core/src/event.cj:14:func readAvailable(maxBytes: Int64): Array<Byte>
 packages/core/src/event.cj:17:public class StdinInputSource <: InputSource {

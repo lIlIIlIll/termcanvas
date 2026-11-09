@@ -15944,7 +15944,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 464,
+      "line": 465,
       "level": "top_level",
       "kind": "class",
       "symbol": "DocumentView",
@@ -15962,7 +15962,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 485,
+      "line": 499,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -15980,7 +15980,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 519,
+      "line": 535,
       "level": "member",
       "kind": "func",
       "symbol": "setTextWidthOptions",
@@ -15998,7 +15998,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 524,
+      "line": 544,
       "level": "member",
       "kind": "func",
       "symbol": "renderedLineCount",
@@ -16016,7 +16016,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 528,
+      "line": 553,
       "level": "member",
       "kind": "func",
       "symbol": "sourceOffsetForRenderedLine",
@@ -16034,7 +16034,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 540,
+      "line": 570,
       "level": "member",
       "kind": "func",
       "symbol": "sourceOffsetAtRenderedLine",
@@ -16052,7 +16052,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 544,
+      "line": 578,
       "level": "member",
       "kind": "func",
       "symbol": "sourceOffsetsForRenderedLines",
@@ -16070,7 +16070,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 559,
+      "line": 598,
       "level": "member",
       "kind": "func",
       "symbol": "renderedLineForSourceOffset",
@@ -16088,7 +16088,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 581,
+      "line": 625,
       "level": "member",
       "kind": "func",
       "symbol": "linkAtRenderedLine",
@@ -16106,7 +16106,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 593,
+      "line": 643,
       "level": "member",
       "kind": "func",
       "symbol": "handleKey",
@@ -16124,7 +16124,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 622,
+      "line": 677,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -16142,7 +16142,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 633,
+      "line": 692,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -16160,7 +16160,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 856,
+      "line": 916,
       "level": "top_level",
       "kind": "class",
       "symbol": "MarkdownView",
@@ -16178,7 +16178,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 859,
+      "line": 928,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -16196,7 +16196,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 872,
+      "line": 950,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -16214,7 +16214,7 @@
     {
       "package": "core",
       "path": "packages/core/src/document.cj",
-      "line": 884,
+      "line": 966,
       "level": "member",
       "kind": "func",
       "symbol": "render",

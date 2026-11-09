@@ -461,6 +461,7 @@ public class DocumentViewState {
     }
 }
 
+/** 排版、绘制文档并提供源偏移、链接和滚动交互。 */
 public class DocumentView <: Widget {
     private let document: Document
     private let block: ?Block
@@ -482,6 +483,19 @@ public class DocumentView <: Widget {
     private var cachedFoldRevision: Int64 = -1
     private var cachedCursorSource: ?Int64 = None
 
+    /** 创建文档视图。
+     * @param document 要显示的文档
+     * @param block 可选边框
+     * @param style 可选段落基础样式
+     * @param headingStyle 可选标题样式
+     * @param theme 可选文档主题
+     * @param scroll 未传入状态时的滚动行数
+     * @param wrap 换行模式
+     * @param highlights 文本高亮规则
+     * @param state 可选交互状态
+     * @param currentSourceStyle 当前源位置的可选高亮样式
+     * @param cacheLayout 是否缓存排版结果
+     */
     public init(
         document: Document,
         block!: ?Block = None,
@@ -515,16 +529,27 @@ public class DocumentView <: Widget {
         this.cacheLayout = cacheLayout
     }
 
-    /** 指定后续排版采用的宽度策略；变更时使缓存失效。 */
+    /** 指定后续排版采用的宽度策略；变更时使缓存失效。
+     * @param options 文本宽度策略
+     */
     public func setTextWidthOptions(options: TextWidthOptions): Unit {
         if (usesWideAmbiguous(options) != usesWideAmbiguous(textWidthOptionsValue)) { cachedWidth = -1 }
         textWidthOptionsValue = options
     }
 
+    /** 计算给定宽度下的渲染行数。
+     * @param width 排版宽度
+     * @return 渲染行数
+     */
     public func renderedLineCount(width: Int64): Int64 {
         renderRows(document, width).size
     }
 
+    /** 获取渲染行首个带源范围的片段起点。
+     * @param width 排版宽度
+     * @param renderedLine 渲染行索引
+     * @return 源偏移；行无效或无源范围时为 None
+     */
     public func sourceOffsetForRenderedLine(width: Int64, renderedLine: Int64): ?Int64 {
         let rows = renderRows(document, width)
         if (renderedLine < 0 || renderedLine >= rows.size) { return None }
@@ -537,10 +562,19 @@ public class DocumentView <: Widget {
         None
     }
 
+    /** 获取渲染行的源偏移，是 sourceOffsetForRenderedLine 的别名。
+     * @param width 排版宽度
+     * @param renderedLine 渲染行索引
+     * @return 源偏移，或 None
+     */
     public func sourceOffsetAtRenderedLine(width: Int64, renderedLine: Int64): ?Int64 {
         sourceOffsetForRenderedLine(width, renderedLine)
     }
 
+    /** 获取每个渲染行的源偏移；无源范围的行沿用上一个偏移，起始为零。
+     * @param width 排版宽度
+     * @return 各渲染行的源偏移
+     */
     public func sourceOffsetsForRenderedLines(width: Int64): Array<Int64> {
         let rows = renderRows(document, width)
         let offsets = ArrayList<Int64>()
@@ -556,6 +590,11 @@ public class DocumentView <: Widget {
         offsets.toArray()
     }
 
+    /** 查找包含源偏移的渲染行；无包含范围时使用之前最后匹配的行或零。
+     * @param width 排版宽度
+     * @param sourceOffset 源偏移
+     * @return 渲染行索引
+     */
     public func renderedLineForSourceOffset(width: Int64, sourceOffset: Int64): Int64 {
         let rows = renderRows(document, width)
         var fallback: Int64 = 0
@@ -578,6 +617,11 @@ public class DocumentView <: Widget {
         fallback
     }
 
+    /** 获取渲染行中的第一个链接地址。
+     * @param width 排版宽度
+     * @param renderedLine 渲染行索引
+     * @return 链接地址；无链接或行无效时为 None
+     */
     public func linkAtRenderedLine(width: Int64, renderedLine: Int64): ?String {
         let rows = renderRows(document, width)
         if (renderedLine < 0 || renderedLine >= rows.size) { return None }
@@ -590,6 +634,12 @@ public class DocumentView <: Widget {
         None
     }
 
+    /** 使用传入的状态对象处理滚动键及回车定位；没有状态对象时不处理。
+     * @param key 按键事件
+     * @param width 排版宽度
+     * @param viewportHeight 视口高度
+     * @return 识别到按键时为 true
+     */
     public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool {
         match (state) {
             case Some(s) =>
@@ -619,6 +669,11 @@ public class DocumentView <: Widget {
         }
     }
 
+    /** 将视口内鼠标行映射到源偏移；不检查鼠标事件种类。
+     * @param mouse 鼠标事件
+     * @param area 视图区域
+     * @return 源偏移；未命中或无源范围时为 None
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64 {
         let target = match (block) {
             case Some(b) => b.inner(area)
@@ -630,6 +685,10 @@ public class DocumentView <: Widget {
         sourceOffsetForRenderedLine(target.width, row)
     }
 
+    /** 按缓冲区主题和宽度策略绘制文档。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         let applicationTheme = buffer.resolveTheme(Option<Theme>.None)
         let sourceHighlight = match (currentSourceOverride) {
@@ -853,9 +912,19 @@ func documentContextThemeEqual(left: ?Theme, right: ?Theme): Bool {
     }
 }
 
+/** 文档视图的兼容包装；文本构造器将输入按纯文本处理，不解析 Markdown。 */
 public class MarkdownView <: Widget {
     private let view: DocumentView
 
+    /** 创建文档视图包装。
+     * @param text 纯文本，按行转换为段落
+     * @param block 可选边框
+     * @param style 可选段落样式
+     * @param headingStyle 可选标题样式
+     * @param theme 可选文档主题
+     * @param scroll 初始滚动行数
+     * @param wrap 换行模式
+     */
     public init(
         text: String,
         block!: ?Block = None,
@@ -869,6 +938,15 @@ public class MarkdownView <: Widget {
         this.view = DocumentView(Document.plain(text, style: textStyle), block: block, style: style, headingStyle: headingStyle, theme: theme, scroll: scroll, wrap: wrap)
     }
 
+    /** 创建文档视图包装。
+     * @param document 已构造的文档
+     * @param block 可选边框
+     * @param style 可选段落样式
+     * @param headingStyle 可选标题样式
+     * @param theme 可选文档主题
+     * @param scroll 初始滚动行数
+     * @param wrap 换行模式
+     */
     public init(
         document: Document,
         block!: ?Block = None,
@@ -881,6 +959,10 @@ public class MarkdownView <: Widget {
         this.view = DocumentView(document, block: block, style: style, headingStyle: headingStyle, theme: theme, scroll: scroll, wrap: wrap)
     }
 
+    /** 绘制包装的文档视图。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         view.render(area, buffer)
     }

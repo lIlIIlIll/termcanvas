@@ -10973,6 +10973,116 @@
           "signature": "public func toggleFold(startOffset: Int64, endOffset: Int64): Bool"
         }
       ]
+    },
+    {
+      "id": "document-view",
+      "source": "docs/api-examples/document-view.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView",
+          "signature": "public class DocumentView <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.init",
+          "signature": "public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], state!: ?DocumentViewState = None, currentSourceStyle!: ?Style = None, cacheLayout!: Bool = false )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.setTextWidthOptions",
+          "signature": "public func setTextWidthOptions(options: TextWidthOptions): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.renderedLineCount",
+          "signature": "public func renderedLineCount(width: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.sourceOffsetForRenderedLine",
+          "signature": "public func sourceOffsetForRenderedLine(width: Int64, renderedLine: Int64): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.sourceOffsetAtRenderedLine",
+          "signature": "public func sourceOffsetAtRenderedLine(width: Int64, renderedLine: Int64): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.sourceOffsetsForRenderedLines",
+          "signature": "public func sourceOffsetsForRenderedLines(width: Int64): Array<Int64>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.renderedLineForSourceOffset",
+          "signature": "public func renderedLineForSourceOffset(width: Int64, sourceOffset: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.linkAtRenderedLine",
+          "signature": "public func linkAtRenderedLine(width: Int64, renderedLine: Int64): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.handleKey",
+          "signature": "public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "DocumentView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "MarkdownView",
+          "signature": "public class MarkdownView <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "MarkdownView.init",
+          "signature": "public init( text: String, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "MarkdownView.init",
+          "signature": "public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/document.cj",
+          "symbol": "MarkdownView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }
