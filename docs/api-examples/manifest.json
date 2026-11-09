@@ -12423,6 +12423,206 @@
           "signature": "public func render(areaRect: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "clipboard-memory",
+      "source": "docs/api-examples/clipboard-memory.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardStatus",
+          "signature": "public enum ClipboardStatus {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardStatus.Success",
+          "signature": "Success"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardStatus.Unavailable",
+          "signature": "Unavailable"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardStatus.Unsupported",
+          "signature": "Unsupported"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardStatus.Timeout",
+          "signature": "Timeout"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardStatus.TooLarge",
+          "signature": "TooLarge"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardStatus.Failed",
+          "signature": "Failed"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardResult",
+          "signature": "public class ClipboardResult {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardResult.status",
+          "signature": "public let status: ClipboardStatus"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardResult.text",
+          "signature": "public let text: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardResult.message",
+          "signature": "public let message: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardResult.backend",
+          "signature": "public let backend: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardResult.init",
+          "signature": "public init(status: ClipboardStatus, text!: String = \"\", message!: String = \"\", backend!: String = \"\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardResult.isSuccess",
+          "signature": "public func isSuccess(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCapabilities",
+          "signature": "public class ClipboardCapabilities {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCapabilities.canRead",
+          "signature": "public let canRead: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCapabilities.canWrite",
+          "signature": "public let canWrite: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCapabilities.backend",
+          "signature": "public let backend: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCapabilities.description",
+          "signature": "public let description: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCapabilities.init",
+          "signature": "public init(canRead: Bool, canWrite: Bool, backend: String, description!: String = \"\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Clipboard",
+          "signature": "public interface Clipboard {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Clipboard.getText",
+          "signature": "func getText(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Clipboard.setText",
+          "signature": "func setText(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Clipboard.capabilities",
+          "signature": "func capabilities(): ClipboardCapabilities"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Clipboard.readText",
+          "signature": "func readText(): ClipboardResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Clipboard.writeText",
+          "signature": "func writeText(text: String): ClipboardResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "MemoryClipboard",
+          "signature": "public class MemoryClipboard <: Clipboard {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "MemoryClipboard.init",
+          "signature": "public init(text!: String = \"\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "MemoryClipboard.getText",
+          "signature": "public func getText(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "MemoryClipboard.setText",
+          "signature": "public func setText(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "MemoryClipboard.capabilities",
+          "signature": "public func capabilities(): ClipboardCapabilities"
+        }
+      ]
     }
   ]
 }

@@ -6869,7 +6869,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 10,
+      "line": 11,
       "level": "top_level",
       "kind": "enum",
       "symbol": "ClipboardStatus",
@@ -6887,7 +6887,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 11,
+      "line": 13,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -6906,7 +6906,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 12,
+      "line": 15,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -6925,7 +6925,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 13,
+      "line": 17,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -6944,7 +6944,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 14,
+      "line": 19,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -6963,7 +6963,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 15,
+      "line": 21,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -6982,7 +6982,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 16,
+      "line": 23,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -7001,7 +7001,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 19,
+      "line": 27,
       "level": "top_level",
       "kind": "class",
       "symbol": "ClipboardResult",
@@ -7019,7 +7019,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 20,
+      "line": 29,
       "level": "member",
       "kind": "let",
       "symbol": "status",
@@ -7037,7 +7037,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 21,
+      "line": 31,
       "level": "member",
       "kind": "let",
       "symbol": "text",
@@ -7055,7 +7055,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 22,
+      "line": 33,
       "level": "member",
       "kind": "let",
       "symbol": "message",
@@ -7073,7 +7073,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 23,
+      "line": 35,
       "level": "member",
       "kind": "let",
       "symbol": "backend",
@@ -7091,7 +7091,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 25,
+      "line": 43,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -7109,7 +7109,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 32,
+      "line": 53,
       "level": "member",
       "kind": "func",
       "symbol": "isSuccess",
@@ -7127,7 +7127,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 37,
+      "line": 59,
       "level": "top_level",
       "kind": "class",
       "symbol": "ClipboardCapabilities",
@@ -7145,7 +7145,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 38,
+      "line": 61,
       "level": "member",
       "kind": "let",
       "symbol": "canRead",
@@ -7163,7 +7163,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 39,
+      "line": 63,
       "level": "member",
       "kind": "let",
       "symbol": "canWrite",
@@ -7181,7 +7181,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 40,
+      "line": 65,
       "level": "member",
       "kind": "let",
       "symbol": "backend",
@@ -7199,7 +7199,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 41,
+      "line": 67,
       "level": "member",
       "kind": "let",
       "symbol": "description",
@@ -7217,7 +7217,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 43,
+      "line": 75,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -7235,7 +7235,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 51,
+      "line": 84,
       "level": "top_level",
       "kind": "interface",
       "symbol": "Clipboard",
@@ -7253,7 +7253,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 52,
+      "line": 88,
       "level": "member",
       "kind": "func",
       "symbol": "getText",
@@ -7272,7 +7272,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 53,
+      "line": 92,
       "level": "member",
       "kind": "func",
       "symbol": "setText",
@@ -7291,7 +7291,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 54,
+      "line": 96,
       "level": "member",
       "kind": "func",
       "symbol": "capabilities",
@@ -7310,7 +7310,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 55,
+      "line": 100,
       "level": "member",
       "kind": "func",
       "symbol": "readText",
@@ -7329,7 +7329,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 59,
+      "line": 108,
       "level": "member",
       "kind": "func",
       "symbol": "writeText",
@@ -7348,7 +7348,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 67,
+      "line": 117,
       "level": "top_level",
       "kind": "class",
       "symbol": "MemoryClipboard",
@@ -7366,7 +7366,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 69,
+      "line": 122,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -7384,7 +7384,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 70,
+      "line": 126,
       "level": "member",
       "kind": "func",
       "symbol": "getText",
@@ -7402,7 +7402,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 71,
+      "line": 130,
       "level": "member",
       "kind": "func",
       "symbol": "setText",
@@ -7420,7 +7420,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 72,
+      "line": 134,
       "level": "member",
       "kind": "func",
       "symbol": "capabilities",
@@ -7438,7 +7438,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 75,
+      "line": 137,
       "level": "top_level",
       "kind": "class",
       "symbol": "ClipboardCommandResult",
@@ -7456,7 +7456,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 76,
+      "line": 138,
       "level": "member",
       "kind": "let",
       "symbol": "status",
@@ -7474,7 +7474,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 77,
+      "line": 139,
       "level": "member",
       "kind": "let",
       "symbol": "output",
@@ -7492,7 +7492,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 78,
+      "line": 140,
       "level": "member",
       "kind": "let",
       "symbol": "exitCode",
@@ -7510,7 +7510,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 79,
+      "line": 141,
       "level": "member",
       "kind": "let",
       "symbol": "message",
@@ -7528,7 +7528,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 81,
+      "line": 143,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -7546,7 +7546,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 90,
+      "line": 152,
       "level": "top_level",
       "kind": "interface",
       "symbol": "ClipboardCommandRunner",
@@ -7564,7 +7564,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 91,
+      "line": 153,
       "level": "member",
       "kind": "func",
       "symbol": "platform",
@@ -7583,7 +7583,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 92,
+      "line": 154,
       "level": "member",
       "kind": "func",
       "symbol": "environment",
@@ -7602,7 +7602,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 93,
+      "line": 155,
       "level": "member",
       "kind": "func",
       "symbol": "available",
@@ -7621,7 +7621,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 94,
+      "line": 156,
       "level": "member",
       "kind": "func",
       "symbol": "run",
@@ -7640,7 +7640,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 97,
+      "line": 159,
       "level": "top_level",
       "kind": "class",
       "symbol": "NativeClipboardCommandRunner",
@@ -7658,7 +7658,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 98,
+      "line": 160,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -7676,7 +7676,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 99,
+      "line": 161,
       "level": "member",
       "kind": "func",
       "symbol": "platform",
@@ -7694,7 +7694,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 100,
+      "line": 162,
       "level": "member",
       "kind": "func",
       "symbol": "environment",
@@ -7712,7 +7712,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 103,
+      "line": 165,
       "level": "member",
       "kind": "func",
       "symbol": "available",
@@ -7730,7 +7730,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 115,
+      "line": 177,
       "level": "member",
       "kind": "func",
       "symbol": "run",
@@ -7748,7 +7748,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 267,
+      "line": 329,
       "level": "top_level",
       "kind": "class",
       "symbol": "SystemClipboard",
@@ -7766,7 +7766,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 277,
+      "line": 339,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -7784,7 +7784,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 315,
+      "line": 377,
       "level": "member",
       "kind": "func",
       "symbol": "capabilities",
@@ -7802,7 +7802,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 319,
+      "line": 381,
       "level": "member",
       "kind": "func",
       "symbol": "readText",
@@ -7820,7 +7820,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 327,
+      "line": 389,
       "level": "member",
       "kind": "func",
       "symbol": "writeText",
@@ -7838,7 +7838,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 335,
+      "line": 397,
       "level": "member",
       "kind": "func",
       "symbol": "getText",
@@ -7856,7 +7856,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 336,
+      "line": 398,
       "level": "member",
       "kind": "func",
       "symbol": "setText",
@@ -7874,7 +7874,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 339,
+      "line": 401,
       "level": "top_level",
       "kind": "class",
       "symbol": "Osc52Clipboard",
@@ -7892,7 +7892,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 345,
+      "line": 407,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -7910,7 +7910,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 351,
+      "line": 413,
       "level": "member",
       "kind": "func",
       "symbol": "capabilities",
@@ -7928,7 +7928,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 354,
+      "line": 416,
       "level": "member",
       "kind": "func",
       "symbol": "readText",
@@ -7946,7 +7946,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 357,
+      "line": 419,
       "level": "member",
       "kind": "func",
       "symbol": "writeText",
@@ -7964,7 +7964,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 367,
+      "line": 429,
       "level": "member",
       "kind": "func",
       "symbol": "getText",
@@ -7982,7 +7982,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 368,
+      "line": 430,
       "level": "member",
       "kind": "func",
       "symbol": "setText",
@@ -8000,7 +8000,7 @@
     {
       "package": "core",
       "path": "packages/core/src/clipboard.cj",
-      "line": 371,
+      "line": 433,
       "level": "top_level",
       "kind": "func",
       "symbol": "detectClipboard",

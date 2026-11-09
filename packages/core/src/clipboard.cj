@@ -7,21 +7,39 @@ import std.io.*
 import std.process.*
 import std.time.*
 
+/** 剪贴板操作状态。 */
 public enum ClipboardStatus {
+    /** 操作成功。 */
     | Success
+    /** 所需剪贴板后端不可用。 */
     | Unavailable
+    /** 操作不受支持。 */
     | Unsupported
+    /** 操作超时。 */
     | Timeout
+    /** 内容超过大小限制。 */
     | TooLarge
+    /** 操作失败。 */
     | Failed
 }
 
+/** 剪贴板操作的状态、文本和诊断信息。 */
 public class ClipboardResult {
+    /** 操作状态。 */
     public let status: ClipboardStatus
+    /** 读取到的文本。 */
     public let text: String
+    /** 附加诊断信息。 */
     public let message: String
+    /** 使用的后端标识。 */
     public let backend: String
 
+    /** 创建剪贴板结果。
+     * @param status 操作状态
+     * @param text 读取文本
+     * @param message 诊断信息
+     * @param backend 后端标识
+     */
     public init(status: ClipboardStatus, text!: String = "", message!: String = "", backend!: String = "") {
         this.status = status
         this.text = text
@@ -29,17 +47,31 @@ public class ClipboardResult {
         this.backend = backend
     }
 
+    /** 判断操作是否成功。
+     * @return 状态为 Success 时为 true
+     */
     public func isSuccess(): Bool {
         match (status) { case ClipboardStatus.Success => true; case _ => false }
     }
 }
 
+/** 剪贴板后端支持的读写能力。 */
 public class ClipboardCapabilities {
+    /** 是否支持读取。 */
     public let canRead: Bool
+    /** 是否支持写入。 */
     public let canWrite: Bool
+    /** 后端标识。 */
     public let backend: String
+    /** 后端说明。 */
     public let description: String
 
+    /** 创建能力说明。
+     * @param canRead 是否支持读取
+     * @param canWrite 是否支持写入
+     * @param backend 后端标识
+     * @param description 后端说明
+     */
     public init(canRead: Bool, canWrite: Bool, backend: String, description!: String = "") {
         this.canRead = canRead
         this.canWrite = canWrite
@@ -48,14 +80,31 @@ public class ClipboardCapabilities {
     }
 }
 
+/** 提供文本剪贴板读写及结构化结果的接口。 */
 public interface Clipboard {
+    /** 读取剪贴板文本。
+     * @return 剪贴板文本
+     */
     func getText(): String
+    /** 写入剪贴板文本。
+     * @param text 要写入的文本
+     */
     func setText(text: String): Unit
+    /** 获取后端能力；默认声明可读可写。
+     * @return 能力说明
+     */
     func capabilities(): ClipboardCapabilities { ClipboardCapabilities(true, true, "custom") }
+    /** 读取文本并转换异常为失败结果。
+     * @return 读取结果
+     */
     func readText(): ClipboardResult {
         try { ClipboardResult(ClipboardStatus.Success, text: getText(), backend: capabilities().backend) }
         catch (error: Exception) { ClipboardResult(ClipboardStatus.Failed, message: error.message, backend: capabilities().backend) }
     }
+    /** 写入文本并转换异常为失败结果。
+     * @param text 要写入的文本
+     * @return 写入结果
+     */
     func writeText(text: String): ClipboardResult {
         try {
             setText(text)
@@ -64,11 +113,24 @@ public interface Clipboard {
     }
 }
 
+/** 只在内存中保存文本的剪贴板实现。 */
 public class MemoryClipboard <: Clipboard {
     private var textValue: String
+    /** 创建内存剪贴板。
+     * @param text 初始文本
+     */
     public init(text!: String = "") { textValue = text }
+    /** 获取当前内存文本。
+     * @return 剪贴板文本
+     */
     public func getText(): String { textValue }
+    /** 替换内存文本。
+     * @param text 要保存的文本
+     */
     public func setText(text: String): Unit { textValue = text }
+    /** 获取内存剪贴板的读写能力。
+     * @return 能力说明
+     */
     public func capabilities(): ClipboardCapabilities { ClipboardCapabilities(true, true, "memory") }
 }
 
