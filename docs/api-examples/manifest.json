@@ -3009,6 +3009,224 @@
           "signature": "public func clearHistory(): Unit"
         }
       ]
+    },
+    {
+      "id": "core-runtime-port",
+      "source": "docs/api-examples/runtime-port.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalEnqueueResult",
+          "signature": "public enum ExternalEnqueueResult {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalEnqueueResult.Accepted",
+          "signature": "Accepted"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalEnqueueResult.Full",
+          "signature": "Full"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalEnqueueResult.Closed",
+          "signature": "Closed"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot",
+          "signature": "public struct FrameSchedulingSnapshot {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.reason",
+          "signature": "public let reason: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.frameRequests",
+          "signature": "public let frameRequests: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.framesPresented",
+          "signature": "public let framesPresented: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.frameRequestsMerged",
+          "signature": "public let frameRequestsMerged: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.frameDeadlineWakes",
+          "signature": "public let frameDeadlineWakes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.pendingFramePromotions",
+          "signature": "public let pendingFramePromotions: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.backgroundFrameRequests",
+          "signature": "public let backgroundFrameRequests: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.interactiveFrameRequests",
+          "signature": "public let interactiveFrameRequests: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.resizeFrameRequests",
+          "signature": "public let resizeFrameRequests: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.updatesPerFrame",
+          "signature": "public let updatesPerFrame: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.dirtyRectsBeforeMerge",
+          "signature": "public let dirtyRectsBeforeMerge: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.dirtyRectsAfterMerge",
+          "signature": "public let dirtyRectsAfterMerge: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.firstInvalidationToFrameMillis",
+          "signature": "public let firstInvalidationToFrameMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.lastUpdateToFrameMillis",
+          "signature": "public let lastUpdateToFrameMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.frameDelayDueToCoalescingMillis",
+          "signature": "public let frameDelayDueToCoalescingMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.framesAvoided",
+          "signature": "public let framesAvoided: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "FrameSchedulingSnapshot.init",
+          "signature": "public init( reason!: String = \"none\", frameRequests!: Int64 = 0, framesPresented!: Int64 = 0, frameRequestsMerged!: Int64 = 0, frameDeadlineWakes!: Int64 = 0, pendingFramePromotions!: Int64 = 0, backgroundFrameRequests!: Int64 = 0, interactiveFrameRequests!: Int64 = 0, resizeFrameRequests!: Int64 = 0, updatesPerFrame!: Int64 = 0, dirtyRectsBeforeMerge!: Int64 = 0, dirtyRectsAfterMerge!: Int64 = 0, firstInvalidationToFrameMillis!: Int64 = 0, lastUpdateToFrameMillis!: Int64 = 0, frameDelayDueToCoalescingMillis!: Int64 = 0, framesAvoided!: Int64 = 0 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort",
+          "signature": "public class ExternalPort<A> {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.init",
+          "signature": "public init(capacity!: Int64 = 256)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.capacity",
+          "signature": "public func capacity(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.enableLatencyMeasurement",
+          "signature": "public func enableLatencyMeasurement(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.tryEnqueue",
+          "signature": "public func tryEnqueue(action: A): ExternalEnqueueResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.size",
+          "signature": "public func size(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.close",
+          "signature": "public func close(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.acceptedCount",
+          "signature": "public func acceptedCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.fullCount",
+          "signature": "public func fullCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.closedCount",
+          "signature": "public func closedCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.wakeSignals",
+          "signature": "public func wakeSignals(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/runtime_foundation.cj",
+          "symbol": "ExternalPort.wakeCoalesced",
+          "signature": "public func wakeCoalesced(): Int64"
+        }
+      ]
     }
   ]
 }

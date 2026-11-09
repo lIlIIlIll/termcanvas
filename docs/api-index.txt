@@ -1593,121 +1593,121 @@ packages/core/src/runtime_foundation.cj:23:public enum RuntimeState {
 packages/core/src/runtime_foundation.cj:24:Running
 packages/core/src/runtime_foundation.cj:25:Closing
 packages/core/src/runtime_foundation.cj:26:Closed
-packages/core/src/runtime_foundation.cj:31:public enum ExternalEnqueueResult {
-packages/core/src/runtime_foundation.cj:32:Accepted
-packages/core/src/runtime_foundation.cj:33:Full
-packages/core/src/runtime_foundation.cj:34:Closed
-packages/core/src/runtime_foundation.cj:39:public struct OwnerToken <: Equatable<OwnerToken> {
-packages/core/src/runtime_foundation.cj:40:public let slot: Int64
-packages/core/src/runtime_foundation.cj:41:public let generation: Int64
-packages/core/src/runtime_foundation.cj:43:public init(slot: Int64, generation: Int64)
-packages/core/src/runtime_foundation.cj:48:public operator func ==(other: OwnerToken): Bool
-packages/core/src/runtime_foundation.cj:52:public operator func !=(other: OwnerToken): Bool
-packages/core/src/runtime_foundation.cj:56:public struct OperationId <: Equatable<OperationId> {
-packages/core/src/runtime_foundation.cj:57:public let value: Int64
-packages/core/src/runtime_foundation.cj:59:public init(value: Int64)
-packages/core/src/runtime_foundation.cj:60:public operator func ==(other: OperationId): Bool
-packages/core/src/runtime_foundation.cj:61:public operator func !=(other: OperationId): Bool
-packages/core/src/runtime_foundation.cj:64:public enum OperationState {
-packages/core/src/runtime_foundation.cj:65:Running
-packages/core/src/runtime_foundation.cj:66:CancelRequested
-packages/core/src/runtime_foundation.cj:67:Settled
-packages/core/src/runtime_foundation.cj:70:public class OwnerRegistry {
-packages/core/src/runtime_foundation.cj:74:public init()
-packages/core/src/runtime_foundation.cj:76:public func acquire(slot: Int64): OwnerToken
-packages/core/src/runtime_foundation.cj:87:public func release(token: OwnerToken): Bool
-packages/core/src/runtime_foundation.cj:93:public func isCurrent(token: OwnerToken): Bool
-packages/core/src/runtime_foundation.cj:99:public class OperationRecord {
-packages/core/src/runtime_foundation.cj:100:public let id: OperationId
-packages/core/src/runtime_foundation.cj:101:public let owner: OwnerToken
-packages/core/src/runtime_foundation.cj:104:public init(id: OperationId, owner: OwnerToken)
-packages/core/src/runtime_foundation.cj:109:public func state(): OperationState
-packages/core/src/runtime_foundation.cj:111:public func requestCancel(): Bool
-packages/core/src/runtime_foundation.cj:120:public func settle(): Bool
-packages/core/src/runtime_foundation.cj:130:public struct OwnedAsyncCompletion {
-packages/core/src/runtime_foundation.cj:131:public let owner: OwnerToken
-packages/core/src/runtime_foundation.cj:132:public let operation: OperationId
-packages/core/src/runtime_foundation.cj:133:public let event: Event
-packages/core/src/runtime_foundation.cj:135:public init(owner: OwnerToken, operation: OperationId, event: Event)
-packages/core/src/runtime_foundation.cj:142:public enum CompletionDisposition {
-packages/core/src/runtime_foundation.cj:143:Applied
-packages/core/src/runtime_foundation.cj:144:Orphan
-packages/core/src/runtime_foundation.cj:145:Duplicate
-packages/core/src/runtime_foundation.cj:150:public class AsyncOwnershipRuntime {
-packages/core/src/runtime_foundation.cj:156:public init()
-packages/core/src/runtime_foundation.cj:158:public func acquireOwner(slot: Int64): OwnerToken
-packages/core/src/runtime_foundation.cj:159:public func releaseOwner(owner: OwnerToken): Bool
-packages/core/src/runtime_foundation.cj:161:public func start(owner: OwnerToken): ?OperationId
-packages/core/src/runtime_foundation.cj:169:public func requestCancel(operation: OperationId): Bool
-packages/core/src/runtime_foundation.cj:176:public func complete(completion: OwnedAsyncCompletion): CompletionDisposition
-packages/core/src/runtime_foundation.cj:198:public func orphanCompletions(): Int64
-packages/core/src/runtime_foundation.cj:208:public enum RuntimeEnvelope<A> {
-packages/core/src/runtime_foundation.cj:209:EventItem(Event)
-packages/core/src/runtime_foundation.cj:210:ExternalItem(A)
-packages/core/src/runtime_foundation.cj:211:QuitItem
-packages/core/src/runtime_foundation.cj:214:public struct SequencedRuntimeItem<A> {
-packages/core/src/runtime_foundation.cj:215:public let sequence: Int64
-packages/core/src/runtime_foundation.cj:216:public let envelope: RuntimeEnvelope<A>
-packages/core/src/runtime_foundation.cj:217:public let enqueuedAtMillis: Int64
-packages/core/src/runtime_foundation.cj:219:public init(sequence: Int64, envelope: RuntimeEnvelope<A>, enqueuedAtMillis!: Int64 = 0)
-packages/core/src/runtime_foundation.cj:265:public class RuntimeQueue<A> {
-packages/core/src/runtime_foundation.cj:282:public init(metrics!: ?AppMetrics = None, capacity!: Int64 = 4096)
-packages/core/src/runtime_foundation.cj:286:public func capacity(): Int64
-packages/core/src/runtime_foundation.cj:287:public func yieldedTurns(): Int64
-packages/core/src/runtime_foundation.cj:288:public func overflowCount(): Int64
-packages/core/src/runtime_foundation.cj:303:public func state(): RuntimeState
-packages/core/src/runtime_foundation.cj:304:public func size(): Int64
-packages/core/src/runtime_foundation.cj:305:public func maxQueueDepth(): Int64
-packages/core/src/runtime_foundation.cj:306:public func maxUpdateDepth(): Int64
-packages/core/src/runtime_foundation.cj:307:public func processedCount(): Int64
-packages/core/src/runtime_foundation.cj:309:public func enqueueEvent(event: Event, nowMillis!: Int64 = 0): ?Int64
-packages/core/src/runtime_foundation.cj:313:public func enqueueExternal(action: A, nowMillis!: Int64 = 0): ?Int64
-packages/core/src/runtime_foundation.cj:317:public func enqueueQuit(nowMillis!: Int64 = 0): ?Int64
-packages/core/src/runtime_foundation.cj:342:public func dequeue(): ?SequencedRuntimeItem<A>
-packages/core/src/runtime_foundation.cj:353:public func enterUpdate(): Unit
-packages/core/src/runtime_foundation.cj:366:public func leaveUpdate(): Unit
-packages/core/src/runtime_foundation.cj:371:public func beginClosing(): Unit
-packages/core/src/runtime_foundation.cj:378:public func close(discardPending!: Bool = true): Unit
-packages/core/src/runtime_foundation.cj:402:public interface RuntimeClock {
-packages/core/src/runtime_foundation.cj:403:func nowMillis(): Int64
-packages/core/src/runtime_foundation.cj:406:public class MonotonicRuntimeClock <: RuntimeClock {
-packages/core/src/runtime_foundation.cj:408:public init()
-packages/core/src/runtime_foundation.cj:409:public func nowMillis(): Int64
-packages/core/src/runtime_foundation.cj:412:public class TestClock <: RuntimeClock {
-packages/core/src/runtime_foundation.cj:414:public init(startMillis!: Int64 = 0)
-packages/core/src/runtime_foundation.cj:415:public func nowMillis(): Int64
-packages/core/src/runtime_foundation.cj:416:public func advance(duration: Duration): Unit
-packages/core/src/runtime_foundation.cj:419:public func advanceMillis(millis: Int64): Unit
-packages/core/src/runtime_foundation.cj:431:public struct FrameSchedulingSnapshot {
-packages/core/src/runtime_foundation.cj:432:public let reason: String
-packages/core/src/runtime_foundation.cj:433:public let frameRequests: Int64
-packages/core/src/runtime_foundation.cj:434:public let framesPresented: Int64
-packages/core/src/runtime_foundation.cj:435:public let frameRequestsMerged: Int64
-packages/core/src/runtime_foundation.cj:436:public let frameDeadlineWakes: Int64
-packages/core/src/runtime_foundation.cj:437:public let pendingFramePromotions: Int64
-packages/core/src/runtime_foundation.cj:438:public let backgroundFrameRequests: Int64
-packages/core/src/runtime_foundation.cj:439:public let interactiveFrameRequests: Int64
-packages/core/src/runtime_foundation.cj:440:public let resizeFrameRequests: Int64
-packages/core/src/runtime_foundation.cj:441:public let updatesPerFrame: Int64
-packages/core/src/runtime_foundation.cj:442:public let dirtyRectsBeforeMerge: Int64
-packages/core/src/runtime_foundation.cj:443:public let dirtyRectsAfterMerge: Int64
-packages/core/src/runtime_foundation.cj:444:public let firstInvalidationToFrameMillis: Int64
-packages/core/src/runtime_foundation.cj:445:public let lastUpdateToFrameMillis: Int64
-packages/core/src/runtime_foundation.cj:446:public let frameDelayDueToCoalescingMillis: Int64
-packages/core/src/runtime_foundation.cj:447:public let framesAvoided: Int64
-packages/core/src/runtime_foundation.cj:449:public init( reason!: String = "none", frameRequests!: Int64 = 0, framesPresented!: Int64 = 0, frameRequestsMerged!: Int64 = 0, frameDeadlineWakes!: Int64 = 0, pendingFramePromotions!: Int64 = 0, backgroundFrameRequests!: Int64 = 0, interactiveFrameRequests!: Int64 = 0, resizeFrameRequests!: Int64 = 0, updatesPerFrame!: Int64 = 0, dirtyRectsBeforeMerge!: Int64 = 0, dirtyRectsAfterMerge!: Int64 = 0, firstInvalidationToFrameMillis!: Int64 = 0, lastUpdateToFrameMillis!: Int64 = 0, frameDelayDueToCoalescingMillis!: Int64 = 0, framesAvoided!: Int64 = 0 )
-packages/core/src/runtime_foundation.cj:750:public class ExternalPort<A> {
-packages/core/src/runtime_foundation.cj:763:public init(capacity!: Int64 = 256)
-packages/core/src/runtime_foundation.cj:769:public func capacity(): Int64
-packages/core/src/runtime_foundation.cj:773:public func enableLatencyMeasurement(): Unit
-packages/core/src/runtime_foundation.cj:778:public func tryEnqueue(action: A): ExternalEnqueueResult
-packages/core/src/runtime_foundation.cj:845:public func size(): Int64
-packages/core/src/runtime_foundation.cj:862:public func close(): Unit
-packages/core/src/runtime_foundation.cj:882:public func acceptedCount(): Int64
-packages/core/src/runtime_foundation.cj:883:public func fullCount(): Int64
-packages/core/src/runtime_foundation.cj:884:public func closedCount(): Int64
-packages/core/src/runtime_foundation.cj:885:public func wakeSignals(): Int64
-packages/core/src/runtime_foundation.cj:886:public func wakeCoalesced(): Int64
+packages/core/src/runtime_foundation.cj:32:public enum ExternalEnqueueResult {
+packages/core/src/runtime_foundation.cj:34:Accepted
+packages/core/src/runtime_foundation.cj:36:Full
+packages/core/src/runtime_foundation.cj:38:Closed
+packages/core/src/runtime_foundation.cj:43:public struct OwnerToken <: Equatable<OwnerToken> {
+packages/core/src/runtime_foundation.cj:44:public let slot: Int64
+packages/core/src/runtime_foundation.cj:45:public let generation: Int64
+packages/core/src/runtime_foundation.cj:47:public init(slot: Int64, generation: Int64)
+packages/core/src/runtime_foundation.cj:52:public operator func ==(other: OwnerToken): Bool
+packages/core/src/runtime_foundation.cj:56:public operator func !=(other: OwnerToken): Bool
+packages/core/src/runtime_foundation.cj:60:public struct OperationId <: Equatable<OperationId> {
+packages/core/src/runtime_foundation.cj:61:public let value: Int64
+packages/core/src/runtime_foundation.cj:63:public init(value: Int64)
+packages/core/src/runtime_foundation.cj:64:public operator func ==(other: OperationId): Bool
+packages/core/src/runtime_foundation.cj:65:public operator func !=(other: OperationId): Bool
+packages/core/src/runtime_foundation.cj:68:public enum OperationState {
+packages/core/src/runtime_foundation.cj:69:Running
+packages/core/src/runtime_foundation.cj:70:CancelRequested
+packages/core/src/runtime_foundation.cj:71:Settled
+packages/core/src/runtime_foundation.cj:74:public class OwnerRegistry {
+packages/core/src/runtime_foundation.cj:78:public init()
+packages/core/src/runtime_foundation.cj:80:public func acquire(slot: Int64): OwnerToken
+packages/core/src/runtime_foundation.cj:91:public func release(token: OwnerToken): Bool
+packages/core/src/runtime_foundation.cj:97:public func isCurrent(token: OwnerToken): Bool
+packages/core/src/runtime_foundation.cj:103:public class OperationRecord {
+packages/core/src/runtime_foundation.cj:104:public let id: OperationId
+packages/core/src/runtime_foundation.cj:105:public let owner: OwnerToken
+packages/core/src/runtime_foundation.cj:108:public init(id: OperationId, owner: OwnerToken)
+packages/core/src/runtime_foundation.cj:113:public func state(): OperationState
+packages/core/src/runtime_foundation.cj:115:public func requestCancel(): Bool
+packages/core/src/runtime_foundation.cj:124:public func settle(): Bool
+packages/core/src/runtime_foundation.cj:134:public struct OwnedAsyncCompletion {
+packages/core/src/runtime_foundation.cj:135:public let owner: OwnerToken
+packages/core/src/runtime_foundation.cj:136:public let operation: OperationId
+packages/core/src/runtime_foundation.cj:137:public let event: Event
+packages/core/src/runtime_foundation.cj:139:public init(owner: OwnerToken, operation: OperationId, event: Event)
+packages/core/src/runtime_foundation.cj:146:public enum CompletionDisposition {
+packages/core/src/runtime_foundation.cj:147:Applied
+packages/core/src/runtime_foundation.cj:148:Orphan
+packages/core/src/runtime_foundation.cj:149:Duplicate
+packages/core/src/runtime_foundation.cj:154:public class AsyncOwnershipRuntime {
+packages/core/src/runtime_foundation.cj:160:public init()
+packages/core/src/runtime_foundation.cj:162:public func acquireOwner(slot: Int64): OwnerToken
+packages/core/src/runtime_foundation.cj:163:public func releaseOwner(owner: OwnerToken): Bool
+packages/core/src/runtime_foundation.cj:165:public func start(owner: OwnerToken): ?OperationId
+packages/core/src/runtime_foundation.cj:173:public func requestCancel(operation: OperationId): Bool
+packages/core/src/runtime_foundation.cj:180:public func complete(completion: OwnedAsyncCompletion): CompletionDisposition
+packages/core/src/runtime_foundation.cj:202:public func orphanCompletions(): Int64
+packages/core/src/runtime_foundation.cj:212:public enum RuntimeEnvelope<A> {
+packages/core/src/runtime_foundation.cj:213:EventItem(Event)
+packages/core/src/runtime_foundation.cj:214:ExternalItem(A)
+packages/core/src/runtime_foundation.cj:215:QuitItem
+packages/core/src/runtime_foundation.cj:218:public struct SequencedRuntimeItem<A> {
+packages/core/src/runtime_foundation.cj:219:public let sequence: Int64
+packages/core/src/runtime_foundation.cj:220:public let envelope: RuntimeEnvelope<A>
+packages/core/src/runtime_foundation.cj:221:public let enqueuedAtMillis: Int64
+packages/core/src/runtime_foundation.cj:223:public init(sequence: Int64, envelope: RuntimeEnvelope<A>, enqueuedAtMillis!: Int64 = 0)
+packages/core/src/runtime_foundation.cj:269:public class RuntimeQueue<A> {
+packages/core/src/runtime_foundation.cj:286:public init(metrics!: ?AppMetrics = None, capacity!: Int64 = 4096)
+packages/core/src/runtime_foundation.cj:290:public func capacity(): Int64
+packages/core/src/runtime_foundation.cj:291:public func yieldedTurns(): Int64
+packages/core/src/runtime_foundation.cj:292:public func overflowCount(): Int64
+packages/core/src/runtime_foundation.cj:307:public func state(): RuntimeState
+packages/core/src/runtime_foundation.cj:308:public func size(): Int64
+packages/core/src/runtime_foundation.cj:309:public func maxQueueDepth(): Int64
+packages/core/src/runtime_foundation.cj:310:public func maxUpdateDepth(): Int64
+packages/core/src/runtime_foundation.cj:311:public func processedCount(): Int64
+packages/core/src/runtime_foundation.cj:313:public func enqueueEvent(event: Event, nowMillis!: Int64 = 0): ?Int64
+packages/core/src/runtime_foundation.cj:317:public func enqueueExternal(action: A, nowMillis!: Int64 = 0): ?Int64
+packages/core/src/runtime_foundation.cj:321:public func enqueueQuit(nowMillis!: Int64 = 0): ?Int64
+packages/core/src/runtime_foundation.cj:346:public func dequeue(): ?SequencedRuntimeItem<A>
+packages/core/src/runtime_foundation.cj:357:public func enterUpdate(): Unit
+packages/core/src/runtime_foundation.cj:370:public func leaveUpdate(): Unit
+packages/core/src/runtime_foundation.cj:375:public func beginClosing(): Unit
+packages/core/src/runtime_foundation.cj:382:public func close(discardPending!: Bool = true): Unit
+packages/core/src/runtime_foundation.cj:406:public interface RuntimeClock {
+packages/core/src/runtime_foundation.cj:407:func nowMillis(): Int64
+packages/core/src/runtime_foundation.cj:410:public class MonotonicRuntimeClock <: RuntimeClock {
+packages/core/src/runtime_foundation.cj:412:public init()
+packages/core/src/runtime_foundation.cj:413:public func nowMillis(): Int64
+packages/core/src/runtime_foundation.cj:416:public class TestClock <: RuntimeClock {
+packages/core/src/runtime_foundation.cj:418:public init(startMillis!: Int64 = 0)
+packages/core/src/runtime_foundation.cj:419:public func nowMillis(): Int64
+packages/core/src/runtime_foundation.cj:420:public func advance(duration: Duration): Unit
+packages/core/src/runtime_foundation.cj:423:public func advanceMillis(millis: Int64): Unit
+packages/core/src/runtime_foundation.cj:436:public struct FrameSchedulingSnapshot {
+packages/core/src/runtime_foundation.cj:438:public let reason: String
+packages/core/src/runtime_foundation.cj:440:public let frameRequests: Int64
+packages/core/src/runtime_foundation.cj:442:public let framesPresented: Int64
+packages/core/src/runtime_foundation.cj:444:public let frameRequestsMerged: Int64
+packages/core/src/runtime_foundation.cj:446:public let frameDeadlineWakes: Int64
+packages/core/src/runtime_foundation.cj:448:public let pendingFramePromotions: Int64
+packages/core/src/runtime_foundation.cj:450:public let backgroundFrameRequests: Int64
+packages/core/src/runtime_foundation.cj:452:public let interactiveFrameRequests: Int64
+packages/core/src/runtime_foundation.cj:454:public let resizeFrameRequests: Int64
+packages/core/src/runtime_foundation.cj:456:public let updatesPerFrame: Int64
+packages/core/src/runtime_foundation.cj:458:public let dirtyRectsBeforeMerge: Int64
+packages/core/src/runtime_foundation.cj:460:public let dirtyRectsAfterMerge: Int64
+packages/core/src/runtime_foundation.cj:462:public let firstInvalidationToFrameMillis: Int64
+packages/core/src/runtime_foundation.cj:464:public let lastUpdateToFrameMillis: Int64
+packages/core/src/runtime_foundation.cj:466:public let frameDelayDueToCoalescingMillis: Int64
+packages/core/src/runtime_foundation.cj:468:public let framesAvoided: Int64
+packages/core/src/runtime_foundation.cj:488:public init( reason!: String = "none", frameRequests!: Int64 = 0, framesPresented!: Int64 = 0, frameRequestsMerged!: Int64 = 0, frameDeadlineWakes!: Int64 = 0, pendingFramePromotions!: Int64 = 0, backgroundFrameRequests!: Int64 = 0, interactiveFrameRequests!: Int64 = 0, resizeFrameRequests!: Int64 = 0, updatesPerFrame!: Int64 = 0, dirtyRectsBeforeMerge!: Int64 = 0, dirtyRectsAfterMerge!: Int64 = 0, firstInvalidationToFrameMillis!: Int64 = 0, lastUpdateToFrameMillis!: Int64 = 0, frameDelayDueToCoalescingMillis!: Int64 = 0, framesAvoided!: Int64 = 0 )
+packages/core/src/runtime_foundation.cj:790:public class ExternalPort<A> {
+packages/core/src/runtime_foundation.cj:807:public init(capacity!: Int64 = 256)
+packages/core/src/runtime_foundation.cj:816:public func capacity(): Int64
+packages/core/src/runtime_foundation.cj:821:public func enableLatencyMeasurement(): Unit
+packages/core/src/runtime_foundation.cj:830:public func tryEnqueue(action: A): ExternalEnqueueResult
+packages/core/src/runtime_foundation.cj:900:public func size(): Int64
+packages/core/src/runtime_foundation.cj:918:public func close(): Unit
+packages/core/src/runtime_foundation.cj:941:public func acceptedCount(): Int64
+packages/core/src/runtime_foundation.cj:945:public func fullCount(): Int64
+packages/core/src/runtime_foundation.cj:949:public func closedCount(): Int64
+packages/core/src/runtime_foundation.cj:953:public func wakeSignals(): Int64
+packages/core/src/runtime_foundation.cj:957:public func wakeCoalesced(): Int64
 packages/core/src/state_models.cj:6:public enum SelectionMode {
 packages/core/src/state_models.cj:8:NoSelection
 packages/core/src/state_models.cj:10:Single

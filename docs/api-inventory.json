@@ -29025,7 +29025,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 31,
+      "line": 32,
       "level": "top_level",
       "kind": "enum",
       "symbol": "ExternalEnqueueResult",
@@ -29043,7 +29043,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 32,
+      "line": 34,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29062,7 +29062,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 33,
+      "line": 36,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29081,7 +29081,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 34,
+      "line": 38,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29100,7 +29100,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 39,
+      "line": 43,
       "level": "top_level",
       "kind": "struct",
       "symbol": "OwnerToken",
@@ -29118,7 +29118,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 40,
+      "line": 44,
       "level": "member",
       "kind": "let",
       "symbol": "slot",
@@ -29136,7 +29136,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 41,
+      "line": 45,
       "level": "member",
       "kind": "let",
       "symbol": "generation",
@@ -29154,7 +29154,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 43,
+      "line": 47,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -29172,7 +29172,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 48,
+      "line": 52,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_==",
@@ -29190,7 +29190,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 52,
+      "line": 56,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_!=",
@@ -29208,7 +29208,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 56,
+      "line": 60,
       "level": "top_level",
       "kind": "struct",
       "symbol": "OperationId",
@@ -29226,7 +29226,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 57,
+      "line": 61,
       "level": "member",
       "kind": "let",
       "symbol": "value",
@@ -29244,7 +29244,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 59,
+      "line": 63,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -29262,7 +29262,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 60,
+      "line": 64,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_==",
@@ -29280,7 +29280,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 61,
+      "line": 65,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_!=",
@@ -29298,7 +29298,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 64,
+      "line": 68,
       "level": "top_level",
       "kind": "enum",
       "symbol": "OperationState",
@@ -29316,7 +29316,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 65,
+      "line": 69,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29335,7 +29335,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 66,
+      "line": 70,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29354,7 +29354,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 67,
+      "line": 71,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29373,7 +29373,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 70,
+      "line": 74,
       "level": "top_level",
       "kind": "class",
       "symbol": "OwnerRegistry",
@@ -29391,7 +29391,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 74,
+      "line": 78,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -29409,7 +29409,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 76,
+      "line": 80,
       "level": "member",
       "kind": "func",
       "symbol": "acquire",
@@ -29427,7 +29427,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 87,
+      "line": 91,
       "level": "member",
       "kind": "func",
       "symbol": "release",
@@ -29445,7 +29445,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 93,
+      "line": 97,
       "level": "member",
       "kind": "func",
       "symbol": "isCurrent",
@@ -29463,7 +29463,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 99,
+      "line": 103,
       "level": "top_level",
       "kind": "class",
       "symbol": "OperationRecord",
@@ -29481,7 +29481,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 100,
+      "line": 104,
       "level": "member",
       "kind": "let",
       "symbol": "id",
@@ -29499,7 +29499,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 101,
+      "line": 105,
       "level": "member",
       "kind": "let",
       "symbol": "owner",
@@ -29517,7 +29517,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 104,
+      "line": 108,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -29535,7 +29535,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 109,
+      "line": 113,
       "level": "member",
       "kind": "func",
       "symbol": "state",
@@ -29553,7 +29553,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 111,
+      "line": 115,
       "level": "member",
       "kind": "func",
       "symbol": "requestCancel",
@@ -29571,7 +29571,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 120,
+      "line": 124,
       "level": "member",
       "kind": "func",
       "symbol": "settle",
@@ -29589,7 +29589,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 130,
+      "line": 134,
       "level": "top_level",
       "kind": "struct",
       "symbol": "OwnedAsyncCompletion",
@@ -29607,7 +29607,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 131,
+      "line": 135,
       "level": "member",
       "kind": "let",
       "symbol": "owner",
@@ -29625,7 +29625,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 132,
+      "line": 136,
       "level": "member",
       "kind": "let",
       "symbol": "operation",
@@ -29643,7 +29643,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 133,
+      "line": 137,
       "level": "member",
       "kind": "let",
       "symbol": "event",
@@ -29661,7 +29661,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 135,
+      "line": 139,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -29679,7 +29679,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 142,
+      "line": 146,
       "level": "top_level",
       "kind": "enum",
       "symbol": "CompletionDisposition",
@@ -29697,7 +29697,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 143,
+      "line": 147,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29716,7 +29716,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 144,
+      "line": 148,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29735,7 +29735,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 145,
+      "line": 149,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29754,7 +29754,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 150,
+      "line": 154,
       "level": "top_level",
       "kind": "class",
       "symbol": "AsyncOwnershipRuntime",
@@ -29772,7 +29772,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 156,
+      "line": 160,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -29790,7 +29790,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 158,
+      "line": 162,
       "level": "member",
       "kind": "func",
       "symbol": "acquireOwner",
@@ -29808,7 +29808,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 159,
+      "line": 163,
       "level": "member",
       "kind": "func",
       "symbol": "releaseOwner",
@@ -29826,7 +29826,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 161,
+      "line": 165,
       "level": "member",
       "kind": "func",
       "symbol": "start",
@@ -29844,7 +29844,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 169,
+      "line": 173,
       "level": "member",
       "kind": "func",
       "symbol": "requestCancel",
@@ -29862,7 +29862,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 176,
+      "line": 180,
       "level": "member",
       "kind": "func",
       "symbol": "complete",
@@ -29880,7 +29880,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 198,
+      "line": 202,
       "level": "member",
       "kind": "func",
       "symbol": "orphanCompletions",
@@ -29898,7 +29898,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 208,
+      "line": 212,
       "level": "top_level",
       "kind": "enum",
       "symbol": "RuntimeEnvelope",
@@ -29916,7 +29916,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 209,
+      "line": 213,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29935,7 +29935,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 210,
+      "line": 214,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29954,7 +29954,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 211,
+      "line": 215,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -29973,7 +29973,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 214,
+      "line": 218,
       "level": "top_level",
       "kind": "struct",
       "symbol": "SequencedRuntimeItem",
@@ -29991,7 +29991,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 215,
+      "line": 219,
       "level": "member",
       "kind": "let",
       "symbol": "sequence",
@@ -30009,7 +30009,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 216,
+      "line": 220,
       "level": "member",
       "kind": "let",
       "symbol": "envelope",
@@ -30027,7 +30027,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 217,
+      "line": 221,
       "level": "member",
       "kind": "let",
       "symbol": "enqueuedAtMillis",
@@ -30045,7 +30045,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 219,
+      "line": 223,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -30063,7 +30063,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 265,
+      "line": 269,
       "level": "top_level",
       "kind": "class",
       "symbol": "RuntimeQueue",
@@ -30081,7 +30081,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 282,
+      "line": 286,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -30099,7 +30099,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 286,
+      "line": 290,
       "level": "member",
       "kind": "func",
       "symbol": "capacity",
@@ -30117,7 +30117,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 287,
+      "line": 291,
       "level": "member",
       "kind": "func",
       "symbol": "yieldedTurns",
@@ -30135,7 +30135,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 288,
+      "line": 292,
       "level": "member",
       "kind": "func",
       "symbol": "overflowCount",
@@ -30153,7 +30153,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 303,
+      "line": 307,
       "level": "member",
       "kind": "func",
       "symbol": "state",
@@ -30171,7 +30171,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 304,
+      "line": 308,
       "level": "member",
       "kind": "func",
       "symbol": "size",
@@ -30189,7 +30189,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 305,
+      "line": 309,
       "level": "member",
       "kind": "func",
       "symbol": "maxQueueDepth",
@@ -30207,7 +30207,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 306,
+      "line": 310,
       "level": "member",
       "kind": "func",
       "symbol": "maxUpdateDepth",
@@ -30225,7 +30225,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 307,
+      "line": 311,
       "level": "member",
       "kind": "func",
       "symbol": "processedCount",
@@ -30243,7 +30243,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 309,
+      "line": 313,
       "level": "member",
       "kind": "func",
       "symbol": "enqueueEvent",
@@ -30261,7 +30261,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 313,
+      "line": 317,
       "level": "member",
       "kind": "func",
       "symbol": "enqueueExternal",
@@ -30279,7 +30279,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 317,
+      "line": 321,
       "level": "member",
       "kind": "func",
       "symbol": "enqueueQuit",
@@ -30297,7 +30297,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 342,
+      "line": 346,
       "level": "member",
       "kind": "func",
       "symbol": "dequeue",
@@ -30315,7 +30315,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 353,
+      "line": 357,
       "level": "member",
       "kind": "func",
       "symbol": "enterUpdate",
@@ -30333,7 +30333,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 366,
+      "line": 370,
       "level": "member",
       "kind": "func",
       "symbol": "leaveUpdate",
@@ -30351,7 +30351,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 371,
+      "line": 375,
       "level": "member",
       "kind": "func",
       "symbol": "beginClosing",
@@ -30369,7 +30369,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 378,
+      "line": 382,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -30387,7 +30387,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 402,
+      "line": 406,
       "level": "top_level",
       "kind": "interface",
       "symbol": "RuntimeClock",
@@ -30405,7 +30405,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 403,
+      "line": 407,
       "level": "member",
       "kind": "func",
       "symbol": "nowMillis",
@@ -30424,7 +30424,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 406,
+      "line": 410,
       "level": "top_level",
       "kind": "class",
       "symbol": "MonotonicRuntimeClock",
@@ -30442,7 +30442,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 408,
+      "line": 412,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -30460,7 +30460,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 409,
+      "line": 413,
       "level": "member",
       "kind": "func",
       "symbol": "nowMillis",
@@ -30478,7 +30478,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 412,
+      "line": 416,
       "level": "top_level",
       "kind": "class",
       "symbol": "TestClock",
@@ -30496,7 +30496,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 414,
+      "line": 418,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -30514,7 +30514,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 415,
+      "line": 419,
       "level": "member",
       "kind": "func",
       "symbol": "nowMillis",
@@ -30532,7 +30532,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 416,
+      "line": 420,
       "level": "member",
       "kind": "func",
       "symbol": "advance",
@@ -30550,7 +30550,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 419,
+      "line": 423,
       "level": "member",
       "kind": "func",
       "symbol": "advanceMillis",
@@ -30568,7 +30568,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 431,
+      "line": 436,
       "level": "top_level",
       "kind": "struct",
       "symbol": "FrameSchedulingSnapshot",
@@ -30586,7 +30586,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 432,
+      "line": 438,
       "level": "member",
       "kind": "let",
       "symbol": "reason",
@@ -30604,7 +30604,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 433,
+      "line": 440,
       "level": "member",
       "kind": "let",
       "symbol": "frameRequests",
@@ -30622,7 +30622,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 434,
+      "line": 442,
       "level": "member",
       "kind": "let",
       "symbol": "framesPresented",
@@ -30640,7 +30640,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 435,
+      "line": 444,
       "level": "member",
       "kind": "let",
       "symbol": "frameRequestsMerged",
@@ -30658,7 +30658,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 436,
+      "line": 446,
       "level": "member",
       "kind": "let",
       "symbol": "frameDeadlineWakes",
@@ -30676,7 +30676,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 437,
+      "line": 448,
       "level": "member",
       "kind": "let",
       "symbol": "pendingFramePromotions",
@@ -30694,7 +30694,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 438,
+      "line": 450,
       "level": "member",
       "kind": "let",
       "symbol": "backgroundFrameRequests",
@@ -30712,7 +30712,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 439,
+      "line": 452,
       "level": "member",
       "kind": "let",
       "symbol": "interactiveFrameRequests",
@@ -30730,7 +30730,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 440,
+      "line": 454,
       "level": "member",
       "kind": "let",
       "symbol": "resizeFrameRequests",
@@ -30748,7 +30748,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 441,
+      "line": 456,
       "level": "member",
       "kind": "let",
       "symbol": "updatesPerFrame",
@@ -30766,7 +30766,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 442,
+      "line": 458,
       "level": "member",
       "kind": "let",
       "symbol": "dirtyRectsBeforeMerge",
@@ -30784,7 +30784,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 443,
+      "line": 460,
       "level": "member",
       "kind": "let",
       "symbol": "dirtyRectsAfterMerge",
@@ -30802,7 +30802,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 444,
+      "line": 462,
       "level": "member",
       "kind": "let",
       "symbol": "firstInvalidationToFrameMillis",
@@ -30820,7 +30820,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 445,
+      "line": 464,
       "level": "member",
       "kind": "let",
       "symbol": "lastUpdateToFrameMillis",
@@ -30838,7 +30838,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 446,
+      "line": 466,
       "level": "member",
       "kind": "let",
       "symbol": "frameDelayDueToCoalescingMillis",
@@ -30856,7 +30856,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 447,
+      "line": 468,
       "level": "member",
       "kind": "let",
       "symbol": "framesAvoided",
@@ -30874,7 +30874,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 449,
+      "line": 488,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -30892,7 +30892,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 750,
+      "line": 790,
       "level": "top_level",
       "kind": "class",
       "symbol": "ExternalPort",
@@ -30910,7 +30910,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 763,
+      "line": 807,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -30928,7 +30928,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 769,
+      "line": 816,
       "level": "member",
       "kind": "func",
       "symbol": "capacity",
@@ -30946,7 +30946,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 773,
+      "line": 821,
       "level": "member",
       "kind": "func",
       "symbol": "enableLatencyMeasurement",
@@ -30964,7 +30964,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 778,
+      "line": 830,
       "level": "member",
       "kind": "func",
       "symbol": "tryEnqueue",
@@ -30982,7 +30982,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 845,
+      "line": 900,
       "level": "member",
       "kind": "func",
       "symbol": "size",
@@ -31000,7 +31000,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 862,
+      "line": 918,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -31018,7 +31018,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 882,
+      "line": 941,
       "level": "member",
       "kind": "func",
       "symbol": "acceptedCount",
@@ -31036,7 +31036,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 883,
+      "line": 945,
       "level": "member",
       "kind": "func",
       "symbol": "fullCount",
@@ -31054,7 +31054,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 884,
+      "line": 949,
       "level": "member",
       "kind": "func",
       "symbol": "closedCount",
@@ -31072,7 +31072,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 885,
+      "line": 953,
       "level": "member",
       "kind": "func",
       "symbol": "wakeSignals",
@@ -31090,7 +31090,7 @@
     {
       "package": "core",
       "path": "packages/core/src/runtime_foundation.cj",
-      "line": 886,
+      "line": 957,
       "level": "member",
       "kind": "func",
       "symbol": "wakeCoalesced",

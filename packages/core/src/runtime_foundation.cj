@@ -28,9 +28,13 @@ public enum RuntimeState {
 
 // Producer-visible outcome. Accepted is admission into a running port with any
 // required wake published; it is not App.update completion or durable delivery.
+/** 外部事件入口的非阻塞入队结果。 */
 public enum ExternalEnqueueResult {
+    /** 已入队；不保证运行时已经处理。 */
     | Accepted
+    /** 队列已满，未接收该动作。 */
     | Full
+    /** 入口已关闭或无法唤醒运行时，未接收该动作。 */
     | Closed
 }
 
@@ -428,24 +432,59 @@ enum FrameRequestKind {
     | SurfaceCritical
 }
 
+/** 一帧呈现时的调度统计快照；时间字段以毫秒为单位。 */
 public struct FrameSchedulingSnapshot {
+    /** 当前帧就绪原因。 */
     public let reason: String
+    /** 累计帧请求数。 */
     public let frameRequests: Int64
+    /** 累计呈现帧数。 */
     public let framesPresented: Int64
+    /** 合并到已有待处理帧的累计请求数。 */
     public let frameRequestsMerged: Int64
+    /** 后台帧因到达截止时间就绪的累计次数。 */
     public let frameDeadlineWakes: Int64
+    /** 待处理帧因交互或尺寸变化提前就绪的累计次数。 */
     public let pendingFramePromotions: Int64
+    /** 累计后台帧请求数。 */
     public let backgroundFrameRequests: Int64
+    /** 累计交互帧请求数。 */
     public let interactiveFrameRequests: Int64
+    /** 累计尺寸变化等表面关键帧请求数。 */
     public let resizeFrameRequests: Int64
+    /** 本帧合并的更新数。 */
     public let updatesPerFrame: Int64
+    /** 本帧请求合并前的脏矩形数。 */
     public let dirtyRectsBeforeMerge: Int64
+    /** 本帧合并后的脏矩形数。 */
     public let dirtyRectsAfterMerge: Int64
+    /** 首次失效到本帧呈现的毫秒数。 */
     public let firstInvalidationToFrameMillis: Int64
+    /** 最后一次更新到本帧呈现的毫秒数。 */
     public let lastUpdateToFrameMillis: Int64
+    /** 后台截止时间合并产生的帧延迟毫秒数。 */
     public let frameDelayDueToCoalescingMillis: Int64
+    /** 累计请求数与呈现帧数之差，不小于零。 */
     public let framesAvoided: Int64
 
+    /** 创建帧调度快照；数值字段的负数按零处理。
+     * @param reason 当前帧就绪原因
+     * @param frameRequests 累计帧请求数
+     * @param framesPresented 累计呈现帧数
+     * @param frameRequestsMerged 合并到已有待处理帧的累计请求数
+     * @param frameDeadlineWakes 后台帧因到达截止时间就绪的累计次数
+     * @param pendingFramePromotions 待处理帧因交互或尺寸变化提前就绪的累计次数
+     * @param backgroundFrameRequests 累计后台帧请求数
+     * @param interactiveFrameRequests 累计交互帧请求数
+     * @param resizeFrameRequests 累计尺寸变化等表面关键帧请求数
+     * @param updatesPerFrame 本帧合并的更新数
+     * @param dirtyRectsBeforeMerge 本帧请求合并前的脏矩形数
+     * @param dirtyRectsAfterMerge 本帧合并后的脏矩形数
+     * @param firstInvalidationToFrameMillis 首次失效到本帧呈现的毫秒数
+     * @param lastUpdateToFrameMillis 最后一次更新到本帧呈现的毫秒数
+     * @param frameDelayDueToCoalescingMillis 后台截止时间合并产生的帧延迟毫秒数
+     * @param framesAvoided 累计请求数与呈现帧数之差，不小于零
+     */
     public init(
         reason!: String = "none",
         frameRequests!: Int64 = 0,
@@ -747,6 +786,7 @@ struct ExternalPortEntry<A> {
 // ordinary Cangjie value/reference semantics and does not deep-copy payloads.
 // Concurrent producer calls are mutex-linearized; close is idempotent and may
 // discard accepted entries that the runtime has not imported yet.
+/** 供应用运行时使用的有界非阻塞入口。并发生产者调用由锁串行化；载荷按普通值或引用语义保存，不进行深拷贝。 */
 public class ExternalPort<A> {
     private let lock = Mutex()
     private let values = ArrayList<ExternalPortEntry<A>>()
@@ -760,21 +800,33 @@ public class ExternalPort<A> {
     private var wakeSignalsValue: Int64 = 0
     private var wakeCoalescedValue: Int64 = 0
 
+    /** 创建外部入口。
+     * @param capacity 队列容量，必须为正
+     * @throws IllegalArgumentException 容量非正
+     */
     public init(capacity!: Int64 = 256) {
         if (capacity <= 0) { throw IllegalArgumentException("ExternalPort capacity must be positive") }
         capacityValue = capacity
         wakeSource = ExternalWakeSource(lock)
     }
 
+    /** 获取队列容量。
+     * @return 最大待处理动作数
+     */
     public func capacity(): Int64 { capacityValue }
 
     // Experimental diagnostics switch. Latency timestamps are not part of the
     // stable producer contract and must be enabled before producers enqueue.
+    /** 启用实验性的入队时间记录；应在生产者开始入队前调用。 */
     public func enableLatencyMeasurement(): Unit {
         lock.lock()
         try { measureLatency = true } finally { lock.unlock() }
     }
 
+    /** 尝试立即入队；队列满或入口关闭时不会阻塞。已接收不保证动作已被运行时处理。
+     * @param action 待提交的动作
+     * @return 接收、队列满或入口关闭
+     */
     public func tryEnqueue(action: A): ExternalEnqueueResult {
         lock.lock()
         try {
@@ -842,6 +894,9 @@ public class ExternalPort<A> {
         }
     }
 
+    /** 获取当前等待运行时导入的动作数量。
+     * @return 队列长度
+     */
     public func size(): Int64 {
         lock.lock()
         try { values.size } finally { lock.unlock() }
@@ -859,6 +914,7 @@ public class ExternalPort<A> {
         } finally { lock.unlock() }
     }
 
+    /** 关闭入口并丢弃尚未导入的动作；重复关闭无效果。 */
     public func close(): Unit {
         lock.lock()
         try {
@@ -879,9 +935,24 @@ public class ExternalPort<A> {
         try { stateValue } finally { lock.unlock() }
     }
 
+    /** 获取成功接收的累计动作数。
+     * @return 成功接收的累计动作数
+     */
     public func acceptedCount(): Int64 { lock.lock(); try { acceptedValue } finally { lock.unlock() } }
+    /** 获取因队列满而拒绝的累计动作数。
+     * @return 因队列满而拒绝的累计动作数
+     */
     public func fullCount(): Int64 { lock.lock(); try { fullValue } finally { lock.unlock() } }
+    /** 获取因入口关闭或唤醒失败而拒绝的累计动作数。
+     * @return 因入口关闭或唤醒失败而拒绝的累计动作数
+     */
     public func closedCount(): Int64 { lock.lock(); try { closedValue } finally { lock.unlock() } }
+    /** 获取成功发送唤醒信号的累计次数。
+     * @return 成功发送唤醒信号的累计次数
+     */
     public func wakeSignals(): Int64 { lock.lock(); try { wakeSignalsValue } finally { lock.unlock() } }
+    /** 获取队列非空时合并的累计唤醒次数。
+     * @return 队列非空时合并的累计唤醒次数
+     */
     public func wakeCoalesced(): Int64 { lock.lock(); try { wakeCoalescedValue } finally { lock.unlock() } }
 }
