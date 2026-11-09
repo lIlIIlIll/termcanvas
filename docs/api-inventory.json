@@ -43922,7 +43922,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 108,
+      "line": 109,
       "level": "top_level",
       "kind": "class",
       "symbol": "VirtualTranscriptState",
@@ -43940,7 +43940,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 109,
+      "line": 111,
       "level": "member",
       "kind": "var",
       "symbol": "scrollTop",
@@ -43958,7 +43958,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 110,
+      "line": 113,
       "level": "member",
       "kind": "var",
       "symbol": "followBottom",
@@ -43976,7 +43976,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 111,
+      "line": 115,
       "level": "member",
       "kind": "var",
       "symbol": "anchorId",
@@ -43994,7 +43994,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 112,
+      "line": 117,
       "level": "member",
       "kind": "var",
       "symbol": "anchorRow",
@@ -44012,7 +44012,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 114,
+      "line": 125,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -44030,7 +44030,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 126,
+      "line": 142,
       "level": "member",
       "kind": "func",
       "symbol": "scrollBy",
@@ -44048,7 +44048,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 132,
+      "line": 149,
       "level": "member",
       "kind": "func",
       "symbol": "home",
@@ -44066,7 +44066,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 139,
+      "line": 160,
       "level": "member",
       "kind": "func",
       "symbol": "end",
@@ -44084,7 +44084,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 303,
+      "line": 324,
       "level": "top_level",
       "kind": "class",
       "symbol": "VisibleRange",
@@ -44102,7 +44102,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 304,
+      "line": 325,
       "level": "member",
       "kind": "let",
       "symbol": "id",
@@ -44120,7 +44120,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 305,
+      "line": 326,
       "level": "member",
       "kind": "let",
       "symbol": "top",
@@ -44138,7 +44138,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 306,
+      "line": 327,
       "level": "member",
       "kind": "let",
       "symbol": "bottom",
@@ -44156,7 +44156,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 308,
+      "line": 329,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -44174,7 +44174,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 317,
+      "line": 338,
       "level": "top_level",
       "kind": "class",
       "symbol": "VirtualTranscriptMetrics",
@@ -44192,7 +44192,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 318,
+      "line": 339,
       "level": "member",
       "kind": "let",
       "symbol": "materialized",
@@ -44210,7 +44210,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 319,
+      "line": 340,
       "level": "member",
       "kind": "let",
       "symbol": "cacheEntries",
@@ -44228,7 +44228,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 320,
+      "line": 341,
       "level": "member",
       "kind": "let",
       "symbol": "measuredEntries",
@@ -44246,7 +44246,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 321,
+      "line": 342,
       "level": "member",
       "kind": "let",
       "symbol": "cachedRows",
@@ -44264,7 +44264,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 322,
+      "line": 343,
       "level": "member",
       "kind": "let",
       "symbol": "appendOnlyFullLayouts",
@@ -44282,7 +44282,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 323,
+      "line": 344,
       "level": "member",
       "kind": "let",
       "symbol": "appendOnlyIncrementalLayouts",
@@ -44300,7 +44300,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 324,
+      "line": 345,
       "level": "member",
       "kind": "let",
       "symbol": "appendOnlyRewrappedBytes",
@@ -44318,7 +44318,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 325,
+      "line": 346,
       "level": "member",
       "kind": "let",
       "symbol": "syncCountCalls",
@@ -44336,7 +44336,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 326,
+      "line": 347,
       "level": "member",
       "kind": "let",
       "symbol": "metadataTouches",
@@ -44354,7 +44354,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 327,
+      "line": 348,
       "level": "member",
       "kind": "let",
       "symbol": "heightIndexResetEntries",
@@ -44372,7 +44372,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 328,
+      "line": 349,
       "level": "member",
       "kind": "let",
       "symbol": "heightIndexUpdateCalls",
@@ -44390,7 +44390,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 329,
+      "line": 350,
       "level": "member",
       "kind": "let",
       "symbol": "heightIndexNodesTouched",
@@ -44408,7 +44408,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 330,
+      "line": 351,
       "level": "member",
       "kind": "let",
       "symbol": "heightIndexGrowOperations",
@@ -44426,7 +44426,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 331,
+      "line": 352,
       "level": "member",
       "kind": "let",
       "symbol": "heightMetadataEntries",
@@ -44444,7 +44444,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 332,
+      "line": 353,
       "level": "member",
       "kind": "let",
       "symbol": "heightIndexNodes",
@@ -44462,7 +44462,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 333,
+      "line": 354,
       "level": "member",
       "kind": "let",
       "symbol": "cacheLookups",
@@ -44480,7 +44480,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 334,
+      "line": 355,
       "level": "member",
       "kind": "let",
       "symbol": "cacheHits",
@@ -44498,7 +44498,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 335,
+      "line": 356,
       "level": "member",
       "kind": "let",
       "symbol": "cacheMisses",
@@ -44516,7 +44516,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 336,
+      "line": 357,
       "level": "member",
       "kind": "let",
       "symbol": "layoutCalls",
@@ -44534,7 +44534,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 337,
+      "line": 358,
       "level": "member",
       "kind": "let",
       "symbol": "documentRequests",
@@ -44552,7 +44552,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 338,
+      "line": 359,
       "level": "member",
       "kind": "let",
       "symbol": "documentsMaterialized",
@@ -44570,7 +44570,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 339,
+      "line": 360,
       "level": "member",
       "kind": "let",
       "symbol": "wrapInputBytes",
@@ -44588,7 +44588,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 340,
+      "line": 361,
       "level": "member",
       "kind": "let",
       "symbol": "measurementInvalidations",
@@ -44606,7 +44606,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 341,
+      "line": 362,
       "level": "member",
       "kind": "let",
       "symbol": "measurementGenerationBumps",
@@ -44624,7 +44624,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 342,
+      "line": 363,
       "level": "member",
       "kind": "let",
       "symbol": "staleEntriesEncountered",
@@ -44642,7 +44642,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 343,
+      "line": 364,
       "level": "member",
       "kind": "let",
       "symbol": "entriesRemeasured",
@@ -44660,7 +44660,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 344,
+      "line": 365,
       "level": "member",
       "kind": "let",
       "symbol": "estimateCorrections",
@@ -44678,7 +44678,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 345,
+      "line": 366,
       "level": "member",
       "kind": "let",
       "symbol": "anchorCorrections",
@@ -44696,7 +44696,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 350,
+      "line": 371,
       "level": "member",
       "kind": "let",
       "symbol": "visibleItems",
@@ -44714,7 +44714,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 351,
+      "line": 372,
       "level": "member",
       "kind": "let",
       "symbol": "itemsVisited",
@@ -44732,7 +44732,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 352,
+      "line": 373,
       "level": "member",
       "kind": "let",
       "symbol": "itemsPainted",
@@ -44750,7 +44750,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 353,
+      "line": 374,
       "level": "member",
       "kind": "let",
       "symbol": "rowsVisited",
@@ -44768,7 +44768,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 354,
+      "line": 375,
       "level": "member",
       "kind": "let",
       "symbol": "rowsPainted",
@@ -44786,7 +44786,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 355,
+      "line": 376,
       "level": "member",
       "kind": "let",
       "symbol": "changedItems",
@@ -44804,7 +44804,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 356,
+      "line": 377,
       "level": "member",
       "kind": "let",
       "symbol": "itemPaintCellAttempts",
@@ -44822,7 +44822,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 357,
+      "line": 378,
       "level": "member",
       "kind": "let",
       "symbol": "rowPaintCellAttempts",
@@ -44840,7 +44840,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 358,
+      "line": 379,
       "level": "member",
       "kind": "let",
       "symbol": "itemBackgroundCellAttempts",
@@ -44858,7 +44858,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 359,
+      "line": 380,
       "level": "member",
       "kind": "let",
       "symbol": "contentCellAttempts",
@@ -44876,7 +44876,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 360,
+      "line": 381,
       "level": "member",
       "kind": "let",
       "symbol": "layoutRowsRequested",
@@ -44894,7 +44894,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 361,
+      "line": 382,
       "level": "member",
       "kind": "let",
       "symbol": "cachedRowsUsed",
@@ -44912,7 +44912,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 362,
+      "line": 383,
       "level": "member",
       "kind": "let",
       "symbol": "selectiveItemInvalidations",
@@ -44930,7 +44930,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 363,
+      "line": 384,
       "level": "member",
       "kind": "let",
       "symbol": "selectiveOffscreenInvalidations",
@@ -44948,7 +44948,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 364,
+      "line": 385,
       "level": "member",
       "kind": "let",
       "symbol": "fallbackFullViewportPaints",
@@ -44966,7 +44966,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 366,
+      "line": 387,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -44984,7 +44984,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 457,
+      "line": 479,
       "level": "top_level",
       "kind": "class",
       "symbol": "VirtualTranscriptView",
@@ -45002,7 +45002,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 459,
+      "line": 482,
       "level": "member",
       "kind": "let",
       "symbol": "state",
@@ -45020,7 +45020,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 518,
+      "line": 542,
       "level": "member",
       "kind": "let",
       "symbol": "lastVisibleRanges",
@@ -45038,7 +45038,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 521,
+      "line": 553,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -45056,7 +45056,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 538,
+      "line": 573,
       "level": "member",
       "kind": "func",
       "symbol": "setThemeKey",
@@ -45074,7 +45074,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 544,
+      "line": 582,
       "level": "member",
       "kind": "func",
       "symbol": "setCardChrome",
@@ -45092,7 +45092,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 552,
+      "line": 593,
       "level": "member",
       "kind": "func",
       "symbol": "setUnicode",
@@ -45110,7 +45110,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 558,
+      "line": 602,
       "level": "member",
       "kind": "func",
       "symbol": "setCardTheme",
@@ -45128,7 +45128,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 564,
+      "line": 608,
       "level": "member",
       "kind": "func",
       "symbol": "clearCardTheme",
@@ -45146,7 +45146,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 583,
+      "line": 631,
       "level": "member",
       "kind": "func",
       "symbol": "invalidateItem",
@@ -45164,7 +45164,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 598,
+      "line": 649,
       "level": "member",
       "kind": "func",
       "symbol": "totalRows",
@@ -45182,7 +45182,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 603,
+      "line": 657,
       "level": "member",
       "kind": "func",
       "symbol": "materializedCount",
@@ -45200,7 +45200,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 605,
+      "line": 662,
       "level": "member",
       "kind": "func",
       "symbol": "metrics",
@@ -45218,7 +45218,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 661,
+      "line": 718,
       "level": "member",
       "kind": "func",
       "symbol": "instrumentationMetrics",
@@ -45236,7 +45236,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 713,
+      "line": 774,
       "level": "member",
       "kind": "func",
       "symbol": "dirtyRectForItemRevision",
@@ -45254,7 +45254,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 738,
+      "line": 803,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -45272,7 +45272,7 @@
     {
       "package": "core",
       "path": "packages/core/src/virtual_transcript.cj",
-      "line": 751,
+      "line": 820,
       "level": "member",
       "kind": "func",
       "symbol": "render",

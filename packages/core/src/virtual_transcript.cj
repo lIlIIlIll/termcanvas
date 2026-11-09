@@ -105,12 +105,23 @@ public interface VirtualTranscriptSource {
     func itemCardTheme(_: Int64): ?TranscriptCardTheme { None }
 }
 
+/** 保存虚拟对话视图的滚动和锚点状态。 */
 public class VirtualTranscriptState {
+    /** 视口顶部的渲染行偏移。 */
     public var scrollTop: Int64
+    /** 是否跟随内容底部。 */
     public var followBottom: Bool
+    /** 保持位置的条目标识。 */
     public var anchorId: String
+    /** 锚点在条目中的行偏移。 */
     public var anchorRow: Int64
 
+    /** 创建虚拟对话状态。
+     * @param scrollTop 顶部行偏移，负值按零处理
+     * @param followBottom 是否跟随底部
+     * @param anchorId 锚点条目标识
+     * @param anchorRow 锚点行偏移，负值按零处理
+     */
     public init(
         scrollTop!: Int64 = 0,
         followBottom!: Bool = true,
@@ -123,12 +134,18 @@ public class VirtualTranscriptState {
         this.anchorRow = max(0, anchorRow)
     }
 
+    /** 滚动并限制顶部行；到达底部时启用跟随。
+     * @param delta 行偏移增量
+     * @param totalRows 总行数
+     * @param viewportRows 视口行数，计算时至少为一
+     */
     public func scrollBy(delta: Int64, totalRows: Int64, viewportRows: Int64): Unit {
         let maximum = max(0, totalRows - max(1, viewportRows))
         scrollTop = clamp(scrollTop + delta, 0, maximum)
         followBottom = scrollTop >= maximum
     }
 
+    /** 滚动到顶部，关闭跟随并清除锚点。 */
     public func home(): Unit {
         scrollTop = 0
         followBottom = false
@@ -136,6 +153,10 @@ public class VirtualTranscriptState {
         anchorRow = 0
     }
 
+    /** 滚动到底部并启用跟随。
+     * @param totalRows 总行数
+     * @param viewportRows 视口行数，计算时至少为一
+     */
     public func end(totalRows: Int64, viewportRows: Int64): Unit {
         scrollTop = max(0, totalRows - max(1, viewportRows))
         followBottom = true
@@ -454,8 +475,10 @@ public class VirtualTranscriptMetrics {
     }
 }
 
+/** 按可见区域和缓存按需排版对话条目的视图。 */
 public class VirtualTranscriptView <: Widget {
     private let source: VirtualTranscriptSource
+    /** 共享的滚动和锚点状态。 */
     public let state: VirtualTranscriptState
     private let entries = ArrayList<VirtualTranscriptCacheEntry>()
     private let heights = TranscriptHeightIndex()
@@ -515,9 +538,18 @@ public class VirtualTranscriptView <: Widget {
     // Screen ranges of items rendered by the last render() call, in
     // transcript order: (itemId, topRow, bottomRow). Used by hosts for
     // hit-testing (e.g. clicking a collapsed tool card to expand it).
+    /** 上次绘制的可见条目屏幕范围，可用于命中测试。 */
     public let lastVisibleRanges = ArrayList<VisibleRange>()
     private let lastVisibleIndices = ArrayList<Int64>()
 
+    /** 创建虚拟对话视图。
+     * @param source 提供条目和修订信息的来源
+     * @param state 滚动状态
+     * @param themeKey 传给来源的主题标识
+     * @param overscanViewports 视口外预排版范围，负值按零处理
+     * @param backgroundBatch 每次后台测量批次大小，负值按零处理
+     * @param instrumentationEnabled 是否启用详细计数
+     */
     public init(
         source: VirtualTranscriptSource,
         state!: VirtualTranscriptState = VirtualTranscriptState(),
@@ -535,12 +567,18 @@ public class VirtualTranscriptView <: Widget {
         syncCount()
     }
 
+    /** 更改来源主题标识并使测量缓存失效。
+     * @param value 新主题标识
+     */
     public func setThemeKey(value: String): Unit {
         if (themeKey == value) { return }
         themeKey = value
         invalidateAllMeasurements()
     }
 
+    /** 设置是否使用卡片边饰，并在变化时使测量缓存失效。
+     * @param enabled 是否启用卡片边饰
+     */
     public func setCardChrome(enabled: Bool): Unit {
         if (cardChrome == enabled) { return }
         cardChrome = enabled
@@ -549,12 +587,18 @@ public class VirtualTranscriptView <: Widget {
 
     // Hosts can switch the event rail to the portable ASCII form when the
     // terminal capability probe says Unicode is unavailable.
+    /** 选择 Unicode 或 ASCII 卡片线条，并在变化时使测量缓存失效。
+     * @param enabled 是否使用 Unicode
+     */
     public func setUnicode(enabled: Bool): Unit {
         if (unicode == enabled) { return }
         unicode = enabled
         invalidateAllMeasurements()
     }
 
+    /** 设置视图级显式卡片主题。
+     * @param theme 卡片主题
+     */
     public func setCardTheme(theme: TranscriptCardTheme): Unit {
         explicitCardTheme = true
         applyCardTheme(theme)
@@ -580,6 +624,10 @@ public class VirtualTranscriptView <: Widget {
         if (layoutChanged) { invalidateAllMeasurements() }
     }
 
+    /** 使指定已缓存条目的测量结果失效。
+     * @param id 条目标识
+     * @return 找到条目时为 true
+     */
     public func invalidateItem(id: String): Bool {
         for (index in 0..entries.size) {
             if (entries[index].id == id) {
@@ -595,13 +643,22 @@ public class VirtualTranscriptView <: Widget {
         false
     }
 
+    /** 获取当前总行数估计；尚未测量的条目使用估计高度。
+     * @return 总行数
+     */
     public func totalRows(): Int64 {
         syncCount()
         heights.total()
     }
 
+    /** 获取累计实例化的条目数。
+     * @return 实例化次数
+     */
     public func materializedCount(): Int64 { materializedCountValue }
 
+    /** 获取当前缓存和测量指标。
+     * @return 指标快照
+     */
     public func metrics(): VirtualTranscriptMetrics {
         var count: Int64 = 0
         var rows: Int64 = 0
@@ -710,6 +767,10 @@ public class VirtualTranscriptView <: Widget {
     // one existing source item. The caller guarantees item order/count did not
     // change. Offscreen changes need no paint. A height change conservatively
     // falls back to the whole viewport because following items may move.
+    /** 计算可见条目更新后的安全重绘区域；调用方需保证条目顺序和数量未变。
+     * @param id 更新的条目标识
+     * @return 脏区域；不可见或尚未绘制时为 None
+     */
     public func dirtyRectForItemRevision(id: String): ?Rect {
         if (lastRenderArea.width <= 0 || lastRenderArea.height <= 0) { return None }
         var visible: Int64 = 0
@@ -735,6 +796,10 @@ public class VirtualTranscriptView <: Widget {
         None
     }
 
+    /** 处理行滚动、翻页及首尾导航按键。
+     * @param key 按键事件
+     * @return 识别到导航按键时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         let page = max(1, viewportRows)
         match (key.code) {
@@ -748,6 +813,10 @@ public class VirtualTranscriptView <: Widget {
         }
     }
 
+    /** 在区域内按需排版并绘制可见条目。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         let applicationTheme = buffer.resolveTheme(Option<Theme>.None)
         if (!transcriptThemeEqual(contextTheme, applicationTheme)) {

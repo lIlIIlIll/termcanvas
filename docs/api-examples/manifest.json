@@ -11083,6 +11083,170 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "virtual-transcript",
+      "source": "docs/api-examples/virtual-transcript.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptState",
+          "signature": "public class VirtualTranscriptState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptState.scrollTop",
+          "signature": "public var scrollTop: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptState.followBottom",
+          "signature": "public var followBottom: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptState.anchorId",
+          "signature": "public var anchorId: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptState.anchorRow",
+          "signature": "public var anchorRow: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptState.init",
+          "signature": "public init( scrollTop!: Int64 = 0, followBottom!: Bool = true, anchorId!: String = \"\", anchorRow!: Int64 = 0 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptState.scrollBy",
+          "signature": "public func scrollBy(delta: Int64, totalRows: Int64, viewportRows: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptState.home",
+          "signature": "public func home(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptState.end",
+          "signature": "public func end(totalRows: Int64, viewportRows: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView",
+          "signature": "public class VirtualTranscriptView <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.state",
+          "signature": "public let state: VirtualTranscriptState"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.lastVisibleRanges",
+          "signature": "public let lastVisibleRanges = ArrayList<VisibleRange>()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.init",
+          "signature": "public init( source: VirtualTranscriptSource, state!: VirtualTranscriptState = VirtualTranscriptState(), themeKey!: String = \"default\", overscanViewports!: Int64 = 2, backgroundBatch!: Int64 = 0, instrumentationEnabled!: Bool = false )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.setThemeKey",
+          "signature": "public func setThemeKey(value: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.setCardChrome",
+          "signature": "public func setCardChrome(enabled: Bool): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.setUnicode",
+          "signature": "public func setUnicode(enabled: Bool): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.setCardTheme",
+          "signature": "public func setCardTheme(theme: TranscriptCardTheme): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.clearCardTheme",
+          "signature": "public func clearCardTheme(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.invalidateItem",
+          "signature": "public func invalidateItem(id: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.totalRows",
+          "signature": "public func totalRows(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.materializedCount",
+          "signature": "public func materializedCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.metrics",
+          "signature": "public func metrics(): VirtualTranscriptMetrics"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.dirtyRectForItemRevision",
+          "signature": "public func dirtyRectForItemRevision(id: String): ?Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/virtual_transcript.cj",
+          "symbol": "VirtualTranscriptView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }
