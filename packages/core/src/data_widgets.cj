@@ -4,11 +4,24 @@ import std.collection.*
 import std.fs.*
 import std.sort.*
 
+/** 管理零起始的分页索引。
+ */
 public class Paginator {
+    /** 当前页索引。
+     */
     public var page: Int64
+    /** 每页项目数。
+     */
     public var pageSize: Int64
+    /** 项目总数。
+     */
     public var total: Int64
 
+    /** 创建分页状态。
+     * @param page 初始页，限制到可用范围
+     * @param pageSize 每页项目数，至少为一
+     * @param total 项目总数，负值按零处理
+     */
     public init(page!: Int64 = 0, pageSize!: Int64 = 10, total!: Int64 = 0) {
         this.pageSize = max(1, pageSize)
         this.total = max(0, total)
@@ -16,23 +29,37 @@ public class Paginator {
         this.page = clamp(page, 0, max(0, pages - 1))
     }
 
+    /** 计算页数。
+     * @return 总数非正时为零。
+     */
     public func pageCount(): Int64 {
         if (total <= 0) { return 0 }
         (total - 1) / pageSize + 1
     }
 
+    /** 计算当前页起始索引。
+     * @return 页索引乘每页大小。
+     */
     public func offset(): Int64 {
         page * pageSize
     }
 
+    /** 移动到下一页并限制在末页。
+     */
     public func next(): Unit {
         page = min(max(0, pageCount() - 1), page + 1)
     }
 
+    /** 移动到上一页并限制在首页。
+     */
     public func previous(): Unit {
         page = max(0, page - 1)
     }
 
+    /** 处理左右、翻页、首页和末页按键。
+     * @param key 键盘事件
+     * @return 支持的按键返回 true。
+     */
     public func handle(key: KeyEvent): Bool {
         match (key.code) {
             case KeyCode.PageDown | KeyCode.Right =>
@@ -52,11 +79,24 @@ public class Paginator {
     }
 }
 
+/** 表格列标题、宽度和对齐方式。
+ */
 public class TableColumn {
+    /** 列标题。
+     */
     public let title: String
+    /** 列宽。
+     */
     public var width: Int64
+    /** 文本对齐方式。
+     */
     public let align: TextAlign
 
+    /** 创建列配置。
+     * @param title 列标题
+     * @param width 列宽，构造时至少为一
+     * @param align 文本对齐方式
+     */
     public init(title: String, width!: Int64 = 10, align!: TextAlign = TextAlign.Left) {
         this.title = title
         this.width = max(1, width)
@@ -64,10 +104,21 @@ public class TableColumn {
     }
 }
 
+/** 表格数据的显示状态。
+ */
 public enum TableStatus {
+    /** 显示数据。
+     */
     | Ready
+    /** 显示空状态。
+     */
     | Empty
+    /** 显示加载状态。
+     */
     | Loading
+    /** 显示错误信息。
+     * @param _0 错误信息文本
+     */
     | Error(String)
 }
 
@@ -815,12 +866,26 @@ func addVirtualTableRowDirty(dirty: DirtyRects, area: Rect, selected: ?Int64, of
     }
 }
 
+/** 可展开的树节点。
+ */
 public class TreeNode {
+    /** 节点标识。
+     */
     public let id: String
+    /** 显示标签。
+     */
     public let label: String
+    /** 是否展开子节点。
+     */
     public var expanded: Bool
     private let children: ArrayList<TreeNode>
 
+    /** 创建节点。
+     * @param id 节点标识
+     * @param label 显示标签
+     * @param expanded 初始展开状态
+     * @param children 初始子节点
+     */
     public init(id: String, label: String, expanded!: Bool = false, children!: Array<TreeNode> = []) {
         this.id = id
         this.label = label
@@ -831,21 +896,33 @@ public class TreeNode {
         }
     }
 
+    /** 追加子节点。
+     * @param child 子节点
+     */
     public func add(child: TreeNode): Unit {
         children.add(child)
     }
 
+    /** 获取当前子节点数组。
+     * @return 按插入顺序排列的子节点。
+     */
     public func childNodes(): Array<TreeNode> {
         children.toArray()
     }
 }
 
+/** 显示普通节点或惰性模型的树视图。
+ */
 public class Tree <: Widget {
     private let roots: Array<TreeNode>
     private let dataModel: ?LazyTreeModel
     private var stableId: ?String = None
     private var rememberedIndex: Int64 = -1
+    /** 当前可见行索引。
+     */
     public var selected: Int64
+    /** 视口起始行索引。
+     */
     public var offset: Int64
     private let block: ?Block
     private let style: Style
@@ -855,6 +932,18 @@ public class Tree <: Widget {
     private var theme: ?Theme
     private var renderedTheme: ?Theme = None
 
+    /** 创建树视图。
+     * @param roots 普通树根节点
+     * @param selected 初始选中行，负值按零处理
+     * @param offset 初始起始行，负值按零处理
+     * @param block 可选外框
+     * @param style 基础样式
+     * @param selectedStyle 可选选中样式
+     * @param dataModel 可选惰性树模型
+     * @param focused 是否聚焦
+     * @param focusedStyle 可选聚焦样式
+     * @param theme 可选语义主题
+     */
     public init(
         roots: Array<TreeNode>,
         selected!: Int64 = 0,
@@ -879,21 +968,42 @@ public class Tree <: Widget {
         this.theme = theme
     }
 
+    /** 创建惰性模型树。
+     * @param model 惰性树模型
+     * @param block 可选外框
+     * @param focused 是否聚焦
+     * @param theme 可选语义主题
+     */
     public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None) {
         this([], block: block, dataModel: Some(model), focused: focused, theme: theme)
         if (model.selectedId().isNone()) { _ = model.selectIndex(0) }
     }
 
+    /** 设置聚焦状态。
+     * @param value 是否聚焦
+     */
     public func setFocused(value: Bool): Unit { focused = value }
 
+    /** 设置或清除语义主题。
+     * @param value 主题；None 表示清除
+     */
     public func setTheme(value: ?Theme): Unit { theme = value }
 
-    /** 按上次绘制的区块几何处理鼠标；若树自身指定了主题，则绘制前也使用该主题计算几何。 */
+    /** 按上次绘制的区块几何处理鼠标；自身主题优先。
+     * @param mouse 鼠标事件
+     * @param area 树的区域
+     * @return 处理了鼠标事件时为 true。
+     */
     public func handle(mouse: MouseEvent, area: Rect): Bool {
         handleMouseWithTheme(mouse, area, None)
     }
 
-    /** 绘制前可传入应用或父主题以计算鼠标命中区域；树和区块的显式主题优先。 */
+    /** 使用可选父主题计算命中区域；树和区块显式主题优先。
+     * @param mouse 鼠标事件
+     * @param area 树的区域
+     * @param theme 可选应用或父主题
+     * @return 处理了鼠标事件时为 true。
+     */
     public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool {
         handleMouseWithTheme(mouse, area, theme)
     }
@@ -924,6 +1034,8 @@ public class Tree <: Widget {
         false
     }
 
+    /** 切换当前节点的展开状态。
+     */
     public func toggleSelected(): Unit {
         if (let Some(model) <- dataModel) { _ = model.toggleSelected(); return }
         let nodes = visibleNodes()
@@ -932,12 +1044,19 @@ public class Tree <: Widget {
         }
     }
 
+    /** 获取当前选择的节点标识。
+     * @return 当前标识或 None。
+     */
     public func selectedId(): ?String {
         if (let Some(model) <- dataModel) { return model.selectedId() }
         _ = visibleRows()
         stableId
     }
 
+    /** 按标识选择可见节点。
+     * @param id 节点标识
+     * @return 找到并选择时为 true。
+     */
     public func selectById(id: String): Bool {
         if (let Some(model) <- dataModel) {
             let found = model.selectById(id)
@@ -955,6 +1074,10 @@ public class Tree <: Widget {
         false
     }
 
+    /** 在普通树的所有节点中查找；惰性树调用会抛出异常。
+     * @param id 节点标识
+     * @return 找到的节点或 None。
+     */
     public func findById(id: String): ?TreeNode {
         if (dataModel.isSome()) { throw IllegalStateException("Use LazyTreeModel.findById for provider nodes") }
         for (root in roots) {
@@ -966,6 +1089,8 @@ public class Tree <: Widget {
         None
     }
 
+    /** 递归展开普通树；惰性树调用会抛出异常。
+     */
     public func expandAll(): Unit {
         if (dataModel.isSome()) { throw IllegalStateException("Lazy trees expand explicit IDs; expandAll would enumerate the source") }
         for (root in roots) {
@@ -973,6 +1098,8 @@ public class Tree <: Widget {
         }
     }
 
+    /** 收起所有节点并重置滚动位置。
+     */
     public func collapseAll(): Unit {
         if (let Some(model) <- dataModel) { model.collapseAll(); offset = 0; return }
         for (root in roots) {
@@ -982,6 +1109,11 @@ public class Tree <: Widget {
         offset = 0
     }
 
+    /** 处理树导航和展开按键。
+     * @param key 键盘事件
+     * @param viewportHeight 可见行数
+     * @return 支持的按键返回 true。
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
         if (let Some(model) <- dataModel) {
             let current = match (model.selectedIndex()) { case Some(index) => index; case None => 0 }
@@ -1013,6 +1145,8 @@ public class Tree <: Widget {
         }
     }
 
+    /** 展开当前节点。
+     */
     public func expandSelected(): Unit {
         if (let Some(model) <- dataModel) {
             if (let Some(id) <- model.selectedId()) { _ = model.setExpanded(id, true) }
@@ -1024,6 +1158,8 @@ public class Tree <: Widget {
         }
     }
 
+    /** 收起当前节点。
+     */
     public func collapseSelected(): Unit {
         if (let Some(model) <- dataModel) {
             if (let Some(id) <- model.selectedId()) { _ = model.setExpanded(id, false) }
@@ -1035,6 +1171,10 @@ public class Tree <: Widget {
         }
     }
 
+    /** 在区域内绘制树。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         renderedTheme = buffer.resolveTheme(None)
         var target = area

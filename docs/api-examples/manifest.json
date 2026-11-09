@@ -13755,6 +13755,296 @@
           "signature": "public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document"
         }
       ]
+    },
+    {
+      "id": "tree-pagination",
+      "source": "docs/api-examples/tree-pagination.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Paginator",
+          "signature": "public class Paginator {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Paginator.page",
+          "signature": "public var page: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Paginator.pageSize",
+          "signature": "public var pageSize: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Paginator.total",
+          "signature": "public var total: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Paginator.init",
+          "signature": "public init(page!: Int64 = 0, pageSize!: Int64 = 10, total!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Paginator.pageCount",
+          "signature": "public func pageCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Paginator.offset",
+          "signature": "public func offset(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Paginator.next",
+          "signature": "public func next(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Paginator.previous",
+          "signature": "public func previous(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Paginator.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TableColumn",
+          "signature": "public class TableColumn {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TableColumn.title",
+          "signature": "public let title: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TableColumn.width",
+          "signature": "public var width: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TableColumn.align",
+          "signature": "public let align: TextAlign"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TableColumn.init",
+          "signature": "public init(title: String, width!: Int64 = 10, align!: TextAlign = TextAlign.Left)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TableStatus",
+          "signature": "public enum TableStatus {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TableStatus.Ready",
+          "signature": "Ready"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TableStatus.Empty",
+          "signature": "Empty"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TableStatus.Loading",
+          "signature": "Loading"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TableStatus.Error",
+          "signature": "Error(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TreeNode",
+          "signature": "public class TreeNode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TreeNode.id",
+          "signature": "public let id: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TreeNode.label",
+          "signature": "public let label: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TreeNode.expanded",
+          "signature": "public var expanded: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TreeNode.init",
+          "signature": "public init(id: String, label: String, expanded!: Bool = false, children!: Array<TreeNode> = [])"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TreeNode.add",
+          "signature": "public func add(child: TreeNode): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "TreeNode.childNodes",
+          "signature": "public func childNodes(): Array<TreeNode>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree",
+          "signature": "public class Tree <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.selected",
+          "signature": "public var selected: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.offset",
+          "signature": "public var offset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.init",
+          "signature": "public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, dataModel!: ?LazyTreeModel = None, focused!: Bool = false, focusedStyle!: ?Style = None, theme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.init",
+          "signature": "public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.setFocused",
+          "signature": "public func setFocused(value: Bool): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.setTheme",
+          "signature": "public func setTheme(value: ?Theme): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.handle",
+          "signature": "public func handle(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.handle",
+          "signature": "public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.toggleSelected",
+          "signature": "public func toggleSelected(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.selectedId",
+          "signature": "public func selectedId(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.selectById",
+          "signature": "public func selectById(id: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.findById",
+          "signature": "public func findById(id: String): ?TreeNode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.expandAll",
+          "signature": "public func expandAll(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.collapseAll",
+          "signature": "public func collapseAll(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.handle",
+          "signature": "public func handle(key: KeyEvent, viewportHeight: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.expandSelected",
+          "signature": "public func expandSelected(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.collapseSelected",
+          "signature": "public func collapseSelected(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "Tree.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }
