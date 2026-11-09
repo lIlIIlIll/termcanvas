@@ -530,110 +530,110 @@ packages/core/src/container_widgets.cj:300:public init(lines: Array<String>, sta
 packages/core/src/container_widgets.cj:312:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 packages/core/src/container_widgets.cj:323:public func handleMouse(mouse: MouseEvent, area: Rect, capture: PointerCapture, owner: String): Bool
 packages/core/src/container_widgets.cj:338:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:6:public enum TranscriptItemKind {
-packages/core/src/content_widgets.cj:7:Text
-packages/core/src/content_widgets.cj:8:Code
-packages/core/src/content_widgets.cj:9:Event
-packages/core/src/content_widgets.cj:10:Error
-packages/core/src/content_widgets.cj:11:Progress
-packages/core/src/content_widgets.cj:12:Detail
-packages/core/src/content_widgets.cj:15:public enum TranscriptItemStatus {
-packages/core/src/content_widgets.cj:16:Pending
-packages/core/src/content_widgets.cj:17:Queued
-packages/core/src/content_widgets.cj:18:Running
-packages/core/src/content_widgets.cj:19:Streaming
-packages/core/src/content_widgets.cj:20:Done
-packages/core/src/content_widgets.cj:21:Awaiting
-packages/core/src/content_widgets.cj:22:Approved
-packages/core/src/content_widgets.cj:23:Failed
-packages/core/src/content_widgets.cj:24:Cancelled
-packages/core/src/content_widgets.cj:25:Rejected
-packages/core/src/content_widgets.cj:26:TimedOut
-packages/core/src/content_widgets.cj:27:Expired
-packages/core/src/content_widgets.cj:28:Conflict
-packages/core/src/content_widgets.cj:31:public class TranscriptCardOption {
-packages/core/src/content_widgets.cj:32:public let label: String
-packages/core/src/content_widgets.cj:33:public let selected: Bool
-packages/core/src/content_widgets.cj:35:public init(label: String, selected!: Bool = false)
-packages/core/src/content_widgets.cj:41:public class TranscriptCardTheme {
-packages/core/src/content_widgets.cj:42:public let style: Style
-packages/core/src/content_widgets.cj:43:public let titleStyle: Style
-packages/core/src/content_widgets.cj:44:public let mutedStyle: Style
-packages/core/src/content_widgets.cj:45:public let selectedStyle: Style
-packages/core/src/content_widgets.cj:46:public let bodyIndent: Int64
-packages/core/src/content_widgets.cj:47:public let bodyLimit: Int64
-packages/core/src/content_widgets.cj:48:public let borderStyle: Style
-packages/core/src/content_widgets.cj:49:public let borderBackground: Style
-packages/core/src/content_widgets.cj:50:public let topTitleStyle: Style
-packages/core/src/content_widgets.cj:54:public let fullFrame: Bool
-packages/core/src/content_widgets.cj:55:public let fillBackground: Bool
-packages/core/src/content_widgets.cj:56:public let contentPadding: Spacing
-packages/core/src/content_widgets.cj:59:public init( style!: Style = Style.default(), titleStyle!: Style = Style(modifier: Modifier.strong()), mutedStyle!: Style = Style(fg: Color.Indexed(8)), selectedStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()), bodyIndent!: Int64 = 2, bodyLimit!: Int64 = 12, borderStyle!: Style = Style(fg: Color.Indexed(8)), borderBackground!: Style = Style.default(), topTitleStyle!: Style = Style(modifier: Modifier.strong()), fullFrame!: Bool = false, fillBackground!: Bool = false, contentPadding!: Spacing = Spacing.zero(), semanticTheme!: ?Theme = None )
-packages/core/src/content_widgets.cj:99:public class TranscriptItem {
-packages/core/src/content_widgets.cj:100:public let id: String
-packages/core/src/content_widgets.cj:101:public let kind: TranscriptItemKind
-packages/core/src/content_widgets.cj:102:public let title: String
-packages/core/src/content_widgets.cj:103:public let body: Document
-packages/core/src/content_widgets.cj:104:public let status: TranscriptItemStatus
-packages/core/src/content_widgets.cj:105:public var collapsed: Bool
-packages/core/src/content_widgets.cj:106:public let timestamp: String
-packages/core/src/content_widgets.cj:107:public let duration: String
-packages/core/src/content_widgets.cj:108:public let stateLabel: String
-packages/core/src/content_widgets.cj:109:public let activityFrame: Int64
-packages/core/src/content_widgets.cj:110:public let options: Array<TranscriptCardOption>
-packages/core/src/content_widgets.cj:111:public let footer: String
-packages/core/src/content_widgets.cj:113:public init( id: String, kind!: TranscriptItemKind = TranscriptItemKind.Text, title!: String = "", body!: Document = Document([]), status!: TranscriptItemStatus = TranscriptItemStatus.Done, collapsed!: Bool = false, timestamp!: String = "", duration!: String = "", stateLabel!: String = "", activityFrame!: Int64 = 0, options!: Array<TranscriptCardOption> = [], footer!: String = "" )
-packages/core/src/content_widgets.cj:142:public class Transcript {
-packages/core/src/content_widgets.cj:145:public init(items!: Array<TranscriptItem> = [])
-packages/core/src/content_widgets.cj:149:public func append(item: TranscriptItem): Unit
-packages/core/src/content_widgets.cj:153:public func size(): Int64
-packages/core/src/content_widgets.cj:157:public func get(index: Int64): ?TranscriptItem
-packages/core/src/content_widgets.cj:161:public func toArray(): Array<TranscriptItem>
-packages/core/src/content_widgets.cj:165:public func toggleCollapsed(id: String): Bool
-packages/core/src/content_widgets.cj:176:public class TranscriptView <: Widget {
-packages/core/src/content_widgets.cj:178:public var offset: Int64
-packages/core/src/content_widgets.cj:179:public var selected: Int64
-packages/core/src/content_widgets.cj:188:public init( transcript: Transcript, offset!: Int64 = 0, selected!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cardTheme!: ?TranscriptCardTheme = None )
-packages/core/src/content_widgets.cj:210:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/content_widgets.cj:238:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:336:public class ComposerSubmit {
-packages/core/src/content_widgets.cj:337:public let text: String
-packages/core/src/content_widgets.cj:338:public init(text: String)
-packages/core/src/content_widgets.cj:363:public class Composer <: Widget {
-packages/core/src/content_widgets.cj:364:public let area: TextArea
-packages/core/src/content_widgets.cj:365:public var lastError: ?String = None
-packages/core/src/content_widgets.cj:385:public init(value!: String = "", slashHints!: Array<String> = [], block!: ?Block = None)
-packages/core/src/content_widgets.cj:392:public func handle(key: KeyEvent): ?ComposerSubmit
-packages/core/src/content_widgets.cj:445:public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool
-packages/core/src/content_widgets.cj:460:public func draftText(): ?String
-packages/core/src/content_widgets.cj:465:public func restoreDraft(text: String): Unit
-packages/core/src/content_widgets.cj:476:public func currentSlashHints(): Array<String>
-packages/core/src/content_widgets.cj:485:public func completionVisible(): Bool
-packages/core/src/content_widgets.cj:489:public func cancelCompletion(): Bool
-packages/core/src/content_widgets.cj:493:public func visualHeight(width: Int64, maximum: Int64): Int64
-packages/core/src/content_widgets.cj:501:public func cursorPosition(areaRect: Rect): Position
-packages/core/src/content_widgets.cj:522:public func render(areaRect: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:754:public class ActivityStep {
-packages/core/src/content_widgets.cj:755:public let title: String
-packages/core/src/content_widgets.cj:756:public let status: TranscriptItemStatus
-packages/core/src/content_widgets.cj:757:public let detail: String
-packages/core/src/content_widgets.cj:758:public let duration: String
-packages/core/src/content_widgets.cj:760:public init(title: String, status!: TranscriptItemStatus = TranscriptItemStatus.Pending, detail!: String = "", duration!: String = "")
-packages/core/src/content_widgets.cj:768:public class ActivityTimeline <: Widget {
-packages/core/src/content_widgets.cj:772:public init(steps: Array<ActivityStep>, block!: ?Block = None)
-packages/core/src/content_widgets.cj:777:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:793:public class RequestDialog <: Widget {
-packages/core/src/content_widgets.cj:799:public var selected: Int64
-packages/core/src/content_widgets.cj:804:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
-packages/core/src/content_widgets.cj:817:public func setTheme(theme: ?Theme): Unit
-packages/core/src/content_widgets.cj:821:public func handle(key: KeyEvent): ?String
-packages/core/src/content_widgets.cj:833:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:844:public type DecisionDialog = RequestDialog
-packages/core/src/content_widgets.cj:846:public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
-packages/core/src/content_widgets.cj:885:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
-packages/core/src/content_widgets.cj:890:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style
-packages/core/src/content_widgets.cj:923:public func transcriptStatusLabel(status: TranscriptItemStatus): String
-packages/core/src/content_widgets.cj:941:public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
+packages/core/src/content_widgets.cj:8:public enum TranscriptItemKind {
+packages/core/src/content_widgets.cj:11:Text
+packages/core/src/content_widgets.cj:14:Code
+packages/core/src/content_widgets.cj:17:Event
+packages/core/src/content_widgets.cj:20:Error
+packages/core/src/content_widgets.cj:23:Progress
+packages/core/src/content_widgets.cj:26:Detail
+packages/core/src/content_widgets.cj:31:public enum TranscriptItemStatus {
+packages/core/src/content_widgets.cj:34:Pending
+packages/core/src/content_widgets.cj:37:Queued
+packages/core/src/content_widgets.cj:40:Running
+packages/core/src/content_widgets.cj:43:Streaming
+packages/core/src/content_widgets.cj:46:Done
+packages/core/src/content_widgets.cj:49:Awaiting
+packages/core/src/content_widgets.cj:52:Approved
+packages/core/src/content_widgets.cj:55:Failed
+packages/core/src/content_widgets.cj:58:Cancelled
+packages/core/src/content_widgets.cj:61:Rejected
+packages/core/src/content_widgets.cj:64:TimedOut
+packages/core/src/content_widgets.cj:67:Expired
+packages/core/src/content_widgets.cj:70:Conflict
+packages/core/src/content_widgets.cj:75:public class TranscriptCardOption {
+packages/core/src/content_widgets.cj:78:public let label: String
+packages/core/src/content_widgets.cj:81:public let selected: Bool
+packages/core/src/content_widgets.cj:87:public init(label: String, selected!: Bool = false)
+packages/core/src/content_widgets.cj:95:public class TranscriptCardTheme {
+packages/core/src/content_widgets.cj:98:public let style: Style
+packages/core/src/content_widgets.cj:101:public let titleStyle: Style
+packages/core/src/content_widgets.cj:104:public let mutedStyle: Style
+packages/core/src/content_widgets.cj:107:public let selectedStyle: Style
+packages/core/src/content_widgets.cj:110:public let bodyIndent: Int64
+packages/core/src/content_widgets.cj:113:public let bodyLimit: Int64
+packages/core/src/content_widgets.cj:116:public let borderStyle: Style
+packages/core/src/content_widgets.cj:119:public let borderBackground: Style
+packages/core/src/content_widgets.cj:122:public let topTitleStyle: Style
+packages/core/src/content_widgets.cj:128:public let fullFrame: Bool
+packages/core/src/content_widgets.cj:131:public let fillBackground: Bool
+packages/core/src/content_widgets.cj:134:public let contentPadding: Spacing
+packages/core/src/content_widgets.cj:152:public init( style!: Style = Style.default(), titleStyle!: Style = Style(modifier: Modifier.strong()), mutedStyle!: Style = Style(fg: Color.Indexed(8)), selectedStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()), bodyIndent!: Int64 = 2, bodyLimit!: Int64 = 12, borderStyle!: Style = Style(fg: Color.Indexed(8)), borderBackground!: Style = Style.default(), topTitleStyle!: Style = Style(modifier: Modifier.strong()), fullFrame!: Bool = false, fillBackground!: Bool = false, contentPadding!: Spacing = Spacing.zero(), semanticTheme!: ?Theme = None )
+packages/core/src/content_widgets.cj:194:public class TranscriptItem {
+packages/core/src/content_widgets.cj:197:public let id: String
+packages/core/src/content_widgets.cj:200:public let kind: TranscriptItemKind
+packages/core/src/content_widgets.cj:203:public let title: String
+packages/core/src/content_widgets.cj:206:public let body: Document
+packages/core/src/content_widgets.cj:209:public let status: TranscriptItemStatus
+packages/core/src/content_widgets.cj:212:public var collapsed: Bool
+packages/core/src/content_widgets.cj:215:public let timestamp: String
+packages/core/src/content_widgets.cj:218:public let duration: String
+packages/core/src/content_widgets.cj:221:public let stateLabel: String
+packages/core/src/content_widgets.cj:224:public let activityFrame: Int64
+packages/core/src/content_widgets.cj:227:public let options: Array<TranscriptCardOption>
+packages/core/src/content_widgets.cj:230:public let footer: String
+packages/core/src/content_widgets.cj:246:public init( id: String, kind!: TranscriptItemKind = TranscriptItemKind.Text, title!: String = "", body!: Document = Document([]), status!: TranscriptItemStatus = TranscriptItemStatus.Done, collapsed!: Bool = false, timestamp!: String = "", duration!: String = "", stateLabel!: String = "", activityFrame!: Int64 = 0, options!: Array<TranscriptCardOption> = [], footer!: String = "" )
+packages/core/src/content_widgets.cj:277:public class Transcript {
+packages/core/src/content_widgets.cj:283:public init(items!: Array<TranscriptItem> = [])
+packages/core/src/content_widgets.cj:290:public func append(item: TranscriptItem): Unit
+packages/core/src/content_widgets.cj:297:public func size(): Int64
+packages/core/src/content_widgets.cj:305:public func get(index: Int64): ?TranscriptItem
+packages/core/src/content_widgets.cj:312:public func toArray(): Array<TranscriptItem>
+packages/core/src/content_widgets.cj:320:public func toggleCollapsed(id: String): Bool
+packages/core/src/content_widgets.cj:333:public class TranscriptView <: Widget {
+packages/core/src/content_widgets.cj:337:public var offset: Int64
+packages/core/src/content_widgets.cj:340:public var selected: Int64
+packages/core/src/content_widgets.cj:358:public init( transcript: Transcript, offset!: Int64 = 0, selected!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cardTheme!: ?TranscriptCardTheme = None )
+packages/core/src/content_widgets.cj:385:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/content_widgets.cj:417:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/content_widgets.cj:515:public class ComposerSubmit {
+packages/core/src/content_widgets.cj:516:public let text: String
+packages/core/src/content_widgets.cj:517:public init(text: String)
+packages/core/src/content_widgets.cj:542:public class Composer <: Widget {
+packages/core/src/content_widgets.cj:543:public let area: TextArea
+packages/core/src/content_widgets.cj:544:public var lastError: ?String = None
+packages/core/src/content_widgets.cj:564:public init(value!: String = "", slashHints!: Array<String> = [], block!: ?Block = None)
+packages/core/src/content_widgets.cj:571:public func handle(key: KeyEvent): ?ComposerSubmit
+packages/core/src/content_widgets.cj:624:public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool
+packages/core/src/content_widgets.cj:639:public func draftText(): ?String
+packages/core/src/content_widgets.cj:644:public func restoreDraft(text: String): Unit
+packages/core/src/content_widgets.cj:655:public func currentSlashHints(): Array<String>
+packages/core/src/content_widgets.cj:664:public func completionVisible(): Bool
+packages/core/src/content_widgets.cj:668:public func cancelCompletion(): Bool
+packages/core/src/content_widgets.cj:672:public func visualHeight(width: Int64, maximum: Int64): Int64
+packages/core/src/content_widgets.cj:680:public func cursorPosition(areaRect: Rect): Position
+packages/core/src/content_widgets.cj:701:public func render(areaRect: Rect, buffer: Buffer): Unit
+packages/core/src/content_widgets.cj:933:public class ActivityStep {
+packages/core/src/content_widgets.cj:934:public let title: String
+packages/core/src/content_widgets.cj:935:public let status: TranscriptItemStatus
+packages/core/src/content_widgets.cj:936:public let detail: String
+packages/core/src/content_widgets.cj:937:public let duration: String
+packages/core/src/content_widgets.cj:939:public init(title: String, status!: TranscriptItemStatus = TranscriptItemStatus.Pending, detail!: String = "", duration!: String = "")
+packages/core/src/content_widgets.cj:947:public class ActivityTimeline <: Widget {
+packages/core/src/content_widgets.cj:951:public init(steps: Array<ActivityStep>, block!: ?Block = None)
+packages/core/src/content_widgets.cj:956:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/content_widgets.cj:972:public class RequestDialog <: Widget {
+packages/core/src/content_widgets.cj:978:public var selected: Int64
+packages/core/src/content_widgets.cj:983:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
+packages/core/src/content_widgets.cj:996:public func setTheme(theme: ?Theme): Unit
+packages/core/src/content_widgets.cj:1000:public func handle(key: KeyEvent): ?String
+packages/core/src/content_widgets.cj:1012:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/content_widgets.cj:1023:public type DecisionDialog = RequestDialog
+packages/core/src/content_widgets.cj:1025:public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
+packages/core/src/content_widgets.cj:1064:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
+packages/core/src/content_widgets.cj:1069:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style
+packages/core/src/content_widgets.cj:1102:public func transcriptStatusLabel(status: TranscriptItemStatus): String
+packages/core/src/content_widgets.cj:1120:public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
 packages/core/src/dashboard_widgets.cj:6:public class MetricCard <: Widget {
 packages/core/src/dashboard_widgets.cj:22:public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: ?Style = None, valueStyle!: ?Style = None )
 packages/core/src/dashboard_widgets.cj:42:public func render(area: Rect, buffer: Buffer): Unit

@@ -13089,6 +13089,416 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "transcript",
+      "source": "docs/api-examples/transcript.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemKind",
+          "signature": "public enum TranscriptItemKind {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemKind.Text",
+          "signature": "Text"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemKind.Code",
+          "signature": "Code"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemKind.Event",
+          "signature": "Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemKind.Error",
+          "signature": "Error"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemKind.Progress",
+          "signature": "Progress"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemKind.Detail",
+          "signature": "Detail"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus",
+          "signature": "public enum TranscriptItemStatus {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Pending",
+          "signature": "Pending"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Queued",
+          "signature": "Queued"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Running",
+          "signature": "Running"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Streaming",
+          "signature": "Streaming"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Done",
+          "signature": "Done"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Awaiting",
+          "signature": "Awaiting"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Approved",
+          "signature": "Approved"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Failed",
+          "signature": "Failed"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Cancelled",
+          "signature": "Cancelled"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Rejected",
+          "signature": "Rejected"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.TimedOut",
+          "signature": "TimedOut"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Expired",
+          "signature": "Expired"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItemStatus.Conflict",
+          "signature": "Conflict"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardOption",
+          "signature": "public class TranscriptCardOption {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardOption.label",
+          "signature": "public let label: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardOption.selected",
+          "signature": "public let selected: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardOption.init",
+          "signature": "public init(label: String, selected!: Bool = false)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme",
+          "signature": "public class TranscriptCardTheme {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.style",
+          "signature": "public let style: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.titleStyle",
+          "signature": "public let titleStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.mutedStyle",
+          "signature": "public let mutedStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.selectedStyle",
+          "signature": "public let selectedStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.bodyIndent",
+          "signature": "public let bodyIndent: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.bodyLimit",
+          "signature": "public let bodyLimit: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.borderStyle",
+          "signature": "public let borderStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.borderBackground",
+          "signature": "public let borderBackground: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.topTitleStyle",
+          "signature": "public let topTitleStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.fullFrame",
+          "signature": "public let fullFrame: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.fillBackground",
+          "signature": "public let fillBackground: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.contentPadding",
+          "signature": "public let contentPadding: Spacing"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptCardTheme.init",
+          "signature": "public init( style!: Style = Style.default(), titleStyle!: Style = Style(modifier: Modifier.strong()), mutedStyle!: Style = Style(fg: Color.Indexed(8)), selectedStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()), bodyIndent!: Int64 = 2, bodyLimit!: Int64 = 12, borderStyle!: Style = Style(fg: Color.Indexed(8)), borderBackground!: Style = Style.default(), topTitleStyle!: Style = Style(modifier: Modifier.strong()), fullFrame!: Bool = false, fillBackground!: Bool = false, contentPadding!: Spacing = Spacing.zero(), semanticTheme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem",
+          "signature": "public class TranscriptItem {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.id",
+          "signature": "public let id: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.kind",
+          "signature": "public let kind: TranscriptItemKind"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.title",
+          "signature": "public let title: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.body",
+          "signature": "public let body: Document"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.status",
+          "signature": "public let status: TranscriptItemStatus"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.collapsed",
+          "signature": "public var collapsed: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.timestamp",
+          "signature": "public let timestamp: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.duration",
+          "signature": "public let duration: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.stateLabel",
+          "signature": "public let stateLabel: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.activityFrame",
+          "signature": "public let activityFrame: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.options",
+          "signature": "public let options: Array<TranscriptCardOption>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.footer",
+          "signature": "public let footer: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptItem.init",
+          "signature": "public init( id: String, kind!: TranscriptItemKind = TranscriptItemKind.Text, title!: String = \"\", body!: Document = Document([]), status!: TranscriptItemStatus = TranscriptItemStatus.Done, collapsed!: Bool = false, timestamp!: String = \"\", duration!: String = \"\", stateLabel!: String = \"\", activityFrame!: Int64 = 0, options!: Array<TranscriptCardOption> = [], footer!: String = \"\" )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Transcript",
+          "signature": "public class Transcript {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Transcript.init",
+          "signature": "public init(items!: Array<TranscriptItem> = [])"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Transcript.append",
+          "signature": "public func append(item: TranscriptItem): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Transcript.size",
+          "signature": "public func size(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Transcript.get",
+          "signature": "public func get(index: Int64): ?TranscriptItem"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Transcript.toArray",
+          "signature": "public func toArray(): Array<TranscriptItem>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Transcript.toggleCollapsed",
+          "signature": "public func toggleCollapsed(id: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptView",
+          "signature": "public class TranscriptView <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptView.offset",
+          "signature": "public var offset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptView.selected",
+          "signature": "public var selected: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptView.init",
+          "signature": "public init( transcript: Transcript, offset!: Int64 = 0, selected!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cardTheme!: ?TranscriptCardTheme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptView.handle",
+          "signature": "public func handle(key: KeyEvent, viewportHeight: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "TranscriptView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

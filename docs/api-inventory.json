@@ -9696,7 +9696,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 6,
+      "line": 8,
       "level": "top_level",
       "kind": "enum",
       "symbol": "TranscriptItemKind",
@@ -9714,7 +9714,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 7,
+      "line": 11,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9733,7 +9733,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 8,
+      "line": 14,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9752,7 +9752,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 9,
+      "line": 17,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9771,7 +9771,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 10,
+      "line": 20,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9790,7 +9790,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 11,
+      "line": 23,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9809,7 +9809,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 12,
+      "line": 26,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9828,7 +9828,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 15,
+      "line": 31,
       "level": "top_level",
       "kind": "enum",
       "symbol": "TranscriptItemStatus",
@@ -9846,7 +9846,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 16,
+      "line": 34,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9865,7 +9865,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 17,
+      "line": 37,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9884,7 +9884,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 18,
+      "line": 40,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9903,7 +9903,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 19,
+      "line": 43,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9922,7 +9922,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 20,
+      "line": 46,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9941,7 +9941,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 21,
+      "line": 49,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9960,7 +9960,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 22,
+      "line": 52,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9979,7 +9979,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 23,
+      "line": 55,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -9998,7 +9998,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 24,
+      "line": 58,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -10017,7 +10017,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 25,
+      "line": 61,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -10036,7 +10036,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 26,
+      "line": 64,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -10055,7 +10055,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 27,
+      "line": 67,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -10074,7 +10074,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 28,
+      "line": 70,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -10093,7 +10093,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 31,
+      "line": 75,
       "level": "top_level",
       "kind": "class",
       "symbol": "TranscriptCardOption",
@@ -10111,7 +10111,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 32,
+      "line": 78,
       "level": "member",
       "kind": "let",
       "symbol": "label",
@@ -10129,7 +10129,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 33,
+      "line": 81,
       "level": "member",
       "kind": "let",
       "symbol": "selected",
@@ -10147,7 +10147,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 35,
+      "line": 87,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -10165,7 +10165,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 41,
+      "line": 95,
       "level": "top_level",
       "kind": "class",
       "symbol": "TranscriptCardTheme",
@@ -10183,7 +10183,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 42,
+      "line": 98,
       "level": "member",
       "kind": "let",
       "symbol": "style",
@@ -10201,7 +10201,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 43,
+      "line": 101,
       "level": "member",
       "kind": "let",
       "symbol": "titleStyle",
@@ -10219,7 +10219,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 44,
+      "line": 104,
       "level": "member",
       "kind": "let",
       "symbol": "mutedStyle",
@@ -10237,7 +10237,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 45,
+      "line": 107,
       "level": "member",
       "kind": "let",
       "symbol": "selectedStyle",
@@ -10255,7 +10255,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 46,
+      "line": 110,
       "level": "member",
       "kind": "let",
       "symbol": "bodyIndent",
@@ -10273,7 +10273,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 47,
+      "line": 113,
       "level": "member",
       "kind": "let",
       "symbol": "bodyLimit",
@@ -10291,7 +10291,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 48,
+      "line": 116,
       "level": "member",
       "kind": "let",
       "symbol": "borderStyle",
@@ -10309,7 +10309,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 49,
+      "line": 119,
       "level": "member",
       "kind": "let",
       "symbol": "borderBackground",
@@ -10327,7 +10327,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 50,
+      "line": 122,
       "level": "member",
       "kind": "let",
       "symbol": "topTitleStyle",
@@ -10345,7 +10345,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 54,
+      "line": 128,
       "level": "member",
       "kind": "let",
       "symbol": "fullFrame",
@@ -10363,7 +10363,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 55,
+      "line": 131,
       "level": "member",
       "kind": "let",
       "symbol": "fillBackground",
@@ -10381,7 +10381,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 56,
+      "line": 134,
       "level": "member",
       "kind": "let",
       "symbol": "contentPadding",
@@ -10399,7 +10399,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 59,
+      "line": 152,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -10417,7 +10417,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 99,
+      "line": 194,
       "level": "top_level",
       "kind": "class",
       "symbol": "TranscriptItem",
@@ -10435,7 +10435,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 100,
+      "line": 197,
       "level": "member",
       "kind": "let",
       "symbol": "id",
@@ -10453,7 +10453,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 101,
+      "line": 200,
       "level": "member",
       "kind": "let",
       "symbol": "kind",
@@ -10471,7 +10471,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 102,
+      "line": 203,
       "level": "member",
       "kind": "let",
       "symbol": "title",
@@ -10489,7 +10489,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 103,
+      "line": 206,
       "level": "member",
       "kind": "let",
       "symbol": "body",
@@ -10507,7 +10507,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 104,
+      "line": 209,
       "level": "member",
       "kind": "let",
       "symbol": "status",
@@ -10525,7 +10525,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 105,
+      "line": 212,
       "level": "member",
       "kind": "var",
       "symbol": "collapsed",
@@ -10543,7 +10543,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 106,
+      "line": 215,
       "level": "member",
       "kind": "let",
       "symbol": "timestamp",
@@ -10561,7 +10561,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 107,
+      "line": 218,
       "level": "member",
       "kind": "let",
       "symbol": "duration",
@@ -10579,7 +10579,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 108,
+      "line": 221,
       "level": "member",
       "kind": "let",
       "symbol": "stateLabel",
@@ -10597,7 +10597,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 109,
+      "line": 224,
       "level": "member",
       "kind": "let",
       "symbol": "activityFrame",
@@ -10615,7 +10615,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 110,
+      "line": 227,
       "level": "member",
       "kind": "let",
       "symbol": "options",
@@ -10633,7 +10633,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 111,
+      "line": 230,
       "level": "member",
       "kind": "let",
       "symbol": "footer",
@@ -10651,7 +10651,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 113,
+      "line": 246,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -10669,7 +10669,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 142,
+      "line": 277,
       "level": "top_level",
       "kind": "class",
       "symbol": "Transcript",
@@ -10687,7 +10687,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 145,
+      "line": 283,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -10705,7 +10705,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 149,
+      "line": 290,
       "level": "member",
       "kind": "func",
       "symbol": "append",
@@ -10723,7 +10723,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 153,
+      "line": 297,
       "level": "member",
       "kind": "func",
       "symbol": "size",
@@ -10741,7 +10741,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 157,
+      "line": 305,
       "level": "member",
       "kind": "func",
       "symbol": "get",
@@ -10759,7 +10759,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 161,
+      "line": 312,
       "level": "member",
       "kind": "func",
       "symbol": "toArray",
@@ -10777,7 +10777,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 165,
+      "line": 320,
       "level": "member",
       "kind": "func",
       "symbol": "toggleCollapsed",
@@ -10795,7 +10795,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 176,
+      "line": 333,
       "level": "top_level",
       "kind": "class",
       "symbol": "TranscriptView",
@@ -10813,7 +10813,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 178,
+      "line": 337,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -10831,7 +10831,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 179,
+      "line": 340,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -10849,7 +10849,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 188,
+      "line": 358,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -10867,7 +10867,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 210,
+      "line": 385,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -10885,7 +10885,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 238,
+      "line": 417,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -10903,7 +10903,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 336,
+      "line": 515,
       "level": "top_level",
       "kind": "class",
       "symbol": "ComposerSubmit",
@@ -10921,7 +10921,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 337,
+      "line": 516,
       "level": "member",
       "kind": "let",
       "symbol": "text",
@@ -10939,7 +10939,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 338,
+      "line": 517,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -10957,7 +10957,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 363,
+      "line": 542,
       "level": "top_level",
       "kind": "class",
       "symbol": "Composer",
@@ -10975,7 +10975,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 364,
+      "line": 543,
       "level": "member",
       "kind": "let",
       "symbol": "area",
@@ -10993,7 +10993,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 365,
+      "line": 544,
       "level": "member",
       "kind": "var",
       "symbol": "lastError",
@@ -11011,7 +11011,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 385,
+      "line": 564,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11029,7 +11029,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 392,
+      "line": 571,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -11047,7 +11047,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 445,
+      "line": 624,
       "level": "member",
       "kind": "func",
       "symbol": "paste",
@@ -11065,7 +11065,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 460,
+      "line": 639,
       "level": "member",
       "kind": "func",
       "symbol": "draftText",
@@ -11083,7 +11083,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 465,
+      "line": 644,
       "level": "member",
       "kind": "func",
       "symbol": "restoreDraft",
@@ -11101,7 +11101,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 476,
+      "line": 655,
       "level": "member",
       "kind": "func",
       "symbol": "currentSlashHints",
@@ -11119,7 +11119,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 485,
+      "line": 664,
       "level": "member",
       "kind": "func",
       "symbol": "completionVisible",
@@ -11137,7 +11137,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 489,
+      "line": 668,
       "level": "member",
       "kind": "func",
       "symbol": "cancelCompletion",
@@ -11155,7 +11155,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 493,
+      "line": 672,
       "level": "member",
       "kind": "func",
       "symbol": "visualHeight",
@@ -11173,7 +11173,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 501,
+      "line": 680,
       "level": "member",
       "kind": "func",
       "symbol": "cursorPosition",
@@ -11191,7 +11191,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 522,
+      "line": 701,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11209,7 +11209,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 754,
+      "line": 933,
       "level": "top_level",
       "kind": "class",
       "symbol": "ActivityStep",
@@ -11227,7 +11227,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 755,
+      "line": 934,
       "level": "member",
       "kind": "let",
       "symbol": "title",
@@ -11245,7 +11245,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 756,
+      "line": 935,
       "level": "member",
       "kind": "let",
       "symbol": "status",
@@ -11263,7 +11263,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 757,
+      "line": 936,
       "level": "member",
       "kind": "let",
       "symbol": "detail",
@@ -11281,7 +11281,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 758,
+      "line": 937,
       "level": "member",
       "kind": "let",
       "symbol": "duration",
@@ -11299,7 +11299,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 760,
+      "line": 939,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11317,7 +11317,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 768,
+      "line": 947,
       "level": "top_level",
       "kind": "class",
       "symbol": "ActivityTimeline",
@@ -11335,7 +11335,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 772,
+      "line": 951,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11353,7 +11353,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 777,
+      "line": 956,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11371,7 +11371,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 793,
+      "line": 972,
       "level": "top_level",
       "kind": "class",
       "symbol": "RequestDialog",
@@ -11389,7 +11389,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 799,
+      "line": 978,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -11407,7 +11407,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 804,
+      "line": 983,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11425,7 +11425,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 817,
+      "line": 996,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -11443,7 +11443,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 821,
+      "line": 1000,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -11461,7 +11461,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 833,
+      "line": 1012,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11479,7 +11479,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 844,
+      "line": 1023,
       "level": "top_level",
       "kind": "type",
       "symbol": "DecisionDialog",
@@ -11497,7 +11497,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 846,
+      "line": 1025,
       "level": "top_level",
       "kind": "func",
       "symbol": "statusMark",
@@ -11515,7 +11515,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 885,
+      "line": 1064,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptStatusStyle",
@@ -11533,7 +11533,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 890,
+      "line": 1069,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptStatusStyle",
@@ -11551,7 +11551,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 923,
+      "line": 1102,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptStatusLabel",
@@ -11569,7 +11569,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 941,
+      "line": 1120,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptCardDocument",

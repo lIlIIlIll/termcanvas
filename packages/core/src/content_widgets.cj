@@ -3,59 +3,152 @@ package core
 import std.collection.*
 import std.env.*
 
+/** 记录项的内容类别。
+ */
 public enum TranscriptItemKind {
+    /** 文本。
+     */
     | Text
+    /** 代码。
+     */
     | Code
+    /** 事件。
+     */
     | Event
+    /** 错误。
+     */
     | Error
+    /** 进度。
+     */
     | Progress
+    /** 详情。
+     */
     | Detail
 }
 
+/** 记录项的执行状态。
+ */
 public enum TranscriptItemStatus {
+    /** 待处理。
+     */
     | Pending
+    /** 已排队。
+     */
     | Queued
+    /** 运行中。
+     */
     | Running
+    /** 流式输出中。
+     */
     | Streaming
+    /** 已完成。
+     */
     | Done
+    /** 等待批准。
+     */
     | Awaiting
+    /** 已批准。
+     */
     | Approved
+    /** 失败。
+     */
     | Failed
+    /** 已取消。
+     */
     | Cancelled
+    /** 已拒绝。
+     */
     | Rejected
+    /** 超时。
+     */
     | TimedOut
+    /** 已过期。
+     */
     | Expired
+    /** 冲突。
+     */
     | Conflict
 }
 
+/** 记录卡片中的可选项。
+ */
 public class TranscriptCardOption {
+    /** 选项文本。
+     */
     public let label: String
+    /** 是否突出显示此选项。
+     */
     public let selected: Bool
 
+    /** 创建并保存配置。
+     * @param label 选项文本
+     * @param selected 是否选中
+     */
     public init(label: String, selected!: Bool = false) {
         this.label = label
         this.selected = selected
     }
 }
 
+/** 控制记录卡片的样式和内容布局。
+ */
 public class TranscriptCardTheme {
+    /** 正文样式。
+     */
     public let style: Style
+    /** 标题样式。
+     */
     public let titleStyle: Style
+    /** 次要信息样式。
+     */
     public let mutedStyle: Style
+    /** 选项选中样式。
+     */
     public let selectedStyle: Style
+    /** 正文缩进列数，不小于零。
+     */
     public let bodyIndent: Int64
+    /** 正文最多显示的原始行数；零表示不限制。
+     */
     public let bodyLimit: Int64
+    /** 边框样式。
+     */
     public let borderStyle: Style
+    /** 边框背景样式。
+     */
     public let borderBackground: Style
+    /** 顶部标题样式。
+     */
     public let topTitleStyle: Style
     // Transcript hosts can opt individual items into a complete terminal
     // frame or a borderless, full-width background block.  Defaults retain
     // the historical left-rail rendering for existing clients.
+    /** 是否使用完整边框。
+     */
     public let fullFrame: Bool
+    /** 是否填充背景。
+     */
     public let fillBackground: Bool
+    /** 内容内边距。
+     */
     public let contentPadding: Spacing
     let semanticTheme: ?Theme
 
+    /** 创建并保存配置。
+     * @param style 正文样式
+     * @param titleStyle 标题样式
+     * @param mutedStyle 次要信息样式
+     * @param selectedStyle 选中项样式
+     * @param bodyIndent 正文缩进列数，负值按零处理
+     * @param bodyLimit 正文最多显示的原始行数，零表示不限制
+     * @param borderStyle 边框样式
+     * @param borderBackground 边框背景样式
+     * @param topTitleStyle 顶部标题样式
+     * @param fullFrame 是否使用完整边框
+     * @param fillBackground 是否填充背景
+     * @param contentPadding 内容内边距
+     * @param semanticTheme 可选语义主题
+     */
     public init(
         style!: Style = Style.default(),
         titleStyle!: Style = Style(modifier: Modifier.strong()),
@@ -96,20 +189,60 @@ func applicationTranscriptCardTheme(theme: Theme, style!: Style = Style.default(
         topTitleStyle: theme.heading, semanticTheme: Some(theme))
 }
 
+/** 一条带状态和可折叠正文的记录。
+ */
 public class TranscriptItem {
+    /** 记录标识。
+     */
     public let id: String
+    /** 内容类别。
+     */
     public let kind: TranscriptItemKind
+    /** 标题；为空时卡片使用标识。
+     */
     public let title: String
+    /** 正文文档。
+     */
     public let body: Document
+    /** 执行状态。
+     */
     public let status: TranscriptItemStatus
+    /** 是否折叠正文。
+     */
     public var collapsed: Bool
+    /** 调用者保存的时间文本。
+     */
     public let timestamp: String
+    /** 显示在标题后的耗时文本。
+     */
     public let duration: String
+    /** 自定义状态文本；为空时使用状态默认标签。
+     */
     public let stateLabel: String
+    /** 活动状态的动画帧，构造时负值按零处理。
+     */
     public let activityFrame: Int64
+    /** 正文后的选项。
+     */
     public let options: Array<TranscriptCardOption>
+    /** 正文后的页脚文本。
+     */
     public let footer: String
 
+    /** 创建并保存配置。
+     * @param id 记录标识
+     * @param kind 内容类别
+     * @param title 标题
+     * @param body 正文文档
+     * @param status 执行状态
+     * @param collapsed 是否折叠正文
+     * @param timestamp 调用者保存的时间文本
+     * @param duration 耗时文本
+     * @param stateLabel 自定义状态文本
+     * @param activityFrame 活动状态动画帧，负值按零处理
+     * @param options 卡片选项
+     * @param footer 页脚文本
+     */
     public init(
         id: String,
         kind!: TranscriptItemKind = TranscriptItemKind.Text,
@@ -139,29 +272,51 @@ public class TranscriptItem {
     }
 }
 
+/** 按顺序保存记录项。
+ */
 public class Transcript {
     private let items = ArrayList<TranscriptItem>()
 
+    /** 创建记录集合。
+     * @param items 初始记录项
+     */
     public init(items!: Array<TranscriptItem> = []) {
         for (item in items) { this.items.add(item) }
     }
 
+    /** 在末尾追加记录。
+     * @param item 待追加的记录
+     */
     public func append(item: TranscriptItem): Unit {
         items.add(item)
     }
 
+    /** 获取记录数。
+     * @return 记录项数量。
+     */
     public func size(): Int64 {
         items.size
     }
 
+    /** 按索引查找记录。
+     * @param index 从零开始的索引
+     * @return 索引有效时返回记录，否则返回 None。
+     */
     public func get(index: Int64): ?TranscriptItem {
         if (index < 0 || index >= items.size) { None } else { Some(items[index]) }
     }
 
+    /** 取得顺序数组。
+     * @return 包含当前记录项的数组。
+     */
     public func toArray(): Array<TranscriptItem> {
         items.toArray()
     }
 
+    /** 切换第一个匹配标识的记录的折叠状态。
+     * @param id 记录标识
+     * @return 找到记录时为 true，否则为 false。
+     */
     public func toggleCollapsed(id: String): Bool {
         for (item in items) {
             if (item.id == id) {
@@ -173,9 +328,15 @@ public class Transcript {
     }
 }
 
+/** 绘制记录集合并支持键盘导航。
+ */
 public class TranscriptView <: Widget {
     private let transcript: Transcript
+    /** 视口起始记录索引。
+     */
     public var offset: Int64
+    /** 当前选中的记录索引。
+     */
     public var selected: Int64
     private let block: ?Block
     private let style: ?Style
@@ -185,6 +346,15 @@ public class TranscriptView <: Widget {
     private var viewportWidth: Int64 = 0
     private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
 
+    /** 创建记录视图。
+     * @param transcript 要显示的记录集合
+     * @param offset 初始起始索引，负值按零处理
+     * @param selected 初始选中索引，负值按零处理
+     * @param block 可选外框
+     * @param style 可选正文样式
+     * @param selectedStyle 可选选中样式
+     * @param cardTheme 可选卡片主题
+     */
     public init(
         transcript: Transcript,
         offset!: Int64 = 0,
@@ -207,6 +377,11 @@ public class TranscriptView <: Widget {
         }
     }
 
+    /** 处理上下、翻页及折叠按键。
+     * @param key 键盘事件
+     * @param viewportHeight 可见高度，用于调整滚动
+     * @return 按键被处理时为 true。
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
         let count = transcript.size()
         match (key.code) {
@@ -235,6 +410,10 @@ public class TranscriptView <: Widget {
         }
     }
 
+    /** 在区域内绘制可见记录。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
