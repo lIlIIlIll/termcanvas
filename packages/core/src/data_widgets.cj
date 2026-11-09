@@ -853,6 +853,7 @@ public class Tree <: Widget {
     private let focusedStyle: ?Style
     private var focused: Bool
     private var theme: ?Theme
+    private var renderedTheme: ?Theme = None
 
     public init(
         roots: Array<TreeNode>,
@@ -889,20 +890,16 @@ public class Tree <: Widget {
 
     /** 按上次绘制的区块几何处理鼠标；若树自身指定了主题，则绘制前也使用该主题计算几何。 */
     public func handle(mouse: MouseEvent, area: Rect): Bool {
-        handleMouseWithTheme(mouse, area, theme)
+        handleMouseWithTheme(mouse, area, None)
     }
 
     /** 绘制前可传入应用或父主题以计算鼠标命中区域；树和区块的显式主题优先。 */
     public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool {
-        let effective = match (this.theme) { case Some(value) => Some(value); case None => theme }
-        handleMouseWithTheme(mouse, area, effective)
+        handleMouseWithTheme(mouse, area, theme)
     }
 
-    private func handleMouseWithTheme(mouse: MouseEvent, area: Rect, effective: ?Theme): Bool {
-        let target = match (block) {
-            case Some(b) => match (effective) { case Some(_) => b.inner(area, theme: effective); case None => b.inner(area) }
-            case None => area
-        }
+    private func handleMouseWithTheme(mouse: MouseEvent, area: Rect, layoutTheme: ?Theme): Bool {
+        let target = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         if (!widgetHitTest(mouse, target)) { return false }
         let total = match (dataModel) { case Some(model) => model.visibleCount(); case None => visibleRows().size }
         let delta = mouseScrollDelta(mouse)
@@ -1039,6 +1036,7 @@ public class Tree <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        renderedTheme = buffer.resolveTheme(None)
         var target = area
         if (let Some(b) <- block) {
             let content = [area]

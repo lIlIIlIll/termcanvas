@@ -740,43 +740,43 @@ packages/core/src/data_widgets.cj:838:public func childNodes(): Array<TreeNode>
 packages/core/src/data_widgets.cj:843:public class Tree <: Widget {
 packages/core/src/data_widgets.cj:848:public var selected: Int64
 packages/core/src/data_widgets.cj:849:public var offset: Int64
-packages/core/src/data_widgets.cj:857:public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, dataModel!: ?LazyTreeModel = None, focused!: Bool = false, focusedStyle!: ?Style = None, theme!: ?Theme = None )
-packages/core/src/data_widgets.cj:881:public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None)
-packages/core/src/data_widgets.cj:886:public func setFocused(value: Bool): Unit
-packages/core/src/data_widgets.cj:888:public func setTheme(value: ?Theme): Unit
-packages/core/src/data_widgets.cj:891:public func handle(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/data_widgets.cj:896:public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool
-packages/core/src/data_widgets.cj:930:public func toggleSelected(): Unit
-packages/core/src/data_widgets.cj:938:public func selectedId(): ?String
-packages/core/src/data_widgets.cj:944:public func selectById(id: String): Bool
-packages/core/src/data_widgets.cj:961:public func findById(id: String): ?TreeNode
-packages/core/src/data_widgets.cj:972:public func expandAll(): Unit
-packages/core/src/data_widgets.cj:979:public func collapseAll(): Unit
-packages/core/src/data_widgets.cj:988:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/data_widgets.cj:1019:public func expandSelected(): Unit
-packages/core/src/data_widgets.cj:1030:public func collapseSelected(): Unit
-packages/core/src/data_widgets.cj:1041:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/data_widgets.cj:1200:public class FilePicker <: Widget {
-packages/core/src/data_widgets.cj:1201:public var path: String
-packages/core/src/data_widgets.cj:1205:public var searchText: String = ""
-packages/core/src/data_widgets.cj:1206:public var showHidden: Bool = false
-packages/core/src/data_widgets.cj:1208:public init(path!: String = ".", extension!: String = "", showHidden!: Bool = false)
-packages/core/src/data_widgets.cj:1215:public func refresh(): Unit
-packages/core/src/data_widgets.cj:1238:public func selectedEntry(): ?String
-packages/core/src/data_widgets.cj:1246:public func selectedPath(): ?String
-packages/core/src/data_widgets.cj:1253:public func chooseSelected(): ?String
-packages/core/src/data_widgets.cj:1257:public func setSearch(text: String): Unit
-packages/core/src/data_widgets.cj:1264:public func toggleHidden(): Unit
-packages/core/src/data_widgets.cj:1269:public func selectedInfo(): ?FileEntryInfo
-packages/core/src/data_widgets.cj:1278:public func enterSelected(): Bool
-packages/core/src/data_widgets.cj:1293:public func parent(): Bool
-packages/core/src/data_widgets.cj:1303:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/data_widgets.cj:1331:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/data_widgets.cj:1336:public class FileEntryInfo {
-packages/core/src/data_widgets.cj:1337:public let name: String
-packages/core/src/data_widgets.cj:1338:public let path: String
-packages/core/src/data_widgets.cj:1339:public let isDir: Bool
-packages/core/src/data_widgets.cj:1341:public init(name: String, path: String, isDir: Bool)
+packages/core/src/data_widgets.cj:858:public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, dataModel!: ?LazyTreeModel = None, focused!: Bool = false, focusedStyle!: ?Style = None, theme!: ?Theme = None )
+packages/core/src/data_widgets.cj:882:public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None)
+packages/core/src/data_widgets.cj:887:public func setFocused(value: Bool): Unit
+packages/core/src/data_widgets.cj:889:public func setTheme(value: ?Theme): Unit
+packages/core/src/data_widgets.cj:892:public func handle(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/data_widgets.cj:897:public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool
+packages/core/src/data_widgets.cj:927:public func toggleSelected(): Unit
+packages/core/src/data_widgets.cj:935:public func selectedId(): ?String
+packages/core/src/data_widgets.cj:941:public func selectById(id: String): Bool
+packages/core/src/data_widgets.cj:958:public func findById(id: String): ?TreeNode
+packages/core/src/data_widgets.cj:969:public func expandAll(): Unit
+packages/core/src/data_widgets.cj:976:public func collapseAll(): Unit
+packages/core/src/data_widgets.cj:985:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/data_widgets.cj:1016:public func expandSelected(): Unit
+packages/core/src/data_widgets.cj:1027:public func collapseSelected(): Unit
+packages/core/src/data_widgets.cj:1038:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/data_widgets.cj:1198:public class FilePicker <: Widget {
+packages/core/src/data_widgets.cj:1199:public var path: String
+packages/core/src/data_widgets.cj:1203:public var searchText: String = ""
+packages/core/src/data_widgets.cj:1204:public var showHidden: Bool = false
+packages/core/src/data_widgets.cj:1206:public init(path!: String = ".", extension!: String = "", showHidden!: Bool = false)
+packages/core/src/data_widgets.cj:1213:public func refresh(): Unit
+packages/core/src/data_widgets.cj:1236:public func selectedEntry(): ?String
+packages/core/src/data_widgets.cj:1244:public func selectedPath(): ?String
+packages/core/src/data_widgets.cj:1251:public func chooseSelected(): ?String
+packages/core/src/data_widgets.cj:1255:public func setSearch(text: String): Unit
+packages/core/src/data_widgets.cj:1262:public func toggleHidden(): Unit
+packages/core/src/data_widgets.cj:1267:public func selectedInfo(): ?FileEntryInfo
+packages/core/src/data_widgets.cj:1276:public func enterSelected(): Bool
+packages/core/src/data_widgets.cj:1291:public func parent(): Bool
+packages/core/src/data_widgets.cj:1301:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/data_widgets.cj:1329:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/data_widgets.cj:1334:public class FileEntryInfo {
+packages/core/src/data_widgets.cj:1335:public let name: String
+packages/core/src/data_widgets.cj:1336:public let path: String
+packages/core/src/data_widgets.cj:1337:public let isDir: Bool
+packages/core/src/data_widgets.cj:1339:public init(name: String, path: String, isDir: Bool)
 packages/core/src/dirty_rects.cj:5:public class DirtyRects {
 packages/core/src/dirty_rects.cj:8:public init()
 packages/core/src/dirty_rects.cj:10:public init(rects: Array<Rect>)
