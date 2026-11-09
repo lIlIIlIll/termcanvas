@@ -15389,6 +15389,236 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "dialog-toast",
+      "source": "docs/api-examples/dialog-toast.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastKind",
+          "signature": "public enum ToastKind {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastKind.Success",
+          "signature": "Success"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastKind.Warning",
+          "signature": "Warning"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastKind.Error",
+          "signature": "Error"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastKind.Info",
+          "signature": "Info"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Toast",
+          "signature": "public class Toast {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Toast.message",
+          "signature": "public let message: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Toast.ttl",
+          "signature": "public let ttl: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Toast.style",
+          "signature": "public let style: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Toast.kind",
+          "signature": "public let kind: ?ToastKind"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Toast.init",
+          "signature": "public init(message: String, ttl!: Int64 = 3, style!: Style = Style(fg: Color.Black, bg: Color.Yellow))"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Toast.init",
+          "signature": "public init( message: String, kind!: ?ToastKind, ttl!: Int64 = 3, style!: Style = Style.default() )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastManager",
+          "signature": "public class ToastManager <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastManager.init",
+          "signature": "public init( toasts!: Array<Toast> = [], maxToasts!: ?Int64 = None, theme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastManager.push",
+          "signature": "public func push(toast: Toast): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastManager.count",
+          "signature": "public func count(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastManager.setTheme",
+          "signature": "public func setTheme(theme: ?Theme): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastManager.tick",
+          "signature": "public func tick(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ToastManager.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Spinner",
+          "signature": "public class Spinner <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Spinner.init",
+          "signature": "public init(label!: String = \"\", frame!: Int64 = 0, style!: ?Style = None, theme!: ?Theme = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Spinner.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Dialog",
+          "signature": "public class Dialog <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Dialog.selected",
+          "signature": "public var selected: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Dialog.init",
+          "signature": "public init( title!: String = \"\", body!: String = \"\", buttons!: Array<String> = [\"OK\"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Dialog.setTheme",
+          "signature": "public func setTheme(theme: ?Theme): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Dialog.handle",
+          "signature": "public func handle(key: KeyEvent): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Dialog.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "Dialog.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ConfirmDialog",
+          "signature": "public class ConfirmDialog <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ConfirmDialog.confirmed",
+          "signature": "public var confirmed: Bool = false"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ConfirmDialog.init",
+          "signature": "public init( message: String, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ConfirmDialog.setTheme",
+          "signature": "public func setTheme(theme: ?Theme): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ConfirmDialog.handle",
+          "signature": "public func handle(key: KeyEvent): ?Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ConfirmDialog.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/command_widgets.cj",
+          "symbol": "ConfirmDialog.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

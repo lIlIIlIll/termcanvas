@@ -460,19 +460,44 @@ public class CommandPalette <: Widget {
     }
 }
 
+/** 通知的语义类别。
+ */
 public enum ToastKind {
+    /** 成功。
+     */
     | Success
+    /** 警告。
+     */
     | Warning
+    /** 错误。
+     */
     | Error
+    /** 信息。
+     */
     | Info
 }
 
+/** 具有存活 tick 数的通知。
+ */
 public class Toast {
+    /** 通知文本。
+     */
     public let message: String
+    /** 剩余 tick 数，构造时负值按零处理。
+     */
     public let ttl: Int64
+    /** 通知样式。
+     */
     public let style: Style
+    /** 可选语义类别。
+     */
     public let kind: ?ToastKind
 
+    /** 创建普通通知。
+     * @param message 通知文本
+     * @param ttl 存活 tick 数，负值按零处理
+     * @param style 通知样式
+     */
     public init(message: String, ttl!: Int64 = 3, style!: Style = Style(fg: Color.Black, bg: Color.Yellow)) {
         this.message = message
         this.ttl = max(0, ttl)
@@ -480,6 +505,12 @@ public class Toast {
         this.kind = None
     }
 
+    /** 创建可带语义类别的通知。
+     * @param message 通知文本
+     * @param kind 可选语义类别
+     * @param ttl 存活 tick 数，负值按零处理
+     * @param style 修补语义样式的样式
+     */
     public init(
         message: String,
         kind!: ?ToastKind,
@@ -493,11 +524,18 @@ public class Toast {
     }
 }
 
+/** 保存、更新和绘制通知队列。
+ */
 public class ToastManager <: Widget {
     private let toasts = ArrayList<Toast>()
     private let maxToasts: ?Int64
     private var theme: ?Theme
 
+    /** 创建通知管理器。
+     * @param toasts 初始通知，已过期项会被忽略
+     * @param maxToasts 可选数量上限；超限保留较新的通知
+     * @param theme 可选语义主题
+     */
     public init(
         toasts!: Array<Toast> = [],
         maxToasts!: ?Int64 = None,
@@ -533,6 +571,9 @@ public class ToastManager <: Widget {
         }
     }
 
+    /** 追加未过期通知；达到上限时移除最旧通知。
+     * @param toast 通知
+     */
     public func push(toast: Toast): Unit {
         if (toast.ttl <= 0) { return }
         if (let Some(limit) <- maxToasts) {
@@ -542,14 +583,22 @@ public class ToastManager <: Widget {
         toasts.add(toast)
     }
 
+    /** 获取当前通知数。
+     * @return 通知数。
+     */
     public func count(): Int64 {
         toasts.size
     }
 
+    /** 设置或清除主题。
+     * @param theme 主题；None 表示清除
+     */
     public func setTheme(theme: ?Theme): Unit {
         this.theme = theme
     }
 
+    /** 将所有通知的剩余 tick 数减一并移除过期项。
+     */
     public func tick(): Unit {
         var writeIndex: Int64 = 0
         let originalCount = toasts.size
@@ -570,6 +619,10 @@ public class ToastManager <: Widget {
         }
     }
 
+    /** 按可用高度绘制最新通知。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let rows = min(area.height, toasts.size)
@@ -621,7 +674,11 @@ public class Spinner <: Widget {
     private let style: ?Style
     private let theme: ?Theme
 
-    /** 创建带标签、帧序号和样式的旋转指示符；负帧序号按 0 保存。
+    /** 创建旋转指示符。
+     * @param label 可选标签
+     * @param frame 帧序号，负值按零处理
+     * @param style 可选样式
+     * @param theme 可选语义主题
      */
     public init(label!: String = "", frame!: Int64 = 0, style!: ?Style = None, theme!: ?Theme = None) {
         this.label = label
@@ -630,7 +687,9 @@ public class Spinner <: Widget {
         this.theme = theme
     }
 
-    /** 在区域左上角绘制由帧序号选出的符号及非空标签，文字按区域宽度截断；宽或高不为正时不绘制。
+    /** 在区域左上角绘制指定帧和标签；绘制不会推进帧。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
@@ -641,11 +700,15 @@ public class Spinner <: Widget {
     }
 }
 
+/** 带标题、正文和按钮的居中对话框。
+ */
 public class Dialog <: Widget {
     private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private let title: String
     private let body: String
     private let buttons: Array<String>
+    /** 当前按钮索引。
+     */
     public var selected: Int64
     private let width: Int64
     private let height: Int64
@@ -654,6 +717,17 @@ public class Dialog <: Widget {
     private var theme: ?Theme = None
     private var renderedTheme: ?Theme = None
 
+    /** 创建对话框。
+     * @param title 标题
+     * @param body 正文
+     * @param buttons 按钮文本
+     * @param selected 初始按钮索引
+     * @param width 目标宽度，至少为四
+     * @param height 目标高度，至少为四
+     * @param style 可选正文样式
+     * @param selectedStyle 可选选中样式
+     * @param theme 可选语义主题
+     */
     public init(
         title!: String = "",
         body!: String = "",
@@ -675,12 +749,17 @@ public class Dialog <: Widget {
         this.selectedStyle = selectedStyle
         this.theme = theme
     }
-    /** 设置对话框使用的语义主题；None 保持未启用主题时的样式。
+    /** 设置或清除主题。
+     * @param theme 主题；None 表示清除
      */
     public func setTheme(theme: ?Theme): Unit {
         this.theme = theme
     }
 
+    /** 处理左右键及回车。
+     * @param key 键盘事件
+     * @return 回车且存在按钮时返回选中按钮文本，否则返回 None。
+     */
     public func handle(key: KeyEvent): ?String {
         normalizeSelected()
         match (key.code) {
@@ -696,6 +775,11 @@ public class Dialog <: Widget {
         }
     }
 
+    /** 处理鼠标点击按钮。
+     * @param mouse 鼠标事件
+     * @param area 对话框所在区域
+     * @return 命中按钮时返回文本，否则返回 None。
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
         normalizeSelected()
         match ((mouse.kind, mouse.button)) {
@@ -717,6 +801,10 @@ public class Dialog <: Widget {
         None
     }
 
+    /** 在区域内居中绘制对话框。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         textWidthOptionsValue = buffer.textWidthOptions()
         renderedTheme = buffer.resolveTheme(None)
@@ -755,10 +843,20 @@ public class Dialog <: Widget {
     }
 }
 
+/** 带 No 和 Yes 选项的确认对话框。
+ */
 public class ConfirmDialog <: Widget {
     private let dialog: Dialog
+    /** 当前是否选择 Yes。
+     */
     public var confirmed: Bool = false
 
+    /** 创建确认对话框。
+     * @param message 提示文本
+     * @param style 可选样式
+     * @param selectedStyle 可选选中样式
+     * @param theme 可选主题
+     */
     public init(
         message: String,
         style!: ?Style = None,
@@ -775,12 +873,17 @@ public class ConfirmDialog <: Widget {
         )
     }
 
-    /** 设置确认提示使用的语义主题；None 清除主题。
+    /** 设置或清除主题。
+     * @param theme 主题；None 表示清除
      */
     public func setTheme(theme: ?Theme): Unit {
         dialog.setTheme(theme)
     }
 
+    /** 处理方向键、y、n、回车和 Escape。
+     * @param key 键盘事件
+     * @return 确认或取消时返回布尔值，其他按键返回 None。
+     */
     public func handle(key: KeyEvent): ?Bool {
         dialog.selected = if (confirmed) { 1 } else { 0 }
         match (key.code) {
@@ -799,7 +902,10 @@ public class ConfirmDialog <: Widget {
         }
     }
 
-    /** 仅左键按下并命中“No”或“Yes”标签时返回对应布尔结果；其余鼠标事件返回 None。
+    /** 处理鼠标点击 No 或 Yes。
+     * @param mouse 鼠标事件
+     * @param area 对话框所在区域
+     * @return 命中时返回选择结果，否则返回 None。
      */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool {
         dialog.selected = if (confirmed) { 1 } else { 0 }
@@ -810,6 +916,10 @@ public class ConfirmDialog <: Widget {
         }
     }
 
+    /** 绘制当前确认选择。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         dialog.selected = if (confirmed) { 1 } else { 0 }
         dialog.render(area, buffer)
