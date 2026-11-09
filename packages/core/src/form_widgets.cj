@@ -2,6 +2,7 @@ package core
 
 import std.collection.*
 
+/** 可通过键盘或鼠标激活的按钮。 */
 public class Button <: Widget {
     private let label: String
     private let focused: Bool
@@ -15,6 +16,14 @@ public class Button <: Widget {
     private var ghost: Bool = false
 
     /** 保存按钮文字、状态和样式配置，供绘制时使用。主题下空样式采用凸起表面及可见边界；指定具体样式优先。无主题时保持原有外观。
+     * @param label 标签文本
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param style 普通样式
+     * @param focusedStyle 聚焦样式
+     * @param disabledStyle 禁用样式
+     * @param theme 可选的语义主题
+     * @param block 可选边框
      */
     public init(
         label: String,
@@ -36,23 +45,41 @@ public class Button <: Widget {
         this.theme = theme
     }
 
-    /** 控制空样式按钮是否使用无边界的主题 normal 样式；具体样式不受影响。 */
+    /** 控制空样式按钮是否使用无边界的主题 normal 样式；具体样式不受影响。
+     * @param value 是否使用无边界样式
+     */
     public func setGhost(value: Bool): Unit { ghost = value }
 
+    /** 启用时处理回车或空格激活。
+     * @param key 按键事件
+     * @return 激活按钮时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         if (disabled) { return false }
         match (key.code) { case KeyCode.Enter | KeyCode.Char(r' ') => true; case _ => false }
     }
 
-    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    /** 使用已有主题信息计算可点击区域并处理左键按下。
+     * @param mouse 鼠标事件
+     * @param area 按钮区域
+     * @return 激活按钮时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
 
+    /** 使用布局主题计算可点击区域并处理左键按下。
+     * @param mouse 鼠标事件
+     * @param area 按钮区域
+     * @param layoutTheme 可选的布局主题
+     * @return 激活按钮时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
         if (disabled || !widgetHitTest(mouse, controlBlockArea(area, block, theme, layoutTheme, renderedTheme))) { return false }
         match ((mouse.kind, mouse.button)) { case (MouseKind.Down, MouseButton.Left) => true; case _ => false }
     }
 
     /** 在可选区块内部居中绘制按钮标签，并将整个可点击的内部区域填充为对应状态样式。下划线仅应用于标签，不应用于填充空白。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         renderedTheme = buffer.resolveTheme(None)
@@ -115,7 +142,9 @@ public class Button <: Widget {
     }
 }
 
+/** 显示并切换布尔选中状态的复选框。 */
 public class Checkbox <: Widget {
+    /** 当前选中状态。 */
     public var checked: Bool
     private let label: String
     private let focused: Bool
@@ -125,6 +154,16 @@ public class Checkbox <: Widget {
     private let disabledStyle: ?Style
     private let theme: ?Theme
 
+    /** 创建复选框。
+     * @param label 标签文本
+     * @param checked 初始选中状态
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param style 普通样式
+     * @param focusedStyle 聚焦样式
+     * @param disabledStyle 禁用样式
+     * @param theme 可选的语义主题
+     */
     public init(
         label: String,
         checked!: Bool = false,
@@ -145,6 +184,10 @@ public class Checkbox <: Widget {
         this.theme = theme
     }
 
+    /** 启用时使用空格或回车切换选中状态。
+     * @param key 按键事件
+     * @return 处理按键时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         if (disabled) { return false }
         match (key.code) {
@@ -155,6 +198,11 @@ public class Checkbox <: Widget {
         }
     }
 
+    /** 启用时在区域内左键按下可切换状态。
+     * @param mouse 鼠标事件
+     * @param area 交互区域
+     * @return 切换状态时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         if (disabled || !widgetHitTest(mouse, area)) { return false }
         match ((mouse.kind, mouse.button)) {
@@ -163,6 +211,10 @@ public class Checkbox <: Widget {
         }
     }
 
+    /** 在区域首行绘制选中标记和标签。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let mark = if (checked) { "[x] " } else { "[ ] " }
@@ -186,6 +238,14 @@ public class Switch <: Widget {
     private var theme: ?Theme
 
     /** 保存标签、初始开关状态及绘制状态和样式。
+     * @param label 标签文本
+     * @param checked 初始选中状态
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param style 普通样式
+     * @param focusedStyle 聚焦样式
+     * @param disabledStyle 禁用样式
+     * @param theme 可选的语义主题
      */
     public init(
         label: String,
@@ -208,6 +268,9 @@ public class Switch <: Widget {
     }
 
     /** 设置聚焦、禁用状态和语义主题；禁用时拒绝键盘与鼠标输入。
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param theme 可选的语义主题
      */
     public func setVisualState(
         focused!: Bool = false,
@@ -220,6 +283,8 @@ public class Switch <: Widget {
     }
 
     /** 未禁用时，空格或回车翻转状态并返回 true；禁用或其他按键时返回 false。
+     * @param key 按键事件
+     * @return 切换状态时为 true
      */
     public func handle(key: KeyEvent): Bool {
         if (disabled) { return false }
@@ -232,6 +297,9 @@ public class Switch <: Widget {
     }
 
     /** 左键在首行按下时切换一次；其他鼠标事件、行、区域外点击及禁用状态不改变 checked。
+     * @param mouse 鼠标事件
+     * @param area 交互区域
+     * @return 切换状态时为 true
      */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         if (disabled || area.width <= 0 || area.height <= 0) { return false }
@@ -243,6 +311,8 @@ public class Switch <: Widget {
     }
 
     /** 在非空区域首行绘制 label [off] 或 label [on]；空标签只绘制状态文字，并按区域宽度截断。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }

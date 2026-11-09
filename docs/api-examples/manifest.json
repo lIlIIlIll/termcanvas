@@ -9101,6 +9101,140 @@
           "signature": "public init( queueEnqueued!: Int64 = 0, queueProcessed!: Int64 = 0, maxQueueDepth!: Int64 = 0, maxUpdateDepth!: Int64 = 0, yieldedTurns!: Int64 = 0, queueOverflows!: Int64 = 0, scheduling!: FrameSchedulingSnapshot = FrameSchedulingSnapshot() )"
         }
       ]
+    },
+    {
+      "id": "basic-controls",
+      "source": "docs/api-examples/basic-controls.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Button",
+          "signature": "public class Button <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Button.init",
+          "signature": "public init( label: String, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Button.setGhost",
+          "signature": "public func setGhost(value: Bool): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Button.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Button.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Button.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Button.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Checkbox",
+          "signature": "public class Checkbox <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Checkbox.checked",
+          "signature": "public var checked: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Checkbox.init",
+          "signature": "public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Checkbox.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Checkbox.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Checkbox.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Switch",
+          "signature": "public class Switch <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Switch.checked",
+          "signature": "public var checked: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Switch.init",
+          "signature": "public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Switch.setVisualState",
+          "signature": "public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Switch.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Switch.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/form_widgets.cj",
+          "symbol": "Switch.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }
