@@ -29,12 +29,14 @@ public enum ProgressBarLabelMode {
      */
     | Ratio
     /** 使用所携带的字符串作为进度文字。
+     * @param _0 标签文字
      */
     | Text(String)
 }
 
 /** 选择标签相对于轨道的位置；Automatic 保持水平右侧、垂直上方。 */
 public enum ProgressBarLabelPosition {
+    /** 水平进度条显示在右侧，垂直进度条显示在上方。 */
     | Automatic
     /** 水平左侧或垂直上方。 */
     | Start
@@ -60,6 +62,10 @@ public class ProgressBarSymbols {
     public let indeterminate: String
 
     /** 按传入字符串保存进度条各部分的符号；省略时已填充部分、前端和不确定进度使用“#”，未填充部分使用“-”。
+     * @param filled 已填充部分符号
+     * @param empty 未填充部分符号
+     * @param head 填充前端符号
+     * @param indeterminate 不确定进度符号
      */
     public init(filled!: String = "#", empty!: String = "-", head!: String = "#", indeterminate!: String = "#") {
         this.filled = filled
@@ -122,6 +128,9 @@ public class ProgressBarSegment {
     public let symbol: String
 
     /** 创建分段，将负数值置为零，并保存指定的样式和符号。
+     * @param value 分段数值
+     * @param style 分段样式
+     * @param symbol 分段符号
      */
     public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#") {
         this.value = max(0, value)
@@ -130,6 +139,7 @@ public class ProgressBarSegment {
     }
 }
 
+/** 可显示确定或不确定进度、分段及标签的进度条。 */
 public class ProgressBar <: Widget {
     private let value: Int64
     private let total: Int64
@@ -152,6 +162,23 @@ public class ProgressBar <: Widget {
     /** 创建进度条，当前值至少保存为零，总量至少保存为一。显式符号优先于主题符号；主题符号须符合终端能力及单列宽度，否则自动回退。
      * 默认水平标签位于轨道右侧、垂直标签位于上方；可用 labelPosition 改变位置。
      * 窄区域优先保留百分比，其他过长标签以省略号代替。省略样式时继承主题，覆盖可显式清除背景。
+     * @param value 当前值
+     * @param total 总量，至少为一
+     * @param label 附加标签
+     * @param style 可选轨道样式
+     * @param fillStyle 可选填充样式
+     * @param theme 可选主题
+     * @param direction 绘制方向
+     * @param labelMode 进度文字模式
+     * @param labelStyle 可选标签样式
+     * @param symbols 轨道符号
+     * @param segments 可选的进度分段
+     * @param indeterminate 是否显示不确定进度
+     * @param phase 不确定进度动画帧序号
+     * @param labelPosition 标签位置
+     * @param trackOverride 轨道逐属性覆盖
+     * @param fillOverride 填充逐属性覆盖
+     * @param labelOverride 标签逐属性覆盖
      */
     public init(
         value: Int64,
@@ -191,6 +218,10 @@ public class ProgressBar <: Widget {
         this.phase = max(0, phase)
     }
 
+    /** 在指定区域绘制组件。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         buffer.withCanvasClip(area) { =>
@@ -386,6 +417,7 @@ func progressClippedLabel(text: String, width: Int64, unicode: Bool, options: Te
     ellipsis
 }
 
+/** 以单行符号显示数据趋势，可选择最新或最早的可见样本。 */
 public class Sparkline <: Widget {
     private let values: Array<Int64>
     private let maxValue: Int64
@@ -394,6 +426,14 @@ public class Sparkline <: Widget {
     private let latest: Bool
     private let symbols: ?Array<String>
 
+    /** 创建趋势图；最大值非正时根据可见样本计算。
+     * @param values 按顺序排列的样本
+     * @param maxValue 缩放上限
+     * @param style 可选样式
+     * @param block 可选外围区块
+     * @param latest 是否优先显示末尾样本
+     * @param symbols 可选等级符号
+     */
     public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None, block!: ?Block = None,
         latest!: Bool = true, symbols!: ?Array<String> = None) {
         this.values = values
@@ -404,6 +444,10 @@ public class Sparkline <: Widget {
         this.symbols = symbols
     }
 
+    /** 在指定区域绘制组件。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
@@ -431,6 +475,7 @@ public class Sparkline <: Widget {
     }
 }
 
+/** 进度条的简化包装，使用当前值、总量和可选标签。 */
 public class Gauge <: Widget {
     private let value: Int64
     private let total: Int64
@@ -438,6 +483,13 @@ public class Gauge <: Widget {
     private let style: ?Style
     private let fillStyle: ?Style
 
+    /** 创建简化进度组件；当前值负数置零，总量至少为一。
+     * @param value 当前值
+     * @param total 总量
+     * @param label 标签
+     * @param style 可选轨道样式
+     * @param fillStyle 可选填充样式
+     */
     public init(
         value: Int64,
         total!: Int64 = 100,
@@ -452,6 +504,10 @@ public class Gauge <: Widget {
         this.fillStyle = fillStyle
     }
 
+    /** 在指定区域绘制组件。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         let hasTheme = buffer.resolveTheme(None).isSome()
         let track = if (hasTheme || style.isSome()) { style } else { Some(Style(fg: Color.Indexed(8))) }
@@ -460,12 +516,19 @@ public class Gauge <: Widget {
     }
 }
 
+/** 按样本顺序绘制柱状图；可见柱至少占一行。 */
 public class Chart <: Widget {
     private let values: Array<Int64>
     private let block: ?Block
     private let style: ?Style
     private let maxValue: Int64
 
+    /** 创建柱状图；最大值非正时根据样本计算。
+     * @param values 按顺序排列的样本
+     * @param block 可选外围区块
+     * @param style 可选样式
+     * @param maxValue 缩放上限
+     */
     public init(
         values: Array<Int64>,
         block!: ?Block = None,
@@ -478,6 +541,10 @@ public class Chart <: Widget {
         this.maxValue = max(0, maxValue)
     }
 
+    /** 在指定区域绘制组件。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
@@ -497,12 +564,20 @@ public class Chart <: Widget {
     }
 }
 
+/** 显示文本行的只读日志视图。 */
 public class LogView <: Widget {
     private let lines: Array<String>
+    /** 首行偏移；负数表示显示末尾内容。 */
     public var offset: Int64
     private let block: ?Block
     private let style: Style
 
+    /** 创建日志视图。
+     * @param lines 日志行
+     * @param offset 首行偏移；负数跟随末尾
+     * @param block 可选外围区块
+     * @param style 文本样式
+     */
     public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default()) {
         this.lines = lines
         this.offset = offset
@@ -510,6 +585,10 @@ public class LogView <: Widget {
         this.style = style
     }
 
+    /** 在指定区域绘制组件。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {

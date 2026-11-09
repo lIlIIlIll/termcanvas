@@ -45440,7 +45440,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 33,
+      "line": 34,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -45459,7 +45459,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 37,
+      "line": 38,
       "level": "top_level",
       "kind": "enum",
       "symbol": "ProgressBarLabelPosition",
@@ -45477,7 +45477,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 38,
+      "line": 40,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -45496,7 +45496,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 40,
+      "line": 42,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -45515,7 +45515,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 42,
+      "line": 44,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -45534,7 +45534,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 47,
+      "line": 49,
       "level": "top_level",
       "kind": "class",
       "symbol": "ProgressBarSymbols",
@@ -45552,7 +45552,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 51,
+      "line": 53,
       "level": "member",
       "kind": "let",
       "symbol": "filled",
@@ -45570,7 +45570,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 54,
+      "line": 56,
       "level": "member",
       "kind": "let",
       "symbol": "empty",
@@ -45588,7 +45588,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 57,
+      "line": 59,
       "level": "member",
       "kind": "let",
       "symbol": "head",
@@ -45606,7 +45606,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 60,
+      "line": 62,
       "level": "member",
       "kind": "let",
       "symbol": "indeterminate",
@@ -45624,7 +45624,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 64,
+      "line": 70,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -45642,7 +45642,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 113,
+      "line": 119,
       "level": "top_level",
       "kind": "class",
       "symbol": "ProgressBarSegment",
@@ -45660,7 +45660,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 116,
+      "line": 122,
       "level": "member",
       "kind": "let",
       "symbol": "value",
@@ -45678,7 +45678,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 119,
+      "line": 125,
       "level": "member",
       "kind": "let",
       "symbol": "style",
@@ -45696,7 +45696,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 122,
+      "line": 128,
       "level": "member",
       "kind": "let",
       "symbol": "symbol",
@@ -45714,7 +45714,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 126,
+      "line": 135,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -45732,7 +45732,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 133,
+      "line": 143,
       "level": "top_level",
       "kind": "class",
       "symbol": "ProgressBar",
@@ -45750,7 +45750,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 156,
+      "line": 183,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -45768,7 +45768,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 194,
+      "line": 225,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -45786,7 +45786,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 389,
+      "line": 421,
       "level": "top_level",
       "kind": "class",
       "symbol": "Sparkline",
@@ -45804,7 +45804,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 397,
+      "line": 437,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -45822,7 +45822,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 407,
+      "line": 451,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -45840,7 +45840,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 434,
+      "line": 479,
       "level": "top_level",
       "kind": "class",
       "symbol": "Gauge",
@@ -45858,7 +45858,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 441,
+      "line": 493,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -45876,7 +45876,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 455,
+      "line": 511,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -45894,7 +45894,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 463,
+      "line": 520,
       "level": "top_level",
       "kind": "class",
       "symbol": "Chart",
@@ -45912,7 +45912,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 469,
+      "line": 532,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -45930,7 +45930,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 481,
+      "line": 548,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -45948,7 +45948,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 500,
+      "line": 568,
       "level": "top_level",
       "kind": "class",
       "symbol": "LogView",
@@ -45966,7 +45966,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 502,
+      "line": 571,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -45984,7 +45984,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 506,
+      "line": 581,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -46002,7 +46002,7 @@
     {
       "package": "core",
       "path": "packages/core/src/visual_widgets.cj",
-      "line": 513,
+      "line": 592,
       "level": "member",
       "kind": "func",
       "symbol": "render",

@@ -4262,6 +4262,261 @@
           "signature": "public func centeredViewport(area: Rect, width: Int64, height: Int64): Rect"
         }
       ]
+    },
+    {
+      "id": "core-progress-and-charts",
+      "source": "docs/api-examples/progress-charts.cj",
+      "dependencies": [
+        "core",
+        "testing"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarDirection",
+          "signature": "public enum ProgressBarDirection {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarDirection.Horizontal",
+          "signature": "Horizontal"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarDirection.Vertical",
+          "signature": "Vertical"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarLabelMode",
+          "signature": "public enum ProgressBarLabelMode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarLabelMode.Hidden",
+          "signature": "Hidden"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarLabelMode.Percent",
+          "signature": "Percent"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarLabelMode.Value",
+          "signature": "Value"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarLabelMode.Ratio",
+          "signature": "Ratio"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarLabelMode.Text",
+          "signature": "Text(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarLabelPosition",
+          "signature": "public enum ProgressBarLabelPosition {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarLabelPosition.Automatic",
+          "signature": "Automatic"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarLabelPosition.Start",
+          "signature": "Start"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarLabelPosition.End",
+          "signature": "End"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSymbols",
+          "signature": "public class ProgressBarSymbols {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSymbols.filled",
+          "signature": "public let filled: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSymbols.empty",
+          "signature": "public let empty: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSymbols.head",
+          "signature": "public let head: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSymbols.indeterminate",
+          "signature": "public let indeterminate: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSymbols.init",
+          "signature": "public init(filled!: String = \"#\", empty!: String = \"-\", head!: String = \"#\", indeterminate!: String = \"#\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSegment",
+          "signature": "public class ProgressBarSegment {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSegment.value",
+          "signature": "public let value: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSegment.style",
+          "signature": "public let style: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSegment.symbol",
+          "signature": "public let symbol: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBarSegment.init",
+          "signature": "public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = \"#\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBar",
+          "signature": "public class ProgressBar <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBar.init",
+          "signature": "public init( value: Int64, total!: Int64 = 100, label!: String = \"\", style!: ?Style = None, fillStyle!: ?Style = None, theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: ?Style = None, symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0, labelPosition!: ProgressBarLabelPosition = ProgressBarLabelPosition.Automatic, trackOverride!: StyleOverride = StyleOverride(), fillOverride!: StyleOverride = StyleOverride(), labelOverride!: StyleOverride = StyleOverride() )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "ProgressBar.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "Sparkline",
+          "signature": "public class Sparkline <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "Sparkline.init",
+          "signature": "public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None, block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "Sparkline.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "Gauge",
+          "signature": "public class Gauge <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "Gauge.init",
+          "signature": "public init( value: Int64, total!: Int64 = 100, label!: String = \"\", style!: ?Style = None, fillStyle!: ?Style = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "Gauge.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "Chart",
+          "signature": "public class Chart <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "Chart.init",
+          "signature": "public init( values: Array<Int64>, block!: ?Block = None, style!: ?Style = None, maxValue!: Int64 = 0 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "Chart.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "LogView",
+          "signature": "public class LogView <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "LogView.offset",
+          "signature": "public var offset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "LogView.init",
+          "signature": "public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/visual_widgets.cj",
+          "symbol": "LogView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

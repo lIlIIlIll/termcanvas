@@ -2498,38 +2498,38 @@ packages/core/src/visual_widgets.cj:21:Hidden
 packages/core/src/visual_widgets.cj:24:Percent
 packages/core/src/visual_widgets.cj:27:Value
 packages/core/src/visual_widgets.cj:30:Ratio
-packages/core/src/visual_widgets.cj:33:Text(String)
-packages/core/src/visual_widgets.cj:37:public enum ProgressBarLabelPosition {
-packages/core/src/visual_widgets.cj:38:Automatic
-packages/core/src/visual_widgets.cj:40:Start
-packages/core/src/visual_widgets.cj:42:End
-packages/core/src/visual_widgets.cj:47:public class ProgressBarSymbols {
-packages/core/src/visual_widgets.cj:51:public let filled: String
-packages/core/src/visual_widgets.cj:54:public let empty: String
-packages/core/src/visual_widgets.cj:57:public let head: String
-packages/core/src/visual_widgets.cj:60:public let indeterminate: String
-packages/core/src/visual_widgets.cj:64:public init(filled!: String = "#", empty!: String = "-", head!: String = "#", indeterminate!: String = "#")
-packages/core/src/visual_widgets.cj:113:public class ProgressBarSegment {
-packages/core/src/visual_widgets.cj:116:public let value: Int64
-packages/core/src/visual_widgets.cj:119:public let style: Style
-packages/core/src/visual_widgets.cj:122:public let symbol: String
-packages/core/src/visual_widgets.cj:126:public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#")
-packages/core/src/visual_widgets.cj:133:public class ProgressBar <: Widget {
-packages/core/src/visual_widgets.cj:156:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None, theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: ?Style = None, symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0, labelPosition!: ProgressBarLabelPosition = ProgressBarLabelPosition.Automatic, trackOverride!: StyleOverride = StyleOverride(), fillOverride!: StyleOverride = StyleOverride(), labelOverride!: StyleOverride = StyleOverride() )
-packages/core/src/visual_widgets.cj:194:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:389:public class Sparkline <: Widget {
-packages/core/src/visual_widgets.cj:397:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None, block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
-packages/core/src/visual_widgets.cj:407:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:434:public class Gauge <: Widget {
-packages/core/src/visual_widgets.cj:441:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None )
-packages/core/src/visual_widgets.cj:455:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:463:public class Chart <: Widget {
-packages/core/src/visual_widgets.cj:469:public init( values: Array<Int64>, block!: ?Block = None, style!: ?Style = None, maxValue!: Int64 = 0 )
-packages/core/src/visual_widgets.cj:481:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:500:public class LogView <: Widget {
-packages/core/src/visual_widgets.cj:502:public var offset: Int64
-packages/core/src/visual_widgets.cj:506:public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
-packages/core/src/visual_widgets.cj:513:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:34:Text(String)
+packages/core/src/visual_widgets.cj:38:public enum ProgressBarLabelPosition {
+packages/core/src/visual_widgets.cj:40:Automatic
+packages/core/src/visual_widgets.cj:42:Start
+packages/core/src/visual_widgets.cj:44:End
+packages/core/src/visual_widgets.cj:49:public class ProgressBarSymbols {
+packages/core/src/visual_widgets.cj:53:public let filled: String
+packages/core/src/visual_widgets.cj:56:public let empty: String
+packages/core/src/visual_widgets.cj:59:public let head: String
+packages/core/src/visual_widgets.cj:62:public let indeterminate: String
+packages/core/src/visual_widgets.cj:70:public init(filled!: String = "#", empty!: String = "-", head!: String = "#", indeterminate!: String = "#")
+packages/core/src/visual_widgets.cj:119:public class ProgressBarSegment {
+packages/core/src/visual_widgets.cj:122:public let value: Int64
+packages/core/src/visual_widgets.cj:125:public let style: Style
+packages/core/src/visual_widgets.cj:128:public let symbol: String
+packages/core/src/visual_widgets.cj:135:public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#")
+packages/core/src/visual_widgets.cj:143:public class ProgressBar <: Widget {
+packages/core/src/visual_widgets.cj:183:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None, theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: ?Style = None, symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0, labelPosition!: ProgressBarLabelPosition = ProgressBarLabelPosition.Automatic, trackOverride!: StyleOverride = StyleOverride(), fillOverride!: StyleOverride = StyleOverride(), labelOverride!: StyleOverride = StyleOverride() )
+packages/core/src/visual_widgets.cj:225:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:421:public class Sparkline <: Widget {
+packages/core/src/visual_widgets.cj:437:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None, block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
+packages/core/src/visual_widgets.cj:451:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:479:public class Gauge <: Widget {
+packages/core/src/visual_widgets.cj:493:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None )
+packages/core/src/visual_widgets.cj:511:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:520:public class Chart <: Widget {
+packages/core/src/visual_widgets.cj:532:public init( values: Array<Int64>, block!: ?Block = None, style!: ?Style = None, maxValue!: Int64 = 0 )
+packages/core/src/visual_widgets.cj:548:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:568:public class LogView <: Widget {
+packages/core/src/visual_widgets.cj:571:public var offset: Int64
+packages/core/src/visual_widgets.cj:581:public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
+packages/core/src/visual_widgets.cj:592:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widget_base.cj:6:public interface Widget {
 packages/core/src/widget_base.cj:11:func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widget_base.cj:36:public enum WrapMode {
