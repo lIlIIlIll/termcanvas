@@ -24,7 +24,7 @@ class VisualPolishTest {
         @Expect(visualPolishRow(full, 0), "━━━━━━━━━━ 100.00%")
         let narrow = Buffer(Rect(0, 0, 4, 1))
         ProgressBar(1, total: 2, labelMode: ProgressBarLabelMode.Percent).render(narrow.area, narrow)
-        @Expect(visualPolishRow(narrow, 0), "   …")
+        @Expect(visualPolishRow(narrow, 0), " 50%")
         let rounded = Buffer(Rect(0, 0, 14, 1))
         ProgressBar(119, total: 120, labelMode: ProgressBarLabelMode.Percent).render(rounded.area, rounded)
         @Expect(visualPolishRow(rounded, 0), "━━━━━━─ 99.17%")

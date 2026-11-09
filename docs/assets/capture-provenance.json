@@ -1,0 +1,112 @@
+{
+  "source_kind": "provisional dirty-worktree snapshot; not tied to a commit",
+  "source_snapshot_sha256": "bb5a74552a24757839a7a9d4bee32b37425054f7b7a2b5e2204db22dd23c7ae5",
+  "readme_sha256": "ff2761e3df39061c93e65ca85129725f5d7199ba64e6648ff82e51dc056467ba",
+  "snapshot_scope": "core, testing, diff, three showcase examples; README and capture scripts verified separately",
+  "sdk": "Cangjie STS 1.2.0",
+  "platform": "Linux",
+  "capture_backend": "real-terminal-preview",
+  "terminal": "Foot 1.28.0",
+  "compositor": "Sway 1.12 (headless)",
+  "actual_color": "truecolor",
+  "actual_glyphs": "unknown",
+  "review": "The four still images and CI GIF frames 0, 9 and 15 were independently visually reviewed; other GIF frames were not reviewed.",
+  "limitations": [
+    "binary/source relationship locally observed, not signed",
+    "time-based readiness does not prove painted frame",
+    "Font fallback and per-glyph rendering were not independently verified.",
+    "GIF interaction uses a private PTY",
+    "no cross-platform or matrix visual review"
+  ],
+  "images": [
+    {
+      "file": "ci-workbench-120x36.png",
+      "sha256": "67218dd065011c5a333b890e748692a79cbbcf2e92d7ead76615d08d6a572c39",
+      "binary_sha256": "c76f2b74b476d3fbd9b50138e491a968ebb6995c45caa05783037ca7ab8e1a2c",
+      "terminal_cells": [
+        120,
+        36
+      ],
+      "font_request": "monospace:size=14",
+      "readiness": "process alive after time-based wait; painted frame not automatically verified",
+      "application_wait_seconds": 2,
+      "compositor_settle_seconds": 0.5,
+      "application_arguments": [
+        "--ci"
+      ]
+    },
+    {
+      "file": "ci-workbench.gif",
+      "sha256": "80ebbe0aaa6beb6a8701589dd02b5e4e6f2c67dc1882fb89bd9f8239b62e9d39",
+      "binary_sha256": "c76f2b74b476d3fbd9b50138e491a968ebb6995c45caa05783037ca7ab8e1a2c",
+      "terminal_cells": [
+        120,
+        36
+      ],
+      "font_request": "monospace:size=14",
+      "readiness": "process alive after time-based wait; painted frame not automatically verified",
+      "application_wait_seconds": 2,
+      "compositor_settle_seconds": 0.5,
+      "application_arguments": [
+        "--ci"
+      ],
+      "interaction": {
+        "method": "private PTY injection",
+        "input": "F3",
+        "input_frame": 6,
+        "expected_output_after_input": "Reset",
+        "observed_in_pty_output": true,
+        "frames": 16,
+        "nominal_fps": 4,
+        "encoding": "ffmpeg full-frame palette; dithering disabled",
+        "independently_reviewed_frame_indices": [
+          0,
+          9,
+          15
+        ]
+      }
+    },
+    {
+      "file": "data-explorer-120x36.png",
+      "sha256": "0f38105f428a83482f3c550b20d9fec7afffe8e6cf9ddd2a270d5fa4e1f8c40a",
+      "binary_sha256": "f63b076da474bf879fef93c93ff422c06214bbcfe97885929673c757296ac916",
+      "terminal_cells": [
+        120,
+        36
+      ],
+      "font_request": "monospace:size=14",
+      "readiness": "process alive after time-based wait; painted frame not automatically verified",
+      "application_wait_seconds": 2,
+      "compositor_settle_seconds": 0.5,
+      "application_arguments": []
+    },
+    {
+      "file": "editor-120x36.png",
+      "sha256": "ff99844033227dd06c673355da6ffd6ffd35ced5cde573439d610ff046c2464b",
+      "binary_sha256": "286a721038f611b83525f422762326aab08ab3f9749ca3edb8b5de2babb2f45c",
+      "terminal_cells": [
+        120,
+        36
+      ],
+      "font_request": "monospace:size=14",
+      "readiness": "process alive after time-based wait; painted frame not automatically verified",
+      "application_wait_seconds": 2,
+      "compositor_settle_seconds": 0.5,
+      "application_arguments": []
+    },
+    {
+      "file": "quickstart.png",
+      "sha256": "ad7737e04407fd5ecbdb5223a85d380e8dd31132c1caca261e85b369c4a6a85b",
+      "binary_sha256": "80493daf7ab5683edc71bb87150541482e7a469d12ae75c8302bcb65eba7675b",
+      "terminal_cells": [
+        64,
+        10
+      ],
+      "font_request": "monospace:size=14",
+      "readiness": "process alive after time-based wait; painted frame not automatically verified",
+      "application_wait_seconds": 2,
+      "compositor_settle_seconds": 0.5,
+      "application_arguments": []
+    }
+  ]
+}

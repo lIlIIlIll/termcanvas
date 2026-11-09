@@ -21,6 +21,83 @@
     "packages/*/tests/**"
   ],
   "rules": [
+    {
+      "id": "core-style-overrides-stable",
+      "match": {"package": "core", "symbols": ["StyleOverride", "resolveStyle"]},
+      "stability": "STABLE", "subsystem": "style", "owner": "core/style",
+      "reason": "Attribute-level style overrides are part of the reusable visual styling contract, including explicit color resets and disabled modifiers.",
+      "consumer_evidence": "Visual system and progress widget tests exercise inherited attributes and explicit resets."
+    },
+    {
+      "id": "core-progress-label-position-stable",
+      "match": {"package": "core", "symbols": ["ProgressBarLabelPosition"]},
+      "stability": "STABLE", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Label placement is a public value of the stable progress bar presentation contract.",
+      "consumer_evidence": "Progress activity visual tests cover explicit label positions."
+    },
+    {
+      "id": "core-animation-experimental",
+      "match": {"package": "core", "symbols": ["AnimationConfig", "AnimationSample", "AnimationScheduler"]},
+      "stability": "EXPERIMENTAL", "subsystem": "animation", "owner": "core/animation",
+      "reason": "Application-owned animation identities, timing, visibility, and scheduling are optional runtime integration.",
+      "consumer_evidence": "Animation scheduler tests exercise registration, time sampling, visibility, and App attachment.",
+      "promotion_condition": "Independent applications and native terminal validation establish the lifecycle and timing contract.",
+      "sunset_condition": "Review the scheduling interface after application adoption; keep it optional."
+    },
+    {
+      "id": "core-glyph-capability-experimental",
+      "match": {"package": "core", "symbols": ["GlyphCapability", "GlyphCapabilityProvider", "UnknownGlyphCapabilityProvider", "GlyphCapabilitySession"]},
+      "stability": "EXPERIMENTAL", "subsystem": "terminal", "owner": "core/terminal",
+      "reason": "Font capability negotiation depends on an application-supplied trusted provider and has no universal terminal probe.",
+      "consumer_evidence": "Glyph capability tests cover overrides, fallback, provider completion, and App integration.",
+      "promotion_condition": "Independent terminal environments and applications validate the conservative detection contract.",
+      "sunset_condition": "Review this optional negotiation surface when terminal font detection evidence changes."
+    },
+    {
+      "id": "core-styled-widget-experimental",
+      "match": {"package": "core", "symbols": ["StyledWidget"]},
+      "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets",
+      "reason": "Scoped widget-wide style overrides are optional composition machinery over stable attribute overrides.",
+      "consumer_evidence": "Styled widget tests cover nested overrides, clipping, cleanup, and media exclusion.",
+      "promotion_condition": "Independent applications validate the composition and interaction contract.",
+      "sunset_condition": "Review the wrapper after application adoption while preserving the stable style override values."
+    },
+    {
+      "id": "core-visual-runtime-attachment-experimental",
+      "match": {"package": "core", "qualified_symbols": ["App.attachAnimationScheduler", "App.attachGlyphCapabilitySession"]},
+      "stability": "EXPERIMENTAL", "subsystem": "runtime", "owner": "core/runtime",
+      "reason": "Explicit optional attachment methods expose experimental animation and glyph negotiation lifecycles.",
+      "consumer_evidence": "Animation scheduler and glyph capability tests exercise App attachment.",
+      "promotion_condition": "The attached lifecycles and their application integration are validated by independent consumers.",
+      "sunset_condition": "Review each attachment with its corresponding optional capability."
+    },
+    {
+      "id": "core-canvas-create-surface-experimental",
+      "match": {"package": "core", "qualified_symbols": ["Canvas.createSurface"]},
+      "stability": "EXPERIMENTAL", "subsystem": "render", "owner": "core/render",
+      "reason": "Creating an optional Surface exposes the existing experimental surface composition policy.",
+      "consumer_evidence": "Surface context tests exercise creation, inherited theme, and composition.",
+      "promotion_condition": "Independent applications validate the Surface lifecycle and composition contract.",
+      "sunset_condition": "Review together with the experimental Surface type."
+    },
+    {
+      "id": "diff-view-styles-experimental",
+      "match": {"package": "diff", "symbols": ["DiffViewStyles"]},
+      "stability": "EXPERIMENTAL", "subsystem": "optional_extension", "owner": "packages/diff",
+      "reason": "Diff presentation style overrides extend the optional experimental DiffView.",
+      "consumer_evidence": "Diff theme tests exercise inherited and explicit line styles.",
+      "promotion_condition": "Independent applications validate the diff rendering style contract.",
+      "sunset_condition": "Review alongside the optional DiffView API."
+    },
+    {
+      "id": "markdown-themed-view-experimental",
+      "match": {"package": "markdown_adapter", "symbols": ["documentThemeFromTheme", "ThemedMarkdownView"]},
+      "stability": "EXPERIMENTAL", "subsystem": "optional_extension", "owner": "packages/markdown_adapter",
+      "reason": "Theme-aware Markdown presentation remains optional adapter functionality.",
+      "consumer_evidence": "Markdown adapter theme and themed view tests exercise document styles and interaction.",
+      "promotion_condition": "Independent applications validate the Markdown adapter presentation contract.",
+      "sunset_condition": "Review with the optional Markdown adapter API."
+    },
     {"id": "core-task-activity", "match": {"package": "core", "symbols": ["TaskStatus", "TaskProgress", "TaskActivityLayout", "TaskActivity", "TaskActivityView", "TaskActivityListEntry", "TaskActivityList"]}, "stability": "EXPERIMENTAL", "subsystem": "widgets", "owner": "core/widgets", "reason": "Immediate task activity presentation accepts caller-owned state and supports individual or count-based progress without owning a runtime.", "consumer_evidence": "The CI activity example exercises both progress forms and the component has public rendering tests.", "promotion_condition": "Independent consumers validate the task presentation contract and native terminal behavior.", "sunset_condition": "Review with the experimental widget family if no independent consumers adopt it."},
     {"id": "v001-text-model", "match": {"package": "core", "symbols": ["TextModel", "EditableTextModel", "TextModelMetrics", "PieceTableTextModel", "TextEditDelta", "TextDecorationProvider", "TextDecorationUpdate", "TextDecorationStore"]}, "stability": "STABLE", "subsystem": "editor", "owner": "core/editor", "reason": "The 0.0.1 TextArea/TextBuffer contract explicitly exposes the replaceable indexed model and revisioned decorations; deterministic editing/history tests define the new boundary.", "consumer_evidence": "0.0.1 integration tests and real example/downstream adoption; see docs/migration-0.0.1.md."},
     {"id": "v001-clipboard-values", "match": {"package": "core", "symbols": ["ClipboardStatus", "ClipboardResult", "ClipboardCapabilities", "ClipboardCommandResult", "ClipboardCommandRunner"]}, "stability": "STABLE", "subsystem": "editor", "owner": "core/editor", "reason": "Clipboard capability and bounded command results are platform-neutral values exposed by the stable Clipboard interface.", "consumer_evidence": "0.0.1 integration tests and real example/downstream adoption; see docs/migration-0.0.1.md."},

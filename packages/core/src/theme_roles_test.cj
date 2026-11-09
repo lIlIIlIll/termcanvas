@@ -6,16 +6,34 @@ import std.unittest.testmacro.*
 @Test
 class ThemeRolesTest {
     @TestCase
-    func defaultsRespectTerminalColorsAndDistinguishSelectionFromFocus(): Unit {
+    func defaultIndigoThemeProvidesLayeredSurfacesAndDistinctStates(): Unit {
         let theme = Theme()
-        @Expect(theme.normal, Style.default())
-        @Expect(theme.canvas, Style.default())
-        @Expect(theme.surface, Style.default())
-        @Expect(theme.raisedSurface, Style.default())
-        @Expect(theme.focused, Style(modifier: focusModifierForTest()))
-        @Expect(theme.selected, Style(bg: Color.Indexed(8), modifier: Modifier.strong()))
-        @Expect(theme.serialize().contains("info=style\ncanvas=default"), true)
+        let fg = Color.Rgb(225, 226, 235)
+        let background = Color.Rgb(19, 20, 34)
+        @Expect(theme.normal, Style(fg: fg, bg: background))
+        @Expect(theme.canvas, Style(fg: fg, bg: background))
+        @Expect(theme.surface, Style(fg: fg, bg: Color.Rgb(26, 27, 44)))
+        @Expect(theme.raisedSurface, Style(fg: fg, bg: Color.Rgb(36, 38, 57)))
+        @Expect(theme.focused, Style(fg: fg, bg: Color.Rgb(54, 50, 61), modifier: focusModifierForTest()))
+        @Expect(theme.selected, Style(fg: fg, bg: Color.Rgb(42, 44, 63), modifier: Modifier.strong()))
+        @Expect(theme.accent, Style(fg: Color.Rgb(244, 187, 96), bg: background))
+        @Expect(Theme.default().normal, theme.normal)
+        @Expect(Theme.indigo().accent, theme.accent)
+        @Expect(theme.serialize().contains("info=style\ncanvas=style"), true)
         @Expect(theme.serialize().contains("iconSet=unicode"), true)
+    }
+
+    @TestCase
+    func terminalBackgroundCanBeRequestedWithoutDroppingForegroundOrState(): Unit {
+        let theme = Theme()
+        let terminal = theme.withTerminalBackground()
+        @Expect(terminal.canvas, theme.canvas.withBg(Color.Reset))
+        @Expect(terminal.surface, theme.surface.withBg(Color.Reset))
+        @Expect(terminal.raisedSurface, theme.raisedSurface.withBg(Color.Reset))
+        @Expect(terminal.focused, theme.focused.withBg(Color.Reset))
+        @Expect(terminal.selected, theme.selected.withBg(Color.Reset))
+        @Expect(terminal.error, theme.error.withBg(Color.Reset))
+        @Expect(theme.canvas, Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)))
     }
 
     @TestCase
@@ -25,6 +43,15 @@ class ThemeRolesTest {
         selected.reversed = true
         @Expect(theme.selected, Style(modifier: selected))
         @Expect(theme.focused, Style(modifier: focusModifierForTest()))
+        var error = Modifier()
+        error.italic = true
+        @Expect(theme.error, Style(modifier: error))
+        var combined = Modifier.strong()
+        combined.reversed = true
+        combined.underline = true
+        combined.italic = true
+        @Expect(theme.resolveState(focused: true, selected: true, error: true), Style(modifier: combined))
+        @Expect(theme.resolveState(focused: true, selected: true, error: true, disabled: true), theme.disabled)
     }
 
     @TestCase

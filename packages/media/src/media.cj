@@ -288,17 +288,19 @@ public class AsciiAnimationView <: Widget {
     private let zoom: Int64
     private let paused: Bool
     private let block: ?Block
-    private let style: Style
-    private let pausedStyle: Style
+    private let style: ?Style
+    private let pausedStyle: ?Style
 
+    /** 创建动画视图；经过时间下限为 0，缩放倍数限制在 1 到 4。未指定样式时使用应用主题的普通或警告角色，无主题时使用原有白色或黄色；显式样式和帧内颜色优先。
+     */
     public init(
         animation: AsciiAnimation,
         elapsedMillis!: Int64 = 0,
         zoom!: Int64 = 1,
         paused!: Bool = false,
         block!: ?Block = None,
-        style!: Style = Style(fg: Color.White),
-        pausedStyle!: Style = Style(fg: Color.Yellow)
+        style!: ?Style = None,
+        pausedStyle!: ?Style = None
     ) {
         this.animation = animation
         this.elapsedMillis = max(0, elapsedMillis)
@@ -318,7 +320,14 @@ public class AsciiAnimationView <: Widget {
         if (target.width <= 0 || target.height <= 0) { return }
         let canvas = Canvas(buffer, target)
         let frame = animation.frameAtElapsed(elapsedMillis)
-        let rowStyle = if (paused) { pausedStyle } else { style }
+        let explicit = if (paused) { pausedStyle } else { style }
+        let rowStyle = match (explicit) {
+            case Some(value) => value
+            case None => match (buffer.resolveTheme(Option<Theme>.None)) {
+                case Some(theme) => if (paused) { theme.warning } else { theme.normal }
+                case None => if (paused) { Style(fg: Color.Yellow) } else { Style(fg: Color.White) }
+            }
+        }
         var outY: Int64 = 0
         for (sourceY in 0..frame.lines.size) {
             if (outY >= target.height) { break }
@@ -328,7 +337,7 @@ public class AsciiAnimationView <: Widget {
                 if (frame.hasColors()) {
                     renderColoredAsciiLine(canvas, target.x, target.y + outY, line, frame, sourceY, zoom, target.width, rowStyle)
                 } else {
-                    let rendered = zoomAsciiLine(line, zoom, target.width)
+                    let rendered = zoomAsciiLine(line, zoom, target.width, options: canvas.textWidthOptions())
                     canvas.drawText(target.x, target.y + outY, rendered, rowStyle)
                 }
                 outY++
@@ -654,12 +663,12 @@ func runeCount(text: String): Int64 {
     count
 }
 
-func zoomAsciiLine(line: String, zoom: Int64, maxWidth: Int64): String {
+func zoomAsciiLine(line: String, zoom: Int64, maxWidth: Int64, options!: TextWidthOptions = TextWidthOptions()): String {
     if (maxWidth <= 0) { return "" }
-    if (zoom <= 1) { return truncateAscii(line, maxWidth) }
+    if (zoom <= 1) { return truncateAscii(line, maxWidth, options: options) }
     let builder = StringBuilder()
     var cells: Int64 = 0
-    for (cluster in graphemeClusters(line)) {
+    for (cluster in graphemeClusters(line, options: options)) {
         if (cluster.width <= 0) { continue }
         for (_ in 0..zoom) {
             if (cluster.width > maxWidth - cells) { return builder.toString() }
@@ -673,7 +682,7 @@ func zoomAsciiLine(line: String, zoom: Int64, maxWidth: Int64): String {
 func renderColoredAsciiLine(canvas: Canvas, x: Int64, y: Int64, line: String, frame: AsciiFrame, sourceY: Int64, zoom: Int64, maxWidth: Int64, baseStyle: Style): Unit {
     var outX: Int64 = 0
     var sourceX: Int64 = 0
-    for (cluster in graphemeClusters(line)) {
+    for (cluster in graphemeClusters(line, options: canvas.textWidthOptions())) {
         if (cluster.width <= 0) { continue }
         for (_ in 0..zoom) {
             if (cluster.width > maxWidth - outX) { return }
@@ -705,8 +714,8 @@ func joinLocal(parts: Array<String>, sep: String): String {
     builder.toString()
 }
 
-func truncateAscii(text: String, maxWidth: Int64): String {
-    graphemePrefix(text, max(0, maxWidth))
+func truncateAscii(text: String, maxWidth: Int64, options!: TextWidthOptions = TextWidthOptions()): String {
+    graphemePrefix(text, max(0, maxWidth), options: options)
 }
 
 func colorEqualsLocal(a: Color, b: Color): Bool {

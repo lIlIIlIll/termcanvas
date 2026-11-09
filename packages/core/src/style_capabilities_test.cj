@@ -60,8 +60,8 @@ class StyleCapabilitiesTest {
             Style(fg: Color.Indexed(240))
         )
 
-        let ansi8 = adaptStyleForCapabilities(rgb, TerminalCapabilities(trueColor: false, colorLevel: 16))
-        @Expect(ansi8, Style(fg: Color.Cyan, bg: Color.Black, modifier: modifier))
+        let ansi16 = adaptStyleForCapabilities(rgb, TerminalCapabilities(trueColor: false, colorLevel: 16))
+        @Expect(ansi16, Style(fg: Color.Indexed(8), bg: Color.Indexed(0), modifier: modifier))
         @Expect(
             Style(fg: adaptStyleForCapabilities(
                 Style(fg: Color.Indexed(67)),
@@ -78,7 +78,9 @@ class StyleCapabilitiesTest {
             accent: Color.Red
         )
         @Expect(monoTheme.normal, Style.default())
-        @Expect(monoTheme.focused.modifier, Modifier.strong())
+        var monoFocus = Modifier.strong()
+        monoFocus.underline = true
+        @Expect(monoTheme.focused.modifier, monoFocus)
     }
 
     @TestCase
@@ -90,11 +92,12 @@ class StyleCapabilitiesTest {
         @Assert(xtermText.contains("48;5;0"))
         @Assert(!xtermText.contains(";2;"))
 
-        let ansi8Text = capabilityAnsiText(adaptStyleForCapabilities(
-            source, TerminalCapabilities(trueColor: false, colorLevel: 16)))
-        @Assert(ansi8Text.contains("36"))
-        @Assert(!ansi8Text.contains(";5;"))
-        @Assert(!ansi8Text.contains(";2;"))
+        let ansi16Text = capabilityAnsiText(source,
+            capabilities: TerminalCapabilities(trueColor: false, colorLevel: 16))
+        @Assert(ansi16Text.contains("\u{1B}[90m"))
+        @Assert(ansi16Text.contains("\u{1B}[40m"))
+        @Assert(!ansi16Text.contains(";5;"))
+        @Assert(!ansi16Text.contains(";2;"))
 
         let monoText = capabilityAnsiText(adaptStyleForCapabilities(
             source, TerminalCapabilities(trueColor: false, colorLevel: 1)))
@@ -150,6 +153,7 @@ class StyleCapabilitiesTest {
         @Expect(disabledBuffer.getCell(0, 0).style, theme.disabled)
         var errorCombined = Modifier()
         errorCombined.bold = true
+        errorCombined.italic = true
         errorCombined.underline = true
         errorCombined.reversed = true
         let errorOverridesSelected = resolvedSemanticStateStyle(
@@ -254,10 +258,11 @@ class StyleCapabilitiesTest {
     }
 }
 
-private func capabilityAnsiText(style: Style): String {
+private func capabilityAnsiText(style: Style, capabilities!: TerminalCapabilities = TerminalCapabilities()): String {
     let output = TestOutput()
     let backend = AnsiBackend(output: output, fallbackArea: Rect(0, 0, 1, 1))
     let buffer = Buffer(Rect(0, 0, 1, 1))
+    buffer.setCapabilities(capabilities)
     buffer.setString(0, 0, "x", style: style)
     backend.draw(buffer)
     output.text()

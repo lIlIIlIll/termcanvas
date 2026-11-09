@@ -603,7 +603,7 @@ public class SpriteRenderer {
 
     private func drawSpriteRow(canvas: Canvas, x: Int64, y: Int64, row: String, sprite: Sprite2D): Unit {
         var cx = x
-        for (cluster in graphemeClusters(row)) {
+        for (cluster in graphemeClusters(row, options: canvas.textWidthOptions())) {
             if (cluster.text != sprite.transparent) {
                 canvas.drawText(cx, y, cluster.text, sprite.style)
             }
@@ -617,12 +617,16 @@ public class TileMap {
     public let height: Int64
     private let rows: Array<String>
     private let solidSymbol: String
+    private let widthOptions: TextWidthOptions
 
-    public init(rows: Array<String>, solidSymbol!: String = "#") {
+    /** 保存给定的地图行，以行数作为高度、按 widthOptions 测得的最长行宽作为宽度，并设置用于判断实心格的符号。查询与碰撞使用同一宽度策略；默认将宽度不确定的字符视为单列。
+     */
+    public init(rows: Array<String>, solidSymbol!: String = "#", widthOptions!: TextWidthOptions = TextWidthOptions()) {
         this.rows = rows
         this.height = rows.size
-        this.width = maxLineWidth(rows)
+        this.width = maxLineWidth(rows, options: widthOptions)
         this.solidSymbol = solidSymbol
+        this.widthOptions = widthOptions
     }
 
     public func isSolid(x: Int64, y: Int64): Bool {
@@ -631,7 +635,7 @@ public class TileMap {
 
     public func tileAt(x: Int64, y: Int64): String {
         if (x < 0 || y < 0 || y >= rows.size) { return "" }
-        symbolAt(rows[y], x)
+        symbolAt(rows[y], x, options: widthOptions)
     }
 
     public func find(symbol: String): Array<TileMarker> {
@@ -674,15 +678,30 @@ public class TileMap {
         out.toArray()
     }
 
-    public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style = Style(fg: Color.White)): Unit {
+    /** 将地图中非空且非空格的符号绘制到缓冲区的指定区域；绘制坐标按相机原点的取整格坐标偏移，并加上视口偏移。绘制使用目标缓冲区的文本宽度策略；若游戏坐标需要与显示一致，构造时传入相同的宽度策略。
+     */
+    public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style): Unit {
+        render(area, buffer, camera: camera, style: Some(style))
+    }
+
+    public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit {
         let canvas = Canvas(buffer, area)
+        let resolvedStyle = match (style) {
+            case Some(value) => value
+            case None => match (buffer.resolveTheme(Option<Theme>.None)) {
+                case Some(theme) => theme.normal
+                case None => Style(fg: Color.White)
+            }
+        }
         for (y in 0..height) {
             let screenY = y - roundCell(camera.origin.y) + camera.viewport.y
-            for (x in 0..width) {
-                let symbol = symbolAt(rows[y], x)
-                if (!symbol.isEmpty() && symbol != " ") {
-                    canvas.drawText(x - roundCell(camera.origin.x) + camera.viewport.x, screenY, symbol, style)
+            var x: Int64 = 0
+            for (cluster in graphemeClusters(rows[y], options: canvas.textWidthOptions())) {
+                if (cluster.width <= 0) { continue }
+                if (cluster.text != " ") {
+                    canvas.drawText(x - roundCell(camera.origin.x) + camera.viewport.x, screenY, cluster.text, resolvedStyle)
                 }
+                x += cluster.width
             }
         }
     }
@@ -840,17 +859,17 @@ func sameKeyCode(left: KeyCode, right: KeyCode): Bool {
     }
 }
 
-func maxLineWidth(rows: Array<String>): Int64 {
+func maxLineWidth(rows: Array<String>, options!: TextWidthOptions = TextWidthOptions()): Int64 {
     var width: Int64 = 0
     for (row in rows) {
-        width = max(width, displayWidth(row))
+        width = max(width, displayWidth(row, options: options))
     }
     width
 }
 
-func symbolAt(row: String, x: Int64): String {
+func symbolAt(row: String, x: Int64, options!: TextWidthOptions = TextWidthOptions()): String {
     var cx: Int64 = 0
-    for (cluster in graphemeClusters(row)) {
+    for (cluster in graphemeClusters(row, options: options)) {
         if (cluster.width <= 0) { continue }
         if (cx == x) { return cluster.text }
         cx += cluster.width

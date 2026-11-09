@@ -24,7 +24,9 @@ Switch toggles on/off with Space, Enter, or a first-row left click and keeps a
 visible value synchronized across the supported terminal sizes.
 Its Button row maps Primary to accent, Secondary to surface, Ghost to normal,
 and Danger to error styles. The live editor remains separate from static state
-previews.
+previews. A themed `Button` with an empty normal style uses a raised surface and
+brackets when space permits. Call `setGhost(true)` to use its borderless normal
+style instead.
 
 Navigation includes an experimental `SegmentedControl` for Compact, Normal,
 and Comfortable density. Left/Right and Home/End update selection; clicking

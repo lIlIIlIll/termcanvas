@@ -95,6 +95,7 @@ public class TerminalScreen {
     public let cols: Int64
     public let rows: Int64
     private let buffer: Buffer
+    private let widthOptions: TextWidthOptions
     private var cursorX: Int64 = 0
     private var cursorY: Int64 = 0
     private var style: Style = Style.default()
@@ -103,10 +104,27 @@ public class TerminalScreen {
     private var lastGlyphX: Int64 = -1
     private var lastGlyphY: Int64 = -1
 
-    public init(cols!: Int64 = 80, rows!: Int64 = 24) {
+    /** 创建画面；行列至少为 1。文本宽度策略须在 feed 前指定，默认使用窄宽度。
+     * 策略不可更改：切换时应创建新画面并重放完整输入，已有单元格不能无损重建。
+     */
+    public init(cols!: Int64 = 80, rows!: Int64 = 24, textWidthOptions!: TextWidthOptions = TextWidthOptions()) {
         this.cols = max(1, cols)
         this.rows = max(1, rows)
         buffer = Buffer(Rect(0, 0, this.cols, this.rows))
+        this.widthOptions = textWidthOptions
+        buffer.setTextWidthOptions(textWidthOptions)
+    }
+
+    /** 返回画面建立时确定的文本宽度策略。 */
+    public func textWidthOptions(): TextWidthOptions { widthOptions }
+
+    /** 判断目标文本宽度策略能否直接复制此画面。 */
+    public func matchesTextWidthOptions(options: TextWidthOptions): Bool {
+        match ((widthOptions.ambiguousWidth, options.ambiguousWidth)) {
+            case (AmbiguousWidth.Narrow, AmbiguousWidth.Narrow) => true
+            case (AmbiguousWidth.Wide, AmbiguousWidth.Wide) => true
+            case _ => false
+        }
     }
 
     public func cell(x: Int64, y: Int64): Cell {
@@ -129,7 +147,12 @@ public class TerminalScreen {
         }
     }
 
+    /** 将画面左上角起的内容复制到目标缓冲区；目标宽度策略不同时抛出 IllegalArgumentException。
+     */
     public func render(area: Rect, target: Buffer): Unit {
+        if (!matchesTextWidthOptions(target.textWidthOptions())) {
+            throw IllegalArgumentException("TerminalScreen text width policy differs from target; create a new screen and replay input")
+        }
         let width = min(area.width, cols)
         let height = min(area.height, rows)
         target.blitFrom(buffer, Rect(0, 0, width, height), area.x, area.y)
@@ -180,21 +203,21 @@ public class TerminalScreen {
             // extensions (combining marks, ZWJ, RI pairs) must not advance as
             // independent cells or trigger a pending wrap.
             if (nextGraphemeOffset(joined, 0) == joined.size) {
-                let width = displayWidth(joined)
+                let width = displayWidth(joined, options: widthOptions)
                 if (width <= cols - lastGlyphX) {
                     buffer.setString(lastGlyphX, lastGlyphY, joined, style: previous.style)
                     cursorX = min(cols - 1, lastGlyphX + width)
                     wrapPending = lastGlyphX + width >= cols
                 } else {
                     // A cluster can grow from one cell to two on a later feed.
-                    buffer.fill(Rect(lastGlyphX, lastGlyphY, displayWidth(previous.symbol), 1), Cell(" ", style: previous.style))
+                    buffer.fill(Rect(lastGlyphX, lastGlyphY, displayWidth(previous.symbol, options: widthOptions), 1), Cell(" ", style: previous.style))
                     newline()
                     writeGlyph(joined, width, previous.style)
                 }
                 return
             }
         }
-        let width = displayWidth(part)
+        let width = displayWidth(part, options: widthOptions)
         if (width <= 0) { lastGlyphX = -1; return }
         if (wrapPending || width > cols - cursorX) { newline() }
         writeGlyph(part, width, style)
@@ -320,8 +343,9 @@ public class TerminalTranscript {
     public let maxChunks: Int64
     public var followTail: Bool
 
-    public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true) {
-        screen = TerminalScreen(cols: cols, rows: rows)
+    public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true,
+        textWidthOptions!: TextWidthOptions = TextWidthOptions()) {
+        screen = TerminalScreen(cols: cols, rows: rows, textWidthOptions: textWidthOptions)
         this.maxChunks = max(1, maxChunks)
         this.followTail = followTail
     }
@@ -341,24 +365,50 @@ public class TerminalView <: Widget {
     private let transcript: TerminalTranscript
     private let block: ?Block
     private let search: String
+    private let searchStyle: ?StyleOverride
+    private let theme: ?Theme
 
-    public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "") {
+    /** 创建终端视图。默认搜索样式继承上下文选中背景并添加下划线；显式搜索样式按属性覆盖 ANSI 样式。
+     */
+    public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "",
+        searchStyle!: ?StyleOverride = None, theme!: ?Theme = None) {
         this.transcript = transcript
         this.block = block
         this.search = search
+        this.searchStyle = searchStyle
+        this.theme = theme
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        if (!transcript.screen.matchesTextWidthOptions(buffer.textWidthOptions())) {
+            throw IllegalArgumentException("TerminalScreen text width policy differs from target; create a new screen and replay input")
+        }
         var target = area
         if (let Some(b) <- block) {
-            b.render(area, buffer)
+            buffer.withParentTheme(theme) { => b.render(area, buffer) }
             target = b.inner(area)
         }
         transcript.screen.render(target, buffer)
-        renderSearch(target, buffer)
+        renderSearch(target, buffer, buffer.resolveTheme(theme))
     }
 
-    private func renderSearch(area: Rect, buffer: Buffer): Unit {
+    private func highlight(original: Style, resolvedTheme: ?Theme): Style {
+        if (let Some(explicit) <- searchStyle) { return explicit.apply(original) }
+        let background = match (resolvedTheme) {
+            case Some(t) => t.selected.bg
+            case None => Color.Yellow
+        }
+        var result = original
+        if (Style(fg: background) != Style(fg: Color.Reset) && Style(fg: background) != Style(fg: original.fg)) {
+            result.bg = background
+        }
+        var modifier = result.modifier
+        modifier.underline = true
+        result.modifier = modifier
+        result
+    }
+
+    private func renderSearch(area: Rect, buffer: Buffer, resolvedTheme: ?Theme): Unit {
         if (search.isEmpty()) { return }
         for (row in 0..min(area.height, transcript.screen.rows)) {
             var line = ""
@@ -384,7 +434,7 @@ public class TerminalView <: Widget {
                     let width: Int64 = match (original.kind) { case CellKind.WideLead => 2; case _ => 1 }
                     if (width <= area.width - x) {
                         // setString updates a wide lead and its continuation atomically.
-                        buffer.setString(area.x + x, area.y + row, original.symbol, style: original.style.withBg(Color.Yellow))
+                        buffer.setString(area.x + x, area.y + row, original.symbol, style: highlight(original.style, resolvedTheme))
                     }
                 }
                 start = found + max(1, search.size)

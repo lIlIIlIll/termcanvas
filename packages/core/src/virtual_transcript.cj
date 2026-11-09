@@ -2,6 +2,38 @@ package core
 
 import std.collection.*
 
+// Do not use Theme.serialize() as a cache identity: it is a presentation
+// format and distinct style values may serialize identically.
+func transcriptThemeEqual(left: ?Theme, right: ?Theme): Bool {
+    match ((left, right)) {
+        case (None, None) => true
+        case (Some(a), Some(b)) =>
+            let icons = match ((a.iconSet, b.iconSet)) {
+                case (IconSet.Unicode, IconSet.Unicode) | (IconSet.Ascii, IconSet.Ascii) | (IconSet.NerdFont, IconSet.NerdFont) => true
+                case _ => false
+            }
+            let border = match ((a.borderKind, b.borderKind)) {
+                case (BorderKind.Auto, BorderKind.Auto) | (BorderKind.Ascii, BorderKind.Ascii) |
+                    (BorderKind.Unicode, BorderKind.Unicode) | (BorderKind.Rounded, BorderKind.Rounded) |
+                    (BorderKind.Double, BorderKind.Double) | (BorderKind.Dashed, BorderKind.Dashed) |
+                    (BorderKind.NoBorder, BorderKind.NoBorder) => true
+                case _ => false
+            }
+            let symbols = match ((a.progressSymbols, b.progressSymbols)) {
+                case (None, None) => true
+                case (Some(x), Some(y)) => x.isAutomatic() == y.isAutomatic() && x.serialize() == y.serialize()
+                case _ => false
+            }
+            icons && border && symbols && a.normal == b.normal && a.focused == b.focused &&
+                a.selected == b.selected && a.disabled == b.disabled && a.error == b.error &&
+                a.accent == b.accent && a.success == b.success && a.warning == b.warning &&
+                a.info == b.info && a.canvas == b.canvas && a.surface == b.surface &&
+                a.raisedSurface == b.raisedSurface && a.heading == b.heading &&
+                a.secondary == b.secondary && a.border == b.border && a.strongBorder == b.strongBorder
+        case _ => false
+    }
+}
+
 // An immutable snapshot for sources whose plain-text body only grows within
 // one append epoch.  The source still owns revision/generation changes; the
 // view owns grapheme-aware wrapping and may retain already-stable visual rows.
@@ -59,7 +91,15 @@ public interface VirtualTranscriptSource {
         _: Int64,
         _: String
     ): ?VirtualTranscriptAppendOnlyText { None }
+    /** 可使用当前应用主题创建追加文本；默认保留原有来源提供的样式。 */
+    func itemAppendOnlyTextWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): ?VirtualTranscriptAppendOnlyText {
+        itemAppendOnlyText(index, width, themeKey)
+    }
     func document(index: Int64, width: Int64, themeKey: String): Document
+    /** 可使用应用主题创建文档；默认保留原有 document 返回的已着色内容。 */
+    func documentWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): Document {
+        document(index, width, themeKey)
+    }
     // Per-entry border theme; falls back to the view-wide card theme when
     // None, so hosts can color borders by card kind.
     func itemCardTheme(_: Int64): ?TranscriptCardTheme { None }
@@ -468,7 +508,10 @@ public class VirtualTranscriptView <: Widget {
     private var lastRenderArea = Rect(0, 0, 0, 0)
     private var cardChrome: Bool = false
     private var unicode: Bool = true
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private var cardTheme: TranscriptCardTheme = TranscriptCardTheme()
+    private var explicitCardTheme: Bool = false
+    private var contextTheme: ?Theme = None
     // Screen ranges of items rendered by the last render() call, in
     // transcript order: (itemId, topRow, bottomRow). Used by hosts for
     // hit-testing (e.g. clicking a collapsed tool card to expand it).
@@ -513,6 +556,20 @@ public class VirtualTranscriptView <: Widget {
     }
 
     public func setCardTheme(theme: TranscriptCardTheme): Unit {
+        explicitCardTheme = true
+        applyCardTheme(theme)
+    }
+
+    /** 清除视图级显式卡片主题，恢复应用主题或无主题时的原始默认主题。 */
+    public func clearCardTheme(): Unit {
+        explicitCardTheme = false
+        applyCardTheme(match (contextTheme) {
+            case Some(value) => applicationTranscriptCardTheme(value)
+            case None => TranscriptCardTheme()
+        })
+    }
+
+    private func applyCardTheme(theme: TranscriptCardTheme): Unit {
         let layoutChanged = cardTheme.fullFrame != theme.fullFrame ||
             cardTheme.fillBackground != theme.fillBackground ||
             cardTheme.contentPadding.left != theme.contentPadding.left ||
@@ -692,6 +749,21 @@ public class VirtualTranscriptView <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        let applicationTheme = buffer.resolveTheme(Option<Theme>.None)
+        if (!transcriptThemeEqual(contextTheme, applicationTheme)) {
+            contextTheme = applicationTheme
+            if (!explicitCardTheme) {
+                cardTheme = match (applicationTheme) {
+                    case Some(value) => applicationTranscriptCardTheme(value)
+                    case None => TranscriptCardTheme()
+                }
+            }
+            invalidateAllMeasurements()
+        }
+        if (usesWideAmbiguous(textWidthOptionsValue) != usesWideAmbiguous(buffer.textWidthOptions())) {
+            textWidthOptionsValue = buffer.textWidthOptions()
+            invalidateAllMeasurements()
+        }
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
 
@@ -802,7 +874,7 @@ public class VirtualTranscriptView <: Widget {
                             entry,
                             footer,
                             entryTheme,
-                            unicode,
+                            unicode && !usesWideAmbiguous(textWidthOptionsValue),
                             geometry
                         )
                         row++
@@ -823,7 +895,7 @@ public class VirtualTranscriptView <: Widget {
                         itemBackgroundAttempts = buffer.cellAttempts() - backgroundAttemptsBefore
                         itemBackgroundCellAttemptsValue += itemBackgroundAttempts
                     }
-                    let bodyRail = if (unicode) { "│ " } else { "|  " }
+                    let bodyRail = if (unicode && !usesWideAmbiguous(textWidthOptionsValue)) { "│ " } else { "|  " }
                     while (row < totalRows && out < available) {
                         let rowAttemptsBefore = if (instrumentationEnabled) { buffer.cellAttempts() } else { 0 }
                         if (row == 0) {
@@ -834,15 +906,15 @@ public class VirtualTranscriptView <: Widget {
                             // to fit the title; otherwise the final
                             // `running`, duration, or result suffix is
                             // clipped by the outer truncate call.
-                            let titleRail = if (unicode) { "╭─ " } else { "+- " }
+                            let titleRail = if (unicode && !usesWideAmbiguous(textWidthOptionsValue)) { "╭─ " } else { "+- " }
                             let title = source.itemTitleForWidth(
                                 index,
-                                max(1, area.width - displayWidth(titleRail))
+                                max(1, area.width - displayWidth(titleRail, options: buffer.textWidthOptions()))
                             )
                             buffer.setString(
                                 area.x,
                                 y + out,
-                                truncate(titleRail + title, area.width),
+                                truncate(titleRail + title, area.width, options: buffer.textWidthOptions()),
                                 style: entryTheme.topTitleStyle
                             )
                         } else if (row == totalRows - 1) {
@@ -850,12 +922,12 @@ public class VirtualTranscriptView <: Widget {
                             buffer.setString(
                                 area.x,
                                 y + out,
-                                truncate((if (unicode) { "╰─ " } else { "+- " }) + footer, area.width),
+                                truncate((if (unicode && !usesWideAmbiguous(textWidthOptionsValue)) { "╰─ " } else { "+- " }) + footer, area.width, options: buffer.textWidthOptions()),
                                 style: entryTheme.borderStyle
                             )
                         } else {
                             buffer.setString(area.x, y + out, bodyRail, style: entryTheme.borderStyle)
-                            renderStyledLine(buffer, area.x + (if (unicode) { 2 } else { 3 }), y + out, entry.rows[row - 1], area.width - (if (unicode) { 2 } else { 3 }))
+                            renderStyledLine(buffer, area.x + (if (unicode && !usesWideAmbiguous(textWidthOptionsValue)) { 2 } else { 3 }), y + out, entry.rows[row - 1], area.width - (if (unicode && !usesWideAmbiguous(textWidthOptionsValue)) { 2 } else { 3 }))
                         }
                         row++
                         out++
@@ -1094,14 +1166,14 @@ public class VirtualTranscriptView <: Widget {
             let chromeColumns = if (entry.fullFrame) {
                 2
             } else if (usesChrome) {
-                if (unicode) { 2 } else { 3 }
+                if (unicode && !usesWideAmbiguous(textWidthOptionsValue)) { 2 } else { 3 }
             } else {
                 0
             }
             // Providers still receive a usable measurement width when the
             // viewport has no body columns. Painting uses the actual width.
             let contentWidth = max(1, transcriptContentWidth(itemWidth, chromeColumns, entry.contentPadding))
-            match (source.itemAppendOnlyText(index, contentWidth, themeKey)) {
+            match (source.itemAppendOnlyTextWithTheme(index, contentWidth, themeKey, contextTheme)) {
                 case Some(snapshot) =>
                     let appendWrapWidth = max(1, snapshot.wrapWidth)
                     let incremental = sameLayoutIdentity &&
@@ -1121,7 +1193,7 @@ public class VirtualTranscriptView <: Widget {
                         layoutCallsValue++
                         wrapInputBytesValue += segment.size
                     }
-                    let wrapped = wrapText(segment, appendWrapWidth, WrapMode.Character)
+                    let wrapped = wrapText(segment, appendWrapWidth, WrapMode.Character, options: textWidthOptionsValue)
                     let nextRows = ArrayList<StyledLine>()
                     if (incremental) {
                         for (row in 0..min(entry.appendStableRows, entry.rows.size)) {
@@ -1160,13 +1232,15 @@ public class VirtualTranscriptView <: Widget {
                     entry.appendStyle = Style.default()
                     entry.appendWrapWidth = -1
                     if (instrumentationEnabled) { documentRequestsValue++ }
-                    entry.document = source.document(index, contentWidth, themeKey)
+                    entry.document = source.documentWithTheme(index, contentWidth, themeKey, contextTheme)
                     if (instrumentationEnabled) {
                         documentsMaterializedValue++
                         layoutCallsValue++
                         wrapInputBytesValue += documentInputBytes(entry.document)
                     }
-                    entry.rows = DocumentView(entry.document).layoutRows(contentWidth)
+                    let view = DocumentView(entry.document)
+                    view.setTextWidthOptions(textWidthOptionsValue)
+                    entry.rows = view.layoutRows(contentWidth)
                     if (instrumentationEnabled) { layoutRowsRequestedValue += max(1, entry.rows.size) }
             }
             if (entry.fullFrame) {
@@ -1286,7 +1360,7 @@ func renderFullFrameRow(
         buffer.setString(
             geometry.contentX,
             y,
-            truncate(footer, geometry.contentWidth),
+            truncate(footer, geometry.contentWidth, options: buffer.textWidthOptions()),
             style: theme.mutedStyle
         )
     }
@@ -1322,7 +1396,7 @@ func renderFrameRuleLabel(
     label: Array<RichSpan>,
     borderStyle: Style
 ): Unit {
-    let textWidth = displayWidth(spansText(label))
+    let textWidth = displayWidth(spansText(label), options: buffer.textWidthOptions())
     if (textWidth <= 0 || width < 7) { return }
     let available = max(1, width - 6)
     buffer.setString(x + 3, y, " ", style: borderStyle)

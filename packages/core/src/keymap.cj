@@ -65,7 +65,7 @@ public class HelpView <: Widget {
             parts.add(keyLabel(binding.keys) + ": " + desc)
         }
         let text = join(parts.toArray(), separator)
-        buffer.setString(area.x, area.y, truncate(text, area.width), style: style)
+        buffer.setString(area.x, area.y, truncate(text, area.width, options: buffer.textWidthOptions()), style: style)
     }
 }
 

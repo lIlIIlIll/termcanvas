@@ -54,6 +54,7 @@ public class TranscriptCardTheme {
     public let fullFrame: Bool
     public let fillBackground: Bool
     public let contentPadding: Spacing
+    let semanticTheme: ?Theme
 
     public init(
         style!: Style = Style.default(),
@@ -67,7 +68,8 @@ public class TranscriptCardTheme {
         topTitleStyle!: Style = Style(modifier: Modifier.strong()),
         fullFrame!: Bool = false,
         fillBackground!: Bool = false,
-        contentPadding!: Spacing = Spacing.zero()
+        contentPadding!: Spacing = Spacing.zero(),
+        semanticTheme!: ?Theme = None
     ) {
         this.style = style
         this.titleStyle = titleStyle
@@ -81,7 +83,17 @@ public class TranscriptCardTheme {
         this.fullFrame = fullFrame
         this.fillBackground = fillBackground
         this.contentPadding = contentPadding
+        this.semanticTheme = semanticTheme
     }
+}
+
+// Preserve the source's card geometry while mapping the default palette to
+// application roles. Explicit card themes remain fully caller-owned.
+func applicationTranscriptCardTheme(theme: Theme, style!: Style = Style.default()): TranscriptCardTheme {
+    TranscriptCardTheme(style: theme.normal.patch(style), titleStyle: theme.heading,
+        mutedStyle: theme.secondary, selectedStyle: theme.selected,
+        borderStyle: theme.border, borderBackground: theme.surface,
+        topTitleStyle: theme.heading, semanticTheme: Some(theme))
 }
 
 public class TranscriptItem {
@@ -166,18 +178,20 @@ public class TranscriptView <: Widget {
     public var offset: Int64
     public var selected: Int64
     private let block: ?Block
-    private let style: Style
-    private let selectedStyle: Style
+    private let style: ?Style
+    private let selectedStyle: ?Style
     private let cardTheme: TranscriptCardTheme
+    private let explicitCardTheme: Bool
     private var viewportWidth: Int64 = 0
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
 
     public init(
         transcript: Transcript,
         offset!: Int64 = 0,
         selected!: Int64 = 0,
         block!: ?Block = None,
-        style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
+        style!: ?Style = None,
+        selectedStyle!: ?Style = None,
         cardTheme!: ?TranscriptCardTheme = None
     ) {
         this.transcript = transcript
@@ -186,9 +200,10 @@ public class TranscriptView <: Widget {
         this.block = block
         this.style = style
         this.selectedStyle = selectedStyle
+        this.explicitCardTheme = cardTheme.isSome()
         this.cardTheme = match (cardTheme) {
             case Some(value) => value
-            case None => TranscriptCardTheme(style: style)
+            case None => TranscriptCardTheme(style: match (style) { case Some(value) => value; case None => Style.default() })
         }
     }
 
@@ -227,7 +242,20 @@ public class TranscriptView <: Widget {
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
+        let applicationTheme = buffer.resolveTheme(Option<Theme>.None)
+        let cardTheme = if (explicitCardTheme) { this.cardTheme } else {
+            match (applicationTheme) {
+                case Some(value) => applicationTranscriptCardTheme(value, style: match (style) { case Some(s) => s; case None => Style.default() })
+                case None => this.cardTheme
+            }
+        }
+        let selection = if (explicitCardTheme) {
+            match (selectedStyle) { case Some(value) => value; case None => cardTheme.selectedStyle }
+        } else {
+            widgetRoleStyle(selectedStyle, applicationTheme, ThemeRole.Selected, Style(fg: Color.Black, bg: Color.White))
+        }
         viewportWidth = target.width
+        textWidthOptionsValue = buffer.textWidthOptions()
         ensureTranscriptVisible(target.height)
         var y = target.y
         var index = offset
@@ -237,17 +265,27 @@ public class TranscriptView <: Widget {
                     let theme = if (index == selected) {
                         TranscriptCardTheme(
                             style: cardTheme.style,
-                            titleStyle: selectedStyle,
+                            titleStyle: selection,
                             mutedStyle: cardTheme.mutedStyle,
                             selectedStyle: cardTheme.selectedStyle,
                             bodyIndent: cardTheme.bodyIndent,
-                            bodyLimit: cardTheme.bodyLimit
+                            bodyLimit: cardTheme.bodyLimit,
+                            borderStyle: cardTheme.borderStyle, borderBackground: cardTheme.borderBackground,
+                            topTitleStyle: cardTheme.topTitleStyle, fullFrame: cardTheme.fullFrame,
+                            fillBackground: cardTheme.fillBackground, contentPadding: cardTheme.contentPadding,
+                            semanticTheme: cardTheme.semanticTheme
                         )
                     } else {
                         cardTheme
                     }
                     let document = transcriptCardDocument(item, theme: theme)
-                    let view = DocumentView(document, cacheLayout: true)
+                    let documentTheme: ?DocumentTheme = if (explicitCardTheme) {
+                        Some(DocumentTheme(paragraph: theme.style))
+                    } else {
+                        None
+                    }
+                    let view = DocumentView(document, theme: documentTheme, cacheLayout: true)
+                    view.setTextWidthOptions(textWidthOptionsValue)
                     let height = min(target.bottom - y, max(1, view.renderedLineCount(target.width)))
                     view.render(
                         Rect(target.x, y, target.width, height),
@@ -287,7 +325,9 @@ public class TranscriptView <: Widget {
             case Some(item) =>
                 let document = transcriptCardDocument(item, theme: cardTheme)
                 if (viewportWidth <= 0) { return max(1, document.lines.size) }
-                max(1, DocumentView(document).renderedLineCount(viewportWidth))
+                let view = DocumentView(document)
+                view.setTextWidthOptions(textWidthOptionsValue)
+                max(1, view.renderedLineCount(viewportWidth))
             case None => 0
         }
     }
@@ -332,6 +372,7 @@ public class Composer <: Widget {
     private var trackedValue: String
     private var visualScroll: Int64 = 0
     private let block: ?Block
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private var cachedWrapRevision: Int64 = -1
     private var cachedWrapWidth: Int64 = -1
     private var cachedWrapLines: Array<String> = []
@@ -479,6 +520,16 @@ public class Composer <: Widget {
     }
 
     public func render(areaRect: Rect, buffer: Buffer): Unit {
+        let theme = buffer.resolveTheme(Option<Theme>.None)
+        let normal = widgetRoleStyle(Option<Style>.None, theme, ThemeRole.Normal, Style.default())
+        let disabled = widgetRoleStyle(Option<Style>.None, theme, ThemeRole.Disabled, Style(fg: Color.Indexed(8)))
+        let errorStyle = widgetRoleStyle(Option<Style>.None, theme, ThemeRole.Error, Style(fg: Color.Red))
+        if (usesWideAmbiguous(textWidthOptionsValue) != usesWideAmbiguous(buffer.textWidthOptions())) {
+            cachedWrapRevision = -1
+            cachedCursorRevision = -1
+        }
+        textWidthOptionsValue = buffer.textWidthOptions()
+        area.setTextWidthOptions(textWidthOptionsValue)
         synchronizeAreaValue()
         var target = areaRect
         match (block) {
@@ -492,8 +543,8 @@ public class Composer <: Widget {
             buffer.setString(
                 target.x,
                 target.y,
-                truncate("message", target.width),
-                style: Style(fg: Color.Indexed(8))
+                truncate("message", target.width, options: buffer.textWidthOptions()),
+                style: disabled
             )
         } else {
             let lines = layoutLines(target.width)
@@ -504,7 +555,7 @@ public class Composer <: Widget {
                 buffer.setString(
                     target.x,
                     target.y + row,
-                    truncate(lines[index], target.width)
+                    truncate(lines[index], target.width, options: buffer.textWidthOptions()), style: normal
                 )
             }
         }
@@ -514,14 +565,14 @@ public class Composer <: Widget {
                     buffer.setString(
                         areaRect.x + 1,
                         areaRect.bottom - 1,
-                        truncate(message, max(0, areaRect.width - 2)),
-                        style: Style(fg: Color.Red)
+                        truncate(message, max(0, areaRect.width - 2), options: buffer.textWidthOptions()),
+                        style: errorStyle
                     )
                 }
             case None =>
                 let hints = currentSlashHints()
                 if (hints.size > 0 && areaRect.height > 1) {
-                    buffer.setString(areaRect.x + 1, areaRect.bottom - 1, truncate(join(hints, "  "), max(0, areaRect.width - 2)), style: Style(fg: Color.Indexed(8)))
+                    buffer.setString(areaRect.x + 1, areaRect.bottom - 1, truncate(join(hints, "  "), max(0, areaRect.width - 2), options: buffer.textWidthOptions()), style: disabled)
                 }
         }
         area.renderCompletionOverlay(target, buffer)
@@ -533,7 +584,7 @@ public class Composer <: Widget {
         if (cachedWrapRevision != revision || cachedWrapWidth != width) {
             cachedWrapRevision = revision
             cachedWrapWidth = width
-            cachedWrapLines = wrapText(area.value, width, WrapMode.Character)
+            cachedWrapLines = wrapText(area.value, width, WrapMode.Character, options: textWidthOptionsValue)
         }
         cachedWrapLines
     }
@@ -546,13 +597,13 @@ public class Composer <: Widget {
         let lines = if (area.cursor == area.value.size) {
             layoutLines(width)
         } else {
-            wrapText(area.value[..area.cursor], width, WrapMode.Character)
+            wrapText(area.value[..area.cursor], width, WrapMode.Character, options: textWidthOptionsValue)
         }
         cachedCursorRevision = revision
         cachedCursorWidth = width
         cachedCursorOffset = area.cursor
         cachedCursorRow = max(0, lines.size - 1)
-        cachedCursorColumn = if (lines.isEmpty()) { 0 } else { displayWidth(lines[lines.size - 1]) }
+        cachedCursorColumn = if (lines.isEmpty()) { 0 } else { displayWidth(lines[lines.size - 1], options: textWidthOptionsValue) }
         (cachedCursorRow, cachedCursorColumn)
     }
 
@@ -734,7 +785,7 @@ public class ActivityTimeline <: Widget {
             let step = steps[i]
             let suffix = if (step.duration.isEmpty()) { "" } else { " " + step.duration }
             let detail = if (step.detail.isEmpty()) { "" } else { " - " + step.detail }
-            buffer.setString(target.x, target.y + i, truncate(statusMark(step.status) + " " + step.title + detail + suffix, target.width), style: transcriptStatusStyle(step.status, Style.default()))
+            buffer.setString(target.x, target.y + i, truncate(statusMark(step.status) + " " + step.title + detail + suffix, target.width, options: buffer.textWidthOptions()), style: transcriptStatusStyle(step.status, Style.default(), theme: buffer.resolveTheme(Option<Theme>.None)))
         }
     }
 }
@@ -746,11 +797,11 @@ public class RequestDialog <: Widget {
     private let risk: String
     private let buttons: Array<String>
     public var selected: Int64
-    private let style: Style
-    private let selectedStyle: Style
+    private let style: ?Style
+    private let selectedStyle: ?Style
     private var theme: ?Theme = None
 
-    public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None) {
+    public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None) {
         this.title = title
         this.body = body
         this.detail = detail
@@ -780,10 +831,12 @@ public class RequestDialog <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
-        Dialog(title: title, body: if (risk.isEmpty()) { body } else { risk + "\n" + body }, buttons: buttons, selected: selected, style: style, selectedStyle: selectedStyle, theme: theme).render(area, buffer)
-        if (detail.lines.size > 0 && area.width > 10 && area.height > 10) {
-            let detailArea = Rect(area.x + area.width / 4, area.y + area.height / 2, area.width / 2, max(1, area.height / 3))
-            DocumentView(detail).render(detailArea, buffer)
+        buffer.withParentTheme(theme) { =>
+            Dialog(title: title, body: if (risk.isEmpty()) { body } else { risk + "\n" + body }, buttons: buttons, selected: selected, style: style, selectedStyle: selectedStyle, theme: theme).render(area, buffer)
+            if (detail.lines.size > 0 && area.width > 10 && area.height > 10) {
+                let detailArea = Rect(area.x + area.width / 4, area.y + area.height / 2, area.width / 2, max(1, area.height / 3))
+                DocumentView(detail).render(detailArea, buffer)
+            }
         }
     }
 }
@@ -830,6 +883,22 @@ func streamingStatusMark(frame: Int64): String {
 }
 
 public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style {
+    transcriptStatusStyle(status, base, theme: None)
+}
+
+/** 根据显式主题解析状态样式；未提供主题时沿用原有无主题行为。 */
+public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style {
+    match (theme) {
+        case Some(value) =>
+            return match (status) {
+                case TranscriptItemStatus.Pending => base.patch(value.disabled)
+                case TranscriptItemStatus.Queued | TranscriptItemStatus.Done | TranscriptItemStatus.Approved => base.patch(value.success)
+                case TranscriptItemStatus.Running | TranscriptItemStatus.Streaming => base.patch(value.accent)
+                case TranscriptItemStatus.Awaiting | TranscriptItemStatus.Cancelled | TranscriptItemStatus.Expired => base.patch(value.warning)
+                case TranscriptItemStatus.Failed | TranscriptItemStatus.Rejected | TranscriptItemStatus.TimedOut | TranscriptItemStatus.Conflict => base.patch(value.error)
+            }
+        case None => ()
+    }
     match (getVariable("NO_COLOR")) {
         case Some(_) => return base
         case None => ()
@@ -883,7 +952,7 @@ public func transcriptCardDocument(
     let header = ArrayList<RichSpan>()
     header.add(RichSpan(
         statusMark(item.status, activityFrame: item.activityFrame) + " ",
-        style: transcriptStatusStyle(item.status, theme.style)
+        style: transcriptStatusStyle(item.status, theme.style, theme: theme.semanticTheme)
     ))
     header.add(RichSpan(title, style: theme.titleStyle))
     if (!state.isEmpty()) {

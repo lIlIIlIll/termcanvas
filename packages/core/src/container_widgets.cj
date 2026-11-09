@@ -237,7 +237,7 @@ public class Scrollable <: Widget {
         for (row in 0..content.height) {
             let index = state.offset + row
             if (index >= lines.size) { break }
-            buffer.setString(content.x, content.y + row, truncate(lines[index], content.width), style: style)
+            buffer.setString(content.x, content.y + row, truncate(lines[index], content.width, options: buffer.textWidthOptions()), style: style)
         }
         if (lines.size > area.height && area.width > 1) {
             Scrollbar(lines.size, offset: state.offset, viewport: area.height, style: scrollbarStyle).render(area, buffer)

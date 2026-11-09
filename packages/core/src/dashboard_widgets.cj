@@ -7,16 +7,16 @@ public class MetricCard <: Widget {
     private let value: String
     private let detail: String
     private let trend: String
-    private let style: Style
-    private let valueStyle: Style
+    private let style: ?Style
+    private let valueStyle: ?Style
 
     public init(
         title: String,
         value: String,
         detail!: String = "",
         trend!: String = "",
-        style!: Style = Style.default(),
-        valueStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong())
+        style!: ?Style = None,
+        valueStyle!: ?Style = None
     ) {
         this.title = title
         this.value = value
@@ -28,15 +28,18 @@ public class MetricCard <: Widget {
 
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
-        buffer.setString(area.x, area.y, truncate(title, area.width), style: style)
+        let theme = buffer.resolveTheme(Option<Theme>.None)
+        let normal = widgetRoleStyle(style, theme, ThemeRole.Normal, Style.default())
+        let value = widgetRoleStyle(valueStyle, theme, ThemeRole.Accent, Style(fg: Color.Cyan, modifier: Modifier.strong()))
+        buffer.setString(area.x, area.y, truncate(title, area.width, options: buffer.textWidthOptions()), style: normal)
         if (area.height > 1) {
-            buffer.setString(area.x, area.y + 1, truncate(value, area.width), style: valueStyle)
+            buffer.setString(area.x, area.y + 1, truncate(this.value, area.width, options: buffer.textWidthOptions()), style: value)
         }
         if (area.height > 2 && !detail.isEmpty()) {
-            buffer.setString(area.x, area.y + 2, truncate(detail, area.width), style: style)
+            buffer.setString(area.x, area.y + 2, truncate(detail, area.width, options: buffer.textWidthOptions()), style: normal)
         }
         if (area.height > 3 && !trend.isEmpty()) {
-            buffer.setString(area.x, area.y + 3, truncate(trend, area.width), style: style)
+            buffer.setString(area.x, area.y + 3, truncate(trend, area.width, options: buffer.textWidthOptions()), style: normal)
         }
     }
 }
@@ -45,10 +48,10 @@ public class Meter <: Widget {
     private let label: String
     private let value: Int64
     private let total: Int64
-    private let style: Style
-    private let fillStyle: Style
+    private let style: ?Style
+    private let fillStyle: ?Style
 
-    public init(label: String, value: Int64, total!: Int64 = 100, style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green)) {
+    public init(label: String, value: Int64, total!: Int64 = 100, style!: ?Style = None, fillStyle!: ?Style = None) {
         this.label = label
         this.value = max(0, value)
         this.total = max(1, total)
@@ -58,12 +61,15 @@ public class Meter <: Widget {
 
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
-        let labelWidth = min(area.width, max(0, displayWidthFast(label) + 1))
+        let theme = buffer.resolveTheme(Option<Theme>.None)
+        let normal = widgetRoleStyle(style, theme, ThemeRole.Disabled, Style(fg: Color.Indexed(8)))
+        let fill = widgetRoleStyle(fillStyle, theme, ThemeRole.Accent, Style(fg: Color.Green))
+        let labelWidth = min(area.width, max(0, displayWidthFast(label, options: buffer.textWidthOptions()) + 1))
         if (labelWidth > 0) {
-            buffer.setString(area.x, area.y, truncate(label, labelWidth), style: style)
+            buffer.setString(area.x, area.y, truncate(label, labelWidth, options: buffer.textWidthOptions()), style: normal)
         }
         let bar = Rect(area.x + labelWidth, area.y, max(0, area.width - labelWidth), 1)
-        ProgressBar(value, total: total, style: style, fillStyle: fillStyle, labelMode: ProgressBarLabelMode.Percent).render(bar, buffer)
+        ProgressBar(value, total: total, style: normal, fillStyle: fill, labelMode: ProgressBarLabelMode.Percent).render(bar, buffer)
     }
 }
 
@@ -71,11 +77,13 @@ public class LegendItem {
     public let label: String
     public let symbol: String
     public let style: Style
+    let explicitStyle: ?Style
 
-    public init(label: String, symbol!: String = "#", style!: Style = Style(fg: Color.Cyan)) {
+    public init(label: String, symbol!: String = "#", style!: ?Style = None) {
         this.label = label
         this.symbol = symbol
-        this.style = style
+        this.explicitStyle = style
+        this.style = match (style) { case Some(value) => value; case None => Style(fg: Color.Cyan) }
     }
 }
 
@@ -94,12 +102,13 @@ public class Legend <: Widget {
         for (item in items) {
             let text = item.symbol + " " + item.label
             if (x >= area.right) { return }
-            buffer.setString(x, area.y, truncate(text, area.right - x), style: item.style)
-            x += displayWidthFast(text)
+            let itemStyle = widgetRoleStyle(item.explicitStyle, buffer.resolveTheme(Option<Theme>.None), ThemeRole.Accent, item.style)
+            buffer.setString(x, area.y, truncate(text, area.right - x, options: buffer.textWidthOptions()), style: itemStyle)
+            x += displayWidthFast(text, options: buffer.textWidthOptions())
             if (x < area.right) {
-                buffer.setString(x, area.y, truncate(gap, area.right - x), style: Style.default())
+                buffer.setString(x, area.y, truncate(gap, area.right - x, options: buffer.textWidthOptions()), style: Style.default())
             }
-            x += displayWidthFast(gap)
+            x += displayWidthFast(gap, options: buffer.textWidthOptions())
         }
     }
 }
@@ -107,9 +116,9 @@ public class Legend <: Widget {
 public class TimeSeriesChart <: Widget {
     private let values: Array<Int64>
     private let maxValue: Int64
-    private let style: Style
+    private let style: ?Style
 
-    public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan)) {
+    public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None) {
         this.values = values
         this.maxValue = max(0, maxValue)
         this.style = style
@@ -117,6 +126,7 @@ public class TimeSeriesChart <: Widget {
 
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0 || values.size == 0) { return }
+        let style = widgetRoleStyle(this.style, buffer.resolveTheme(Option<Theme>.None), ThemeRole.Accent, Style(fg: Color.Cyan))
         let maxV = max(1, if (maxValue > 0) { maxValue } else { maxArray(values) })
         let count = min(area.width, values.size)
         for (i in 0..count) {
@@ -158,9 +168,9 @@ public class HeaderBar <: Widget {
     private let title: String
     private let left: String
     private let right: String
-    private let style: Style
+    private let style: ?Style
 
-    public init(title: String, left!: String = "", right!: String = "", style!: Style = Style(fg: Color.White, modifier: Modifier.strong())) {
+    public init(title: String, left!: String = "", right!: String = "", style!: ?Style = None) {
         this.title = title
         this.left = left
         this.right = right
@@ -168,7 +178,7 @@ public class HeaderBar <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
-        renderBar(area, buffer, left, title, right, style)
+        renderBar(area, buffer, left, title, right, widgetRoleStyle(style, buffer.resolveTheme(Option<Theme>.None), ThemeRole.Normal, Style(fg: Color.White, modifier: Modifier.strong())))
     }
 }
 
@@ -176,9 +186,9 @@ public class FooterBar <: Widget {
     private let left: String
     private let center: String
     private let right: String
-    private let style: Style
+    private let style: ?Style
 
-    public init(left!: String = "", center!: String = "", right!: String = "", style!: Style = Style(fg: Color.Indexed(8))) {
+    public init(left!: String = "", center!: String = "", right!: String = "", style!: ?Style = None) {
         this.left = left
         this.center = center
         this.right = right
@@ -186,39 +196,51 @@ public class FooterBar <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
-        renderBar(area, buffer, left, center, right, style)
+        renderBar(area, buffer, left, center, right, widgetRoleStyle(style, buffer.resolveTheme(Option<Theme>.None), ThemeRole.Disabled, Style(fg: Color.Indexed(8))))
     }
 }
 
 public class EmptyState <: Widget {
     private let title: String
     private let detail: String
-    private let style: Style
+    private let style: ?Style
 
-    public init(title!: String = "No data", detail!: String = "", style!: Style = Style(fg: Color.Indexed(8))) {
+    public init(title!: String = "No data", detail!: String = "", style!: ?Style = None) {
         this.title = title
         this.detail = detail
         this.style = style
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
-        renderCenteredLines(area, buffer, [title, detail], style)
+        renderCenteredLines(area, buffer, [title, detail], widgetRoleStyle(style, buffer.resolveTheme(Option<Theme>.None), ThemeRole.Disabled, Style(fg: Color.Indexed(8))))
     }
 }
 
 public class ErrorBox <: Widget {
     private let message: String
     private let detail: String
+    private let style: ?Style
+    private let borderKind: ?BorderKind
+    private let theme: ?Theme
 
-    public init(message: String, detail!: String = "") {
+    public init(message: String, detail!: String = "", style!: ?Style = None, borderKind!: ?BorderKind = None, theme!: ?Theme = None) {
         this.message = message
         this.detail = detail
+        this.style = style
+        this.borderKind = borderKind
+        this.theme = theme
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
-        let block = Block(BlockOptions(title: "Error", borderKind: BorderKind.Ascii, borderStyle: Style(fg: Color.Red), titleStyle: Style(fg: Color.Red)))
+        let resolvedTheme = buffer.resolveTheme(theme)
+        let errorStyle = widgetRoleStyle(style, resolvedTheme, ThemeRole.Error, Style(fg: Color.Red))
+        let kind = match (borderKind) {
+            case Some(value) => value
+            case None => if (resolvedTheme.isSome()) { BorderKind.Auto } else { BorderKind.Ascii }
+        }
+        let block = Block(BlockOptions(title: "Error", borderKind: kind, borderStyle: errorStyle, titleStyle: errorStyle, theme: theme))
         let inner = block.renderInner(area, buffer)
-        renderCenteredLines(inner, buffer, [message, detail], Style(fg: Color.Red))
+        renderCenteredLines(inner, buffer, [message, detail], errorStyle)
     }
 }
 
@@ -238,14 +260,15 @@ public class LoadingOverlay <: Widget {
 
 public class Skeleton <: Widget {
     private let rows: Int64
-    private let style: Style
+    private let style: ?Style
 
-    public init(rows!: Int64 = 3, style!: Style = Style(fg: Color.Indexed(8))) {
+    public init(rows!: Int64 = 3, style!: ?Style = None) {
         this.rows = max(0, rows)
         this.style = style
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        let style = widgetRoleStyle(this.style, buffer.resolveTheme(Option<Theme>.None), ThemeRole.Disabled, Style(fg: Color.Indexed(8)))
         let count = min(rows, area.height)
         for (row in 0..count) {
             let width = max(1, area.width - row % 3)
@@ -265,7 +288,7 @@ public class InlineAlert <: Widget {
 
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
-        let style = match (state) {
+        let fallback = match (state) {
             case StyleState.Error => Style(fg: Color.Red)
             case StyleState.Disabled => Style(fg: Color.Indexed(8))
             case StyleState.Selected => Style(fg: Color.Green)
@@ -273,18 +296,27 @@ public class InlineAlert <: Widget {
             case StyleState.Accent => Style(fg: Color.Yellow)
             case StyleState.Normal => Style.default()
         }
-        buffer.setString(area.x, area.y, truncate(message, area.width), style: style)
+        let role = match (state) {
+            case StyleState.Error => ThemeRole.Error
+            case StyleState.Disabled => ThemeRole.Disabled
+            case StyleState.Selected => ThemeRole.Selected
+            case StyleState.Focused => ThemeRole.Focused
+            case StyleState.Accent => ThemeRole.Accent
+            case StyleState.Normal => ThemeRole.Normal
+        }
+        let style = widgetRoleStyle(Option<Style>.None, buffer.resolveTheme(Option<Theme>.None), role, fallback)
+        buffer.setString(area.x, area.y, truncate(message, area.width, options: buffer.textWidthOptions()), style: style)
     }
 }
 
 /** 绘制单行方括号标签；空标签显示为“[]”，仅为可见文本设置样式。 */
 public class Badge <: Widget {
     private let label: String
-    private let style: Style
+    private let style: ?Style
     private let theme: ?Theme
 
     /** 保存标签及绘制样式；提供主题时，显式样式会修补 normal 角色。 */
-    public init(label: String, style!: Style = Style.default(), theme!: ?Theme = None) {
+    public init(label: String, style!: ?Style = None, theme!: ?Theme = None) {
         this.label = label
         this.style = style
         this.theme = theme
@@ -293,12 +325,12 @@ public class Badge <: Widget {
     /** 只在区域首行绘制可见的 [label] 文本，并裁剪到指定区域。 */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
-        let resolvedStyle = themedNormal(style, theme)
+        let resolvedStyle = widgetRoleStyle(style, buffer.resolveTheme(theme), ThemeRole.Normal, Style.default())
         buffer.withCanvasClip(Rect(area.x, area.y, area.width, 1)) { =>
             buffer.setString(area.x, area.y, "[", style: resolvedStyle)
             if (area.width > 1) {
                 buffer.setString(area.x + 1, area.y, label, style: resolvedStyle)
-                let labelWidth = displayWidthFast(label)
+                let labelWidth = displayWidthFast(label, options: buffer.textWidthOptions())
                 if (labelWidth < area.width - 1) {
                     buffer.setString(area.x + 1 + labelWidth, area.y, "]", style: resolvedStyle)
                 }
@@ -311,15 +343,15 @@ func renderBar(area: Rect, buffer: Buffer, left: String, center: String, right: 
     if (area.width <= 0 || area.height <= 0) { return }
     buffer.fillLine(area.y, area.x, area.width, style: style)
     if (!left.isEmpty()) {
-        buffer.setString(area.x, area.y, truncate(left, area.width), style: style)
+        buffer.setString(area.x, area.y, truncate(left, area.width, options: buffer.textWidthOptions()), style: style)
     }
     if (!center.isEmpty()) {
-        let text = truncate(center, area.width)
-        buffer.setString(alignedX(area, displayWidthFast(text), TextAlign.Center), area.y, text, style: style)
+        let text = truncate(center, area.width, options: buffer.textWidthOptions())
+        buffer.setString(alignedX(area, displayWidthFast(text, options: buffer.textWidthOptions()), TextAlign.Center), area.y, text, style: style)
     }
     if (!right.isEmpty()) {
-        let text = truncate(right, area.width)
-        buffer.setString(area.right - displayWidthFast(text), area.y, text, style: style)
+        let text = truncate(right, area.width, options: buffer.textWidthOptions())
+        buffer.setString(area.right - displayWidthFast(text, options: buffer.textWidthOptions()), area.y, text, style: style)
     }
 }
 
@@ -329,7 +361,7 @@ func renderCenteredLines(area: Rect, buffer: Buffer, lines: Array<String>, style
     let startY = area.y + max(0, (area.height - count) / 2)
     for (i in 0..count) {
         if (lines[i].isEmpty()) { continue }
-        let text = truncate(lines[i], area.width)
-        buffer.setString(alignedX(Rect(area.x, startY + i, area.width, 1), displayWidthFast(text), TextAlign.Center), startY + i, text, style: style)
+        let text = truncate(lines[i], area.width, options: buffer.textWidthOptions())
+        buffer.setString(alignedX(Rect(area.x, startY + i, area.width, 1), displayWidthFast(text, options: buffer.textWidthOptions()), TextAlign.Center), startY + i, text, style: style)
     }
 }

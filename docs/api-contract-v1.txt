@@ -1,3 +1,23 @@
+packages/core/src/animation.cj:public struct AnimationConfig {
+packages/core/src/animation.cj:public let durationMillis: Int64
+packages/core/src/animation.cj:public let framesPerSecond: Int64
+packages/core/src/animation.cj:public let enabled: Bool
+packages/core/src/animation.cj:public init(durationMillis!: Int64 = 1000, framesPerSecond!: Int64 = 30, enabled!: Bool = true)
+packages/core/src/animation.cj:public struct AnimationSample {
+packages/core/src/animation.cj:public let elapsedMillis: Int64
+packages/core/src/animation.cj:public let cycleMillis: Int64
+packages/core/src/animation.cj:public let durationMillis: Int64
+packages/core/src/animation.cj:public init(elapsedMillis: Int64, durationMillis: Int64)
+packages/core/src/animation.cj:public class AnimationScheduler {
+packages/core/src/animation.cj:public init(clock!: RuntimeClock = MonotonicRuntimeClock(), maxFramesPerSecond!: Int64 = 30)
+packages/core/src/animation.cj:public func register(scope: String, id: String, config!: AnimationConfig = AnimationConfig(), group!: ?String = None, visible!: Bool = true): Bool
+packages/core/src/animation.cj:public func setVisible(scope: String, id: String, visible: Bool): Bool
+packages/core/src/animation.cj:public func setConfig(scope: String, id: String, config: AnimationConfig): Bool
+packages/core/src/animation.cj:public func remove(scope: String, id: String): Bool
+packages/core/src/animation.cj:public func removeScope(scope: String): Unit
+packages/core/src/animation.cj:public func sample(scope: String, id: String): ?AnimationSample
+packages/core/src/animation.cj:public func nextTimeoutMillis(): ?Int64
+packages/core/src/animation.cj:public func framePresented(): Unit
 packages/core/src/app.cj:public enum ControlFlow {
 packages/core/src/app.cj:Continue
 packages/core/src/app.cj:Exit
@@ -226,6 +246,10 @@ packages/core/src/app.cj:public class App {
 packages/core/src/app.cj:public init( inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
 packages/core/src/app.cj:public init( backend!: Backend, inputSource!: InputSource = StdinInputSource(), terminalDriver!: TerminalDriver = defaultTerminalDriver(), probeInputSource!: InputSource = StdinInputSource(), renderMode!: RenderMode = RenderMode.Diff, rawMode!: Bool = true, alternateScreen!: Bool = true, mouse!: Bool = false, mouseMove!: Bool = false, focusEvents!: Bool = false, bracketedPaste!: Bool = true, hideCursor!: Bool = true, keyboard!: KeyboardOptions = KeyboardOptions(), resize!: Bool = true, tickEvery!: ?Duration = None, targetFps!: ?Int64 = None, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop, idleSleep!: Duration = Duration.millisecond * 10, resizePollEvery!: Duration = Duration.millisecond * 250, metrics!: ?AppMetrics = None, instrumentationEnabled!: Bool = false )
 packages/core/src/app.cj:public func attachTraceSink(traceSink: AppTraceSink): Unit
+packages/core/src/app.cj:public func setTheme(theme: ?Theme): Unit
+packages/core/src/app.cj:public func setTextWidthOptions(options: TextWidthOptions): Unit
+packages/core/src/app.cj:public func attachAnimationScheduler(scheduler: AnimationScheduler): Unit
+packages/core/src/app.cj:public func attachGlyphCapabilitySession(session: GlyphCapabilitySession): Unit
 packages/core/src/app.cj:public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit
 packages/core/src/app.cj:public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit
 packages/core/src/app.cj:public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit
@@ -252,6 +276,7 @@ packages/core/src/app.cj:public init()
 packages/core/src/app.cj:public func add(id: String, enabled!: Bool = true): Unit
 packages/core/src/app.cj:public func remove(id: String): Unit
 packages/core/src/app.cj:public func focus(id: String): Bool
+packages/core/src/app.cj:public func setEnabled(id: String, value: Bool): Bool
 packages/core/src/app.cj:public func current(): ?String
 packages/core/src/app.cj:public func isFocused(id: String): Bool
 packages/core/src/app.cj:public func next(): ?String
@@ -273,6 +298,12 @@ packages/core/src/buffer.cj:public let area: Rect
 packages/core/src/buffer.cj:public init(area: Rect)
 packages/core/src/buffer.cj:public func capabilities(): TerminalCapabilities
 packages/core/src/buffer.cj:public func setCapabilities(capabilities: TerminalCapabilities): Unit
+packages/core/src/buffer.cj:public func theme(): ?Theme
+packages/core/src/buffer.cj:public func setTheme(theme: ?Theme): Unit
+packages/core/src/buffer.cj:public func resolveTheme(explicit: ?Theme): ?Theme
+packages/core/src/buffer.cj:public func withParentTheme(explicit: ?Theme, draw: () -> Unit): Unit
+packages/core/src/buffer.cj:public func textWidthOptions(): TextWidthOptions
+packages/core/src/buffer.cj:public func setTextWidthOptions(options: TextWidthOptions): Unit
 packages/core/src/buffer.cj:public func clear(style!: Style = Style.default()): Unit
 packages/core/src/buffer.cj:public func indexOf(x: Int64, y: Int64): ?Int64
 packages/core/src/buffer.cj:public func setCell(x: Int64, y: Int64, cell: Cell): Unit
@@ -326,6 +357,8 @@ packages/core/src/canvas.cj:public func canvas(): Canvas
 packages/core/src/canvas.cj:public func bufferView(): Buffer
 packages/core/src/canvas.cj:public class Canvas {
 packages/core/src/canvas.cj:public init(buffer: Buffer, clip: Rect, translateX!: Int64 = 0, translateY!: Int64 = 0)
+packages/core/src/canvas.cj:public func textWidthOptions(): TextWidthOptions
+packages/core/src/canvas.cj:public func createSurface(area: Rect, zIndex!: Int64 = 0): Surface
 packages/core/src/canvas.cj:public func withClip(area: Rect): Canvas
 packages/core/src/canvas.cj:public func translated(x: Int64, y: Int64): Canvas
 packages/core/src/canvas.cj:public func viewport(camera: Position): Canvas
@@ -334,6 +367,7 @@ packages/core/src/canvas.cj:public func fillRect(x: Int64, y: Int64, width: Int6
 packages/core/src/canvas.cj:public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit
 packages/core/src/canvas.cj:public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit
 packages/core/src/canvas.cj:public func strokeRect(area: Rect, style: Style, horizontal!: String = "-", vertical!: String = "|", corner!: String = "+"): Unit
+packages/core/src/canvas.cj:public func strokeBorder(area: Rect, style: Style, border!: ?BorderSet = None): Unit
 packages/core/src/canvas.cj:public func drawLine(x1: Int64, y1: Int64, x2: Int64, y2: Int64, symbol: String, style: Style): Unit
 packages/core/src/canvas.cj:public func drawText(x: Int64, y: Int64, text: String, style: Style): Unit
 packages/core/src/canvas.cj:public func drawSprite(x: Int64, y: Int64, lines: Array<String>, style: Style): Unit
@@ -411,13 +445,13 @@ packages/core/src/command_widgets.cj:public init(label: String, action!: String 
 packages/core/src/command_widgets.cj:public class Menu <: Widget {
 packages/core/src/command_widgets.cj:public var selected: Int64
 packages/core/src/command_widgets.cj:public var offset: Int64 = 0
-packages/core/src/command_widgets.cj:public init( title: String, items: Array<MenuItem>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)) )
+packages/core/src/command_widgets.cj:public init( title: String, items: Array<MenuItem>, selected!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?String
 packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class MenuBar <: Widget {
 packages/core/src/command_widgets.cj:public var selected: Int64
-packages/core/src/command_widgets.cj:public init( menus: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/command_widgets.cj:public init( menus: Array<String>, selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None )
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
@@ -425,7 +459,7 @@ packages/core/src/command_widgets.cj:public class CommandPalette <: Widget {
 packages/core/src/command_widgets.cj:public var query: String
 packages/core/src/command_widgets.cj:public var selected: Int64
 packages/core/src/command_widgets.cj:public var offset: Int64 = 0
-packages/core/src/command_widgets.cj:public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style.default(), theme!: ?Theme = None, caseSensitive!: Bool = true )
+packages/core/src/command_widgets.cj:public init( items: Array<MenuItem>, query!: String = "", selected!: Int64 = 0, block!: ?Block = Some(Block(title: "Command")), style!: ?Style = None, selectedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None, caseSensitive!: Bool = true )
 packages/core/src/command_widgets.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/command_widgets.cj:public func paste(text: String): Unit
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?String
@@ -451,18 +485,18 @@ packages/core/src/command_widgets.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/command_widgets.cj:public func tick(): Unit
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class Spinner <: Widget {
-packages/core/src/command_widgets.cj:public init(label!: String = "", frame!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
+packages/core/src/command_widgets.cj:public init(label!: String = "", frame!: Int64 = 0, style!: ?Style = None, theme!: ?Theme = None)
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class Dialog <: Widget {
 packages/core/src/command_widgets.cj:public var selected: Int64
-packages/core/src/command_widgets.cj:public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+packages/core/src/command_widgets.cj:public init( title!: String = "", body!: String = "", buttons!: Array<String> = ["OK"], selected!: Int64 = 0, width!: Int64 = 40, height!: Int64 = 7, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None )
 packages/core/src/command_widgets.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?String
 packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
 packages/core/src/command_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/command_widgets.cj:public class ConfirmDialog <: Widget {
 packages/core/src/command_widgets.cj:public var confirmed: Bool = false
-packages/core/src/command_widgets.cj:public init( message: String, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None )
+packages/core/src/command_widgets.cj:public init( message: String, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None )
 packages/core/src/command_widgets.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/command_widgets.cj:public func handle(key: KeyEvent): ?Bool
 packages/core/src/command_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?Bool
@@ -534,7 +568,7 @@ packages/core/src/content_widgets.cj:public let topTitleStyle: Style
 packages/core/src/content_widgets.cj:public let fullFrame: Bool
 packages/core/src/content_widgets.cj:public let fillBackground: Bool
 packages/core/src/content_widgets.cj:public let contentPadding: Spacing
-packages/core/src/content_widgets.cj:public init( style!: Style = Style.default(), titleStyle!: Style = Style(modifier: Modifier.strong()), mutedStyle!: Style = Style(fg: Color.Indexed(8)), selectedStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()), bodyIndent!: Int64 = 2, bodyLimit!: Int64 = 12, borderStyle!: Style = Style(fg: Color.Indexed(8)), borderBackground!: Style = Style.default(), topTitleStyle!: Style = Style(modifier: Modifier.strong()), fullFrame!: Bool = false, fillBackground!: Bool = false, contentPadding!: Spacing = Spacing.zero() )
+packages/core/src/content_widgets.cj:public init( style!: Style = Style.default(), titleStyle!: Style = Style(modifier: Modifier.strong()), mutedStyle!: Style = Style(fg: Color.Indexed(8)), selectedStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()), bodyIndent!: Int64 = 2, bodyLimit!: Int64 = 12, borderStyle!: Style = Style(fg: Color.Indexed(8)), borderBackground!: Style = Style.default(), topTitleStyle!: Style = Style(modifier: Modifier.strong()), fullFrame!: Bool = false, fillBackground!: Bool = false, contentPadding!: Spacing = Spacing.zero(), semanticTheme!: ?Theme = None )
 packages/core/src/content_widgets.cj:public class TranscriptItem {
 packages/core/src/content_widgets.cj:public let id: String
 packages/core/src/content_widgets.cj:public let kind: TranscriptItemKind
@@ -559,7 +593,7 @@ packages/core/src/content_widgets.cj:public func toggleCollapsed(id: String): Bo
 packages/core/src/content_widgets.cj:public class TranscriptView <: Widget {
 packages/core/src/content_widgets.cj:public var offset: Int64
 packages/core/src/content_widgets.cj:public var selected: Int64
-packages/core/src/content_widgets.cj:public init( transcript: Transcript, offset!: Int64 = 0, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cardTheme!: ?TranscriptCardTheme = None )
+packages/core/src/content_widgets.cj:public init( transcript: Transcript, offset!: Int64 = 0, selected!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cardTheme!: ?TranscriptCardTheme = None )
 packages/core/src/content_widgets.cj:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 packages/core/src/content_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/content_widgets.cj:public class ComposerSubmit {
@@ -590,55 +624,56 @@ packages/core/src/content_widgets.cj:public init(steps: Array<ActivityStep>, blo
 packages/core/src/content_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/content_widgets.cj:public class RequestDialog <: Widget {
 packages/core/src/content_widgets.cj:public var selected: Int64
-packages/core/src/content_widgets.cj:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), theme!: ?Theme = None)
+packages/core/src/content_widgets.cj:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
 packages/core/src/content_widgets.cj:public func setTheme(theme: ?Theme): Unit
 packages/core/src/content_widgets.cj:public func handle(key: KeyEvent): ?String
 packages/core/src/content_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/content_widgets.cj:public type DecisionDialog = RequestDialog
 packages/core/src/content_widgets.cj:public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
 packages/core/src/content_widgets.cj:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
+packages/core/src/content_widgets.cj:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style
 packages/core/src/content_widgets.cj:public func transcriptStatusLabel(status: TranscriptItemStatus): String
 packages/core/src/content_widgets.cj:public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
 packages/core/src/dashboard_widgets.cj:public class MetricCard <: Widget {
-packages/core/src/dashboard_widgets.cj:public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: Style = Style.default(), valueStyle!: Style = Style(fg: Color.Cyan, modifier: Modifier.strong()) )
+packages/core/src/dashboard_widgets.cj:public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: ?Style = None, valueStyle!: ?Style = None )
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class Meter <: Widget {
-packages/core/src/dashboard_widgets.cj:public init(label: String, value: Int64, total!: Int64 = 100, style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green))
+packages/core/src/dashboard_widgets.cj:public init(label: String, value: Int64, total!: Int64 = 100, style!: ?Style = None, fillStyle!: ?Style = None)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class LegendItem {
 packages/core/src/dashboard_widgets.cj:public let label: String
 packages/core/src/dashboard_widgets.cj:public let symbol: String
 packages/core/src/dashboard_widgets.cj:public let style: Style
-packages/core/src/dashboard_widgets.cj:public init(label: String, symbol!: String = "#", style!: Style = Style(fg: Color.Cyan))
+packages/core/src/dashboard_widgets.cj:public init(label: String, symbol!: String = "#", style!: ?Style = None)
 packages/core/src/dashboard_widgets.cj:public class Legend <: Widget {
 packages/core/src/dashboard_widgets.cj:public init(items: Array<LegendItem>, gap!: String = " ")
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class TimeSeriesChart <: Widget {
-packages/core/src/dashboard_widgets.cj:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan))
+packages/core/src/dashboard_widgets.cj:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class HeaderBar <: Widget {
-packages/core/src/dashboard_widgets.cj:public init(title: String, left!: String = "", right!: String = "", style!: Style = Style(fg: Color.White, modifier: Modifier.strong()))
+packages/core/src/dashboard_widgets.cj:public init(title: String, left!: String = "", right!: String = "", style!: ?Style = None)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class FooterBar <: Widget {
-packages/core/src/dashboard_widgets.cj:public init(left!: String = "", center!: String = "", right!: String = "", style!: Style = Style(fg: Color.Indexed(8)))
+packages/core/src/dashboard_widgets.cj:public init(left!: String = "", center!: String = "", right!: String = "", style!: ?Style = None)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class EmptyState <: Widget {
-packages/core/src/dashboard_widgets.cj:public init(title!: String = "No data", detail!: String = "", style!: Style = Style(fg: Color.Indexed(8)))
+packages/core/src/dashboard_widgets.cj:public init(title!: String = "No data", detail!: String = "", style!: ?Style = None)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class ErrorBox <: Widget {
-packages/core/src/dashboard_widgets.cj:public init(message: String, detail!: String = "")
+packages/core/src/dashboard_widgets.cj:public init(message: String, detail!: String = "", style!: ?Style = None, borderKind!: ?BorderKind = None, theme!: ?Theme = None)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class LoadingOverlay <: Widget {
 packages/core/src/dashboard_widgets.cj:public init(label!: String = "Loading", frame!: Int64 = 0)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class Skeleton <: Widget {
-packages/core/src/dashboard_widgets.cj:public init(rows!: Int64 = 3, style!: Style = Style(fg: Color.Indexed(8)))
+packages/core/src/dashboard_widgets.cj:public init(rows!: Int64 = 3, style!: ?Style = None)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class InlineAlert <: Widget {
 packages/core/src/dashboard_widgets.cj:public init(message: String, state!: StyleState = StyleState.Accent)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/dashboard_widgets.cj:public class Badge <: Widget {
-packages/core/src/dashboard_widgets.cj:public init(label: String, style!: Style = Style.default(), theme!: ?Theme = None)
+packages/core/src/dashboard_widgets.cj:public init(label: String, style!: ?Style = None, theme!: ?Theme = None)
 packages/core/src/dashboard_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/data_widgets.cj:public class Paginator {
 packages/core/src/data_widgets.cj:public var page: Int64
@@ -673,7 +708,7 @@ packages/core/src/data_widgets.cj:public var stickyHeader: Bool = true
 packages/core/src/data_widgets.cj:public var status: TableStatus = TableStatus.Ready
 packages/core/src/data_widgets.cj:public var emptyText: String = "No rows"
 packages/core/src/data_widgets.cj:public var loadingText: String = "Loading"
-packages/core/src/data_widgets.cj:public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), cellStyle!: Style = Style(fg: Color.Black, bg: Color.Cyan), statusStyle!: Style = Style(fg: Color.Indexed(8)), selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None, dataModel!: ?PagedTableModel = None, cacheCapacity!: Int64 = 1024 )
+packages/core/src/data_widgets.cj:public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cellStyle!: ?Style = None, statusStyle!: ?Style = None, selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None, dataModel!: ?PagedTableModel = None, cacheCapacity!: Int64 = 1024 )
 packages/core/src/data_widgets.cj:public init(columns: Array<TableColumn>, model: PagedTableModel, block!: ?Block = None)
 packages/core/src/data_widgets.cj:public func handle(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/data_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
@@ -710,6 +745,7 @@ packages/core/src/data_widgets.cj:public init(model: LazyTreeModel, block!: ?Blo
 packages/core/src/data_widgets.cj:public func setFocused(value: Bool): Unit
 packages/core/src/data_widgets.cj:public func setTheme(value: ?Theme): Unit
 packages/core/src/data_widgets.cj:public func handle(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/data_widgets.cj:public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool
 packages/core/src/data_widgets.cj:public func toggleSelected(): Unit
 packages/core/src/data_widgets.cj:public func selectedId(): ?String
 packages/core/src/data_widgets.cj:public func selectById(id: String): Bool
@@ -840,7 +876,8 @@ packages/core/src/document.cj:public func isFolded(startOffset: Int64, endOffset
 packages/core/src/document.cj:public func setFolded(startOffset: Int64, endOffset: Int64, folded: Bool): Unit
 packages/core/src/document.cj:public func toggleFold(startOffset: Int64, endOffset: Int64): Bool
 packages/core/src/document.cj:public class DocumentView <: Widget {
-packages/core/src/document.cj:public init( document: Document, block!: ?Block = None, style!: Style = Style.default(), headingStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], state!: ?DocumentViewState = None, currentSourceStyle!: Style = Style(bg: Color.Indexed(8)), cacheLayout!: Bool = false )
+packages/core/src/document.cj:public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], state!: ?DocumentViewState = None, currentSourceStyle!: ?Style = None, cacheLayout!: Bool = false )
+packages/core/src/document.cj:public func setTextWidthOptions(options: TextWidthOptions): Unit
 packages/core/src/document.cj:public func renderedLineCount(width: Int64): Int64
 packages/core/src/document.cj:public func sourceOffsetForRenderedLine(width: Int64, renderedLine: Int64): ?Int64
 packages/core/src/document.cj:public func sourceOffsetAtRenderedLine(width: Int64, renderedLine: Int64): ?Int64
@@ -851,8 +888,8 @@ packages/core/src/document.cj:public func handleKey(key: KeyEvent, width: Int64,
 packages/core/src/document.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
 packages/core/src/document.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/document.cj:public class MarkdownView <: Widget {
-packages/core/src/document.cj:public init( text: String, block!: ?Block = None, style!: Style = Style.default(), headingStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
-packages/core/src/document.cj:public init( document: Document, block!: ?Block = None, style!: Style = Style.default(), headingStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
+packages/core/src/document.cj:public init( text: String, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
+packages/core/src/document.cj:public init( document: Document, block!: ?Block = None, style!: ?Style = None, headingStyle!: ?Style = None, theme!: ?DocumentTheme = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word )
 packages/core/src/document.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/event.cj:public interface InputSource {
 packages/core/src/event.cj:func readAvailable(maxBytes: Int64): Array<Byte>
@@ -1000,19 +1037,21 @@ packages/core/src/event.cj:public func hasPendingInputDrain(): Bool
 packages/core/src/event.cj:public func flushEsc(): Array<Event>
 packages/core/src/event.cj:public func flushEscAfterPolls(polls: Int64): Array<Event>
 packages/core/src/form_widgets.cj:public class Button <: Widget {
-packages/core/src/form_widgets.cj:public init( label: String, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:public init( label: String, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:public func setGhost(value: Bool): Unit
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class Checkbox <: Widget {
 packages/core/src/form_widgets.cj:public var checked: Bool
-packages/core/src/form_widgets.cj:public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class Switch <: Widget {
 packages/core/src/form_widgets.cj:public var checked: Bool
-packages/core/src/form_widgets.cj:public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:public init( label: String, checked!: Bool = false, focused!: Bool = false, disabled!: Bool = false, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
 packages/core/src/form_widgets.cj:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
@@ -1020,23 +1059,25 @@ packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer)
 packages/core/src/form_widgets.cj:public class RadioGroup <: Widget {
 packages/core/src/form_widgets.cj:public var selected: Int64
 packages/core/src/form_widgets.cj:public var offset: Int64 = 0
-packages/core/src/form_widgets.cj:public init( items: Array<String>, selected!: Int64 = 0, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: Style = Style(fg: Color.Cyan), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White), disabledStyle!: Style = Style(fg: Color.Indexed(8)), theme!: ?Theme = None )
+packages/core/src/form_widgets.cj:public init( items: Array<String>, selected!: Int64 = 0, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: ?Style = None, selectedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class Select <: Widget {
 packages/core/src/form_widgets.cj:public var selected: Int64
 packages/core/src/form_widgets.cj:public var offset: Int64 = 0
-packages/core/src/form_widgets.cj:public init( items: Array<String>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/form_widgets.cj:public init( items: Array<String>, selected!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None )
 packages/core/src/form_widgets.cj:public func selectedValue(): ?String
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): ?String
 packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?String
+packages/core/src/form_widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): ?String
 packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/form_widgets.cj:public class Dropdown <: Widget {
 packages/core/src/form_widgets.cj:public var selected: Int64
 packages/core/src/form_widgets.cj:public var offset: Int64 = 0
 packages/core/src/form_widgets.cj:public var open: Bool
-packages/core/src/form_widgets.cj:public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White) )
+packages/core/src/form_widgets.cj:public init( items: Array<String>, selected!: Int64 = 0, open!: Bool = false, placeholder!: String = "Select", style!: Style = Style.default(), selectedStyle!: ?Style = None )
 packages/core/src/form_widgets.cj:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
 packages/core/src/form_widgets.cj:public func setTransactionalSelection(enabled!: Bool): Unit
 packages/core/src/form_widgets.cj:public func cancelSelection(): Unit
@@ -1055,7 +1096,7 @@ packages/core/src/form_widgets.cj:public func render(area: Rect, buffer: Buffer)
 packages/core/src/form_widgets.cj:public class MultiSelect <: Widget {
 packages/core/src/form_widgets.cj:public var cursor: Int64
 packages/core/src/form_widgets.cj:public var offset: Int64 = 0
-packages/core/src/form_widgets.cj:public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White))
+packages/core/src/form_widgets.cj:public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
 packages/core/src/form_widgets.cj:public func selectedIndices(): Array<Int64>
 packages/core/src/form_widgets.cj:public func toggle(): Unit
 packages/core/src/form_widgets.cj:public func handle(key: KeyEvent): Bool
@@ -1149,6 +1190,23 @@ packages/core/src/geometry.cj:public class LayoutCache {
 packages/core/src/geometry.cj:public init()
 packages/core/src/geometry.cj:public func get(area: Rect, compute: (Rect) -> Array<Rect>): Array<Rect>
 packages/core/src/geometry.cj:public func invalidate(): Unit
+packages/core/src/glyph_capability.cj:public enum GlyphCapability {
+packages/core/src/glyph_capability.cj:Unknown
+packages/core/src/glyph_capability.cj:VerifiedSupported
+packages/core/src/glyph_capability.cj:Unsupported
+packages/core/src/glyph_capability.cj:public interface GlyphCapabilityProvider {
+packages/core/src/glyph_capability.cj:func probe(budgetMillis: Int64): GlyphCapability
+packages/core/src/glyph_capability.cj:public class UnknownGlyphCapabilityProvider <: GlyphCapabilityProvider {
+packages/core/src/glyph_capability.cj:public init()
+packages/core/src/glyph_capability.cj:public func probe(_: Int64): GlyphCapability
+packages/core/src/glyph_capability.cj:public class GlyphCapabilitySession {
+packages/core/src/glyph_capability.cj:public init(provider!: GlyphCapabilityProvider = UnknownGlyphCapabilityProvider(), timeoutMillis!: Int64 = 150, clock!: RuntimeClock = MonotonicRuntimeClock())
+packages/core/src/glyph_capability.cj:public func iconSet(): IconSet
+packages/core/src/glyph_capability.cj:public func detected(): GlyphCapability
+packages/core/src/glyph_capability.cj:public func applyTo(theme: Theme): Theme
+packages/core/src/glyph_capability.cj:public func setOverride(value: ?IconSet): Unit
+packages/core/src/glyph_capability.cj:public func requestProbe(): Unit
+packages/core/src/glyph_capability.cj:public func close(): Unit
 packages/core/src/keymap.cj:public class KeyBinding {
 packages/core/src/keymap.cj:public let keys: Array<KeyEvent>
 packages/core/src/keymap.cj:public let action: String
@@ -1252,7 +1310,7 @@ packages/core/src/navigation.cj:public func handleMouse(mouse: MouseEvent, area:
 packages/core/src/navigation.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/navigation.cj:public class SegmentedControl <: Widget {
 packages/core/src/navigation.cj:public var selected: Int64
-packages/core/src/navigation.cj:public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: Style = Style(fg: Color.Indexed(8)), focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )
+packages/core/src/navigation.cj:public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: ?Style = None, focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )
 packages/core/src/navigation.cj:public func selectedValue(): ?String
 packages/core/src/navigation.cj:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
 packages/core/src/navigation.cj:public func handle(key: KeyEvent): Bool
@@ -1268,9 +1326,9 @@ packages/core/src/navigation.cj:public let style: Style
 packages/core/src/navigation.cj:public let fillStyle: Style
 packages/core/src/navigation.cj:public let labelStyle: Style
 packages/core/src/navigation.cj:public let symbols: ProgressBarSymbols
-packages/core/src/navigation.cj:public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = "", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: Style = Style(fg: Color.Indexed(8), bg: Color.White), fillStyle!: Style = Style(fg: Color.Cyan, bg: Color.White), labelStyle!: Style = Style(fg: Color.Black, bg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols(filled: "=", empty: "-", head: ">", indeterminate: ">") )
+packages/core/src/navigation.cj:public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = "", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: ?Style = None, fillStyle!: ?Style = None, labelStyle!: ?Style = None, symbols!: ?ProgressBarSymbols = None )
 packages/core/src/navigation.cj:public class StatusBar <: Widget {
-packages/core/src/navigation.cj:public init( left!: String = "", right!: String = "", style!: Style = Style(fg: Color.Black, bg: Color.White), progress!: ?StatusBarProgress = None )
+packages/core/src/navigation.cj:public init( left!: String = "", right!: String = "", style!: ?Style = None, progress!: ?StatusBarProgress = None )
 packages/core/src/navigation.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/navigation.cj:public class Viewport <: Widget {
 packages/core/src/navigation.cj:public var offset: Int64
@@ -1717,6 +1775,16 @@ packages/core/src/style.cj:public func withBg(color: Color): Style
 packages/core/src/style.cj:public func withModifier(modifier: Modifier): Style
 packages/core/src/style.cj:public func patch(other: Style): Style
 packages/core/src/style.cj:public operator func ==(other: Style): Bool
+packages/core/src/style.cj:public struct StyleOverride {
+packages/core/src/style.cj:public let fg: ?Color
+packages/core/src/style.cj:public let bg: ?Color
+packages/core/src/style.cj:public let bold: ?Bool
+packages/core/src/style.cj:public let italic: ?Bool
+packages/core/src/style.cj:public let underline: ?Bool
+packages/core/src/style.cj:public let reversed: ?Bool
+packages/core/src/style.cj:public init(fg!: ?Color = None, bg!: ?Color = None, bold!: ?Bool = None, italic!: ?Bool = None, underline!: ?Bool = None, reversed!: ?Bool = None)
+packages/core/src/style.cj:public func apply(base: Style): Style
+packages/core/src/style.cj:public func resolveStyle(base: Style, legacy!: Style = Style.default(), override!: ?StyleOverride = None): Style
 packages/core/src/style.cj:public enum IconSet {
 packages/core/src/style.cj:Unicode
 packages/core/src/style.cj:NerdFont
@@ -1739,9 +1807,16 @@ packages/core/src/style.cj:public let secondary: Style
 packages/core/src/style.cj:public let border: Style
 packages/core/src/style.cj:public let strongBorder: Style
 packages/core/src/style.cj:public let iconSet: IconSet
-packages/core/src/style.cj:public init( normal!: Style = Style.default(), focused!: Style = Style(modifier: focusModifier()), selected!: Style = Style(bg: Color.Indexed(8), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Indexed(8)), error!: Style = Style(fg: Color.Red), accent!: Style = Style(fg: Color.Cyan), success!: Style = Style(fg: Color.Green), warning!: Style = Style(fg: Color.Yellow), info!: Style = Style(fg: Color.Cyan), canvas!: Style = Style.default(), surface!: Style = Style.default(), raisedSurface!: Style = Style.default(), heading!: Style = Style(modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Indexed(8)), border!: Style = Style(fg: Color.Indexed(8)), strongBorder!: Style = Style.default(), iconSet!: IconSet = IconSet.Unicode )
+packages/core/src/style.cj:public let borderKind: BorderKind
+packages/core/src/style.cj:public let progressSymbols: ?ProgressBarSymbols
+packages/core/src/style.cj:public init( normal!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), focused!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(54, 50, 61), modifier: focusModifier()), selected!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(42, 44, 63), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), error!: Style = Style(fg: Color.Rgb(255, 122, 131), bg: Color.Rgb(19, 20, 34), modifier: errorModifier()), accent!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), success!: Style = Style(fg: Color.Rgb(111, 211, 162), bg: Color.Rgb(19, 20, 34)), warning!: Style = Style(fg: Color.Rgb(255, 198, 114), bg: Color.Rgb(19, 20, 34)), info!: Style = Style(fg: Color.Rgb(118, 193, 231), bg: Color.Rgb(19, 20, 34)), canvas!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), surface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(26, 27, 44)), raisedSurface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(36, 38, 57)), heading!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34), modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), border!: Style = Style(fg: Color.Rgb(88, 92, 115), bg: Color.Rgb(19, 20, 34)), strongBorder!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), iconSet!: IconSet = IconSet.Unicode, borderKind!: BorderKind = BorderKind.Auto, progressSymbols!: ?ProgressBarSymbols = None )
 packages/core/src/style.cj:public static func default(): Theme
+packages/core/src/style.cj:public func resolveState(focused!: Bool = false, selected!: Bool = false, disabled!: Bool = false, error!: Bool = false, override!: ?StyleOverride = None): Style
 packages/core/src/style.cj:public func withIconSet(value: IconSet): Theme
+packages/core/src/style.cj:public func withBorderKind(value: BorderKind): Theme
+packages/core/src/style.cj:public func withProgressSymbols(value: ?ProgressBarSymbols): Theme
+packages/core/src/style.cj:public func withTerminalBackground(): Theme
+packages/core/src/style.cj:public static func indigo(accent!: Color = Color.Rgb(244, 187, 96)): Theme
 packages/core/src/style.cj:public static func graphite(accent!: Color = Color.Cyan): Theme
 packages/core/src/style.cj:public static func light(): Theme
 packages/core/src/style.cj:public static func light(accent!: Color): Theme
@@ -1755,10 +1830,14 @@ packages/core/src/style.cj:Selected
 packages/core/src/style.cj:Disabled
 packages/core/src/style.cj:Error
 packages/core/src/style.cj:Accent
+packages/core/src/styled_widget.cj:public class StyledWidget <: Widget {
+packages/core/src/styled_widget.cj:public init(child: Widget, override!: StyleOverride)
+packages/core/src/styled_widget.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/task_activity.cj:public enum TaskStatus {
 packages/core/src/task_activity.cj:Pending
 packages/core/src/task_activity.cj:Queued
 packages/core/src/task_activity.cj:Running
+packages/core/src/task_activity.cj:Paused
 packages/core/src/task_activity.cj:Done
 packages/core/src/task_activity.cj:Failed
 packages/core/src/task_activity.cj:Cancelled
@@ -1779,14 +1858,14 @@ packages/core/src/task_activity.cj:public let detail: String
 packages/core/src/task_activity.cj:public let progressLabel: String
 packages/core/src/task_activity.cj:public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
 packages/core/src/task_activity.cj:public class TaskActivityView <: Widget {
-packages/core/src/task_activity.cj:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
+packages/core/src/task_activity.cj:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
 packages/core/src/task_activity.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/task_activity.cj:public class TaskActivityListEntry {
 packages/core/src/task_activity.cj:public let activity: TaskActivity
 packages/core/src/task_activity.cj:public let layout: TaskActivityLayout
 packages/core/src/task_activity.cj:public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded)
 packages/core/src/task_activity.cj:public class TaskActivityList <: Widget {
-packages/core/src/task_activity.cj:public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: Theme = Theme(), unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
+packages/core/src/task_activity.cj:public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
 packages/core/src/task_activity.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/terminal.cj:public enum CursorShape {
 packages/core/src/terminal.cj:Block
@@ -1824,6 +1903,8 @@ packages/core/src/terminal.cj:public init(dirtyCells: Int64, spans: Array<Render
 packages/core/src/terminal.cj:public class Frame {
 packages/core/src/terminal.cj:public let area: Rect
 packages/core/src/terminal.cj:public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None)
+packages/core/src/terminal.cj:public func theme(): ?Theme
+packages/core/src/terminal.cj:public func textWidthOptions(): TextWidthOptions
 packages/core/src/terminal.cj:public func renderWidget(widget: Widget, area: Rect): Unit
 packages/core/src/terminal.cj:public func canvas(area!: Rect = this.area): Canvas
 packages/core/src/terminal.cj:public func fill(area: Rect, style: Style): Unit
@@ -1841,6 +1922,8 @@ packages/core/src/terminal.cj:Full
 packages/core/src/terminal.cj:public class Terminal {
 packages/core/src/terminal.cj:public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )
 packages/core/src/terminal.cj:public func setCapabilities(capabilities: TerminalCapabilities): Unit
+packages/core/src/terminal.cj:public func setTheme(theme: ?Theme): Unit
+packages/core/src/terminal.cj:public func setTextWidthOptions(options: TextWidthOptions): Unit
 packages/core/src/terminal.cj:public func draw(render: (Frame) -> Unit): RenderMetrics
 packages/core/src/terminal.cj:public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics
 packages/core/src/terminal.cj:public func clear(): Unit
@@ -2060,11 +2143,14 @@ packages/core/src/text.cj:public func displayWidth(text: String, options!: TextW
 packages/core/src/text.cj:public func displayWidth(r: Rune): Int64
 packages/core/src/text.cj:public func displayWidth(r: Rune, options!: TextWidthOptions): Int64
 packages/core/src/text.cj:public func graphemeClusters(text: String): Array<GraphemeCluster>
+packages/core/src/text.cj:public func graphemeClusters(text: String, options!: TextWidthOptions): Array<GraphemeCluster>
 packages/core/src/text.cj:public func graphemeDisplayWidth(text: String): Int64
 packages/core/src/text.cj:public func cut(text: String, width: Int64): String
 packages/core/src/text.cj:public func graphemePrefix(text: String, maxWidth: Int64): String
+packages/core/src/text.cj:public func graphemePrefix(text: String, maxWidth: Int64, options!: TextWidthOptions): String
 packages/core/src/text.cj:public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64
 packages/core/src/text.cj:public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String>
+packages/core/src/text.cj:public func wrapText(text: String, width: Int64, mode: WrapMode, options!: TextWidthOptions): Array<String>
 packages/core/src/text.cj:public func clampToRuneBoundary(text: String, offset: Int64): Int64
 packages/core/src/text.cj:public func previousGraphemeOffset(text: String, offset: Int64): Int64
 packages/core/src/text.cj:public func nextGraphemeOffset(text: String, offset: Int64): Int64
@@ -2126,7 +2212,9 @@ packages/core/src/text_area.cj:public init( value!: String = "", model!: ?Editab
 packages/core/src/text_area.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/text_area.cj:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
 packages/core/src/text_area.cj:public func handleVimNavigation(key: KeyEvent): Bool
+packages/core/src/text_area.cj:public func setTextWidthOptions(options: TextWidthOptions): Unit
 packages/core/src/text_area.cj:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/text_area.cj:public func cursorPosition(area: Rect, options!: TextWidthOptions): Position
 packages/core/src/text_area.cj:public func cursorPosition(area: Rect): Position
 packages/core/src/text_area.cj:public func cursorPositions(area: Rect): Array<Position>
 packages/core/src/text_area.cj:public func select(start: Int64, end: Int64): Unit
@@ -2322,7 +2410,9 @@ packages/core/src/virtual_transcript.cj:func itemFooter(_: Int64): String
 packages/core/src/virtual_transcript.cj:func itemUsesCompactCardChrome(_: Int64): Bool
 packages/core/src/virtual_transcript.cj:func revision(index: Int64): Int64
 packages/core/src/virtual_transcript.cj:func itemAppendOnlyText( _: Int64, _: Int64, _: String ): ?VirtualTranscriptAppendOnlyText
+packages/core/src/virtual_transcript.cj:func itemAppendOnlyTextWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): ?VirtualTranscriptAppendOnlyText
 packages/core/src/virtual_transcript.cj:func document(index: Int64, width: Int64, themeKey: String): Document
+packages/core/src/virtual_transcript.cj:func documentWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): Document
 packages/core/src/virtual_transcript.cj:func itemCardTheme(_: Int64): ?TranscriptCardTheme
 packages/core/src/virtual_transcript.cj:public class VirtualTranscriptState {
 packages/core/src/virtual_transcript.cj:public var scrollTop: Int64
@@ -2391,6 +2481,7 @@ packages/core/src/virtual_transcript.cj:public func setThemeKey(value: String): 
 packages/core/src/virtual_transcript.cj:public func setCardChrome(enabled: Bool): Unit
 packages/core/src/virtual_transcript.cj:public func setUnicode(enabled: Bool): Unit
 packages/core/src/virtual_transcript.cj:public func setCardTheme(theme: TranscriptCardTheme): Unit
+packages/core/src/virtual_transcript.cj:public func clearCardTheme(): Unit
 packages/core/src/virtual_transcript.cj:public func invalidateItem(id: String): Bool
 packages/core/src/virtual_transcript.cj:public func totalRows(): Int64
 packages/core/src/virtual_transcript.cj:public func materializedCount(): Int64
@@ -2408,6 +2499,10 @@ packages/core/src/visual_widgets.cj:Percent
 packages/core/src/visual_widgets.cj:Value
 packages/core/src/visual_widgets.cj:Ratio
 packages/core/src/visual_widgets.cj:Text(String)
+packages/core/src/visual_widgets.cj:public enum ProgressBarLabelPosition {
+packages/core/src/visual_widgets.cj:Automatic
+packages/core/src/visual_widgets.cj:Start
+packages/core/src/visual_widgets.cj:End
 packages/core/src/visual_widgets.cj:public class ProgressBarSymbols {
 packages/core/src/visual_widgets.cj:public let filled: String
 packages/core/src/visual_widgets.cj:public let empty: String
@@ -2420,16 +2515,16 @@ packages/core/src/visual_widgets.cj:public let style: Style
 packages/core/src/visual_widgets.cj:public let symbol: String
 packages/core/src/visual_widgets.cj:public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#")
 packages/core/src/visual_widgets.cj:public class ProgressBar <: Widget {
-packages/core/src/visual_widgets.cj:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Cyan), theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: Style = Style(fg: Color.White), symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0 )
+packages/core/src/visual_widgets.cj:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None, theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: ?Style = None, symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0, labelPosition!: ProgressBarLabelPosition = ProgressBarLabelPosition.Automatic, trackOverride!: StyleOverride = StyleOverride(), fillOverride!: StyleOverride = StyleOverride(), labelOverride!: StyleOverride = StyleOverride() )
 packages/core/src/visual_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/visual_widgets.cj:public class Sparkline <: Widget {
-packages/core/src/visual_widgets.cj:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: Style = Style(fg: Color.Cyan), block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
+packages/core/src/visual_widgets.cj:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None, block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
 packages/core/src/visual_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/visual_widgets.cj:public class Gauge <: Widget {
-packages/core/src/visual_widgets.cj:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: Style = Style(fg: Color.Indexed(8)), fillStyle!: Style = Style(fg: Color.Green) )
+packages/core/src/visual_widgets.cj:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None )
 packages/core/src/visual_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/visual_widgets.cj:public class Chart <: Widget {
-packages/core/src/visual_widgets.cj:public init( values: Array<Int64>, block!: ?Block = None, style!: Style = Style(fg: Color.Cyan), maxValue!: Int64 = 0 )
+packages/core/src/visual_widgets.cj:public init( values: Array<Int64>, block!: ?Block = None, style!: ?Style = None, maxValue!: Int64 = 0 )
 packages/core/src/visual_widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/visual_widgets.cj:public class LogView <: Widget {
 packages/core/src/visual_widgets.cj:public var offset: Int64
@@ -2450,6 +2545,8 @@ packages/core/src/widgets.cj:Auto
 packages/core/src/widgets.cj:Ascii
 packages/core/src/widgets.cj:Unicode
 packages/core/src/widgets.cj:Rounded
+packages/core/src/widgets.cj:Double
+packages/core/src/widgets.cj:Dashed
 packages/core/src/widgets.cj:NoBorder
 packages/core/src/widgets.cj:public enum TitleAlign {
 packages/core/src/widgets.cj:Left
@@ -2472,6 +2569,8 @@ packages/core/src/widgets.cj:public init( horizontal!: String = "-", vertical!: 
 packages/core/src/widgets.cj:public static func ascii(): BorderSet
 packages/core/src/widgets.cj:public static func unicode(): BorderSet
 packages/core/src/widgets.cj:public static func rounded(): BorderSet
+packages/core/src/widgets.cj:public static func doubleLine(): BorderSet
+packages/core/src/widgets.cj:public static func dashed(): BorderSet
 packages/core/src/widgets.cj:public class BlockOptions {
 packages/core/src/widgets.cj:public let title: String
 packages/core/src/widgets.cj:public let borderKind: BorderKind
@@ -2488,9 +2587,10 @@ packages/core/src/widgets.cj:public let asciiFallback: Bool
 packages/core/src/widgets.cj:public let theme: ?Theme
 packages/core/src/widgets.cj:public init( title!: String = "", borderKind!: BorderKind = BorderKind.Auto, border!: BorderSet = BorderSet(horizontal: "", vertical: "", topLeft: "", topRight: "", bottomLeft: "", bottomRight: ""), titleAlign!: TitleAlign = TitleAlign.Left, padding!: Spacing = Spacing.zero(), margin!: Spacing = Spacing.zero(), backgroundStyle!: ?Style = None, borderStyle!: ?Style = None, contentStyle!: ?Style = None, titleStyle!: ?Style = None, state!: BoxState = BoxState.Normal, asciiFallback!: Bool = false, theme!: ?Theme = None )
 packages/core/src/widgets.cj:public class Block <: Widget {
-packages/core/src/widgets.cj:public init(title!: String = "", style!: Style = Style.default())
+packages/core/src/widgets.cj:public init(title!: String = "", style!: ?Style = None)
 packages/core/src/widgets.cj:public init(options: BlockOptions)
 packages/core/src/widgets.cj:public func inner(area: Rect): Rect
+packages/core/src/widgets.cj:public func inner(area: Rect, theme!: ?Theme): Rect
 packages/core/src/widgets.cj:public func renderInner(area: Rect, buffer: Buffer): Rect
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class Panel <: Widget {
@@ -2499,11 +2599,12 @@ packages/core/src/widgets.cj:public init(options: BlockOptions, child!: ?Widget 
 packages/core/src/widgets.cj:public func renderInner(area: Rect, buffer: Buffer): Rect
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class Paragraph <: Widget {
-packages/core/src/widgets.cj:public init( text: String, block!: ?Block = None, style!: Style = Style.default(), scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
+packages/core/src/widgets.cj:public init( text: String, block!: ?Block = None, style!: ?Style = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class List <: Widget {
 packages/core/src/widgets.cj:public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
 packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class ListState {
 packages/core/src/widgets.cj:public var selected: ?Int64
@@ -2516,8 +2617,9 @@ packages/core/src/widgets.cj:public func moveWithDirty(delta: Int64, total: Int6
 packages/core/src/widgets.cj:public func previous(total: Int64): Unit
 packages/core/src/widgets.cj:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
 packages/core/src/widgets.cj:public class Table <: Widget {
-packages/core/src/widgets.cj:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: Style = Style.default(), headerStyle!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
+packages/core/src/widgets.cj:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: ?Style = None, headerStyle!: ?Style = None, selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
 packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widgets.cj:public class TableState {
 packages/core/src/widgets.cj:public var selectedRow: ?Int64
@@ -2535,14 +2637,18 @@ packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Uni
 packages/core/src/widgets.cj:public class Input <: Widget {
 packages/core/src/widgets.cj:public var value: String
 packages/core/src/widgets.cj:public var cursor: Int64
-packages/core/src/widgets.cj:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: Style = Style(fg: Color.Indexed(8)), showBoundary!: Bool = true )
+packages/core/src/widgets.cj:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: ?Style = None, showBoundary!: Bool = true )
 packages/core/src/widgets.cj:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
 packages/core/src/widgets.cj:public func paste(text: String): Unit
 packages/core/src/widgets.cj:public func handle(key: KeyEvent): Bool
 packages/core/src/widgets.cj:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+packages/core/src/widgets.cj:public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects
 packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
 packages/core/src/widgets.cj:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position
 packages/core/src/widgets.cj:public func cursorPosition(area: Rect): Position
+packages/core/src/widgets.cj:public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position
 packages/core/src/widgets.cj:public func setValue(value: String, cursor!: Int64 = -1): Unit
 packages/core/src/widgets.cj:public func clear(): Unit
 packages/core/src/widgets.cj:public func moveToStart(): Unit
@@ -2582,11 +2688,19 @@ packages/diff/src/diff.cj:public init(files: Array<DiffFile>)
 packages/diff/src/diff.cj:public func addedLines(): Int64
 packages/diff/src/diff.cj:public func deletedLines(): Int64
 packages/diff/src/diff.cj:public func parseUnifiedDiff(text: String): DiffDocument
+packages/diff/src/diff.cj:public struct DiffViewStyles {
+packages/diff/src/diff.cj:public let summary: StyleOverride
+packages/diff/src/diff.cj:public let hunk: StyleOverride
+packages/diff/src/diff.cj:public let context: StyleOverride
+packages/diff/src/diff.cj:public let add: StyleOverride
+packages/diff/src/diff.cj:public let delete: StyleOverride
+packages/diff/src/diff.cj:public let header: StyleOverride
+packages/diff/src/diff.cj:public init(summary!: StyleOverride = StyleOverride(), hunk!: StyleOverride = StyleOverride(), context!: StyleOverride = StyleOverride(), add!: StyleOverride = StyleOverride(), delete!: StyleOverride = StyleOverride(), header!: StyleOverride = StyleOverride())
 packages/diff/src/diff.cj:public class DiffView <: Widget {
 packages/diff/src/diff.cj:public var selectedFile: Int64
 packages/diff/src/diff.cj:public var selectedLine: Int64
 packages/diff/src/diff.cj:public var offset: Int64
-packages/diff/src/diff.cj:public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, sideBySide!: Bool = false)
+packages/diff/src/diff.cj:public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, sideBySide!: Bool = false, theme!: ?Theme = None, styles!: DiffViewStyles = DiffViewStyles())
 packages/diff/src/diff.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/game/src/game.cj:public struct EntityId <: Equatable<EntityId> {
 packages/game/src/game.cj:public let value: Int64
@@ -2709,13 +2823,15 @@ packages/game/src/game.cj:public func drawSprite(canvas: Canvas, transform: Tran
 packages/game/src/game.cj:public class TileMap {
 packages/game/src/game.cj:public let width: Int64
 packages/game/src/game.cj:public let height: Int64
-packages/game/src/game.cj:public init(rows: Array<String>, solidSymbol!: String = "#")
+packages/game/src/game.cj:public init(rows: Array<String>, solidSymbol!: String = "#", widthOptions!: TextWidthOptions = TextWidthOptions())
 packages/game/src/game.cj:public func isSolid(x: Int64, y: Int64): Bool
 packages/game/src/game.cj:public func tileAt(x: Int64, y: Int64): String
 packages/game/src/game.cj:public func find(symbol: String): Array<TileMarker>
 packages/game/src/game.cj:public func findAny(symbols: Array<String>): Array<TileMarker>
 packages/game/src/game.cj:public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
-packages/game/src/game.cj:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style = Style(fg: Color.White)): Unit
+packages/game/src/game.cj:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style): Unit
+packages/game/src/game.cj:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit
+packages/markdown_adapter/src/markdown.cj:public func documentThemeFromTheme(theme: Theme): DocumentTheme
 packages/markdown_adapter/src/markdown.cj:public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
 packages/markdown_adapter/src/markdown.cj:public func markdownAstToDocument( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
 packages/markdown_adapter/src/markdown.cj:public class MarkdownPresentation {
@@ -2737,6 +2853,12 @@ packages/markdown_adapter/src/markdown.cj:public func markdownOutline(result: Pa
 packages/markdown_adapter/src/markdown.cj:public func markdownPreviewIndex(document: Document, width: Int64): MarkdownPreviewIndex
 packages/markdown_adapter/src/syntax_config.cj:public class SyntaxHighlightConfig {
 packages/markdown_adapter/src/syntax_config.cj:public func parseSyntaxHighlightConfig(text: String): SyntaxHighlightConfig
+packages/markdown_adapter/src/themed_markdown_view.cj:public class ThemedMarkdownView <: Widget {
+packages/markdown_adapter/src/themed_markdown_view.cj:public init(text: String, theme!: ?DocumentTheme = None, preserveSoftBreaks!: Bool = false, syntax!: ?SyntaxHighlightConfig = None, block!: ?Block = None, state!: ?DocumentViewState = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Word, highlights!: Array<DocumentHighlight> = [], cacheLayout!: Bool = false)
+packages/markdown_adapter/src/themed_markdown_view.cj:public func setText(text: String): Unit
+packages/markdown_adapter/src/themed_markdown_view.cj:public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool
+packages/markdown_adapter/src/themed_markdown_view.cj:public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64
+packages/markdown_adapter/src/themed_markdown_view.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/media/src/media.cj:public class MediaDecodeRequest {
 packages/media/src/media.cj:public let source: MediaSource
 packages/media/src/media.cj:public let area: Rect
@@ -2792,7 +2914,7 @@ packages/media/src/media.cj:public init(ffmpeg!: String = "ffmpeg")
 packages/media/src/media.cj:public func decode(source: MediaSource, options: AsciiRenderOptions): ?AsciiAnimation
 packages/media/src/media.cj:public func commandFor(source: MediaSource, options: AsciiRenderOptions): String
 packages/media/src/media.cj:public class AsciiAnimationView <: Widget {
-packages/media/src/media.cj:public init( animation: AsciiAnimation, elapsedMillis!: Int64 = 0, zoom!: Int64 = 1, paused!: Bool = false, block!: ?Block = None, style!: Style = Style(fg: Color.White), pausedStyle!: Style = Style(fg: Color.Yellow) )
+packages/media/src/media.cj:public init( animation: AsciiAnimation, elapsedMillis!: Int64 = 0, zoom!: Int64 = 1, paused!: Bool = false, block!: ?Block = None, style!: ?Style = None, pausedStyle!: ?Style = None )
 packages/media/src/media.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/media/src/media.cj:public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame
 packages/media/src/media.cj:public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol
@@ -2811,7 +2933,9 @@ packages/terminal/src/terminal.cj:public func parseAnsi(text: String): Array<Ans
 packages/terminal/src/terminal.cj:public class TerminalScreen {
 packages/terminal/src/terminal.cj:public let cols: Int64
 packages/terminal/src/terminal.cj:public let rows: Int64
-packages/terminal/src/terminal.cj:public init(cols!: Int64 = 80, rows!: Int64 = 24)
+packages/terminal/src/terminal.cj:public init(cols!: Int64 = 80, rows!: Int64 = 24, textWidthOptions!: TextWidthOptions = TextWidthOptions())
+packages/terminal/src/terminal.cj:public func textWidthOptions(): TextWidthOptions
+packages/terminal/src/terminal.cj:public func matchesTextWidthOptions(options: TextWidthOptions): Bool
 packages/terminal/src/terminal.cj:public func cell(x: Int64, y: Int64): Cell
 packages/terminal/src/terminal.cj:public func lineText(y: Int64): String
 packages/terminal/src/terminal.cj:public func feed(text: String): Unit
@@ -2820,11 +2944,11 @@ packages/terminal/src/terminal.cj:public class TerminalTranscript {
 packages/terminal/src/terminal.cj:public let screen: TerminalScreen
 packages/terminal/src/terminal.cj:public let maxChunks: Int64
 packages/terminal/src/terminal.cj:public var followTail: Bool
-packages/terminal/src/terminal.cj:public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true)
+packages/terminal/src/terminal.cj:public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true, textWidthOptions!: TextWidthOptions = TextWidthOptions())
 packages/terminal/src/terminal.cj:public func append(text: String): Unit
 packages/terminal/src/terminal.cj:public func chunkCount(): Int64
 packages/terminal/src/terminal.cj:public class TerminalView <: Widget {
-packages/terminal/src/terminal.cj:public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "")
+packages/terminal/src/terminal.cj:public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "", searchStyle!: ?StyleOverride = None, theme!: ?Theme = None)
 packages/terminal/src/terminal.cj:public func render(area: Rect, buffer: Buffer): Unit
 packages/testing/src/testing.cj:public class TestReport {
 packages/testing/src/testing.cj:public let passed: Bool

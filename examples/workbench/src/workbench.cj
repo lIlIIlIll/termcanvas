@@ -42,7 +42,7 @@ class WorkbenchApp {
     let galleryTree = Tree(galleryTreeNodes, selected: 2)
     let galleryTableState = TableState(selectedRow: Some(0))
     let galleryListState = ListState(selected: Some(0))
-    let galleryDialog = ConfirmDialog("This is a real confirmation dialog.\nYes confirms; No declines.", selectedStyle: Style.default())
+    let galleryDialog = ConfirmDialog("This is a real confirmation dialog.\nYes confirms; No declines.")
     var galleryAsciiFallback: Bool = false
     let projectNodes = [
         TreeNode("all", "All projects"),
@@ -52,7 +52,7 @@ class WorkbenchApp {
     ]
     let projects: Tree
     let taskSearch = Input(value: "", placeholder: "Search by task name, ID, or text", block: Block(title: "Search"))
-    let taskFilter = Dropdown(["All", "Queued", "Running", "Done"], placeholder: "Status", selectedStyle: Style.default())
+    let taskFilter = Dropdown(["All", "Queued", "Running", "Done"], placeholder: "Status")
     let taskState = TableState(selectedRow: Some(0))
     let taskScroll = ScrollState()
     let logScroll = ScrollState()
@@ -77,8 +77,22 @@ class WorkbenchApp {
         MenuItem("Filter Alpha project", action: "project.alpha"),
         MenuItem("Filter Beta project", action: "project.beta"),
         MenuItem("Filter Gamma project", action: "project.gamma"),
+        MenuItem("Create task", action: "task.create"),
         MenuItem("Start selected task", action: "task.start"),
+        MenuItem("Pause selected task", action: "task.pause"),
+        MenuItem("Resume selected task", action: "task.resume"),
+        MenuItem("Cancel selected task", action: "task.cancel"),
+        MenuItem("Retry selected task", action: "task.retry"),
+        MenuItem("Delete selected task", action: "task.delete"),
+        MenuItem("Simulate task failure", action: "task.fail"),
+        MenuItem("Batch start marked tasks", action: "batch.start"),
+        MenuItem("Batch pause marked tasks", action: "batch.pause"),
+        MenuItem("Batch resume marked tasks", action: "batch.resume"),
+        MenuItem("Batch cancel marked tasks", action: "batch.cancel"),
+        MenuItem("Batch retry marked tasks", action: "batch.retry"),
+        MenuItem("Batch delete marked tasks", action: "batch.delete"),
         MenuItem("Edit selected task", action: "task.edit"),
+        MenuItem("View selected task and log", action: "task.details"),
         MenuItem("Reset selected task", action: "task.reset"),
         MenuItem("Pause or resume simulation", action: "simulation.pause"),
         MenuItem("Toggle motion", action: "motion.toggle"),
@@ -87,13 +101,15 @@ class WorkbenchApp {
         MenuItem("Quit", action: "app.quit"),
         MenuItem("Unavailable command", action: "unavailable", enabled: false)
     ],
-        selectedStyle: Style.default(),
         caseSensitive: false
     )
-    let helpDialog = Dialog(title: "Workbench help", body: "F1 help   F2 commands   F3 next page\nF4 edit task F5 run task F6 pause\nTab changes focus. / searches. q exits.\nGallery: Left/Right categories; click controls.\nMouse supports selection, sorting, scrolling, and modal actions.", buttons: ["Close"], width: 68, height: 10, selectedStyle: Style.default())
-    let resetDialog = Dialog(title: "Reset task", body: "Return this task to the queued state?", buttons: ["Cancel", "Reset"], width: 56, height: 9, selectedStyle: Style.default())
-    let demoResetDialog = Dialog(title: "Reset local demo", body: "Discard demo progress and restore all 120 tasks?", buttons: ["Cancel", "Reset"], width: 62, height: 9, selectedStyle: Style.default())
+    let helpDialog = Dialog(title: "Workbench help", body: "SIMULATED / memory only; no CI connection.\nF1 help  F2 commands  F3 page  F4 edit\nTasks table: n create; p/r pause/resume; x cancel\nt retry; d delete; l details; Space marks\nA/P/R/X/T/D batch start/pause/resume/cancel/retry/delete\nTab focus  / search  q exit. F6 pauses simulation.", buttons: ["Close"], width: 68, height: 10)
+    var detailsDialog = Dialog(title: "Task details", body: "", buttons: ["Close"], width: 64, height: 12)
+    var detailLogOffset: Int64 = 0
+    let resetDialog = Dialog(title: "Reset task", body: "Return this task to the queued state?", buttons: ["Cancel", "Reset"], width: 56, height: 9)
+    let demoResetDialog = Dialog(title: "Reset local demo", body: "Discard demo progress and restore all 120 tasks?", buttons: ["Cancel", "Reset"], width: 62, height: 9)
 
+    var productMode: Bool = false
     var darkTheme: Bool = true
     var capabilities: TerminalCapabilities = TerminalCapabilities()
     var theme: Theme = Theme.default()
@@ -109,6 +125,8 @@ class WorkbenchApp {
     var selectedId: ?Int64 = Some(1)
     var projectFilter: ?String = None
     var editingId: ?Int64 = None
+    var editorCreating: Bool = false
+    let markedIds = ArrayList<Int64>()
     var pendingResetId: ?Int64 = None
     var spinnerFrame: Int64 = 0
     private var overviewFocus: ?String = None
@@ -151,6 +169,35 @@ class WorkbenchApp {
         syncFocus(false)
     }
 
+    func enterCiShowcase(): Unit {
+        productMode = true
+        prepareCiSimulation()
+        accentPicker.selected = 2
+        refreshTheme()
+        switchPage(WorkbenchPage.Overview)
+    }
+
+    private func prepareCiSimulation(): Unit {
+        _ = model.setMetadata(1, "Cross-platform CI", "High", true, ["build", "test"], "Simulated local pipeline")
+        _ = model.setMetadata(2, "Documentation checks", "Normal", true, ["docs"], "")
+        _ = model.setMetadata(3, "Release packaging", "Normal", true, ["release"], "")
+        _ = model.setMetadata(4, "Unit tests / Linux", "Normal", true, ["test"], "")
+        _ = model.setMetadata(5, "Unit tests / Windows", "Normal", true, ["test"], "")
+        _ = model.setMetadata(6, "Integration suite", "Normal", true, ["test"], "")
+        _ = model.setMetadata(7, "Format and lint", "Normal", true, ["build"], "")
+        _ = model.setMetadata(8, "API compatibility", "Normal", true, ["test"], "")
+        _ = model.setMetadata(9, "Package archive", "Normal", true, ["release"], "")
+        match (model.job(1)) { case Some(task) => task.events.add("Checkout started"); case None => () }
+        recordActivity("job-1: Checkout started (simulated)")
+        // Warm the local simulation in chronological order so concurrent jobs
+        // begin at different stages; all counts and events come from the model.
+        _ = model.advance(1200)
+        if (model.start(2)) { recordActivity("job-2: Checkout started (simulated)") }
+        _ = model.advance(1200)
+        if (model.start(3)) { recordActivity("job-3: Checkout started (simulated)") }
+        model.sampleHistory(model.totalProgressHundredths())
+    }
+
     func update(event: Event): UpdateResult {
         match (event) {
             case Event.KeyDown(key) =>
@@ -173,7 +220,7 @@ class WorkbenchApp {
                 hovered = None
                 cancelPointerCapture()
                 screen = area
-                layout = workbenchLayout(screen, page)
+                layout = workbenchLayout(screen, page, product: productMode)
                 syncFocus(true)
                 UpdateResult.next()
             case Event.FocusOut =>
@@ -200,7 +247,7 @@ class WorkbenchApp {
     func render(frame: Frame): Unit {
         if (screen.width != frame.area.width || screen.height != frame.area.height) {
             screen = frame.area
-            layout = workbenchLayout(screen, page)
+            layout = workbenchLayout(screen, page, product: productMode)
             syncFocus(true)
         }
         renderWorkbench(this, frame)
@@ -230,8 +277,22 @@ class WorkbenchApp {
             case "project.alpha" => setProject(Some("Alpha")); UpdateResult.next()
             case "project.beta" => setProject(Some("Beta")); UpdateResult.next()
             case "project.gamma" => setProject(Some("Gamma")); UpdateResult.next()
+            case "task.create" => openNewTask(); UpdateResult.next()
             case "task.start" => startSelected(); UpdateResult.next()
+            case "task.pause" => taskAction("pause", false); UpdateResult.next()
+            case "task.resume" => taskAction("resume", false); UpdateResult.next()
+            case "task.cancel" => taskAction("cancel", false); UpdateResult.next()
+            case "task.retry" => taskAction("retry", false); UpdateResult.next()
+            case "task.delete" => taskAction("delete", false); UpdateResult.next()
+            case "task.fail" => taskAction("fail", false); UpdateResult.next()
+            case "batch.start" => taskAction("start", true); UpdateResult.next()
+            case "batch.pause" => taskAction("pause", true); UpdateResult.next()
+            case "batch.resume" => taskAction("resume", true); UpdateResult.next()
+            case "batch.cancel" => taskAction("cancel", true); UpdateResult.next()
+            case "batch.retry" => taskAction("retry", true); UpdateResult.next()
+            case "batch.delete" => taskAction("delete", true); UpdateResult.next()
             case "task.edit" => openEditor(); UpdateResult.next()
+            case "task.details" => openTaskDetails(); UpdateResult.next()
             case "task.reset" => openTaskReset(); UpdateResult.next()
             case "simulation.pause" =>
                 paused = !paused
@@ -292,9 +353,9 @@ class WorkbenchApp {
         let available = max(0, layout.taskTable.width - 6)
         let idWidth = min(8, available)
         let progressWidth = min(8, max(0, available - idWidth))
-        let statusWidth = min(10, max(0, available - idWidth - progressWidth))
-        let projectWidth = min(14, max(0, available - idWidth - progressWidth - statusWidth))
-        let nameWidth = min(20, max(0, available - idWidth - progressWidth - statusWidth - projectWidth))
+        let statusWidth = min(9, max(0, available - idWidth - progressWidth))
+        let projectWidth = min(8, max(0, available - idWidth - progressWidth - statusWidth))
+        let nameWidth = min(28, max(0, available - idWidth - progressWidth - statusWidth - projectWidth))
         [idWidth, nameWidth, projectWidth, statusWidth, progressWidth]
     }
 
@@ -534,6 +595,14 @@ class WorkbenchApp {
                 match (helpDialog.handle(key)) {
                     case Some(_) => closeModal()
                     case None => ()
+                }
+                UpdateResult.next()
+            case Some("details") =>
+                match (key.code) {
+                    case KeyCode.Up => detailLogOffset = max(0, detailLogOffset - 1); refreshTaskDetails()
+                    case KeyCode.Down => detailLogOffset++; refreshTaskDetails()
+                    case KeyCode.Enter => closeModal()
+                    case _ => ()
                 }
                 UpdateResult.next()
             case Some("palette") =>
@@ -971,6 +1040,12 @@ class WorkbenchApp {
                     case None => ()
                 }
                 UpdateResult.next()
+            case Some("details") =>
+                match (detailsDialog.handleMouse(mouse, layout.dialog)) {
+                    case Some(_) => closeModal()
+                    case None => ()
+                }
+                UpdateResult.next()
             case Some("palette") =>
                 match (palette.handleMouse(mouse, layout.palette)) {
                     case Some(action) =>
@@ -1081,6 +1156,21 @@ class WorkbenchApp {
             case KeyCode.Enter => return perform("task.edit")
             case KeyCode.Char(r's') => sortBy((model.sortColumn + 1) % 5)
             case KeyCode.Char(r'S') => sortBy(model.sortColumn, forceToggle: true)
+            case KeyCode.Char(r'n') => return perform("task.create")
+            case KeyCode.Char(r'p') => return perform("task.pause")
+            case KeyCode.Char(r'r') => return perform("task.resume")
+            case KeyCode.Char(r'x') => return perform("task.cancel")
+            case KeyCode.Char(r't') => return perform("task.retry")
+            case KeyCode.Char(r'd') => return perform("task.delete")
+            case KeyCode.Char(r'f') => return perform("task.fail")
+            case KeyCode.Char(r'l') => return perform("task.details")
+            case KeyCode.Char(r'A') => return perform("batch.start")
+            case KeyCode.Char(r'P') => return perform("batch.pause")
+            case KeyCode.Char(r'R') => return perform("batch.resume")
+            case KeyCode.Char(r'X') => return perform("batch.cancel")
+            case KeyCode.Char(r'T') => return perform("batch.retry")
+            case KeyCode.Char(r'D') => return perform("batch.delete")
+            case KeyCode.Char(r' ') => toggleMark(); return UpdateResult.next()
             case _ => return UpdateResult.unchanged()
         }
         syncSelectedFromTable()
@@ -1123,7 +1213,7 @@ class WorkbenchApp {
                     if (!model.completedIds.isEmpty()) {
                         statusChanged = true
                         for (id in model.completedIds) {
-                            let task = model.jobs[id - 1]
+                            let task = model.job(id).getOrThrow()
                             let message = "Completed ${task.label()}"
                             recordActivity(message)
                             if (task.notify) {
@@ -1193,6 +1283,11 @@ class WorkbenchApp {
                 case WorkbenchPage.Overview =>
                     result = addDirty(result, layout.overviewTop)
                     result = addDirty(result, layout.sparkPanel)
+                    if (productMode) {
+                        if (logFollowTail) { logScroll.offset = max(0, model.logs().size - layout.logView.height) }
+                        result = addDirty(result, layout.overviewBottom)
+                        result = addDirty(result, layout.queuePanel)
+                    }
                     if (containsId(tickChangedIds, selectedId)) {
                         result = addDirty(result, layout.overviewTask)
                     }
@@ -1311,12 +1406,128 @@ class WorkbenchApp {
         }
     }
 
+    func taskRows(options: TextWidthOptions): Array<Array<String>> {
+        let rows = ArrayList<Array<String>>()
+        let widths = layoutTableWidths()
+        for (id in model.visibleIds()) {
+            let task = model.job(id).getOrThrow()
+            let marker = if (isMarked(id)) { "*" } else { " " }
+            let values = [marker + task.label(), task.name, task.project, statusLabel(task.status), "${task.progressPercent}%"]
+            rows.add(Array<String>(values.size, { index => workbenchTableCell(values[index], widths[index], options, capabilities.unicode) }))
+        }
+        rows.toArray()
+    }
+
+    private func isMarked(id: Int64): Bool {
+        for (candidate in markedIds) { if (candidate == id) { return true } }
+        false
+    }
+
+    private func toggleMark(): Unit {
+        match (selectedId) {
+            case Some(id) =>
+                for (index in 0..markedIds.size) {
+                    if (markedIds[index] == id) { markedIds.remove(at: index); statusMessage = "Unmarked job-${id}"; return }
+                }
+                markedIds.add(id)
+                statusMessage = "Marked job-${id}; ${markedIds.size} selected"
+            case None => statusMessage = "No task selected"
+        }
+    }
+
+    private func taskAction(action: String, batch: Bool): Unit {
+        let targets = ArrayList<Int64>()
+        if (batch) {
+            for (id in markedIds) { targets.add(id) }
+        } else {
+            match (selectedId) { case Some(id) => targets.add(id); case None => () }
+        }
+        if (targets.isEmpty()) {
+            statusMessage = if (batch) { "Mark tasks with Space first" } else { "No task selected" }
+            return
+        }
+        var succeeded: Int64 = 0
+        var failed: Int64 = 0
+        for (id in targets) {
+            let missing = model.job(id).isNone()
+            let ok = match (action) {
+                case "start" => model.start(id)
+                case "pause" => model.pause(id)
+                case "resume" => model.resume(id)
+                case "cancel" => model.cancel(id)
+                case "retry" => model.retry(id)
+                case "delete" => model.delete(id)
+                case "fail" => model.fail(id)
+                case _ => false
+            }
+            if (ok) { succeeded++ } else if (missing) { failed++ }
+            let outcome = if (ok) { "ok" } else if (missing) { "failed: missing task" } else { "skipped" }
+            recordActivity("${action} job-${id}: ${outcome}")
+        }
+        if (action == "delete") {
+            var index: Int64 = 0
+            while (index < markedIds.size) {
+                if (model.job(markedIds[index]).isNone()) { markedIds.remove(at: index) } else { index++ }
+            }
+        }
+        statusMessage = "${action}: ${succeeded} succeeded, ${targets.size - succeeded - failed} skipped, ${failed} failed; see activity"
+        syncTableSelection()
+    }
+
+    private func openTaskDetails(): Unit {
+        match (selectedId) {
+            case Some(id) =>
+                match (model.job(id)) {
+                    case Some(task) =>
+                        detailLogOffset = max(0, task.events.size - 4)
+                        refreshTaskDetails()
+                        _ = interaction.open("details", ["details-close"])
+                        layout = workbenchLayout(screen, page, product: productMode)
+                    case None => statusMessage = "Task no longer exists"
+                }
+            case None => statusMessage = "No task selected"
+        }
+    }
+
+    private func refreshTaskDetails(): Unit {
+        match (selectedId) {
+            case Some(id) =>
+                match (model.job(id)) {
+                    case Some(task) =>
+                        detailLogOffset = max(0, min(detailLogOffset, max(0, task.events.size - 4)))
+                        var lines = "${task.label()}  ${task.name}  ${task.project}\n${statusLabel(task.status)} / ${task.progressPercent}% / ${task.priority}\nLog (Up/Down):\n"
+                        for (index in detailLogOffset..min(task.events.size, detailLogOffset + 4)) {
+                            lines += task.events[index] + "\n"
+                        }
+                        detailsDialog = Dialog(title: "Simulated task details", body: lines,
+                            buttons: ["Close"], width: 64, height: 12, theme: Some(theme))
+                    case None => ()
+                }
+            case None => ()
+        }
+    }
+
+    private func openNewTask(): Unit {
+        editingId = None
+        editorCreating = true
+        editorName.setValue("")
+        editorPrioritySelect.selected = 1
+        editorNotify.checked = true
+        editorTags = MultiSelect(["build", "test", "docs", "release"])
+        editorNotes.setValue("")
+        editorError = ""
+        _ = interaction.open("editor", ["editor-name", "editor-priority", "editor-notify", "editor-tags", "editor-notes", "editor-cancel", "editor-save"],
+            keymap: KeyMap(bindings: [KeyBinding([KeyEvent(KeyCode.F(1))], "help")]))
+        layout = workbenchLayout(screen, page, product: productMode)
+    }
+
     private func openEditor(): Unit {
         match (selectedId) {
             case Some(id) =>
                 match (model.job(id)) {
                     case Some(task) =>
                         editingId = Some(id)
+                        editorCreating = false
                         editorName.setValue(task.name)
                         editorPrioritySelect.selected = priorityIndex(task.priority)
                         editorNotify.checked = task.notify
@@ -1330,7 +1541,7 @@ class WorkbenchApp {
                         editorError = ""
                         _ = interaction.open("editor", ["editor-name", "editor-priority", "editor-notify", "editor-tags", "editor-notes", "editor-cancel", "editor-save"],
                             keymap: KeyMap(bindings: [KeyBinding([KeyEvent(KeyCode.F(1))], "help")]))
-                        layout = workbenchLayout(screen, page)
+                        layout = workbenchLayout(screen, page, product: productMode)
                     case None => statusMessage = "Task no longer exists"
                 }
             case None => statusMessage = "Select a task to edit"
@@ -1343,6 +1554,14 @@ class WorkbenchApp {
             editorError = "Name cannot be empty"
             _ = interaction.focus().focus("editor-name")
             return UpdateResult.next()
+        }
+        let created = editorCreating
+        if (editorCreating) {
+            let project = match (projectFilter) { case Some(value) => value; case None => "Alpha" }
+            let id = model.create(name, project)
+            editingId = Some(id)
+            editorCreating = false
+            recordActivity("Created job-${id} (simulated)")
         }
         match (editingId) {
             case Some(id) =>
@@ -1363,15 +1582,16 @@ class WorkbenchApp {
                     case _ => "Critical"
                 }
                 if (model.setMetadata(id, name, priority, editorNotify.checked, tags.toArray(), editorNotes.value)) {
-                    let message = "Updated job-${id}"
-                    recordActivity(message)
+                    let message = if (created) { "Created job-${id}" } else { "Updated job-${id}" }
+                    if (!created) { recordActivity(message) }
                     statusMessage = message
                 } else {
-                    statusMessage = "Task details unchanged"
+                    statusMessage = if (created) { "Created job-${id}" } else { "Task details unchanged" }
                 }
                 selectedId = Some(id)
                 closeModal()
                 applyTaskFilters()
+                if (selectedId != Some(id)) { statusMessage += "; hidden by filter" }
                 UpdateResult.next()
             case None =>
                 closeModal()
@@ -1385,7 +1605,7 @@ class WorkbenchApp {
         pendingResetId = selectedId
         resetDialog.selected = 0
         _ = interaction.open("reset-confirm", ["confirm-cancel", "confirm-reset"])
-        layout = workbenchLayout(screen, page)
+        layout = workbenchLayout(screen, page, product: productMode)
     }
 
     private func finishTaskReset(action: String): UpdateResult {
@@ -1410,13 +1630,14 @@ class WorkbenchApp {
     private func openDemoReset(): Unit {
         demoResetDialog.selected = 0
         _ = interaction.open("demo-confirm", ["demo-cancel", "demo-reset"])
-        layout = workbenchLayout(screen, page)
+        layout = workbenchLayout(screen, page, product: productMode)
     }
 
     private func finishDemoReset(action: String): UpdateResult {
         if (action == "Reset") {
             taskFilter.cancelSelection()
             model = WorkbenchModel()
+            markedIds.clear()
             toastAges.clear()
             toastItems.clear()
             toastManager = ToastManager(maxToasts: Some(8), theme: Some(theme))
@@ -1424,11 +1645,12 @@ class WorkbenchApp {
             logScroll.offset = 0
             recordActivity("Local demo initialized: 120 tasks")
             model.sampleHistory(model.totalProgressHundredths())
+            if (productMode) { prepareCiSimulation() }
             taskSearch.setValue("")
             taskFilter.selected = 0
             projectFilter = None
             _ = projects.selectById("all")
-            tabs.selected = 0
+            tabs.selected = 1
             page = WorkbenchPage.Overview
             paused = false
             selectedId = Some(1)
@@ -1454,7 +1676,7 @@ class WorkbenchApp {
 
     private func openHelp(): Unit {
         _ = interaction.open("help", ["help-close"])
-        layout = workbenchLayout(screen, page)
+        layout = workbenchLayout(screen, page, product: productMode)
     }
 
     private func openPalette(): Unit {
@@ -1462,14 +1684,14 @@ class WorkbenchApp {
         palette.selected = 0
         palette.offset = 0
         _ = interaction.open("palette", ["palette"])
-        layout = workbenchLayout(screen, page)
+        layout = workbenchLayout(screen, page, product: productMode)
     }
 
     private func openGalleryDialog(): Unit {
         galleryDialog.confirmed = false
         _ = interaction.open("gallery-dialog", ["gallery-dialog-cancel", "gallery-dialog-confirm"])
         _ = interaction.focus().focus("gallery-dialog-cancel")
-        layout = workbenchLayout(screen, page)
+        layout = workbenchLayout(screen, page, product: productMode)
     }
 
     private func finishGalleryDialog(accepted: Bool): UpdateResult {
@@ -1486,17 +1708,18 @@ class WorkbenchApp {
     private func closeModal(): Unit {
         let closed = interaction.close()
         modalClosed(closed)
-        layout = workbenchLayout(screen, page)
+        layout = workbenchLayout(screen, page, product: productMode)
     }
 
     private func modalClosed(id: ?String): Unit {
         if (id == Some("editor")) {
             cancelPointerCapture()
             editingId = None
+            editorCreating = false
             editorError = ""
         }
         if (id == Some("reset-confirm")) { pendingResetId = None }
-        layout = workbenchLayout(screen, page)
+        layout = workbenchLayout(screen, page, product: productMode)
     }
 
     private func switchPage(next: WorkbenchPage): Unit {
@@ -1510,7 +1733,7 @@ class WorkbenchApp {
             case WorkbenchPage.Tasks => 2
             case WorkbenchPage.Settings => 3
         }
-        layout = workbenchLayout(screen, page)
+        layout = workbenchLayout(screen, page, product: productMode)
         syncFocus(false)
     }
 
@@ -1688,17 +1911,11 @@ class WorkbenchApp {
             case 3 => Some(WorkbenchJobStatus.Done)
             case _ => None
         }
-        let oldSelected = selectedId
-        let changed = model.setQuery(taskSearch.value, projectFilter, statusFilter)
-        if (changed) {
-            match (oldSelected) {
-                case Some(id) =>
-                    if (visibleIndex(id) < 0) { selectedId = None }
-                case None => ()
-            }
-            syncTableSelection()
-        }
-        syncFocus(true)
+        // The model may already have rebuilt its rows after a create or edit,
+        // even when the filter text itself did not change. Always reconcile the
+        // highlighted row with the selected stable ID after applying filters.
+        _ = model.setQuery(taskSearch.value, projectFilter, statusFilter)
+        syncTableSelection()
     }
 
     private func filterLabel(): String {
@@ -1803,7 +2020,7 @@ class WorkbenchApp {
 
     private func headerColumn(x: Int64): Int64 {
         let widths = layoutTableWidths()
-        var start = layout.taskTable.x
+        var start = layout.taskTable.x + min(2, layout.taskTable.width)
         for (column in 0..widths.size) {
             let end = start + widths[column]
             if (x >= start && x < end) { return column }
@@ -1847,9 +2064,13 @@ class WorkbenchApp {
     private func refreshTheme(): Unit {
         let effective = effectiveCapabilities()
         let selected = selectedAccent()
-        theme = match (selected) {
-            case Color.Cyan => Theme.forCapabilities(effective, dark: darkTheme)
-            case _ => Theme.forCapabilities(effective, dark: darkTheme, accent: selected)
+        theme = if (productMode && darkTheme && accentPicker.selected == 2) {
+            Theme.indigo().adapted(effective)
+        } else {
+            match (selected) {
+                case Color.Cyan => Theme.forCapabilities(effective, dark: darkTheme)
+                case _ => Theme.forCapabilities(effective, dark: darkTheme, accent: selected)
+            }
         }
         let accent = theme.accent.fg
         surfaceStyle = theme.surface
@@ -1967,7 +2188,7 @@ class WorkbenchApp {
                 toast.message,
                 kind: toast.kind,
                 ttl: remaining,
-                style: toast.style
+                style: if (productMode) { toast.style.withBg(theme.raisedSurface.bg) } else { toast.style }
             ))
         }
         toastManager = manager
@@ -2068,4 +2289,12 @@ func tagIndex(tag: String): Int64 {
         case "release" => 3
         case _ => -1
     }
+}
+
+// Preserve grapheme clusters and reserve one cell for an explicit truncation marker.
+func workbenchTableCell(text: String, width: Int64, options: TextWidthOptions, unicode: Bool): String {
+    if (width <= 0) { return "" }
+    if (displayWidth(text, options: options) <= width) { return text }
+    let marker = if (unicode && displayWidth("…", options: options) == 1) { "…" } else { "." }
+    graphemePrefix(text, width - 1, options: options) + marker
 }

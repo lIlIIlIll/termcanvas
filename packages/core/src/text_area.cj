@@ -185,6 +185,7 @@ public class TextArea <: Widget {
     public var horizontalScroll: Int64 = 0
     private var viewportHeight: Int64 = 1
     private var viewportWidth: Int64 = 0
+    private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
     private var preferredColumn: ?Int64 = None
     private var verticalColumns: Array<Int64> = []
     private var verticalOffsets: Array<Int64> = []
@@ -384,7 +385,18 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 设置后续光标及鼠标定位所使用的文本宽度策略。绘制时会与缓冲区同步。 */
+    public func setTextWidthOptions(options: TextWidthOptions): Unit {
+        if (usesWideAmbiguous(options) != usesWideAmbiguous(textWidthOptionsValue)) {
+            preferredColumn = None
+            verticalColumns = []
+            verticalOffsets = []
+        }
+        textWidthOptionsValue = options
+    }
+
     public func render(area: Rect, buffer: Buffer): Unit {
+        setTextWidthOptions(buffer.textWidthOptions())
         synchronizeValue()
         var target = area
         if (let Some(b) <- block) { b.render(area, buffer); target = b.inner(area) }
@@ -410,11 +422,17 @@ public class TextArea <: Widget {
             }
             renderLine(textTarget.x, textTarget.y + row, textTarget.width, lineIndex, line, buffer)
             if (lineHasFoldMarker(lineIndex) && textTarget.width > 0) {
-                let markerX = max(textTarget.x, min(textTarget.right - 3, textTarget.x + displayWidth(line) - horizontalScroll + 1))
+                let markerX = max(textTarget.x, min(textTarget.right - 3, textTarget.x + displayWidth(line, options: textWidthOptionsValue) - horizontalScroll + 1))
                 buffer.writeStringClipped(markerX, textTarget.y + row, "...", maxWidth: textTarget.right - markerX, style: lineNumberStyle)
             }
         }
         renderCompletion(area, textTarget, buffer)
+    }
+
+    /** 使用指定宽度策略计算主光标位置，也将其用于后续定位与编辑。 */
+    public func cursorPosition(area: Rect, options!: TextWidthOptions): Position {
+        setTextWidthOptions(options)
+        cursorPosition(area)
     }
 
     public func cursorPosition(area: Rect): Position {
@@ -668,7 +686,7 @@ public class TextArea <: Widget {
         let source = value
         let start = completionPrefixStart(source, cursor)
         let line = lineForOffset(cursor)
-        let column = displayWidth(textModelValue.slice(lineStartForOffset(cursor), cursor))
+        let column = displayWidth(textModelValue.slice(lineStartForOffset(cursor), cursor), options: textWidthOptionsValue)
         completionRequestId = requestId
         completionRevision = revision
         completionReplaceStart = start
@@ -936,7 +954,7 @@ public class TextArea <: Widget {
     }
 
     private func columnForOffset(offset: Int64): Int64 {
-        displayWidth(textModelValue.slice(lineStartForOffset(offset), offset))
+        displayWidth(textModelValue.slice(lineStartForOffset(offset), offset), options: textWidthOptionsValue)
     }
 
     internal func previousOffset(offset: Int64): Int64 {
@@ -1340,7 +1358,7 @@ public class TextArea <: Widget {
     }
     private func offsetAtCachedLineColumn(line: Int64, column: Int64): Int64 {
         let index = clamp(line, 0, max(0, textModelValue.lineCount() - 1))
-        textModelValue.lineStart(index) + offsetAtLineColumn(textModelValue.line(index), 0, column)
+        textModelValue.lineStart(index) + offsetAtLineColumn(textModelValue.line(index), 0, column, options: textWidthOptionsValue)
     }
     public func lineCacheRebuildCount(): Int64 { cachedLineRebuilds }
 
@@ -1476,7 +1494,7 @@ public class TextArea <: Widget {
             let prefix = if (itemIndex == completionIndex) { "> " } else { "  " }
             let text = if (item.detail.isEmpty()) { prefix + item.label } else { prefix + item.label + " " + item.detail }
             let popupStyle = if (itemIndex == completionIndex) { selectedStyle } else { Style(fg: Color.Cyan) }
-            buffer.setString(pos.x, startY + row, truncate(text, max(0, area.x + area.width - pos.x)), style: popupStyle)
+            buffer.setString(pos.x, startY + row, truncate(text, max(0, area.x + area.width - pos.x), options: buffer.textWidthOptions()), style: popupStyle)
         }
     }
 
@@ -1490,7 +1508,7 @@ public class TextArea <: Widget {
             var offset: Int64 = 0
             buffer.fill(Rect(x, y, width, 1), style: style)
             for (span in styled) {
-                for (cluster in graphemeClusters(span.text)) {
+                for (cluster in graphemeClusters(span.text, options: buffer.textWidthOptions())) {
                     if (column >= horizontalScroll + width) { break }
                     if (column >= horizontalScroll && column + cluster.width <= horizontalScroll + width) {
                         var cellStyle = span.style
@@ -1674,9 +1692,9 @@ func renderDecoratedLine(buffer: Buffer, x: Int64, y: Int64, width: Int64, spans
     let right = x + width
     for (span in spans) {
         if (cx >= right) { return }
-        let part = truncate(span.text, right - cx)
+        let part = truncate(span.text, right - cx, options: buffer.textWidthOptions())
         buffer.setString(cx, y, part, style: span.style)
-        cx += displayWidth(part)
+        cx += displayWidth(part, options: buffer.textWidthOptions())
     }
 }
 

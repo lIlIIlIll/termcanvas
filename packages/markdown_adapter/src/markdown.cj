@@ -1,8 +1,22 @@
 package markdown_adapter
 
 import markdown.core.{DiagnosticSeverity, ListKind, Markdown, MarkdownProfile, NodeKind, NodeRef, ParseResult, SourceSpan, TableAlignment, TaskState}
-import core.{Document, DocumentLine, DocumentLineKind, DocumentTheme, DocumentView, MediaKind, MediaSource, RichSpan, Style, TextDecoration, displayWidth}
+import core.{Document, DocumentLine, DocumentLineKind, DocumentTheme, DocumentView, MediaKind, MediaSource, RichSpan, Style, StyleOverride, TextDecoration, Theme, displayWidth}
 import std.collection.*
+
+/** 以应用的语义主题构建文档主题；代码语法高亮的独立配色仍由语法配置决定。
+ */
+public func documentThemeFromTheme(theme: Theme): DocumentTheme {
+    let emphasis = StyleOverride(italic: Some(true)).apply(theme.normal)
+    let strong = StyleOverride(bold: Some(true)).apply(theme.normal)
+    DocumentTheme(paragraph: theme.normal, heading: theme.heading,
+        heading1: Some(theme.heading), heading2: Some(theme.heading), heading3: Some(theme.heading),
+        heading4: Some(theme.heading), heading5: Some(theme.heading), heading6: Some(theme.heading),
+        list: theme.normal, quoteStyle: theme.secondary, code: theme.surface,
+        table: theme.normal, link: theme.accent, emphasis: emphasis, strong: strong,
+        inlineCode: theme.surface, image: theme.accent, diagnostic: theme.error,
+        html: theme.secondary, strikethrough: theme.secondary, tableHeader: theme.heading)
+}
 
 public func markdownDocument(
     text: String,

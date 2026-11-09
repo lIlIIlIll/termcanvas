@@ -8,6 +8,9 @@ import std.unicode.*
 enum WorkbenchJobStatus {
     | Queued
     | Running
+    | Paused
+    | Cancelled
+    | Failed
     | Done
 }
 
@@ -24,6 +27,7 @@ class WorkbenchJob {
     var tags: Array<String> = ["build"]
     var notes: String = ""
     var rowCache: Array<String> = ["", "", "", "", ""]
+    let events = ArrayList<String>()
 
     init(id: Int64, project: String, status: WorkbenchJobStatus) {
         this.id = id
@@ -31,6 +35,7 @@ class WorkbenchJob {
         this.status = status
         this.durationMillis = 6000 + ((id - 1) % 5) * 2000
         this.name = "Task ${id}"
+        events.add("Created in local simulation")
         refreshRow()
     }
 
@@ -40,6 +45,9 @@ class WorkbenchJob {
         let statusText = match (status) {
             case WorkbenchJobStatus.Queued => "Queued"
             case WorkbenchJobStatus.Running => "Running"
+            case WorkbenchJobStatus.Paused => "Paused"
+            case WorkbenchJobStatus.Cancelled => "Cancelled"
+            case WorkbenchJobStatus.Failed => "Failed"
             case WorkbenchJobStatus.Done => "Done"
         }
         rowCache = [label(), name, project, statusText, "${progressPercent}%"]
@@ -63,6 +71,7 @@ class WorkbenchModel {
         }
     }
     private let historyStore = WorkbenchHistoryStore()
+    private var nextId: Int64 = 121
 
     private var queryText: String = ""
     private var queryLower: String = ""
@@ -96,10 +105,11 @@ class WorkbenchModel {
     }
 
     func job(id: Int64): ?WorkbenchJob {
-        if (id < 1 || id > jobs.size) { None } else { Some(jobs[id - 1]) }
+        for (task in jobs) { if (task.id == id) { return Some(task) } }
+        None
     }
 
-    func totalProgressHundredths(): Int64 { progressSum * 100 / jobs.size }
+    func totalProgressHundredths(): Int64 { if (jobs.isEmpty()) { 0 } else { progressSum * 100 / jobs.size } }
 
     func visibleIds(): Array<Int64> { visibleIdCache }
 
@@ -141,10 +151,12 @@ class WorkbenchModel {
     }
 
     func start(id: Int64): Bool {
-        if (id < 1 || id > jobs.size || runningCount >= 4) { return false }
-        let task = jobs[id - 1]
+        if (runningCount >= 4) { return false }
+        let task = match (job(id)) { case Some(value) => value; case None => return false }
         if (task.status != WorkbenchJobStatus.Queued) { return false }
         task.status = WorkbenchJobStatus.Running
+        task.events.add("Started")
+        task.events.add("Checkout started")
         queuedCount--
         runningCount++
         activeIds.add(id)
@@ -155,15 +167,15 @@ class WorkbenchModel {
     }
 
     func reset(id: Int64): Bool {
-        if (id < 1 || id > jobs.size) { return false }
-        let task = jobs[id - 1]
+        let task = match (job(id)) { case Some(value) => value; case None => return false }
         if (task.status == WorkbenchJobStatus.Queued) { return false }
         if (task.status == WorkbenchJobStatus.Running) {
             runningCount--
             removeActive(id)
-        } else {
+        } else if (task.status == WorkbenchJobStatus.Done) {
             doneCount--
         }
+        task.events.add("Reset to queue")
         task.status = WorkbenchJobStatus.Queued
         task.elapsedMillis = 0
         progressSum -= task.progressPercent
@@ -185,13 +197,25 @@ class WorkbenchModel {
         var index: Int64 = 0
         while (index < activeIds.size) {
             let id = activeIds[index]
-            let task = jobs[id - 1]
+            let task = match (job(id)) {
+                case Some(value) => value
+                case None => activeIds.remove(at: index); continue
+            }
             var taskChanged = false
             let remaining = max(0, task.durationMillis - task.elapsedMillis)
             let step = min(delta, remaining)
             if (step > 0) {
                 task.elapsedMillis += step
                 let percent = min(100, task.elapsedMillis * 100 / task.durationMillis)
+                let oldStage = min(4, task.progressPercent / 20)
+                let newStage = min(4, percent / 20)
+                for (stage in oldStage..newStage) {
+                    let finished = workbenchStageName(stage)
+                    let next = workbenchStageName(stage + 1)
+                    task.events.add("${finished} completed")
+                    task.events.add("${next} started")
+                    historyStore.pushLog("${task.label()}: ${finished} completed; ${next} started")
+                }
                 if (percent != task.progressPercent) {
                     progressSum += percent - task.progressPercent
                     task.progressPercent = percent
@@ -203,6 +227,7 @@ class WorkbenchModel {
             }
             if (task.elapsedMillis >= task.durationMillis) {
                 task.status = WorkbenchJobStatus.Done
+                task.events.add("Completed")
                 runningCount--
                 doneCount++
                 task.progressPercent = 100
@@ -229,10 +254,10 @@ class WorkbenchModel {
         tags: Array<String>,
         notes: String
     ): Bool {
-        if (id < 1 || id > jobs.size) { return false }
-        let task = jobs[id - 1]
+        let task = match (job(id)) { case Some(value) => value; case None => return false }
         if (task.name == name && task.priority == priority && task.notify == notify &&
             sameStrings(task.tags, tags) && task.notes == notes) { return false }
+        task.events.add("Details updated")
         task.name = name
         task.priority = priority
         task.notify = notify
@@ -242,6 +267,81 @@ class WorkbenchModel {
         rebuildVisible()
         rebuildQueuePreview()
         true
+    }
+
+    func create(name: String, project: String): Int64 {
+        let id = nextId
+        nextId++
+        let task = WorkbenchJob(id, project, WorkbenchJobStatus.Queued)
+        task.name = name
+        task.refreshRow()
+        jobs.add(task)
+        queuedCount++
+        rebuildVisible()
+        rebuildQueuePreview()
+        id
+    }
+
+    func pause(id: Int64): Bool {
+        let task = match (job(id)) { case Some(value) => value; case None => return false }
+        if (task.status != WorkbenchJobStatus.Running) { return false }
+        task.status = WorkbenchJobStatus.Paused
+        task.events.add("Paused")
+        removeActive(id)
+        runningCount--
+        task.refreshRow()
+        rebuildVisible()
+        true
+    }
+
+    func resume(id: Int64): Bool {
+        let task = match (job(id)) { case Some(value) => value; case None => return false }
+        if (task.status != WorkbenchJobStatus.Paused || runningCount >= 4) { return false }
+        task.status = WorkbenchJobStatus.Running
+        task.events.add("Resumed")
+        runningCount++
+        activeIds.add(id)
+        task.refreshRow()
+        rebuildVisible()
+        true
+    }
+
+    func cancel(id: Int64): Bool { stop(id, WorkbenchJobStatus.Cancelled, "Cancelled") }
+    func fail(id: Int64): Bool { stop(id, WorkbenchJobStatus.Failed, "Failed (simulated)") }
+
+    private func stop(id: Int64, status: WorkbenchJobStatus, message: String): Bool {
+        let task = match (job(id)) { case Some(value) => value; case None => return false }
+        if (task.status == WorkbenchJobStatus.Queued) { queuedCount-- }
+        else if (task.status == WorkbenchJobStatus.Running) { runningCount--; removeActive(id) }
+        else if (task.status != WorkbenchJobStatus.Paused) { return false }
+        task.status = status
+        task.events.add(message)
+        task.refreshRow()
+        rebuildVisible()
+        rebuildQueuePreview()
+        true
+    }
+
+    func retry(id: Int64): Bool {
+        let task = match (job(id)) { case Some(value) => value; case None => return false }
+        if (task.status != WorkbenchJobStatus.Cancelled && task.status != WorkbenchJobStatus.Failed) { return false }
+        reset(id)
+    }
+
+    func delete(id: Int64): Bool {
+        for (index in 0..jobs.size) {
+            let task = jobs[index]
+            if (task.id != id) { continue }
+            if (task.status == WorkbenchJobStatus.Queued) { queuedCount-- }
+            else if (task.status == WorkbenchJobStatus.Running) { runningCount--; removeActive(id) }
+            else if (task.status == WorkbenchJobStatus.Done) { doneCount-- }
+            progressSum -= task.progressPercent
+            jobs.remove(at: index)
+            rebuildVisible()
+            rebuildQueuePreview()
+            return true
+        }
+        false
     }
 
     private func removeActive(id: Int64): Unit {
@@ -266,8 +366,8 @@ class WorkbenchModel {
     }
 
     private func compareJobs(leftId: Int64, rightId: Int64): Int64 {
-        let left = jobs[leftId - 1]
-        let right = jobs[rightId - 1]
+        let left = job(leftId).getOrThrow()
+        let right = job(rightId).getOrThrow()
         var result: Int64 = 0
         match (sortColumn) {
             case 0 => result = compareInt(left.id, right.id)
@@ -292,7 +392,7 @@ class WorkbenchModel {
         }
         visibleIdCache = ids.toArray()
         let rows = ArrayList<Array<String>>()
-        for (id in visibleIdCache) { rows.add(jobs[id - 1].rowCache) }
+        for (id in visibleIdCache) { rows.add(job(id).getOrThrow().rowCache) }
         visibleRowCache = rows.toArray()
     }
 
@@ -361,6 +461,16 @@ class WorkbenchHistoryStore {
     func history(): Array<Int64> { historyCache }
 }
 
+func workbenchStageName(index: Int64): String {
+    match (index) {
+        case 0 => "Checkout"
+        case 1 => "Build"
+        case 2 => "Test"
+        case 3 => "Package"
+        case _ => "Publish"
+    }
+}
+
 func compareInt(left: Int64, right: Int64): Int64 {
     if (left < right) { -1 } else if (left > right) { 1 } else { 0 }
 }
@@ -377,7 +487,10 @@ func statusRank(status: WorkbenchJobStatus): Int64 {
     match (status) {
         case WorkbenchJobStatus.Queued => 0
         case WorkbenchJobStatus.Running => 1
-        case WorkbenchJobStatus.Done => 2
+        case WorkbenchJobStatus.Paused => 2
+        case WorkbenchJobStatus.Cancelled => 3
+        case WorkbenchJobStatus.Failed => 4
+        case WorkbenchJobStatus.Done => 5
     }
 }
 

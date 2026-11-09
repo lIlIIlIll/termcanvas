@@ -8,18 +8,22 @@ public class Button <: Widget {
     private let disabled: Bool
     private let block: ?Block
     private let style: Style
-    private let focusedStyle: Style
-    private let disabledStyle: Style
+    private let focusedStyle: ?Style
+    private let disabledStyle: ?Style
     private let theme: ?Theme
+    private var renderedTheme: ?Theme = None
+    private var ghost: Bool = false
 
+    /** 保存按钮文字、状态和样式配置，供绘制时使用。主题下空样式采用凸起表面及可见边界；指定具体样式优先。无主题时保持原有外观。
+     */
     public init(
         label: String,
         focused!: Bool = false,
         disabled!: Bool = false,
         block!: ?Block = None,
         style!: Style = Style.default(),
-        focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
-        disabledStyle!: Style = Style(fg: Color.Indexed(8)),
+        focusedStyle!: ?Style = None,
+        disabledStyle!: ?Style = None,
         theme!: ?Theme = None
     ) {
         this.label = label
@@ -32,41 +36,82 @@ public class Button <: Widget {
         this.theme = theme
     }
 
+    /** 控制空样式按钮是否使用无边界的主题 normal 样式；具体样式不受影响。 */
+    public func setGhost(value: Bool): Unit { ghost = value }
+
     public func handle(key: KeyEvent): Bool {
         if (disabled) { return false }
         match (key.code) { case KeyCode.Enter | KeyCode.Char(r' ') => true; case _ => false }
     }
 
-    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
-        if (disabled || !widgetHitTest(mouse, widgetInnerArea(area, block))) { return false }
+    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
+        if (disabled || !widgetHitTest(mouse, controlBlockArea(area, block, theme, layoutTheme, renderedTheme))) { return false }
         match ((mouse.kind, mouse.button)) { case (MouseKind.Down, MouseButton.Left) => true; case _ => false }
     }
 
+    /** 在可选区块内部居中绘制按钮标签，并将整个可点击的内部区域填充为对应状态样式。下划线仅应用于标签，不应用于填充空白。
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
+        renderedTheme = buffer.resolveTheme(None)
         var target = area
         if (let Some(b) <- block) {
-            b.render(area, buffer)
+            buffer.withParentTheme(theme) { => b.render(area, buffer) }
             target = b.inner(area)
         }
         if (target.width <= 0 || target.height <= 0) { return }
-        var rowStyle = resolvedStateStyle(style, focusedStyle, disabledStyle, focused, disabled, theme)
-        // Add a non-colour cue for the built-in states without altering explicit styles.
-        if (disabled && disabledStyle == Style(fg: Color.Indexed(8))) {
-            var modifier = rowStyle.modifier
+        let activeTheme = buffer.resolveTheme(theme)
+        var labelStyle = if (disabled) {
+            match (disabledStyle) {
+                case Some(value) => value
+                case None => match (activeTheme) {
+                    case Some(value) => value.disabled
+                    case None => Style(fg: Color.Indexed(8))
+                }
+            }
+        } else if (focused) {
+            match (focusedStyle) {
+                case Some(value) => value
+                case None => match (activeTheme) {
+                    case Some(value) => value.focused
+                    case None => Style(fg: Color.Black, bg: Color.White)
+                }
+            }
+        } else {
+            if (!ghost && style == Style.default()) {
+                match (activeTheme) { case Some(value) => value.raisedSurface; case None => style }
+            } else {
+                themedNormal(style, activeTheme)
+            }
+        }
+        // Keep the built-in focus and disabled cues, while respecting all
+        // explicitly supplied label styles.
+        if (disabled && disabledStyle.isNone()) {
+            var modifier = labelStyle.modifier
             modifier.italic = true
-            rowStyle = rowStyle.withModifier(modifier)
-        } else if (focused && focusedStyle == Style(fg: Color.Black, bg: Color.White)) {
-            var modifier = rowStyle.modifier
+            labelStyle = labelStyle.withModifier(modifier)
+        } else if (!disabled && focused && focusedStyle.isNone()) {
+            var modifier = labelStyle.modifier
             modifier.bold = true
             modifier.underline = true
-            rowStyle = rowStyle.withModifier(modifier)
+            labelStyle = labelStyle.withModifier(modifier)
         }
-        buffer.fillRect(target, style: rowStyle)
-        let textWidth = if (displayWidth(label) <= target.width - 2) { target.width - 2 } else { target.width }
-        let text = truncate(label, textWidth)
-        let x = alignedX(target, displayWidth(text), TextAlign.Center)
+        var fillModifier = labelStyle.modifier
+        fillModifier.underline = false
+        buffer.fillRect(target, style: labelStyle.withModifier(fillModifier))
+        let textWidth = if (displayWidth(label, options: buffer.textWidthOptions()) <= target.width - 2) { target.width - 2 } else { target.width }
+        let text = truncate(label, textWidth, options: buffer.textWidthOptions())
+        let textColumns = displayWidth(text, options: buffer.textWidthOptions())
+        let x = alignedX(target, textColumns, TextAlign.Center)
         let y = target.y + (target.height - 1) / 2
-        buffer.setString(x, y, text, style: rowStyle)
+        if (!ghost && style == Style.default() && activeTheme.isSome() && x > target.x && x + textColumns < target.right) {
+            let boundaryStyle = labelStyle.withModifier(fillModifier)
+            buffer.setString(x - 1, y, "[", style: boundaryStyle)
+            buffer.setString(x + textColumns, y, "]", style: boundaryStyle)
+        }
+        buffer.setString(x, y, text, style: labelStyle)
     }
 }
 
@@ -76,8 +121,8 @@ public class Checkbox <: Widget {
     private let focused: Bool
     private let disabled: Bool
     private let style: Style
-    private let focusedStyle: Style
-    private let disabledStyle: Style
+    private let focusedStyle: ?Style
+    private let disabledStyle: ?Style
     private let theme: ?Theme
 
     public init(
@@ -86,8 +131,8 @@ public class Checkbox <: Widget {
         focused!: Bool = false,
         disabled!: Bool = false,
         style!: Style = Style.default(),
-        focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
-        disabledStyle!: Style = Style(fg: Color.Indexed(8)),
+        focusedStyle!: ?Style = None,
+        disabledStyle!: ?Style = None,
         theme!: ?Theme = None
     ) {
         this.label = label
@@ -121,8 +166,8 @@ public class Checkbox <: Widget {
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let mark = if (checked) { "[x] " } else { "[ ] " }
-        let rowStyle = resolvedStateStyle(style, focusedStyle, disabledStyle, focused, disabled, theme)
-        buffer.setString(area.x, area.y, truncate(mark + label, area.width), style: rowStyle)
+        let rowStyle = formVisualStyle(style, focusedStyle, disabledStyle, focused, disabled, buffer.resolveTheme(theme))
+        buffer.setString(area.x, area.y, truncate(mark + label, area.width, options: buffer.textWidthOptions()), style: rowStyle)
     }
 }
 
@@ -136,8 +181,8 @@ public class Switch <: Widget {
     private var focused: Bool
     private var disabled: Bool
     private let style: Style
-    private let focusedStyle: Style
-    private let disabledStyle: Style
+    private let focusedStyle: ?Style
+    private let disabledStyle: ?Style
     private var theme: ?Theme
 
     /** 保存标签、初始开关状态及绘制状态和样式。
@@ -148,8 +193,8 @@ public class Switch <: Widget {
         focused!: Bool = false,
         disabled!: Bool = false,
         style!: Style = Style.default(),
-        focusedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
-        disabledStyle!: Style = Style(fg: Color.Indexed(8)),
+        focusedStyle!: ?Style = None,
+        disabledStyle!: ?Style = None,
         theme!: ?Theme = None
     ) {
         this.label = label
@@ -203,10 +248,29 @@ public class Switch <: Widget {
         if (area.width <= 0 || area.height <= 0) { return }
         let state = if (checked) { "on" } else { "off" }
         let text = if (label.isEmpty()) { "[${state}]" } else { "${label} [${state}]" }
-        let rowStyle = resolvedStateStyle(style, focusedStyle, disabledStyle, focused, disabled, theme)
+        let rowStyle = formVisualStyle(style, focusedStyle, disabledStyle, focused, disabled, buffer.resolveTheme(theme))
         buffer.fillRect(Rect(area.x, area.y, area.width, 1), style: rowStyle)
-        buffer.setString(area.x, area.y, truncate(text, area.width), style: rowStyle)
+        buffer.setString(area.x, area.y, truncate(text, area.width, options: buffer.textWidthOptions()), style: rowStyle)
     }
+}
+
+// Default focus and disabled roles follow the inherited theme. Explicit
+// legacy styles patch the corresponding theme role, retaining unset fields.
+private func formVisualStyle(style: Style, focusedStyle: ?Style, disabledStyle: ?Style,
+    focused: Bool, disabled: Bool, theme: ?Theme): Style {
+    if (disabled) {
+        return match (disabledStyle) {
+            case Some(value) => themedDisabled(value, theme)
+            case None => match (theme) { case Some(value) => value.disabled; case None => Style(fg: Color.Indexed(8)) }
+        }
+    }
+    if (focused) {
+        return match (focusedStyle) {
+            case Some(value) => themedFocused(value, theme)
+            case None => match (theme) { case Some(value) => value.focused; case None => Style(fg: Color.Black, bg: Color.White) }
+        }
+    }
+    themedNormal(style, theme)
 }
 
 public class RadioGroup <: Widget {
@@ -218,10 +282,11 @@ public class RadioGroup <: Widget {
     private let disabled: Bool
     private let block: ?Block
     private let style: Style
-    private let focusedStyle: Style
-    private let selectedStyle: Style
-    private let disabledStyle: Style
+    private let focusedStyle: ?Style
+    private let selectedStyle: ?Style
+    private let disabledStyle: ?Style
     private let theme: ?Theme
+    private var renderedTheme: ?Theme = None
 
     public init(
         items: Array<String>,
@@ -230,9 +295,9 @@ public class RadioGroup <: Widget {
         disabled!: Bool = false,
         block!: ?Block = None,
         style!: Style = Style.default(),
-        focusedStyle!: Style = Style(fg: Color.Cyan),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White),
-        disabledStyle!: Style = Style(fg: Color.Indexed(8)),
+        focusedStyle!: ?Style = None,
+        selectedStyle!: ?Style = None,
+        disabledStyle!: ?Style = None,
         theme!: ?Theme = None
     ) {
         this.items = items
@@ -265,9 +330,12 @@ public class RadioGroup <: Widget {
         }
     }
 
-    public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
+    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
         if (disabled) { return false }
-        let target = widgetInnerArea(area, block)
+        let target = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         offset = selectionViewportOffset(offset, selected, items.size, target.height)
         if (let Some(index) <- selectionMouse(mouse, target, offset, items.size, selected)) {
             selected = index
@@ -277,32 +345,40 @@ public class RadioGroup <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        renderedTheme = buffer.resolveTheme(None)
         var target = area
         if (let Some(b) <- block) {
-            b.render(area, buffer)
+            buffer.withParentTheme(theme) { => b.render(area, buffer) }
             target = b.inner(area)
         }
         viewportHeight = max(1, target.height)
         selected = clamp(selected, 0, max(0, items.size - 1))
         offset = selectionViewportOffset(offset, selected, items.size, target.height)
         let rows = min(target.height, items.size - offset)
+        let activeTheme = buffer.resolveTheme(theme)
+        let defaultFocused = if (activeTheme.isSome()) { Style.default() } else { Style(fg: Color.Cyan) }
+        let defaultSelected = if (activeTheme.isSome()) { Style.default() } else { Style(fg: Color.Black, bg: Color.White) }
+        let defaultDisabled = if (activeTheme.isSome()) { Style.default() } else { Style(fg: Color.Indexed(8)) }
+        let focusedValue = match (focusedStyle) { case Some(value) => value; case None => defaultFocused }
+        let selectedValue = match (selectedStyle) { case Some(value) => value; case None => defaultSelected }
+        let disabledValue = match (disabledStyle) { case Some(value) => value; case None => defaultDisabled }
         for (i in 0..rows) {
             let index = offset + i
             let active = index == selected
             let mark = if (active) { "(*) " } else { "( ) " }
             let rowStyle = resolvedSemanticStateStyle(
                 style,
-                focusedStyle,
-                selectedStyle,
-                disabledStyle,
+                focusedValue,
+                selectedValue,
+                disabledValue,
                 Style.default(),
                 focused,
                 active,
                 disabled,
                 false,
-                theme
+                activeTheme
             )
-            buffer.setString(target.x, target.y + i, truncate(mark + items[index], target.width), style: rowStyle)
+            buffer.setString(target.x, target.y + i, truncate(mark + items[index], target.width, options: buffer.textWidthOptions()), style: rowStyle)
         }
     }
 }
@@ -317,15 +393,16 @@ public class Select <: Widget {
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1
     private let block: ?Block
+    private var renderedTheme: ?Theme = None
     private let style: Style
-    private let selectedStyle: Style
+    private let selectedStyle: ?Style
 
     public init(
         items: Array<String>,
         selected!: Int64 = 0,
         block!: ?Block = None,
         style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        selectedStyle!: ?Style = None
     ) {
         this.items = items
         this.selected = clamp(selected, 0, max(0, items.size - 1))
@@ -362,8 +439,11 @@ public class Select <: Widget {
         }
     }
 
-    public func handleMouse(mouse: MouseEvent, area: Rect): ?String {
-        let target = widgetInnerArea(area, block)
+    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    public func handleMouse(mouse: MouseEvent, area: Rect): ?String { handleMouse(mouse, area, layoutTheme: None) }
+
+    public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): ?String {
+        let target = controlBlockArea(area, block, Option<Theme>.None, layoutTheme, renderedTheme)
         offset = selectionViewportOffset(offset, selected, items.size, target.height)
         if (let Some(index) <- selectionMouse(mouse, target, offset, items.size, selected)) {
             selected = index
@@ -373,6 +453,7 @@ public class Select <: Widget {
     }
 
     public func render(area: Rect, buffer: Buffer): Unit {
+        renderedTheme = buffer.resolveTheme(None)
         var target = area
         if (let Some(b) <- block) {
             b.render(area, buffer)
@@ -386,8 +467,8 @@ public class Select <: Widget {
             buffer.setString(
                 target.x,
                 target.y + row,
-                truncate(items[index], target.width),
-                style: if (index == selected) { selectedStyle } else { style }
+                truncate(items[index], target.width, options: buffer.textWidthOptions()),
+                style: if (index == selected) { listSelectionStyle(selectedStyle, buffer.resolveTheme(None)) } else { themedNormal(style, buffer.resolveTheme(None)) }
             )
         }
     }
@@ -401,7 +482,7 @@ public class Dropdown <: Widget {
     public var open: Bool
     private let placeholder: String
     private let style: Style
-    private let selectedStyle: Style
+    private let selectedStyle: ?Style
     private var focused: Bool = false
     private var disabled: Bool = false
     private var theme: ?Theme = None
@@ -415,7 +496,7 @@ public class Dropdown <: Widget {
         open!: Bool = false,
         placeholder!: String = "Select",
         style!: Style = Style.default(),
-        selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)
+        selectedStyle!: ?Style = None
     ) {
         this.items = items
         this.selected = clamp(selected, 0, max(0, items.size - 1))
@@ -425,7 +506,7 @@ public class Dropdown <: Widget {
         this.selectedStyle = selectedStyle
     }
 
-    /** 设置聚焦、禁用状态和语义主题；禁用时拒绝键盘与鼠标输入。selectedStyle 显式设为 Style.default() 时使用主题选中角色，其余显式选中样式保持优先。
+    /** 设置聚焦、禁用状态和语义主题；禁用时拒绝键盘与鼠标输入。省略 selectedStyle 或显式传入 Style.default() 时使用主题选中角色，其余显式选中样式保持优先。
      */
     public func setVisualState(
         focused!: Bool = false,
@@ -489,23 +570,26 @@ public class Dropdown <: Widget {
         selectedValue()
     }
 
-    private func resolvedHeaderStyle(): Style {
+    private func resolvedHeaderStyle(theme: ?Theme): Style {
         if (disabled) { return themedDisabled(style, theme) }
         if (focused) { return themedFocused(style, theme) }
         themedNormal(style, theme)
     }
 
-    private func resolvedListStyle(): Style {
+    private func resolvedListStyle(theme: ?Theme): Style {
         if (disabled) { return themedDisabled(style, theme) }
         themedNormal(style, theme)
     }
 
-    private func resolvedSelectedRowStyle(): Style {
-        if (disabled) { return themedDisabled(selectedStyle, theme) }
-        let base = if (selectedStyle == Style.default()) {
-            themedSelected(selectedStyle, theme)
-        } else {
-            selectedStyle
+    private func resolvedSelectedRowStyle(theme: ?Theme): Style {
+        let explicit = match (selectedStyle) { case Some(value) => value; case None => Style.default() }
+        if (disabled) { return themedDisabled(explicit, theme) }
+        let base = match (selectedStyle) {
+            case Some(value) => if (value == Style.default()) { themedSelected(value, theme) } else { value }
+            case None => match (theme) {
+                case Some(value) => value.selected
+                case None => Style(fg: Color.Black, bg: Color.White)
+            }
         }
         if (focused) { addFocusedModifiers(base, Style.default(), theme) } else { base }
     }
@@ -588,17 +672,17 @@ public class Dropdown <: Widget {
             case None => placeholder
         }
         let mark = if (open) { "v " } else { "> " }
-        buffer.setString(area.x, area.y, truncate(mark + current, area.width), style: resolvedHeaderStyle())
+        buffer.setString(area.x, area.y, truncate(mark + current, area.width, options: buffer.textWidthOptions()), style: resolvedHeaderStyle(buffer.resolveTheme(theme)))
         if (open) {
             let target = Rect(area.x, area.y + 1, area.width, max(0, area.height - 1))
             let select = Select(
                 items,
                 selected: selected,
-                style: resolvedListStyle(),
-                selectedStyle: resolvedSelectedRowStyle()
+                style: resolvedListStyle(buffer.resolveTheme(theme)),
+                selectedStyle: resolvedSelectedRowStyle(buffer.resolveTheme(theme))
             )
             select.offset = offset
-            select.render(target, buffer)
+            buffer.withParentTheme(theme) { => select.render(target, buffer) }
             selected = select.selected
             offset = select.offset
         }
@@ -703,7 +787,7 @@ public class ColorPicker <: Widget {
         (start, visibleCount)
     }
 
-    private func swatchStyle(index: Int64): Style {
+    private func swatchStyle(index: Int64, theme: ?Theme): Style {
         let color = colors[index]
         if (index != selected) { return Style(fg: color) }
         let foreground = match (color) {
@@ -731,7 +815,7 @@ public class ColorPicker <: Widget {
         while (slot < visibleCount) {
             let index = start + slot
             let x = area.x + slot * 3
-            _ = buffer.writeStringClipped(x, area.y, "##", maxWidth: area.right - x, style: swatchStyle(index))
+            _ = buffer.writeStringClipped(x, area.y, "##", maxWidth: area.right - x, style: swatchStyle(index, buffer.resolveTheme(theme)))
             slot++
         }
         let trailingIndex = start + visibleCount
@@ -742,7 +826,7 @@ public class ColorPicker <: Widget {
                 area.y,
                 "##",
                 maxWidth: area.right - trailingX,
-                style: swatchStyle(trailingIndex)
+                style: swatchStyle(trailingIndex, buffer.resolveTheme(theme))
             )
         }
     }
@@ -763,16 +847,19 @@ public class MultiSelect <: Widget {
     public var cursor: Int64
     public var offset: Int64 = 0
     private var viewportHeight: Int64 = 1
-    private let style: Style
-    private let selectedStyle: Style
+    private let style: ?Style
+    private let selectedStyle: ?Style
+    private let theme: ?Theme
 
-    /** 保存条目与两种绘制样式，将光标限制在 0 到最后一个条目索引之间，并按传入顺序保存初始选中索引；不校验这些选中索引。
+    /** 保存条目与两种绘制样式，将光标限制在 0 到最后一个条目索引之间，并按传入顺序保存有效且不重复的初始选中索引。省略样式时使用主题角色，显式样式优先。
      */
-    public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: Style = Style.default(), selectedStyle!: Style = Style(fg: Color.Black, bg: Color.White)) {
+    public init(items: Array<String>, cursor!: Int64 = 0, selected!: Array<Int64> = [], style!: ?Style = None,
+        selectedStyle!: ?Style = None, theme!: ?Theme = None) {
         this.items = items
         this.cursor = clamp(cursor, 0, max(0, items.size - 1))
         this.style = style
         this.selectedStyle = selectedStyle
+        this.theme = theme
         for (index in selected) {
             if (index >= 0 && index < items.size && !containsIndex(selectedItems, index)) {
                 selectedItems.add(index)
@@ -820,11 +907,20 @@ public class MultiSelect <: Widget {
         viewportHeight = max(1, area.height)
         cursor = clamp(cursor, 0, max(0, items.size - 1))
         offset = selectionViewportOffset(offset, cursor, items.size, area.height)
+        let activeTheme = buffer.resolveTheme(theme)
+        let normal = match (style) {
+            case Some(value) => value
+            case None => match (activeTheme) { case Some(value) => value.normal; case None => Style.default() }
+        }
+        let active = match (selectedStyle) {
+            case Some(value) => value
+            case None => match (activeTheme) { case Some(value) => value.selected; case None => Style(fg: Color.Black, bg: Color.White) }
+        }
         for (row in 0..min(area.height, items.size - offset)) {
             let index = offset + row
             let checked = containsIndex(selectedItems, index)
             let mark = if (checked) { "[x] " } else { "[ ] " }
-            buffer.setString(area.x, area.y + row, truncate(mark + items[index], area.width), style: if (index == cursor) { selectedStyle } else { style })
+            buffer.setString(area.x, area.y + row, truncate(mark + items[index], area.width, options: buffer.textWidthOptions()), style: if (index == cursor) { active } else { normal })
         }
     }
 }
@@ -910,9 +1006,9 @@ public class DatePicker <: Widget {
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
-        let rowStyle = resolvedStateStyle(style, style, style, focused, disabled, theme)
+        let rowStyle = resolvedStateStyle(style, style, style, focused, disabled, buffer.resolveTheme(theme))
         buffer.withCanvasClip(area) { =>
-            buffer.setString(area.x, area.y, truncate(value(), area.width), style: rowStyle)
+            buffer.setString(area.x, area.y, truncate(value(), area.width, options: buffer.textWidthOptions()), style: rowStyle)
         }
     }
 }

@@ -19,7 +19,7 @@ func renderShowcase(app: WorkbenchApp, frame: Frame): Unit {
     if (layout.galleryContent.width <= 0 || layout.galleryContent.height <= 0) { return }
     let areas = workbenchGalleryAreas(layout.galleryContent, app.galleryTabs.selected, sample: app.galleryDataTabs.selected)
     if (app.interaction.active().isNone() && app.galleryTabs.selected == 2 && app.focus.current() == Some("gallery-input")) {
-        frame.setCursor(app.galleryInput.cursorPosition(areas.formInputs[1]))
+        frame.setCursor(app.galleryInput.cursorPosition(areas.formInputs[1], options: frame.textWidthOptions()))
     }
     if (!frame.isDirty(layout.galleryContent)) { return }
     frame.fill(layout.galleryContent, app.theme.normal)
@@ -357,8 +357,10 @@ func galleryButton(app: WorkbenchApp, label: String, variant: Int64, id: String,
         case _ => app.theme.disabled
     }
     let marker = if (app.focus.isFocused(id)) { "> " } else if (app.hovered == Some(id)) { "~ " } else { "" }
-    Button(marker + label, focused: app.focus.isFocused(id), disabled: disabled || variant == 4, style: style,
+    let button = Button(marker + label, focused: app.focus.isFocused(id), disabled: disabled || variant == 4, style: style,
         focusedStyle: app.theme.focused, disabledStyle: app.theme.disabled, theme: Some(app.theme))
+    if (variant == 2) { button.setGhost(true) }
+    button
 }
 
 func galleryBlock(app: WorkbenchApp, title: String, border: BorderKind,

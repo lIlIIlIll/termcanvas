@@ -6,6 +6,27 @@ public interface Widget {
     func render(area: Rect, buffer: Buffer): Unit
 }
 
+// Some widgets historically always had a complete built-in theme. Resolve
+// the application context first, retaining that built-in fallback when absent.
+func widgetTheme(buffer: Buffer, explicit: ?Theme): Theme {
+    match (buffer.resolveTheme(explicit)) {
+        case Some(theme) => theme
+        case None => Theme()
+    }
+}
+
+// Explicit legacy styles patch a role; absent styles use the role or the
+// original no-theme fallback. Use StyleOverride where an explicit reset is needed.
+func widgetRoleStyle(style: ?Style, theme: ?Theme, role: ThemeRole, fallback: Style): Style {
+    match (style) {
+        case Some(value) => themeRoleStyle(value, role, theme)
+        case None => match (theme) {
+            case Some(_) => themeRoleStyle(Style.default(), role, theme)
+            case None => fallback
+        }
+    }
+}
+
 public enum WrapMode {
     | NoWrap
     | Word
