@@ -14409,6 +14409,236 @@
           "signature": "public func selectedRowIndices(): Array<Int64>"
         }
       ]
+    },
+    {
+      "id": "events",
+      "source": "docs/api-examples/events.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "StdinInputSource",
+          "signature": "public class StdinInputSource <: InputSource {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "StdinInputSource.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "StdinInputSource.readAvailable",
+          "signature": "public func readAvailable(maxBytes: Int64): Array<Byte>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event",
+          "signature": "public enum Event {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.KeyDown",
+          "signature": "KeyDown(KeyEvent)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.KeyUp",
+          "signature": "KeyUp(KeyEvent)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.KeyRepeat",
+          "signature": "KeyRepeat(KeyEvent)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.KeyHeld",
+          "signature": "KeyHeld(KeyEvent)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.Mouse",
+          "signature": "Mouse(MouseEvent)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.FocusIn",
+          "signature": "FocusIn"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.FocusOut",
+          "signature": "FocusOut"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.Capabilities",
+          "signature": "Capabilities(TerminalCapabilities)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.Paste",
+          "signature": "Paste(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.Message",
+          "signature": "Message(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.ExecResult",
+          "signature": "ExecResult(String, Int64, String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.TextCompletion",
+          "signature": "TextCompletion(String, TextCompletionResult)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.ProcessStarted",
+          "signature": "ProcessStarted(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.ProcessOutput",
+          "signature": "ProcessOutput(String, ProcessOutputStream, Array<Byte>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.ProcessFinished",
+          "signature": "ProcessFinished(String, ProcessResult)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.ProcessFailed",
+          "signature": "ProcessFailed(String, String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.ProcessCancelRequested",
+          "signature": "ProcessCancelRequested(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.PtyStarted",
+          "signature": "PtyStarted(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.PtyOutput",
+          "signature": "PtyOutput(String, PtyOutputStream, Array<Byte>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.PtyExited",
+          "signature": "PtyExited(String, PtyExitStatus)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.PtyFailed",
+          "signature": "PtyFailed(String, String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.AsyncStarted",
+          "signature": "AsyncStarted(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.AsyncCompleted",
+          "signature": "AsyncCompleted(String, Event)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.AsyncFailed",
+          "signature": "AsyncFailed(String, String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.AsyncCancelled",
+          "signature": "AsyncCancelled(String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.DataReady",
+          "signature": "DataReady(String, Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.DataFailed",
+          "signature": "DataFailed(String, Int64, String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.DataCancelled",
+          "signature": "DataCancelled(String, Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.Tick",
+          "signature": "Tick(TickEvent)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.Timer",
+          "signature": "Timer(TimerEvent)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.Resize",
+          "signature": "Resize(Rect)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/event.cj",
+          "symbol": "Event.Unknown",
+          "signature": "Unknown(Array<Byte>)"
+        }
+      ]
     }
   ]
 }

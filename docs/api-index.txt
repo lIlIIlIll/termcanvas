@@ -893,149 +893,149 @@ packages/core/src/document.cj:950:public init( document: Document, block!: ?Bloc
 packages/core/src/document.cj:966:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/event.cj:9:public interface InputSource {
 packages/core/src/event.cj:14:func readAvailable(maxBytes: Int64): Array<Byte>
-packages/core/src/event.cj:17:public class StdinInputSource <: InputSource {
-packages/core/src/event.cj:21:public init()
-packages/core/src/event.cj:23:public func readAvailable(maxBytes: Int64): Array<Byte>
-packages/core/src/event.cj:45:public enum KeyCode {
-packages/core/src/event.cj:49:Char(Rune)
-packages/core/src/event.cj:51:CtrlC
-packages/core/src/event.cj:53:Esc
-packages/core/src/event.cj:55:Tab
-packages/core/src/event.cj:57:BackTab
-packages/core/src/event.cj:59:Enter
-packages/core/src/event.cj:61:Backspace
-packages/core/src/event.cj:63:Delete
-packages/core/src/event.cj:65:Insert
-packages/core/src/event.cj:67:Up
-packages/core/src/event.cj:69:Down
-packages/core/src/event.cj:71:Left
-packages/core/src/event.cj:73:Right
-packages/core/src/event.cj:75:Home
-packages/core/src/event.cj:77:End
-packages/core/src/event.cj:79:PageUp
-packages/core/src/event.cj:81:PageDown
-packages/core/src/event.cj:85:F(Int64)
-packages/core/src/event.cj:89:public enum KeyProtocol {
-packages/core/src/event.cj:91:Basic
-packages/core/src/event.cj:93:ModifyOtherKeys
-packages/core/src/event.cj:95:Kitty
-packages/core/src/event.cj:99:public struct KeyModifier <: Equatable<KeyModifier> {
-packages/core/src/event.cj:101:public let shift: Bool
-packages/core/src/event.cj:103:public let alt: Bool
-packages/core/src/event.cj:105:public let ctrl: Bool
-packages/core/src/event.cj:107:public let superKey: Bool
-packages/core/src/event.cj:109:public let meta: Bool
-packages/core/src/event.cj:111:public let hyper: Bool
-packages/core/src/event.cj:113:public let capsLock: Bool
-packages/core/src/event.cj:115:public let numLock: Bool
-packages/core/src/event.cj:127:public init( shift!: Bool = false, alt!: Bool = false, ctrl!: Bool = false, superKey!: Bool = false, meta!: Bool = false, hyper!: Bool = false, capsLock!: Bool = false, numLock!: Bool = false )
-packages/core/src/event.cj:150:public static func none(): KeyModifier
-packages/core/src/event.cj:158:public static func fromCsiParam(value: Int64): KeyModifier
-packages/core/src/event.cj:188:public operator func ==(other: KeyModifier): Bool
-packages/core/src/event.cj:203:public operator func !=(other: KeyModifier): Bool
-packages/core/src/event.cj:209:public struct KeyEvent {
-packages/core/src/event.cj:211:public let code: KeyCode
-packages/core/src/event.cj:213:public let modifiers: KeyModifier
-packages/core/src/event.cj:215:public let text: ?String
-packages/core/src/event.cj:217:public let protocol: KeyProtocol
-packages/core/src/event.cj:219:public let nativeRepeat: Bool
-packages/core/src/event.cj:228:public init( code: KeyCode, modifiers!: KeyModifier = KeyModifier.none(), text!: ?String = None, protocol!: KeyProtocol = KeyProtocol.Basic, nativeRepeat!: Bool = false )
-packages/core/src/event.cj:244:public enum MouseButton {
-packages/core/src/event.cj:246:Left
-packages/core/src/event.cj:248:Middle
-packages/core/src/event.cj:250:Right
-packages/core/src/event.cj:252:WheelUp
-packages/core/src/event.cj:254:WheelDown
-packages/core/src/event.cj:256:None
-packages/core/src/event.cj:260:public enum MouseKind {
-packages/core/src/event.cj:262:Down
-packages/core/src/event.cj:264:Up
-packages/core/src/event.cj:266:Drag
-packages/core/src/event.cj:268:Move
-packages/core/src/event.cj:270:Scroll
-packages/core/src/event.cj:274:public struct MouseEvent {
-packages/core/src/event.cj:276:public let kind: MouseKind
-packages/core/src/event.cj:278:public let button: MouseButton
-packages/core/src/event.cj:280:public let x: Int64
-packages/core/src/event.cj:282:public let y: Int64
-packages/core/src/event.cj:284:public let modifiers: KeyModifier
-packages/core/src/event.cj:292:public init(kind: MouseKind, button: MouseButton, x: Int64, y: Int64, modifiers!: KeyModifier = KeyModifier.none())
-packages/core/src/event.cj:302:public struct TickEvent {
-packages/core/src/event.cj:304:public let deltaMillis: Int64
-packages/core/src/event.cj:306:public let elapsedMillis: Int64
-packages/core/src/event.cj:308:public let frameIndex: Int64
-packages/core/src/event.cj:310:public let droppedFrames: Int64
-packages/core/src/event.cj:318:public init(deltaMillis!: Int64 = 0, elapsedMillis!: Int64 = 0, frameIndex!: Int64 = 0, droppedFrames!: Int64 = 0)
-packages/core/src/event.cj:327:public enum TimerMode {
-packages/core/src/event.cj:329:OneShot
-packages/core/src/event.cj:331:Repeating
-packages/core/src/event.cj:335:public enum FrameMissPolicy {
-packages/core/src/event.cj:337:Drop
-packages/core/src/event.cj:341:CatchUp(Int64)
-packages/core/src/event.cj:345:public struct TimerEvent {
-packages/core/src/event.cj:347:public let id: String
-packages/core/src/event.cj:349:public let elapsedMillis: Int64
-packages/core/src/event.cj:351:public let firedCount: Int64
-packages/core/src/event.cj:353:public let droppedFrames: Int64
-packages/core/src/event.cj:361:public init(id: String, elapsedMillis!: Int64 = 0, firedCount!: Int64 = 1, droppedFrames!: Int64 = 0)
-packages/core/src/event.cj:370:public enum TimerPriority {
-packages/core/src/event.cj:372:Immediate
-packages/core/src/event.cj:374:Normal
-packages/core/src/event.cj:376:Low
-packages/core/src/event.cj:379:public enum Event {
-packages/core/src/event.cj:380:KeyDown(KeyEvent)
-packages/core/src/event.cj:381:KeyUp(KeyEvent)
-packages/core/src/event.cj:382:KeyRepeat(KeyEvent)
-packages/core/src/event.cj:383:KeyHeld(KeyEvent)
-packages/core/src/event.cj:384:Mouse(MouseEvent)
-packages/core/src/event.cj:385:FocusIn
-packages/core/src/event.cj:386:FocusOut
-packages/core/src/event.cj:387:Capabilities(TerminalCapabilities)
-packages/core/src/event.cj:388:Paste(String)
-packages/core/src/event.cj:389:Message(String)
-packages/core/src/event.cj:390:ExecResult(String, Int64, String)
-packages/core/src/event.cj:391:TextCompletion(String, TextCompletionResult)
-packages/core/src/event.cj:392:ProcessStarted(String)
-packages/core/src/event.cj:393:ProcessOutput(String, ProcessOutputStream, Array<Byte>)
-packages/core/src/event.cj:394:ProcessFinished(String, ProcessResult)
-packages/core/src/event.cj:395:ProcessFailed(String, String)
-packages/core/src/event.cj:396:ProcessCancelRequested(String)
-packages/core/src/event.cj:397:PtyStarted(String)
-packages/core/src/event.cj:398:PtyOutput(String, PtyOutputStream, Array<Byte>)
-packages/core/src/event.cj:399:PtyExited(String, PtyExitStatus)
-packages/core/src/event.cj:400:PtyFailed(String, String)
-packages/core/src/event.cj:401:AsyncStarted(String)
-packages/core/src/event.cj:402:AsyncCompleted(String, Event)
-packages/core/src/event.cj:403:AsyncFailed(String, String)
-packages/core/src/event.cj:404:AsyncCancelled(String)
-packages/core/src/event.cj:405:DataReady(String, Int64)
-packages/core/src/event.cj:406:DataFailed(String, Int64, String)
-packages/core/src/event.cj:407:DataCancelled(String, Int64)
-packages/core/src/event.cj:408:Tick(TickEvent)
-packages/core/src/event.cj:409:Timer(TimerEvent)
-packages/core/src/event.cj:410:Resize(Rect)
-packages/core/src/event.cj:411:Unknown(Array<Byte>)
-packages/core/src/event.cj:415:public struct PressedKey {
-packages/core/src/event.cj:417:public let key: KeyEvent
-packages/core/src/event.cj:419:public let heldMillis: Int64
-packages/core/src/event.cj:425:public init(key: KeyEvent, heldMillis!: Int64 = 0)
-packages/core/src/event.cj:442:public class InputState {
-packages/core/src/event.cj:450:public init(releaseAfterMillis!: Int64 = 180)
-packages/core/src/event.cj:458:public func handle(event: Event): Array<Event>
-packages/core/src/event.cj:477:public func advance(deltaMillis: Int64): Array<Event>
-packages/core/src/event.cj:498:public func isPressed(key: KeyEvent): Bool
-packages/core/src/event.cj:505:public func pressedKeys(): Array<PressedKey>
-packages/core/src/event.cj:516:public func modifiers(): KeyModifier
-packages/core/src/event.cj:521:public func clear(): Unit
-packages/core/src/event.cj:577:public class EventParser {
-packages/core/src/event.cj:588:public init(inputSource!: InputSource = StdinInputSource())
-packages/core/src/event.cj:596:public func push(bytes: Array<Byte>): Array<Event>
-packages/core/src/event.cj:613:public func readEvents(): Array<Event>
-packages/core/src/event.cj:645:public func readEvent(): ?Event
-packages/core/src/event.cj:663:public func lastReadBytes(): Int64
-packages/core/src/event.cj:670:public func hasPendingInputDrain(): Bool
-packages/core/src/event.cj:681:public func flushEsc(): Array<Event>
-packages/core/src/event.cj:694:public func flushEscAfterPolls(polls: Int64): Array<Event>
+packages/core/src/event.cj:18:public class StdinInputSource <: InputSource {
+packages/core/src/event.cj:23:public init()
+packages/core/src/event.cj:29:public func readAvailable(maxBytes: Int64): Array<Byte>
+packages/core/src/event.cj:51:public enum KeyCode {
+packages/core/src/event.cj:55:Char(Rune)
+packages/core/src/event.cj:57:CtrlC
+packages/core/src/event.cj:59:Esc
+packages/core/src/event.cj:61:Tab
+packages/core/src/event.cj:63:BackTab
+packages/core/src/event.cj:65:Enter
+packages/core/src/event.cj:67:Backspace
+packages/core/src/event.cj:69:Delete
+packages/core/src/event.cj:71:Insert
+packages/core/src/event.cj:73:Up
+packages/core/src/event.cj:75:Down
+packages/core/src/event.cj:77:Left
+packages/core/src/event.cj:79:Right
+packages/core/src/event.cj:81:Home
+packages/core/src/event.cj:83:End
+packages/core/src/event.cj:85:PageUp
+packages/core/src/event.cj:87:PageDown
+packages/core/src/event.cj:91:F(Int64)
+packages/core/src/event.cj:95:public enum KeyProtocol {
+packages/core/src/event.cj:97:Basic
+packages/core/src/event.cj:99:ModifyOtherKeys
+packages/core/src/event.cj:101:Kitty
+packages/core/src/event.cj:105:public struct KeyModifier <: Equatable<KeyModifier> {
+packages/core/src/event.cj:107:public let shift: Bool
+packages/core/src/event.cj:109:public let alt: Bool
+packages/core/src/event.cj:111:public let ctrl: Bool
+packages/core/src/event.cj:113:public let superKey: Bool
+packages/core/src/event.cj:115:public let meta: Bool
+packages/core/src/event.cj:117:public let hyper: Bool
+packages/core/src/event.cj:119:public let capsLock: Bool
+packages/core/src/event.cj:121:public let numLock: Bool
+packages/core/src/event.cj:133:public init( shift!: Bool = false, alt!: Bool = false, ctrl!: Bool = false, superKey!: Bool = false, meta!: Bool = false, hyper!: Bool = false, capsLock!: Bool = false, numLock!: Bool = false )
+packages/core/src/event.cj:156:public static func none(): KeyModifier
+packages/core/src/event.cj:164:public static func fromCsiParam(value: Int64): KeyModifier
+packages/core/src/event.cj:194:public operator func ==(other: KeyModifier): Bool
+packages/core/src/event.cj:209:public operator func !=(other: KeyModifier): Bool
+packages/core/src/event.cj:215:public struct KeyEvent {
+packages/core/src/event.cj:217:public let code: KeyCode
+packages/core/src/event.cj:219:public let modifiers: KeyModifier
+packages/core/src/event.cj:221:public let text: ?String
+packages/core/src/event.cj:223:public let protocol: KeyProtocol
+packages/core/src/event.cj:225:public let nativeRepeat: Bool
+packages/core/src/event.cj:234:public init( code: KeyCode, modifiers!: KeyModifier = KeyModifier.none(), text!: ?String = None, protocol!: KeyProtocol = KeyProtocol.Basic, nativeRepeat!: Bool = false )
+packages/core/src/event.cj:250:public enum MouseButton {
+packages/core/src/event.cj:252:Left
+packages/core/src/event.cj:254:Middle
+packages/core/src/event.cj:256:Right
+packages/core/src/event.cj:258:WheelUp
+packages/core/src/event.cj:260:WheelDown
+packages/core/src/event.cj:262:None
+packages/core/src/event.cj:266:public enum MouseKind {
+packages/core/src/event.cj:268:Down
+packages/core/src/event.cj:270:Up
+packages/core/src/event.cj:272:Drag
+packages/core/src/event.cj:274:Move
+packages/core/src/event.cj:276:Scroll
+packages/core/src/event.cj:280:public struct MouseEvent {
+packages/core/src/event.cj:282:public let kind: MouseKind
+packages/core/src/event.cj:284:public let button: MouseButton
+packages/core/src/event.cj:286:public let x: Int64
+packages/core/src/event.cj:288:public let y: Int64
+packages/core/src/event.cj:290:public let modifiers: KeyModifier
+packages/core/src/event.cj:298:public init(kind: MouseKind, button: MouseButton, x: Int64, y: Int64, modifiers!: KeyModifier = KeyModifier.none())
+packages/core/src/event.cj:308:public struct TickEvent {
+packages/core/src/event.cj:310:public let deltaMillis: Int64
+packages/core/src/event.cj:312:public let elapsedMillis: Int64
+packages/core/src/event.cj:314:public let frameIndex: Int64
+packages/core/src/event.cj:316:public let droppedFrames: Int64
+packages/core/src/event.cj:324:public init(deltaMillis!: Int64 = 0, elapsedMillis!: Int64 = 0, frameIndex!: Int64 = 0, droppedFrames!: Int64 = 0)
+packages/core/src/event.cj:333:public enum TimerMode {
+packages/core/src/event.cj:335:OneShot
+packages/core/src/event.cj:337:Repeating
+packages/core/src/event.cj:341:public enum FrameMissPolicy {
+packages/core/src/event.cj:343:Drop
+packages/core/src/event.cj:347:CatchUp(Int64)
+packages/core/src/event.cj:351:public struct TimerEvent {
+packages/core/src/event.cj:353:public let id: String
+packages/core/src/event.cj:355:public let elapsedMillis: Int64
+packages/core/src/event.cj:357:public let firedCount: Int64
+packages/core/src/event.cj:359:public let droppedFrames: Int64
+packages/core/src/event.cj:367:public init(id: String, elapsedMillis!: Int64 = 0, firedCount!: Int64 = 1, droppedFrames!: Int64 = 0)
+packages/core/src/event.cj:376:public enum TimerPriority {
+packages/core/src/event.cj:378:Immediate
+packages/core/src/event.cj:380:Normal
+packages/core/src/event.cj:382:Low
+packages/core/src/event.cj:386:public enum Event {
+packages/core/src/event.cj:390:KeyDown(KeyEvent)
+packages/core/src/event.cj:394:KeyUp(KeyEvent)
+packages/core/src/event.cj:398:KeyRepeat(KeyEvent)
+packages/core/src/event.cj:402:KeyHeld(KeyEvent)
+packages/core/src/event.cj:406:Mouse(MouseEvent)
+packages/core/src/event.cj:409:FocusIn
+packages/core/src/event.cj:412:FocusOut
+packages/core/src/event.cj:416:Capabilities(TerminalCapabilities)
+packages/core/src/event.cj:420:Paste(String)
+packages/core/src/event.cj:424:Message(String)
+packages/core/src/event.cj:430:ExecResult(String, Int64, String)
+packages/core/src/event.cj:435:TextCompletion(String, TextCompletionResult)
+packages/core/src/event.cj:439:ProcessStarted(String)
+packages/core/src/event.cj:445:ProcessOutput(String, ProcessOutputStream, Array<Byte>)
+packages/core/src/event.cj:450:ProcessFinished(String, ProcessResult)
+packages/core/src/event.cj:455:ProcessFailed(String, String)
+packages/core/src/event.cj:459:ProcessCancelRequested(String)
+packages/core/src/event.cj:463:PtyStarted(String)
+packages/core/src/event.cj:469:PtyOutput(String, PtyOutputStream, Array<Byte>)
+packages/core/src/event.cj:474:PtyExited(String, PtyExitStatus)
+packages/core/src/event.cj:479:PtyFailed(String, String)
+packages/core/src/event.cj:483:AsyncStarted(String)
+packages/core/src/event.cj:488:AsyncCompleted(String, Event)
+packages/core/src/event.cj:493:AsyncFailed(String, String)
+packages/core/src/event.cj:497:AsyncCancelled(String)
+packages/core/src/event.cj:502:DataReady(String, Int64)
+packages/core/src/event.cj:508:DataFailed(String, Int64, String)
+packages/core/src/event.cj:513:DataCancelled(String, Int64)
+packages/core/src/event.cj:517:Tick(TickEvent)
+packages/core/src/event.cj:521:Timer(TimerEvent)
+packages/core/src/event.cj:525:Resize(Rect)
+packages/core/src/event.cj:529:Unknown(Array<Byte>)
+packages/core/src/event.cj:533:public struct PressedKey {
+packages/core/src/event.cj:535:public let key: KeyEvent
+packages/core/src/event.cj:537:public let heldMillis: Int64
+packages/core/src/event.cj:543:public init(key: KeyEvent, heldMillis!: Int64 = 0)
+packages/core/src/event.cj:560:public class InputState {
+packages/core/src/event.cj:568:public init(releaseAfterMillis!: Int64 = 180)
+packages/core/src/event.cj:576:public func handle(event: Event): Array<Event>
+packages/core/src/event.cj:595:public func advance(deltaMillis: Int64): Array<Event>
+packages/core/src/event.cj:616:public func isPressed(key: KeyEvent): Bool
+packages/core/src/event.cj:623:public func pressedKeys(): Array<PressedKey>
+packages/core/src/event.cj:634:public func modifiers(): KeyModifier
+packages/core/src/event.cj:639:public func clear(): Unit
+packages/core/src/event.cj:695:public class EventParser {
+packages/core/src/event.cj:706:public init(inputSource!: InputSource = StdinInputSource())
+packages/core/src/event.cj:714:public func push(bytes: Array<Byte>): Array<Event>
+packages/core/src/event.cj:731:public func readEvents(): Array<Event>
+packages/core/src/event.cj:763:public func readEvent(): ?Event
+packages/core/src/event.cj:781:public func lastReadBytes(): Int64
+packages/core/src/event.cj:788:public func hasPendingInputDrain(): Bool
+packages/core/src/event.cj:799:public func flushEsc(): Array<Event>
+packages/core/src/event.cj:812:public func flushEscAfterPolls(polls: Int64): Array<Event>
 packages/core/src/form_widgets.cj:6:public class Button <: Widget {
 packages/core/src/form_widgets.cj:28:public init( label: String, focused!: Bool = false, disabled!: Bool = false, block!: ?Block = None, style!: Style = Style.default(), focusedStyle!: ?Style = None, disabledStyle!: ?Style = None, theme!: ?Theme = None )
 packages/core/src/form_widgets.cj:51:public func setGhost(value: Bool): Unit

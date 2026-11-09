@@ -14,12 +14,18 @@ public interface InputSource {
     func readAvailable(maxBytes: Int64): Array<Byte>
 }
 
+/** 从标准输入读取终端字节。 */
 public class StdinInputSource <: InputSource {
     @When[os == "Windows"]
     private let console = WindowsConsoleInput()
 
+    /** 创建标准输入源。 */
     public init() {}
 
+    /** 读取标准输入；调用可能等待数据。
+     * @param maxBytes 希望读取的最大字节数；应传入正值
+     * @return 读取的字节；未读到数据时为空
+     */
     public func readAvailable(maxBytes: Int64): Array<Byte> { readNative(maxBytes) }
 
     @When[os == "Windows"]
@@ -376,38 +382,150 @@ public enum TimerPriority {
     | Low
 }
 
+/** 应用接收的输入、运行时和定时事件。 */
 public enum Event {
+    /** 按键按下事件。
+     * @param _0 键盘事件
+     */
     | KeyDown(KeyEvent)
+    /** 按键释放事件。
+     * @param _0 键盘事件
+     */
     | KeyUp(KeyEvent)
+    /** 按键重复事件。
+     * @param _0 键盘事件
+     */
     | KeyRepeat(KeyEvent)
+    /** 按键持续按下事件。
+     * @param _0 键盘事件
+     */
     | KeyHeld(KeyEvent)
+    /** 鼠标输入事件。
+     * @param _0 鼠标事件
+     */
     | Mouse(MouseEvent)
+    /** 终端获得焦点。
+     */
     | FocusIn
+    /** 终端失去焦点。
+     */
     | FocusOut
+    /** 终端能力发生更新。
+     * @param _0 终端能力
+     */
     | Capabilities(TerminalCapabilities)
+    /** 粘贴输入。
+     * @param _0 粘贴文本
+     */
     | Paste(String)
+    /** 应用消息。
+     * @param _0 消息文本
+     */
     | Message(String)
+    /** 命令执行结果。
+     * @param _0 命令标识
+     * @param _1 退出码
+     * @param _2 合并的标准输出和标准错误文本或错误信息
+     */
     | ExecResult(String, Int64, String)
+    /** 文本补全结果。
+     * @param _0 请求标识
+     * @param _1 补全结果
+     */
     | TextCompletion(String, TextCompletionResult)
+    /** 管道子进程启动。
+     * @param _0 进程标识
+     */
     | ProcessStarted(String)
+    /** 管道子进程输出。
+     * @param _0 进程标识
+     * @param _1 输出流
+     * @param _2 输出字节
+     */
     | ProcessOutput(String, ProcessOutputStream, Array<Byte>)
+    /** 管道子进程结束。
+     * @param _0 进程标识
+     * @param _1 进程结果
+     */
     | ProcessFinished(String, ProcessResult)
+    /** 管道子进程操作失败。
+     * @param _0 进程标识
+     * @param _1 错误信息
+     */
     | ProcessFailed(String, String)
+    /** 已请求取消管道子进程。
+     * @param _0 进程标识
+     */
     | ProcessCancelRequested(String)
+    /** 伪终端进程启动。
+     * @param _0 进程标识
+     */
     | PtyStarted(String)
+    /** 伪终端进程输出。
+     * @param _0 进程标识
+     * @param _1 输出流
+     * @param _2 输出字节
+     */
     | PtyOutput(String, PtyOutputStream, Array<Byte>)
+    /** 伪终端进程退出。
+     * @param _0 进程标识
+     * @param _1 退出状态
+     */
     | PtyExited(String, PtyExitStatus)
+    /** 伪终端操作失败。
+     * @param _0 进程标识
+     * @param _1 错误信息
+     */
     | PtyFailed(String, String)
+    /** 异步任务启动。
+     * @param _0 任务标识
+     */
     | AsyncStarted(String)
+    /** 异步任务完成。
+     * @param _0 任务标识
+     * @param _1 任务返回的事件
+     */
     | AsyncCompleted(String, Event)
+    /** 异步任务失败。
+     * @param _0 任务标识
+     * @param _1 错误信息
+     */
     | AsyncFailed(String, String)
+    /** 异步任务取消。
+     * @param _0 任务标识
+     */
     | AsyncCancelled(String)
+    /** 异步数据已就绪。
+     * @param _0 数据标识
+     * @param _1 代次
+     */
     | DataReady(String, Int64)
+    /** 异步数据加载失败。
+     * @param _0 数据标识
+     * @param _1 代次
+     * @param _2 错误信息
+     */
     | DataFailed(String, Int64, String)
+    /** 异步数据加载取消。
+     * @param _0 数据标识
+     * @param _1 代次
+     */
     | DataCancelled(String, Int64)
+    /** 帧计时事件。
+     * @param _0 帧时间信息
+     */
     | Tick(TickEvent)
+    /** 定时器触发事件。
+     * @param _0 定时器信息
+     */
     | Timer(TimerEvent)
+    /** 终端尺寸变化。
+     * @param _0 新区域
+     */
     | Resize(Rect)
+    /** 无法识别的输入字节。
+     * @param _0 原始字节
+     */
     | Unknown(Array<Byte>)
 }
 
