@@ -23736,7 +23736,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 48,
+      "line": 52,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -23754,7 +23754,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 61,
+      "line": 66,
       "level": "member",
       "kind": "func",
       "symbol": "setFocused",
@@ -23772,7 +23772,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 65,
+      "line": 73,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -23790,7 +23790,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 71,
+      "line": 81,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -23808,7 +23808,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 87,
+      "line": 100,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -23826,7 +23826,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 114,
+      "line": 129,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -23844,7 +23844,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 164,
+      "line": 179,
       "level": "top_level",
       "kind": "class",
       "symbol": "SegmentedControl",
@@ -23862,7 +23862,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 169,
+      "line": 184,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -23880,7 +23880,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 179,
+      "line": 202,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -23898,7 +23898,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 201,
+      "line": 225,
       "level": "member",
       "kind": "func",
       "symbol": "selectedValue",
@@ -23916,7 +23916,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 209,
+      "line": 236,
       "level": "member",
       "kind": "func",
       "symbol": "setVisualState",
@@ -23934,7 +23934,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 221,
+      "line": 250,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -23952,7 +23952,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 243,
+      "line": 275,
       "level": "member",
       "kind": "func",
       "symbol": "handleMouse",
@@ -23970,7 +23970,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 271,
+      "line": 305,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -23988,7 +23988,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 345,
+      "line": 380,
       "level": "top_level",
       "kind": "class",
       "symbol": "StatusBarProgress",
@@ -24006,7 +24006,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 346,
+      "line": 382,
       "level": "member",
       "kind": "let",
       "symbol": "value",
@@ -24024,7 +24024,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 347,
+      "line": 384,
       "level": "member",
       "kind": "let",
       "symbol": "total",
@@ -24042,7 +24042,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 348,
+      "line": 386,
       "level": "member",
       "kind": "let",
       "symbol": "width",
@@ -24060,7 +24060,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 349,
+      "line": 388,
       "level": "member",
       "kind": "let",
       "symbol": "label",
@@ -24078,7 +24078,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 350,
+      "line": 390,
       "level": "member",
       "kind": "let",
       "symbol": "labelMode",
@@ -24096,7 +24096,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 353,
+      "line": 393,
       "level": "member",
       "kind": "let",
       "symbol": "style",
@@ -24114,7 +24114,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 356,
+      "line": 396,
       "level": "member",
       "kind": "let",
       "symbol": "fillStyle",
@@ -24132,7 +24132,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 359,
+      "line": 399,
       "level": "member",
       "kind": "let",
       "symbol": "labelStyle",
@@ -24150,7 +24150,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 362,
+      "line": 402,
       "level": "member",
       "kind": "let",
       "symbol": "symbols",
@@ -24168,7 +24168,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 371,
+      "line": 420,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -24186,7 +24186,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 403,
+      "line": 453,
       "level": "top_level",
       "kind": "class",
       "symbol": "StatusBar",
@@ -24204,7 +24204,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 409,
+      "line": 465,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -24222,7 +24222,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 423,
+      "line": 481,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -24240,7 +24240,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 487,
+      "line": 546,
       "level": "top_level",
       "kind": "class",
       "symbol": "Viewport",
@@ -24258,7 +24258,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 489,
+      "line": 549,
       "level": "member",
       "kind": "var",
       "symbol": "offset",
@@ -24276,7 +24276,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 493,
+      "line": 559,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -24294,7 +24294,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 500,
+      "line": 571,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -24312,7 +24312,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 512,
+      "line": 587,
       "level": "member",
       "kind": "func",
       "symbol": "scroll",
@@ -24330,7 +24330,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 516,
+      "line": 595,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -24348,7 +24348,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 542,
+      "line": 621,
       "level": "top_level",
       "kind": "func",
       "symbol": "widgetHitTest",
@@ -24366,7 +24366,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 554,
+      "line": 633,
       "level": "top_level",
       "kind": "func",
       "symbol": "widgetRowAt",
@@ -24384,7 +24384,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 564,
+      "line": 643,
       "level": "top_level",
       "kind": "func",
       "symbol": "mouseScrollDelta",
@@ -24402,7 +24402,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 576,
+      "line": 655,
       "level": "top_level",
       "kind": "class",
       "symbol": "PointerCapture",
@@ -24420,7 +24420,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 582,
+      "line": 661,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -24438,7 +24438,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 591,
+      "line": 670,
       "level": "member",
       "kind": "func",
       "symbol": "begin",
@@ -24456,7 +24456,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 607,
+      "line": 686,
       "level": "member",
       "kind": "func",
       "symbol": "owns",
@@ -24474,7 +24474,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 611,
+      "line": 690,
       "level": "member",
       "kind": "func",
       "symbol": "activeOwner",
@@ -24492,7 +24492,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 615,
+      "line": 694,
       "level": "member",
       "kind": "func",
       "symbol": "origin",
@@ -24510,7 +24510,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 619,
+      "line": 698,
       "level": "member",
       "kind": "func",
       "symbol": "initialValue",
@@ -24528,7 +24528,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 626,
+      "line": 705,
       "level": "member",
       "kind": "func",
       "symbol": "release",
@@ -24546,7 +24546,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 635,
+      "line": 714,
       "level": "member",
       "kind": "func",
       "symbol": "cancel",
@@ -24564,7 +24564,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 654,
+      "line": 733,
       "level": "top_level",
       "kind": "class",
       "symbol": "ModalFocusState",
@@ -24582,7 +24582,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 663,
+      "line": 742,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -24600,7 +24600,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 674,
+      "line": 753,
       "level": "member",
       "kind": "func",
       "symbol": "open",
@@ -24618,7 +24618,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 684,
+      "line": 763,
       "level": "member",
       "kind": "func",
       "symbol": "active",
@@ -24636,7 +24636,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 691,
+      "line": 770,
       "level": "member",
       "kind": "func",
       "symbol": "focus",
@@ -24654,7 +24654,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 698,
+      "line": 777,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -24672,7 +24672,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 713,
+      "line": 792,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -24690,7 +24690,7 @@
     {
       "package": "core",
       "path": "packages/core/src/navigation.cj",
-      "line": 725,
+      "line": 804,
       "level": "member",
       "kind": "func",
       "symbol": "actionFor",

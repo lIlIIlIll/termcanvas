@@ -7741,6 +7741,250 @@
           "signature": "public func actionFor(key: KeyEvent): ?String"
         }
       ]
+    },
+    {
+      "id": "tabs-segments",
+      "source": "docs/api-examples/tabs-segments.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Tabs",
+          "signature": "public class Tabs <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Tabs.selected",
+          "signature": "public var selected: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Tabs.init",
+          "signature": "public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: ?Style = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Tabs.setFocused",
+          "signature": "public func setFocused(focused: Bool): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Tabs.setTheme",
+          "signature": "public func setTheme(theme: ?Theme): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Tabs.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Tabs.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Tabs.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "SegmentedControl",
+          "signature": "public class SegmentedControl <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "SegmentedControl.selected",
+          "signature": "public var selected: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "SegmentedControl.init",
+          "signature": "public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: ?Style = None, focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "SegmentedControl.selectedValue",
+          "signature": "public func selectedValue(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "SegmentedControl.setVisualState",
+          "signature": "public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "SegmentedControl.handle",
+          "signature": "public func handle(key: KeyEvent): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "SegmentedControl.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "SegmentedControl.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
+    },
+    {
+      "id": "status-viewport",
+      "source": "docs/api-examples/status-viewport.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress",
+          "signature": "public class StatusBarProgress {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress.value",
+          "signature": "public let value: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress.total",
+          "signature": "public let total: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress.width",
+          "signature": "public let width: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress.label",
+          "signature": "public let label: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress.labelMode",
+          "signature": "public let labelMode: ProgressBarLabelMode"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress.style",
+          "signature": "public let style: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress.fillStyle",
+          "signature": "public let fillStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress.labelStyle",
+          "signature": "public let labelStyle: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress.symbols",
+          "signature": "public let symbols: ProgressBarSymbols"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBarProgress.init",
+          "signature": "public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = \"\", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: ?Style = None, fillStyle!: ?Style = None, labelStyle!: ?Style = None, symbols!: ?ProgressBarSymbols = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBar",
+          "signature": "public class StatusBar <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBar.init",
+          "signature": "public init( left!: String = \"\", right!: String = \"\", style!: ?Style = None, progress!: ?StatusBarProgress = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "StatusBar.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Viewport",
+          "signature": "public class Viewport <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Viewport.offset",
+          "signature": "public var offset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Viewport.init",
+          "signature": "public init(lines: Array<String>, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default())"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Viewport.handle",
+          "signature": "public func handle(key: KeyEvent, viewportHeight: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Viewport.scroll",
+          "signature": "public func scroll(delta: Int64, viewportHeight: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/navigation.cj",
+          "symbol": "Viewport.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

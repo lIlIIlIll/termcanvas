@@ -1302,60 +1302,60 @@ packages/core/src/media.cj:242:public func mediaFallbackText(source: MediaSource
 packages/core/src/media.cj:252:public func mediaProtocolName(protocol: MediaProtocol): String
 packages/core/src/navigation.cj:35:public class Tabs <: Widget {
 packages/core/src/navigation.cj:40:public var selected: Int64
-packages/core/src/navigation.cj:48:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: ?Style = None )
-packages/core/src/navigation.cj:61:public func setFocused(focused: Bool): Unit
-packages/core/src/navigation.cj:65:public func setTheme(theme: ?Theme): Unit
-packages/core/src/navigation.cj:71:public func handle(key: KeyEvent): Bool
-packages/core/src/navigation.cj:87:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/navigation.cj:114:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:164:public class SegmentedControl <: Widget {
-packages/core/src/navigation.cj:169:public var selected: Int64
-packages/core/src/navigation.cj:179:public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: ?Style = None, focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )
-packages/core/src/navigation.cj:201:public func selectedValue(): ?String
-packages/core/src/navigation.cj:209:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/navigation.cj:221:public func handle(key: KeyEvent): Bool
-packages/core/src/navigation.cj:243:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/navigation.cj:271:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:345:public class StatusBarProgress {
-packages/core/src/navigation.cj:346:public let value: Int64
-packages/core/src/navigation.cj:347:public let total: Int64
-packages/core/src/navigation.cj:348:public let width: Int64
-packages/core/src/navigation.cj:349:public let label: String
-packages/core/src/navigation.cj:350:public let labelMode: ProgressBarLabelMode
-packages/core/src/navigation.cj:353:public let style: Style
-packages/core/src/navigation.cj:356:public let fillStyle: Style
-packages/core/src/navigation.cj:359:public let labelStyle: Style
-packages/core/src/navigation.cj:362:public let symbols: ProgressBarSymbols
-packages/core/src/navigation.cj:371:public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = "", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: ?Style = None, fillStyle!: ?Style = None, labelStyle!: ?Style = None, symbols!: ?ProgressBarSymbols = None )
-packages/core/src/navigation.cj:403:public class StatusBar <: Widget {
-packages/core/src/navigation.cj:409:public init( left!: String = "", right!: String = "", style!: ?Style = None, progress!: ?StatusBarProgress = None )
-packages/core/src/navigation.cj:423:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:487:public class Viewport <: Widget {
-packages/core/src/navigation.cj:489:public var offset: Int64
-packages/core/src/navigation.cj:493:public init(lines: Array<String>, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default())
-packages/core/src/navigation.cj:500:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/navigation.cj:512:public func scroll(delta: Int64, viewportHeight: Int64): Unit
-packages/core/src/navigation.cj:516:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/navigation.cj:542:public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/navigation.cj:554:public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64
-packages/core/src/navigation.cj:564:public func mouseScrollDelta(mouse: MouseEvent): Int64
-packages/core/src/navigation.cj:576:public class PointerCapture {
-packages/core/src/navigation.cj:582:public init()
-packages/core/src/navigation.cj:591:public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool
-packages/core/src/navigation.cj:607:public func owns(owner: String): Bool
-packages/core/src/navigation.cj:611:public func activeOwner(): ?String
-packages/core/src/navigation.cj:615:public func origin(): Position
-packages/core/src/navigation.cj:619:public func initialValue(): Int64
-packages/core/src/navigation.cj:626:public func release(owner: String, mouse: MouseEvent): Bool
-packages/core/src/navigation.cj:635:public func cancel(): Unit
-packages/core/src/navigation.cj:654:public class ModalFocusState {
-packages/core/src/navigation.cj:663:public init(base: FocusManager, keymap!: KeyMap = KeyMap())
-packages/core/src/navigation.cj:674:public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
-packages/core/src/navigation.cj:684:public func active(): ?String
-packages/core/src/navigation.cj:691:public func focus(): FocusManager
-packages/core/src/navigation.cj:698:public func close(): ?String
-packages/core/src/navigation.cj:713:public func handle(key: KeyEvent): Bool
-packages/core/src/navigation.cj:725:public func actionFor(key: KeyEvent): ?String
+packages/core/src/navigation.cj:52:public init( titles: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: ?Style = None )
+packages/core/src/navigation.cj:66:public func setFocused(focused: Bool): Unit
+packages/core/src/navigation.cj:73:public func setTheme(theme: ?Theme): Unit
+packages/core/src/navigation.cj:81:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:100:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:129:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:179:public class SegmentedControl <: Widget {
+packages/core/src/navigation.cj:184:public var selected: Int64
+packages/core/src/navigation.cj:202:public init( items: Array<String>, selected!: Int64 = 0, style!: Style = Style.default(), selectedStyle!: Style = Style.default(), disabledStyle!: ?Style = None, focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None )
+packages/core/src/navigation.cj:225:public func selectedValue(): ?String
+packages/core/src/navigation.cj:236:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/navigation.cj:250:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:275:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:305:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:380:public class StatusBarProgress {
+packages/core/src/navigation.cj:382:public let value: Int64
+packages/core/src/navigation.cj:384:public let total: Int64
+packages/core/src/navigation.cj:386:public let width: Int64
+packages/core/src/navigation.cj:388:public let label: String
+packages/core/src/navigation.cj:390:public let labelMode: ProgressBarLabelMode
+packages/core/src/navigation.cj:393:public let style: Style
+packages/core/src/navigation.cj:396:public let fillStyle: Style
+packages/core/src/navigation.cj:399:public let labelStyle: Style
+packages/core/src/navigation.cj:402:public let symbols: ProgressBarSymbols
+packages/core/src/navigation.cj:420:public init( value: Int64, total!: Int64 = 100, width!: Int64 = 18, label!: String = "", labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Percent, style!: ?Style = None, fillStyle!: ?Style = None, labelStyle!: ?Style = None, symbols!: ?ProgressBarSymbols = None )
+packages/core/src/navigation.cj:453:public class StatusBar <: Widget {
+packages/core/src/navigation.cj:465:public init( left!: String = "", right!: String = "", style!: ?Style = None, progress!: ?StatusBarProgress = None )
+packages/core/src/navigation.cj:481:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:546:public class Viewport <: Widget {
+packages/core/src/navigation.cj:549:public var offset: Int64
+packages/core/src/navigation.cj:559:public init(lines: Array<String>, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default())
+packages/core/src/navigation.cj:571:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/navigation.cj:587:public func scroll(delta: Int64, viewportHeight: Int64): Unit
+packages/core/src/navigation.cj:595:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/navigation.cj:621:public func widgetHitTest(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/navigation.cj:633:public func widgetRowAt(mouse: MouseEvent, area: Rect, offset: Int64, total: Int64): ?Int64
+packages/core/src/navigation.cj:643:public func mouseScrollDelta(mouse: MouseEvent): Int64
+packages/core/src/navigation.cj:655:public class PointerCapture {
+packages/core/src/navigation.cj:661:public init()
+packages/core/src/navigation.cj:670:public func begin(owner: String, mouse: MouseEvent, area: Rect, value!: Int64 = 0): Bool
+packages/core/src/navigation.cj:686:public func owns(owner: String): Bool
+packages/core/src/navigation.cj:690:public func activeOwner(): ?String
+packages/core/src/navigation.cj:694:public func origin(): Position
+packages/core/src/navigation.cj:698:public func initialValue(): Int64
+packages/core/src/navigation.cj:705:public func release(owner: String, mouse: MouseEvent): Bool
+packages/core/src/navigation.cj:714:public func cancel(): Unit
+packages/core/src/navigation.cj:733:public class ModalFocusState {
+packages/core/src/navigation.cj:742:public init(base: FocusManager, keymap!: KeyMap = KeyMap())
+packages/core/src/navigation.cj:753:public func open(id: String, focusIds: Array<String>, keymap!: KeyMap = KeyMap()): Bool
+packages/core/src/navigation.cj:763:public func active(): ?String
+packages/core/src/navigation.cj:770:public func focus(): FocusManager
+packages/core/src/navigation.cj:777:public func close(): ?String
+packages/core/src/navigation.cj:792:public func handle(key: KeyEvent): Bool
+packages/core/src/navigation.cj:804:public func actionFor(key: KeyEvent): ?String
 packages/core/src/paged_table.cj:5:public class TableDataRow {
 packages/core/src/paged_table.cj:6:public let id: String
 packages/core/src/paged_table.cj:7:public let cells: Array<String>

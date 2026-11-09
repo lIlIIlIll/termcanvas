@@ -44,6 +44,10 @@ public class Tabs <: Widget {
 
     private var focused: Bool = false
     /** 保存标签标题和两种绘制样式，并将初始选中索引限制在 0 到最后一个标题索引之间；没有标题时设为 0。
+     * @param titles 标签标题
+     * @param selected 初始选中索引
+     * @param style 普通标签样式
+     * @param selectedStyle 可选的选中标签样式
      */
     public init(
         titles: Array<String>,
@@ -57,16 +61,22 @@ public class Tabs <: Widget {
         this.selectedStyle = selectedStyle
     }
     /** 设置当前标签栏是否具有焦点；聚焦时选中标签额外显示粗体和下划线。
+     * @param focused 是否聚焦
      */
     public func setFocused(focused: Bool): Unit {
         this.focused = focused
     }
 
+    /** 设置标签栏使用的可选语义主题。
+     * @param theme 语义主题；None 使用缓冲区主题
+     */
     public func setTheme(theme: ?Theme): Unit {
         this.theme = theme
     }
 
     /** 左右方向键在非空标签列表中切换选中项并返回 true；按键前先限制公开索引，空列表或其他按键返回 false。
+     * @param key 按键事件
+     * @return 识别到切换按键时为 true
      */
     public func handle(key: KeyEvent): Bool {
         normalizeSelected()
@@ -83,6 +93,9 @@ public class Tabs <: Widget {
     }
 
     /** 按当前可见标签的字符单元格命中鼠标；标题截断或窄区域滚动后命中范围与实际显示一致。
+     * @param mouse 鼠标事件
+     * @param area 标签栏区域
+     * @return 命中并选中标签时为 true
      */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         normalizeSelected()
@@ -110,6 +123,8 @@ public class Tabs <: Widget {
     }
 
     /** 在区域首行绘制当前视口内的标签；选中标签使用选中样式，聚焦时再加粗并下划线，绘制前限制公开索引。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         textWidthOptionsValue = buffer.textWidthOptions()
@@ -175,6 +190,14 @@ public class SegmentedControl <: Widget {
     private var theme: ?Theme
 
     /** 保存分段值与绘制状态；构造时将选中索引限制到有效范围，选中样式默认使用语义主题角色。
+     * @param items 分段值
+     * @param selected 初始选中索引
+     * @param style 普通段样式
+     * @param selectedStyle 选中段样式
+     * @param disabledStyle 禁用样式
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param theme 可选的语义主题
      */
     public init(
         items: Array<String>,
@@ -197,6 +220,7 @@ public class SegmentedControl <: Widget {
     }
 
     /** 返回当前选中值；空列表返回 None，查询前会限制可公开修改的索引。
+     * @return 选中值；无选项时为 None
      */
     public func selectedValue(): ?String {
         normalizeSelected()
@@ -205,6 +229,9 @@ public class SegmentedControl <: Widget {
     }
 
     /** 设置聚焦、禁用状态和语义主题；禁用时拒绝键盘与鼠标输入。
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param theme 可选的语义主题
      */
     public func setVisualState(
         focused!: Bool = false,
@@ -217,6 +244,8 @@ public class SegmentedControl <: Widget {
     }
 
     /** 非空且启用时，Left/Right 有界移动，Home/End 跳到首尾；识别的按键即使停在边界也返回 true。
+     * @param key 按键事件
+     * @return 识别到导航按键时为 true
      */
     public func handle(key: KeyEvent): Bool {
         normalizeSelected()
@@ -239,6 +268,9 @@ public class SegmentedControl <: Widget {
     }
 
     /** 左键按下只选中首行可见段的文本单元格；段间空格、不可见位置及禁用状态不改变选中项。
+     * @param mouse 鼠标事件
+     * @param area 分段控件区域
+     * @return 命中并选中分段时为 true
      */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         normalizeSelected()
@@ -267,6 +299,8 @@ public class SegmentedControl <: Widget {
     }
 
     /** 绘制一行分段值；选中段用方括号，其他段两侧留空，间隔空格不属于任何段。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         textWidthOptionsValue = buffer.textWidthOptions()
@@ -342,11 +376,17 @@ public class SegmentedControl <: Widget {
     }
 }
 
+/** 状态栏内嵌进度条的值、尺寸、样式和符号配置。 */
 public class StatusBarProgress {
+    /** 当前进度，至少为零。 */
     public let value: Int64
+    /** 进度总量，至少为一。 */
     public let total: Int64
+    /** 期望进度条宽度，至少为零。 */
     public let width: Int64
+    /** 自定义进度标签。 */
     public let label: String
+    /** 标签显示模式。 */
     public let labelMode: ProgressBarLabelMode
     /** 未使用应用主题时的默认基础样式；显式设置始终优先。
      */
@@ -367,6 +407,15 @@ public class StatusBarProgress {
 
     /** 保存状态栏进度条的配置；将当前值限制为至少 0、总量限制为至少 1、宽度限制为至少 0。
      * 未显式设置样式或符号时，有应用主题则继承主题，否则使用上述默认值。
+     * @param value 当前进度
+     * @param total 进度总量
+     * @param width 期望宽度
+     * @param label 自定义标签
+     * @param labelMode 标签显示模式
+     * @param style 基础样式
+     * @param fillStyle 填充样式
+     * @param labelStyle 标签样式
+     * @param symbols 进度符号
      */
     public init(
         value: Int64,
@@ -400,12 +449,19 @@ public class StatusBarProgress {
     func hasCustomSymbols(): Bool { customSymbols }
 }
 
+/** 在一行内显示左右文本以及可选的进度条。 */
 public class StatusBar <: Widget {
     private let left: String
     private let right: String
     private let style: ?Style
     private let progress: ?StatusBarProgress
 
+    /** 创建状态栏。
+     * @param left 左侧文本
+     * @param right 右对齐文本
+     * @param style 可选样式
+     * @param progress 可选进度配置
+     */
     public init(
         left!: String = "",
         right!: String = "",
@@ -419,6 +475,8 @@ public class StatusBar <: Widget {
     }
 
     /** 宽或高不大于 0 时不绘制；否则在区域首行先填充空格，再绘制左侧及右对齐文字。宽度不足时以省略标记表示未显示内容；两侧均有内容且区域至少三列时保留分隔。配置了进度条且可用宽度至少为 6 时，在两侧文字之间绘制进度条。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
@@ -484,12 +542,20 @@ public class StatusBar <: Widget {
 
 }
 
+/** 显示文本行的一段可滚动视口。 */
 public class Viewport <: Widget {
     private let lines: Array<String>
+    /** 首个显示行的索引。 */
     public var offset: Int64
     private let block: ?Block
     private let style: Style
 
+    /** 创建文本视口。
+     * @param lines 要显示的文本行
+     * @param offset 起始行索引，负值按零处理
+     * @param block 可选的边框容器
+     * @param style 文本样式
+     */
     public init(lines: Array<String>, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default()) {
         this.lines = lines
         this.offset = max(0, offset)
@@ -497,6 +563,11 @@ public class Viewport <: Widget {
         this.style = style
     }
 
+    /** 处理上下、翻页及首尾导航按键。
+     * @param key 按键事件
+     * @param viewportHeight 可见行数
+     * @return 识别到导航按键时为 true
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
         match (key.code) {
             case KeyCode.Up => scroll(-1, viewportHeight); true
@@ -509,10 +580,18 @@ public class Viewport <: Widget {
         }
     }
 
+    /** 按行滚动并将偏移限制在可用范围内。
+     * @param delta 行数增量
+     * @param viewportHeight 可见行数
+     */
     public func scroll(delta: Int64, viewportHeight: Int64): Unit {
         offset = clamp(offset + delta, 0, max(0, lines.size - max(0, viewportHeight)))
     }
 
+    /** 将可见行绘制到缓冲区；设置边框时先绘制边框。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
