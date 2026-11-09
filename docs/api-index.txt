@@ -1356,53 +1356,53 @@ packages/core/src/navigation.cj:770:public func focus(): FocusManager
 packages/core/src/navigation.cj:777:public func close(): ?String
 packages/core/src/navigation.cj:792:public func handle(key: KeyEvent): Bool
 packages/core/src/navigation.cj:804:public func actionFor(key: KeyEvent): ?String
-packages/core/src/paged_table.cj:5:public class TableDataRow {
-packages/core/src/paged_table.cj:6:public let id: String
-packages/core/src/paged_table.cj:7:public let cells: Array<String>
-packages/core/src/paged_table.cj:8:public init(id: String, cells: Array<String>)
-packages/core/src/paged_table.cj:14:public struct TableQuery {
-packages/core/src/paged_table.cj:15:public let filter: String
-packages/core/src/paged_table.cj:16:public let sortColumn: ?Int64
-packages/core/src/paged_table.cj:17:public let descending: Bool
-packages/core/src/paged_table.cj:18:public init(filter!: String = "", sortColumn!: ?Int64 = None, descending!: Bool = false)
-packages/core/src/paged_table.cj:25:public class TablePageRequest {
-packages/core/src/paged_table.cj:26:public let revision: Int64
-packages/core/src/paged_table.cj:27:public let requestId: Int64
-packages/core/src/paged_table.cj:28:public let offset: Int64
-packages/core/src/paged_table.cj:29:public let limit: Int64
-packages/core/src/paged_table.cj:30:public let query: TableQuery
-packages/core/src/paged_table.cj:37:public class TablePage {
-packages/core/src/paged_table.cj:38:public let rows: Array<TableDataRow>
-packages/core/src/paged_table.cj:39:public let totalRows: Int64
-packages/core/src/paged_table.cj:40:public init(rows: Array<TableDataRow>, totalRows: Int64)
-packages/core/src/paged_table.cj:48:public interface TableDataSource {
-packages/core/src/paged_table.cj:49:func load(request: TablePageRequest): TablePage
-packages/core/src/paged_table.cj:53:public class PagedTableModel {
-packages/core/src/paged_table.cj:54:public let pageSize: Int64
-packages/core/src/paged_table.cj:55:public let maxPages: Int64
-packages/core/src/paged_table.cj:69:public init(pageSize!: Int64 = 128, maxPages!: Int64 = 8)
-packages/core/src/paged_table.cj:73:public func query(): TableQuery
-packages/core/src/paged_table.cj:74:public func revision(): Int64
-packages/core/src/paged_table.cj:75:public func totalRows(): Int64
-packages/core/src/paged_table.cj:76:public func hasTotal(): Bool
-packages/core/src/paged_table.cj:77:public func cachedPageCount(): Int64
-packages/core/src/paged_table.cj:78:public func pendingPageCount(): Int64
-packages/core/src/paged_table.cj:79:public func cachedRowCount(): Int64
-packages/core/src/paged_table.cj:84:public func selectedId(): ?String
-packages/core/src/paged_table.cj:85:public func selectedIndex(): ?Int64
-packages/core/src/paged_table.cj:86:public func selectedIds(): Array<String>
-packages/core/src/paged_table.cj:91:public func isSelected(id: String): Bool
-packages/core/src/paged_table.cj:92:public func toggle(id: String): Unit
-packages/core/src/paged_table.cj:95:public func selectIndex(index: Int64): Unit
-packages/core/src/paged_table.cj:100:public func selectId(id: String): Unit
-packages/core/src/paged_table.cj:107:public func setQuery(query: TableQuery): Bool
-packages/core/src/paged_table.cj:113:public func invalidate(): Unit
-packages/core/src/paged_table.cj:118:public func row(index: Int64): ?TableDataRow
-packages/core/src/paged_table.cj:126:public func statusAt(index: Int64): TableStatus
-packages/core/src/paged_table.cj:135:public func requestViewport(offset: Int64, height: Int64, retry!: Bool = false): Array<TablePageRequest>
-packages/core/src/paged_table.cj:171:public func accept(request: TablePageRequest, page: TablePage): Bool
-packages/core/src/paged_table.cj:196:public func fail(request: TablePageRequest, message: String): Bool
-packages/core/src/paged_table.cj:201:public func isPending(request: TablePageRequest): Bool
+packages/core/src/paged_table.cj:7:public class TableDataRow {
+packages/core/src/paged_table.cj:10:public let id: String
+packages/core/src/paged_table.cj:13:public let cells: Array<String>
+packages/core/src/paged_table.cj:18:public init(id: String, cells: Array<String>)
+packages/core/src/paged_table.cj:26:public struct TableQuery {
+packages/core/src/paged_table.cj:29:public let filter: String
+packages/core/src/paged_table.cj:32:public let sortColumn: ?Int64
+packages/core/src/paged_table.cj:35:public let descending: Bool
+packages/core/src/paged_table.cj:41:public init(filter!: String = "", sortColumn!: ?Int64 = None, descending!: Bool = false)
+packages/core/src/paged_table.cj:50:public class TablePageRequest {
+packages/core/src/paged_table.cj:53:public let revision: Int64
+packages/core/src/paged_table.cj:56:public let requestId: Int64
+packages/core/src/paged_table.cj:59:public let offset: Int64
+packages/core/src/paged_table.cj:62:public let limit: Int64
+packages/core/src/paged_table.cj:65:public let query: TableQuery
+packages/core/src/paged_table.cj:74:public class TablePage {
+packages/core/src/paged_table.cj:77:public let rows: Array<TableDataRow>
+packages/core/src/paged_table.cj:80:public let totalRows: Int64
+packages/core/src/paged_table.cj:85:public init(rows: Array<TableDataRow>, totalRows: Int64)
+packages/core/src/paged_table.cj:95:public interface TableDataSource {
+packages/core/src/paged_table.cj:100:func load(request: TablePageRequest): TablePage
+packages/core/src/paged_table.cj:106:public class PagedTableModel {
+packages/core/src/paged_table.cj:109:public let pageSize: Int64
+packages/core/src/paged_table.cj:112:public let maxPages: Int64
+packages/core/src/paged_table.cj:130:public init(pageSize!: Int64 = 128, maxPages!: Int64 = 8)
+packages/core/src/paged_table.cj:137:public func query(): TableQuery
+packages/core/src/paged_table.cj:141:public func revision(): Int64
+packages/core/src/paged_table.cj:145:public func totalRows(): Int64
+packages/core/src/paged_table.cj:149:public func hasTotal(): Bool
+packages/core/src/paged_table.cj:153:public func cachedPageCount(): Int64
+packages/core/src/paged_table.cj:157:public func pendingPageCount(): Int64
+packages/core/src/paged_table.cj:161:public func cachedRowCount(): Int64
+packages/core/src/paged_table.cj:169:public func selectedId(): ?String
+packages/core/src/paged_table.cj:173:public func selectedIndex(): ?Int64
+packages/core/src/paged_table.cj:177:public func selectedIds(): Array<String>
+packages/core/src/paged_table.cj:186:public func isSelected(id: String): Bool
+packages/core/src/paged_table.cj:190:public func toggle(id: String): Unit
+packages/core/src/paged_table.cj:196:public func selectIndex(index: Int64): Unit
+packages/core/src/paged_table.cj:204:public func selectId(id: String): Unit
+packages/core/src/paged_table.cj:215:public func setQuery(query: TableQuery): Bool
+packages/core/src/paged_table.cj:223:public func invalidate(): Unit
+packages/core/src/paged_table.cj:232:public func row(index: Int64): ?TableDataRow
+packages/core/src/paged_table.cj:244:public func statusAt(index: Int64): TableStatus
+packages/core/src/paged_table.cj:259:public func requestViewport(offset: Int64, height: Int64, retry!: Bool = false): Array<TablePageRequest>
+packages/core/src/paged_table.cj:300:public func accept(request: TablePageRequest, page: TablePage): Bool
+packages/core/src/paged_table.cj:330:public func fail(request: TablePageRequest, message: String): Bool
+packages/core/src/paged_table.cj:339:public func isPending(request: TablePageRequest): Bool
 packages/core/src/process_runtime.cj:6:public enum ProcessOutputStream { | Stdout | Stderr }
 packages/core/src/process_runtime.cj:6:Stdout
 packages/core/src/process_runtime.cj:6:Stderr

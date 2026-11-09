@@ -24708,7 +24708,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 5,
+      "line": 7,
       "level": "top_level",
       "kind": "class",
       "symbol": "TableDataRow",
@@ -24726,7 +24726,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 6,
+      "line": 10,
       "level": "member",
       "kind": "let",
       "symbol": "id",
@@ -24744,7 +24744,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 7,
+      "line": 13,
       "level": "member",
       "kind": "let",
       "symbol": "cells",
@@ -24762,7 +24762,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 8,
+      "line": 18,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -24780,7 +24780,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 14,
+      "line": 26,
       "level": "top_level",
       "kind": "struct",
       "symbol": "TableQuery",
@@ -24798,7 +24798,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 15,
+      "line": 29,
       "level": "member",
       "kind": "let",
       "symbol": "filter",
@@ -24816,7 +24816,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 16,
+      "line": 32,
       "level": "member",
       "kind": "let",
       "symbol": "sortColumn",
@@ -24834,7 +24834,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 17,
+      "line": 35,
       "level": "member",
       "kind": "let",
       "symbol": "descending",
@@ -24852,7 +24852,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 18,
+      "line": 41,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -24870,7 +24870,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 25,
+      "line": 50,
       "level": "top_level",
       "kind": "class",
       "symbol": "TablePageRequest",
@@ -24888,7 +24888,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 26,
+      "line": 53,
       "level": "member",
       "kind": "let",
       "symbol": "revision",
@@ -24906,7 +24906,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 27,
+      "line": 56,
       "level": "member",
       "kind": "let",
       "symbol": "requestId",
@@ -24924,7 +24924,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 28,
+      "line": 59,
       "level": "member",
       "kind": "let",
       "symbol": "offset",
@@ -24942,7 +24942,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 29,
+      "line": 62,
       "level": "member",
       "kind": "let",
       "symbol": "limit",
@@ -24960,7 +24960,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 30,
+      "line": 65,
       "level": "member",
       "kind": "let",
       "symbol": "query",
@@ -24978,7 +24978,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 37,
+      "line": 74,
       "level": "top_level",
       "kind": "class",
       "symbol": "TablePage",
@@ -24996,7 +24996,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 38,
+      "line": 77,
       "level": "member",
       "kind": "let",
       "symbol": "rows",
@@ -25014,7 +25014,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 39,
+      "line": 80,
       "level": "member",
       "kind": "let",
       "symbol": "totalRows",
@@ -25032,7 +25032,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 40,
+      "line": 85,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -25050,7 +25050,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 48,
+      "line": 95,
       "level": "top_level",
       "kind": "interface",
       "symbol": "TableDataSource",
@@ -25068,7 +25068,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 49,
+      "line": 100,
       "level": "member",
       "kind": "func",
       "symbol": "load",
@@ -25087,7 +25087,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 53,
+      "line": 106,
       "level": "top_level",
       "kind": "class",
       "symbol": "PagedTableModel",
@@ -25105,7 +25105,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 54,
+      "line": 109,
       "level": "member",
       "kind": "let",
       "symbol": "pageSize",
@@ -25123,7 +25123,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 55,
+      "line": 112,
       "level": "member",
       "kind": "let",
       "symbol": "maxPages",
@@ -25141,7 +25141,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 69,
+      "line": 130,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -25159,7 +25159,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 73,
+      "line": 137,
       "level": "member",
       "kind": "func",
       "symbol": "query",
@@ -25177,7 +25177,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 74,
+      "line": 141,
       "level": "member",
       "kind": "func",
       "symbol": "revision",
@@ -25195,7 +25195,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 75,
+      "line": 145,
       "level": "member",
       "kind": "func",
       "symbol": "totalRows",
@@ -25213,7 +25213,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 76,
+      "line": 149,
       "level": "member",
       "kind": "func",
       "symbol": "hasTotal",
@@ -25231,7 +25231,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 77,
+      "line": 153,
       "level": "member",
       "kind": "func",
       "symbol": "cachedPageCount",
@@ -25249,7 +25249,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 78,
+      "line": 157,
       "level": "member",
       "kind": "func",
       "symbol": "pendingPageCount",
@@ -25267,7 +25267,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 79,
+      "line": 161,
       "level": "member",
       "kind": "func",
       "symbol": "cachedRowCount",
@@ -25285,7 +25285,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 84,
+      "line": 169,
       "level": "member",
       "kind": "func",
       "symbol": "selectedId",
@@ -25303,7 +25303,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 85,
+      "line": 173,
       "level": "member",
       "kind": "func",
       "symbol": "selectedIndex",
@@ -25321,7 +25321,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 86,
+      "line": 177,
       "level": "member",
       "kind": "func",
       "symbol": "selectedIds",
@@ -25339,7 +25339,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 91,
+      "line": 186,
       "level": "member",
       "kind": "func",
       "symbol": "isSelected",
@@ -25357,7 +25357,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 92,
+      "line": 190,
       "level": "member",
       "kind": "func",
       "symbol": "toggle",
@@ -25375,7 +25375,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 95,
+      "line": 196,
       "level": "member",
       "kind": "func",
       "symbol": "selectIndex",
@@ -25393,7 +25393,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 100,
+      "line": 204,
       "level": "member",
       "kind": "func",
       "symbol": "selectId",
@@ -25411,7 +25411,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 107,
+      "line": 215,
       "level": "member",
       "kind": "func",
       "symbol": "setQuery",
@@ -25429,7 +25429,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 113,
+      "line": 223,
       "level": "member",
       "kind": "func",
       "symbol": "invalidate",
@@ -25447,7 +25447,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 118,
+      "line": 232,
       "level": "member",
       "kind": "func",
       "symbol": "row",
@@ -25465,7 +25465,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 126,
+      "line": 244,
       "level": "member",
       "kind": "func",
       "symbol": "statusAt",
@@ -25483,7 +25483,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 135,
+      "line": 259,
       "level": "member",
       "kind": "func",
       "symbol": "requestViewport",
@@ -25501,7 +25501,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 171,
+      "line": 300,
       "level": "member",
       "kind": "func",
       "symbol": "accept",
@@ -25519,7 +25519,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 196,
+      "line": 330,
       "level": "member",
       "kind": "func",
       "symbol": "fail",
@@ -25537,7 +25537,7 @@
     {
       "package": "core",
       "path": "packages/core/src/paged_table.cj",
-      "line": 201,
+      "line": 339,
       "level": "member",
       "kind": "func",
       "symbol": "isPending",

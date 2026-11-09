@@ -14639,6 +14639,302 @@
           "signature": "Unknown(Array<Byte>)"
         }
       ]
+    },
+    {
+      "id": "paged-table",
+      "source": "docs/api-examples/paged-table.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableDataRow",
+          "signature": "public class TableDataRow {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableDataRow.id",
+          "signature": "public let id: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableDataRow.cells",
+          "signature": "public let cells: Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableDataRow.init",
+          "signature": "public init(id: String, cells: Array<String>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableQuery",
+          "signature": "public struct TableQuery {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableQuery.filter",
+          "signature": "public let filter: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableQuery.sortColumn",
+          "signature": "public let sortColumn: ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableQuery.descending",
+          "signature": "public let descending: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableQuery.init",
+          "signature": "public init(filter!: String = \"\", sortColumn!: ?Int64 = None, descending!: Bool = false)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TablePageRequest",
+          "signature": "public class TablePageRequest {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TablePageRequest.revision",
+          "signature": "public let revision: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TablePageRequest.requestId",
+          "signature": "public let requestId: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TablePageRequest.offset",
+          "signature": "public let offset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TablePageRequest.limit",
+          "signature": "public let limit: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TablePageRequest.query",
+          "signature": "public let query: TableQuery"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TablePage",
+          "signature": "public class TablePage {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TablePage.rows",
+          "signature": "public let rows: Array<TableDataRow>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TablePage.totalRows",
+          "signature": "public let totalRows: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TablePage.init",
+          "signature": "public init(rows: Array<TableDataRow>, totalRows: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableDataSource",
+          "signature": "public interface TableDataSource {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "TableDataSource.load",
+          "signature": "func load(request: TablePageRequest): TablePage"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel",
+          "signature": "public class PagedTableModel {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.pageSize",
+          "signature": "public let pageSize: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.maxPages",
+          "signature": "public let maxPages: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.init",
+          "signature": "public init(pageSize!: Int64 = 128, maxPages!: Int64 = 8)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.query",
+          "signature": "public func query(): TableQuery"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.revision",
+          "signature": "public func revision(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.totalRows",
+          "signature": "public func totalRows(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.hasTotal",
+          "signature": "public func hasTotal(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.cachedPageCount",
+          "signature": "public func cachedPageCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.pendingPageCount",
+          "signature": "public func pendingPageCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.cachedRowCount",
+          "signature": "public func cachedRowCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.selectedId",
+          "signature": "public func selectedId(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.selectedIndex",
+          "signature": "public func selectedIndex(): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.selectedIds",
+          "signature": "public func selectedIds(): Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.isSelected",
+          "signature": "public func isSelected(id: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.toggle",
+          "signature": "public func toggle(id: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.selectIndex",
+          "signature": "public func selectIndex(index: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.selectId",
+          "signature": "public func selectId(id: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.setQuery",
+          "signature": "public func setQuery(query: TableQuery): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.invalidate",
+          "signature": "public func invalidate(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.row",
+          "signature": "public func row(index: Int64): ?TableDataRow"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.statusAt",
+          "signature": "public func statusAt(index: Int64): TableStatus"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.requestViewport",
+          "signature": "public func requestViewport(offset: Int64, height: Int64, retry!: Bool = false): Array<TablePageRequest>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.accept",
+          "signature": "public func accept(request: TablePageRequest, page: TablePage): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.fail",
+          "signature": "public func fail(request: TablePageRequest, message: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/paged_table.cj",
+          "symbol": "PagedTableModel.isPending",
+          "signature": "public func isPending(request: TablePageRequest): Bool"
+        }
+      ]
     }
   ]
 }
