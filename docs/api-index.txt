@@ -2724,113 +2724,113 @@ packages/game/src/game.cj:153:public func set(id: EntityId, value: T): Bool
 packages/game/src/game.cj:163:public func entities(): Array<EntityId>
 packages/game/src/game.cj:170:public func size(): Int64
 packages/game/src/game.cj:175:public func clearDead(world: EntityWorld): Unit
-packages/game/src/game.cj:195:public struct Vec2 <: Equatable<Vec2> {
-packages/game/src/game.cj:196:public var x: Float64
-packages/game/src/game.cj:197:public var y: Float64
-packages/game/src/game.cj:199:public init(x!: Float64 = 0.0, y!: Float64 = 0.0)
-packages/game/src/game.cj:204:public operator func ==(other: Vec2): Bool
-packages/game/src/game.cj:208:public func plus(other: Vec2): Vec2
-packages/game/src/game.cj:209:public func minus(other: Vec2): Vec2
-packages/game/src/game.cj:210:public func scale(value: Float64): Vec2
-packages/game/src/game.cj:213:public struct Aabb <: Equatable<Aabb> {
-packages/game/src/game.cj:214:public var x: Float64
-packages/game/src/game.cj:215:public var y: Float64
-packages/game/src/game.cj:216:public var width: Float64
-packages/game/src/game.cj:217:public var height: Float64
-packages/game/src/game.cj:219:public init(x!: Float64 = 0.0, y!: Float64 = 0.0, width!: Float64 = 0.0, height!: Float64 = 0.0)
-packages/game/src/game.cj:226:public operator func ==(other: Aabb): Bool
-packages/game/src/game.cj:230:public prop right: Float64 { get() { x + width } }
-packages/game/src/game.cj:231:public prop bottom: Float64 { get() { y + height } }
-packages/game/src/game.cj:233:public func moved(delta: Vec2): Aabb
-packages/game/src/game.cj:237:public func overlaps(other: Aabb): Bool
-packages/game/src/game.cj:242:public struct Transform2D {
-packages/game/src/game.cj:243:public var position: Vec2
-packages/game/src/game.cj:244:public var size: Vec2
-packages/game/src/game.cj:246:public init(position!: Vec2 = Vec2(), size!: Vec2 = Vec2(x: 1.0, y: 1.0))
-packages/game/src/game.cj:251:public func bounds(): Aabb
-packages/game/src/game.cj:256:public struct Velocity2D {
-packages/game/src/game.cj:257:public var value: Vec2
-packages/game/src/game.cj:258:public init(value!: Vec2 = Vec2())
-packages/game/src/game.cj:263:public struct Sprite2D {
-packages/game/src/game.cj:264:public let rows: Array<String>
-packages/game/src/game.cj:265:public let style: Style
-packages/game/src/game.cj:266:public let transparent: String
-packages/game/src/game.cj:268:public init(rows: Array<String>, style!: Style = Style.default(), transparent!: String = " ")
-packages/game/src/game.cj:275:public struct SpriteFrame {
-packages/game/src/game.cj:276:public let sprite: Sprite2D
-packages/game/src/game.cj:277:public let durationMillis: Int64
-packages/game/src/game.cj:279:public init(sprite: Sprite2D, durationMillis!: Int64 = 120)
-packages/game/src/game.cj:285:public class SpriteAnimation {
-packages/game/src/game.cj:291:public init(frames: Array<SpriteFrame>, loop!: Bool = true)
-packages/game/src/game.cj:296:public func reset(): Unit
-packages/game/src/game.cj:301:public func advance(deltaMillis: Int64): Sprite2D
-packages/game/src/game.cj:314:public func current(): Sprite2D
-packages/game/src/game.cj:319:public struct Camera2D {
-packages/game/src/game.cj:320:public var origin: Vec2
-packages/game/src/game.cj:321:public var viewport: Rect
-packages/game/src/game.cj:323:public init(origin!: Vec2 = Vec2(), viewport!: Rect = Rect(0, 0, 80, 24))
-packages/game/src/game.cj:329:public enum ColliderKind {
-packages/game/src/game.cj:330:Solid
-packages/game/src/game.cj:331:Sensor
-packages/game/src/game.cj:334:public struct Collider2D {
-packages/game/src/game.cj:335:public let kind: ColliderKind
-packages/game/src/game.cj:336:public let bounds: Aabb
-packages/game/src/game.cj:337:public let layer: Int64
-packages/game/src/game.cj:338:public let mask: Int64
-packages/game/src/game.cj:340:public init(kind!: ColliderKind = ColliderKind.Solid, bounds!: Aabb = Aabb(width: 1.0, height: 1.0), layer!: Int64 = 1, mask!: Int64 = Int64.Max)
-packages/game/src/game.cj:348:public enum BodyType {
-packages/game/src/game.cj:349:Static
-packages/game/src/game.cj:350:Kinematic
-packages/game/src/game.cj:351:Dynamic
-packages/game/src/game.cj:354:public struct RigidBody2D {
-packages/game/src/game.cj:355:public let bodyType: BodyType
-packages/game/src/game.cj:356:public let mass: Float64
-packages/game/src/game.cj:357:public let gravityScale: Float64
-packages/game/src/game.cj:358:public let damping: Float64
-packages/game/src/game.cj:360:public init(bodyType!: BodyType = BodyType.Dynamic, mass!: Float64 = 1.0, gravityScale!: Float64 = 1.0, damping!: Float64 = 0.0)
-packages/game/src/game.cj:368:public struct CollisionEvent {
-packages/game/src/game.cj:369:public let entity: EntityId
-packages/game/src/game.cj:370:public let other: EntityId
-packages/game/src/game.cj:371:public let normal: Vec2
-packages/game/src/game.cj:372:public let time: Float64
-packages/game/src/game.cj:373:public let hitX: Float64
-packages/game/src/game.cj:374:public let hitY: Float64
-packages/game/src/game.cj:376:public init(entity: EntityId, other: EntityId, normal: Vec2, time: Float64, hitX: Float64, hitY: Float64)
-packages/game/src/game.cj:386:public struct TileMarker <: Equatable<TileMarker> {
-packages/game/src/game.cj:387:public let x: Int64
-packages/game/src/game.cj:388:public let y: Int64
-packages/game/src/game.cj:389:public let symbol: String
-packages/game/src/game.cj:391:public init(x: Int64, y: Int64, symbol: String)
-packages/game/src/game.cj:397:public operator func ==(other: TileMarker): Bool
-packages/game/src/game.cj:402:public class PhysicsWorld {
-packages/game/src/game.cj:403:public var gravity: Vec2
-packages/game/src/game.cj:404:public var maxSubSteps: Int64
-packages/game/src/game.cj:405:public var skin: Float64
-packages/game/src/game.cj:408:public init(gravity!: Vec2 = Vec2(x: 0.0, y: 30.0), maxSubSteps!: Int64 = 4, skin!: Float64 = 0.001)
-packages/game/src/game.cj:414:public func step( world: EntityWorld, transforms: ComponentStore<Transform2D>, velocities: ComponentStore<Velocity2D>, colliders: ComponentStore<Collider2D>, bodies: ComponentStore<RigidBody2D>, deltaMillis: Int64 ): Array<CollisionEvent>
-packages/game/src/game.cj:433:public func overlaps( world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>, id: EntityId ): Array<CollisionEvent>
-packages/game/src/game.cj:584:public class GameInputState {
-packages/game/src/game.cj:588:public init()
-packages/game/src/game.cj:590:public func beginFrame(): Unit
-packages/game/src/game.cj:596:public func handle(event: Event): Unit
-packages/game/src/game.cj:620:public func pressed(code: KeyCode): Bool
-packages/game/src/game.cj:624:public func justPressed(code: KeyCode): Bool
-packages/game/src/game.cj:628:public func axis(negative: KeyCode, positive: KeyCode): Int64
-packages/game/src/game.cj:635:public class SpriteRenderer {
-packages/game/src/game.cj:636:public init()
-packages/game/src/game.cj:638:public func render( area: Rect, buffer: Buffer, transforms: ComponentStore<Transform2D>, sprites: ComponentStore<Sprite2D>, camera!: Camera2D = Camera2D() ): Unit
-packages/game/src/game.cj:659:public func drawSprite(canvas: Canvas, transform: Transform2D, sprite: Sprite2D, camera: Camera2D): Unit
-packages/game/src/game.cj:678:public class TileMap {
-packages/game/src/game.cj:679:public let width: Int64
-packages/game/src/game.cj:680:public let height: Int64
-packages/game/src/game.cj:687:public init(rows: Array<String>, solidSymbol!: String = "#", widthOptions!: TextWidthOptions = TextWidthOptions())
-packages/game/src/game.cj:695:public func isSolid(x: Int64, y: Int64): Bool
-packages/game/src/game.cj:699:public func tileAt(x: Int64, y: Int64): String
-packages/game/src/game.cj:704:public func find(symbol: String): Array<TileMarker>
-packages/game/src/game.cj:716:public func findAny(symbols: Array<String>): Array<TileMarker>
-packages/game/src/game.cj:729:public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
-packages/game/src/game.cj:746:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style): Unit
-packages/game/src/game.cj:750:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit
+packages/game/src/game.cj:196:public struct Vec2 <: Equatable<Vec2> {
+packages/game/src/game.cj:198:public var x: Float64
+packages/game/src/game.cj:200:public var y: Float64
+packages/game/src/game.cj:206:public init(x!: Float64 = 0.0, y!: Float64 = 0.0)
+packages/game/src/game.cj:215:public operator func ==(other: Vec2): Bool
+packages/game/src/game.cj:223:public func plus(other: Vec2): Vec2
+packages/game/src/game.cj:228:public func minus(other: Vec2): Vec2
+packages/game/src/game.cj:233:public func scale(value: Float64): Vec2
+packages/game/src/game.cj:237:public struct Aabb <: Equatable<Aabb> {
+packages/game/src/game.cj:239:public var x: Float64
+packages/game/src/game.cj:241:public var y: Float64
+packages/game/src/game.cj:243:public var width: Float64
+packages/game/src/game.cj:245:public var height: Float64
+packages/game/src/game.cj:253:public init(x!: Float64 = 0.0, y!: Float64 = 0.0, width!: Float64 = 0.0, height!: Float64 = 0.0)
+packages/game/src/game.cj:264:public operator func ==(other: Aabb): Bool
+packages/game/src/game.cj:269:public prop right: Float64 { get() { x + width } }
+packages/game/src/game.cj:271:public prop bottom: Float64 { get() { y + height } }
+packages/game/src/game.cj:277:public func moved(delta: Vec2): Aabb
+packages/game/src/game.cj:285:public func overlaps(other: Aabb): Bool
+packages/game/src/game.cj:291:public struct Transform2D {
+packages/game/src/game.cj:293:public var position: Vec2
+packages/game/src/game.cj:295:public var size: Vec2
+packages/game/src/game.cj:301:public init(position!: Vec2 = Vec2(), size!: Vec2 = Vec2(x: 1.0, y: 1.0))
+packages/game/src/game.cj:309:public func bounds(): Aabb
+packages/game/src/game.cj:315:public struct Velocity2D {
+packages/game/src/game.cj:317:public var value: Vec2
+packages/game/src/game.cj:321:public init(value!: Vec2 = Vec2())
+packages/game/src/game.cj:326:public struct Sprite2D {
+packages/game/src/game.cj:327:public let rows: Array<String>
+packages/game/src/game.cj:328:public let style: Style
+packages/game/src/game.cj:329:public let transparent: String
+packages/game/src/game.cj:331:public init(rows: Array<String>, style!: Style = Style.default(), transparent!: String = " ")
+packages/game/src/game.cj:338:public struct SpriteFrame {
+packages/game/src/game.cj:339:public let sprite: Sprite2D
+packages/game/src/game.cj:340:public let durationMillis: Int64
+packages/game/src/game.cj:342:public init(sprite: Sprite2D, durationMillis!: Int64 = 120)
+packages/game/src/game.cj:348:public class SpriteAnimation {
+packages/game/src/game.cj:354:public init(frames: Array<SpriteFrame>, loop!: Bool = true)
+packages/game/src/game.cj:359:public func reset(): Unit
+packages/game/src/game.cj:364:public func advance(deltaMillis: Int64): Sprite2D
+packages/game/src/game.cj:377:public func current(): Sprite2D
+packages/game/src/game.cj:382:public struct Camera2D {
+packages/game/src/game.cj:383:public var origin: Vec2
+packages/game/src/game.cj:384:public var viewport: Rect
+packages/game/src/game.cj:386:public init(origin!: Vec2 = Vec2(), viewport!: Rect = Rect(0, 0, 80, 24))
+packages/game/src/game.cj:392:public enum ColliderKind {
+packages/game/src/game.cj:393:Solid
+packages/game/src/game.cj:394:Sensor
+packages/game/src/game.cj:397:public struct Collider2D {
+packages/game/src/game.cj:398:public let kind: ColliderKind
+packages/game/src/game.cj:399:public let bounds: Aabb
+packages/game/src/game.cj:400:public let layer: Int64
+packages/game/src/game.cj:401:public let mask: Int64
+packages/game/src/game.cj:403:public init(kind!: ColliderKind = ColliderKind.Solid, bounds!: Aabb = Aabb(width: 1.0, height: 1.0), layer!: Int64 = 1, mask!: Int64 = Int64.Max)
+packages/game/src/game.cj:411:public enum BodyType {
+packages/game/src/game.cj:412:Static
+packages/game/src/game.cj:413:Kinematic
+packages/game/src/game.cj:414:Dynamic
+packages/game/src/game.cj:417:public struct RigidBody2D {
+packages/game/src/game.cj:418:public let bodyType: BodyType
+packages/game/src/game.cj:419:public let mass: Float64
+packages/game/src/game.cj:420:public let gravityScale: Float64
+packages/game/src/game.cj:421:public let damping: Float64
+packages/game/src/game.cj:423:public init(bodyType!: BodyType = BodyType.Dynamic, mass!: Float64 = 1.0, gravityScale!: Float64 = 1.0, damping!: Float64 = 0.0)
+packages/game/src/game.cj:431:public struct CollisionEvent {
+packages/game/src/game.cj:432:public let entity: EntityId
+packages/game/src/game.cj:433:public let other: EntityId
+packages/game/src/game.cj:434:public let normal: Vec2
+packages/game/src/game.cj:435:public let time: Float64
+packages/game/src/game.cj:436:public let hitX: Float64
+packages/game/src/game.cj:437:public let hitY: Float64
+packages/game/src/game.cj:439:public init(entity: EntityId, other: EntityId, normal: Vec2, time: Float64, hitX: Float64, hitY: Float64)
+packages/game/src/game.cj:449:public struct TileMarker <: Equatable<TileMarker> {
+packages/game/src/game.cj:450:public let x: Int64
+packages/game/src/game.cj:451:public let y: Int64
+packages/game/src/game.cj:452:public let symbol: String
+packages/game/src/game.cj:454:public init(x: Int64, y: Int64, symbol: String)
+packages/game/src/game.cj:460:public operator func ==(other: TileMarker): Bool
+packages/game/src/game.cj:465:public class PhysicsWorld {
+packages/game/src/game.cj:466:public var gravity: Vec2
+packages/game/src/game.cj:467:public var maxSubSteps: Int64
+packages/game/src/game.cj:468:public var skin: Float64
+packages/game/src/game.cj:471:public init(gravity!: Vec2 = Vec2(x: 0.0, y: 30.0), maxSubSteps!: Int64 = 4, skin!: Float64 = 0.001)
+packages/game/src/game.cj:477:public func step( world: EntityWorld, transforms: ComponentStore<Transform2D>, velocities: ComponentStore<Velocity2D>, colliders: ComponentStore<Collider2D>, bodies: ComponentStore<RigidBody2D>, deltaMillis: Int64 ): Array<CollisionEvent>
+packages/game/src/game.cj:496:public func overlaps( world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>, id: EntityId ): Array<CollisionEvent>
+packages/game/src/game.cj:647:public class GameInputState {
+packages/game/src/game.cj:651:public init()
+packages/game/src/game.cj:653:public func beginFrame(): Unit
+packages/game/src/game.cj:659:public func handle(event: Event): Unit
+packages/game/src/game.cj:683:public func pressed(code: KeyCode): Bool
+packages/game/src/game.cj:687:public func justPressed(code: KeyCode): Bool
+packages/game/src/game.cj:691:public func axis(negative: KeyCode, positive: KeyCode): Int64
+packages/game/src/game.cj:698:public class SpriteRenderer {
+packages/game/src/game.cj:699:public init()
+packages/game/src/game.cj:701:public func render( area: Rect, buffer: Buffer, transforms: ComponentStore<Transform2D>, sprites: ComponentStore<Sprite2D>, camera!: Camera2D = Camera2D() ): Unit
+packages/game/src/game.cj:722:public func drawSprite(canvas: Canvas, transform: Transform2D, sprite: Sprite2D, camera: Camera2D): Unit
+packages/game/src/game.cj:741:public class TileMap {
+packages/game/src/game.cj:742:public let width: Int64
+packages/game/src/game.cj:743:public let height: Int64
+packages/game/src/game.cj:750:public init(rows: Array<String>, solidSymbol!: String = "#", widthOptions!: TextWidthOptions = TextWidthOptions())
+packages/game/src/game.cj:758:public func isSolid(x: Int64, y: Int64): Bool
+packages/game/src/game.cj:762:public func tileAt(x: Int64, y: Int64): String
+packages/game/src/game.cj:767:public func find(symbol: String): Array<TileMarker>
+packages/game/src/game.cj:779:public func findAny(symbols: Array<String>): Array<TileMarker>
+packages/game/src/game.cj:792:public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
+packages/game/src/game.cj:809:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style): Unit
+packages/game/src/game.cj:813:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit
 packages/markdown_adapter/src/markdown.cj:11:public func documentThemeFromTheme(theme: Theme): DocumentTheme
 packages/markdown_adapter/src/markdown.cj:29:public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
 packages/markdown_adapter/src/markdown.cj:44:public func markdownAstToDocument( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document

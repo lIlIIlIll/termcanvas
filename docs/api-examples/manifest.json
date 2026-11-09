@@ -9753,6 +9753,182 @@
           "signature": "public func clearDead(world: EntityWorld): Unit"
         }
       ]
+    },
+    {
+      "id": "game-geometry",
+      "source": "docs/api-examples/game-geometry.cj",
+      "dependencies": [
+        "game"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Vec2",
+          "signature": "public struct Vec2 <: Equatable<Vec2> {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Vec2.x",
+          "signature": "public var x: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Vec2.y",
+          "signature": "public var y: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Vec2.init",
+          "signature": "public init(x!: Float64 = 0.0, y!: Float64 = 0.0)"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Vec2.operator_==",
+          "signature": "public operator func ==(other: Vec2): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Vec2.plus",
+          "signature": "public func plus(other: Vec2): Vec2"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Vec2.minus",
+          "signature": "public func minus(other: Vec2): Vec2"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Vec2.scale",
+          "signature": "public func scale(value: Float64): Vec2"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb",
+          "signature": "public struct Aabb <: Equatable<Aabb> {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb.x",
+          "signature": "public var x: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb.y",
+          "signature": "public var y: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb.width",
+          "signature": "public var width: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb.height",
+          "signature": "public var height: Float64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb.init",
+          "signature": "public init(x!: Float64 = 0.0, y!: Float64 = 0.0, width!: Float64 = 0.0, height!: Float64 = 0.0)"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb.operator_==",
+          "signature": "public operator func ==(other: Aabb): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb.right",
+          "signature": "public prop right: Float64 { get() { x + width } }"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb.bottom",
+          "signature": "public prop bottom: Float64 { get() { y + height } }"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb.moved",
+          "signature": "public func moved(delta: Vec2): Aabb"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Aabb.overlaps",
+          "signature": "public func overlaps(other: Aabb): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Transform2D",
+          "signature": "public struct Transform2D {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Transform2D.position",
+          "signature": "public var position: Vec2"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Transform2D.size",
+          "signature": "public var size: Vec2"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Transform2D.init",
+          "signature": "public init(position!: Vec2 = Vec2(), size!: Vec2 = Vec2(x: 1.0, y: 1.0))"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Transform2D.bounds",
+          "signature": "public func bounds(): Aabb"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Velocity2D",
+          "signature": "public struct Velocity2D {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Velocity2D.value",
+          "signature": "public var value: Vec2"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "Velocity2D.init",
+          "signature": "public init(value!: Vec2 = Vec2())"
+        }
+      ]
     }
   ]
 }

@@ -192,30 +192,64 @@ public class ComponentStore<T> {
     }
 }
 
+/** 二维浮点向量。 */
 public struct Vec2 <: Equatable<Vec2> {
+    /** 横向分量。 */
     public var x: Float64
+    /** 纵向分量。 */
     public var y: Float64
 
+    /** 创建向量。
+     * @param x 横向分量
+     * @param y 纵向分量
+     */
     public init(x!: Float64 = 0.0, y!: Float64 = 0.0) {
         this.x = x
         this.y = y
     }
 
+    /** 逐分量比较向量。
+     * @param other 另一个向量
+     * @return 两个分量均相等时为 true
+     */
     public operator func ==(other: Vec2): Bool {
         x == other.x && y == other.y
     }
 
+    /** 计算向量和。
+     * @param other 另一个向量
+     * @return 相加后的向量
+     */
     public func plus(other: Vec2): Vec2 { Vec2(x: x + other.x, y: y + other.y) }
+    /** 计算向量差。
+     * @param other 要减去的向量
+     * @return 相减后的向量
+     */
     public func minus(other: Vec2): Vec2 { Vec2(x: x - other.x, y: y - other.y) }
+    /** 按标量缩放向量。
+     * @param value 缩放倍数
+     * @return 缩放后的向量
+     */
     public func scale(value: Float64): Vec2 { Vec2(x: x * value, y: y * value) }
 }
 
+/** 二维轴对齐包围盒。 */
 public struct Aabb <: Equatable<Aabb> {
+    /** 左侧横坐标。 */
     public var x: Float64
+    /** 顶部纵坐标。 */
     public var y: Float64
+    /** 包围盒宽度。 */
     public var width: Float64
+    /** 包围盒高度。 */
     public var height: Float64
 
+    /** 创建包围盒；宽度和高度的负值按零处理。
+     * @param x 左侧横坐标
+     * @param y 顶部纵坐标
+     * @param width 宽度
+     * @param height 高度
+     */
     public init(x!: Float64 = 0.0, y!: Float64 = 0.0, width!: Float64 = 0.0, height!: Float64 = 0.0) {
         this.x = x
         this.y = y
@@ -223,38 +257,67 @@ public struct Aabb <: Equatable<Aabb> {
         this.height = fmax(0.0, height)
     }
 
+    /** 逐字段比较包围盒。
+     * @param other 另一个包围盒
+     * @return 字段均相等时为 true
+     */
     public operator func ==(other: Aabb): Bool {
         x == other.x && y == other.y && width == other.width && height == other.height
     }
 
+    /** 右侧边界坐标。 */
     public prop right: Float64 { get() { x + width } }
+    /** 底部边界坐标。 */
     public prop bottom: Float64 { get() { y + height } }
 
+    /** 返回按向量平移后的包围盒。
+     * @param delta 平移向量
+     * @return 平移后的包围盒
+     */
     public func moved(delta: Vec2): Aabb {
         Aabb(x: x + delta.x, y: y + delta.y, width: width, height: height)
     }
 
+    /** 使用边界坐标的严格比较判断交叠；仅边界接触不算交叠。
+     * @param other 另一个包围盒
+     * @return 交叠时为 true
+     */
     public func overlaps(other: Aabb): Bool {
         x < other.right && right > other.x && y < other.bottom && bottom > other.y
     }
 }
 
+/** 实体的二维位置和尺寸。 */
 public struct Transform2D {
+    /** 实体位置。 */
     public var position: Vec2
+    /** 实体尺寸。 */
     public var size: Vec2
 
+    /** 创建变换。
+     * @param position 位置
+     * @param size 尺寸
+     */
     public init(position!: Vec2 = Vec2(), size!: Vec2 = Vec2(x: 1.0, y: 1.0)) {
         this.position = position
         this.size = size
     }
 
+    /** 根据位置与尺寸创建包围盒。
+     * @return 实体包围盒
+     */
     public func bounds(): Aabb {
         Aabb(x: position.x, y: position.y, width: size.x, height: size.y)
     }
 }
 
+/** 实体的二维速度。 */
 public struct Velocity2D {
+    /** 速度向量。 */
     public var value: Vec2
+    /** 创建速度。
+     * @param value 速度向量
+     */
     public init(value!: Vec2 = Vec2()) {
         this.value = value
     }
