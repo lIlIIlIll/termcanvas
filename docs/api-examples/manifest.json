@@ -9607,6 +9607,152 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "game-entities",
+      "source": "docs/api-examples/game-entities.cj",
+      "dependencies": [
+        "game"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityId",
+          "signature": "public struct EntityId <: Equatable<EntityId> {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityId.value",
+          "signature": "public let value: Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityId.init",
+          "signature": "public init(value: Int64)"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityId.operator_==",
+          "signature": "public operator func ==(other: EntityId): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityWorld",
+          "signature": "public class EntityWorld {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityWorld.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityWorld.create",
+          "signature": "public func create(): EntityId"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityWorld.destroy",
+          "signature": "public func destroy(id: EntityId): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityWorld.isAlive",
+          "signature": "public func isAlive(id: EntityId): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityWorld.entities",
+          "signature": "public func entities(): Array<EntityId>"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityWorld.frame",
+          "signature": "public func frame(): Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "EntityWorld.advanceFrame",
+          "signature": "public func advanceFrame(): Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ComponentStore",
+          "signature": "public class ComponentStore<T> {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ComponentStore.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ComponentStore.insert",
+          "signature": "public func insert(id: EntityId, value: T): Unit"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ComponentStore.remove",
+          "signature": "public func remove(id: EntityId): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ComponentStore.has",
+          "signature": "public func has(id: EntityId): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ComponentStore.get",
+          "signature": "public func get(id: EntityId): ?T"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ComponentStore.set",
+          "signature": "public func set(id: EntityId, value: T): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ComponentStore.entities",
+          "signature": "public func entities(): Array<EntityId>"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ComponentStore.size",
+          "signature": "public func size(): Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "ComponentStore.clearDead",
+          "signature": "public func clearDead(world: EntityWorld): Unit"
+        }
+      ]
     }
   ]
 }

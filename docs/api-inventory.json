@@ -49142,7 +49142,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 6,
+      "line": 7,
       "level": "top_level",
       "kind": "struct",
       "symbol": "EntityId",
@@ -49160,7 +49160,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 7,
+      "line": 9,
       "level": "member",
       "kind": "let",
       "symbol": "value",
@@ -49178,7 +49178,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 9,
+      "line": 14,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -49196,7 +49196,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 13,
+      "line": 22,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_==",
@@ -49214,7 +49214,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 18,
+      "line": 28,
       "level": "top_level",
       "kind": "class",
       "symbol": "EntityWorld",
@@ -49232,7 +49232,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 23,
+      "line": 34,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -49250,7 +49250,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 25,
+      "line": 39,
       "level": "member",
       "kind": "func",
       "symbol": "create",
@@ -49268,7 +49268,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 32,
+      "line": 50,
       "level": "member",
       "kind": "func",
       "symbol": "destroy",
@@ -49286,7 +49286,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 42,
+      "line": 64,
       "level": "member",
       "kind": "func",
       "symbol": "isAlive",
@@ -49304,7 +49304,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 49,
+      "line": 74,
       "level": "member",
       "kind": "func",
       "symbol": "entities",
@@ -49322,7 +49322,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 53,
+      "line": 81,
       "level": "member",
       "kind": "func",
       "symbol": "frame",
@@ -49340,7 +49340,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 55,
+      "line": 86,
       "level": "member",
       "kind": "func",
       "symbol": "advanceFrame",
@@ -49358,7 +49358,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 61,
+      "line": 93,
       "level": "top_level",
       "kind": "class",
       "symbol": "ComponentStore",
@@ -49376,7 +49376,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 65,
+      "line": 98,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -49394,7 +49394,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 67,
+      "line": 104,
       "level": "member",
       "kind": "func",
       "symbol": "insert",
@@ -49412,7 +49412,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 78,
+      "line": 119,
       "level": "member",
       "kind": "func",
       "symbol": "remove",
@@ -49430,7 +49430,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 89,
+      "line": 134,
       "level": "member",
       "kind": "func",
       "symbol": "has",
@@ -49448,7 +49448,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 93,
+      "line": 142,
       "level": "member",
       "kind": "func",
       "symbol": "get",
@@ -49466,7 +49466,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 99,
+      "line": 153,
       "level": "member",
       "kind": "func",
       "symbol": "set",
@@ -49484,7 +49484,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 106,
+      "line": 163,
       "level": "member",
       "kind": "func",
       "symbol": "entities",
@@ -49502,7 +49502,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 110,
+      "line": 170,
       "level": "member",
       "kind": "func",
       "symbol": "size",
@@ -49520,7 +49520,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 112,
+      "line": 175,
       "level": "member",
       "kind": "func",
       "symbol": "clearDead",
@@ -49538,7 +49538,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 132,
+      "line": 195,
       "level": "top_level",
       "kind": "struct",
       "symbol": "Vec2",
@@ -49556,7 +49556,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 133,
+      "line": 196,
       "level": "member",
       "kind": "var",
       "symbol": "x",
@@ -49574,7 +49574,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 134,
+      "line": 197,
       "level": "member",
       "kind": "var",
       "symbol": "y",
@@ -49592,7 +49592,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 136,
+      "line": 199,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -49610,7 +49610,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 141,
+      "line": 204,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_==",
@@ -49628,7 +49628,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 145,
+      "line": 208,
       "level": "member",
       "kind": "func",
       "symbol": "plus",
@@ -49646,7 +49646,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 146,
+      "line": 209,
       "level": "member",
       "kind": "func",
       "symbol": "minus",
@@ -49664,7 +49664,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 147,
+      "line": 210,
       "level": "member",
       "kind": "func",
       "symbol": "scale",
@@ -49682,7 +49682,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 150,
+      "line": 213,
       "level": "top_level",
       "kind": "struct",
       "symbol": "Aabb",
@@ -49700,7 +49700,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 151,
+      "line": 214,
       "level": "member",
       "kind": "var",
       "symbol": "x",
@@ -49718,7 +49718,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 152,
+      "line": 215,
       "level": "member",
       "kind": "var",
       "symbol": "y",
@@ -49736,7 +49736,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 153,
+      "line": 216,
       "level": "member",
       "kind": "var",
       "symbol": "width",
@@ -49754,7 +49754,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 154,
+      "line": 217,
       "level": "member",
       "kind": "var",
       "symbol": "height",
@@ -49772,7 +49772,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 156,
+      "line": 219,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -49790,7 +49790,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 163,
+      "line": 226,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_==",
@@ -49808,7 +49808,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 167,
+      "line": 230,
       "level": "member",
       "kind": "prop",
       "symbol": "right",
@@ -49826,7 +49826,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 168,
+      "line": 231,
       "level": "member",
       "kind": "prop",
       "symbol": "bottom",
@@ -49844,7 +49844,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 170,
+      "line": 233,
       "level": "member",
       "kind": "func",
       "symbol": "moved",
@@ -49862,7 +49862,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 174,
+      "line": 237,
       "level": "member",
       "kind": "func",
       "symbol": "overlaps",
@@ -49880,7 +49880,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 179,
+      "line": 242,
       "level": "top_level",
       "kind": "struct",
       "symbol": "Transform2D",
@@ -49898,7 +49898,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 180,
+      "line": 243,
       "level": "member",
       "kind": "var",
       "symbol": "position",
@@ -49916,7 +49916,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 181,
+      "line": 244,
       "level": "member",
       "kind": "var",
       "symbol": "size",
@@ -49934,7 +49934,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 183,
+      "line": 246,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -49952,7 +49952,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 188,
+      "line": 251,
       "level": "member",
       "kind": "func",
       "symbol": "bounds",
@@ -49970,7 +49970,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 193,
+      "line": 256,
       "level": "top_level",
       "kind": "struct",
       "symbol": "Velocity2D",
@@ -49988,7 +49988,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 194,
+      "line": 257,
       "level": "member",
       "kind": "var",
       "symbol": "value",
@@ -50006,7 +50006,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 195,
+      "line": 258,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -50024,7 +50024,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 200,
+      "line": 263,
       "level": "top_level",
       "kind": "struct",
       "symbol": "Sprite2D",
@@ -50042,7 +50042,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 201,
+      "line": 264,
       "level": "member",
       "kind": "let",
       "symbol": "rows",
@@ -50060,7 +50060,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 202,
+      "line": 265,
       "level": "member",
       "kind": "let",
       "symbol": "style",
@@ -50078,7 +50078,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 203,
+      "line": 266,
       "level": "member",
       "kind": "let",
       "symbol": "transparent",
@@ -50096,7 +50096,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 205,
+      "line": 268,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -50114,7 +50114,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 212,
+      "line": 275,
       "level": "top_level",
       "kind": "struct",
       "symbol": "SpriteFrame",
@@ -50132,7 +50132,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 213,
+      "line": 276,
       "level": "member",
       "kind": "let",
       "symbol": "sprite",
@@ -50150,7 +50150,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 214,
+      "line": 277,
       "level": "member",
       "kind": "let",
       "symbol": "durationMillis",
@@ -50168,7 +50168,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 216,
+      "line": 279,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -50186,7 +50186,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 222,
+      "line": 285,
       "level": "top_level",
       "kind": "class",
       "symbol": "SpriteAnimation",
@@ -50204,7 +50204,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 228,
+      "line": 291,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -50222,7 +50222,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 233,
+      "line": 296,
       "level": "member",
       "kind": "func",
       "symbol": "reset",
@@ -50240,7 +50240,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 238,
+      "line": 301,
       "level": "member",
       "kind": "func",
       "symbol": "advance",
@@ -50258,7 +50258,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 251,
+      "line": 314,
       "level": "member",
       "kind": "func",
       "symbol": "current",
@@ -50276,7 +50276,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 256,
+      "line": 319,
       "level": "top_level",
       "kind": "struct",
       "symbol": "Camera2D",
@@ -50294,7 +50294,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 257,
+      "line": 320,
       "level": "member",
       "kind": "var",
       "symbol": "origin",
@@ -50312,7 +50312,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 258,
+      "line": 321,
       "level": "member",
       "kind": "var",
       "symbol": "viewport",
@@ -50330,7 +50330,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 260,
+      "line": 323,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -50348,7 +50348,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 266,
+      "line": 329,
       "level": "top_level",
       "kind": "enum",
       "symbol": "ColliderKind",
@@ -50366,7 +50366,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 267,
+      "line": 330,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -50385,7 +50385,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 268,
+      "line": 331,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -50404,7 +50404,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 271,
+      "line": 334,
       "level": "top_level",
       "kind": "struct",
       "symbol": "Collider2D",
@@ -50422,7 +50422,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 272,
+      "line": 335,
       "level": "member",
       "kind": "let",
       "symbol": "kind",
@@ -50440,7 +50440,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 273,
+      "line": 336,
       "level": "member",
       "kind": "let",
       "symbol": "bounds",
@@ -50458,7 +50458,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 274,
+      "line": 337,
       "level": "member",
       "kind": "let",
       "symbol": "layer",
@@ -50476,7 +50476,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 275,
+      "line": 338,
       "level": "member",
       "kind": "let",
       "symbol": "mask",
@@ -50494,7 +50494,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 277,
+      "line": 340,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -50512,7 +50512,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 285,
+      "line": 348,
       "level": "top_level",
       "kind": "enum",
       "symbol": "BodyType",
@@ -50530,7 +50530,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 286,
+      "line": 349,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -50549,7 +50549,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 287,
+      "line": 350,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -50568,7 +50568,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 288,
+      "line": 351,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -50587,7 +50587,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 291,
+      "line": 354,
       "level": "top_level",
       "kind": "struct",
       "symbol": "RigidBody2D",
@@ -50605,7 +50605,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 292,
+      "line": 355,
       "level": "member",
       "kind": "let",
       "symbol": "bodyType",
@@ -50623,7 +50623,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 293,
+      "line": 356,
       "level": "member",
       "kind": "let",
       "symbol": "mass",
@@ -50641,7 +50641,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 294,
+      "line": 357,
       "level": "member",
       "kind": "let",
       "symbol": "gravityScale",
@@ -50659,7 +50659,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 295,
+      "line": 358,
       "level": "member",
       "kind": "let",
       "symbol": "damping",
@@ -50677,7 +50677,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 297,
+      "line": 360,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -50695,7 +50695,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 305,
+      "line": 368,
       "level": "top_level",
       "kind": "struct",
       "symbol": "CollisionEvent",
@@ -50713,7 +50713,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 306,
+      "line": 369,
       "level": "member",
       "kind": "let",
       "symbol": "entity",
@@ -50731,7 +50731,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 307,
+      "line": 370,
       "level": "member",
       "kind": "let",
       "symbol": "other",
@@ -50749,7 +50749,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 308,
+      "line": 371,
       "level": "member",
       "kind": "let",
       "symbol": "normal",
@@ -50767,7 +50767,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 309,
+      "line": 372,
       "level": "member",
       "kind": "let",
       "symbol": "time",
@@ -50785,7 +50785,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 310,
+      "line": 373,
       "level": "member",
       "kind": "let",
       "symbol": "hitX",
@@ -50803,7 +50803,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 311,
+      "line": 374,
       "level": "member",
       "kind": "let",
       "symbol": "hitY",
@@ -50821,7 +50821,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 313,
+      "line": 376,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -50839,7 +50839,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 323,
+      "line": 386,
       "level": "top_level",
       "kind": "struct",
       "symbol": "TileMarker",
@@ -50857,7 +50857,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 324,
+      "line": 387,
       "level": "member",
       "kind": "let",
       "symbol": "x",
@@ -50875,7 +50875,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 325,
+      "line": 388,
       "level": "member",
       "kind": "let",
       "symbol": "y",
@@ -50893,7 +50893,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 326,
+      "line": 389,
       "level": "member",
       "kind": "let",
       "symbol": "symbol",
@@ -50911,7 +50911,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 328,
+      "line": 391,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -50929,7 +50929,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 334,
+      "line": 397,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_==",
@@ -50947,7 +50947,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 339,
+      "line": 402,
       "level": "top_level",
       "kind": "class",
       "symbol": "PhysicsWorld",
@@ -50965,7 +50965,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 340,
+      "line": 403,
       "level": "member",
       "kind": "var",
       "symbol": "gravity",
@@ -50983,7 +50983,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 341,
+      "line": 404,
       "level": "member",
       "kind": "var",
       "symbol": "maxSubSteps",
@@ -51001,7 +51001,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 342,
+      "line": 405,
       "level": "member",
       "kind": "var",
       "symbol": "skin",
@@ -51019,7 +51019,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 345,
+      "line": 408,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -51037,7 +51037,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 351,
+      "line": 414,
       "level": "member",
       "kind": "func",
       "symbol": "step",
@@ -51055,7 +51055,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 370,
+      "line": 433,
       "level": "member",
       "kind": "func",
       "symbol": "overlaps",
@@ -51073,7 +51073,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 521,
+      "line": 584,
       "level": "top_level",
       "kind": "class",
       "symbol": "GameInputState",
@@ -51091,7 +51091,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 525,
+      "line": 588,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -51109,7 +51109,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 527,
+      "line": 590,
       "level": "member",
       "kind": "func",
       "symbol": "beginFrame",
@@ -51127,7 +51127,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 533,
+      "line": 596,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -51145,7 +51145,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 557,
+      "line": 620,
       "level": "member",
       "kind": "func",
       "symbol": "pressed",
@@ -51163,7 +51163,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 561,
+      "line": 624,
       "level": "member",
       "kind": "func",
       "symbol": "justPressed",
@@ -51181,7 +51181,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 565,
+      "line": 628,
       "level": "member",
       "kind": "func",
       "symbol": "axis",
@@ -51199,7 +51199,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 572,
+      "line": 635,
       "level": "top_level",
       "kind": "class",
       "symbol": "SpriteRenderer",
@@ -51217,7 +51217,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 573,
+      "line": 636,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -51235,7 +51235,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 575,
+      "line": 638,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -51253,7 +51253,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 596,
+      "line": 659,
       "level": "member",
       "kind": "func",
       "symbol": "drawSprite",
@@ -51271,7 +51271,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 615,
+      "line": 678,
       "level": "top_level",
       "kind": "class",
       "symbol": "TileMap",
@@ -51289,7 +51289,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 616,
+      "line": 679,
       "level": "member",
       "kind": "let",
       "symbol": "width",
@@ -51307,7 +51307,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 617,
+      "line": 680,
       "level": "member",
       "kind": "let",
       "symbol": "height",
@@ -51325,7 +51325,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 624,
+      "line": 687,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -51343,7 +51343,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 632,
+      "line": 695,
       "level": "member",
       "kind": "func",
       "symbol": "isSolid",
@@ -51361,7 +51361,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 636,
+      "line": 699,
       "level": "member",
       "kind": "func",
       "symbol": "tileAt",
@@ -51379,7 +51379,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 641,
+      "line": 704,
       "level": "member",
       "kind": "func",
       "symbol": "find",
@@ -51397,7 +51397,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 653,
+      "line": 716,
       "level": "member",
       "kind": "func",
       "symbol": "findAny",
@@ -51415,7 +51415,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 666,
+      "line": 729,
       "level": "member",
       "kind": "func",
       "symbol": "addStaticColliders",
@@ -51433,7 +51433,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 683,
+      "line": 746,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -51451,7 +51451,7 @@
     {
       "package": "game",
       "path": "packages/game/src/game.cj",
-      "line": 687,
+      "line": 750,
       "level": "member",
       "kind": "func",
       "symbol": "render",

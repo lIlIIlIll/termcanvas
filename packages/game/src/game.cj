@@ -3,25 +3,39 @@ package game
 import core.*
 import std.collection.*
 
+/** 游戏世界中的实体标识。 */
 public struct EntityId <: Equatable<EntityId> {
+    /** 非负整数标识。 */
     public let value: Int64
 
+    /** 创建实体标识；负值按零处理。
+     * @param value 整数标识
+     */
     public init(value: Int64) {
         this.value = max(0, value)
     }
 
+    /** 比较实体标识值。
+     * @param other 另一个实体标识
+     * @return 标识值相同时为 true
+     */
     public operator func ==(other: EntityId): Bool {
         value == other.value
     }
 }
 
+/** 分配实体标识并跟踪存活实体和帧序号。 */
 public class EntityWorld {
     private var nextId: Int64 = 1
     private var frameValue: Int64 = 0
     private let alive = ArrayList<EntityId>()
 
+    /** 创建空世界。 */
     public init() {}
 
+    /** 创建新的存活实体。
+     * @return 新实体标识
+     */
     public func create(): EntityId {
         let id = EntityId(nextId)
         nextId++
@@ -29,6 +43,10 @@ public class EntityWorld {
         id
     }
 
+    /** 从世界中移除实体；组件存储需另行清理。
+     * @param id 实体标识
+     * @return 实体存在并被移除时为 true
+     */
     public func destroy(id: EntityId): Bool {
         for (i in 0..alive.size) {
             if (alive[i] == id) {
@@ -39,6 +57,10 @@ public class EntityWorld {
         false
     }
 
+    /** 查询实体是否仍在世界中。
+     * @param id 实体标识
+     * @return 存活时为 true
+     */
     public func isAlive(id: EntityId): Bool {
         for (item in alive) {
             if (item == id) { return true }
@@ -46,24 +68,39 @@ public class EntityWorld {
         false
     }
 
+    /** 获取存活实体的快照。
+     * @return 实体标识数组
+     */
     public func entities(): Array<EntityId> {
         alive.toArray()
     }
 
+    /** 获取当前帧序号。
+     * @return 帧序号
+     */
     public func frame(): Int64 { frameValue }
 
+    /** 将帧序号增加一。
+     * @return 增加后的帧序号
+     */
     public func advanceFrame(): Int64 {
         frameValue++
         frameValue
     }
 }
 
+/** 按实体标识保存一种类型的组件；移除实体后可使用 clearDead 清理。 */
 public class ComponentStore<T> {
     private let ids = ArrayList<EntityId>()
     private let values = ArrayList<T>()
 
+    /** 创建空组件存储。 */
     public init() {}
 
+    /** 插入组件；已有该实体时替换旧值。
+     * @param id 实体标识
+     * @param value 组件值
+     */
     public func insert(id: EntityId, value: T): Unit {
         for (i in 0..ids.size) {
             if (ids[i] == id) {
@@ -75,6 +112,10 @@ public class ComponentStore<T> {
         values.add(value)
     }
 
+    /** 移除实体对应的组件。
+     * @param id 实体标识
+     * @return 存在并移除组件时为 true
+     */
     public func remove(id: EntityId): Bool {
         for (i in 0..ids.size) {
             if (ids[i] == id) {
@@ -86,16 +127,29 @@ public class ComponentStore<T> {
         false
     }
 
+    /** 判断实体是否有组件。
+     * @param id 实体标识
+     * @return 有组件时为 true
+     */
     public func has(id: EntityId): Bool {
         indexOf(id) >= 0
     }
 
+    /** 查询实体组件。
+     * @param id 实体标识
+     * @return 组件值；不存在时为 None
+     */
     public func get(id: EntityId): ?T {
         let index = indexOf(id)
         if (index < 0) { return None }
         Some(values[index])
     }
 
+    /** 更新已有组件，不会插入缺失的组件。
+     * @param id 实体标识
+     * @param value 新组件值
+     * @return 成功更新时为 true
+     */
     public func set(id: EntityId, value: T): Bool {
         let index = indexOf(id)
         if (index < 0) { return false }
@@ -103,12 +157,21 @@ public class ComponentStore<T> {
         true
     }
 
+    /** 获取带有组件的实体标识。
+     * @return 实体标识数组
+     */
     public func entities(): Array<EntityId> {
         ids.toArray()
     }
 
+    /** 获取存储的组件数。
+     * @return 组件数量
+     */
     public func size(): Int64 { ids.size }
 
+    /** 移除不在指定世界中的实体组件。
+     * @param world 用于判断存活状态的世界
+     */
     public func clearDead(world: EntityWorld): Unit {
         var i: Int64 = 0
         while (i < ids.size) {
