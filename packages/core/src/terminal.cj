@@ -119,8 +119,11 @@ let DISABLE_NEWLINE_AUTO_RETURN: UInt32 = 0x0008u32
 @When[os == "Windows"]
 let CONSOLE_SCREEN_BUFFER_INFO_BYTES: Int64 = 22
 
+/** 终端光标形状。 */
 public enum CursorShape {
+    /** 块状光标。 */
     | Block
+    /** 竖线光标。 */
     | Bar
 }
 
@@ -156,12 +159,23 @@ public interface Backend {
     func diagnosticByteCount(): Int64 { -1 }
 }
 
+/** 一段从指定坐标开始、使用相同样式的差异文本。 */
 public struct RenderDiffSpan {
+    /** 起始横坐标。 */
     public let x: Int64
+    /** 纵坐标。 */
     public let y: Int64
+    /** 差异文本。 */
     public let text: String
+    /** 文本样式。 */
     public let style: Style
 
+    /** 创建差异文本片段。
+     * @param x 起始横坐标
+     * @param y 纵坐标
+     * @param text 差异文本
+     * @param style 文本样式
+     */
     public init(x: Int64, y: Int64, text: String, style: Style) {
         this.x = x
         this.y = y
@@ -170,54 +184,95 @@ public struct RenderDiffSpan {
     }
 }
 
+/** 一次差异绘制的脏单元格数量和文本片段。 */
 public struct RenderDiffPlan {
+    /** 脏单元格数量。 */
     public let dirtyCells: Int64
+    /** 按绘制顺序排列的差异片段。 */
     public let spans: Array<RenderDiffSpan>
 
+    /** 创建差异计划；负单元格数量按零处理。
+     * @param dirtyCells 脏单元格数量
+     * @param spans 差异文本片段
+     */
     public init(dirtyCells: Int64, spans: Array<RenderDiffSpan>) {
         this.dirtyCells = max(0, dirtyCells)
         this.spans = spans
     }
 }
 
+/** 一次绘制使用的区域、缓冲区及可选脏区域。 */
 public class Frame {
+    /** 帧的绘制区域。 */
     public let area: Rect
     private let buffer: Buffer
     private let dirty: ?DirtyRects
     private var cursor: ?Position = None
     private var cursorShape: ?CursorShape = None
 
+    /** 创建帧；未指定脏区域时视为全部需要绘制。
+     * @param area 帧区域
+     * @param buffer 目标缓冲区
+     * @param dirty 可选脏区域
+     */
     public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None) {
         this.area = area
         this.buffer = buffer
         this.dirty = dirty
     }
 
-    /** 返回应用为该帧设置的主题；None 表示使用组件原有默认样式。 */
+    /** 返回应用为该帧设置的主题；None 表示使用组件原有默认样式。
+     * @return 应用主题或 None
+     */
     public func theme(): ?Theme { buffer.theme() }
 
-    /** 返回该帧采用的文本显示宽度策略。 */
+    /** 返回该帧采用的文本显示宽度策略。
+     * @return 文本宽度选项
+     */
     public func textWidthOptions(): TextWidthOptions { buffer.textWidthOptions() }
 
+    /** 区域与脏区域相交时绘制组件；未指定脏区域时直接绘制。
+     * @param widget 要绘制的组件
+     * @param area 组件区域
+     */
     public func renderWidget(widget: Widget, area: Rect): Unit {
         if (!isDirty(area)) { return }
         widget.render(area, buffer)
     }
 
+    /** 创建使用指定区域裁剪的画布。
+     * @param area 画布裁剪区域
+     * @return 共享帧缓冲区的画布
+     */
     public func canvas(area!: Rect = this.area): Canvas {
         Canvas(buffer, area)
     }
 
+    /** 使用样式填充区域。
+     * @param area 待填充区域
+     * @param style 填充样式
+     */
     public func fill(area: Rect, style: Style): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         buffer.fill(area, style: style)
     }
 
+    /** 按坐标和尺寸填充区域。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param width 宽度
+     * @param height 高度
+     * @param style 填充样式
+     */
     public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit {
         if (width <= 0 || height <= 0) { return }
         buffer.fillRect(x, y, width, height, style: style)
     }
 
+    /** 检查区域是否与脏区域相交；未指定脏区域时返回 true。
+     * @param area 待检查区域
+     * @return 需要绘制时为 true
+     */
     public func isDirty(area: Rect): Bool {
         match (dirty) {
             case Some(rects) => rects.intersects(area)
@@ -225,6 +280,11 @@ public class Frame {
         }
     }
 
+    /** 检查单元格是否位于脏区域；未指定脏区域时返回 true。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @return 需要绘制时为 true
+     */
     public func isDirtyCell(x: Int64, y: Int64): Bool {
         match (dirty) {
             case Some(rects) => rects.intersectsCell(x, y)
@@ -232,6 +292,9 @@ public class Frame {
         }
     }
 
+    /** 获取帧的脏区域；未指定时返回帧区域。
+     * @return 脏矩形数组
+     */
     public func dirtyRects(): Array<Rect> {
         match (dirty) {
             case Some(rects) => rects.rects()
@@ -239,14 +302,23 @@ public class Frame {
         }
     }
 
+    /** 向缓冲区追加媒体放置。
+     * @param placement 媒体放置
+     */
     public func addMedia(placement: MediaPlacement): Unit {
         buffer.addMedia(placement)
     }
 
+    /** 设置帧结束时使用的光标位置。
+     * @param position 光标坐标
+     */
     public func setCursor(position: Position): Unit {
         cursor = Some(position)
     }
 
+    /** 设置帧结束时使用的光标形状。
+     * @param shape 光标形状
+     */
     public func setCursorShape(shape: CursorShape): Unit {
         cursorShape = Some(shape)
     }
@@ -255,6 +327,9 @@ public class Frame {
         cursorShape
     }
 
+    /** 获取已设置的光标位置。
+     * @return 光标位置；未设置时为 None
+     */
     public func getCursor(): ?Position {
         cursor
     }

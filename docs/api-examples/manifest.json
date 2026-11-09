@@ -6085,6 +6085,194 @@
           "signature": "public func mediaProtocolName(protocol: MediaProtocol): String"
         }
       ]
+    },
+    {
+      "id": "core-frame-rendering",
+      "source": "docs/api-examples/frame.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "CursorShape",
+          "signature": "public enum CursorShape {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "CursorShape.Block",
+          "signature": "Block"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "CursorShape.Bar",
+          "signature": "Bar"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderDiffSpan",
+          "signature": "public struct RenderDiffSpan {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderDiffSpan.x",
+          "signature": "public let x: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderDiffSpan.y",
+          "signature": "public let y: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderDiffSpan.text",
+          "signature": "public let text: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderDiffSpan.style",
+          "signature": "public let style: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderDiffSpan.init",
+          "signature": "public init(x: Int64, y: Int64, text: String, style: Style)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderDiffPlan",
+          "signature": "public struct RenderDiffPlan {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderDiffPlan.dirtyCells",
+          "signature": "public let dirtyCells: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderDiffPlan.spans",
+          "signature": "public let spans: Array<RenderDiffSpan>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderDiffPlan.init",
+          "signature": "public init(dirtyCells: Int64, spans: Array<RenderDiffSpan>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame",
+          "signature": "public class Frame {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.area",
+          "signature": "public let area: Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.init",
+          "signature": "public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.theme",
+          "signature": "public func theme(): ?Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.textWidthOptions",
+          "signature": "public func textWidthOptions(): TextWidthOptions"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.renderWidget",
+          "signature": "public func renderWidget(widget: Widget, area: Rect): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.canvas",
+          "signature": "public func canvas(area!: Rect = this.area): Canvas"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.fill",
+          "signature": "public func fill(area: Rect, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.fillRect",
+          "signature": "public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.isDirty",
+          "signature": "public func isDirty(area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.isDirtyCell",
+          "signature": "public func isDirtyCell(x: Int64, y: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.dirtyRects",
+          "signature": "public func dirtyRects(): Array<Rect>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.addMedia",
+          "signature": "public func addMedia(placement: MediaPlacement): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.setCursor",
+          "signature": "public func setCursor(position: Position): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.setCursorShape",
+          "signature": "public func setCursorShape(shape: CursorShape): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Frame.getCursor",
+          "signature": "public func getCursor(): ?Position"
+        }
+      ]
     }
   ]
 }
