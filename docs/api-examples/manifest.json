@@ -5013,6 +5013,218 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "core-lists-and-tables",
+      "source": "docs/api-examples/lists-and-tables.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "List",
+          "signature": "public class List <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "List.init",
+          "signature": "public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "List.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "List.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "List.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "ListState",
+          "signature": "public class ListState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "ListState.selected",
+          "signature": "public var selected: ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "ListState.offset",
+          "signature": "public var offset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "ListState.init",
+          "signature": "public init(selected!: ?Int64 = None, offset!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "ListState.select",
+          "signature": "public func select(index: ?Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "ListState.next",
+          "signature": "public func next(total: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "ListState.move",
+          "signature": "public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "ListState.moveWithDirty",
+          "signature": "public func moveWithDirty(delta: Int64, total: Int64, viewportHeight: Int64, area: Rect): DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "ListState.previous",
+          "signature": "public func previous(total: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "ListState.scrollToVisible",
+          "signature": "public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Table",
+          "signature": "public class Table <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Table.init",
+          "signature": "public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: ?Style = None, headerStyle!: ?Style = None, selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Table.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Table.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Table.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TableState",
+          "signature": "public class TableState {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TableState.selectedRow",
+          "signature": "public var selectedRow: ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TableState.offset",
+          "signature": "public var offset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TableState.init",
+          "signature": "public init(selectedRow!: ?Int64 = None, offset!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TableState.select",
+          "signature": "public func select(index: ?Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TableState.next",
+          "signature": "public func next(total: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TableState.move",
+          "signature": "public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TableState.previous",
+          "signature": "public func previous(total: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "TableState.scrollToVisible",
+          "signature": "public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Scrollbar",
+          "signature": "public class Scrollbar <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Scrollbar.init",
+          "signature": "public init( total: Int64, offset!: Int64 = 0, viewport!: Int64 = 0, style!: Style = Style(fg: Color.Indexed(8)), thumbStyle!: Style = Style(fg: Color.White) )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Scrollbar.handleMouse",
+          "signature": "public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/widgets.cj",
+          "symbol": "Scrollbar.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

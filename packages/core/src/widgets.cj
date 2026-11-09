@@ -534,6 +534,7 @@ func controlBlockArea(area: Rect, block: ?Block, componentTheme: ?Theme,
     match (block) { case Some(value) => value.inner(area, theme: effective); case None => area }
 }
 
+/** 显示文本项并可使用外部状态管理选择和滚动的列表。 */
 public class List <: Widget {
     private let items: Array<String>
     private let selected: ?Int64
@@ -547,6 +548,18 @@ public class List <: Widget {
     private var renderedTheme: ?Theme = None
     private let selectionMarker: ?String
 
+    /** 创建列表；提供 state 时绘制和鼠标处理使用该状态。
+     * @param items 按顺序显示的文本项
+     * @param selected 无外部状态时的选中索引
+     * @param offset 无外部状态时的首项偏移
+     * @param state 可选的列表状态
+     * @param block 可选外围区块
+     * @param style 普通项样式
+     * @param selectedStyle 可选选中样式
+     * @param focused 是否显示焦点
+     * @param theme 可选主题
+     * @param selectionMarker 可选选择标记
+     */
     public init(
         items: Array<String>,
         selected!: ?Int64 = None,
@@ -571,9 +584,19 @@ public class List <: Widget {
         this.selectionMarker = selectionMarker
     }
 
-    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    /** 使用已知主题处理鼠标选择。
+     * @param mouse 鼠标事件
+     * @param area 组件区域
+     * @return 更新选择时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
 
+    /** 处理鼠标选择；组件和区块的显式主题优先于布局主题。
+     * @param mouse 鼠标事件
+     * @param area 组件区域
+     * @param layoutTheme 可选的布局主题
+     * @return 更新选择时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
         let target = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         match (state) {
@@ -589,6 +612,10 @@ public class List <: Widget {
         false
     }
 
+    /** 在区域内绘制内容。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -672,19 +699,32 @@ func writeFocusedListText(x: Int64, y: Int64, text: String, width: Int64, style:
     }
 }
 
+/** 保存列表的选中索引和首项偏移。 */
 public class ListState {
+    /** 选中项索引；None 表示未选择。 */
     public var selected: ?Int64
+    /** 首个可见项的索引。 */
     public var offset: Int64
 
+    /** 创建状态；负偏移按零处理。
+     * @param selected 初始选中索引
+     * @param offset 初始首项偏移
+     */
     public init(selected!: ?Int64 = None, offset!: Int64 = 0) {
         this.selected = selected
         this.offset = max(0, offset)
     }
 
+    /** 设置选中索引；此操作不调整偏移。
+     * @param index 选中索引，None 清除选择
+     */
     public func select(index: ?Int64): Unit {
         selected = index
     }
 
+    /** 选择下一项，最多到最后一项；总数非正时清除选择并重置偏移。
+     * @param total 项目总数
+     */
     public func next(total: Int64): Unit {
         if (total <= 0) {
             selected = None
@@ -698,6 +738,11 @@ public class ListState {
         selected = Some(min(total - 1, current + 1))
     }
 
+    /** 按增量移动选择；视口高度为正时调整偏移以显示选择。
+     * @param delta 选择移动量
+     * @param total 项目总数
+     * @param viewportHeight 可见行数
+     */
     public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit {
         if (total <= 0) {
             selected = None
@@ -714,6 +759,13 @@ public class ListState {
         }
     }
 
+    /** 移动选择并返回需要重绘的区域；滚动时标记整个区域，否则标记新旧选择行。
+     * @param delta 选择移动量
+     * @param total 项目总数
+     * @param viewportHeight 可见行数
+     * @param area 列表内容区域
+     * @return 脏区域集合
+     */
     public func moveWithDirty(delta: Int64, total: Int64, viewportHeight: Int64, area: Rect): DirtyRects {
         let beforeSelected = selected
         let beforeOffset = offset
@@ -728,6 +780,9 @@ public class ListState {
         dirty
     }
 
+    /** 选择上一项，最少到第一项；总数非正时清除选择并重置偏移。
+     * @param total 项目总数
+     */
     public func previous(total: Int64): Unit {
         if (total <= 0) {
             selected = None
@@ -741,6 +796,10 @@ public class ListState {
         selected = Some(max(0, current - 1))
     }
 
+    /** 调整偏移以显示选中项；总数或视口高度非正时偏移置零。
+     * @param total 项目总数
+     * @param viewportHeight 可见行数
+     */
     public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit {
         if (total <= 0 || viewportHeight <= 0) {
             offset = 0
@@ -759,6 +818,7 @@ public class ListState {
     }
 }
 
+/** 显示表头和数据行，并可使用外部状态管理选择的表格。 */
 public class Table <: Widget {
     private let headers: Array<String>
     private let rows: Array<Array<String>>
@@ -776,6 +836,17 @@ public class Table <: Widget {
     /** 保存表头、数据行、列宽及绘制设置，用于后续表格绘制。
      * 省略 style 时普通数据行保留已有背景；显式样式沿用主题样式合并规则。
      * 省略 headerStyle 时使用主题标题样式，并保留表头与分隔线下方已有的背景；显式样式原样使用，包括重置背景色。
+     * @param headers 表头文字
+     * @param rows 按顺序排列的数据行
+     * @param widths 可选列宽
+     * @param state 可选表格状态
+     * @param block 可选外围区块
+     * @param style 可选数据行样式
+     * @param headerStyle 可选表头样式
+     * @param selectedStyle 可选选中行样式
+     * @param focused 是否显示焦点
+     * @param theme 可选主题
+     * @param selectionMarker 可选选择标记
      */
     public init(
         headers: Array<String>,
@@ -803,9 +874,19 @@ public class Table <: Widget {
         this.selectionMarker = selectionMarker
     }
 
-    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    /** 使用已知主题处理鼠标选择。
+     * @param mouse 鼠标事件
+     * @param area 组件区域
+     * @return 更新选择时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
 
+    /** 处理鼠标选择；组件和区块的显式主题优先于布局主题。
+     * @param mouse 鼠标事件
+     * @param area 组件区域
+     * @param layoutTheme 可选的布局主题
+     * @return 更新选择时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
         let inner = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         let target = Rect(inner.x, inner.y + 2, inner.width, max(0, inner.height - 2))
@@ -822,6 +903,10 @@ public class Table <: Widget {
         false
     }
 
+    /** 在区域内绘制内容。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -1064,19 +1149,32 @@ func listSelectionStyle(style: ?Style, theme: ?Theme): Style {
     }
 }
 
+/** 保存表格的选中行和首行偏移。 */
 public class TableState {
+    /** 选中行索引；None 表示未选择。 */
     public var selectedRow: ?Int64
+    /** 首个可见项的索引。 */
     public var offset: Int64
 
+    /** 创建状态；负偏移按零处理。
+     * @param selectedRow 初始选中索引
+     * @param offset 初始首项偏移
+     */
     public init(selectedRow!: ?Int64 = None, offset!: Int64 = 0) {
         this.selectedRow = selectedRow
         this.offset = max(0, offset)
     }
 
+    /** 设置选中索引；此操作不调整偏移。
+     * @param index 选中索引，None 清除选择
+     */
     public func select(index: ?Int64): Unit {
         selectedRow = index
     }
 
+    /** 选择下一项，最多到最后一项；总数非正时清除选择并重置偏移。
+     * @param total 项目总数
+     */
     public func next(total: Int64): Unit {
         if (total <= 0) {
             selectedRow = None
@@ -1090,6 +1188,11 @@ public class TableState {
         selectedRow = Some(min(total - 1, current + 1))
     }
 
+    /** 按增量移动选择；视口高度为正时调整偏移以显示选择。
+     * @param delta 选择移动量
+     * @param total 项目总数
+     * @param viewportHeight 可见行数
+     */
     public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit {
         if (total <= 0) {
             selectedRow = None
@@ -1106,6 +1209,9 @@ public class TableState {
         }
     }
 
+    /** 选择上一项，最少到第一项；总数非正时清除选择并重置偏移。
+     * @param total 项目总数
+     */
     public func previous(total: Int64): Unit {
         if (total <= 0) {
             selectedRow = None
@@ -1119,6 +1225,10 @@ public class TableState {
         selectedRow = Some(max(0, current - 1))
     }
 
+    /** 调整偏移以显示选中项；总数或视口高度非正时偏移置零。
+     * @param total 项目总数
+     * @param viewportHeight 可见行数
+     */
     public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit {
         if (total <= 0 || viewportHeight <= 0) {
             offset = 0
@@ -1137,6 +1247,7 @@ public class TableState {
     }
 }
 
+/** 绘制滚动位置并支持鼠标滚轮及拖动的垂直滚动条。 */
 public class Scrollbar <: Widget {
     private let total: Int64
     private let offset: Int64
@@ -1144,6 +1255,13 @@ public class Scrollbar <: Widget {
     private let style: Style
     private let thumbStyle: Style
 
+    /** 创建滚动条；总数、偏移和视口的负值按零处理。
+     * @param total 项目总数
+     * @param offset 当前偏移
+     * @param viewport 可见项目数
+     * @param style 轨道样式
+     * @param thumbStyle 滑块样式
+     */
     public init(
         total: Int64,
         offset!: Int64 = 0,
@@ -1158,6 +1276,14 @@ public class Scrollbar <: Widget {
         this.thumbStyle = thumbStyle
     }
 
+    /** 处理滚动条的鼠标事件并更新传入的滚动状态。
+     * @param mouse 鼠标事件
+     * @param area 滚动条所在区域
+     * @param state 要更新的滚动状态
+     * @param capture 指针捕获状态
+     * @param owner 捕获身份
+     * @return 事件被处理时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool {
         if (capture.release(owner, mouse)) { return true }
         if (area.width <= 0 || area.height <= 0 || total <= viewport || viewport <= 0) { return false }
@@ -1193,6 +1319,8 @@ public class Scrollbar <: Widget {
     }
 
     /** 在区域最右列绘制轨道和滑块；Unicode 不可用或符号并非单列时回退至 ASCII。单行视口使用方向标记表示还有内容可滚动。区域宽高不大于 0、视口不大于 0 或内容量不超过视口时不写入缓冲区。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0 || total <= viewport || viewport <= 0) {

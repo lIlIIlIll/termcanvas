@@ -2601,64 +2601,64 @@ packages/core/src/widgets.cj:458:public func render(area: Rect, buffer: Buffer):
 packages/core/src/widgets.cj:464:public class Paragraph <: Widget {
 packages/core/src/widgets.cj:480:public init( text: String, block!: ?Block = None, style!: ?Style = None, scroll!: Int64 = 0, wrap!: WrapMode = WrapMode.Character, align!: TextAlign = TextAlign.Left )
 packages/core/src/widgets.cj:500:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:537:public class List <: Widget {
-packages/core/src/widgets.cj:550:public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
-packages/core/src/widgets.cj:575:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/widgets.cj:577:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
-packages/core/src/widgets.cj:592:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:675:public class ListState {
-packages/core/src/widgets.cj:676:public var selected: ?Int64
-packages/core/src/widgets.cj:677:public var offset: Int64
-packages/core/src/widgets.cj:679:public init(selected!: ?Int64 = None, offset!: Int64 = 0)
-packages/core/src/widgets.cj:684:public func select(index: ?Int64): Unit
-packages/core/src/widgets.cj:688:public func next(total: Int64): Unit
-packages/core/src/widgets.cj:701:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
-packages/core/src/widgets.cj:717:public func moveWithDirty(delta: Int64, total: Int64, viewportHeight: Int64, area: Rect): DirtyRects
-packages/core/src/widgets.cj:731:public func previous(total: Int64): Unit
-packages/core/src/widgets.cj:744:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
-packages/core/src/widgets.cj:762:public class Table <: Widget {
-packages/core/src/widgets.cj:780:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: ?Style = None, headerStyle!: ?Style = None, selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
-packages/core/src/widgets.cj:807:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/widgets.cj:809:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
-packages/core/src/widgets.cj:825:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:1067:public class TableState {
-packages/core/src/widgets.cj:1068:public var selectedRow: ?Int64
-packages/core/src/widgets.cj:1069:public var offset: Int64
-packages/core/src/widgets.cj:1071:public init(selectedRow!: ?Int64 = None, offset!: Int64 = 0)
-packages/core/src/widgets.cj:1076:public func select(index: ?Int64): Unit
-packages/core/src/widgets.cj:1080:public func next(total: Int64): Unit
-packages/core/src/widgets.cj:1093:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
-packages/core/src/widgets.cj:1109:public func previous(total: Int64): Unit
-packages/core/src/widgets.cj:1122:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
-packages/core/src/widgets.cj:1140:public class Scrollbar <: Widget {
-packages/core/src/widgets.cj:1147:public init( total: Int64, offset!: Int64 = 0, viewport!: Int64 = 0, style!: Style = Style(fg: Color.Indexed(8)), thumbStyle!: Style = Style(fg: Color.White) )
-packages/core/src/widgets.cj:1161:public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool
-packages/core/src/widgets.cj:1197:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:1236:public class Input <: Widget {
-packages/core/src/widgets.cj:1239:public var value: String
-packages/core/src/widgets.cj:1242:public var cursor: Int64
-packages/core/src/widgets.cj:1258:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: ?Style = None, showBoundary!: Bool = true )
-packages/core/src/widgets.cj:1277:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
-packages/core/src/widgets.cj:1291:public func paste(text: String): Unit
-packages/core/src/widgets.cj:1299:public func handle(key: KeyEvent): Bool
-packages/core/src/widgets.cj:1330:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
-packages/core/src/widgets.cj:1332:public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects
-packages/core/src/widgets.cj:1347:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/widgets.cj:1349:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
-packages/core/src/widgets.cj:1363:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/widgets.cj:1436:public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position
-packages/core/src/widgets.cj:1443:public func cursorPosition(area: Rect): Position
-packages/core/src/widgets.cj:1445:public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position
-packages/core/src/widgets.cj:1462:public func setValue(value: String, cursor!: Int64 = -1): Unit
-packages/core/src/widgets.cj:1468:public func clear(): Unit
-packages/core/src/widgets.cj:1474:public func moveToStart(): Unit
-packages/core/src/widgets.cj:1479:public func moveToEnd(): Unit
-packages/core/src/widgets.cj:1531:public class FileDialog <: Widget {
-packages/core/src/widgets.cj:1532:public let picker: FilePicker
-packages/core/src/widgets.cj:1534:public init(path!: String = ".", extension!: String = "", title!: String = "Files")
-packages/core/src/widgets.cj:1538:public func selectedPath(): ?String
-packages/core/src/widgets.cj:1539:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/widgets.cj:1540:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:538:public class List <: Widget {
+packages/core/src/widgets.cj:563:public init( items: Array<String>, selected!: ?Int64 = None, offset!: Int64 = 0, state!: ?ListState = None, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
+packages/core/src/widgets.cj:592:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:600:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
+packages/core/src/widgets.cj:619:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:703:public class ListState {
+packages/core/src/widgets.cj:705:public var selected: ?Int64
+packages/core/src/widgets.cj:707:public var offset: Int64
+packages/core/src/widgets.cj:713:public init(selected!: ?Int64 = None, offset!: Int64 = 0)
+packages/core/src/widgets.cj:721:public func select(index: ?Int64): Unit
+packages/core/src/widgets.cj:728:public func next(total: Int64): Unit
+packages/core/src/widgets.cj:746:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
+packages/core/src/widgets.cj:769:public func moveWithDirty(delta: Int64, total: Int64, viewportHeight: Int64, area: Rect): DirtyRects
+packages/core/src/widgets.cj:786:public func previous(total: Int64): Unit
+packages/core/src/widgets.cj:803:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
+packages/core/src/widgets.cj:822:public class Table <: Widget {
+packages/core/src/widgets.cj:851:public init( headers: Array<String>, rows: Array<Array<String>>, widths!: Array<Int64> = [], state!: ?TableState = None, block!: ?Block = None, style!: ?Style = None, headerStyle!: ?Style = None, selectedStyle!: ?Style = None, focused!: Bool = false, theme!: ?Theme = None, selectionMarker!: ?String = None )
+packages/core/src/widgets.cj:882:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:890:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
+packages/core/src/widgets.cj:910:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:1153:public class TableState {
+packages/core/src/widgets.cj:1155:public var selectedRow: ?Int64
+packages/core/src/widgets.cj:1157:public var offset: Int64
+packages/core/src/widgets.cj:1163:public init(selectedRow!: ?Int64 = None, offset!: Int64 = 0)
+packages/core/src/widgets.cj:1171:public func select(index: ?Int64): Unit
+packages/core/src/widgets.cj:1178:public func next(total: Int64): Unit
+packages/core/src/widgets.cj:1196:public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit
+packages/core/src/widgets.cj:1215:public func previous(total: Int64): Unit
+packages/core/src/widgets.cj:1232:public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit
+packages/core/src/widgets.cj:1251:public class Scrollbar <: Widget {
+packages/core/src/widgets.cj:1265:public init( total: Int64, offset!: Int64 = 0, viewport!: Int64 = 0, style!: Style = Style(fg: Color.Indexed(8)), thumbStyle!: Style = Style(fg: Color.White) )
+packages/core/src/widgets.cj:1287:public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool
+packages/core/src/widgets.cj:1325:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:1364:public class Input <: Widget {
+packages/core/src/widgets.cj:1367:public var value: String
+packages/core/src/widgets.cj:1370:public var cursor: Int64
+packages/core/src/widgets.cj:1386:public init( value!: String = "", cursor!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), placeholder!: String = "", placeholderStyle!: ?Style = None, showBoundary!: Bool = true )
+packages/core/src/widgets.cj:1405:public func setVisualState( focused!: Bool = false, disabled!: Bool = false, error!: Bool = false, theme!: ?Theme = None ): Unit
+packages/core/src/widgets.cj:1419:public func paste(text: String): Unit
+packages/core/src/widgets.cj:1427:public func handle(key: KeyEvent): Bool
+packages/core/src/widgets.cj:1458:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+packages/core/src/widgets.cj:1460:public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects
+packages/core/src/widgets.cj:1475:public func handleMouse(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/widgets.cj:1477:public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool
+packages/core/src/widgets.cj:1491:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/widgets.cj:1564:public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position
+packages/core/src/widgets.cj:1571:public func cursorPosition(area: Rect): Position
+packages/core/src/widgets.cj:1573:public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position
+packages/core/src/widgets.cj:1590:public func setValue(value: String, cursor!: Int64 = -1): Unit
+packages/core/src/widgets.cj:1596:public func clear(): Unit
+packages/core/src/widgets.cj:1602:public func moveToStart(): Unit
+packages/core/src/widgets.cj:1607:public func moveToEnd(): Unit
+packages/core/src/widgets.cj:1659:public class FileDialog <: Widget {
+packages/core/src/widgets.cj:1660:public let picker: FilePicker
+packages/core/src/widgets.cj:1662:public init(path!: String = ".", extension!: String = "", title!: String = "Files")
+packages/core/src/widgets.cj:1666:public func selectedPath(): ?String
+packages/core/src/widgets.cj:1667:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/widgets.cj:1668:public func render(area: Rect, buffer: Buffer): Unit
 packages/diff/src/diff.cj:7:public enum DiffLineKind {
 packages/diff/src/diff.cj:9:Context
 packages/diff/src/diff.cj:11:Add
