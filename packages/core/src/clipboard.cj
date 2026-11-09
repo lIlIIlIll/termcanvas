@@ -134,12 +134,23 @@ public class MemoryClipboard <: Clipboard {
     public func capabilities(): ClipboardCapabilities { ClipboardCapabilities(true, true, "memory") }
 }
 
+/** 剪贴板后端命令的执行结果。 */
 public class ClipboardCommandResult {
+    /** 执行状态。 */
     public let status: ClipboardStatus
+    /** 命令输出文本。 */
     public let output: String
+    /** 进程退出码；不可用时默认为 -1。 */
     public let exitCode: Int64
+    /** 诊断信息。 */
     public let message: String
 
+    /** 创建命令结果。
+     * @param status 执行状态
+     * @param output 输出文本
+     * @param exitCode 退出码
+     * @param message 诊断信息
+     */
     public init(status: ClipboardStatus, output!: String = "", exitCode!: Int64 = -1, message!: String = "") {
         this.status = status
         this.output = output
@@ -149,19 +160,52 @@ public class ClipboardCommandResult {
 }
 
 // No shell interpolation: clipboard contents are delivered only on stdin.
+/** 用于探测和执行剪贴板命令的可替换接口。 */
 public interface ClipboardCommandRunner {
+    /** 获取平台标识。
+     * @return 平台标识
+     */
     func platform(): String
+    /** 读取环境变量；未设置时可返回空字符串。
+     * @param name 环境变量名
+     * @return 环境变量值
+     */
     func environment(name: String): String
+    /** 判断命令是否可用。
+     * @param command 命令名称或路径
+     * @return 可用时为 true
+     */
     func available(command: String): Bool
+    /** 执行剪贴板命令。
+     * @param command 命令名称或路径
+     * @param arguments 参数数组
+     * @param input 可选标准输入文本
+     * @param timeoutMillis 超时毫秒数
+     * @param maxBytes 输入输出字节上限
+     * @return 命令结果
+     */
     func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult
 }
 
+/** 通过本机环境和进程执行剪贴板命令。 */
 public class NativeClipboardCommandRunner <: ClipboardCommandRunner {
+    /** 创建本机命令执行器。 */
     public init() {}
+    /** 获取本机平台标识。
+     * @return windows、macos 或 linux
+     */
     public func platform(): String { clipboardPlatform() }
+    /** 读取环境变量；未设置时返回空字符串。
+     * @param name 环境变量名
+     * @return 环境变量值
+     */
     public func environment(name: String): String {
         match (getVariable(name)) { case Some(value) => value; case None => "" }
     }
+    /** 检查命令路径或 PATH 中的可执行文件。
+     * @param command 命令名称或路径
+     * @return 存在可执行文件时为 true
+     */
     public func available(command: String): Bool {
         if (command.contains("/") || command.contains("\\")) { return clipboardExecutable(command) }
         let separator = if (platform() == "windows") { ";" } else { ":" }
@@ -174,6 +218,14 @@ public class NativeClipboardCommandRunner <: ClipboardCommandRunner {
         false
     }
 
+    /** 不经 shell 执行命令；输入通过标准输入提供，超时和大小限制有界。
+     * @param command 命令名称或路径
+     * @param arguments 参数数组
+     * @param input 可选标准输入文本
+     * @param timeoutMillis 超时毫秒数，限制为 1 到 60000
+     * @param maxBytes 输入输出字节上限，限制为 0 到 16 MiB
+     * @return 命令结果
+     */
     public func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult {
         let limit = clamp(maxBytes, 0, 16 * 1024 * 1024)
         if (let Some(text) <- input) {
@@ -326,6 +378,7 @@ func clipboardPlatform(): String { "macos" }
 @When[os != "Windows" && os != "macOS"]
 func clipboardPlatform(): String { "linux" }
 
+/** 根据平台、会话环境和可执行程序探测系统剪贴板后端。 */
 public class SystemClipboard <: Clipboard {
     private let runner: ClipboardCommandRunner
     private let timeoutMillis: Int64
@@ -336,6 +389,11 @@ public class SystemClipboard <: Clipboard {
     private var readArguments: Array<String> = []
     private var writeArguments: Array<String> = []
 
+    /** 创建并探测系统剪贴板。
+     * @param runner 命令执行器
+     * @param timeoutMillis 操作超时毫秒数，限制为 1 到 60000
+     * @param maxBytes 文本字节上限，限制为 0 到 16 MiB
+     */
     public init(runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024) {
         this.runner = runner
         this.timeoutMillis = clamp(timeoutMillis, 1, 60000)
@@ -374,10 +432,16 @@ public class SystemClipboard <: Clipboard {
         }
     }
 
+    /** 获取探测到的读写能力；实际操作仍可能失败。
+     * @return 后端能力
+     */
     public func capabilities(): ClipboardCapabilities {
         ClipboardCapabilities(!readCommand.isEmpty(), !writeCommand.isEmpty(), backend,
             description: "Detected executable and display session; operations report connection, timeout and exit failures")
     }
+    /** 读取系统剪贴板并返回结构化状态。
+     * @return 读取结果
+     */
     public func readText(): ClipboardResult {
         if (readCommand.isEmpty()) { return ClipboardResult(ClipboardStatus.Unavailable, message: "No system clipboard reader is available", backend: backend) }
         try {
@@ -386,6 +450,10 @@ public class SystemClipboard <: Clipboard {
             ClipboardResult(result.status, text: if (clipboardStatusSuccess(result.status)) { result.output } else { "" }, message: result.message, backend: backend)
         } catch (error: Exception) { ClipboardResult(ClipboardStatus.Failed, message: error.message, backend: backend) }
     }
+    /** 写入系统剪贴板并返回结构化状态。
+     * @param text 要写入的文本
+     * @return 写入结果
+     */
     public func writeText(text: String): ClipboardResult {
         if (text.size > maxBytes) { return ClipboardResult(ClipboardStatus.TooLarge, message: "Clipboard input exceeds byte limit", backend: backend) }
         if (writeCommand.isEmpty()) { return ClipboardResult(ClipboardStatus.Unavailable, message: "No system clipboard writer is available", backend: backend) }
@@ -394,28 +462,51 @@ public class SystemClipboard <: Clipboard {
             ClipboardResult(result.status, message: result.message, backend: backend)
         } catch (error: Exception) { ClipboardResult(ClipboardStatus.Failed, message: error.message, backend: backend) }
     }
+    /** 读取文本；操作不成功时抛出异常。
+     * @return 读取的文本
+     */
     public func getText(): String { clipboardRequire(readText()).text }
+    /** 写入文本；操作不成功时抛出异常。
+     * @param text 要写入的文本
+     */
     public func setText(text: String): Unit { _ = clipboardRequire(writeText(text)) }
 }
 
+/** 通过回调发送 OSC 52 序列的只写剪贴板。 */
 public class Osc52Clipboard <: Clipboard {
     private let emit: (String) -> Unit
     private let enabled: Bool
     private let maxBytes: Int64
     private let tmuxPassthrough: Bool
 
+    /** 创建 OSC 52 剪贴板。
+     * @param emit 发送终端序列的回调
+     * @param enabled 是否允许写入
+     * @param maxBytes 文本字节上限，限制为 0 到 16 MiB
+     * @param tmuxPassthrough 是否使用 tmux 透传包装
+     */
     public init(emit: (String) -> Unit, enabled!: Bool = true, maxBytes!: Int64 = 100000, tmuxPassthrough!: Bool = false) {
         this.emit = emit
         this.enabled = enabled
         this.maxBytes = clamp(maxBytes, 0, 16 * 1024 * 1024)
         this.tmuxPassthrough = tmuxPassthrough
     }
+    /** 获取只写能力。
+     * @return 后端能力
+     */
     public func capabilities(): ClipboardCapabilities {
         ClipboardCapabilities(false, enabled, "osc52", description: "Write-only; success means sequence emitted, not acknowledged by the remote terminal")
     }
+    /** 报告不支持读取；终端粘贴应通过输入事件接收。
+     * @return Unsupported 结果
+     */
     public func readText(): ClipboardResult {
         ClipboardResult(ClipboardStatus.Unsupported, message: "OSC 52 reading is not supported; paste through terminal input", backend: "osc52")
     }
+    /** 编码文本并调用发送回调；成功仅表示序列已发送，不代表终端确认。
+     * @param text 要写入的文本
+     * @return 写入结果
+     */
     public func writeText(text: String): ClipboardResult {
         if (!enabled) { return ClipboardResult(ClipboardStatus.Unavailable, message: "OSC 52 is disabled", backend: "osc52") }
         if (text.size > maxBytes) { return ClipboardResult(ClipboardStatus.TooLarge, message: "OSC 52 payload exceeds byte limit", backend: "osc52") }
@@ -426,10 +517,23 @@ public class Osc52Clipboard <: Clipboard {
             ClipboardResult(ClipboardStatus.Success, message: "OSC 52 sequence emitted; terminal acknowledgement is unavailable", backend: "osc52")
         } catch (error: Exception) { ClipboardResult(ClipboardStatus.Failed, message: error.message, backend: "osc52") }
     }
+    /** 读取操作不受支持，会抛出异常。
+     * @return 不会正常返回
+     */
     public func getText(): String { clipboardRequire(readText()).text }
+    /** 发送文本；操作不成功时抛出异常。
+     * @param text 要写入的文本
+     */
     public func setText(text: String): Unit { _ = clipboardRequire(writeText(text)) }
 }
 
+/** 根据系统后端、远程会话及可选 OSC 52 回调选择剪贴板。
+ * @param runner 命令执行器
+ * @param osc52Emitter 可选的 OSC 52 序列发送回调
+ * @param timeoutMillis 系统后端操作超时
+ * @param maxBytes 文本字节上限
+ * @return 所选剪贴板；系统后端不可用且未提供回调时返回不可用的系统后端
+ */
 public func detectClipboard(
     runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(),
     osc52Emitter!: ?(String) -> Unit = None,

@@ -405,38 +405,38 @@ packages/core/src/clipboard.cj:122:public init(text!: String = "")
 packages/core/src/clipboard.cj:126:public func getText(): String
 packages/core/src/clipboard.cj:130:public func setText(text: String): Unit
 packages/core/src/clipboard.cj:134:public func capabilities(): ClipboardCapabilities
-packages/core/src/clipboard.cj:137:public class ClipboardCommandResult {
-packages/core/src/clipboard.cj:138:public let status: ClipboardStatus
-packages/core/src/clipboard.cj:139:public let output: String
-packages/core/src/clipboard.cj:140:public let exitCode: Int64
-packages/core/src/clipboard.cj:141:public let message: String
-packages/core/src/clipboard.cj:143:public init(status: ClipboardStatus, output!: String = "", exitCode!: Int64 = -1, message!: String = "")
-packages/core/src/clipboard.cj:152:public interface ClipboardCommandRunner {
-packages/core/src/clipboard.cj:153:func platform(): String
-packages/core/src/clipboard.cj:154:func environment(name: String): String
-packages/core/src/clipboard.cj:155:func available(command: String): Bool
-packages/core/src/clipboard.cj:156:func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult
-packages/core/src/clipboard.cj:159:public class NativeClipboardCommandRunner <: ClipboardCommandRunner {
-packages/core/src/clipboard.cj:160:public init()
-packages/core/src/clipboard.cj:161:public func platform(): String
-packages/core/src/clipboard.cj:162:public func environment(name: String): String
-packages/core/src/clipboard.cj:165:public func available(command: String): Bool
-packages/core/src/clipboard.cj:177:public func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult
-packages/core/src/clipboard.cj:329:public class SystemClipboard <: Clipboard {
-packages/core/src/clipboard.cj:339:public init(runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024)
-packages/core/src/clipboard.cj:377:public func capabilities(): ClipboardCapabilities
-packages/core/src/clipboard.cj:381:public func readText(): ClipboardResult
-packages/core/src/clipboard.cj:389:public func writeText(text: String): ClipboardResult
-packages/core/src/clipboard.cj:397:public func getText(): String
-packages/core/src/clipboard.cj:398:public func setText(text: String): Unit
-packages/core/src/clipboard.cj:401:public class Osc52Clipboard <: Clipboard {
-packages/core/src/clipboard.cj:407:public init(emit: (String) -> Unit, enabled!: Bool = true, maxBytes!: Int64 = 100000, tmuxPassthrough!: Bool = false)
-packages/core/src/clipboard.cj:413:public func capabilities(): ClipboardCapabilities
-packages/core/src/clipboard.cj:416:public func readText(): ClipboardResult
-packages/core/src/clipboard.cj:419:public func writeText(text: String): ClipboardResult
-packages/core/src/clipboard.cj:429:public func getText(): String
-packages/core/src/clipboard.cj:430:public func setText(text: String): Unit
-packages/core/src/clipboard.cj:433:public func detectClipboard( runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), osc52Emitter!: ?(String) -> Unit = None, timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024 ): Clipboard
+packages/core/src/clipboard.cj:138:public class ClipboardCommandResult {
+packages/core/src/clipboard.cj:140:public let status: ClipboardStatus
+packages/core/src/clipboard.cj:142:public let output: String
+packages/core/src/clipboard.cj:144:public let exitCode: Int64
+packages/core/src/clipboard.cj:146:public let message: String
+packages/core/src/clipboard.cj:154:public init(status: ClipboardStatus, output!: String = "", exitCode!: Int64 = -1, message!: String = "")
+packages/core/src/clipboard.cj:164:public interface ClipboardCommandRunner {
+packages/core/src/clipboard.cj:168:func platform(): String
+packages/core/src/clipboard.cj:173:func environment(name: String): String
+packages/core/src/clipboard.cj:178:func available(command: String): Bool
+packages/core/src/clipboard.cj:187:func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult
+packages/core/src/clipboard.cj:191:public class NativeClipboardCommandRunner <: ClipboardCommandRunner {
+packages/core/src/clipboard.cj:193:public init()
+packages/core/src/clipboard.cj:197:public func platform(): String
+packages/core/src/clipboard.cj:202:public func environment(name: String): String
+packages/core/src/clipboard.cj:209:public func available(command: String): Bool
+packages/core/src/clipboard.cj:229:public func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult
+packages/core/src/clipboard.cj:382:public class SystemClipboard <: Clipboard {
+packages/core/src/clipboard.cj:397:public init(runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024)
+packages/core/src/clipboard.cj:438:public func capabilities(): ClipboardCapabilities
+packages/core/src/clipboard.cj:445:public func readText(): ClipboardResult
+packages/core/src/clipboard.cj:457:public func writeText(text: String): ClipboardResult
+packages/core/src/clipboard.cj:468:public func getText(): String
+packages/core/src/clipboard.cj:472:public func setText(text: String): Unit
+packages/core/src/clipboard.cj:476:public class Osc52Clipboard <: Clipboard {
+packages/core/src/clipboard.cj:488:public init(emit: (String) -> Unit, enabled!: Bool = true, maxBytes!: Int64 = 100000, tmuxPassthrough!: Bool = false)
+packages/core/src/clipboard.cj:497:public func capabilities(): ClipboardCapabilities
+packages/core/src/clipboard.cj:503:public func readText(): ClipboardResult
+packages/core/src/clipboard.cj:510:public func writeText(text: String): ClipboardResult
+packages/core/src/clipboard.cj:523:public func getText(): String
+packages/core/src/clipboard.cj:527:public func setText(text: String): Unit
+packages/core/src/clipboard.cj:537:public func detectClipboard( runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), osc52Emitter!: ?(String) -> Unit = None, timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024 ): Clipboard
 packages/core/src/command_widgets.cj:6:public class MenuItem {
 packages/core/src/command_widgets.cj:7:public let label: String
 packages/core/src/command_widgets.cj:8:public let action: String

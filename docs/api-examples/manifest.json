@@ -12623,6 +12623,212 @@
           "signature": "public func capabilities(): ClipboardCapabilities"
         }
       ]
+    },
+    {
+      "id": "clipboard-backends",
+      "source": "docs/api-examples/clipboard-backends.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandResult",
+          "signature": "public class ClipboardCommandResult {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandResult.status",
+          "signature": "public let status: ClipboardStatus"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandResult.output",
+          "signature": "public let output: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandResult.exitCode",
+          "signature": "public let exitCode: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandResult.message",
+          "signature": "public let message: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandResult.init",
+          "signature": "public init(status: ClipboardStatus, output!: String = \"\", exitCode!: Int64 = -1, message!: String = \"\")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandRunner",
+          "signature": "public interface ClipboardCommandRunner {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandRunner.platform",
+          "signature": "func platform(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandRunner.environment",
+          "signature": "func environment(name: String): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandRunner.available",
+          "signature": "func available(command: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "ClipboardCommandRunner.run",
+          "signature": "func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "NativeClipboardCommandRunner",
+          "signature": "public class NativeClipboardCommandRunner <: ClipboardCommandRunner {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "NativeClipboardCommandRunner.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "NativeClipboardCommandRunner.platform",
+          "signature": "public func platform(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "NativeClipboardCommandRunner.environment",
+          "signature": "public func environment(name: String): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "NativeClipboardCommandRunner.available",
+          "signature": "public func available(command: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "NativeClipboardCommandRunner.run",
+          "signature": "public func run(command: String, arguments: Array<String>, input: ?String, timeoutMillis: Int64, maxBytes: Int64): ClipboardCommandResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "SystemClipboard",
+          "signature": "public class SystemClipboard <: Clipboard {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "SystemClipboard.init",
+          "signature": "public init(runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "SystemClipboard.capabilities",
+          "signature": "public func capabilities(): ClipboardCapabilities"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "SystemClipboard.readText",
+          "signature": "public func readText(): ClipboardResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "SystemClipboard.writeText",
+          "signature": "public func writeText(text: String): ClipboardResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "SystemClipboard.getText",
+          "signature": "public func getText(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "SystemClipboard.setText",
+          "signature": "public func setText(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Osc52Clipboard",
+          "signature": "public class Osc52Clipboard <: Clipboard {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Osc52Clipboard.init",
+          "signature": "public init(emit: (String) -> Unit, enabled!: Bool = true, maxBytes!: Int64 = 100000, tmuxPassthrough!: Bool = false)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Osc52Clipboard.capabilities",
+          "signature": "public func capabilities(): ClipboardCapabilities"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Osc52Clipboard.readText",
+          "signature": "public func readText(): ClipboardResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Osc52Clipboard.writeText",
+          "signature": "public func writeText(text: String): ClipboardResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Osc52Clipboard.getText",
+          "signature": "public func getText(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "Osc52Clipboard.setText",
+          "signature": "public func setText(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/clipboard.cj",
+          "symbol": "detectClipboard",
+          "signature": "public func detectClipboard( runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), osc52Emitter!: ?(String) -> Unit = None, timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024 ): Clipboard"
+        }
+      ]
     }
   ]
 }
