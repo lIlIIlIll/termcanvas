@@ -16103,6 +16103,350 @@
           "signature": "public static func size(): ?Rect"
         }
       ]
+    },
+    {
+      "id": "pty-runtime",
+      "source": "docs/api-examples/pty-runtime.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyOutputStream",
+          "signature": "public enum PtyOutputStream {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyOutputStream.Stdout",
+          "signature": "Stdout"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyOutputStream.Stderr",
+          "signature": "Stderr"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySize",
+          "signature": "public struct PtySize {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySize.cols",
+          "signature": "public let cols: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySize.rows",
+          "signature": "public let rows: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySize.init",
+          "signature": "public init(cols!: Int64 = 80, rows!: Int64 = 24)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySpec",
+          "signature": "public class PtySpec {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySpec.command",
+          "signature": "public let command: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySpec.args",
+          "signature": "public let args: Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySpec.cwd",
+          "signature": "public let cwd: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySpec.env",
+          "signature": "public let env: Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySpec.size",
+          "signature": "public let size: PtySize"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySpec.init",
+          "signature": "public init( command: String, args!: Array<String> = [], cwd!: String = \"\", env!: Array<String> = [], size!: PtySize = PtySize() )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySignal",
+          "signature": "public enum PtySignal {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySignal.Interrupt",
+          "signature": "Interrupt"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySignal.Terminate",
+          "signature": "Terminate"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtySignal.Kill",
+          "signature": "Kill"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyExitStatus",
+          "signature": "public enum PtyExitStatus {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyExitStatus.Exited",
+          "signature": "Exited(Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyExitStatus.Signaled",
+          "signature": "Signaled(Int32)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyProcess",
+          "signature": "public interface PtyProcess {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyProcess.id",
+          "signature": "func id(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyProcess.write",
+          "signature": "func write(bytes: Array<Byte>): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyProcess.writeText",
+          "signature": "func writeText(text: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyProcess.resize",
+          "signature": "func resize(size: PtySize): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyProcess.signal",
+          "signature": "func signal(signal: PtySignal): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyProcess.close",
+          "signature": "func close(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyRuntime",
+          "signature": "public interface PtyRuntime {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyRuntime.start",
+          "signature": "func start(id: String, spec: PtySpec): Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyRuntime.process",
+          "signature": "func process(id: String): ?PtyProcess"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyRuntime.write",
+          "signature": "func write(id: String, bytes: Array<Byte>): Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyRuntime.resize",
+          "signature": "func resize(id: String, size: PtySize): Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyRuntime.signal",
+          "signature": "func signal(id: String, signal: PtySignal): Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyRuntime.close",
+          "signature": "func close(id: String): Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyRuntime.sources",
+          "signature": "func sources(): Array<EventSource>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyRuntime.drain",
+          "signature": "func drain(): Array<Event>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyRuntime.activeCount",
+          "signature": "func activeCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSourceInterest",
+          "signature": "public enum EventSourceInterest {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSourceInterest.Read",
+          "signature": "Read"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSourceInterest.Write",
+          "signature": "Write"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSourceInterest.ReadWrite",
+          "signature": "ReadWrite"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSource",
+          "signature": "public interface EventSource {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSource.id",
+          "signature": "func id(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSource.fd",
+          "signature": "func fd(): ?Int32"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSource.waitHandle",
+          "signature": "func waitHandle(): ?CPointer<Unit>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSource.interests",
+          "signature": "func interests(): EventSourceInterest"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSource.onReady",
+          "signature": "func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSource.drain",
+          "signature": "func drain(): Array<Event>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "EventSource.close",
+          "signature": "func close(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyFlowMetrics",
+          "signature": "public struct PtyFlowMetrics {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyFlowMetrics.queuedBytes",
+          "signature": "public let queuedBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyFlowMetrics.peakQueuedBytes",
+          "signature": "public let peakQueuedBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyFlowMetrics.backpressureCount",
+          "signature": "public let backpressureCount: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/pty.cj",
+          "symbol": "PtyFlowMetrics.init",
+          "signature": "public init(queuedBytes: Int64, peakQueuedBytes: Int64, backpressureCount: Int64)"
+        }
+      ]
     }
   ]
 }

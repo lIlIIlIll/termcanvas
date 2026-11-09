@@ -26740,7 +26740,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 98,
+      "line": 100,
       "level": "top_level",
       "kind": "enum",
       "symbol": "PtyOutputStream",
@@ -26758,7 +26758,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 99,
+      "line": 103,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -26777,7 +26777,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 100,
+      "line": 106,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -26796,7 +26796,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 103,
+      "line": 111,
       "level": "top_level",
       "kind": "struct",
       "symbol": "PtySize",
@@ -26814,7 +26814,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 104,
+      "line": 114,
       "level": "member",
       "kind": "let",
       "symbol": "cols",
@@ -26832,7 +26832,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 105,
+      "line": 117,
       "level": "member",
       "kind": "let",
       "symbol": "rows",
@@ -26850,7 +26850,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 107,
+      "line": 123,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -26868,7 +26868,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 121,
+      "line": 139,
       "level": "top_level",
       "kind": "class",
       "symbol": "PtySpec",
@@ -26886,7 +26886,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 122,
+      "line": 142,
       "level": "member",
       "kind": "let",
       "symbol": "command",
@@ -26904,7 +26904,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 123,
+      "line": 145,
       "level": "member",
       "kind": "let",
       "symbol": "args",
@@ -26922,7 +26922,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 124,
+      "line": 148,
       "level": "member",
       "kind": "let",
       "symbol": "cwd",
@@ -26940,7 +26940,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 125,
+      "line": 151,
       "level": "member",
       "kind": "let",
       "symbol": "env",
@@ -26958,7 +26958,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 126,
+      "line": 154,
       "level": "member",
       "kind": "let",
       "symbol": "size",
@@ -26976,7 +26976,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 128,
+      "line": 163,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -26994,7 +26994,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 143,
+      "line": 180,
       "level": "top_level",
       "kind": "enum",
       "symbol": "PtySignal",
@@ -27012,7 +27012,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 144,
+      "line": 183,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -27031,7 +27031,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 145,
+      "line": 186,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -27050,7 +27050,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 146,
+      "line": 189,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -27069,7 +27069,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 149,
+      "line": 194,
       "level": "top_level",
       "kind": "enum",
       "symbol": "PtyExitStatus",
@@ -27087,7 +27087,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 150,
+      "line": 198,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -27106,7 +27106,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 151,
+      "line": 202,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -27125,7 +27125,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 154,
+      "line": 207,
       "level": "top_level",
       "kind": "interface",
       "symbol": "PtyProcess",
@@ -27143,7 +27143,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 155,
+      "line": 211,
       "level": "member",
       "kind": "func",
       "symbol": "id",
@@ -27162,7 +27162,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 159,
+      "line": 219,
       "level": "member",
       "kind": "func",
       "symbol": "write",
@@ -27181,7 +27181,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 160,
+      "line": 224,
       "level": "member",
       "kind": "func",
       "symbol": "writeText",
@@ -27200,7 +27200,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 161,
+      "line": 229,
       "level": "member",
       "kind": "func",
       "symbol": "resize",
@@ -27219,7 +27219,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 162,
+      "line": 234,
       "level": "member",
       "kind": "func",
       "symbol": "signal",
@@ -27238,7 +27238,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 165,
+      "line": 239,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -27257,7 +27257,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 168,
+      "line": 244,
       "level": "top_level",
       "kind": "interface",
       "symbol": "PtyRuntime",
@@ -27275,7 +27275,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 170,
+      "line": 251,
       "level": "member",
       "kind": "func",
       "symbol": "start",
@@ -27294,7 +27294,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 171,
+      "line": 256,
       "level": "member",
       "kind": "func",
       "symbol": "process",
@@ -27313,7 +27313,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 172,
+      "line": 262,
       "level": "member",
       "kind": "func",
       "symbol": "write",
@@ -27332,7 +27332,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 173,
+      "line": 268,
       "level": "member",
       "kind": "func",
       "symbol": "resize",
@@ -27351,7 +27351,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 174,
+      "line": 274,
       "level": "member",
       "kind": "func",
       "symbol": "signal",
@@ -27370,7 +27370,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 177,
+      "line": 281,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -27389,7 +27389,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 178,
+      "line": 285,
       "level": "member",
       "kind": "func",
       "symbol": "sources",
@@ -27408,7 +27408,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 179,
+      "line": 289,
       "level": "member",
       "kind": "func",
       "symbol": "drain",
@@ -27427,7 +27427,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 180,
+      "line": 293,
       "level": "member",
       "kind": "func",
       "symbol": "activeCount",
@@ -27446,7 +27446,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 183,
+      "line": 298,
       "level": "top_level",
       "kind": "enum",
       "symbol": "EventSourceInterest",
@@ -27464,7 +27464,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 184,
+      "line": 301,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -27483,7 +27483,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 185,
+      "line": 304,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -27502,7 +27502,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 186,
+      "line": 307,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -27521,7 +27521,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 189,
+      "line": 312,
       "level": "top_level",
       "kind": "interface",
       "symbol": "EventSource",
@@ -27539,7 +27539,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 190,
+      "line": 316,
       "level": "member",
       "kind": "func",
       "symbol": "id",
@@ -27558,7 +27558,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 191,
+      "line": 320,
       "level": "member",
       "kind": "func",
       "symbol": "fd",
@@ -27577,7 +27577,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 194,
+      "line": 326,
       "level": "member",
       "kind": "func",
       "symbol": "waitHandle",
@@ -27596,7 +27596,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 195,
+      "line": 330,
       "level": "member",
       "kind": "func",
       "symbol": "interests",
@@ -27615,7 +27615,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 196,
+      "line": 337,
       "level": "member",
       "kind": "func",
       "symbol": "onReady",
@@ -27634,7 +27634,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 197,
+      "line": 341,
       "level": "member",
       "kind": "func",
       "symbol": "drain",
@@ -27653,7 +27653,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 198,
+      "line": 344,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -27672,7 +27672,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 201,
+      "line": 347,
       "level": "top_level",
       "kind": "class",
       "symbol": "FakePtyProcess",
@@ -27690,7 +27690,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 203,
+      "line": 349,
       "level": "member",
       "kind": "var",
       "symbol": "lastWrite",
@@ -27708,7 +27708,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 204,
+      "line": 350,
       "level": "member",
       "kind": "var",
       "symbol": "lastSize",
@@ -27726,7 +27726,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 205,
+      "line": 351,
       "level": "member",
       "kind": "var",
       "symbol": "lastSignal",
@@ -27744,7 +27744,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 206,
+      "line": 352,
       "level": "member",
       "kind": "var",
       "symbol": "closed",
@@ -27762,7 +27762,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 208,
+      "line": 354,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -27780,7 +27780,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 213,
+      "line": 359,
       "level": "member",
       "kind": "func",
       "symbol": "id",
@@ -27798,7 +27798,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 215,
+      "line": 361,
       "level": "member",
       "kind": "func",
       "symbol": "write",
@@ -27816,7 +27816,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 220,
+      "line": 366,
       "level": "member",
       "kind": "func",
       "symbol": "writeText",
@@ -27834,7 +27834,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 224,
+      "line": 370,
       "level": "member",
       "kind": "func",
       "symbol": "resize",
@@ -27852,7 +27852,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 229,
+      "line": 375,
       "level": "member",
       "kind": "func",
       "symbol": "signal",
@@ -27870,7 +27870,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 234,
+      "line": 380,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -27888,7 +27888,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 239,
+      "line": 385,
       "level": "top_level",
       "kind": "class",
       "symbol": "FakePtyRuntime",
@@ -27906,7 +27906,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 243,
+      "line": 389,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -27924,7 +27924,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 245,
+      "line": 391,
       "level": "member",
       "kind": "func",
       "symbol": "start",
@@ -27942,7 +27942,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 252,
+      "line": 398,
       "level": "member",
       "kind": "func",
       "symbol": "process",
@@ -27960,7 +27960,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 259,
+      "line": 405,
       "level": "member",
       "kind": "func",
       "symbol": "fakeProcess",
@@ -27978,7 +27978,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 264,
+      "line": 410,
       "level": "member",
       "kind": "func",
       "symbol": "sources",
@@ -27996,7 +27996,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 266,
+      "line": 412,
       "level": "member",
       "kind": "func",
       "symbol": "injectOutput",
@@ -28014,7 +28014,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 270,
+      "line": 416,
       "level": "member",
       "kind": "func",
       "symbol": "injectText",
@@ -28032,7 +28032,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 274,
+      "line": 420,
       "level": "member",
       "kind": "func",
       "symbol": "injectExit",
@@ -28050,7 +28050,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 279,
+      "line": 425,
       "level": "member",
       "kind": "func",
       "symbol": "injectFailure",
@@ -28068,7 +28068,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 284,
+      "line": 430,
       "level": "member",
       "kind": "func",
       "symbol": "write",
@@ -28086,7 +28086,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 292,
+      "line": 438,
       "level": "member",
       "kind": "func",
       "symbol": "resize",
@@ -28104,7 +28104,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 300,
+      "line": 446,
       "level": "member",
       "kind": "func",
       "symbol": "signal",
@@ -28122,7 +28122,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 308,
+      "line": 454,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -28140,7 +28140,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 319,
+      "line": 465,
       "level": "member",
       "kind": "func",
       "symbol": "drain",
@@ -28158,7 +28158,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 327,
+      "line": 473,
       "level": "member",
       "kind": "func",
       "symbol": "activeCount",
@@ -28176,7 +28176,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 347,
+      "line": 493,
       "level": "top_level",
       "kind": "class",
       "symbol": "UnsupportedPtyRuntime",
@@ -28194,7 +28194,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 348,
+      "line": 494,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -28212,7 +28212,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 350,
+      "line": 496,
       "level": "member",
       "kind": "func",
       "symbol": "start",
@@ -28230,7 +28230,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 354,
+      "line": 500,
       "level": "member",
       "kind": "func",
       "symbol": "process",
@@ -28248,7 +28248,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 359,
+      "line": 505,
       "level": "member",
       "kind": "func",
       "symbol": "write",
@@ -28266,7 +28266,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 363,
+      "line": 509,
       "level": "member",
       "kind": "func",
       "symbol": "resize",
@@ -28284,7 +28284,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 367,
+      "line": 513,
       "level": "member",
       "kind": "func",
       "symbol": "signal",
@@ -28302,7 +28302,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 371,
+      "line": 517,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -28320,7 +28320,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 375,
+      "line": 521,
       "level": "member",
       "kind": "func",
       "symbol": "sources",
@@ -28338,7 +28338,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 377,
+      "line": 523,
       "level": "member",
       "kind": "func",
       "symbol": "drain",
@@ -28356,7 +28356,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 379,
+      "line": 525,
       "level": "member",
       "kind": "func",
       "symbol": "activeCount",
@@ -28374,7 +28374,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 382,
+      "line": 530,
       "level": "top_level",
       "kind": "struct",
       "symbol": "PtyFlowMetrics",
@@ -28392,7 +28392,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 383,
+      "line": 533,
       "level": "member",
       "kind": "let",
       "symbol": "queuedBytes",
@@ -28410,7 +28410,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 384,
+      "line": 536,
       "level": "member",
       "kind": "let",
       "symbol": "peakQueuedBytes",
@@ -28428,7 +28428,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 385,
+      "line": 539,
       "level": "member",
       "kind": "let",
       "symbol": "backpressureCount",
@@ -28446,7 +28446,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 386,
+      "line": 545,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -28464,7 +28464,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 409,
+      "line": 568,
       "level": "top_level",
       "kind": "class",
       "symbol": "LinuxPtyRuntime",
@@ -28482,7 +28482,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 417,
+      "line": 576,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -28500,7 +28500,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 421,
+      "line": 580,
       "level": "member",
       "kind": "func",
       "symbol": "flowMetrics",
@@ -28518,7 +28518,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 423,
+      "line": 582,
       "level": "member",
       "kind": "func",
       "symbol": "start",
@@ -28536,7 +28536,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 494,
+      "line": 653,
       "level": "member",
       "kind": "func",
       "symbol": "process",
@@ -28554,7 +28554,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 501,
+      "line": 660,
       "level": "member",
       "kind": "func",
       "symbol": "write",
@@ -28572,7 +28572,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 509,
+      "line": 668,
       "level": "member",
       "kind": "func",
       "symbol": "resize",
@@ -28590,7 +28590,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 517,
+      "line": 676,
       "level": "member",
       "kind": "func",
       "symbol": "signal",
@@ -28608,7 +28608,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 525,
+      "line": 684,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -28626,7 +28626,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 541,
+      "line": 700,
       "level": "member",
       "kind": "func",
       "symbol": "sources",
@@ -28644,7 +28644,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 551,
+      "line": 710,
       "level": "member",
       "kind": "func",
       "symbol": "drain",
@@ -28662,7 +28662,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 585,
+      "line": 744,
       "level": "member",
       "kind": "func",
       "symbol": "activeCount",
@@ -28680,7 +28680,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 601,
+      "line": 760,
       "level": "top_level",
       "kind": "class",
       "symbol": "LinuxPtyProcess",
@@ -28698,7 +28698,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 617,
+      "line": 776,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -28716,7 +28716,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 630,
+      "line": 789,
       "level": "member",
       "kind": "func",
       "symbol": "id",
@@ -28734,7 +28734,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 632,
+      "line": 791,
       "level": "member",
       "kind": "func",
       "symbol": "fd",
@@ -28752,7 +28752,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 636,
+      "line": 795,
       "level": "member",
       "kind": "func",
       "symbol": "interests",
@@ -28770,7 +28770,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 640,
+      "line": 799,
       "level": "member",
       "kind": "func",
       "symbol": "stderrSource",
@@ -28788,7 +28788,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 642,
+      "line": 801,
       "level": "member",
       "kind": "func",
       "symbol": "onReady",
@@ -28806,7 +28806,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 651,
+      "line": 810,
       "level": "member",
       "kind": "func",
       "symbol": "write",
@@ -28824,7 +28824,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 685,
+      "line": 844,
       "level": "member",
       "kind": "func",
       "symbol": "writeText",
@@ -28842,7 +28842,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 689,
+      "line": 848,
       "level": "member",
       "kind": "func",
       "symbol": "resize",
@@ -28860,7 +28860,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 705,
+      "line": 864,
       "level": "member",
       "kind": "func",
       "symbol": "signal",
@@ -28878,7 +28878,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 710,
+      "line": 869,
       "level": "member",
       "kind": "func",
       "symbol": "close",
@@ -28896,7 +28896,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 777,
+      "line": 936,
       "level": "member",
       "kind": "func",
       "symbol": "drain",
@@ -28914,7 +28914,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 779,
+      "line": 938,
       "level": "member",
       "kind": "func",
       "symbol": "pollExit",
@@ -28932,7 +28932,7 @@
     {
       "package": "core",
       "path": "packages/core/src/pty.cj",
-      "line": 790,
+      "line": 949,
       "level": "member",
       "kind": "func",
       "symbol": "reap",

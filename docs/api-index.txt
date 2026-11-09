@@ -1468,127 +1468,127 @@ packages/core/src/process_runtime.cj:538:public class Utf8StreamDecoder {
 packages/core/src/process_runtime.cj:542:public init()
 packages/core/src/process_runtime.cj:547:public func feed(bytes: Array<Byte>): String
 packages/core/src/process_runtime.cj:584:public func finish(): String
-packages/core/src/pty.cj:98:public enum PtyOutputStream {
-packages/core/src/pty.cj:99:Stdout
-packages/core/src/pty.cj:100:Stderr
-packages/core/src/pty.cj:103:public struct PtySize {
-packages/core/src/pty.cj:104:public let cols: Int64
-packages/core/src/pty.cj:105:public let rows: Int64
-packages/core/src/pty.cj:107:public init(cols!: Int64 = 80, rows!: Int64 = 24)
-packages/core/src/pty.cj:121:public class PtySpec {
-packages/core/src/pty.cj:122:public let command: String
-packages/core/src/pty.cj:123:public let args: Array<String>
-packages/core/src/pty.cj:124:public let cwd: String
-packages/core/src/pty.cj:125:public let env: Array<String>
-packages/core/src/pty.cj:126:public let size: PtySize
-packages/core/src/pty.cj:128:public init( command: String, args!: Array<String> = [], cwd!: String = "", env!: Array<String> = [], size!: PtySize = PtySize() )
-packages/core/src/pty.cj:143:public enum PtySignal {
-packages/core/src/pty.cj:144:Interrupt
-packages/core/src/pty.cj:145:Terminate
-packages/core/src/pty.cj:146:Kill
-packages/core/src/pty.cj:149:public enum PtyExitStatus {
-packages/core/src/pty.cj:150:Exited(Int64)
-packages/core/src/pty.cj:151:Signaled(Int32)
-packages/core/src/pty.cj:154:public interface PtyProcess {
-packages/core/src/pty.cj:155:func id(): String
-packages/core/src/pty.cj:159:func write(bytes: Array<Byte>): Bool
-packages/core/src/pty.cj:160:func writeText(text: String): Bool
-packages/core/src/pty.cj:161:func resize(size: PtySize): Bool
-packages/core/src/pty.cj:162:func signal(signal: PtySignal): Bool
-packages/core/src/pty.cj:165:func close(): Unit
-packages/core/src/pty.cj:168:public interface PtyRuntime {
-packages/core/src/pty.cj:170:func start(id: String, spec: PtySpec): Event
-packages/core/src/pty.cj:171:func process(id: String): ?PtyProcess
-packages/core/src/pty.cj:172:func write(id: String, bytes: Array<Byte>): Event
-packages/core/src/pty.cj:173:func resize(id: String, size: PtySize): Event
-packages/core/src/pty.cj:174:func signal(id: String, signal: PtySignal): Event
-packages/core/src/pty.cj:177:func close(id: String): Event
-packages/core/src/pty.cj:178:func sources(): Array<EventSource>
-packages/core/src/pty.cj:179:func drain(): Array<Event>
-packages/core/src/pty.cj:180:func activeCount(): Int64
-packages/core/src/pty.cj:183:public enum EventSourceInterest {
-packages/core/src/pty.cj:184:Read
-packages/core/src/pty.cj:185:Write
-packages/core/src/pty.cj:186:ReadWrite
-packages/core/src/pty.cj:189:public interface EventSource {
-packages/core/src/pty.cj:190:func id(): String
-packages/core/src/pty.cj:191:func fd(): ?Int32
-packages/core/src/pty.cj:194:func waitHandle(): ?CPointer<Unit>
-packages/core/src/pty.cj:195:func interests(): EventSourceInterest
-packages/core/src/pty.cj:196:func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
-packages/core/src/pty.cj:197:func drain(): Array<Event>
-packages/core/src/pty.cj:198:func close(): Unit
-packages/core/src/pty.cj:201:public class FakePtyProcess <: PtyProcess {
-packages/core/src/pty.cj:203:public var lastWrite: Array<Byte> = []
-packages/core/src/pty.cj:204:public var lastSize: PtySize
-packages/core/src/pty.cj:205:public var lastSignal: ?PtySignal = None
-packages/core/src/pty.cj:206:public var closed: Bool = false
-packages/core/src/pty.cj:208:public init(id: String, size!: PtySize = PtySize())
-packages/core/src/pty.cj:213:public func id(): String
-packages/core/src/pty.cj:215:public func write(bytes: Array<Byte>): Bool
-packages/core/src/pty.cj:220:public func writeText(text: String): Bool
-packages/core/src/pty.cj:224:public func resize(size: PtySize): Bool
-packages/core/src/pty.cj:229:public func signal(signal: PtySignal): Bool
-packages/core/src/pty.cj:234:public func close(): Unit
-packages/core/src/pty.cj:239:public class FakePtyRuntime <: PtyRuntime {
-packages/core/src/pty.cj:243:public init()
-packages/core/src/pty.cj:245:public func start(id: String, spec: PtySpec): Event
-packages/core/src/pty.cj:252:public func process(id: String): ?PtyProcess
-packages/core/src/pty.cj:259:public func fakeProcess(id: String): ?FakePtyProcess
-packages/core/src/pty.cj:264:public func sources(): Array<EventSource>
-packages/core/src/pty.cj:266:public func injectOutput(id: String, bytes: Array<Byte>, stream!: PtyOutputStream = PtyOutputStream.Stdout): Unit
-packages/core/src/pty.cj:270:public func injectText(id: String, text: String, stream!: PtyOutputStream = PtyOutputStream.Stdout): Unit
-packages/core/src/pty.cj:274:public func injectExit(id: String, status: PtyExitStatus): Unit
-packages/core/src/pty.cj:279:public func injectFailure(id: String, message: String): Unit
-packages/core/src/pty.cj:284:public func write(id: String, bytes: Array<Byte>): Event
-packages/core/src/pty.cj:292:public func resize(id: String, size: PtySize): Event
-packages/core/src/pty.cj:300:public func signal(id: String, signal: PtySignal): Event
-packages/core/src/pty.cj:308:public func close(id: String): Event
-packages/core/src/pty.cj:319:public func drain(): Array<Event>
-packages/core/src/pty.cj:327:public func activeCount(): Int64
-packages/core/src/pty.cj:347:public class UnsupportedPtyRuntime <: PtyRuntime {
-packages/core/src/pty.cj:348:public init()
-packages/core/src/pty.cj:350:public func start(id: String, spec: PtySpec): Event
-packages/core/src/pty.cj:354:public func process(id: String): ?PtyProcess
-packages/core/src/pty.cj:359:public func write(id: String, bytes: Array<Byte>): Event
-packages/core/src/pty.cj:363:public func resize(id: String, size: PtySize): Event
-packages/core/src/pty.cj:367:public func signal(id: String, signal: PtySignal): Event
-packages/core/src/pty.cj:371:public func close(id: String): Event
-packages/core/src/pty.cj:375:public func sources(): Array<EventSource>
-packages/core/src/pty.cj:377:public func drain(): Array<Event>
-packages/core/src/pty.cj:379:public func activeCount(): Int64
-packages/core/src/pty.cj:382:public struct PtyFlowMetrics {
-packages/core/src/pty.cj:383:public let queuedBytes: Int64
-packages/core/src/pty.cj:384:public let peakQueuedBytes: Int64
-packages/core/src/pty.cj:385:public let backpressureCount: Int64
-packages/core/src/pty.cj:386:public init(queuedBytes: Int64, peakQueuedBytes: Int64, backpressureCount: Int64)
-packages/core/src/pty.cj:409:public class LinuxPtyRuntime <: PtyRuntime {
-packages/core/src/pty.cj:417:public init(readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 2 * 1024 * 1024, maxProcesses!: Int64 = 32)
-packages/core/src/pty.cj:421:public func flowMetrics(): PtyFlowMetrics
-packages/core/src/pty.cj:423:public func start(id: String, spec: PtySpec): Event
-packages/core/src/pty.cj:494:public func process(id: String): ?PtyProcess
-packages/core/src/pty.cj:501:public func write(id: String, bytes: Array<Byte>): Event
+packages/core/src/pty.cj:100:public enum PtyOutputStream {
+packages/core/src/pty.cj:103:Stdout
+packages/core/src/pty.cj:106:Stderr
+packages/core/src/pty.cj:111:public struct PtySize {
+packages/core/src/pty.cj:114:public let cols: Int64
+packages/core/src/pty.cj:117:public let rows: Int64
+packages/core/src/pty.cj:123:public init(cols!: Int64 = 80, rows!: Int64 = 24)
+packages/core/src/pty.cj:139:public class PtySpec {
+packages/core/src/pty.cj:142:public let command: String
+packages/core/src/pty.cj:145:public let args: Array<String>
+packages/core/src/pty.cj:148:public let cwd: String
+packages/core/src/pty.cj:151:public let env: Array<String>
+packages/core/src/pty.cj:154:public let size: PtySize
+packages/core/src/pty.cj:163:public init( command: String, args!: Array<String> = [], cwd!: String = "", env!: Array<String> = [], size!: PtySize = PtySize() )
+packages/core/src/pty.cj:180:public enum PtySignal {
+packages/core/src/pty.cj:183:Interrupt
+packages/core/src/pty.cj:186:Terminate
+packages/core/src/pty.cj:189:Kill
+packages/core/src/pty.cj:194:public enum PtyExitStatus {
+packages/core/src/pty.cj:198:Exited(Int64)
+packages/core/src/pty.cj:202:Signaled(Int32)
+packages/core/src/pty.cj:207:public interface PtyProcess {
+packages/core/src/pty.cj:211:func id(): String
+packages/core/src/pty.cj:219:func write(bytes: Array<Byte>): Bool
+packages/core/src/pty.cj:224:func writeText(text: String): Bool
+packages/core/src/pty.cj:229:func resize(size: PtySize): Bool
+packages/core/src/pty.cj:234:func signal(signal: PtySignal): Bool
+packages/core/src/pty.cj:239:func close(): Unit
+packages/core/src/pty.cj:244:public interface PtyRuntime {
+packages/core/src/pty.cj:251:func start(id: String, spec: PtySpec): Event
+packages/core/src/pty.cj:256:func process(id: String): ?PtyProcess
+packages/core/src/pty.cj:262:func write(id: String, bytes: Array<Byte>): Event
+packages/core/src/pty.cj:268:func resize(id: String, size: PtySize): Event
+packages/core/src/pty.cj:274:func signal(id: String, signal: PtySignal): Event
+packages/core/src/pty.cj:281:func close(id: String): Event
+packages/core/src/pty.cj:285:func sources(): Array<EventSource>
+packages/core/src/pty.cj:289:func drain(): Array<Event>
+packages/core/src/pty.cj:293:func activeCount(): Int64
+packages/core/src/pty.cj:298:public enum EventSourceInterest {
+packages/core/src/pty.cj:301:Read
+packages/core/src/pty.cj:304:Write
+packages/core/src/pty.cj:307:ReadWrite
+packages/core/src/pty.cj:312:public interface EventSource {
+packages/core/src/pty.cj:316:func id(): String
+packages/core/src/pty.cj:320:func fd(): ?Int32
+packages/core/src/pty.cj:326:func waitHandle(): ?CPointer<Unit>
+packages/core/src/pty.cj:330:func interests(): EventSourceInterest
+packages/core/src/pty.cj:337:func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
+packages/core/src/pty.cj:341:func drain(): Array<Event>
+packages/core/src/pty.cj:344:func close(): Unit
+packages/core/src/pty.cj:347:public class FakePtyProcess <: PtyProcess {
+packages/core/src/pty.cj:349:public var lastWrite: Array<Byte> = []
+packages/core/src/pty.cj:350:public var lastSize: PtySize
+packages/core/src/pty.cj:351:public var lastSignal: ?PtySignal = None
+packages/core/src/pty.cj:352:public var closed: Bool = false
+packages/core/src/pty.cj:354:public init(id: String, size!: PtySize = PtySize())
+packages/core/src/pty.cj:359:public func id(): String
+packages/core/src/pty.cj:361:public func write(bytes: Array<Byte>): Bool
+packages/core/src/pty.cj:366:public func writeText(text: String): Bool
+packages/core/src/pty.cj:370:public func resize(size: PtySize): Bool
+packages/core/src/pty.cj:375:public func signal(signal: PtySignal): Bool
+packages/core/src/pty.cj:380:public func close(): Unit
+packages/core/src/pty.cj:385:public class FakePtyRuntime <: PtyRuntime {
+packages/core/src/pty.cj:389:public init()
+packages/core/src/pty.cj:391:public func start(id: String, spec: PtySpec): Event
+packages/core/src/pty.cj:398:public func process(id: String): ?PtyProcess
+packages/core/src/pty.cj:405:public func fakeProcess(id: String): ?FakePtyProcess
+packages/core/src/pty.cj:410:public func sources(): Array<EventSource>
+packages/core/src/pty.cj:412:public func injectOutput(id: String, bytes: Array<Byte>, stream!: PtyOutputStream = PtyOutputStream.Stdout): Unit
+packages/core/src/pty.cj:416:public func injectText(id: String, text: String, stream!: PtyOutputStream = PtyOutputStream.Stdout): Unit
+packages/core/src/pty.cj:420:public func injectExit(id: String, status: PtyExitStatus): Unit
+packages/core/src/pty.cj:425:public func injectFailure(id: String, message: String): Unit
+packages/core/src/pty.cj:430:public func write(id: String, bytes: Array<Byte>): Event
+packages/core/src/pty.cj:438:public func resize(id: String, size: PtySize): Event
+packages/core/src/pty.cj:446:public func signal(id: String, signal: PtySignal): Event
+packages/core/src/pty.cj:454:public func close(id: String): Event
+packages/core/src/pty.cj:465:public func drain(): Array<Event>
+packages/core/src/pty.cj:473:public func activeCount(): Int64
+packages/core/src/pty.cj:493:public class UnsupportedPtyRuntime <: PtyRuntime {
+packages/core/src/pty.cj:494:public init()
+packages/core/src/pty.cj:496:public func start(id: String, spec: PtySpec): Event
+packages/core/src/pty.cj:500:public func process(id: String): ?PtyProcess
+packages/core/src/pty.cj:505:public func write(id: String, bytes: Array<Byte>): Event
 packages/core/src/pty.cj:509:public func resize(id: String, size: PtySize): Event
-packages/core/src/pty.cj:517:public func signal(id: String, signal: PtySignal): Event
-packages/core/src/pty.cj:525:public func close(id: String): Event
-packages/core/src/pty.cj:541:public func sources(): Array<EventSource>
-packages/core/src/pty.cj:551:public func drain(): Array<Event>
-packages/core/src/pty.cj:585:public func activeCount(): Int64
-packages/core/src/pty.cj:601:public class LinuxPtyProcess <: PtyProcess & EventSource {
-packages/core/src/pty.cj:617:public init(id: String, fd: Int32, stderrFd: Int32, pid: Int32, size: PtySize, events: ArrayList<Event>)
-packages/core/src/pty.cj:630:public func id(): String
-packages/core/src/pty.cj:632:public func fd(): ?Int32
-packages/core/src/pty.cj:636:public func interests(): EventSourceInterest
-packages/core/src/pty.cj:640:public func stderrSource(): EventSource
-packages/core/src/pty.cj:642:public func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
-packages/core/src/pty.cj:651:public func write(bytes: Array<Byte>): Bool
-packages/core/src/pty.cj:685:public func writeText(text: String): Bool
-packages/core/src/pty.cj:689:public func resize(size: PtySize): Bool
-packages/core/src/pty.cj:705:public func signal(signal: PtySignal): Bool
-packages/core/src/pty.cj:710:public func close(): Unit
-packages/core/src/pty.cj:777:public func drain(): Array<Event>
-packages/core/src/pty.cj:779:public func pollExit(): ?PtyExitStatus
-packages/core/src/pty.cj:790:public func reap(): PtyExitStatus
+packages/core/src/pty.cj:513:public func signal(id: String, signal: PtySignal): Event
+packages/core/src/pty.cj:517:public func close(id: String): Event
+packages/core/src/pty.cj:521:public func sources(): Array<EventSource>
+packages/core/src/pty.cj:523:public func drain(): Array<Event>
+packages/core/src/pty.cj:525:public func activeCount(): Int64
+packages/core/src/pty.cj:530:public struct PtyFlowMetrics {
+packages/core/src/pty.cj:533:public let queuedBytes: Int64
+packages/core/src/pty.cj:536:public let peakQueuedBytes: Int64
+packages/core/src/pty.cj:539:public let backpressureCount: Int64
+packages/core/src/pty.cj:545:public init(queuedBytes: Int64, peakQueuedBytes: Int64, backpressureCount: Int64)
+packages/core/src/pty.cj:568:public class LinuxPtyRuntime <: PtyRuntime {
+packages/core/src/pty.cj:576:public init(readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 2 * 1024 * 1024, maxProcesses!: Int64 = 32)
+packages/core/src/pty.cj:580:public func flowMetrics(): PtyFlowMetrics
+packages/core/src/pty.cj:582:public func start(id: String, spec: PtySpec): Event
+packages/core/src/pty.cj:653:public func process(id: String): ?PtyProcess
+packages/core/src/pty.cj:660:public func write(id: String, bytes: Array<Byte>): Event
+packages/core/src/pty.cj:668:public func resize(id: String, size: PtySize): Event
+packages/core/src/pty.cj:676:public func signal(id: String, signal: PtySignal): Event
+packages/core/src/pty.cj:684:public func close(id: String): Event
+packages/core/src/pty.cj:700:public func sources(): Array<EventSource>
+packages/core/src/pty.cj:710:public func drain(): Array<Event>
+packages/core/src/pty.cj:744:public func activeCount(): Int64
+packages/core/src/pty.cj:760:public class LinuxPtyProcess <: PtyProcess & EventSource {
+packages/core/src/pty.cj:776:public init(id: String, fd: Int32, stderrFd: Int32, pid: Int32, size: PtySize, events: ArrayList<Event>)
+packages/core/src/pty.cj:789:public func id(): String
+packages/core/src/pty.cj:791:public func fd(): ?Int32
+packages/core/src/pty.cj:795:public func interests(): EventSourceInterest
+packages/core/src/pty.cj:799:public func stderrSource(): EventSource
+packages/core/src/pty.cj:801:public func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
+packages/core/src/pty.cj:810:public func write(bytes: Array<Byte>): Bool
+packages/core/src/pty.cj:844:public func writeText(text: String): Bool
+packages/core/src/pty.cj:848:public func resize(size: PtySize): Bool
+packages/core/src/pty.cj:864:public func signal(signal: PtySignal): Bool
+packages/core/src/pty.cj:869:public func close(): Unit
+packages/core/src/pty.cj:936:public func drain(): Array<Event>
+packages/core/src/pty.cj:938:public func pollExit(): ?PtyExitStatus
+packages/core/src/pty.cj:949:public func reap(): PtyExitStatus
 packages/core/src/runtime_foundation.cj:23:public enum RuntimeState {
 packages/core/src/runtime_foundation.cj:24:Running
 packages/core/src/runtime_foundation.cj:25:Closing
