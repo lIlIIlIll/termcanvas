@@ -10076,6 +10076,165 @@
           "signature": "public func drawSprite(canvas: Canvas, transform: Transform2D, sprite: Sprite2D, camera: Camera2D): Unit"
         }
       ]
+    },
+    {
+      "id": "game-map-input",
+      "source": "docs/api-examples/game-map-input.cj",
+      "dependencies": [
+        "core",
+        "game"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMarker",
+          "signature": "public struct TileMarker <: Equatable<TileMarker> {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMarker.x",
+          "signature": "public let x: Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMarker.y",
+          "signature": "public let y: Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMarker.symbol",
+          "signature": "public let symbol: String"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMarker.init",
+          "signature": "public init(x: Int64, y: Int64, symbol: String)"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMarker.operator_==",
+          "signature": "public operator func ==(other: TileMarker): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "GameInputState",
+          "signature": "public class GameInputState {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "GameInputState.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "GameInputState.beginFrame",
+          "signature": "public func beginFrame(): Unit"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "GameInputState.handle",
+          "signature": "public func handle(event: Event): Unit"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "GameInputState.pressed",
+          "signature": "public func pressed(code: KeyCode): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "GameInputState.justPressed",
+          "signature": "public func justPressed(code: KeyCode): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "GameInputState.axis",
+          "signature": "public func axis(negative: KeyCode, positive: KeyCode): Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap",
+          "signature": "public class TileMap {"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap.width",
+          "signature": "public let width: Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap.height",
+          "signature": "public let height: Int64"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap.init",
+          "signature": "public init(rows: Array<String>, solidSymbol!: String = \"#\", widthOptions!: TextWidthOptions = TextWidthOptions())"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap.isSolid",
+          "signature": "public func isSolid(x: Int64, y: Int64): Bool"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap.tileAt",
+          "signature": "public func tileAt(x: Int64, y: Int64): String"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap.find",
+          "signature": "public func find(symbol: String): Array<TileMarker>"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap.findAny",
+          "signature": "public func findAny(symbols: Array<String>): Array<TileMarker>"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap.addStaticColliders",
+          "signature": "public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap.render",
+          "signature": "public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style): Unit"
+        },
+        {
+          "package": "game",
+          "path": "packages/game/src/game.cj",
+          "symbol": "TileMap.render",
+          "signature": "public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit"
+        }
+      ]
     }
   ]
 }

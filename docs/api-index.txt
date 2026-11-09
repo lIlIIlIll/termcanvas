@@ -2796,41 +2796,41 @@ packages/game/src/game.cj:471:public let time: Float64
 packages/game/src/game.cj:472:public let hitX: Float64
 packages/game/src/game.cj:473:public let hitY: Float64
 packages/game/src/game.cj:475:public init(entity: EntityId, other: EntityId, normal: Vec2, time: Float64, hitX: Float64, hitY: Float64)
-packages/game/src/game.cj:485:public struct TileMarker <: Equatable<TileMarker> {
-packages/game/src/game.cj:486:public let x: Int64
-packages/game/src/game.cj:487:public let y: Int64
-packages/game/src/game.cj:488:public let symbol: String
-packages/game/src/game.cj:490:public init(x: Int64, y: Int64, symbol: String)
-packages/game/src/game.cj:496:public operator func ==(other: TileMarker): Bool
-packages/game/src/game.cj:501:public class PhysicsWorld {
-packages/game/src/game.cj:502:public var gravity: Vec2
-packages/game/src/game.cj:503:public var maxSubSteps: Int64
-packages/game/src/game.cj:504:public var skin: Float64
-packages/game/src/game.cj:507:public init(gravity!: Vec2 = Vec2(x: 0.0, y: 30.0), maxSubSteps!: Int64 = 4, skin!: Float64 = 0.001)
-packages/game/src/game.cj:513:public func step( world: EntityWorld, transforms: ComponentStore<Transform2D>, velocities: ComponentStore<Velocity2D>, colliders: ComponentStore<Collider2D>, bodies: ComponentStore<RigidBody2D>, deltaMillis: Int64 ): Array<CollisionEvent>
-packages/game/src/game.cj:532:public func overlaps( world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>, id: EntityId ): Array<CollisionEvent>
-packages/game/src/game.cj:683:public class GameInputState {
-packages/game/src/game.cj:687:public init()
-packages/game/src/game.cj:689:public func beginFrame(): Unit
-packages/game/src/game.cj:695:public func handle(event: Event): Unit
-packages/game/src/game.cj:719:public func pressed(code: KeyCode): Bool
-packages/game/src/game.cj:723:public func justPressed(code: KeyCode): Bool
-packages/game/src/game.cj:727:public func axis(negative: KeyCode, positive: KeyCode): Int64
-packages/game/src/game.cj:735:public class SpriteRenderer {
-packages/game/src/game.cj:737:public init()
-packages/game/src/game.cj:746:public func render( area: Rect, buffer: Buffer, transforms: ComponentStore<Transform2D>, sprites: ComponentStore<Sprite2D>, camera!: Camera2D = Camera2D() ): Unit
-packages/game/src/game.cj:773:public func drawSprite(canvas: Canvas, transform: Transform2D, sprite: Sprite2D, camera: Camera2D): Unit
-packages/game/src/game.cj:792:public class TileMap {
-packages/game/src/game.cj:793:public let width: Int64
-packages/game/src/game.cj:794:public let height: Int64
-packages/game/src/game.cj:801:public init(rows: Array<String>, solidSymbol!: String = "#", widthOptions!: TextWidthOptions = TextWidthOptions())
-packages/game/src/game.cj:809:public func isSolid(x: Int64, y: Int64): Bool
-packages/game/src/game.cj:813:public func tileAt(x: Int64, y: Int64): String
-packages/game/src/game.cj:818:public func find(symbol: String): Array<TileMarker>
-packages/game/src/game.cj:830:public func findAny(symbols: Array<String>): Array<TileMarker>
-packages/game/src/game.cj:843:public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
-packages/game/src/game.cj:860:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style): Unit
-packages/game/src/game.cj:864:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit
+packages/game/src/game.cj:486:public struct TileMarker <: Equatable<TileMarker> {
+packages/game/src/game.cj:488:public let x: Int64
+packages/game/src/game.cj:490:public let y: Int64
+packages/game/src/game.cj:492:public let symbol: String
+packages/game/src/game.cj:499:public init(x: Int64, y: Int64, symbol: String)
+packages/game/src/game.cj:509:public operator func ==(other: TileMarker): Bool
+packages/game/src/game.cj:514:public class PhysicsWorld {
+packages/game/src/game.cj:515:public var gravity: Vec2
+packages/game/src/game.cj:516:public var maxSubSteps: Int64
+packages/game/src/game.cj:517:public var skin: Float64
+packages/game/src/game.cj:520:public init(gravity!: Vec2 = Vec2(x: 0.0, y: 30.0), maxSubSteps!: Int64 = 4, skin!: Float64 = 0.001)
+packages/game/src/game.cj:526:public func step( world: EntityWorld, transforms: ComponentStore<Transform2D>, velocities: ComponentStore<Velocity2D>, colliders: ComponentStore<Collider2D>, bodies: ComponentStore<RigidBody2D>, deltaMillis: Int64 ): Array<CollisionEvent>
+packages/game/src/game.cj:545:public func overlaps( world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>, id: EntityId ): Array<CollisionEvent>
+packages/game/src/game.cj:697:public class GameInputState {
+packages/game/src/game.cj:702:public init()
+packages/game/src/game.cj:705:public func beginFrame(): Unit
+packages/game/src/game.cj:714:public func handle(event: Event): Unit
+packages/game/src/game.cj:742:public func pressed(code: KeyCode): Bool
+packages/game/src/game.cj:750:public func justPressed(code: KeyCode): Bool
+packages/game/src/game.cj:759:public func axis(negative: KeyCode, positive: KeyCode): Int64
+packages/game/src/game.cj:767:public class SpriteRenderer {
+packages/game/src/game.cj:769:public init()
+packages/game/src/game.cj:778:public func render( area: Rect, buffer: Buffer, transforms: ComponentStore<Transform2D>, sprites: ComponentStore<Sprite2D>, camera!: Camera2D = Camera2D() ): Unit
+packages/game/src/game.cj:805:public func drawSprite(canvas: Canvas, transform: Transform2D, sprite: Sprite2D, camera: Camera2D): Unit
+packages/game/src/game.cj:825:public class TileMap {
+packages/game/src/game.cj:827:public let width: Int64
+packages/game/src/game.cj:829:public let height: Int64
+packages/game/src/game.cj:839:public init(rows: Array<String>, solidSymbol!: String = "#", widthOptions!: TextWidthOptions = TextWidthOptions())
+packages/game/src/game.cj:852:public func isSolid(x: Int64, y: Int64): Bool
+packages/game/src/game.cj:861:public func tileAt(x: Int64, y: Int64): String
+packages/game/src/game.cj:870:public func find(symbol: String): Array<TileMarker>
+packages/game/src/game.cj:886:public func findAny(symbols: Array<String>): Array<TileMarker>
+packages/game/src/game.cj:905:public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId>
+packages/game/src/game.cj:926:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style): Unit
+packages/game/src/game.cj:936:public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit
 packages/markdown_adapter/src/markdown.cj:11:public func documentThemeFromTheme(theme: Theme): DocumentTheme
 packages/markdown_adapter/src/markdown.cj:29:public func markdownDocument( text: String, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document
 packages/markdown_adapter/src/markdown.cj:44:public func markdownAstToDocument( result: ParseResult, theme!: DocumentTheme = DocumentTheme(), preserveSoftBreaks!: Bool = false ): Document

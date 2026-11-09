@@ -482,17 +482,30 @@ public struct CollisionEvent {
     }
 }
 
+/** 地图中一个匹配符号的位置。 */
 public struct TileMarker <: Equatable<TileMarker> {
+    /** 横向格坐标。 */
     public let x: Int64
+    /** 纵向格坐标。 */
     public let y: Int64
+    /** 地图符号。 */
     public let symbol: String
 
+    /** 创建地图标记。
+     * @param x 横向格坐标
+     * @param y 纵向格坐标
+     * @param symbol 地图符号
+     */
     public init(x: Int64, y: Int64, symbol: String) {
         this.x = x
         this.y = y
         this.symbol = symbol
     }
 
+    /** 比较标记的位置与符号。
+     * @param other 另一个标记
+     * @return 所有字段相同时为 true
+     */
     public operator func ==(other: TileMarker): Bool {
         x == other.x && y == other.y && symbol == other.symbol
     }
@@ -680,18 +693,24 @@ struct MotionResult {
     }
 }
 
+/** 跟踪游戏按键的按住和本帧首次按下状态。 */
 public class GameInputState {
     private let pressedKeys = ArrayList<KeyCode>()
     private let justPressedKeys = ArrayList<KeyCode>()
 
+    /** 创建空输入状态。 */
     public init() {}
 
+    /** 清除上一帧的首次按下记录；保持按住状态。 */
     public func beginFrame(): Unit {
         while (justPressedKeys.size > 0) {
             justPressedKeys.remove(at: 0)
         }
     }
 
+    /** 更新按键状态；失焦时清空按键。
+     * @param event 输入事件
+     */
     public func handle(event: Event): Unit {
         match (event) {
             case Event.KeyDown(key) =>
@@ -716,14 +735,27 @@ public class GameInputState {
         }
     }
 
+    /** 查询按键是否按住。
+     * @param code 按键代码
+     * @return 按住时为 true
+     */
     public func pressed(code: KeyCode): Bool {
         containsKey(pressedKeys, code)
     }
 
+    /** 查询按键是否在本帧首次按下。
+     * @param code 按键代码
+     * @return 本帧首次按下时为 true
+     */
     public func justPressed(code: KeyCode): Bool {
         containsKey(justPressedKeys, code)
     }
 
+    /** 根据一对按键计算方向。
+     * @param negative 负方向按键
+     * @param positive 正方向按键
+     * @return 正方向减负方向，结果为 -1、0 或 1
+     */
     public func axis(negative: KeyCode, positive: KeyCode): Int64 {
         let left = if (pressed(negative)) { 1 } else { 0 }
         let right = if (pressed(positive)) { 1 } else { 0 }
@@ -789,14 +821,20 @@ public class SpriteRenderer {
     }
 }
 
+/** 从文本行构建、查询和绘制的格子地图。 */
 public class TileMap {
+    /** 最长地图行的显示单元格宽度。 */
     public let width: Int64
+    /** 地图行数。 */
     public let height: Int64
     private let rows: Array<String>
     private let solidSymbol: String
     private let widthOptions: TextWidthOptions
 
     /** 保存给定的地图行，以行数作为高度、按 widthOptions 测得的最长行宽作为宽度，并设置用于判断实心格的符号。查询与碰撞使用同一宽度策略；默认将宽度不确定的字符视为单列。
+     * @param rows 地图文本行
+     * @param solidSymbol 实心格符号
+     * @param widthOptions 地图查询使用的文本宽度策略
      */
     public init(rows: Array<String>, solidSymbol!: String = "#", widthOptions!: TextWidthOptions = TextWidthOptions()) {
         this.rows = rows
@@ -806,15 +844,29 @@ public class TileMap {
         this.widthOptions = widthOptions
     }
 
+    /** 判断格子的符号是否等于实心符号。
+     * @param x 横向格坐标
+     * @param y 纵向格坐标
+     * @return 符号匹配时为 true
+     */
     public func isSolid(x: Int64, y: Int64): Bool {
         tileAt(x, y) == solidSymbol
     }
 
+    /** 获取指定格子的地图符号。
+     * @param x 横向格坐标
+     * @param y 纵向格坐标
+     * @return 对应符号；坐标无效时为空字符串
+     */
     public func tileAt(x: Int64, y: Int64): String {
         if (x < 0 || y < 0 || y >= rows.size) { return "" }
         symbolAt(rows[y], x, options: widthOptions)
     }
 
+    /** 查找等于指定符号的格子。
+     * @param symbol 要查找的符号
+     * @return 匹配格子的标记
+     */
     public func find(symbol: String): Array<TileMarker> {
         let out = ArrayList<TileMarker>()
         for (y in 0..height) {
@@ -827,6 +879,10 @@ public class TileMap {
         out.toArray()
     }
 
+    /** 查找符号属于给定集合的格子。
+     * @param symbols 要查找的符号
+     * @return 匹配格子的标记
+     */
     public func findAny(symbols: Array<String>): Array<TileMarker> {
         let out = ArrayList<TileMarker>()
         for (y in 0..height) {
@@ -840,6 +896,12 @@ public class TileMap {
         out.toArray()
     }
 
+    /** 为每个实心格创建实体、变换和碰撞组件。
+     * @param world 接收实体的世界
+     * @param transforms 变换组件存储
+     * @param colliders 碰撞组件存储
+     * @return 创建的实体标识
+     */
     public func addStaticColliders(world: EntityWorld, transforms: ComponentStore<Transform2D>, colliders: ComponentStore<Collider2D>): Array<EntityId> {
         let out = ArrayList<EntityId>()
         for (y in 0..height) {
@@ -856,11 +918,21 @@ public class TileMap {
     }
 
     /** 将地图中非空且非空格的符号绘制到缓冲区的指定区域；绘制坐标按相机原点的取整格坐标偏移，并加上视口偏移。绘制使用目标缓冲区的文本宽度策略；若游戏坐标需要与显示一致，构造时传入相同的宽度策略。
+     * @param area 画布区域
+     * @param buffer 目标缓冲区
+     * @param camera 世界坐标到视口的映射
+     * @param style 显式绘制样式
      */
     public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: Style): Unit {
         render(area, buffer, camera: camera, style: Some(style))
     }
 
+    /** 使用可选样式绘制非空格地图符号。
+     * @param area 画布区域
+     * @param buffer 目标缓冲区
+     * @param camera 世界坐标到视口的映射
+     * @param style 可选样式，None 使用缓冲区主题或默认样式
+     */
     public func render(area: Rect, buffer: Buffer, camera!: Camera2D = Camera2D(), style!: ?Style = None): Unit {
         let canvas = Canvas(buffer, area)
         let resolvedStyle = match (style) {
