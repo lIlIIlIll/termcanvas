@@ -2,16 +2,34 @@ package core
 
 import std.collection.*
 
+/** 区分进度条沿水平方向或垂直方向绘制。
+ */
 public enum ProgressBarDirection {
+    /** 进度条采用水平方向绘制。
+     */
     | Horizontal
+    /** 进度条采用垂直方向绘制。
+     */
     | Vertical
 }
 
+/** 区分不显示进度文字、显示百分比、当前值、当前值与总量之比，以及显示指定文字。
+ */
 public enum ProgressBarLabelMode {
+    /** 不生成进度文字。
+     */
     | Hidden
+    /** 将限制在零与总量之间的当前值换算为百分比；空间不足时使用紧凑格式。
+     */
     | Percent
+    /** 将限制在零与总量之间的当前值作为进度文字。
+     */
     | Value
+    /** 以“当前值/总量”的形式生成进度文字；当前值限制在零与总量之间。
+     */
     | Ratio
+    /** 使用所携带的字符串作为进度文字。
+     */
     | Text(String)
 }
 
@@ -24,13 +42,25 @@ public enum ProgressBarLabelPosition {
     | End
 }
 
+/** 保存进度条已填充部分、未填充部分、前端及不确定进度所用的符号字符串。
+ */
 public class ProgressBarSymbols {
     private var autoSelect: Bool = false
+    /** 表示进度条已填充部分的符号字符串。
+     */
     public let filled: String
+    /** 表示进度条未填充部分的符号字符串。
+     */
     public let empty: String
+    /** 表示进度条填充前端的符号字符串。
+     */
     public let head: String
+    /** 表示不确定进度所用的符号字符串。
+     */
     public let indeterminate: String
 
+    /** 按传入字符串保存进度条各部分的符号；省略时已填充部分、前端和不确定进度使用“#”，未填充部分使用“-”。
+     */
     public init(filled!: String = "#", empty!: String = "-", head!: String = "#", indeterminate!: String = "#") {
         this.filled = filled
         this.empty = empty
@@ -78,11 +108,21 @@ public class ProgressBarSymbols {
     }
 }
 
+/** 保存一个进度条分段的非负数值、样式和符号。
+ */
 public class ProgressBarSegment {
+    /** 分段保存的数值；构造时负数会被置为零。
+     */
     public let value: Int64
+    /** 分段保存的显示样式。
+     */
     public let style: Style
+    /** 分段保存的符号字符串。
+     */
     public let symbol: String
 
+    /** 创建分段，将负数值置为零，并保存指定的样式和符号。
+     */
     public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#") {
         this.value = max(0, value)
         this.style = style

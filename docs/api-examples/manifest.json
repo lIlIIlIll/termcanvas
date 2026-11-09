@@ -1,0 +1,277 @@
+{
+  "format_version": 1,
+  "scenarios": [
+    {
+      "id": "diff-model-and-view",
+      "source": "docs/api-examples/diff.cj",
+      "dependencies": [
+        "diff"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLineKind",
+          "signature": "public enum DiffLineKind {"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLineKind.Context",
+          "signature": "Context"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLineKind.Add",
+          "signature": "Add"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLineKind.Delete",
+          "signature": "Delete"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLineKind.Header",
+          "signature": "Header"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLine",
+          "signature": "public class DiffLine {"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLine.kind",
+          "signature": "public let kind: DiffLineKind"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLine.text",
+          "signature": "public let text: String"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLine.oldLine",
+          "signature": "public let oldLine: ?Int64"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLine.newLine",
+          "signature": "public let newLine: ?Int64"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffLine.init",
+          "signature": "public init(kind: DiffLineKind, text: String, oldLine!: ?Int64 = None, newLine!: ?Int64 = None)"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffHunk",
+          "signature": "public class DiffHunk {"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffHunk.header",
+          "signature": "public let header: String"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffHunk.lines",
+          "signature": "public let lines: Array<DiffLine>"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffHunk.collapsed",
+          "signature": "public var collapsed: Bool"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffHunk.init",
+          "signature": "public init(header: String, lines!: Array<DiffLine> = [], collapsed!: Bool = false)"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffFile",
+          "signature": "public class DiffFile {"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffFile.oldPath",
+          "signature": "public let oldPath: String"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffFile.newPath",
+          "signature": "public let newPath: String"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffFile.hunks",
+          "signature": "public let hunks: Array<DiffHunk>"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffFile.init",
+          "signature": "public init(oldPath: String, newPath: String, hunks!: Array<DiffHunk> = [])"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffFile.addedLines",
+          "signature": "public func addedLines(): Int64"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffFile.deletedLines",
+          "signature": "public func deletedLines(): Int64"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffDocument",
+          "signature": "public class DiffDocument {"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffDocument.files",
+          "signature": "public let files: Array<DiffFile>"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffDocument.init",
+          "signature": "public init(files: Array<DiffFile>)"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffDocument.addedLines",
+          "signature": "public func addedLines(): Int64"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffDocument.deletedLines",
+          "signature": "public func deletedLines(): Int64"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "parseUnifiedDiff",
+          "signature": "public func parseUnifiedDiff(text: String): DiffDocument"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffViewStyles",
+          "signature": "public struct DiffViewStyles {"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffViewStyles.summary",
+          "signature": "public let summary: StyleOverride"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffViewStyles.hunk",
+          "signature": "public let hunk: StyleOverride"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffViewStyles.context",
+          "signature": "public let context: StyleOverride"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffViewStyles.add",
+          "signature": "public let add: StyleOverride"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffViewStyles.delete",
+          "signature": "public let delete: StyleOverride"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffViewStyles.header",
+          "signature": "public let header: StyleOverride"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffViewStyles.init",
+          "signature": "public init(summary!: StyleOverride = StyleOverride(), hunk!: StyleOverride = StyleOverride(), context!: StyleOverride = StyleOverride(), add!: StyleOverride = StyleOverride(), delete!: StyleOverride = StyleOverride(), header!: StyleOverride = StyleOverride())"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffView",
+          "signature": "public class DiffView <: Widget {"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffView.selectedFile",
+          "signature": "public var selectedFile: Int64"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffView.selectedLine",
+          "signature": "public var selectedLine: Int64"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffView.offset",
+          "signature": "public var offset: Int64"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffView.init",
+          "signature": "public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, sideBySide!: Bool = false, theme!: ?Theme = None, styles!: DiffViewStyles = DiffViewStyles())"
+        },
+        {
+          "package": "diff",
+          "path": "packages/diff/src/diff.cj",
+          "symbol": "DiffView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
+    }
+  ]
+}

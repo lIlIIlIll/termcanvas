@@ -3,19 +3,35 @@ package diff
 import core.*
 import std.collection.*
 
+/** 差异行的类别，用于区分上下文、添加、删除和头部行。 */
 public enum DiffLineKind {
+    /** 新旧文件共有的上下文行。 */
     | Context
+    /** 新文件中添加的行。 */
     | Add
+    /** 旧文件中删除的行。 */
     | Delete
+    /** 差异中的头部行。 */
     | Header
 }
 
+/** 一条差异行及其在旧文件和新文件中的可选行号。 */
 public class DiffLine {
+    /** 差异行的类别。 */
     public let kind: DiffLineKind
+    /** 行的原始文本，解析结果包含行首的差异标记。 */
     public let text: String
+    /** 旧文件中的行号；不存在时为 None。 */
     public let oldLine: ?Int64
+    /** 新文件中的行号；不存在时为 None。 */
     public let newLine: ?Int64
 
+    /** 保存类别、文本和可选行号。
+     * @param kind 差异行类别
+     * @param text 要显示的文本
+     * @param oldLine 旧文件行号
+     * @param newLine 新文件行号
+     */
     public init(kind: DiffLineKind, text: String, oldLine!: ?Int64 = None, newLine!: ?Int64 = None) {
         this.kind = kind
         this.text = text
@@ -24,11 +40,20 @@ public class DiffLine {
     }
 }
 
+/** 一个差异区块，包含区块标题、行和折叠状态。 */
 public class DiffHunk {
+    /** 区块头文本。 */
     public let header: String
+    /** 区块内的差异行。 */
     public let lines: Array<DiffLine>
+    /** 是否在差异视图中折叠区块内容。 */
     public var collapsed: Bool
 
+    /** 保存区块标题、行和折叠状态。
+     * @param header 区块头文本
+     * @param lines 区块中的差异行
+     * @param collapsed 是否折叠内容
+     */
     public init(header: String, lines!: Array<DiffLine> = [], collapsed!: Bool = false) {
         this.header = header
         this.lines = lines
@@ -36,21 +61,36 @@ public class DiffHunk {
     }
 }
 
+/** 一个文件的旧路径、新路径和差异区块。 */
 public class DiffFile {
+    /** 旧文件路径。 */
     public let oldPath: String
+    /** 新文件路径。 */
     public let newPath: String
+    /** 属于该文件的差异区块。 */
     public let hunks: Array<DiffHunk>
 
+    /** 保存两个路径与差异区块。
+     * @param oldPath 旧文件路径
+     * @param newPath 新文件路径
+     * @param hunks 文件中的差异区块
+     */
     public init(oldPath: String, newPath: String, hunks!: Array<DiffHunk> = []) {
         this.oldPath = oldPath
         this.newPath = newPath
         this.hunks = hunks
     }
 
+    /** 统计所有区块中的新增行。
+     * @return 新增行数
+     */
     public func addedLines(): Int64 {
         countLines(DiffLineKind.Add)
     }
 
+    /** 统计所有区块中的删除行。
+     * @return 删除行数
+     */
     public func deletedLines(): Int64 {
         countLines(DiffLineKind.Delete)
     }
@@ -66,19 +106,30 @@ public class DiffFile {
     }
 }
 
+/** 按文件保存解析后的差异数据。 */
 public class DiffDocument {
+    /** 文档包含的文件差异。 */
     public let files: Array<DiffFile>
 
+    /** 保存文件差异数组。
+     * @param files 文件差异
+     */
     public init(files: Array<DiffFile>) {
         this.files = files
     }
 
+    /** 统计所有区块中的新增行。
+     * @return 新增行数
+     */
     public func addedLines(): Int64 {
         var count: Int64 = 0
         for (file in files) { count += file.addedLines() }
         count
     }
 
+    /** 统计所有区块中的删除行。
+     * @return 删除行数
+     */
     public func deletedLines(): Int64 {
         var count: Int64 = 0
         for (file in files) { count += file.deletedLines() }
@@ -86,6 +137,18 @@ public class DiffDocument {
     }
 }
 
+/** 将统一差异文本解析为文件、区块和差异行。
+ *
+ * @param text 统一差异文本
+ * @return 解析得到的差异文档
+ * @example 解析并显示差异
+ * ```cangjie
+ * let document = parseUnifiedDiff("--- a/example.txt\n+++ b/example.txt\n@@ -1 +1 @@\n-old\n+new\n")
+ * if (document.addedLines() != 1 || document.deletedLines() != 1) { throw IllegalStateException("incorrect diff counts") }
+ * let report = TestScenario().run({ frame => frame.renderWidget(DiffView(document), frame.area) }, { _ => UpdateResult.unchanged() })
+ * if (!report.passed || !report.lastSnapshot().contains("+1 -1")) { throw IllegalStateException("incorrect diff rendering") }
+ * ```
+ */
 public func parseUnifiedDiff(text: String): DiffDocument {
     let files = ArrayList<DiffFile>()
     var oldPath = ""
@@ -156,13 +219,27 @@ public func parseUnifiedDiff(text: String): DiffDocument {
  * `Some(Color.Reset)` 可显式恢复终端默认颜色。
  */
 public struct DiffViewStyles {
+    /** 文件摘要使用的样式覆盖。 */
     public let summary: StyleOverride
+    /** 区块标题使用的样式覆盖。 */
     public let hunk: StyleOverride
+    /** 上下文行使用的样式覆盖。 */
     public let context: StyleOverride
+    /** 新增行使用的样式覆盖。 */
     public let add: StyleOverride
+    /** 删除行使用的样式覆盖。 */
     public let delete: StyleOverride
+    /** 头部行使用的样式覆盖。 */
     public let header: StyleOverride
 
+    /** 为各差异角色保存逐属性样式覆盖。
+     * @param summary 文件摘要样式
+     * @param hunk 区块标题样式
+     * @param context 上下文行样式
+     * @param add 新增行样式
+     * @param delete 删除行样式
+     * @param header 头部行样式
+     */
     public init(summary!: StyleOverride = StyleOverride(), hunk!: StyleOverride = StyleOverride(),
         context!: StyleOverride = StyleOverride(), add!: StyleOverride = StyleOverride(),
         delete!: StyleOverride = StyleOverride(), header!: StyleOverride = StyleOverride()) {
@@ -175,10 +252,13 @@ public struct DiffViewStyles {
     }
 }
 
+/** 将差异文档绘制为统一视图或并排视图。 */
 public class DiffView <: Widget {
     private let document: DiffDocument
     // render normalizes this index to the available file range (negative => 0).
+    /** 选中文件的索引；渲染时限制在文档文件的有效范围内。 */
     public var selectedFile: Int64
+    /** 保存的选中行索引；当前 render 不使用此值。 */
     public var selectedLine: Int64
     /** 差异内容的显示偏移量，按显示行跳过区块标题及差异行；并排模式的配对行算一行。构造时传入的负值按 0 保存。
      */
@@ -191,6 +271,15 @@ public class DiffView <: Widget {
     /** 以指定文档创建差异视图，保存显示选项，并将文件索引、行索引和偏移量的负值置为 0。
      * 指定主题时内容区铺设 surface 背景，各角色继承对应语义样式；styles 可逐项覆盖文本样式，包括显式清除背景。
      * 未指定主题时继承缓冲区上下文主题；无上下文主题时保留传统配色。外围区块的显式主题优先。
+     *
+     * @param document 要绘制的差异文档
+     * @param selectedFile 初始文件索引
+     * @param selectedLine 初始行索引
+     * @param offset 显示行偏移
+     * @param block 可选外围区块
+     * @param sideBySide 是否尝试并排显示
+     * @param theme 可选语义主题
+     * @param styles 各角色的样式覆盖
      */
     public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0,
         block!: ?Block = None, sideBySide!: Bool = false, theme!: ?Theme = None,
@@ -206,6 +295,8 @@ public class DiffView <: Widget {
     }
 
     /** 将选中文件的路径及增删行数绘制到目标区域，并按偏移量绘制区块标题和未折叠的差异行；有外围区块时先绘制区块并使用其内部区域。区域无可用宽高或文档无文件时不绘制差异内容；有主题时空内容区仍铺设 surface 背景。渲染时会修正选中文件索引。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area

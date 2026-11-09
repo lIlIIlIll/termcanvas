@@ -1743,93 +1743,93 @@ packages/core/src/state_models.cj:169:public init(query!: String = "", active!: 
 packages/core/src/state_models.cj:174:public func set(query: String): Unit
 packages/core/src/state_models.cj:179:public func clear(): Unit
 packages/core/src/state_models.cj:184:public func matches(text: String): Bool
-packages/core/src/style.cj:3:public enum Color {
-packages/core/src/style.cj:4:Reset
-packages/core/src/style.cj:5:Black
-packages/core/src/style.cj:6:Red
-packages/core/src/style.cj:7:Green
-packages/core/src/style.cj:8:Yellow
-packages/core/src/style.cj:9:Blue
-packages/core/src/style.cj:10:Magenta
-packages/core/src/style.cj:11:Cyan
-packages/core/src/style.cj:12:White
-packages/core/src/style.cj:13:Indexed(UInt8)
-packages/core/src/style.cj:14:Rgb(UInt8, UInt8, UInt8)
-packages/core/src/style.cj:17:public struct Modifier <: Equatable<Modifier> {
-packages/core/src/style.cj:18:public var bold: Bool = false
-packages/core/src/style.cj:19:public var italic: Bool = false
-packages/core/src/style.cj:20:public var underline: Bool = false
-packages/core/src/style.cj:21:public var reversed: Bool = false
-packages/core/src/style.cj:23:public init()
-packages/core/src/style.cj:25:public static func none(): Modifier
-packages/core/src/style.cj:27:public static func strong(): Modifier
-packages/core/src/style.cj:33:public operator func ==(other: Modifier): Bool
-packages/core/src/style.cj:38:public struct Style <: Equatable<Style> {
-packages/core/src/style.cj:39:public var fg: Color = Color.Reset
-packages/core/src/style.cj:40:public var bg: Color = Color.Reset
-packages/core/src/style.cj:41:public var modifier: Modifier = Modifier.none()
-packages/core/src/style.cj:43:public init(fg!: Color = Color.Reset, bg!: Color = Color.Reset, modifier!: Modifier = Modifier.none())
-packages/core/src/style.cj:49:public static func default(): Style
-packages/core/src/style.cj:51:public func withFg(color: Color): Style
-packages/core/src/style.cj:57:public func withBg(color: Color): Style
-packages/core/src/style.cj:63:public func withModifier(modifier: Modifier): Style
-packages/core/src/style.cj:69:public func patch(other: Style): Style
-packages/core/src/style.cj:83:public operator func ==(other: Style): Bool
-packages/core/src/style.cj:91:public struct StyleOverride {
-packages/core/src/style.cj:92:public let fg: ?Color
-packages/core/src/style.cj:93:public let bg: ?Color
-packages/core/src/style.cj:94:public let bold: ?Bool
-packages/core/src/style.cj:95:public let italic: ?Bool
-packages/core/src/style.cj:96:public let underline: ?Bool
-packages/core/src/style.cj:97:public let reversed: ?Bool
-packages/core/src/style.cj:99:public init(fg!: ?Color = None, bg!: ?Color = None, bold!: ?Bool = None, italic!: ?Bool = None, underline!: ?Bool = None, reversed!: ?Bool = None)
-packages/core/src/style.cj:110:public func apply(base: Style): Style
-packages/core/src/style.cj:125:public func resolveStyle(base: Style, legacy!: Style = Style.default(), override!: ?StyleOverride = None): Style
-packages/core/src/style.cj:133:public enum IconSet {
-packages/core/src/style.cj:134:Unicode
-packages/core/src/style.cj:135:NerdFont
-packages/core/src/style.cj:136:Ascii
-packages/core/src/style.cj:139:public struct Theme {
-packages/core/src/style.cj:140:public let normal: Style
-packages/core/src/style.cj:141:public let focused: Style
-packages/core/src/style.cj:142:public let selected: Style
-packages/core/src/style.cj:143:public let disabled: Style
-packages/core/src/style.cj:144:public let error: Style
-packages/core/src/style.cj:145:public let accent: Style
-packages/core/src/style.cj:146:public let success: Style
-packages/core/src/style.cj:147:public let warning: Style
-packages/core/src/style.cj:148:public let info: Style
-packages/core/src/style.cj:149:public let canvas: Style
-packages/core/src/style.cj:150:public let surface: Style
-packages/core/src/style.cj:151:public let raisedSurface: Style
-packages/core/src/style.cj:152:public let heading: Style
-packages/core/src/style.cj:153:public let secondary: Style
-packages/core/src/style.cj:154:public let border: Style
-packages/core/src/style.cj:155:public let strongBorder: Style
-packages/core/src/style.cj:156:public let iconSet: IconSet
-packages/core/src/style.cj:157:public let borderKind: BorderKind
-packages/core/src/style.cj:159:public let progressSymbols: ?ProgressBarSymbols
-packages/core/src/style.cj:161:public init( normal!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), focused!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(54, 50, 61), modifier: focusModifier()), selected!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(42, 44, 63), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), error!: Style = Style(fg: Color.Rgb(255, 122, 131), bg: Color.Rgb(19, 20, 34), modifier: errorModifier()), accent!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), success!: Style = Style(fg: Color.Rgb(111, 211, 162), bg: Color.Rgb(19, 20, 34)), warning!: Style = Style(fg: Color.Rgb(255, 198, 114), bg: Color.Rgb(19, 20, 34)), info!: Style = Style(fg: Color.Rgb(118, 193, 231), bg: Color.Rgb(19, 20, 34)), canvas!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), surface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(26, 27, 44)), raisedSurface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(36, 38, 57)), heading!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34), modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), border!: Style = Style(fg: Color.Rgb(88, 92, 115), bg: Color.Rgb(19, 20, 34)), strongBorder!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), iconSet!: IconSet = IconSet.Unicode, borderKind!: BorderKind = BorderKind.Auto, progressSymbols!: ?ProgressBarSymbols = None )
-packages/core/src/style.cj:203:public static func default(): Theme
-packages/core/src/style.cj:208:public func resolveState(focused!: Bool = false, selected!: Bool = false, disabled!: Bool = false, error!: Bool = false, override!: ?StyleOverride = None): Style
-packages/core/src/style.cj:215:public func withIconSet(value: IconSet): Theme
-packages/core/src/style.cj:224:public func withBorderKind(value: BorderKind): Theme
-packages/core/src/style.cj:233:public func withProgressSymbols(value: ?ProgressBarSymbols): Theme
-packages/core/src/style.cj:242:public func withTerminalBackground(): Theme
-packages/core/src/style.cj:254:public static func indigo(accent!: Color = Color.Rgb(244, 187, 96)): Theme
-packages/core/src/style.cj:261:public static func graphite(accent!: Color = Color.Cyan): Theme
-packages/core/src/style.cj:267:public static func light(): Theme
-packages/core/src/style.cj:271:public static func light(accent!: Color): Theme
-packages/core/src/style.cj:277:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: ?Color = None ): Theme
-packages/core/src/style.cj:292:public func adapted(capabilities: TerminalCapabilities): Theme
-packages/core/src/style.cj:332:public func serialize(): String
-packages/core/src/style.cj:347:public enum StyleState {
-packages/core/src/style.cj:348:Normal
-packages/core/src/style.cj:349:Focused
-packages/core/src/style.cj:350:Selected
-packages/core/src/style.cj:351:Disabled
-packages/core/src/style.cj:352:Error
-packages/core/src/style.cj:353:Accent
+packages/core/src/style.cj:5:public enum Color {
+packages/core/src/style.cj:8:Reset
+packages/core/src/style.cj:11:Black
+packages/core/src/style.cj:14:Red
+packages/core/src/style.cj:17:Green
+packages/core/src/style.cj:20:Yellow
+packages/core/src/style.cj:23:Blue
+packages/core/src/style.cj:26:Magenta
+packages/core/src/style.cj:29:Cyan
+packages/core/src/style.cj:32:White
+packages/core/src/style.cj:35:Indexed(UInt8)
+packages/core/src/style.cj:38:Rgb(UInt8, UInt8, UInt8)
+packages/core/src/style.cj:43:public struct Modifier <: Equatable<Modifier> {
+packages/core/src/style.cj:46:public var bold: Bool = false
+packages/core/src/style.cj:49:public var italic: Bool = false
+packages/core/src/style.cj:52:public var underline: Bool = false
+packages/core/src/style.cj:55:public var reversed: Bool = false
+packages/core/src/style.cj:59:public init()
+packages/core/src/style.cj:63:public static func none(): Modifier
+packages/core/src/style.cj:67:public static func strong(): Modifier
+packages/core/src/style.cj:75:public operator func ==(other: Modifier): Bool
+packages/core/src/style.cj:82:public struct Style <: Equatable<Style> {
+packages/core/src/style.cj:85:public var fg: Color = Color.Reset
+packages/core/src/style.cj:88:public var bg: Color = Color.Reset
+packages/core/src/style.cj:91:public var modifier: Modifier = Modifier.none()
+packages/core/src/style.cj:95:public init(fg!: Color = Color.Reset, bg!: Color = Color.Reset, modifier!: Modifier = Modifier.none())
+packages/core/src/style.cj:103:public static func default(): Style
+packages/core/src/style.cj:107:public func withFg(color: Color): Style
+packages/core/src/style.cj:115:public func withBg(color: Color): Style
+packages/core/src/style.cj:123:public func withModifier(modifier: Modifier): Style
+packages/core/src/style.cj:131:public func patch(other: Style): Style
+packages/core/src/style.cj:147:public operator func ==(other: Style): Bool
+packages/core/src/style.cj:155:public struct StyleOverride {
+packages/core/src/style.cj:156:public let fg: ?Color
+packages/core/src/style.cj:157:public let bg: ?Color
+packages/core/src/style.cj:158:public let bold: ?Bool
+packages/core/src/style.cj:159:public let italic: ?Bool
+packages/core/src/style.cj:160:public let underline: ?Bool
+packages/core/src/style.cj:161:public let reversed: ?Bool
+packages/core/src/style.cj:163:public init(fg!: ?Color = None, bg!: ?Color = None, bold!: ?Bool = None, italic!: ?Bool = None, underline!: ?Bool = None, reversed!: ?Bool = None)
+packages/core/src/style.cj:174:public func apply(base: Style): Style
+packages/core/src/style.cj:189:public func resolveStyle(base: Style, legacy!: Style = Style.default(), override!: ?StyleOverride = None): Style
+packages/core/src/style.cj:198:public enum IconSet {
+packages/core/src/style.cj:199:Unicode
+packages/core/src/style.cj:200:NerdFont
+packages/core/src/style.cj:201:Ascii
+packages/core/src/style.cj:207:public struct Theme {
+packages/core/src/style.cj:209:public let normal: Style
+packages/core/src/style.cj:211:public let focused: Style
+packages/core/src/style.cj:213:public let selected: Style
+packages/core/src/style.cj:215:public let disabled: Style
+packages/core/src/style.cj:217:public let error: Style
+packages/core/src/style.cj:219:public let accent: Style
+packages/core/src/style.cj:221:public let success: Style
+packages/core/src/style.cj:223:public let warning: Style
+packages/core/src/style.cj:225:public let info: Style
+packages/core/src/style.cj:227:public let canvas: Style
+packages/core/src/style.cj:229:public let surface: Style
+packages/core/src/style.cj:231:public let raisedSurface: Style
+packages/core/src/style.cj:233:public let heading: Style
+packages/core/src/style.cj:235:public let secondary: Style
+packages/core/src/style.cj:237:public let border: Style
+packages/core/src/style.cj:239:public let strongBorder: Style
+packages/core/src/style.cj:241:public let iconSet: IconSet
+packages/core/src/style.cj:243:public let borderKind: BorderKind
+packages/core/src/style.cj:245:public let progressSymbols: ?ProgressBarSymbols
+packages/core/src/style.cj:247:public init( normal!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), focused!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(54, 50, 61), modifier: focusModifier()), selected!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(42, 44, 63), modifier: Modifier.strong()), disabled!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), error!: Style = Style(fg: Color.Rgb(255, 122, 131), bg: Color.Rgb(19, 20, 34), modifier: errorModifier()), accent!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), success!: Style = Style(fg: Color.Rgb(111, 211, 162), bg: Color.Rgb(19, 20, 34)), warning!: Style = Style(fg: Color.Rgb(255, 198, 114), bg: Color.Rgb(19, 20, 34)), info!: Style = Style(fg: Color.Rgb(118, 193, 231), bg: Color.Rgb(19, 20, 34)), canvas!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34)), surface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(26, 27, 44)), raisedSurface!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(36, 38, 57)), heading!: Style = Style(fg: Color.Rgb(225, 226, 235), bg: Color.Rgb(19, 20, 34), modifier: Modifier.strong()), secondary!: Style = Style(fg: Color.Rgb(157, 160, 181), bg: Color.Rgb(19, 20, 34)), border!: Style = Style(fg: Color.Rgb(88, 92, 115), bg: Color.Rgb(19, 20, 34)), strongBorder!: Style = Style(fg: Color.Rgb(244, 187, 96), bg: Color.Rgb(19, 20, 34)), iconSet!: IconSet = IconSet.Unicode, borderKind!: BorderKind = BorderKind.Auto, progressSymbols!: ?ProgressBarSymbols = None )
+packages/core/src/style.cj:289:public static func default(): Theme
+packages/core/src/style.cj:294:public func resolveState(focused!: Bool = false, selected!: Bool = false, disabled!: Bool = false, error!: Bool = false, override!: ?StyleOverride = None): Style
+packages/core/src/style.cj:301:public func withIconSet(value: IconSet): Theme
+packages/core/src/style.cj:310:public func withBorderKind(value: BorderKind): Theme
+packages/core/src/style.cj:319:public func withProgressSymbols(value: ?ProgressBarSymbols): Theme
+packages/core/src/style.cj:328:public func withTerminalBackground(): Theme
+packages/core/src/style.cj:340:public static func indigo(accent!: Color = Color.Rgb(244, 187, 96)): Theme
+packages/core/src/style.cj:347:public static func graphite(accent!: Color = Color.Cyan): Theme
+packages/core/src/style.cj:353:public static func light(): Theme
+packages/core/src/style.cj:357:public static func light(accent!: Color): Theme
+packages/core/src/style.cj:363:public static func forCapabilities( capabilities: TerminalCapabilities, dark!: Bool = true, accent!: ?Color = None ): Theme
+packages/core/src/style.cj:378:public func adapted(capabilities: TerminalCapabilities): Theme
+packages/core/src/style.cj:418:public func serialize(): String
+packages/core/src/style.cj:433:public enum StyleState {
+packages/core/src/style.cj:434:Normal
+packages/core/src/style.cj:435:Focused
+packages/core/src/style.cj:436:Selected
+packages/core/src/style.cj:437:Disabled
+packages/core/src/style.cj:438:Error
+packages/core/src/style.cj:439:Accent
 packages/core/src/styled_widget.cj:9:public class StyledWidget <: Widget {
 packages/core/src/styled_widget.cj:13:public init(child: Widget, override!: StyleOverride)
 packages/core/src/styled_widget.cj:19:public func render(area: Rect, buffer: Buffer): Unit
@@ -1856,17 +1856,17 @@ packages/core/src/task_activity.cj:61:public let statusText: String
 packages/core/src/task_activity.cj:64:public let duration: String
 packages/core/src/task_activity.cj:67:public let detail: String
 packages/core/src/task_activity.cj:70:public let progressLabel: String
-packages/core/src/task_activity.cj:75:public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
-packages/core/src/task_activity.cj:109:public class TaskActivityView <: Widget {
-packages/core/src/task_activity.cj:121:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
-packages/core/src/task_activity.cj:139:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/task_activity.cj:378:public class TaskActivityListEntry {
-packages/core/src/task_activity.cj:379:public let activity: TaskActivity
-packages/core/src/task_activity.cj:380:public let layout: TaskActivityLayout
-packages/core/src/task_activity.cj:382:public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded)
-packages/core/src/task_activity.cj:403:public class TaskActivityList <: Widget {
-packages/core/src/task_activity.cj:411:public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
-packages/core/src/task_activity.cj:421:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/task_activity.cj:85:public init( title: String, status!: TaskStatus = TaskStatus.Pending, id!: String = "", prefix!: String = "", statusText!: String = "", duration!: String = "", detail!: String = "", progressLabel!: String = "", progress!: ?TaskProgress = None )
+packages/core/src/task_activity.cj:119:public class TaskActivityView <: Widget {
+packages/core/src/task_activity.cj:131:public init( activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88 )
+packages/core/src/task_activity.cj:149:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/task_activity.cj:388:public class TaskActivityListEntry {
+packages/core/src/task_activity.cj:389:public let activity: TaskActivity
+packages/core/src/task_activity.cj:390:public let layout: TaskActivityLayout
+packages/core/src/task_activity.cj:392:public init(activity: TaskActivity, layout!: TaskActivityLayout = TaskActivityLayout.Expanded)
+packages/core/src/task_activity.cj:413:public class TaskActivityList <: Widget {
+packages/core/src/task_activity.cj:421:public init(entries: Array<TaskActivityListEntry>, offset!: Int64 = 0, activityFrame!: Int64 = 0, theme!: ?Theme = None, unicode!: ?Bool = None, maxHeaderWidth!: Int64 = 88)
+packages/core/src/task_activity.cj:431:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/terminal.cj:122:public enum CursorShape {
 packages/core/src/terminal.cj:123:Block
 packages/core/src/terminal.cj:124:Bar
@@ -2490,46 +2490,46 @@ packages/core/src/virtual_transcript.cj:661:public func instrumentationMetrics()
 packages/core/src/virtual_transcript.cj:713:public func dirtyRectForItemRevision(id: String): ?Rect
 packages/core/src/virtual_transcript.cj:738:public func handle(key: KeyEvent): Bool
 packages/core/src/virtual_transcript.cj:751:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:5:public enum ProgressBarDirection {
-packages/core/src/visual_widgets.cj:6:Horizontal
-packages/core/src/visual_widgets.cj:7:Vertical
-packages/core/src/visual_widgets.cj:10:public enum ProgressBarLabelMode {
-packages/core/src/visual_widgets.cj:11:Hidden
-packages/core/src/visual_widgets.cj:12:Percent
-packages/core/src/visual_widgets.cj:13:Value
-packages/core/src/visual_widgets.cj:14:Ratio
-packages/core/src/visual_widgets.cj:15:Text(String)
-packages/core/src/visual_widgets.cj:19:public enum ProgressBarLabelPosition {
-packages/core/src/visual_widgets.cj:20:Automatic
-packages/core/src/visual_widgets.cj:22:Start
-packages/core/src/visual_widgets.cj:24:End
-packages/core/src/visual_widgets.cj:27:public class ProgressBarSymbols {
-packages/core/src/visual_widgets.cj:29:public let filled: String
-packages/core/src/visual_widgets.cj:30:public let empty: String
-packages/core/src/visual_widgets.cj:31:public let head: String
-packages/core/src/visual_widgets.cj:32:public let indeterminate: String
-packages/core/src/visual_widgets.cj:34:public init(filled!: String = "#", empty!: String = "-", head!: String = "#", indeterminate!: String = "#")
-packages/core/src/visual_widgets.cj:81:public class ProgressBarSegment {
-packages/core/src/visual_widgets.cj:82:public let value: Int64
-packages/core/src/visual_widgets.cj:83:public let style: Style
-packages/core/src/visual_widgets.cj:84:public let symbol: String
-packages/core/src/visual_widgets.cj:86:public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#")
-packages/core/src/visual_widgets.cj:93:public class ProgressBar <: Widget {
-packages/core/src/visual_widgets.cj:116:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None, theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: ?Style = None, symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0, labelPosition!: ProgressBarLabelPosition = ProgressBarLabelPosition.Automatic, trackOverride!: StyleOverride = StyleOverride(), fillOverride!: StyleOverride = StyleOverride(), labelOverride!: StyleOverride = StyleOverride() )
-packages/core/src/visual_widgets.cj:154:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:349:public class Sparkline <: Widget {
-packages/core/src/visual_widgets.cj:357:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None, block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
-packages/core/src/visual_widgets.cj:367:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:394:public class Gauge <: Widget {
-packages/core/src/visual_widgets.cj:401:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None )
-packages/core/src/visual_widgets.cj:415:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:423:public class Chart <: Widget {
-packages/core/src/visual_widgets.cj:429:public init( values: Array<Int64>, block!: ?Block = None, style!: ?Style = None, maxValue!: Int64 = 0 )
-packages/core/src/visual_widgets.cj:441:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/visual_widgets.cj:460:public class LogView <: Widget {
-packages/core/src/visual_widgets.cj:462:public var offset: Int64
-packages/core/src/visual_widgets.cj:466:public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
-packages/core/src/visual_widgets.cj:473:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:7:public enum ProgressBarDirection {
+packages/core/src/visual_widgets.cj:10:Horizontal
+packages/core/src/visual_widgets.cj:13:Vertical
+packages/core/src/visual_widgets.cj:18:public enum ProgressBarLabelMode {
+packages/core/src/visual_widgets.cj:21:Hidden
+packages/core/src/visual_widgets.cj:24:Percent
+packages/core/src/visual_widgets.cj:27:Value
+packages/core/src/visual_widgets.cj:30:Ratio
+packages/core/src/visual_widgets.cj:33:Text(String)
+packages/core/src/visual_widgets.cj:37:public enum ProgressBarLabelPosition {
+packages/core/src/visual_widgets.cj:38:Automatic
+packages/core/src/visual_widgets.cj:40:Start
+packages/core/src/visual_widgets.cj:42:End
+packages/core/src/visual_widgets.cj:47:public class ProgressBarSymbols {
+packages/core/src/visual_widgets.cj:51:public let filled: String
+packages/core/src/visual_widgets.cj:54:public let empty: String
+packages/core/src/visual_widgets.cj:57:public let head: String
+packages/core/src/visual_widgets.cj:60:public let indeterminate: String
+packages/core/src/visual_widgets.cj:64:public init(filled!: String = "#", empty!: String = "-", head!: String = "#", indeterminate!: String = "#")
+packages/core/src/visual_widgets.cj:113:public class ProgressBarSegment {
+packages/core/src/visual_widgets.cj:116:public let value: Int64
+packages/core/src/visual_widgets.cj:119:public let style: Style
+packages/core/src/visual_widgets.cj:122:public let symbol: String
+packages/core/src/visual_widgets.cj:126:public init(value: Int64, style!: Style = Style(fg: Color.Cyan), symbol!: String = "#")
+packages/core/src/visual_widgets.cj:133:public class ProgressBar <: Widget {
+packages/core/src/visual_widgets.cj:156:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None, theme!: ?Theme = None, direction!: ProgressBarDirection = ProgressBarDirection.Horizontal, labelMode!: ProgressBarLabelMode = ProgressBarLabelMode.Hidden, labelStyle!: ?Style = None, symbols!: ProgressBarSymbols = ProgressBarSymbols.automatic(), segments!: Array<ProgressBarSegment> = [], indeterminate!: Bool = false, phase!: Int64 = 0, labelPosition!: ProgressBarLabelPosition = ProgressBarLabelPosition.Automatic, trackOverride!: StyleOverride = StyleOverride(), fillOverride!: StyleOverride = StyleOverride(), labelOverride!: StyleOverride = StyleOverride() )
+packages/core/src/visual_widgets.cj:194:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:389:public class Sparkline <: Widget {
+packages/core/src/visual_widgets.cj:397:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None, block!: ?Block = None, latest!: Bool = true, symbols!: ?Array<String> = None)
+packages/core/src/visual_widgets.cj:407:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:434:public class Gauge <: Widget {
+packages/core/src/visual_widgets.cj:441:public init( value: Int64, total!: Int64 = 100, label!: String = "", style!: ?Style = None, fillStyle!: ?Style = None )
+packages/core/src/visual_widgets.cj:455:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:463:public class Chart <: Widget {
+packages/core/src/visual_widgets.cj:469:public init( values: Array<Int64>, block!: ?Block = None, style!: ?Style = None, maxValue!: Int64 = 0 )
+packages/core/src/visual_widgets.cj:481:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/visual_widgets.cj:500:public class LogView <: Widget {
+packages/core/src/visual_widgets.cj:502:public var offset: Int64
+packages/core/src/visual_widgets.cj:506:public init(lines: Array<String>, offset!: Int64 = -1, block!: ?Block = None, style!: Style = Style.default())
+packages/core/src/visual_widgets.cj:513:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widget_base.cj:5:public interface Widget {
 packages/core/src/widget_base.cj:6:func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/widget_base.cj:30:public enum WrapMode {
@@ -2659,49 +2659,49 @@ packages/core/src/widgets.cj:1407:public init(path!: String = ".", extension!: S
 packages/core/src/widgets.cj:1411:public func selectedPath(): ?String
 packages/core/src/widgets.cj:1412:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 packages/core/src/widgets.cj:1413:public func render(area: Rect, buffer: Buffer): Unit
-packages/diff/src/diff.cj:6:public enum DiffLineKind {
-packages/diff/src/diff.cj:7:Context
-packages/diff/src/diff.cj:8:Add
-packages/diff/src/diff.cj:9:Delete
-packages/diff/src/diff.cj:10:Header
-packages/diff/src/diff.cj:13:public class DiffLine {
-packages/diff/src/diff.cj:14:public let kind: DiffLineKind
-packages/diff/src/diff.cj:15:public let text: String
-packages/diff/src/diff.cj:16:public let oldLine: ?Int64
-packages/diff/src/diff.cj:17:public let newLine: ?Int64
-packages/diff/src/diff.cj:19:public init(kind: DiffLineKind, text: String, oldLine!: ?Int64 = None, newLine!: ?Int64 = None)
-packages/diff/src/diff.cj:27:public class DiffHunk {
-packages/diff/src/diff.cj:28:public let header: String
-packages/diff/src/diff.cj:29:public let lines: Array<DiffLine>
-packages/diff/src/diff.cj:30:public var collapsed: Bool
-packages/diff/src/diff.cj:32:public init(header: String, lines!: Array<DiffLine> = [], collapsed!: Bool = false)
-packages/diff/src/diff.cj:39:public class DiffFile {
-packages/diff/src/diff.cj:40:public let oldPath: String
-packages/diff/src/diff.cj:41:public let newPath: String
-packages/diff/src/diff.cj:42:public let hunks: Array<DiffHunk>
-packages/diff/src/diff.cj:44:public init(oldPath: String, newPath: String, hunks!: Array<DiffHunk> = [])
-packages/diff/src/diff.cj:50:public func addedLines(): Int64
-packages/diff/src/diff.cj:54:public func deletedLines(): Int64
-packages/diff/src/diff.cj:69:public class DiffDocument {
-packages/diff/src/diff.cj:70:public let files: Array<DiffFile>
-packages/diff/src/diff.cj:72:public init(files: Array<DiffFile>)
-packages/diff/src/diff.cj:76:public func addedLines(): Int64
-packages/diff/src/diff.cj:82:public func deletedLines(): Int64
-packages/diff/src/diff.cj:89:public func parseUnifiedDiff(text: String): DiffDocument
-packages/diff/src/diff.cj:158:public struct DiffViewStyles {
-packages/diff/src/diff.cj:159:public let summary: StyleOverride
-packages/diff/src/diff.cj:160:public let hunk: StyleOverride
-packages/diff/src/diff.cj:161:public let context: StyleOverride
-packages/diff/src/diff.cj:162:public let add: StyleOverride
-packages/diff/src/diff.cj:163:public let delete: StyleOverride
-packages/diff/src/diff.cj:164:public let header: StyleOverride
-packages/diff/src/diff.cj:166:public init(summary!: StyleOverride = StyleOverride(), hunk!: StyleOverride = StyleOverride(), context!: StyleOverride = StyleOverride(), add!: StyleOverride = StyleOverride(), delete!: StyleOverride = StyleOverride(), header!: StyleOverride = StyleOverride())
-packages/diff/src/diff.cj:178:public class DiffView <: Widget {
-packages/diff/src/diff.cj:181:public var selectedFile: Int64
-packages/diff/src/diff.cj:182:public var selectedLine: Int64
-packages/diff/src/diff.cj:185:public var offset: Int64
-packages/diff/src/diff.cj:195:public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, sideBySide!: Bool = false, theme!: ?Theme = None, styles!: DiffViewStyles = DiffViewStyles())
-packages/diff/src/diff.cj:210:public func render(area: Rect, buffer: Buffer): Unit
+packages/diff/src/diff.cj:7:public enum DiffLineKind {
+packages/diff/src/diff.cj:9:Context
+packages/diff/src/diff.cj:11:Add
+packages/diff/src/diff.cj:13:Delete
+packages/diff/src/diff.cj:15:Header
+packages/diff/src/diff.cj:19:public class DiffLine {
+packages/diff/src/diff.cj:21:public let kind: DiffLineKind
+packages/diff/src/diff.cj:23:public let text: String
+packages/diff/src/diff.cj:25:public let oldLine: ?Int64
+packages/diff/src/diff.cj:27:public let newLine: ?Int64
+packages/diff/src/diff.cj:35:public init(kind: DiffLineKind, text: String, oldLine!: ?Int64 = None, newLine!: ?Int64 = None)
+packages/diff/src/diff.cj:44:public class DiffHunk {
+packages/diff/src/diff.cj:46:public let header: String
+packages/diff/src/diff.cj:48:public let lines: Array<DiffLine>
+packages/diff/src/diff.cj:50:public var collapsed: Bool
+packages/diff/src/diff.cj:57:public init(header: String, lines!: Array<DiffLine> = [], collapsed!: Bool = false)
+packages/diff/src/diff.cj:65:public class DiffFile {
+packages/diff/src/diff.cj:67:public let oldPath: String
+packages/diff/src/diff.cj:69:public let newPath: String
+packages/diff/src/diff.cj:71:public let hunks: Array<DiffHunk>
+packages/diff/src/diff.cj:78:public init(oldPath: String, newPath: String, hunks!: Array<DiffHunk> = [])
+packages/diff/src/diff.cj:87:public func addedLines(): Int64
+packages/diff/src/diff.cj:94:public func deletedLines(): Int64
+packages/diff/src/diff.cj:110:public class DiffDocument {
+packages/diff/src/diff.cj:112:public let files: Array<DiffFile>
+packages/diff/src/diff.cj:117:public init(files: Array<DiffFile>)
+packages/diff/src/diff.cj:124:public func addedLines(): Int64
+packages/diff/src/diff.cj:133:public func deletedLines(): Int64
+packages/diff/src/diff.cj:152:public func parseUnifiedDiff(text: String): DiffDocument
+packages/diff/src/diff.cj:221:public struct DiffViewStyles {
+packages/diff/src/diff.cj:223:public let summary: StyleOverride
+packages/diff/src/diff.cj:225:public let hunk: StyleOverride
+packages/diff/src/diff.cj:227:public let context: StyleOverride
+packages/diff/src/diff.cj:229:public let add: StyleOverride
+packages/diff/src/diff.cj:231:public let delete: StyleOverride
+packages/diff/src/diff.cj:233:public let header: StyleOverride
+packages/diff/src/diff.cj:243:public init(summary!: StyleOverride = StyleOverride(), hunk!: StyleOverride = StyleOverride(), context!: StyleOverride = StyleOverride(), add!: StyleOverride = StyleOverride(), delete!: StyleOverride = StyleOverride(), header!: StyleOverride = StyleOverride())
+packages/diff/src/diff.cj:256:public class DiffView <: Widget {
+packages/diff/src/diff.cj:260:public var selectedFile: Int64
+packages/diff/src/diff.cj:262:public var selectedLine: Int64
+packages/diff/src/diff.cj:265:public var offset: Int64
+packages/diff/src/diff.cj:284:public init(document: DiffDocument, selectedFile!: Int64 = 0, selectedLine!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, sideBySide!: Bool = false, theme!: ?Theme = None, styles!: DiffViewStyles = DiffViewStyles())
+packages/diff/src/diff.cj:301:public func render(area: Rect, buffer: Buffer): Unit
 packages/game/src/game.cj:6:public struct EntityId <: Equatable<EntityId> {
 packages/game/src/game.cj:7:public let value: Int64
 packages/game/src/game.cj:9:public init(value: Int64)
@@ -2950,23 +2950,23 @@ packages/terminal/src/terminal.cj:359:public func chunkCount(): Int64
 packages/terminal/src/terminal.cj:364:public class TerminalView <: Widget {
 packages/terminal/src/terminal.cj:373:public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "", searchStyle!: ?StyleOverride = None, theme!: ?Theme = None)
 packages/terminal/src/terminal.cj:382:public func render(area: Rect, buffer: Buffer): Unit
-packages/testing/src/testing.cj:7:public class TestReport {
-packages/testing/src/testing.cj:8:public let passed: Bool
-packages/testing/src/testing.cj:9:public let exited: Bool
-packages/testing/src/testing.cj:10:public let frames: Array<Buffer>
-packages/testing/src/testing.cj:11:public let snapshots: Array<String>
-packages/testing/src/testing.cj:12:public let failures: Array<String>
-packages/testing/src/testing.cj:14:public init(passed: Bool, exited: Bool, frames: Array<Buffer>, snapshots: Array<String>, failures: Array<String>)
-packages/testing/src/testing.cj:22:public func lastSnapshot(): String
-packages/testing/src/testing.cj:27:public class TestScenario {
-packages/testing/src/testing.cj:30:public init()
-packages/testing/src/testing.cj:32:public func event(value: Event): TestScenario
-packages/testing/src/testing.cj:33:public func key(value: KeyEvent): TestScenario
-packages/testing/src/testing.cj:34:public func paste(text: String): TestScenario
-packages/testing/src/testing.cj:35:public func message(text: String): TestScenario
-packages/testing/src/testing.cj:36:public func render(): TestScenario
-packages/testing/src/testing.cj:38:public func resize(width: Int64, height: Int64): TestScenario
-packages/testing/src/testing.cj:44:public func tick(count!: Int64 = 1): TestScenario
-packages/testing/src/testing.cj:50:public func expectSnapshot(text: String): TestScenario
-packages/testing/src/testing.cj:51:public func expectCell(x: Int64, y: Int64, symbol: String): TestScenario
-packages/testing/src/testing.cj:56:public func run( render: (Frame) -> Unit, update: (Event) -> UpdateResult, width!: Int64 = 80, height!: Int64 = 24, tickDeltaMillis!: Int64 = 16 ): TestReport
+packages/testing/src/testing.cj:10:public class TestReport {
+packages/testing/src/testing.cj:12:public let passed: Bool
+packages/testing/src/testing.cj:14:public let exited: Bool
+packages/testing/src/testing.cj:16:public let frames: Array<Buffer>
+packages/testing/src/testing.cj:18:public let snapshots: Array<String>
+packages/testing/src/testing.cj:20:public let failures: Array<String>
+packages/testing/src/testing.cj:29:public init(passed: Bool, exited: Bool, frames: Array<Buffer>, snapshots: Array<String>, failures: Array<String>)
+packages/testing/src/testing.cj:40:public func lastSnapshot(): String
+packages/testing/src/testing.cj:71:public class TestScenario {
+packages/testing/src/testing.cj:75:public init()
+packages/testing/src/testing.cj:81:public func event(value: Event): TestScenario
+packages/testing/src/testing.cj:86:public func key(value: KeyEvent): TestScenario
+packages/testing/src/testing.cj:91:public func paste(text: String): TestScenario
+packages/testing/src/testing.cj:96:public func message(text: String): TestScenario
+packages/testing/src/testing.cj:100:public func render(): TestScenario
+packages/testing/src/testing.cj:108:public func resize(width: Int64, height: Int64): TestScenario
+packages/testing/src/testing.cj:119:public func tick(count!: Int64 = 1): TestScenario
+packages/testing/src/testing.cj:129:public func expectSnapshot(text: String): TestScenario
+packages/testing/src/testing.cj:136:public func expectCell(x: Int64, y: Int64, symbol: String): TestScenario
+packages/testing/src/testing.cj:152:public func run( render: (Frame) -> Unit, update: (Event) -> UpdateResult, width!: Int64 = 80, height!: Int64 = 24, tickDeltaMillis!: Int64 = 16 ): TestReport

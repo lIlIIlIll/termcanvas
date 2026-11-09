@@ -644,7 +644,7 @@ func containsRune(text: String, needle: Rune): Bool {
 
 func isEastAsianAmbiguous(code: UInt32): Bool {
     if (code < 0x00A1u32) { return false }
-    (code >= 0x00A1u32 && code <= 0x00A1u32) ||
+    if ((code >= 0x00A1u32 && code <= 0x00A1u32) ||
         (code >= 0x00A4u32 && code <= 0x00A4u32) ||
         (code >= 0x00A7u32 && code <= 0x00A8u32) ||
         (code >= 0x00AAu32 && code <= 0x00AAu32) ||
@@ -655,8 +655,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x00C6u32 && code <= 0x00C6u32) ||
         (code >= 0x00D0u32 && code <= 0x00D0u32) ||
         (code >= 0x00D7u32 && code <= 0x00D8u32) ||
-        (code >= 0x00DEu32 && code <= 0x00E1u32) ||
-        (code >= 0x00E6u32 && code <= 0x00E6u32) ||
+        (code >= 0x00DEu32 && code <= 0x00E1u32)) { return true }
+    if ((code >= 0x00E6u32 && code <= 0x00E6u32) ||
         (code >= 0x00E8u32 && code <= 0x00EAu32) ||
         (code >= 0x00ECu32 && code <= 0x00EDu32) ||
         (code >= 0x00F0u32 && code <= 0x00F0u32) ||
@@ -667,8 +667,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x0101u32 && code <= 0x0101u32) ||
         (code >= 0x0111u32 && code <= 0x0111u32) ||
         (code >= 0x0113u32 && code <= 0x0113u32) ||
-        (code >= 0x011Bu32 && code <= 0x011Bu32) ||
-        (code >= 0x0126u32 && code <= 0x0127u32) ||
+        (code >= 0x011Bu32 && code <= 0x011Bu32)) { return true }
+    if ((code >= 0x0126u32 && code <= 0x0127u32) ||
         (code >= 0x012Bu32 && code <= 0x012Bu32) ||
         (code >= 0x0131u32 && code <= 0x0133u32) ||
         (code >= 0x0138u32 && code <= 0x0138u32) ||
@@ -679,8 +679,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x0152u32 && code <= 0x0153u32) ||
         (code >= 0x0166u32 && code <= 0x0167u32) ||
         (code >= 0x016Bu32 && code <= 0x016Bu32) ||
-        (code >= 0x01CEu32 && code <= 0x01CEu32) ||
-        (code >= 0x01D0u32 && code <= 0x01D0u32) ||
+        (code >= 0x01CEu32 && code <= 0x01CEu32)) { return true }
+    if ((code >= 0x01D0u32 && code <= 0x01D0u32) ||
         (code >= 0x01D2u32 && code <= 0x01D2u32) ||
         (code >= 0x01D4u32 && code <= 0x01D4u32) ||
         (code >= 0x01D6u32 && code <= 0x01D6u32) ||
@@ -691,8 +691,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x0261u32 && code <= 0x0261u32) ||
         (code >= 0x02C4u32 && code <= 0x02C4u32) ||
         (code >= 0x02C7u32 && code <= 0x02C7u32) ||
-        (code >= 0x02C9u32 && code <= 0x02CBu32) ||
-        (code >= 0x02CDu32 && code <= 0x02CDu32) ||
+        (code >= 0x02C9u32 && code <= 0x02CBu32)) { return true }
+    if ((code >= 0x02CDu32 && code <= 0x02CDu32) ||
         (code >= 0x02D0u32 && code <= 0x02D0u32) ||
         (code >= 0x02D8u32 && code <= 0x02DBu32) ||
         (code >= 0x02DDu32 && code <= 0x02DDu32) ||
@@ -703,8 +703,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x2013u32 && code <= 0x2016u32) ||
         (code >= 0x2018u32 && code <= 0x2019u32) ||
         (code >= 0x201Cu32 && code <= 0x201Du32) ||
-        (code >= 0x2020u32 && code <= 0x2022u32) ||
-        (code >= 0x2024u32 && code <= 0x2027u32) ||
+        (code >= 0x2020u32 && code <= 0x2022u32)) { return true }
+    if ((code >= 0x2024u32 && code <= 0x2027u32) ||
         (code >= 0x2030u32 && code <= 0x2030u32) ||
         (code >= 0x2032u32 && code <= 0x2033u32) ||
         (code >= 0x2035u32 && code <= 0x2035u32) ||
@@ -715,8 +715,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x2081u32 && code <= 0x2084u32) ||
         (code >= 0x20ACu32 && code <= 0x20ACu32) ||
         (code >= 0x2103u32 && code <= 0x2103u32) ||
-        (code >= 0x2105u32 && code <= 0x2105u32) ||
-        (code >= 0x2109u32 && code <= 0x2109u32) ||
+        (code >= 0x2105u32 && code <= 0x2105u32)) { return true }
+    if ((code >= 0x2109u32 && code <= 0x2109u32) ||
         (code >= 0x2113u32 && code <= 0x2113u32) ||
         (code >= 0x2116u32 && code <= 0x2116u32) ||
         (code >= 0x2121u32 && code <= 0x2122u32) ||
@@ -727,8 +727,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x2160u32 && code <= 0x216Bu32) ||
         (code >= 0x2170u32 && code <= 0x2179u32) ||
         (code >= 0x2189u32 && code <= 0x2189u32) ||
-        (code >= 0x2190u32 && code <= 0x2199u32) ||
-        (code >= 0x21B8u32 && code <= 0x21B9u32) ||
+        (code >= 0x2190u32 && code <= 0x2199u32)) { return true }
+    if ((code >= 0x21B8u32 && code <= 0x21B9u32) ||
         (code >= 0x21D2u32 && code <= 0x21D2u32) ||
         (code >= 0x21D4u32 && code <= 0x21D4u32) ||
         (code >= 0x21E7u32 && code <= 0x21E7u32) ||
@@ -739,8 +739,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x220Fu32 && code <= 0x220Fu32) ||
         (code >= 0x2211u32 && code <= 0x2211u32) ||
         (code >= 0x2215u32 && code <= 0x2215u32) ||
-        (code >= 0x221Au32 && code <= 0x221Au32) ||
-        (code >= 0x221Du32 && code <= 0x2220u32) ||
+        (code >= 0x221Au32 && code <= 0x221Au32)) { return true }
+    if ((code >= 0x221Du32 && code <= 0x2220u32) ||
         (code >= 0x2223u32 && code <= 0x2223u32) ||
         (code >= 0x2225u32 && code <= 0x2225u32) ||
         (code >= 0x2227u32 && code <= 0x222Cu32) ||
@@ -751,8 +751,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x224Cu32 && code <= 0x224Cu32) ||
         (code >= 0x2252u32 && code <= 0x2252u32) ||
         (code >= 0x2260u32 && code <= 0x2261u32) ||
-        (code >= 0x2264u32 && code <= 0x2267u32) ||
-        (code >= 0x226Au32 && code <= 0x226Bu32) ||
+        (code >= 0x2264u32 && code <= 0x2267u32)) { return true }
+    if ((code >= 0x226Au32 && code <= 0x226Bu32) ||
         (code >= 0x226Eu32 && code <= 0x226Fu32) ||
         (code >= 0x2282u32 && code <= 0x2283u32) ||
         (code >= 0x2286u32 && code <= 0x2287u32) ||
@@ -763,8 +763,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x2312u32 && code <= 0x2312u32) ||
         (code >= 0x2460u32 && code <= 0x24E9u32) ||
         (code >= 0x24EBu32 && code <= 0x254Bu32) ||
-        (code >= 0x2550u32 && code <= 0x2573u32) ||
-        (code >= 0x2580u32 && code <= 0x258Fu32) ||
+        (code >= 0x2550u32 && code <= 0x2573u32)) { return true }
+    if ((code >= 0x2580u32 && code <= 0x258Fu32) ||
         (code >= 0x2592u32 && code <= 0x2595u32) ||
         (code >= 0x25A0u32 && code <= 0x25A1u32) ||
         (code >= 0x25A3u32 && code <= 0x25A9u32) ||
@@ -775,8 +775,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x25C6u32 && code <= 0x25C8u32) ||
         (code >= 0x25CBu32 && code <= 0x25CBu32) ||
         (code >= 0x25CEu32 && code <= 0x25D1u32) ||
-        (code >= 0x25E2u32 && code <= 0x25E5u32) ||
-        (code >= 0x25EFu32 && code <= 0x25EFu32) ||
+        (code >= 0x25E2u32 && code <= 0x25E5u32)) { return true }
+    if ((code >= 0x25EFu32 && code <= 0x25EFu32) ||
         (code >= 0x2605u32 && code <= 0x2606u32) ||
         (code >= 0x2609u32 && code <= 0x2609u32) ||
         (code >= 0x260Eu32 && code <= 0x260Fu32) ||
@@ -787,8 +787,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x2660u32 && code <= 0x2661u32) ||
         (code >= 0x2663u32 && code <= 0x2665u32) ||
         (code >= 0x2667u32 && code <= 0x266Au32) ||
-        (code >= 0x266Cu32 && code <= 0x266Du32) ||
-        (code >= 0x266Fu32 && code <= 0x266Fu32) ||
+        (code >= 0x266Cu32 && code <= 0x266Du32)) { return true }
+    if ((code >= 0x266Fu32 && code <= 0x266Fu32) ||
         (code >= 0x269Eu32 && code <= 0x269Fu32) ||
         (code >= 0x26BFu32 && code <= 0x26BFu32) ||
         (code >= 0x26C6u32 && code <= 0x26CDu32) ||
@@ -799,8 +799,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x26EBu32 && code <= 0x26F1u32) ||
         (code >= 0x26F4u32 && code <= 0x26F4u32) ||
         (code >= 0x26F6u32 && code <= 0x26F9u32) ||
-        (code >= 0x26FBu32 && code <= 0x26FCu32) ||
-        (code >= 0x26FEu32 && code <= 0x26FFu32) ||
+        (code >= 0x26FBu32 && code <= 0x26FCu32)) { return true }
+    if ((code >= 0x26FEu32 && code <= 0x26FFu32) ||
         (code >= 0x273Du32 && code <= 0x273Du32) ||
         (code >= 0x2776u32 && code <= 0x277Fu32) ||
         (code >= 0x2B56u32 && code <= 0x2B59u32) ||
@@ -811,9 +811,10 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x1F100u32 && code <= 0x1F10Au32) ||
         (code >= 0x1F110u32 && code <= 0x1F12Du32) ||
         (code >= 0x1F130u32 && code <= 0x1F169u32) ||
-        (code >= 0x1F170u32 && code <= 0x1F18Du32) ||
-        (code >= 0x1F18Fu32 && code <= 0x1F190u32) ||
-        (code >= 0x1F19Bu32 && code <= 0x1F1ACu32)
+        (code >= 0x1F170u32 && code <= 0x1F18Du32)) { return true }
+    if ((code >= 0x1F18Fu32 && code <= 0x1F190u32) ||
+        (code >= 0x1F19Bu32 && code <= 0x1F1ACu32)) { return true }
+    false
 }
 
 

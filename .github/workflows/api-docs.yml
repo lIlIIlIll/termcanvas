@@ -1,0 +1,162 @@
+name: API documentation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  DISABLE_ZOXIDE: '1'
+
+jobs:
+  examples:
+    name: API examples (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: linux
+          - os: macos-15
+            target: macos
+          - os: windows-2025
+            target: windows
+    steps:
+      - name: Preserve source bytes across platforms
+        shell: bash
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v7
+      - name: Install pinned Cangjie STS SDK
+        uses: Zxilly/setup-cangjie@91463316b1c359f216c2ac49e35900f9341c1571 # v3.2.0
+        with:
+          channel: sts
+          version: 1.2.0
+          cjv-version: v0.2.21
+      - name: Configure isolated example environment
+        shell: python {0}
+        run: |
+          import os
+          from pathlib import Path
+          temporary = Path(os.environ['RUNNER_TEMP']) / 'termcanvas-docs-tmp'
+          temporary.mkdir(parents=True, exist_ok=True)
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as output:
+              for name, value in {'CANGJIE_SDK_ROOT': os.environ['CANGJIE_HOME'],
+                                  'TMPDIR': str(temporary), 'TMP': str(temporary), 'TEMP': str(temporary)}.items():
+                  output.write(f'{name}={value}\n')
+      - name: Build and run documented examples
+        shell: bash
+        run: python scripts/run_cjdoc_examples.py --report "$RUNNER_TEMP/cjdoc-examples.json"
+      - name: Preserve native example results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cjdoc-examples-${{ matrix.target }}
+          path: ${{ runner.temp }}/cjdoc-examples.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  build:
+    name: Generate and verify API reference
+    needs: examples
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pinned Cangjie STS SDK
+        uses: Zxilly/setup-cangjie@91463316b1c359f216c2ac49e35900f9341c1571 # v3.2.0
+        with:
+          channel: sts
+          version: 1.2.0
+          cjv-version: v0.2.21
+      - name: Configure isolated documentation environment
+        shell: python {0}
+        run: |
+          import os
+          from pathlib import Path
+          temporary = Path(os.environ['RUNNER_TEMP']) / 'termcanvas-docs-tmp'
+          temporary.mkdir(parents=True, exist_ok=True)
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as output:
+              for name, value in {'CANGJIE_SDK_ROOT': os.environ['CANGJIE_HOME'],
+                                  'TMPDIR': str(temporary), 'TMP': str(temporary), 'TEMP': str(temporary)}.items():
+                  output.write(f'{name}={value}\n')
+      - name: Install qualified cjdoc release
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/cjdoc.tar.gz"
+          curl -fsSL --retry 3 --output "$archive" https://github.com/lIlIIlIll/cjdoc/releases/download/v0.7.7/cjdoc-0.7.7-linux-x64.tar.gz
+          printf '%s  %s\n' ee328b037828891534d34b17a0691ee95ad521125868200f0ba2a37f58a89de4 "$archive" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/cjdoc-tool"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/cjdoc-tool"
+      - name: Test documentation tooling
+        env:
+          TERMCANVAS_CJDOC_BINARY: ${{ runner.temp }}/cjdoc-tool/cjdoc-0.7.7/cjdoc
+        run: python3 -m unittest discover -s scripts -p 'test_*cjdoc*.py' -v
+      - name: Generate all API sites
+        shell: bash
+        run: |
+          python3 scripts/generate_cjdoc.py --cjdoc "$RUNNER_TEMP/cjdoc-tool/cjdoc-0.7.7/cjdoc" --output "$RUNNER_TEMP/cjdoc-site"
+      - name: Download native example results
+        uses: actions/download-artifact@v8
+        with:
+          pattern: cjdoc-examples-*
+          path: ${{ runner.temp }}/cjdoc-reports
+      - name: Require complete documentation and native evidence
+        shell: bash
+        run: |
+          python3 scripts/check_cjdoc_completion.py "$RUNNER_TEMP/cjdoc-site" \
+            --report "$RUNNER_TEMP/cjdoc-reports/cjdoc-examples-linux/cjdoc-examples.json" \
+            --report "$RUNNER_TEMP/cjdoc-reports/cjdoc-examples-macos/cjdoc-examples.json" \
+            --report "$RUNNER_TEMP/cjdoc-reports/cjdoc-examples-windows/cjdoc-examples.json" \
+            --attestation "$RUNNER_TEMP/cjdoc-attestation.json" > "$RUNNER_TEMP/cjdoc-completion.json"
+      - name: Build offline archive
+        shell: bash
+        run: python3 scripts/bundle_cjdoc.py "$RUNNER_TEMP/cjdoc-site" --output "$RUNNER_TEMP/termcanvas-api-reference.zip"
+      - name: Prepare publication and recheck links
+        shell: bash
+        run: |
+          python3 scripts/prepare_cjdoc_publication.py "$RUNNER_TEMP/cjdoc-site" \
+            --archive "$RUNNER_TEMP/termcanvas-api-reference.zip" \
+            --attestation "$RUNNER_TEMP/cjdoc-attestation.json" \
+            --report "$RUNNER_TEMP/cjdoc-reports/cjdoc-examples-linux/cjdoc-examples.json" \
+            --report "$RUNNER_TEMP/cjdoc-reports/cjdoc-examples-macos/cjdoc-examples.json" \
+            --report "$RUNNER_TEMP/cjdoc-reports/cjdoc-examples-windows/cjdoc-examples.json" \
+            --revision "$GITHUB_SHA"
+          python3 scripts/check_cjdoc_links.py "$RUNNER_TEMP/cjdoc-site"
+      - name: Preserve completion report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cjdoc-completion
+          path: ${{ runner.temp }}/cjdoc-completion.json
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ${{ runner.temp }}/cjdoc-site
+
+  deploy:
+    name: Deploy API reference
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: termcanvas-api-pages
+      cancel-in-progress: false
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

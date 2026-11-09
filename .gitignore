@@ -43,3 +43,6 @@ docs/reviews/*/findings.json
 !examples/ci_activity/screenshots/ci-showcase-capture-manifest.json
 !scripts/visual_inventory.json
 !docs/assets/capture-provenance.json
+
+# Keep the source-controlled API example bindings.
+!docs/api-examples/manifest.json
