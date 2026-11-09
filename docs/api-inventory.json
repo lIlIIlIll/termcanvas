@@ -53058,7 +53058,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 6,
+      "line": 7,
       "level": "top_level",
       "kind": "enum",
       "symbol": "AnsiTokenKind",
@@ -53076,7 +53076,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 7,
+      "line": 9,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -53095,7 +53095,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 8,
+      "line": 11,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -53114,7 +53114,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 9,
+      "line": 13,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -53133,7 +53133,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 10,
+      "line": 15,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -53152,7 +53152,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 11,
+      "line": 17,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -53171,7 +53171,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 14,
+      "line": 21,
       "level": "top_level",
       "kind": "class",
       "symbol": "AnsiToken",
@@ -53189,7 +53189,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 15,
+      "line": 23,
       "level": "member",
       "kind": "let",
       "symbol": "kind",
@@ -53207,7 +53207,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 16,
+      "line": 25,
       "level": "member",
       "kind": "let",
       "symbol": "text",
@@ -53225,7 +53225,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 18,
+      "line": 31,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -53243,7 +53243,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 24,
+      "line": 42,
       "level": "top_level",
       "kind": "func",
       "symbol": "parseAnsi",
@@ -53261,7 +53261,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 94,
+      "line": 113,
       "level": "top_level",
       "kind": "class",
       "symbol": "TerminalScreen",
@@ -53279,7 +53279,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 95,
+      "line": 115,
       "level": "member",
       "kind": "let",
       "symbol": "cols",
@@ -53297,7 +53297,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 96,
+      "line": 117,
       "level": "member",
       "kind": "let",
       "symbol": "rows",
@@ -53315,7 +53315,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 110,
+      "line": 134,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -53333,7 +53333,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 119,
+      "line": 145,
       "level": "member",
       "kind": "func",
       "symbol": "textWidthOptions",
@@ -53351,7 +53351,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 122,
+      "line": 151,
       "level": "member",
       "kind": "func",
       "symbol": "matchesTextWidthOptions",
@@ -53369,7 +53369,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 130,
+      "line": 164,
       "level": "member",
       "kind": "func",
       "symbol": "cell",
@@ -53387,7 +53387,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 134,
+      "line": 172,
       "level": "member",
       "kind": "func",
       "symbol": "lineText",
@@ -53405,7 +53405,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 144,
+      "line": 185,
       "level": "member",
       "kind": "func",
       "symbol": "feed",
@@ -53423,7 +53423,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 152,
+      "line": 196,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -53441,7 +53441,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 340,
+      "line": 385,
       "level": "top_level",
       "kind": "class",
       "symbol": "TerminalTranscript",
@@ -53459,7 +53459,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 341,
+      "line": 387,
       "level": "member",
       "kind": "let",
       "symbol": "screen",
@@ -53477,7 +53477,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 343,
+      "line": 390,
       "level": "member",
       "kind": "let",
       "symbol": "maxChunks",
@@ -53495,7 +53495,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 344,
+      "line": 392,
       "level": "member",
       "kind": "var",
       "symbol": "followTail",
@@ -53513,7 +53513,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 346,
+      "line": 401,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -53531,7 +53531,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 353,
+      "line": 411,
       "level": "member",
       "kind": "func",
       "symbol": "append",
@@ -53549,7 +53549,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 359,
+      "line": 420,
       "level": "member",
       "kind": "func",
       "symbol": "chunkCount",
@@ -53567,7 +53567,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 364,
+      "line": 426,
       "level": "top_level",
       "kind": "class",
       "symbol": "TerminalView",
@@ -53585,7 +53585,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 373,
+      "line": 440,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -53603,7 +53603,7 @@
     {
       "package": "terminal",
       "path": "packages/terminal/src/terminal.cj",
-      "line": 382,
+      "line": 454,
       "level": "member",
       "kind": "func",
       "symbol": "render",

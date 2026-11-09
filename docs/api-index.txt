@@ -2919,37 +2919,37 @@ packages/media/src/media.cj:314:public func render(area: Rect, buffer: Buffer): 
 packages/media/src/media.cj:349:public func rgbaToAsciiFrame(bytes: Array<Byte>, width: Int64, height: Int64, options: AsciiRenderOptions): AsciiFrame
 packages/media/src/media.cj:472:public func preferredMediaProtocol(caps: TerminalCapabilities): MediaProtocol
 packages/media/src/media.cj:478:public func mediaPlacementWithAdapter( id: String, source: MediaSource, area: Rect, caps: TerminalCapabilities, adapter!: MediaAdapter = FallbackMediaAdapter(), fit!: MediaFit = MediaFit.Contain, frameIndex!: Int64 = 0 ): MediaPlacement
-packages/terminal/src/terminal.cj:6:public enum AnsiTokenKind {
-packages/terminal/src/terminal.cj:7:Text
-packages/terminal/src/terminal.cj:8:Sgr
-packages/terminal/src/terminal.cj:9:Cursor
-packages/terminal/src/terminal.cj:10:Erase
-packages/terminal/src/terminal.cj:11:Control
-packages/terminal/src/terminal.cj:14:public class AnsiToken {
-packages/terminal/src/terminal.cj:15:public let kind: AnsiTokenKind
-packages/terminal/src/terminal.cj:16:public let text: String
-packages/terminal/src/terminal.cj:18:public init(kind: AnsiTokenKind, text!: String = "")
-packages/terminal/src/terminal.cj:24:public func parseAnsi(text: String): Array<AnsiToken>
-packages/terminal/src/terminal.cj:94:public class TerminalScreen {
-packages/terminal/src/terminal.cj:95:public let cols: Int64
-packages/terminal/src/terminal.cj:96:public let rows: Int64
-packages/terminal/src/terminal.cj:110:public init(cols!: Int64 = 80, rows!: Int64 = 24, textWidthOptions!: TextWidthOptions = TextWidthOptions())
-packages/terminal/src/terminal.cj:119:public func textWidthOptions(): TextWidthOptions
-packages/terminal/src/terminal.cj:122:public func matchesTextWidthOptions(options: TextWidthOptions): Bool
-packages/terminal/src/terminal.cj:130:public func cell(x: Int64, y: Int64): Cell
-packages/terminal/src/terminal.cj:134:public func lineText(y: Int64): String
-packages/terminal/src/terminal.cj:144:public func feed(text: String): Unit
-packages/terminal/src/terminal.cj:152:public func render(area: Rect, target: Buffer): Unit
-packages/terminal/src/terminal.cj:340:public class TerminalTranscript {
-packages/terminal/src/terminal.cj:341:public let screen: TerminalScreen
-packages/terminal/src/terminal.cj:343:public let maxChunks: Int64
-packages/terminal/src/terminal.cj:344:public var followTail: Bool
-packages/terminal/src/terminal.cj:346:public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true, textWidthOptions!: TextWidthOptions = TextWidthOptions())
-packages/terminal/src/terminal.cj:353:public func append(text: String): Unit
-packages/terminal/src/terminal.cj:359:public func chunkCount(): Int64
-packages/terminal/src/terminal.cj:364:public class TerminalView <: Widget {
-packages/terminal/src/terminal.cj:373:public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "", searchStyle!: ?StyleOverride = None, theme!: ?Theme = None)
-packages/terminal/src/terminal.cj:382:public func render(area: Rect, buffer: Buffer): Unit
+packages/terminal/src/terminal.cj:7:public enum AnsiTokenKind {
+packages/terminal/src/terminal.cj:9:Text
+packages/terminal/src/terminal.cj:11:Sgr
+packages/terminal/src/terminal.cj:13:Cursor
+packages/terminal/src/terminal.cj:15:Erase
+packages/terminal/src/terminal.cj:17:Control
+packages/terminal/src/terminal.cj:21:public class AnsiToken {
+packages/terminal/src/terminal.cj:23:public let kind: AnsiTokenKind
+packages/terminal/src/terminal.cj:25:public let text: String
+packages/terminal/src/terminal.cj:31:public init(kind: AnsiTokenKind, text!: String = "")
+packages/terminal/src/terminal.cj:42:public func parseAnsi(text: String): Array<AnsiToken>
+packages/terminal/src/terminal.cj:113:public class TerminalScreen {
+packages/terminal/src/terminal.cj:115:public let cols: Int64
+packages/terminal/src/terminal.cj:117:public let rows: Int64
+packages/terminal/src/terminal.cj:134:public init(cols!: Int64 = 80, rows!: Int64 = 24, textWidthOptions!: TextWidthOptions = TextWidthOptions())
+packages/terminal/src/terminal.cj:145:public func textWidthOptions(): TextWidthOptions
+packages/terminal/src/terminal.cj:151:public func matchesTextWidthOptions(options: TextWidthOptions): Bool
+packages/terminal/src/terminal.cj:164:public func cell(x: Int64, y: Int64): Cell
+packages/terminal/src/terminal.cj:172:public func lineText(y: Int64): String
+packages/terminal/src/terminal.cj:185:public func feed(text: String): Unit
+packages/terminal/src/terminal.cj:196:public func render(area: Rect, target: Buffer): Unit
+packages/terminal/src/terminal.cj:385:public class TerminalTranscript {
+packages/terminal/src/terminal.cj:387:public let screen: TerminalScreen
+packages/terminal/src/terminal.cj:390:public let maxChunks: Int64
+packages/terminal/src/terminal.cj:392:public var followTail: Bool
+packages/terminal/src/terminal.cj:401:public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true, textWidthOptions!: TextWidthOptions = TextWidthOptions())
+packages/terminal/src/terminal.cj:411:public func append(text: String): Unit
+packages/terminal/src/terminal.cj:420:public func chunkCount(): Int64
+packages/terminal/src/terminal.cj:426:public class TerminalView <: Widget {
+packages/terminal/src/terminal.cj:440:public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "", searchStyle!: ?StyleOverride = None, theme!: ?Theme = None)
+packages/terminal/src/terminal.cj:454:public func render(area: Rect, buffer: Buffer): Unit
 packages/testing/src/testing.cj:10:public class TestReport {
 packages/testing/src/testing.cj:12:public let passed: Bool
 packages/testing/src/testing.cj:14:public let exited: Bool

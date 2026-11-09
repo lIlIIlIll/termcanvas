@@ -3,24 +3,42 @@ package terminal
 import core.*
 import std.collection.*
 
+/** ANSI 解析结果的类别。 */
 public enum AnsiTokenKind {
+    /** 普通文本。 */
     | Text
+    /** 设置图形属性的 SGR 序列。 */
     | Sgr
+    /** 设置光标位置的序列。 */
     | Cursor
+    /** 清除显示区域或行的序列。 */
     | Erase
+    /** 其他已识别的控制序列。 */
     | Control
 }
 
+/** 一个 ANSI 解析结果，包含类别和原始文本。 */
 public class AnsiToken {
+    /** 解析结果的类别。 */
     public let kind: AnsiTokenKind
+    /** 文本或控制序列的原始内容。 */
     public let text: String
 
+    /** 保存类别和文本。
+     * @param kind 解析结果类别
+     * @param text 文本或控制序列
+     */
     public init(kind: AnsiTokenKind, text!: String = "") {
         this.kind = kind
         this.text = text
     }
 }
 
+/** 解析一次 ANSI 输入；末尾未完成的控制序列不会保留。
+ * 跨多次输入保留解析状态时，可使用 TerminalScreen.feed。
+ * @param text 要解析的文本
+ * @return 按输入顺序产生的解析结果
+ */
 public func parseAnsi(text: String): Array<AnsiToken> {
     // A standalone parse drops an unfinished control prefix at end of input.
     // TerminalScreen owns a parser instance to preserve it across feed calls.
@@ -91,8 +109,11 @@ class AnsiParser {
     }
 }
 
+/** 保存终端单元格画面，并按顺序处理文本和支持的 ANSI 控制序列。 */
 public class TerminalScreen {
+    /** 画面列数，至少为一。 */
     public let cols: Int64
+    /** 画面行数，至少为一。 */
     public let rows: Int64
     private let buffer: Buffer
     private let widthOptions: TextWidthOptions
@@ -106,6 +127,9 @@ public class TerminalScreen {
 
     /** 创建画面；行列至少为 1。文本宽度策略须在 feed 前指定，默认使用窄宽度。
      * 策略不可更改：切换时应创建新画面并重放完整输入，已有单元格不能无损重建。
+     * @param cols 终端列数；小于一时按一处理
+     * @param rows 终端行数；小于一时按一处理
+     * @param textWidthOptions 画面使用的文本宽度策略
      */
     public init(cols!: Int64 = 80, rows!: Int64 = 24, textWidthOptions!: TextWidthOptions = TextWidthOptions()) {
         this.cols = max(1, cols)
@@ -115,10 +139,15 @@ public class TerminalScreen {
         buffer.setTextWidthOptions(textWidthOptions)
     }
 
-    /** 返回画面建立时确定的文本宽度策略。 */
+    /** 返回画面建立时确定的文本宽度策略。
+     * @return 创建画面时使用的宽度策略
+     */
     public func textWidthOptions(): TextWidthOptions { widthOptions }
 
-    /** 判断目标文本宽度策略能否直接复制此画面。 */
+    /** 判断目标文本宽度策略能否直接复制此画面。
+     * @param options 目标宽度策略
+     * @return 两者的模糊宽度策略一致时为 true
+     */
     public func matchesTextWidthOptions(options: TextWidthOptions): Bool {
         match ((widthOptions.ambiguousWidth, options.ambiguousWidth)) {
             case (AmbiguousWidth.Narrow, AmbiguousWidth.Narrow) => true
@@ -127,10 +156,19 @@ public class TerminalScreen {
         }
     }
 
+    /** 返回指定位置的单元格；越界时返回默认单元格。
+     * @param x 列坐标
+     * @param y 行坐标
+     * @return 指定单元格或默认单元格
+     */
     public func cell(x: Int64, y: Int64): Cell {
         buffer.getCell(x, y)
     }
 
+    /** 返回一行的单元格文本，用空格表示空符号；越界时返回空字符串。
+     * @param y 行坐标
+     * @return 该行文本，或越界时的空字符串
+     */
     public func lineText(y: Int64): String {
         var out = ""
         if (y < 0 || y >= rows) { return out }
@@ -141,13 +179,19 @@ public class TerminalScreen {
         out
     }
 
+    /** 将输入交给连续的 ANSI 解析器并更新画面；未完成的控制序列可在后续输入中继续。
+     * @param text 新输入的文本或控制序列
+     */
     public func feed(text: String): Unit {
         for (token in parser.feed(text)) {
             apply(token)
         }
     }
 
-    /** 将画面左上角起的内容复制到目标缓冲区；目标宽度策略不同时抛出 IllegalArgumentException。
+    /** 将画面左上角起的内容复制到目标缓冲区。
+     * @param area 目标区域
+     * @param target 目标缓冲区
+     * @throws IllegalArgumentException 目标与画面的文本宽度策略不同
      */
     public func render(area: Rect, target: Buffer): Unit {
         if (!matchesTextWidthOptions(target.textWidthOptions())) {
@@ -337,12 +381,23 @@ public class TerminalScreen {
     }
 }
 
+/** 保存终端画面和最近输入块的数量上限。 */
 public class TerminalTranscript {
+    /** 追加输入时更新的终端画面。 */
     public let screen: TerminalScreen
     private let chunks = ArrayList<String>()
+    /** 保留的输入块数量上限，至少为一。 */
     public let maxChunks: Int64
+    /** 保存调用方设置的跟随标志；当前视图渲染不读取此值。 */
     public var followTail: Bool
 
+    /** 创建终端画面并保存输入块上限与跟随标志。
+     * @param cols 画面列数
+     * @param rows 画面行数
+     * @param maxChunks 输入块保留上限；小于一时按一处理
+     * @param followTail 初始跟随标志
+     * @param textWidthOptions 画面的文本宽度策略
+     */
     public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true,
         textWidthOptions!: TextWidthOptions = TextWidthOptions()) {
         screen = TerminalScreen(cols: cols, rows: rows, textWidthOptions: textWidthOptions)
@@ -350,17 +405,24 @@ public class TerminalTranscript {
         this.followTail = followTail
     }
 
+    /** 追加输入块并更新画面；超出上限时移除最早的输入块。
+     * @param text 文本或 ANSI 控制序列
+     */
     public func append(text: String): Unit {
         chunks.add(text)
         while (chunks.size > maxChunks) { chunks.remove(at: 0) }
         screen.feed(text)
     }
 
+    /** 返回当前保留的输入块数量。
+     * @return 保留的输入块数
+     */
     public func chunkCount(): Int64 {
         chunks.size
     }
 }
 
+/** 把终端记录中的画面绘制到缓冲区，并可突出显示搜索文字。 */
 public class TerminalView <: Widget {
     private let transcript: TerminalTranscript
     private let block: ?Block
@@ -369,6 +431,11 @@ public class TerminalView <: Widget {
     private let theme: ?Theme
 
     /** 创建终端视图。默认搜索样式继承上下文选中背景并添加下划线；显式搜索样式按属性覆盖 ANSI 样式。
+     * @param transcript 要显示的终端记录
+     * @param block 可选外围区块
+     * @param search 要突出显示的文字；空字符串不搜索
+     * @param searchStyle 可选搜索样式覆盖
+     * @param theme 可选语义主题
      */
     public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = "",
         searchStyle!: ?StyleOverride = None, theme!: ?Theme = None) {
@@ -379,6 +446,11 @@ public class TerminalView <: Widget {
         this.theme = theme
     }
 
+    /** 绘制记录画面及搜索结果；文本宽度策略须与目标缓冲区一致。
+     * @param area 目标区域
+     * @param buffer 目标缓冲区
+     * @throws IllegalArgumentException 记录与缓冲区的文本宽度策略不同
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (!transcript.screen.matchesTextWidthOptions(buffer.textWidthOptions())) {
             throw IllegalArgumentException("TerminalScreen text width policy differs from target; create a new screen and replay input")

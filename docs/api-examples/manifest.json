@@ -272,6 +272,206 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "terminal-parse-and-view",
+      "source": "docs/api-examples/terminal.cj",
+      "dependencies": [
+        "terminal"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "AnsiTokenKind",
+          "signature": "public enum AnsiTokenKind {"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "AnsiTokenKind.Text",
+          "signature": "Text"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "AnsiTokenKind.Sgr",
+          "signature": "Sgr"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "AnsiTokenKind.Cursor",
+          "signature": "Cursor"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "AnsiTokenKind.Erase",
+          "signature": "Erase"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "AnsiTokenKind.Control",
+          "signature": "Control"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "AnsiToken",
+          "signature": "public class AnsiToken {"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "AnsiToken.kind",
+          "signature": "public let kind: AnsiTokenKind"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "AnsiToken.text",
+          "signature": "public let text: String"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "AnsiToken.init",
+          "signature": "public init(kind: AnsiTokenKind, text!: String = \"\")"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "parseAnsi",
+          "signature": "public func parseAnsi(text: String): Array<AnsiToken>"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalScreen",
+          "signature": "public class TerminalScreen {"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalScreen.cols",
+          "signature": "public let cols: Int64"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalScreen.rows",
+          "signature": "public let rows: Int64"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalScreen.init",
+          "signature": "public init(cols!: Int64 = 80, rows!: Int64 = 24, textWidthOptions!: TextWidthOptions = TextWidthOptions())"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalScreen.textWidthOptions",
+          "signature": "public func textWidthOptions(): TextWidthOptions"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalScreen.matchesTextWidthOptions",
+          "signature": "public func matchesTextWidthOptions(options: TextWidthOptions): Bool"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalScreen.cell",
+          "signature": "public func cell(x: Int64, y: Int64): Cell"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalScreen.lineText",
+          "signature": "public func lineText(y: Int64): String"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalScreen.feed",
+          "signature": "public func feed(text: String): Unit"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalScreen.render",
+          "signature": "public func render(area: Rect, target: Buffer): Unit"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalTranscript",
+          "signature": "public class TerminalTranscript {"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalTranscript.screen",
+          "signature": "public let screen: TerminalScreen"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalTranscript.maxChunks",
+          "signature": "public let maxChunks: Int64"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalTranscript.followTail",
+          "signature": "public var followTail: Bool"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalTranscript.init",
+          "signature": "public init(cols!: Int64 = 80, rows!: Int64 = 24, maxChunks!: Int64 = 10000, followTail!: Bool = true, textWidthOptions!: TextWidthOptions = TextWidthOptions())"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalTranscript.append",
+          "signature": "public func append(text: String): Unit"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalTranscript.chunkCount",
+          "signature": "public func chunkCount(): Int64"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalView",
+          "signature": "public class TerminalView <: Widget {"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalView.init",
+          "signature": "public init(transcript: TerminalTranscript, block!: ?Block = None, search!: String = \"\", searchStyle!: ?StyleOverride = None, theme!: ?Theme = None)"
+        },
+        {
+          "package": "terminal",
+          "path": "packages/terminal/src/terminal.cj",
+          "symbol": "TerminalView.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }
