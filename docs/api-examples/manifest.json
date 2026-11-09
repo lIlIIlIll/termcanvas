@@ -14185,6 +14185,230 @@
           "signature": "public init(name: String, path: String, isDir: Bool)"
         }
       ]
+    },
+    {
+      "id": "virtual-table",
+      "source": "docs/api-examples/virtual-table.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable",
+          "signature": "public class VirtualTable <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.offset",
+          "signature": "public var offset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.selectedRow",
+          "signature": "public var selectedRow: ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.selectedColumn",
+          "signature": "public var selectedColumn: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.columnOffset",
+          "signature": "public var columnOffset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.frozenColumns",
+          "signature": "public var frozenColumns: Int64 = 0"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.sortColumn",
+          "signature": "public var sortColumn: ?Int64 = None"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.sortDescending",
+          "signature": "public var sortDescending: Bool = false"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.filterText",
+          "signature": "public var filterText: String = \"\""
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.stickyHeader",
+          "signature": "public var stickyHeader: Bool = true"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.status",
+          "signature": "public var status: TableStatus = TableStatus.Ready"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.emptyText",
+          "signature": "public var emptyText: String = \"No rows\""
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.loadingText",
+          "signature": "public var loadingText: String = \"Loading\""
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.init",
+          "signature": "public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cellStyle!: ?Style = None, statusStyle!: ?Style = None, selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None, dataModel!: ?PagedTableModel = None, cacheCapacity!: Int64 = 1024 )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.init",
+          "signature": "public init(columns: Array<TableColumn>, model: PagedTableModel, block!: ?Block = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.handle",
+          "signature": "public func handle(mouse: MouseEvent, area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.handle",
+          "signature": "public func handle(key: KeyEvent, viewportHeight: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.handleWithDirty",
+          "signature": "public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.dirtyHeader",
+          "signature": "public func dirtyHeader(area: Rect): DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.dirtyBody",
+          "signature": "public func dirtyBody(area: Rect): DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.dirtyRows",
+          "signature": "public func dirtyRows(area: Rect, rows: Array<Int64>): DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.dirtySelectionChange",
+          "signature": "public func dirtySelectionChange(area: Rect, before: ?Int64, after: ?Int64): DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.dirtyStatus",
+          "signature": "public func dirtyStatus(area: Rect): DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.clearCachedRows",
+          "signature": "public func clearCachedRows(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.cachedRowCount",
+          "signature": "public func cachedRowCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.sortBy",
+          "signature": "public func sortBy(column: Int64, descending!: Bool = false): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.clearSort",
+          "signature": "public func clearSort(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.resizeColumn",
+          "signature": "public func resizeColumn(column: Int64, width: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.setFrozenColumns",
+          "signature": "public func setFrozenColumns(count: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.setFilter",
+          "signature": "public func setFilter(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.setStatus",
+          "signature": "public func setStatus(status: TableStatus): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.toggleSelectedRow",
+          "signature": "public func toggleSelectedRow(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.isSelected",
+          "signature": "public func isSelected(row: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/data_widgets.cj",
+          "symbol": "VirtualTable.selectedRowIndices",
+          "signature": "public func selectedRowIndices(): Array<Int64>"
+        }
+      ]
     }
   ]
 }

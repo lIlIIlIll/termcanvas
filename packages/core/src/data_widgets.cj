@@ -122,21 +122,47 @@ public enum TableStatus {
     | Error(String)
 }
 
+/** 按需读取行并支持导航、过滤和多选的表格。
+ */
 public class VirtualTable <: Widget {
     private let columns: Array<TableColumn>
     private let rowCount: Int64
     private let rowAt: (Int64) -> Array<String>
+    /** 视口起始的可见行索引。
+     */
     public var offset: Int64
+    /** 当前可见行索引。
+     */
     public var selectedRow: ?Int64
+    /** 当前列索引。
+     */
     public var selectedColumn: Int64
+    /** 横向滚动的起始列。
+     */
     public var columnOffset: Int64
+    /** 左侧冻结列数。
+     */
     public var frozenColumns: Int64 = 0
+    /** 当前排序列。
+     */
     public var sortColumn: ?Int64 = None
+    /** 是否降序排序。
+     */
     public var sortDescending: Bool = false
+    /** 当前过滤文本。
+     */
     public var filterText: String = ""
+    /** 是否绘制固定表头。
+     */
     public var stickyHeader: Bool = true
+    /** 表格显示状态。
+     */
     public var status: TableStatus = TableStatus.Ready
+    /** 空表提示文本。
+     */
     public var emptyText: String = "No rows"
+    /** 加载提示文本。
+     */
     public var loadingText: String = "Loading"
     private let selectedRows = ArrayList<Int64>()
     private let rowCache = HashMap<Int64, Array<String>>()
@@ -157,6 +183,26 @@ public class VirtualTable <: Widget {
     private let sortState: ?SortState
     private let filterState: ?FilterState
 
+    /** 创建按索引读取行的表格；分页模型不能与旧式排序、过滤或选择绑定同时使用。
+     * @param columns 表格列
+     * @param rowCount 源行数，负值按零处理
+     * @param rowAt 按源索引读取单行的函数
+     * @param offset 初始可见行偏移
+     * @param selectedRow 初始选中行
+     * @param selectedColumn 初始选中列
+     * @param columnOffset 初始横向起始列
+     * @param block 可选外框
+     * @param style 可选普通行样式
+     * @param selectedStyle 可选选中行样式
+     * @param cellStyle 可选选中单元格样式
+     * @param statusStyle 可选状态提示样式
+     * @param selectionModel 可选旧式选择状态
+     * @param scrollState 可选滚动状态
+     * @param sortState 可选旧式排序状态
+     * @param filterState 可选旧式过滤状态
+     * @param dataModel 可选分页模型
+     * @param cacheCapacity 行缓存容量，至少为一
+     */
     public init(
         columns: Array<TableColumn>,
         rowCount: Int64,
@@ -200,10 +246,20 @@ public class VirtualTable <: Widget {
         this.cacheCapacity = max(1, cacheCapacity)
     }
 
+    /** 创建由分页模型提供数据的表格。
+     * @param columns 表格列
+     * @param model 分页表格模型
+     * @param block 可选外框
+     */
     public init(columns: Array<TableColumn>, model: PagedTableModel, block!: ?Block = None) {
         this(columns, 0, { _ => Array<String>() }, block: block, dataModel: Some(model))
     }
 
+    /** 处理表头排序、滚动和行列选择。
+     * @param mouse 鼠标事件
+     * @param area 表格区域
+     * @return 处理了事件时为 true。
+     */
     public func handle(mouse: MouseEvent, area: Rect): Bool {
         syncExternalState()
         let target = contentArea(area)
@@ -241,6 +297,10 @@ public class VirtualTable <: Widget {
         false
     }
 
+    /** 在区域内裁剪绘制表头和数据。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -314,6 +374,11 @@ public class VirtualTable <: Widget {
         }
     }
 
+    /** 处理行列导航及空格多选。
+     * @param key 键盘事件
+     * @param viewportHeight 可见数据行数
+     * @return 支持的按键返回 true。
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
         syncExternalState()
         let current = match (selectedRow) {
@@ -373,6 +438,11 @@ public class VirtualTable <: Widget {
         handled
     }
 
+    /** 处理按键并计算需要重绘的区域。
+     * @param key 键盘事件
+     * @param area 表格区域
+     * @return 按键被处理且有可用数据区域时返回脏区域，否则返回 None。
+     */
     public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects {
         let content = contentArea(area)
         if (content.width <= 0 || content.height <= 0) { return None }
@@ -395,6 +465,10 @@ public class VirtualTable <: Widget {
         Some(dirtySelectionChange(area, beforeSelected, selectedRow))
     }
 
+    /** 计算表头重绘区域。
+     * @param area 表格区域
+     * @return 表头脏区域；未显示表头时为空。
+     */
     public func dirtyHeader(area: Rect): DirtyRects {
         let dirty = DirtyRects()
         let content = contentArea(area)
@@ -404,6 +478,10 @@ public class VirtualTable <: Widget {
         dirty
     }
 
+    /** 计算数据区重绘区域。
+     * @param area 表格区域
+     * @return 数据区脏区域。
+     */
     public func dirtyBody(area: Rect): DirtyRects {
         let dirty = DirtyRects()
         let content = contentArea(area)
@@ -413,6 +491,11 @@ public class VirtualTable <: Widget {
         dirty
     }
 
+    /** 计算指定可见行的重绘区域；没有命中行时回退到整个内容区域。
+     * @param area 表格区域
+     * @param rows 可见行索引
+     * @return 重绘区域集合。
+     */
     public func dirtyRows(area: Rect, rows: Array<Int64>): DirtyRects {
         let dirty = DirtyRects()
         let content = contentArea(area)
@@ -425,6 +508,12 @@ public class VirtualTable <: Widget {
         dirty
     }
 
+    /** 计算选择变化前后行的重绘区域。
+     * @param area 表格区域
+     * @param before 原可见行索引
+     * @param after 新可见行索引
+     * @return 重绘区域集合。
+     */
     public func dirtySelectionChange(area: Rect, before: ?Int64, after: ?Int64): DirtyRects {
         let rows = ArrayList<Int64>()
         match (before) {
@@ -438,20 +527,33 @@ public class VirtualTable <: Widget {
         dirtyRows(area, rows.toArray())
     }
 
+    /** 计算状态变化的重绘区域。
+     * @param area 表格区域
+     * @return 数据区脏区域。
+     */
     public func dirtyStatus(area: Rect): DirtyRects {
         dirtyBody(area)
     }
 
+    /** 清除行缓存；分页模型也会失效。
+     */
     public func clearCachedRows(): Unit {
         if (let Some(model) <- dataModel) { model.invalidate() }
         clearRowCache()
     }
 
+    /** 获取当前缓存的行数。
+     * @return 缓存行数。
+     */
     public func cachedRowCount(): Int64 {
         if (let Some(model) <- dataModel) { return model.cachedRowCount() }
         rowCache.size
     }
 
+    /** 按列设置排序，重置滚动并清除行缓存。
+     * @param column 排序列索引，会限制到列范围
+     * @param descending 是否降序
+     */
     public func sortBy(column: Int64, descending!: Bool = false): Unit {
         syncExternalState()
         let sortedColumn = clamp(column, 0, max(0, columns.size - 1))
@@ -470,6 +572,8 @@ public class VirtualTable <: Widget {
         clearRowCache()
     }
 
+    /** 清除排序并清除行缓存。
+     */
     public func clearSort(): Unit {
         syncExternalState()
         sortColumn = None
@@ -482,16 +586,27 @@ public class VirtualTable <: Widget {
         clearRowCache()
     }
 
+    /** 调整列宽。
+     * @param column 列索引
+     * @param width 新宽度，至少为一
+     * @return 列索引有效时为 true。
+     */
     public func resizeColumn(column: Int64, width: Int64): Bool {
         if (column < 0 || column >= columns.size) { return false }
         columns[column].width = max(1, width)
         true
     }
 
+    /** 设置左侧冻结列数。
+     * @param count 列数，会限制到有效范围
+     */
     public func setFrozenColumns(count: Int64): Unit {
         frozenColumns = clamp(count, 0, columns.size)
     }
 
+    /** 设置过滤条件，重置选择和滚动并清除缓存。
+     * @param text 过滤文本
+     */
     public func setFilter(text: String): Unit {
         syncExternalState()
         filterText = text
@@ -509,10 +624,15 @@ public class VirtualTable <: Widget {
         clearRowCache()
     }
 
+    /** 设置显示状态。
+     * @param status 新状态
+     */
     public func setStatus(status: TableStatus): Unit {
         this.status = status
     }
 
+    /** 切换当前行的多选状态；分页模型使用其节点标识。
+     */
     public func toggleSelectedRow(): Unit {
         if (let Some(model) <- dataModel) {
             if (let Some(id) <- model.selectedId()) { model.toggle(id) }
@@ -539,6 +659,10 @@ public class VirtualTable <: Widget {
         }
     }
 
+    /** 查询旧式选择模型或本地集合的源行选择状态。
+     * @param row 源行索引
+     * @return 已选中时为 true。
+     */
     public func isSelected(row: Int64): Bool {
         match (selectionModel) {
             case Some(model) => return model.isSelected(row)
@@ -550,6 +674,9 @@ public class VirtualTable <: Widget {
         false
     }
 
+    /** 获取旧式选择模型或本地集合的源行索引。
+     * @return 已选中的源行索引数组。
+     */
     public func selectedRowIndices(): Array<Int64> {
         match (selectionModel) {
             case Some(model) => model.selectedIndices()

@@ -695,88 +695,88 @@ packages/core/src/data_widgets.cj:112:Ready
 packages/core/src/data_widgets.cj:115:Empty
 packages/core/src/data_widgets.cj:118:Loading
 packages/core/src/data_widgets.cj:122:Error(String)
-packages/core/src/data_widgets.cj:125:public class VirtualTable <: Widget {
-packages/core/src/data_widgets.cj:129:public var offset: Int64
-packages/core/src/data_widgets.cj:130:public var selectedRow: ?Int64
-packages/core/src/data_widgets.cj:131:public var selectedColumn: Int64
-packages/core/src/data_widgets.cj:132:public var columnOffset: Int64
-packages/core/src/data_widgets.cj:133:public var frozenColumns: Int64 = 0
-packages/core/src/data_widgets.cj:134:public var sortColumn: ?Int64 = None
-packages/core/src/data_widgets.cj:135:public var sortDescending: Bool = false
-packages/core/src/data_widgets.cj:136:public var filterText: String = ""
-packages/core/src/data_widgets.cj:137:public var stickyHeader: Bool = true
-packages/core/src/data_widgets.cj:138:public var status: TableStatus = TableStatus.Ready
-packages/core/src/data_widgets.cj:139:public var emptyText: String = "No rows"
-packages/core/src/data_widgets.cj:140:public var loadingText: String = "Loading"
-packages/core/src/data_widgets.cj:160:public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cellStyle!: ?Style = None, statusStyle!: ?Style = None, selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None, dataModel!: ?PagedTableModel = None, cacheCapacity!: Int64 = 1024 )
-packages/core/src/data_widgets.cj:203:public init(columns: Array<TableColumn>, model: PagedTableModel, block!: ?Block = None)
-packages/core/src/data_widgets.cj:207:public func handle(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/data_widgets.cj:244:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/data_widgets.cj:317:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/data_widgets.cj:376:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
-packages/core/src/data_widgets.cj:398:public func dirtyHeader(area: Rect): DirtyRects
-packages/core/src/data_widgets.cj:407:public func dirtyBody(area: Rect): DirtyRects
-packages/core/src/data_widgets.cj:416:public func dirtyRows(area: Rect, rows: Array<Int64>): DirtyRects
-packages/core/src/data_widgets.cj:428:public func dirtySelectionChange(area: Rect, before: ?Int64, after: ?Int64): DirtyRects
-packages/core/src/data_widgets.cj:441:public func dirtyStatus(area: Rect): DirtyRects
-packages/core/src/data_widgets.cj:445:public func clearCachedRows(): Unit
-packages/core/src/data_widgets.cj:450:public func cachedRowCount(): Int64
-packages/core/src/data_widgets.cj:455:public func sortBy(column: Int64, descending!: Bool = false): Unit
-packages/core/src/data_widgets.cj:473:public func clearSort(): Unit
-packages/core/src/data_widgets.cj:485:public func resizeColumn(column: Int64, width: Int64): Bool
-packages/core/src/data_widgets.cj:491:public func setFrozenColumns(count: Int64): Unit
-packages/core/src/data_widgets.cj:495:public func setFilter(text: String): Unit
-packages/core/src/data_widgets.cj:512:public func setStatus(status: TableStatus): Unit
-packages/core/src/data_widgets.cj:516:public func toggleSelectedRow(): Unit
-packages/core/src/data_widgets.cj:542:public func isSelected(row: Int64): Bool
-packages/core/src/data_widgets.cj:553:public func selectedRowIndices(): Array<Int64>
-packages/core/src/data_widgets.cj:871:public class TreeNode {
-packages/core/src/data_widgets.cj:874:public let id: String
-packages/core/src/data_widgets.cj:877:public let label: String
-packages/core/src/data_widgets.cj:880:public var expanded: Bool
-packages/core/src/data_widgets.cj:889:public init(id: String, label: String, expanded!: Bool = false, children!: Array<TreeNode> = [])
-packages/core/src/data_widgets.cj:902:public func add(child: TreeNode): Unit
-packages/core/src/data_widgets.cj:909:public func childNodes(): Array<TreeNode>
-packages/core/src/data_widgets.cj:916:public class Tree <: Widget {
-packages/core/src/data_widgets.cj:923:public var selected: Int64
-packages/core/src/data_widgets.cj:926:public var offset: Int64
-packages/core/src/data_widgets.cj:947:public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, dataModel!: ?LazyTreeModel = None, focused!: Bool = false, focusedStyle!: ?Style = None, theme!: ?Theme = None )
-packages/core/src/data_widgets.cj:977:public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None)
-packages/core/src/data_widgets.cj:985:public func setFocused(value: Bool): Unit
-packages/core/src/data_widgets.cj:990:public func setTheme(value: ?Theme): Unit
-packages/core/src/data_widgets.cj:997:public func handle(mouse: MouseEvent, area: Rect): Bool
-packages/core/src/data_widgets.cj:1007:public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool
-packages/core/src/data_widgets.cj:1039:public func toggleSelected(): Unit
-packages/core/src/data_widgets.cj:1050:public func selectedId(): ?String
-packages/core/src/data_widgets.cj:1060:public func selectById(id: String): Bool
-packages/core/src/data_widgets.cj:1081:public func findById(id: String): ?TreeNode
-packages/core/src/data_widgets.cj:1094:public func expandAll(): Unit
-packages/core/src/data_widgets.cj:1103:public func collapseAll(): Unit
-packages/core/src/data_widgets.cj:1117:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/data_widgets.cj:1150:public func expandSelected(): Unit
-packages/core/src/data_widgets.cj:1163:public func collapseSelected(): Unit
-packages/core/src/data_widgets.cj:1178:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/data_widgets.cj:1340:public class FilePicker <: Widget {
-packages/core/src/data_widgets.cj:1343:public var path: String
-packages/core/src/data_widgets.cj:1349:public var searchText: String = ""
-packages/core/src/data_widgets.cj:1352:public var showHidden: Bool = false
-packages/core/src/data_widgets.cj:1359:public init(path!: String = ".", extension!: String = "", showHidden!: Bool = false)
-packages/core/src/data_widgets.cj:1368:public func refresh(): Unit
-packages/core/src/data_widgets.cj:1394:public func selectedEntry(): ?String
-packages/core/src/data_widgets.cj:1405:public func selectedPath(): ?String
-packages/core/src/data_widgets.cj:1415:public func chooseSelected(): ?String
-packages/core/src/data_widgets.cj:1422:public func setSearch(text: String): Unit
-packages/core/src/data_widgets.cj:1431:public func toggleHidden(): Unit
-packages/core/src/data_widgets.cj:1439:public func selectedInfo(): ?FileEntryInfo
-packages/core/src/data_widgets.cj:1451:public func enterSelected(): Bool
-packages/core/src/data_widgets.cj:1469:public func parent(): Bool
-packages/core/src/data_widgets.cj:1484:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
-packages/core/src/data_widgets.cj:1516:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/data_widgets.cj:1523:public class FileEntryInfo {
-packages/core/src/data_widgets.cj:1526:public let name: String
-packages/core/src/data_widgets.cj:1529:public let path: String
-packages/core/src/data_widgets.cj:1532:public let isDir: Bool
-packages/core/src/data_widgets.cj:1539:public init(name: String, path: String, isDir: Bool)
+packages/core/src/data_widgets.cj:127:public class VirtualTable <: Widget {
+packages/core/src/data_widgets.cj:133:public var offset: Int64
+packages/core/src/data_widgets.cj:136:public var selectedRow: ?Int64
+packages/core/src/data_widgets.cj:139:public var selectedColumn: Int64
+packages/core/src/data_widgets.cj:142:public var columnOffset: Int64
+packages/core/src/data_widgets.cj:145:public var frozenColumns: Int64 = 0
+packages/core/src/data_widgets.cj:148:public var sortColumn: ?Int64 = None
+packages/core/src/data_widgets.cj:151:public var sortDescending: Bool = false
+packages/core/src/data_widgets.cj:154:public var filterText: String = ""
+packages/core/src/data_widgets.cj:157:public var stickyHeader: Bool = true
+packages/core/src/data_widgets.cj:160:public var status: TableStatus = TableStatus.Ready
+packages/core/src/data_widgets.cj:163:public var emptyText: String = "No rows"
+packages/core/src/data_widgets.cj:166:public var loadingText: String = "Loading"
+packages/core/src/data_widgets.cj:206:public init( columns: Array<TableColumn>, rowCount: Int64, rowAt: (Int64) -> Array<String>, offset!: Int64 = 0, selectedRow!: ?Int64 = None, selectedColumn!: Int64 = 0, columnOffset!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cellStyle!: ?Style = None, statusStyle!: ?Style = None, selectionModel!: ?SelectionModel = None, scrollState!: ?ScrollState = None, sortState!: ?SortState = None, filterState!: ?FilterState = None, dataModel!: ?PagedTableModel = None, cacheCapacity!: Int64 = 1024 )
+packages/core/src/data_widgets.cj:254:public init(columns: Array<TableColumn>, model: PagedTableModel, block!: ?Block = None)
+packages/core/src/data_widgets.cj:263:public func handle(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/data_widgets.cj:304:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/data_widgets.cj:382:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/data_widgets.cj:446:public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects
+packages/core/src/data_widgets.cj:472:public func dirtyHeader(area: Rect): DirtyRects
+packages/core/src/data_widgets.cj:485:public func dirtyBody(area: Rect): DirtyRects
+packages/core/src/data_widgets.cj:499:public func dirtyRows(area: Rect, rows: Array<Int64>): DirtyRects
+packages/core/src/data_widgets.cj:517:public func dirtySelectionChange(area: Rect, before: ?Int64, after: ?Int64): DirtyRects
+packages/core/src/data_widgets.cj:534:public func dirtyStatus(area: Rect): DirtyRects
+packages/core/src/data_widgets.cj:540:public func clearCachedRows(): Unit
+packages/core/src/data_widgets.cj:548:public func cachedRowCount(): Int64
+packages/core/src/data_widgets.cj:557:public func sortBy(column: Int64, descending!: Bool = false): Unit
+packages/core/src/data_widgets.cj:577:public func clearSort(): Unit
+packages/core/src/data_widgets.cj:594:public func resizeColumn(column: Int64, width: Int64): Bool
+packages/core/src/data_widgets.cj:603:public func setFrozenColumns(count: Int64): Unit
+packages/core/src/data_widgets.cj:610:public func setFilter(text: String): Unit
+packages/core/src/data_widgets.cj:630:public func setStatus(status: TableStatus): Unit
+packages/core/src/data_widgets.cj:636:public func toggleSelectedRow(): Unit
+packages/core/src/data_widgets.cj:666:public func isSelected(row: Int64): Bool
+packages/core/src/data_widgets.cj:680:public func selectedRowIndices(): Array<Int64>
+packages/core/src/data_widgets.cj:998:public class TreeNode {
+packages/core/src/data_widgets.cj:1001:public let id: String
+packages/core/src/data_widgets.cj:1004:public let label: String
+packages/core/src/data_widgets.cj:1007:public var expanded: Bool
+packages/core/src/data_widgets.cj:1016:public init(id: String, label: String, expanded!: Bool = false, children!: Array<TreeNode> = [])
+packages/core/src/data_widgets.cj:1029:public func add(child: TreeNode): Unit
+packages/core/src/data_widgets.cj:1036:public func childNodes(): Array<TreeNode>
+packages/core/src/data_widgets.cj:1043:public class Tree <: Widget {
+packages/core/src/data_widgets.cj:1050:public var selected: Int64
+packages/core/src/data_widgets.cj:1053:public var offset: Int64
+packages/core/src/data_widgets.cj:1074:public init( roots: Array<TreeNode>, selected!: Int64 = 0, offset!: Int64 = 0, block!: ?Block = None, style!: Style = Style.default(), selectedStyle!: ?Style = None, dataModel!: ?LazyTreeModel = None, focused!: Bool = false, focusedStyle!: ?Style = None, theme!: ?Theme = None )
+packages/core/src/data_widgets.cj:1104:public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None)
+packages/core/src/data_widgets.cj:1112:public func setFocused(value: Bool): Unit
+packages/core/src/data_widgets.cj:1117:public func setTheme(value: ?Theme): Unit
+packages/core/src/data_widgets.cj:1124:public func handle(mouse: MouseEvent, area: Rect): Bool
+packages/core/src/data_widgets.cj:1134:public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool
+packages/core/src/data_widgets.cj:1166:public func toggleSelected(): Unit
+packages/core/src/data_widgets.cj:1177:public func selectedId(): ?String
+packages/core/src/data_widgets.cj:1187:public func selectById(id: String): Bool
+packages/core/src/data_widgets.cj:1208:public func findById(id: String): ?TreeNode
+packages/core/src/data_widgets.cj:1221:public func expandAll(): Unit
+packages/core/src/data_widgets.cj:1230:public func collapseAll(): Unit
+packages/core/src/data_widgets.cj:1244:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/data_widgets.cj:1277:public func expandSelected(): Unit
+packages/core/src/data_widgets.cj:1290:public func collapseSelected(): Unit
+packages/core/src/data_widgets.cj:1305:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/data_widgets.cj:1467:public class FilePicker <: Widget {
+packages/core/src/data_widgets.cj:1470:public var path: String
+packages/core/src/data_widgets.cj:1476:public var searchText: String = ""
+packages/core/src/data_widgets.cj:1479:public var showHidden: Bool = false
+packages/core/src/data_widgets.cj:1486:public init(path!: String = ".", extension!: String = "", showHidden!: Bool = false)
+packages/core/src/data_widgets.cj:1495:public func refresh(): Unit
+packages/core/src/data_widgets.cj:1521:public func selectedEntry(): ?String
+packages/core/src/data_widgets.cj:1532:public func selectedPath(): ?String
+packages/core/src/data_widgets.cj:1542:public func chooseSelected(): ?String
+packages/core/src/data_widgets.cj:1549:public func setSearch(text: String): Unit
+packages/core/src/data_widgets.cj:1558:public func toggleHidden(): Unit
+packages/core/src/data_widgets.cj:1566:public func selectedInfo(): ?FileEntryInfo
+packages/core/src/data_widgets.cj:1578:public func enterSelected(): Bool
+packages/core/src/data_widgets.cj:1596:public func parent(): Bool
+packages/core/src/data_widgets.cj:1611:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
+packages/core/src/data_widgets.cj:1643:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/data_widgets.cj:1650:public class FileEntryInfo {
+packages/core/src/data_widgets.cj:1653:public let name: String
+packages/core/src/data_widgets.cj:1656:public let path: String
+packages/core/src/data_widgets.cj:1659:public let isDir: Bool
+packages/core/src/data_widgets.cj:1666:public init(name: String, path: String, isDir: Bool)
 packages/core/src/dirty_rects.cj:6:public class DirtyRects {
 packages/core/src/dirty_rects.cj:10:public init()
 packages/core/src/dirty_rects.cj:15:public init(rects: Array<Rect>)
