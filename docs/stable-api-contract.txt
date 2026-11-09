@@ -740,10 +740,10 @@ core|PointerCapture.origin|func|public func origin(): Position
 core|PointerCapture.initialValue|func|public func initialValue(): Int64
 core|PointerCapture.release|func|public func release(owner: String, mouse: MouseEvent): Bool
 core|PointerCapture.cancel|func|public func cancel(): Unit
-core|ProcessOutputStream|enum|public enum ProcessOutputStream { | Stdout | Stderr }
+core|ProcessOutputStream|enum|public enum ProcessOutputStream {
 core|ProcessOutputStream.Stdout|enum_constructor|Stdout
 core|ProcessOutputStream.Stderr|enum_constructor|Stderr
-core|ProcessEndReason|enum|public enum ProcessEndReason { | Exited | Cancelled | TimedOut | OutputLimit | DrainTimeout }
+core|ProcessEndReason|enum|public enum ProcessEndReason {
 core|ProcessEndReason.Exited|enum_constructor|Exited
 core|ProcessEndReason.Cancelled|enum_constructor|Cancelled
 core|ProcessEndReason.TimedOut|enum_constructor|TimedOut

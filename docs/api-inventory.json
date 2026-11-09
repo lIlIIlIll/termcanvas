@@ -25555,13 +25555,13 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 6,
+      "line": 7,
       "level": "top_level",
       "kind": "enum",
       "symbol": "ProcessOutputStream",
       "owner_symbol": "ProcessOutputStream",
       "qualified_symbol": "ProcessOutputStream",
-      "signature": "public enum ProcessOutputStream { | Stdout | Stderr }",
+      "signature": "public enum ProcessOutputStream {",
       "visibility": "public",
       "visibility_origin": "explicit",
       "stability": "STABLE",
@@ -25573,8 +25573,8 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 6,
-      "column": 35,
+      "line": 9,
+      "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
       "symbol": "Stdout",
@@ -25592,8 +25592,8 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 6,
-      "column": 44,
+      "line": 11,
+      "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
       "symbol": "Stderr",
@@ -25611,13 +25611,13 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 7,
+      "line": 14,
       "level": "top_level",
       "kind": "enum",
       "symbol": "ProcessEndReason",
       "owner_symbol": "ProcessEndReason",
       "qualified_symbol": "ProcessEndReason",
-      "signature": "public enum ProcessEndReason { | Exited | Cancelled | TimedOut | OutputLimit | DrainTimeout }",
+      "signature": "public enum ProcessEndReason {",
       "visibility": "public",
       "visibility_origin": "explicit",
       "stability": "STABLE",
@@ -25629,8 +25629,8 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 7,
-      "column": 32,
+      "line": 16,
+      "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
       "symbol": "Exited",
@@ -25648,8 +25648,8 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 7,
-      "column": 41,
+      "line": 18,
+      "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
       "symbol": "Cancelled",
@@ -25667,8 +25667,8 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 7,
-      "column": 53,
+      "line": 20,
+      "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
       "symbol": "TimedOut",
@@ -25686,8 +25686,8 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 7,
-      "column": 64,
+      "line": 22,
+      "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
       "symbol": "OutputLimit",
@@ -25705,8 +25705,8 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 7,
-      "column": 78,
+      "line": 24,
+      "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
       "symbol": "DrainTimeout",
@@ -25724,7 +25724,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 10,
+      "line": 30,
       "level": "top_level",
       "kind": "class",
       "symbol": "ProcessSpec",
@@ -25742,7 +25742,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 11,
+      "line": 33,
       "level": "member",
       "kind": "let",
       "symbol": "command",
@@ -25760,7 +25760,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 12,
+      "line": 36,
       "level": "member",
       "kind": "let",
       "symbol": "args",
@@ -25778,7 +25778,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 13,
+      "line": 39,
       "level": "member",
       "kind": "let",
       "symbol": "cwd",
@@ -25796,7 +25796,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 14,
+      "line": 42,
       "level": "member",
       "kind": "let",
       "symbol": "env",
@@ -25814,7 +25814,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 15,
+      "line": 45,
       "level": "member",
       "kind": "let",
       "symbol": "timeoutMillis",
@@ -25832,7 +25832,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 16,
+      "line": 48,
       "level": "member",
       "kind": "let",
       "symbol": "maxOutputBytes",
@@ -25850,7 +25850,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 17,
+      "line": 51,
       "level": "member",
       "kind": "let",
       "symbol": "drainTimeoutMillis",
@@ -25868,7 +25868,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 18,
+      "line": 61,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -25886,7 +25886,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 34,
+      "line": 79,
       "level": "top_level",
       "kind": "struct",
       "symbol": "ProcessResult",
@@ -25904,7 +25904,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 35,
+      "line": 82,
       "level": "member",
       "kind": "let",
       "symbol": "reason",
@@ -25922,7 +25922,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 36,
+      "line": 85,
       "level": "member",
       "kind": "let",
       "symbol": "status",
@@ -25940,7 +25940,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 37,
+      "line": 88,
       "level": "member",
       "kind": "let",
       "symbol": "outputBytes",
@@ -25958,7 +25958,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 38,
+      "line": 91,
       "level": "member",
       "kind": "let",
       "symbol": "outputComplete",
@@ -25976,7 +25976,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 39,
+      "line": 98,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -25994,7 +25994,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 44,
+      "line": 105,
       "level": "top_level",
       "kind": "struct",
       "symbol": "ProcessMetrics",
@@ -26012,7 +26012,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 45,
+      "line": 108,
       "level": "member",
       "kind": "let",
       "symbol": "queuedBytes",
@@ -26030,7 +26030,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 46,
+      "line": 111,
       "level": "member",
       "kind": "let",
       "symbol": "peakQueuedBytes",
@@ -26048,7 +26048,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 47,
+      "line": 114,
       "level": "member",
       "kind": "let",
       "symbol": "outputBytes",
@@ -26066,7 +26066,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 48,
+      "line": 117,
       "level": "member",
       "kind": "let",
       "symbol": "backpressureCount",
@@ -26084,7 +26084,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 49,
+      "line": 124,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -26102,7 +26102,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 55,
+      "line": 132,
       "level": "top_level",
       "kind": "interface",
       "symbol": "ProcessRuntime",
@@ -26120,7 +26120,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 56,
+      "line": 138,
       "level": "member",
       "kind": "func",
       "symbol": "start",
@@ -26139,7 +26139,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 59,
+      "line": 145,
       "level": "member",
       "kind": "func",
       "symbol": "cancel",
@@ -26158,7 +26158,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 60,
+      "line": 149,
       "level": "member",
       "kind": "func",
       "symbol": "sources",
@@ -26177,7 +26177,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 61,
+      "line": 153,
       "level": "member",
       "kind": "func",
       "symbol": "drain",
@@ -26196,7 +26196,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 62,
+      "line": 157,
       "level": "member",
       "kind": "func",
       "symbol": "activeCount",
@@ -26215,7 +26215,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 63,
+      "line": 161,
       "level": "member",
       "kind": "func",
       "symbol": "nextTimeoutMillis",
@@ -26234,7 +26234,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 64,
+      "line": 165,
       "level": "member",
       "kind": "func",
       "symbol": "metrics",
@@ -26253,7 +26253,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 65,
+      "line": 168,
       "level": "member",
       "kind": "func",
       "symbol": "closeAll",
@@ -26272,7 +26272,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 68,
+      "line": 171,
       "level": "top_level",
       "kind": "class",
       "symbol": "UnsupportedProcessRuntime",
@@ -26290,7 +26290,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 69,
+      "line": 172,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -26308,7 +26308,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 70,
+      "line": 173,
       "level": "member",
       "kind": "func",
       "symbol": "start",
@@ -26326,7 +26326,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 71,
+      "line": 174,
       "level": "member",
       "kind": "func",
       "symbol": "cancel",
@@ -26344,7 +26344,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 72,
+      "line": 175,
       "level": "member",
       "kind": "func",
       "symbol": "sources",
@@ -26362,7 +26362,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 73,
+      "line": 176,
       "level": "member",
       "kind": "func",
       "symbol": "drain",
@@ -26380,7 +26380,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 74,
+      "line": 177,
       "level": "member",
       "kind": "func",
       "symbol": "activeCount",
@@ -26398,7 +26398,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 75,
+      "line": 178,
       "level": "member",
       "kind": "func",
       "symbol": "nextTimeoutMillis",
@@ -26416,7 +26416,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 76,
+      "line": 179,
       "level": "member",
       "kind": "func",
       "symbol": "metrics",
@@ -26434,7 +26434,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 77,
+      "line": 180,
       "level": "member",
       "kind": "func",
       "symbol": "closeAll",
@@ -26452,7 +26452,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 81,
+      "line": 184,
       "level": "top_level",
       "kind": "func",
       "symbol": "defaultProcessRuntime",
@@ -26470,7 +26470,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 83,
+      "line": 186,
       "level": "top_level",
       "kind": "func",
       "symbol": "defaultProcessRuntime",
@@ -26488,7 +26488,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 96,
+      "line": 199,
       "level": "top_level",
       "kind": "class",
       "symbol": "PosixProcessRuntime",
@@ -26506,7 +26506,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 107,
+      "line": 210,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -26524,7 +26524,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 112,
+      "line": 215,
       "level": "member",
       "kind": "func",
       "symbol": "start",
@@ -26542,7 +26542,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 169,
+      "line": 272,
       "level": "member",
       "kind": "func",
       "symbol": "cancel",
@@ -26560,7 +26560,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 175,
+      "line": 278,
       "level": "member",
       "kind": "func",
       "symbol": "sources",
@@ -26578,7 +26578,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 189,
+      "line": 292,
       "level": "member",
       "kind": "func",
       "symbol": "drain",
@@ -26596,7 +26596,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 223,
+      "line": 326,
       "level": "member",
       "kind": "func",
       "symbol": "activeCount",
@@ -26614,7 +26614,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 224,
+      "line": 327,
       "level": "member",
       "kind": "func",
       "symbol": "nextTimeoutMillis",
@@ -26632,7 +26632,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 232,
+      "line": 335,
       "level": "member",
       "kind": "func",
       "symbol": "metrics",
@@ -26650,7 +26650,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 239,
+      "line": 342,
       "level": "member",
       "kind": "func",
       "symbol": "closeAll",
@@ -26668,7 +26668,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 433,
+      "line": 538,
       "level": "top_level",
       "kind": "class",
       "symbol": "Utf8StreamDecoder",
@@ -26686,7 +26686,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 435,
+      "line": 542,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -26704,7 +26704,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 436,
+      "line": 547,
       "level": "member",
       "kind": "func",
       "symbol": "feed",
@@ -26722,7 +26722,7 @@
     {
       "package": "core",
       "path": "packages/core/src/process_runtime.cj",
-      "line": 470,
+      "line": 584,
       "level": "member",
       "kind": "func",
       "symbol": "finish",

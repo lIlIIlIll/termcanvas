@@ -14935,6 +14935,278 @@
           "signature": "public func isPending(request: TablePageRequest): Bool"
         }
       ]
+    },
+    {
+      "id": "process-decoder",
+      "source": "docs/api-examples/process-decoder.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessOutputStream",
+          "signature": "public enum ProcessOutputStream {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessOutputStream.Stdout",
+          "signature": "Stdout"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessOutputStream.Stderr",
+          "signature": "Stderr"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessEndReason",
+          "signature": "public enum ProcessEndReason {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessEndReason.Exited",
+          "signature": "Exited"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessEndReason.Cancelled",
+          "signature": "Cancelled"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessEndReason.TimedOut",
+          "signature": "TimedOut"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessEndReason.OutputLimit",
+          "signature": "OutputLimit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessEndReason.DrainTimeout",
+          "signature": "DrainTimeout"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessSpec",
+          "signature": "public class ProcessSpec {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessSpec.command",
+          "signature": "public let command: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessSpec.args",
+          "signature": "public let args: Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessSpec.cwd",
+          "signature": "public let cwd: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessSpec.env",
+          "signature": "public let env: Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessSpec.timeoutMillis",
+          "signature": "public let timeoutMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessSpec.maxOutputBytes",
+          "signature": "public let maxOutputBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessSpec.drainTimeoutMillis",
+          "signature": "public let drainTimeoutMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessSpec.init",
+          "signature": "public init(command: String, args!: Array<String> = [], cwd!: String = \"\", env!: Array<String> = [], timeoutMillis!: Int64 = 0, maxOutputBytes!: Int64 = 16 * 1024 * 1024, drainTimeoutMillis!: Int64 = 1000)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessResult",
+          "signature": "public struct ProcessResult {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessResult.reason",
+          "signature": "public let reason: ProcessEndReason"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessResult.status",
+          "signature": "public let status: PtyExitStatus"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessResult.outputBytes",
+          "signature": "public let outputBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessResult.outputComplete",
+          "signature": "public let outputComplete: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessResult.init",
+          "signature": "public init(reason: ProcessEndReason, status: PtyExitStatus, outputBytes: Int64, outputComplete!: Bool = true)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessMetrics",
+          "signature": "public struct ProcessMetrics {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessMetrics.queuedBytes",
+          "signature": "public let queuedBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessMetrics.peakQueuedBytes",
+          "signature": "public let peakQueuedBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessMetrics.outputBytes",
+          "signature": "public let outputBytes: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessMetrics.backpressureCount",
+          "signature": "public let backpressureCount: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessMetrics.init",
+          "signature": "public init(queuedBytes!: Int64 = 0, peakQueuedBytes!: Int64 = 0, outputBytes!: Int64 = 0, backpressureCount!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessRuntime",
+          "signature": "public interface ProcessRuntime {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessRuntime.start",
+          "signature": "func start(id: String, spec: ProcessSpec): Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessRuntime.cancel",
+          "signature": "func cancel(id: String): Event"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessRuntime.sources",
+          "signature": "func sources(): Array<EventSource>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessRuntime.drain",
+          "signature": "func drain(): Array<Event>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessRuntime.activeCount",
+          "signature": "func activeCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessRuntime.nextTimeoutMillis",
+          "signature": "func nextTimeoutMillis(): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessRuntime.metrics",
+          "signature": "func metrics(): ProcessMetrics"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "ProcessRuntime.closeAll",
+          "signature": "func closeAll(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "Utf8StreamDecoder",
+          "signature": "public class Utf8StreamDecoder {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "Utf8StreamDecoder.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "Utf8StreamDecoder.feed",
+          "signature": "public func feed(bytes: Array<Byte>): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/process_runtime.cj",
+          "symbol": "Utf8StreamDecoder.finish",
+          "signature": "public func finish(): String"
+        }
+      ]
     }
   ]
 }

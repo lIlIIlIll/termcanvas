@@ -1403,71 +1403,71 @@ packages/core/src/paged_table.cj:259:public func requestViewport(offset: Int64, 
 packages/core/src/paged_table.cj:300:public func accept(request: TablePageRequest, page: TablePage): Bool
 packages/core/src/paged_table.cj:330:public func fail(request: TablePageRequest, message: String): Bool
 packages/core/src/paged_table.cj:339:public func isPending(request: TablePageRequest): Bool
-packages/core/src/process_runtime.cj:6:public enum ProcessOutputStream { | Stdout | Stderr }
-packages/core/src/process_runtime.cj:6:Stdout
-packages/core/src/process_runtime.cj:6:Stderr
-packages/core/src/process_runtime.cj:7:public enum ProcessEndReason { | Exited | Cancelled | TimedOut | OutputLimit | DrainTimeout }
-packages/core/src/process_runtime.cj:7:Exited
-packages/core/src/process_runtime.cj:7:Cancelled
-packages/core/src/process_runtime.cj:7:TimedOut
-packages/core/src/process_runtime.cj:7:OutputLimit
-packages/core/src/process_runtime.cj:7:DrainTimeout
-packages/core/src/process_runtime.cj:10:public class ProcessSpec {
-packages/core/src/process_runtime.cj:11:public let command: String
-packages/core/src/process_runtime.cj:12:public let args: Array<String>
-packages/core/src/process_runtime.cj:13:public let cwd: String
-packages/core/src/process_runtime.cj:14:public let env: Array<String>
-packages/core/src/process_runtime.cj:15:public let timeoutMillis: Int64
-packages/core/src/process_runtime.cj:16:public let maxOutputBytes: Int64
-packages/core/src/process_runtime.cj:17:public let drainTimeoutMillis: Int64
-packages/core/src/process_runtime.cj:18:public init(command: String, args!: Array<String> = [], cwd!: String = "", env!: Array<String> = [], timeoutMillis!: Int64 = 0, maxOutputBytes!: Int64 = 16 * 1024 * 1024, drainTimeoutMillis!: Int64 = 1000)
-packages/core/src/process_runtime.cj:34:public struct ProcessResult {
-packages/core/src/process_runtime.cj:35:public let reason: ProcessEndReason
-packages/core/src/process_runtime.cj:36:public let status: PtyExitStatus
-packages/core/src/process_runtime.cj:37:public let outputBytes: Int64
-packages/core/src/process_runtime.cj:38:public let outputComplete: Bool
-packages/core/src/process_runtime.cj:39:public init(reason: ProcessEndReason, status: PtyExitStatus, outputBytes: Int64, outputComplete!: Bool = true)
-packages/core/src/process_runtime.cj:44:public struct ProcessMetrics {
-packages/core/src/process_runtime.cj:45:public let queuedBytes: Int64
-packages/core/src/process_runtime.cj:46:public let peakQueuedBytes: Int64
-packages/core/src/process_runtime.cj:47:public let outputBytes: Int64
-packages/core/src/process_runtime.cj:48:public let backpressureCount: Int64
-packages/core/src/process_runtime.cj:49:public init(queuedBytes!: Int64 = 0, peakQueuedBytes!: Int64 = 0, outputBytes!: Int64 = 0, backpressureCount!: Int64 = 0)
-packages/core/src/process_runtime.cj:55:public interface ProcessRuntime {
-packages/core/src/process_runtime.cj:56:func start(id: String, spec: ProcessSpec): Event
-packages/core/src/process_runtime.cj:59:func cancel(id: String): Event
-packages/core/src/process_runtime.cj:60:func sources(): Array<EventSource>
-packages/core/src/process_runtime.cj:61:func drain(): Array<Event>
-packages/core/src/process_runtime.cj:62:func activeCount(): Int64
-packages/core/src/process_runtime.cj:63:func nextTimeoutMillis(): ?Int64
-packages/core/src/process_runtime.cj:64:func metrics(): ProcessMetrics
-packages/core/src/process_runtime.cj:65:func closeAll(): Unit
-packages/core/src/process_runtime.cj:68:public class UnsupportedProcessRuntime <: ProcessRuntime {
-packages/core/src/process_runtime.cj:69:public init()
-packages/core/src/process_runtime.cj:70:public func start(id: String, spec: ProcessSpec): Event
-packages/core/src/process_runtime.cj:71:public func cancel(id: String): Event
-packages/core/src/process_runtime.cj:72:public func sources(): Array<EventSource>
-packages/core/src/process_runtime.cj:73:public func drain(): Array<Event>
-packages/core/src/process_runtime.cj:74:public func activeCount(): Int64
-packages/core/src/process_runtime.cj:75:public func nextTimeoutMillis(): ?Int64
-packages/core/src/process_runtime.cj:76:public func metrics(): ProcessMetrics
-packages/core/src/process_runtime.cj:77:public func closeAll(): Unit
-packages/core/src/process_runtime.cj:81:public func defaultProcessRuntime(): ProcessRuntime
-packages/core/src/process_runtime.cj:83:public func defaultProcessRuntime(): ProcessRuntime
-packages/core/src/process_runtime.cj:96:public class PosixProcessRuntime <: ProcessRuntime {
-packages/core/src/process_runtime.cj:107:public init(maxProcesses!: Int64 = 32, readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 64 * 1024)
-packages/core/src/process_runtime.cj:112:public func start(id: String, spec: ProcessSpec): Event
-packages/core/src/process_runtime.cj:169:public func cancel(id: String): Event
+packages/core/src/process_runtime.cj:7:public enum ProcessOutputStream {
+packages/core/src/process_runtime.cj:9:Stdout
+packages/core/src/process_runtime.cj:11:Stderr
+packages/core/src/process_runtime.cj:14:public enum ProcessEndReason {
+packages/core/src/process_runtime.cj:16:Exited
+packages/core/src/process_runtime.cj:18:Cancelled
+packages/core/src/process_runtime.cj:20:TimedOut
+packages/core/src/process_runtime.cj:22:OutputLimit
+packages/core/src/process_runtime.cj:24:DrainTimeout
+packages/core/src/process_runtime.cj:30:public class ProcessSpec {
+packages/core/src/process_runtime.cj:33:public let command: String
+packages/core/src/process_runtime.cj:36:public let args: Array<String>
+packages/core/src/process_runtime.cj:39:public let cwd: String
+packages/core/src/process_runtime.cj:42:public let env: Array<String>
+packages/core/src/process_runtime.cj:45:public let timeoutMillis: Int64
+packages/core/src/process_runtime.cj:48:public let maxOutputBytes: Int64
+packages/core/src/process_runtime.cj:51:public let drainTimeoutMillis: Int64
+packages/core/src/process_runtime.cj:61:public init(command: String, args!: Array<String> = [], cwd!: String = "", env!: Array<String> = [], timeoutMillis!: Int64 = 0, maxOutputBytes!: Int64 = 16 * 1024 * 1024, drainTimeoutMillis!: Int64 = 1000)
+packages/core/src/process_runtime.cj:79:public struct ProcessResult {
+packages/core/src/process_runtime.cj:82:public let reason: ProcessEndReason
+packages/core/src/process_runtime.cj:85:public let status: PtyExitStatus
+packages/core/src/process_runtime.cj:88:public let outputBytes: Int64
+packages/core/src/process_runtime.cj:91:public let outputComplete: Bool
+packages/core/src/process_runtime.cj:98:public init(reason: ProcessEndReason, status: PtyExitStatus, outputBytes: Int64, outputComplete!: Bool = true)
+packages/core/src/process_runtime.cj:105:public struct ProcessMetrics {
+packages/core/src/process_runtime.cj:108:public let queuedBytes: Int64
+packages/core/src/process_runtime.cj:111:public let peakQueuedBytes: Int64
+packages/core/src/process_runtime.cj:114:public let outputBytes: Int64
+packages/core/src/process_runtime.cj:117:public let backpressureCount: Int64
+packages/core/src/process_runtime.cj:124:public init(queuedBytes!: Int64 = 0, peakQueuedBytes!: Int64 = 0, outputBytes!: Int64 = 0, backpressureCount!: Int64 = 0)
+packages/core/src/process_runtime.cj:132:public interface ProcessRuntime {
+packages/core/src/process_runtime.cj:138:func start(id: String, spec: ProcessSpec): Event
+packages/core/src/process_runtime.cj:145:func cancel(id: String): Event
+packages/core/src/process_runtime.cj:149:func sources(): Array<EventSource>
+packages/core/src/process_runtime.cj:153:func drain(): Array<Event>
+packages/core/src/process_runtime.cj:157:func activeCount(): Int64
+packages/core/src/process_runtime.cj:161:func nextTimeoutMillis(): ?Int64
+packages/core/src/process_runtime.cj:165:func metrics(): ProcessMetrics
+packages/core/src/process_runtime.cj:168:func closeAll(): Unit
+packages/core/src/process_runtime.cj:171:public class UnsupportedProcessRuntime <: ProcessRuntime {
+packages/core/src/process_runtime.cj:172:public init()
+packages/core/src/process_runtime.cj:173:public func start(id: String, spec: ProcessSpec): Event
+packages/core/src/process_runtime.cj:174:public func cancel(id: String): Event
 packages/core/src/process_runtime.cj:175:public func sources(): Array<EventSource>
-packages/core/src/process_runtime.cj:189:public func drain(): Array<Event>
-packages/core/src/process_runtime.cj:223:public func activeCount(): Int64
-packages/core/src/process_runtime.cj:224:public func nextTimeoutMillis(): ?Int64
-packages/core/src/process_runtime.cj:232:public func metrics(): ProcessMetrics
-packages/core/src/process_runtime.cj:239:public func closeAll(): Unit
-packages/core/src/process_runtime.cj:433:public class Utf8StreamDecoder {
-packages/core/src/process_runtime.cj:435:public init()
-packages/core/src/process_runtime.cj:436:public func feed(bytes: Array<Byte>): String
-packages/core/src/process_runtime.cj:470:public func finish(): String
+packages/core/src/process_runtime.cj:176:public func drain(): Array<Event>
+packages/core/src/process_runtime.cj:177:public func activeCount(): Int64
+packages/core/src/process_runtime.cj:178:public func nextTimeoutMillis(): ?Int64
+packages/core/src/process_runtime.cj:179:public func metrics(): ProcessMetrics
+packages/core/src/process_runtime.cj:180:public func closeAll(): Unit
+packages/core/src/process_runtime.cj:184:public func defaultProcessRuntime(): ProcessRuntime
+packages/core/src/process_runtime.cj:186:public func defaultProcessRuntime(): ProcessRuntime
+packages/core/src/process_runtime.cj:199:public class PosixProcessRuntime <: ProcessRuntime {
+packages/core/src/process_runtime.cj:210:public init(maxProcesses!: Int64 = 32, readBudgetBytes!: Int64 = 16 * 1024, maxQueuedBytes!: Int64 = 64 * 1024)
+packages/core/src/process_runtime.cj:215:public func start(id: String, spec: ProcessSpec): Event
+packages/core/src/process_runtime.cj:272:public func cancel(id: String): Event
+packages/core/src/process_runtime.cj:278:public func sources(): Array<EventSource>
+packages/core/src/process_runtime.cj:292:public func drain(): Array<Event>
+packages/core/src/process_runtime.cj:326:public func activeCount(): Int64
+packages/core/src/process_runtime.cj:327:public func nextTimeoutMillis(): ?Int64
+packages/core/src/process_runtime.cj:335:public func metrics(): ProcessMetrics
+packages/core/src/process_runtime.cj:342:public func closeAll(): Unit
+packages/core/src/process_runtime.cj:538:public class Utf8StreamDecoder {
+packages/core/src/process_runtime.cj:542:public init()
+packages/core/src/process_runtime.cj:547:public func feed(bytes: Array<Byte>): String
+packages/core/src/process_runtime.cj:584:public func finish(): String
 packages/core/src/pty.cj:98:public enum PtyOutputStream {
 packages/core/src/pty.cj:99:Stdout
 packages/core/src/pty.cj:100:Stderr
