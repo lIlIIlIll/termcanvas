@@ -375,11 +375,15 @@ public class Frame {
     }
 }
 
+/** 终端帧输出模式。 */
 public enum RenderMode {
+    /** 比较前后帧并输出差异。 */
     | Diff
+    /** 每次输出完整帧。 */
     | Full
 }
 
+/** 通过后端管理帧缓冲区、主题和完整或差异绘制。 */
 public class Terminal {
     private let backend: Backend
     private let renderMode: RenderMode
@@ -393,6 +397,11 @@ public class Terminal {
     private var themeValue: ?Theme = None
     private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
 
+    /** 创建终端渲染器。
+     * @param backend 输出后端
+     * @param renderMode 完整或差异输出模式
+     * @param instrumentationEnabled 是否启用可选性能统计
+     */
     public init(
         backend: Backend,
         renderMode!: RenderMode = RenderMode.Diff,
@@ -404,32 +413,46 @@ public class Terminal {
         backend.setInstrumentationEnabled(instrumentationEnabled)
     }
 
+    /** 设置后续帧的终端能力并丢弃缓存，使下一帧完整重绘。
+     * @param capabilities 终端能力
+     */
     public func setCapabilities(capabilities: TerminalCapabilities): Unit {
         capabilitiesValue = capabilities
         front = None
         back = None
     }
 
-    /** 设置后续帧的应用主题，并强制下一帧完整重绘；None 恢复组件默认样式。 */
+    /** 设置后续帧的应用主题，并强制下一帧完整重绘；None 恢复组件默认样式。
+     * @param theme 可选应用主题
+     */
     public func setTheme(theme: ?Theme): Unit {
         themeValue = theme
         front = None
         back = None
     }
 
-    /** 设置后续帧的文本宽度策略，并强制完整重绘。 */
+    /** 设置后续帧的文本宽度策略，并强制完整重绘。
+     * @param options 文本宽度策略
+     */
     public func setTextWidthOptions(options: TextWidthOptions): Unit {
         textWidthOptionsValue = options
         front = None
         back = None
     }
 
+    /** 按后端当前尺寸绘制一帧。
+     * @param render 帧绘制回调
+     * @return 渲染指标
+     */
     public func draw(render: (Frame) -> Unit): RenderMetrics {
         draw(render, dirtyRects: None)
     }
 
     /** 按后端当前尺寸绘制一帧；尺寸变化时丢弃旧缓冲区，差异模式下可依据脏区域局部渲染，并返回渲染指标。
      * 渲染回调抛出异常时原样传播，并使后续一帧完整重绘。
+     * @param render 帧绘制回调
+     * @param dirtyRects 可选的脏区域
+     * @return 渲染指标
      */
     public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics {
         let area = backend.size()
@@ -596,6 +619,7 @@ public class Terminal {
         )
     }
 
+    /** 清除后端和已显示的媒体，并使下一帧完整重绘。 */
     public func clear(): Unit {
         backend.drawMedia(diffMediaPlacements(previousMedia, []))
         backend.clear()
@@ -1815,27 +1839,68 @@ func mediaTerminalId(id: String): Int64 {
     max(1, value)
 }
 
+/** 终端尺寸、输入输出和显示能力的快照。 */
 public struct TerminalCapabilities {
+    /** 终端区域。 */
     public let size: Rect
+    /** 是否支持真彩色。 */
     public let trueColor: Bool
+    /** 颜色能力等级。 */
     public let colorLevel: Int64
+    /** 是否支持鼠标事件。 */
     public let mouse: Bool
+    /** 是否支持鼠标移动事件。 */
     public let mouseMove: Bool
+    /** 是否支持焦点事件。 */
     public let focusEvents: Bool
+    /** 是否支持括号粘贴。 */
     public let bracketedPaste: Bool
+    /** 是否支持备用屏幕。 */
     public let alternateScreen: Bool
+    /** 是否支持 Unicode。 */
     public let unicode: Bool
+    /** 是否支持 Kitty 图形协议。 */
     public let kittyGraphics: Bool
+    /** 是否支持 Sixel。 */
     public let sixel: Bool
+    /** 是否支持 OSC 8 超链接。 */
     public let osc8: Bool
+    /** 键盘协议。 */
     public let keyboardProtocol: KeyProtocol
+    /** 是否支持按键释放事件。 */
     public let keyUp: Bool
+    /** 是否支持按键重复事件。 */
     public let keyRepeat: Bool
+    /** 建议的刷新帧率。 */
     public let recommendedFps: Int64
+    /** 单元格像素宽度。 */
     public let cellWidthPixels: Int64
+    /** 单元格像素高度。 */
     public let cellHeightPixels: Int64
+    /** 终端驱动名称。 */
     public let driverName: String
 
+    /** 创建终端能力快照；颜色等级、帧率和单元格像素尺寸限制为正。真彩色时颜色等级至少为 24。
+     * @param size 终端区域
+     * @param trueColor 是否支持真彩色
+     * @param colorLevel 颜色能力等级
+     * @param mouse 是否支持鼠标事件
+     * @param mouseMove 是否支持鼠标移动事件
+     * @param focusEvents 是否支持焦点事件
+     * @param bracketedPaste 是否支持括号粘贴
+     * @param alternateScreen 是否支持备用屏幕
+     * @param unicode 是否支持 Unicode
+     * @param kittyGraphics 是否支持 Kitty 图形协议
+     * @param sixel 是否支持 Sixel
+     * @param osc8 是否支持 OSC 8 超链接
+     * @param keyboardProtocol 键盘协议
+     * @param keyUp 是否支持按键释放事件
+     * @param keyRepeat 是否支持按键重复事件
+     * @param recommendedFps 建议的刷新帧率
+     * @param cellWidthPixels 单元格像素宽度
+     * @param cellHeightPixels 单元格像素高度
+     * @param driverName 终端驱动名称
+     */
     public init(
         size!: Rect = Rect(0, 0, 80, 24),
         trueColor!: Bool = true,

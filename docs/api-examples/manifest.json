@@ -6611,6 +6611,212 @@
           "signature": "public func assertLastMediaOpCount(expected: Int64): Bool"
         }
       ]
+    },
+    {
+      "id": "core-terminal-rendering",
+      "source": "docs/api-examples/terminal-rendering.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMode",
+          "signature": "public enum RenderMode {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMode.Diff",
+          "signature": "Diff"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "RenderMode.Full",
+          "signature": "Full"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Terminal",
+          "signature": "public class Terminal {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Terminal.init",
+          "signature": "public init( backend: Backend, renderMode!: RenderMode = RenderMode.Diff, instrumentationEnabled!: Bool = false )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Terminal.setCapabilities",
+          "signature": "public func setCapabilities(capabilities: TerminalCapabilities): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Terminal.setTheme",
+          "signature": "public func setTheme(theme: ?Theme): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Terminal.setTextWidthOptions",
+          "signature": "public func setTextWidthOptions(options: TextWidthOptions): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Terminal.draw",
+          "signature": "public func draw(render: (Frame) -> Unit): RenderMetrics"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Terminal.draw",
+          "signature": "public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Terminal.clear",
+          "signature": "public func clear(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities",
+          "signature": "public struct TerminalCapabilities {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.size",
+          "signature": "public let size: Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.trueColor",
+          "signature": "public let trueColor: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.colorLevel",
+          "signature": "public let colorLevel: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.mouse",
+          "signature": "public let mouse: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.mouseMove",
+          "signature": "public let mouseMove: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.focusEvents",
+          "signature": "public let focusEvents: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.bracketedPaste",
+          "signature": "public let bracketedPaste: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.alternateScreen",
+          "signature": "public let alternateScreen: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.unicode",
+          "signature": "public let unicode: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.kittyGraphics",
+          "signature": "public let kittyGraphics: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.sixel",
+          "signature": "public let sixel: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.osc8",
+          "signature": "public let osc8: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.keyboardProtocol",
+          "signature": "public let keyboardProtocol: KeyProtocol"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.keyUp",
+          "signature": "public let keyUp: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.keyRepeat",
+          "signature": "public let keyRepeat: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.recommendedFps",
+          "signature": "public let recommendedFps: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.cellWidthPixels",
+          "signature": "public let cellWidthPixels: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.cellHeightPixels",
+          "signature": "public let cellHeightPixels: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.driverName",
+          "signature": "public let driverName: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TerminalCapabilities.init",
+          "signature": "public init( size!: Rect = Rect(0, 0, 80, 24), trueColor!: Bool = true, colorLevel!: Int64 = 24, mouse!: Bool = true, mouseMove!: Bool = true, focusEvents!: Bool = true, bracketedPaste!: Bool = true, alternateScreen!: Bool = true, unicode!: Bool = true, kittyGraphics!: Bool = false, sixel!: Bool = false, osc8!: Bool = true, keyboardProtocol!: KeyProtocol = KeyProtocol.Basic, keyUp!: Bool = false, keyRepeat!: Bool = true, recommendedFps!: Int64 = 30, cellWidthPixels!: Int64 = 8, cellHeightPixels!: Int64 = 16, driverName!: String = \"linux-glibc\" )"
+        }
+      ]
     }
   ]
 }
