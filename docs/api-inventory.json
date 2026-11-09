@@ -21085,7 +21085,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 346,
+      "line": 347,
       "level": "top_level",
       "kind": "struct",
       "symbol": "SizeHint",
@@ -21103,7 +21103,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 347,
+      "line": 349,
       "level": "member",
       "kind": "let",
       "symbol": "minWidth",
@@ -21121,7 +21121,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 348,
+      "line": 351,
       "level": "member",
       "kind": "let",
       "symbol": "minHeight",
@@ -21139,7 +21139,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 349,
+      "line": 353,
       "level": "member",
       "kind": "let",
       "symbol": "preferredWidth",
@@ -21157,7 +21157,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 350,
+      "line": 355,
       "level": "member",
       "kind": "let",
       "symbol": "preferredHeight",
@@ -21175,7 +21175,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 351,
+      "line": 357,
       "level": "member",
       "kind": "let",
       "symbol": "maxWidth",
@@ -21193,7 +21193,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 352,
+      "line": 359,
       "level": "member",
       "kind": "let",
       "symbol": "maxHeight",
@@ -21211,7 +21211,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 354,
+      "line": 369,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -21229,7 +21229,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 371,
+      "line": 387,
       "level": "top_level",
       "kind": "interface",
       "symbol": "Sizable",
@@ -21247,7 +21247,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 372,
+      "line": 391,
       "level": "member",
       "kind": "func",
       "symbol": "sizeHint",
@@ -21266,7 +21266,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 375,
+      "line": 395,
       "level": "top_level",
       "kind": "class",
       "symbol": "Grid",
@@ -21284,7 +21284,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 381,
+      "line": 407,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -21302,7 +21302,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 388,
+      "line": 418,
       "level": "member",
       "kind": "func",
       "symbol": "split",
@@ -21320,7 +21320,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 399,
+      "line": 430,
       "level": "top_level",
       "kind": "struct",
       "symbol": "FlexItem",
@@ -21338,7 +21338,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 400,
+      "line": 432,
       "level": "member",
       "kind": "let",
       "symbol": "basis",
@@ -21356,7 +21356,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 401,
+      "line": 434,
       "level": "member",
       "kind": "let",
       "symbol": "grow",
@@ -21374,7 +21374,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 402,
+      "line": 436,
       "level": "member",
       "kind": "let",
       "symbol": "shrink",
@@ -21392,7 +21392,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 403,
+      "line": 438,
       "level": "member",
       "kind": "let",
       "symbol": "minSize",
@@ -21410,7 +21410,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 404,
+      "line": 440,
       "level": "member",
       "kind": "let",
       "symbol": "maxSize",
@@ -21428,7 +21428,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 406,
+      "line": 449,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -21446,7 +21446,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 420,
+      "line": 470,
       "level": "member",
       "kind": "func",
       "symbol": "fromSizeHint",
@@ -21464,7 +21464,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 433,
+      "line": 484,
       "level": "top_level",
       "kind": "class",
       "symbol": "FlexLayoutResult",
@@ -21482,7 +21482,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 434,
+      "line": 486,
       "level": "member",
       "kind": "let",
       "symbol": "rects",
@@ -21500,7 +21500,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 436,
+      "line": 488,
       "level": "member",
       "kind": "let",
       "symbol": "constraintsSatisfied",
@@ -21518,7 +21518,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 437,
+      "line": 490,
       "level": "member",
       "kind": "let",
       "symbol": "effectiveGap",
@@ -21536,7 +21536,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 439,
+      "line": 497,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -21554,7 +21554,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 446,
+      "line": 505,
       "level": "top_level",
       "kind": "class",
       "symbol": "FlexLayout",
@@ -21572,7 +21572,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 451,
+      "line": 515,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -21590,7 +21590,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 457,
+      "line": 525,
       "level": "member",
       "kind": "func",
       "symbol": "split",
@@ -21608,7 +21608,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 459,
+      "line": 531,
       "level": "member",
       "kind": "func",
       "symbol": "resolve",
@@ -21626,7 +21626,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 572,
+      "line": 645,
       "level": "top_level",
       "kind": "class",
       "symbol": "LayoutCache",
@@ -21644,7 +21644,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 577,
+      "line": 651,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -21662,7 +21662,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 579,
+      "line": 658,
       "level": "member",
       "kind": "func",
       "symbol": "get",
@@ -21680,7 +21680,7 @@
     {
       "package": "core",
       "path": "packages/core/src/geometry.cj",
-      "line": 592,
+      "line": 672,
       "level": "member",
       "kind": "func",
       "symbol": "invalidate",

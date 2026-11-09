@@ -756,6 +756,224 @@
           "signature": "public func split(area: Rect): Array<Rect>"
         }
       ]
+    },
+    {
+      "id": "core-flex-and-grid",
+      "source": "docs/api-examples/flex-layout.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "SizeHint",
+          "signature": "public struct SizeHint {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "SizeHint.minWidth",
+          "signature": "public let minWidth: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "SizeHint.minHeight",
+          "signature": "public let minHeight: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "SizeHint.preferredWidth",
+          "signature": "public let preferredWidth: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "SizeHint.preferredHeight",
+          "signature": "public let preferredHeight: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "SizeHint.maxWidth",
+          "signature": "public let maxWidth: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "SizeHint.maxHeight",
+          "signature": "public let maxHeight: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "SizeHint.init",
+          "signature": "public init( minWidth!: Int64 = 0, minHeight!: Int64 = 0, preferredWidth!: Int64 = 0, preferredHeight!: Int64 = 0, maxWidth!: Int64 = Int64.Max, maxHeight!: Int64 = Int64.Max )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Sizable",
+          "signature": "public interface Sizable {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Sizable.sizeHint",
+          "signature": "func sizeHint(): SizeHint"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Grid",
+          "signature": "public class Grid {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Grid.init",
+          "signature": "public init(rows: Array<Constraint>, columns: Array<Constraint>, gap!: Int64 = 0, margin!: Spacing = Spacing.zero())"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "Grid.split",
+          "signature": "public func split(area: Rect): Array<Array<Rect>>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexItem",
+          "signature": "public struct FlexItem {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexItem.basis",
+          "signature": "public let basis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexItem.grow",
+          "signature": "public let grow: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexItem.shrink",
+          "signature": "public let shrink: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexItem.minSize",
+          "signature": "public let minSize: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexItem.maxSize",
+          "signature": "public let maxSize: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexItem.init",
+          "signature": "public init( basis!: Int64 = 0, grow!: Int64 = 1, shrink!: Int64 = 1, minSize!: Int64 = 0, maxSize!: Int64 = Int64.Max )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexItem.fromSizeHint",
+          "signature": "public static func fromSizeHint( hint: SizeHint, direction: Direction, grow!: Int64 = 1, shrink!: Int64 = 1 ): FlexItem"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexLayoutResult",
+          "signature": "public class FlexLayoutResult {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexLayoutResult.rects",
+          "signature": "public let rects: Array<Rect>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexLayoutResult.constraintsSatisfied",
+          "signature": "public let constraintsSatisfied: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexLayoutResult.effectiveGap",
+          "signature": "public let effectiveGap: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexLayoutResult.init",
+          "signature": "public init(rects: Array<Rect>, constraintsSatisfied: Bool, effectiveGap: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexLayout",
+          "signature": "public class FlexLayout {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexLayout.init",
+          "signature": "public init(direction: Direction, items: Array<FlexItem>, gap!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexLayout.split",
+          "signature": "public func split(area: Rect): Array<Rect>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "FlexLayout.resolve",
+          "signature": "public func resolve(area: Rect): FlexLayoutResult"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "LayoutCache",
+          "signature": "public class LayoutCache {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "LayoutCache.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "LayoutCache.get",
+          "signature": "public func get(area: Rect, compute: (Rect) -> Array<Rect>): Array<Rect>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/geometry.cj",
+          "symbol": "LayoutCache.invalidate",
+          "signature": "public func invalidate(): Unit"
+        }
+      ]
     }
   ]
 }

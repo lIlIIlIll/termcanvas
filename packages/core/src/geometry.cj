@@ -343,14 +343,29 @@ public class Layout {
     }
 }
 
+/** 组件期望的最小、首选和最大尺寸；各值独立地限制为非负数。 */
 public struct SizeHint {
+    /** 最小宽度。 */
     public let minWidth: Int64
+    /** 最小高度。 */
     public let minHeight: Int64
+    /** 首选宽度。 */
     public let preferredWidth: Int64
+    /** 首选高度。 */
     public let preferredHeight: Int64
+    /** 最大宽度。 */
     public let maxWidth: Int64
+    /** 最大高度。 */
     public let maxHeight: Int64
 
+    /** 创建尺寸提示；负值置零，各最小、首选和最大值之间不自动排序。
+     * @param minWidth 最小宽度
+     * @param minHeight 最小高度
+     * @param preferredWidth 首选宽度
+     * @param preferredHeight 首选高度
+     * @param maxWidth 最大宽度
+     * @param maxHeight 最大高度
+     */
     public init(
         minWidth!: Int64 = 0,
         minHeight!: Int64 = 0,
@@ -368,16 +383,27 @@ public struct SizeHint {
     }
 }
 
+/** 提供布局可使用的尺寸提示。 */
 public interface Sizable {
+    /** 返回组件的尺寸提示。
+     * @return 尺寸提示
+     */
     func sizeHint(): SizeHint
 }
 
+/** 按行和列约束将区域拆分为网格。 */
 public class Grid {
     private let rows: Array<Constraint>
     private let columns: Array<Constraint>
     private let gap: Int64
     private let margin: Spacing
 
+    /** 创建网格；行列共用相同间隔，负间隔置零。
+     * @param rows 按顺序排列的行约束
+     * @param columns 按顺序排列的列约束
+     * @param gap 相邻行或列的间隔
+     * @param margin 网格外边距
+     */
     public init(rows: Array<Constraint>, columns: Array<Constraint>, gap!: Int64 = 0, margin!: Spacing = Spacing.zero()) {
         this.rows = rows
         this.columns = columns
@@ -385,6 +411,10 @@ public class Grid {
         this.margin = margin
     }
 
+    /** 先扣除外边距，再按行列约束拆分区域。
+     * @param area 待拆分区域
+     * @return 按行排列的矩形数组，每行按列顺序排列
+     */
     public func split(area: Rect): Array<Array<Rect>> {
         let target = margin.inner(area)
         let rowRects = Layout.vertical(rows).withGap(gap).split(target)
@@ -396,13 +426,26 @@ public class Grid {
     }
 }
 
+/** 弹性布局中一个区域的基准尺寸、伸缩权重和尺寸上下限。 */
 public struct FlexItem {
+    /** 限制在最小和最大值之间的基准尺寸。 */
     public let basis: Int64
+    /** 分配剩余空间时使用的非负权重。 */
     public let grow: Int64
+    /** 空间不足时使用的非负收缩权重。 */
     public let shrink: Int64
+    /** 非负最小尺寸。 */
     public let minSize: Int64
+    /** 不小于最小尺寸的最大尺寸。 */
     public let maxSize: Int64
 
+    /** 创建弹性项目；上下限和权重归一化后，基准尺寸限制在上下限内。
+     * @param basis 初始主轴尺寸
+     * @param grow 扩展权重，负数置零
+     * @param shrink 收缩权重，负数置零
+     * @param minSize 最小尺寸，负数置零
+     * @param maxSize 最大尺寸，小于最小尺寸时使用最小尺寸
+     */
     public init(
         basis!: Int64 = 0,
         grow!: Int64 = 1,
@@ -417,6 +460,13 @@ public struct FlexItem {
         this.shrink = max(0, shrink)
     }
 
+    /** 从尺寸提示中选取对应方向的首选尺寸和上下限。
+     * @param hint 组件尺寸提示
+     * @param direction 布局主轴方向
+     * @param grow 扩展权重
+     * @param shrink 收缩权重
+     * @return 使用选定主轴尺寸创建的弹性项目
+     */
     public static func fromSizeHint(
         hint: SizeHint,
         direction: Direction,
@@ -430,12 +480,20 @@ public struct FlexItem {
     }
 }
 
+/** 弹性布局的区域及约束满足情况。 */
 public class FlexLayoutResult {
+    /** 按项目顺序排列的布局区域。 */
     public let rects: Array<Rect>
-    // False when the viewport cannot preserve minima or zero-shrink bases.
+    /** 间隔和最小尺寸可保留且无需压缩零收缩项目的基准尺寸时为 true。 */
     public let constraintsSatisfied: Bool
+    /** 实际使用的相邻区域间隔；空间不足时可能小于请求值。 */
     public let effectiveGap: Int64
 
+    /** 创建布局结果。
+     * @param rects 按项目顺序排列的区域
+     * @param constraintsSatisfied 是否满足布局约束
+     * @param effectiveGap 实际间隔
+     */
     public init(rects: Array<Rect>, constraintsSatisfied: Bool, effectiveGap: Int64) {
         this.rects = rects
         this.constraintsSatisfied = constraintsSatisfied
@@ -443,19 +501,33 @@ public class FlexLayoutResult {
     }
 }
 
+/** 按权重和尺寸约束分配主轴空间的布局。 */
 public class FlexLayout {
     private let direction: Direction
     private let items: Array<FlexItem>
     private let gap: Int64
 
+    /** 创建弹性布局并复制项目数组；负间隔置零。
+     * @param direction 主轴方向
+     * @param items 按布局顺序排列的项目
+     * @param gap 相邻项目间隔
+     */
     public init(direction: Direction, items: Array<FlexItem>, gap!: Int64 = 0) {
         this.direction = direction
         this.items = items.clone()
         this.gap = max(0, gap)
     }
 
+    /** 计算区域；需要约束状态时使用 resolve。
+     * @param area 待拆分区域
+     * @return 按项目顺序排列的矩形
+     */
     public func split(area: Rect): Array<Rect> { resolve(area).rects }
 
+    /** 计算项目区域并报告约束是否满足；空间不足时会压缩间隔或尺寸。
+     * @param area 待拆分区域
+     * @return 区域、实际间隔和约束满足状态
+     */
     public func resolve(area: Rect): FlexLayoutResult {
         if (items.size == 0) { return FlexLayoutResult([], true, 0) }
         // Rect coordinates are Int64. Clip unrepresentable positive extents
@@ -569,13 +641,20 @@ func flexDistribute(
     remaining
 }
 
+/** 按最近一次矩形区域缓存布局结果。 */
 public class LayoutCache {
     private var area: Rect = Rect(0, 0, 0, 0)
     private var rects: Array<Rect> = []
     private var valid: Bool = false
 
+    /** 创建空布局缓存。 */
     public init() {}
 
+    /** 区域与缓存键相同时返回缓存；否则调用 compute 并缓存结果。回调抛错时保留旧缓存。
+     * @param area 作为缓存键和回调输入的区域
+     * @param compute 缓存未命中时计算区域的回调
+     * @return 缓存或新计算的区域数组
+     */
     public func get(area: Rect, compute: (Rect) -> Array<Rect>): Array<Rect> {
         if (valid && this.area == area) {
             return rects
@@ -589,6 +668,7 @@ public class LayoutCache {
         rects
     }
 
+    /** 使缓存失效，使下次 get 重新计算。 */
     public func invalidate(): Unit {
         valid = false
     }
