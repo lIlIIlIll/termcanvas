@@ -2,31 +2,51 @@ package core
 
 import std.collection.*
 
+/** 缓冲区单元格在普通或宽字符中的角色。 */
 public enum CellKind {
+    /** 普通单元格。 */
     | Normal
+    /** 宽字符的起始单元格。 */
     | WideLead
+    /** 宽字符的后续单元格。 */
     | WideCont
 }
 
+/** 一个终端单元格的符号、样式和宽字符角色。 */
 public struct Cell <: Equatable<Cell> {
+    /** 单元格符号。 */
     public var symbol: String = " "
+    /** 单元格样式。 */
     public var style: Style = Style.default()
+    /** 单元格角色。 */
     public var kind: CellKind = CellKind.Normal
 
+    /** 创建使用默认样式的空白单元格。 */
     public init() {}
 
+    /** 创建单元格。
+     * @param symbol 单元格符号
+     * @param style 单元格样式
+     * @param kind 单元格角色
+     */
     public init(symbol: String, style!: Style = Style.default(), kind!: CellKind = CellKind.Normal) {
         this.symbol = symbol
         this.style = style
         this.kind = kind
     }
 
+    /** 比较符号、样式和角色。
+     * @param other 待比较单元格
+     * @return 三项均相同时为 true
+     */
     public operator func ==(other: Cell): Bool {
         symbol == other.symbol && style == other.style && sameCellKind(kind, other.kind)
     }
 }
 
+/** 保存矩形区域内终端单元格及视觉上下文的缓冲区。 */
 public class Buffer {
+    /** 缓冲区的绝对坐标区域。 */
     public let area: Rect
     private let cells: Array<Cell>
     private let media = ArrayList<MediaPlacement>()
@@ -49,22 +69,35 @@ public class Buffer {
     private var cellAttemptsValue: Int64 = 0
     private var cellWritesValue: Int64 = 0
 
+    /** 创建区域内均为空白单元格的缓冲区。
+     * @param area 缓冲区区域
+     */
     public init(area: Rect) {
         this.area = area
         this.cells = Array<Cell>(area.width * area.height, repeat: Cell())
     }
 
+    /** 获取当前终端能力。
+     * @return 终端能力
+     */
     public func capabilities(): TerminalCapabilities { capabilitiesValue }
 
+    /** 更新终端能力并重新适配应用主题；不重绘已有单元格。
+     * @param capabilities 新的终端能力
+     */
     public func setCapabilities(capabilities: TerminalCapabilities): Unit {
         capabilitiesValue = capabilities
         refreshAdaptedTheme()
     }
 
-    /** 返回应用为此缓冲区设置的主题，None 表示沿用组件的默认样式。 */
+    /** 返回应用为此缓冲区设置的主题，None 表示沿用组件的默认样式。
+     * @return 应用主题或 None
+     */
     public func theme(): ?Theme { themeValue }
 
-    /** 设置后续组件绘制使用的应用主题；已有单元格不会自动重绘。 */
+    /** 设置后续组件绘制使用的应用主题；已有单元格不会自动重绘。
+     * @param theme 可选应用主题
+     */
     public func setTheme(theme: ?Theme): Unit {
         themeValue = theme
         inheritedParentThemeValue = None
@@ -78,7 +111,10 @@ public class Buffer {
         }
     }
 
-    /** 显式组件主题优先，其次为嵌套父主题，最后为适配终端能力的应用主题。 */
+    /** 显式组件主题优先，其次为嵌套父主题，最后为适配终端能力的应用主题。
+     * @param explicit 可选的组件显式主题
+     * @return 解析后的主题或 None
+     */
     public func resolveTheme(explicit: ?Theme): ?Theme {
         match (explicit) {
             case Some(value) => Some(value)
@@ -94,6 +130,8 @@ public class Buffer {
 
     /** 在同步绘制闭包内临时提供父主题；子组件显式主题优先，None 保留已有父主题。
      * 闭包返回或抛出异常时恢复原作用域；同一缓冲区不得在此期间由其他线程使用。
+     * @param explicit 临时父主题，None 保留已有父主题
+     * @param draw 同步绘制闭包
      */
     public func withParentTheme(explicit: ?Theme, draw: () -> Unit): Unit {
         if (explicit.isNone()) { draw(); return }
@@ -118,16 +156,23 @@ public class Buffer {
         }
     }
 
-    /** 返回当前文本的显示宽度策略。 */
+    /** 返回当前文本的显示宽度策略。
+     * @return 当前文本宽度选项
+     */
     public func textWidthOptions(): TextWidthOptions { textWidthOptionsValue }
 
-    /** 设置后续绘制的宽度策略；现有单元格不会重新排版。 */
+    /** 设置后续绘制的宽度策略；现有单元格不会重新排版。
+     * @param options 新的文本宽度选项
+     */
     public func setTextWidthOptions(options: TextWidthOptions): Unit {
         let changed = usesWideAmbiguous(options) != usesWideAmbiguous(textWidthOptionsValue)
         textWidthOptionsValue = options
         if (changed) { widthRevalidationNeeded = hasStaleWidthCells(area) }
     }
 
+    /** 使用空白单元格清除缓冲区；不会清除媒体放置记录。
+     * @param style 空白单元格样式
+     */
     public func clear(style!: Style = Style.default()): Unit {
         // A widget-scoped clear must remain within that widget's clip and
         // the current frame's dirty region, just like other widget writes.
@@ -219,6 +264,11 @@ public class Buffer {
         }
     }
 
+    /** 将绝对坐标转换为行优先的单元格索引。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @return 区域内的索引；越界时为 None
+     */
     public func indexOf(x: Int64, y: Int64): ?Int64 {
         if (x < area.x || y < area.y || x >= area.right || y >= area.bottom) {
             return None
@@ -226,6 +276,11 @@ public class Buffer {
         return (y - area.y) * area.width + (x - area.x)
     }
 
+    /** 写入单元格并按需修复被覆盖的宽字符；区域外或受裁剪限制的位置不写入。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param cell 待写入单元格
+     */
     public func setCell(x: Int64, y: Int64, cell: Cell): Unit {
         if (workMetricsEnabled) { cellAttemptsValue++ }
         if (!isWritable(x, y)) { return }
@@ -253,6 +308,11 @@ public class Buffer {
         }
     }
 
+    /** 读取绝对坐标处的单元格。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @return 对应单元格；越界时返回默认空白单元格
+     */
     public func getCell(x: Int64, y: Int64): Cell {
         if (let Some(index) <- indexOf(x, y)) {
             return cells[index]
@@ -260,6 +320,10 @@ public class Buffer {
         Cell()
     }
 
+    /** 用单元格填充与缓冲区及当前裁剪区域相交的部分。
+     * @param area 待填充区域
+     * @param cell 填充单元格
+     */
     public func fill(area: Rect, cell: Cell): Unit {
         let physical = intersect(this.area, area)
         let target = match (canvasClip) { case Some(clip) => intersect(physical, clip); case None => physical }
@@ -305,24 +369,54 @@ public class Buffer {
         }
     }
 
+    /** 使用指定样式的空白单元格填充区域。
+     * @param area 待填充区域
+     * @param style 空白单元格样式
+     */
     public func fill(area: Rect, style!: Style = Style.default()): Unit {
         let blank = Cell(" ", style: style)
         fill(area, blank)
     }
 
+    /** 按坐标和尺寸填充样式化空白。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param width 区域宽度
+     * @param height 区域高度
+     * @param style 空白单元格样式
+     */
     public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style!: Style = Style.default()): Unit {
         fill(Rect(x, y, width, height), style: style)
     }
 
+    /** 用单元格填充水平行。
+     * @param y 纵坐标
+     * @param x 起始横坐标
+     * @param width 行宽
+     * @param cell 填充单元格
+     */
     public func fillLine(y: Int64, x: Int64, width: Int64, cell: Cell): Unit {
         if (width <= 0) { return }
         fill(Rect(x, y, width, 1), cell)
     }
 
+    /** 用样式化空白填充水平行。
+     * @param y 纵坐标
+     * @param x 起始横坐标
+     * @param width 行宽
+     * @param style 空白单元格样式
+     */
     public func fillLine(y: Int64, x: Int64, width: Int64, style!: Style = Style.default()): Unit {
         fillLine(y, x, width, Cell(" ", style: style))
     }
 
+    /** 用指定符号绘制线条。
+     * @param x 起始横坐标
+     * @param y 起始纵坐标
+     * @param width 线条长度
+     * @param symbol 线条符号
+     * @param style 线条样式
+     */
     public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit {
         if (width <= 0 || symbol == "") { return }
         let target = intersect(this.area, Rect(x, y, width, 1))
@@ -348,10 +442,23 @@ public class Buffer {
         }
     }
 
+    /** 用默认 ASCII 符号绘制线条。
+     * @param x 起始横坐标
+     * @param y 起始纵坐标
+     * @param width 线条长度
+     * @param style 线条样式
+     */
     public func hline(x: Int64, y: Int64, width: Int64, style!: Style = Style.default()): Unit {
         hline(x, y, width, "-", style)
     }
 
+    /** 用指定符号绘制线条。
+     * @param x 起始横坐标
+     * @param y 起始纵坐标
+     * @param height 线条长度
+     * @param symbol 线条符号
+     * @param style 线条样式
+     */
     public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit {
         if (height <= 0 || symbol == "") { return }
         let target = intersect(this.area, Rect(x, y, 1, height))
@@ -376,10 +483,23 @@ public class Buffer {
         }
     }
 
+    /** 用默认 ASCII 符号绘制线条。
+     * @param x 起始横坐标
+     * @param y 起始纵坐标
+     * @param height 线条长度
+     * @param style 线条样式
+     */
     public func vline(x: Int64, y: Int64, height: Int64, style!: Style = Style.default()): Unit {
         vline(x, y, height, "|", style)
     }
 
+    /** 检查文本是否全部为可打印 ASCII；通过时按边界和裁剪规则写入。
+     * @param x 起始横坐标
+     * @param y 纵坐标
+     * @param text 待写入文本
+     * @param style 文本样式
+     * @return 全部为可打印 ASCII 时为 true，否则不写入并返回 false
+     */
     public func writeAsciiSpan(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Bool {
         let bytes = unsafe { text.rawData() }
         if (!isPrintableAscii(bytes)) {
@@ -389,6 +509,12 @@ public class Buffer {
         true
     }
 
+    /** 写入 ASCII 文本而不验证字符；调用方必须保证文本全部为可打印 ASCII。
+     * @param x 起始横坐标
+     * @param y 纵坐标
+     * @param text 可打印 ASCII 文本
+     * @param style 文本样式
+     */
     public func writeAsciiSpanUnchecked(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit {
         let bytes = unsafe { text.rawData() }
         setAsciiString(x, y, bytes, style)
@@ -398,6 +524,12 @@ public class Buffer {
         fill(area, style: style)
     }
 
+    /** 从指定位置写入文本，按单元格宽度和裁剪规则处理。
+     * @param x 起始横坐标
+     * @param y 纵坐标
+     * @param text 待写入文本
+     * @param style 文本样式
+     */
     public func setString(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit {
         let _ = writeString(x, y, text, 0, false, style)
     }
@@ -520,6 +652,10 @@ public class Buffer {
         }
     }
 
+    /** 创建新缓冲区并复制重叠单元格及视觉上下文；媒体放置不随之复制。
+     * @param area 新区域
+     * @return 调整尺寸后的新缓冲区
+     */
     public func resize(area: Rect): Buffer {
         let next = Buffer(area)
         next.inheritVisualContext(this)
@@ -529,6 +665,9 @@ public class Buffer {
         next
     }
 
+    /** 复制单元格、媒体放置和视觉上下文。
+     * @return 新缓冲区
+     */
     public func copy(): Buffer {
         let next = Buffer(area)
         next.inheritVisualContext(this)
@@ -550,6 +689,11 @@ public class Buffer {
     // Existing destination glyphs are repaired as a group, as with setString.
     /** 将来源区域的单元格复制到目标位置；在边界截断宽字符时以空白处理被截断部分，并成组修复目标中原有的宽字符。
      * 非空来源区域的宽度策略与目标不同时，或来源切换策略后仍有过时字符时，在写入前抛出 IllegalArgumentException。
+     * @param source 来源缓冲区
+     * @param sourceArea 来源区域
+     * @param targetX 目标起始横坐标
+     * @param targetY 目标起始纵坐标
+     * @throws IllegalArgumentException 宽度策略不兼容或来源字符过时
      */
     public func blitFrom(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit {
         blitCells(source, sourceArea, targetX, targetY, true)
@@ -559,6 +703,11 @@ public class Buffer {
     // constrained the destination. Physical and Canvas bounds still apply.
     /** 将来源区域的单元格复制到目标位置，忽略帧的脏矩形限制；物理边界和画布边界仍然生效。调用方需自行约束目标区域。
      * 与 blitFrom 一样检查宽度策略与过时字符，并在写入前报告不兼容。
+     * @param source 来源缓冲区
+     * @param sourceArea 来源区域
+     * @param targetX 目标起始横坐标
+     * @param targetY 目标起始纵坐标
+     * @throws IllegalArgumentException 宽度策略不兼容或来源字符过时
      */
     public func blitFromUnchecked(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit {
         blitCells(source, sourceArea, targetX, targetY, false)
@@ -651,6 +800,10 @@ public class Buffer {
         }
     }
 
+    /** 比较当前缓冲区和之前的缓冲区，生成不同单元格的绘制操作。
+     * @param previous 之前的缓冲区
+     * @return 按行优先顺序排列的操作
+     */
     public func diff(previous: Buffer): Array<DrawOp> {
         let ops = ArrayList<DrawOp>()
         for (y in area.y..area.bottom) {
@@ -664,10 +817,16 @@ public class Buffer {
         ops.toArray()
     }
 
+    /** 追加媒体放置记录。
+     * @param placement 媒体放置
+     */
     public func addMedia(placement: MediaPlacement): Unit {
         media.add(placement)
     }
 
+    /** 获取媒体放置记录数组的副本。
+     * @return 媒体放置记录
+     */
     public func mediaPlacements(): Array<MediaPlacement> {
         media.toArray()
     }
@@ -741,11 +900,20 @@ func asciiByteToString(byte: UInt8): String {
     unsafe { String.fromUtf8Unchecked([byte]) }
 }
 
+/** 一个绝对坐标上的单元格绘制操作。 */
 public struct DrawOp {
+    /** 横坐标。 */
     public let x: Int64
+    /** 纵坐标。 */
     public let y: Int64
+    /** 要绘制的单元格。 */
     public let cell: Cell
 
+    /** 创建单元格绘制操作。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param cell 要绘制的单元格
+     */
     public init(x: Int64, y: Int64, cell: Cell) {
         this.x = x
         this.y = y

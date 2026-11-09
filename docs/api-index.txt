@@ -282,56 +282,56 @@ packages/core/src/app.cj:3264:public func isFocused(id: String): Bool
 packages/core/src/app.cj:3271:public func next(): ?String
 packages/core/src/app.cj:3275:public func previous(): ?String
 packages/core/src/app.cj:3279:public func handle(key: KeyEvent): Bool
-packages/core/src/buffer.cj:5:public enum CellKind {
-packages/core/src/buffer.cj:6:Normal
-packages/core/src/buffer.cj:7:WideLead
-packages/core/src/buffer.cj:8:WideCont
-packages/core/src/buffer.cj:11:public struct Cell <: Equatable<Cell> {
-packages/core/src/buffer.cj:12:public var symbol: String = " "
-packages/core/src/buffer.cj:13:public var style: Style = Style.default()
-packages/core/src/buffer.cj:14:public var kind: CellKind = CellKind.Normal
-packages/core/src/buffer.cj:16:public init()
-packages/core/src/buffer.cj:18:public init(symbol: String, style!: Style = Style.default(), kind!: CellKind = CellKind.Normal)
-packages/core/src/buffer.cj:24:public operator func ==(other: Cell): Bool
-packages/core/src/buffer.cj:29:public class Buffer {
-packages/core/src/buffer.cj:30:public let area: Rect
-packages/core/src/buffer.cj:52:public init(area: Rect)
-packages/core/src/buffer.cj:57:public func capabilities(): TerminalCapabilities
-packages/core/src/buffer.cj:59:public func setCapabilities(capabilities: TerminalCapabilities): Unit
-packages/core/src/buffer.cj:65:public func theme(): ?Theme
-packages/core/src/buffer.cj:68:public func setTheme(theme: ?Theme): Unit
-packages/core/src/buffer.cj:82:public func resolveTheme(explicit: ?Theme): ?Theme
-packages/core/src/buffer.cj:98:public func withParentTheme(explicit: ?Theme, draw: () -> Unit): Unit
-packages/core/src/buffer.cj:122:public func textWidthOptions(): TextWidthOptions
-packages/core/src/buffer.cj:125:public func setTextWidthOptions(options: TextWidthOptions): Unit
-packages/core/src/buffer.cj:131:public func clear(style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:222:public func indexOf(x: Int64, y: Int64): ?Int64
-packages/core/src/buffer.cj:229:public func setCell(x: Int64, y: Int64, cell: Cell): Unit
-packages/core/src/buffer.cj:256:public func getCell(x: Int64, y: Int64): Cell
-packages/core/src/buffer.cj:263:public func fill(area: Rect, cell: Cell): Unit
-packages/core/src/buffer.cj:308:public func fill(area: Rect, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:313:public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:317:public func fillLine(y: Int64, x: Int64, width: Int64, cell: Cell): Unit
-packages/core/src/buffer.cj:322:public func fillLine(y: Int64, x: Int64, width: Int64, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:326:public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit
-packages/core/src/buffer.cj:351:public func hline(x: Int64, y: Int64, width: Int64, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:355:public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit
-packages/core/src/buffer.cj:379:public func vline(x: Int64, y: Int64, height: Int64, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:383:public func writeAsciiSpan(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Bool
-packages/core/src/buffer.cj:392:public func writeAsciiSpanUnchecked(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:401:public func setString(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit
-packages/core/src/buffer.cj:523:public func resize(area: Rect): Buffer
-packages/core/src/buffer.cj:532:public func copy(): Buffer
-packages/core/src/buffer.cj:554:public func blitFrom(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit
-packages/core/src/buffer.cj:563:public func blitFromUnchecked(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit
-packages/core/src/buffer.cj:654:public func diff(previous: Buffer): Array<DrawOp>
-packages/core/src/buffer.cj:667:public func addMedia(placement: MediaPlacement): Unit
-packages/core/src/buffer.cj:671:public func mediaPlacements(): Array<MediaPlacement>
-packages/core/src/buffer.cj:744:public struct DrawOp {
-packages/core/src/buffer.cj:745:public let x: Int64
-packages/core/src/buffer.cj:746:public let y: Int64
-packages/core/src/buffer.cj:747:public let cell: Cell
-packages/core/src/buffer.cj:749:public init(x: Int64, y: Int64, cell: Cell)
+packages/core/src/buffer.cj:6:public enum CellKind {
+packages/core/src/buffer.cj:8:Normal
+packages/core/src/buffer.cj:10:WideLead
+packages/core/src/buffer.cj:12:WideCont
+packages/core/src/buffer.cj:16:public struct Cell <: Equatable<Cell> {
+packages/core/src/buffer.cj:18:public var symbol: String = " "
+packages/core/src/buffer.cj:20:public var style: Style = Style.default()
+packages/core/src/buffer.cj:22:public var kind: CellKind = CellKind.Normal
+packages/core/src/buffer.cj:25:public init()
+packages/core/src/buffer.cj:32:public init(symbol: String, style!: Style = Style.default(), kind!: CellKind = CellKind.Normal)
+packages/core/src/buffer.cj:42:public operator func ==(other: Cell): Bool
+packages/core/src/buffer.cj:48:public class Buffer {
+packages/core/src/buffer.cj:50:public let area: Rect
+packages/core/src/buffer.cj:75:public init(area: Rect)
+packages/core/src/buffer.cj:83:public func capabilities(): TerminalCapabilities
+packages/core/src/buffer.cj:88:public func setCapabilities(capabilities: TerminalCapabilities): Unit
+packages/core/src/buffer.cj:96:public func theme(): ?Theme
+packages/core/src/buffer.cj:101:public func setTheme(theme: ?Theme): Unit
+packages/core/src/buffer.cj:118:public func resolveTheme(explicit: ?Theme): ?Theme
+packages/core/src/buffer.cj:136:public func withParentTheme(explicit: ?Theme, draw: () -> Unit): Unit
+packages/core/src/buffer.cj:162:public func textWidthOptions(): TextWidthOptions
+packages/core/src/buffer.cj:167:public func setTextWidthOptions(options: TextWidthOptions): Unit
+packages/core/src/buffer.cj:176:public func clear(style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:272:public func indexOf(x: Int64, y: Int64): ?Int64
+packages/core/src/buffer.cj:284:public func setCell(x: Int64, y: Int64, cell: Cell): Unit
+packages/core/src/buffer.cj:316:public func getCell(x: Int64, y: Int64): Cell
+packages/core/src/buffer.cj:327:public func fill(area: Rect, cell: Cell): Unit
+packages/core/src/buffer.cj:376:public func fill(area: Rect, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:388:public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:398:public func fillLine(y: Int64, x: Int64, width: Int64, cell: Cell): Unit
+packages/core/src/buffer.cj:409:public func fillLine(y: Int64, x: Int64, width: Int64, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:420:public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit
+packages/core/src/buffer.cj:451:public func hline(x: Int64, y: Int64, width: Int64, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:462:public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit
+packages/core/src/buffer.cj:492:public func vline(x: Int64, y: Int64, height: Int64, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:503:public func writeAsciiSpan(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Bool
+packages/core/src/buffer.cj:518:public func writeAsciiSpanUnchecked(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:533:public func setString(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit
+packages/core/src/buffer.cj:659:public func resize(area: Rect): Buffer
+packages/core/src/buffer.cj:671:public func copy(): Buffer
+packages/core/src/buffer.cj:698:public func blitFrom(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit
+packages/core/src/buffer.cj:712:public func blitFromUnchecked(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit
+packages/core/src/buffer.cj:807:public func diff(previous: Buffer): Array<DrawOp>
+packages/core/src/buffer.cj:823:public func addMedia(placement: MediaPlacement): Unit
+packages/core/src/buffer.cj:830:public func mediaPlacements(): Array<MediaPlacement>
+packages/core/src/buffer.cj:904:public struct DrawOp {
+packages/core/src/buffer.cj:906:public let x: Int64
+packages/core/src/buffer.cj:908:public let y: Int64
+packages/core/src/buffer.cj:910:public let cell: Cell
+packages/core/src/buffer.cj:917:public init(x: Int64, y: Int64, cell: Cell)
 packages/core/src/canvas.cj:6:public enum ResizePolicy {
 packages/core/src/canvas.cj:8:Stretch
 packages/core/src/canvas.cj:10:Letterbox

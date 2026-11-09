@@ -5206,7 +5206,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "enum",
       "symbol": "CellKind",
@@ -5224,7 +5224,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 6,
+      "line": 8,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -5243,7 +5243,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 7,
+      "line": 10,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -5262,7 +5262,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 8,
+      "line": 12,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -5281,7 +5281,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 11,
+      "line": 16,
       "level": "top_level",
       "kind": "struct",
       "symbol": "Cell",
@@ -5299,7 +5299,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 12,
+      "line": 18,
       "level": "member",
       "kind": "var",
       "symbol": "symbol",
@@ -5317,7 +5317,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 13,
+      "line": 20,
       "level": "member",
       "kind": "var",
       "symbol": "style",
@@ -5335,7 +5335,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 14,
+      "line": 22,
       "level": "member",
       "kind": "var",
       "symbol": "kind",
@@ -5353,7 +5353,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 16,
+      "line": 25,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -5371,7 +5371,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 18,
+      "line": 32,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -5389,7 +5389,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 24,
+      "line": 42,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_==",
@@ -5407,7 +5407,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 29,
+      "line": 48,
       "level": "top_level",
       "kind": "class",
       "symbol": "Buffer",
@@ -5425,7 +5425,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 30,
+      "line": 50,
       "level": "member",
       "kind": "let",
       "symbol": "area",
@@ -5443,7 +5443,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 52,
+      "line": 75,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -5461,7 +5461,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 57,
+      "line": 83,
       "level": "member",
       "kind": "func",
       "symbol": "capabilities",
@@ -5479,7 +5479,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 59,
+      "line": 88,
       "level": "member",
       "kind": "func",
       "symbol": "setCapabilities",
@@ -5497,7 +5497,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 65,
+      "line": 96,
       "level": "member",
       "kind": "func",
       "symbol": "theme",
@@ -5515,7 +5515,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 68,
+      "line": 101,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -5533,7 +5533,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 82,
+      "line": 118,
       "level": "member",
       "kind": "func",
       "symbol": "resolveTheme",
@@ -5551,7 +5551,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 98,
+      "line": 136,
       "level": "member",
       "kind": "func",
       "symbol": "withParentTheme",
@@ -5569,7 +5569,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 122,
+      "line": 162,
       "level": "member",
       "kind": "func",
       "symbol": "textWidthOptions",
@@ -5587,7 +5587,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 125,
+      "line": 167,
       "level": "member",
       "kind": "func",
       "symbol": "setTextWidthOptions",
@@ -5605,7 +5605,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 131,
+      "line": 176,
       "level": "member",
       "kind": "func",
       "symbol": "clear",
@@ -5623,7 +5623,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 222,
+      "line": 272,
       "level": "member",
       "kind": "func",
       "symbol": "indexOf",
@@ -5641,7 +5641,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 229,
+      "line": 284,
       "level": "member",
       "kind": "func",
       "symbol": "setCell",
@@ -5659,7 +5659,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 256,
+      "line": 316,
       "level": "member",
       "kind": "func",
       "symbol": "getCell",
@@ -5677,7 +5677,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 263,
+      "line": 327,
       "level": "member",
       "kind": "func",
       "symbol": "fill",
@@ -5695,7 +5695,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 308,
+      "line": 376,
       "level": "member",
       "kind": "func",
       "symbol": "fill",
@@ -5713,7 +5713,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 313,
+      "line": 388,
       "level": "member",
       "kind": "func",
       "symbol": "fillRect",
@@ -5731,7 +5731,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 317,
+      "line": 398,
       "level": "member",
       "kind": "func",
       "symbol": "fillLine",
@@ -5749,7 +5749,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 322,
+      "line": 409,
       "level": "member",
       "kind": "func",
       "symbol": "fillLine",
@@ -5767,7 +5767,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 326,
+      "line": 420,
       "level": "member",
       "kind": "func",
       "symbol": "hline",
@@ -5785,7 +5785,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 351,
+      "line": 451,
       "level": "member",
       "kind": "func",
       "symbol": "hline",
@@ -5803,7 +5803,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 355,
+      "line": 462,
       "level": "member",
       "kind": "func",
       "symbol": "vline",
@@ -5821,7 +5821,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 379,
+      "line": 492,
       "level": "member",
       "kind": "func",
       "symbol": "vline",
@@ -5839,7 +5839,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 383,
+      "line": 503,
       "level": "member",
       "kind": "func",
       "symbol": "writeAsciiSpan",
@@ -5857,7 +5857,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 392,
+      "line": 518,
       "level": "member",
       "kind": "func",
       "symbol": "writeAsciiSpanUnchecked",
@@ -5875,7 +5875,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 401,
+      "line": 533,
       "level": "member",
       "kind": "func",
       "symbol": "setString",
@@ -5893,7 +5893,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 523,
+      "line": 659,
       "level": "member",
       "kind": "func",
       "symbol": "resize",
@@ -5911,7 +5911,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 532,
+      "line": 671,
       "level": "member",
       "kind": "func",
       "symbol": "copy",
@@ -5929,7 +5929,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 554,
+      "line": 698,
       "level": "member",
       "kind": "func",
       "symbol": "blitFrom",
@@ -5947,7 +5947,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 563,
+      "line": 712,
       "level": "member",
       "kind": "func",
       "symbol": "blitFromUnchecked",
@@ -5965,7 +5965,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 654,
+      "line": 807,
       "level": "member",
       "kind": "func",
       "symbol": "diff",
@@ -5983,7 +5983,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 667,
+      "line": 823,
       "level": "member",
       "kind": "func",
       "symbol": "addMedia",
@@ -6001,7 +6001,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 671,
+      "line": 830,
       "level": "member",
       "kind": "func",
       "symbol": "mediaPlacements",
@@ -6019,7 +6019,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 744,
+      "line": 904,
       "level": "top_level",
       "kind": "struct",
       "symbol": "DrawOp",
@@ -6037,7 +6037,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 745,
+      "line": 906,
       "level": "member",
       "kind": "let",
       "symbol": "x",
@@ -6055,7 +6055,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 746,
+      "line": 908,
       "level": "member",
       "kind": "let",
       "symbol": "y",
@@ -6073,7 +6073,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 747,
+      "line": 910,
       "level": "member",
       "kind": "let",
       "symbol": "cell",
@@ -6091,7 +6091,7 @@
     {
       "package": "core",
       "path": "packages/core/src/buffer.cj",
-      "line": 749,
+      "line": 917,
       "level": "member",
       "kind": "init",
       "symbol": "init",

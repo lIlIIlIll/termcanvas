@@ -5451,6 +5451,320 @@
           "signature": "public func handle(event: Event): Bool"
         }
       ]
+    },
+    {
+      "id": "core-buffer-drawing",
+      "source": "docs/api-examples/buffer.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "CellKind",
+          "signature": "public enum CellKind {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "CellKind.Normal",
+          "signature": "Normal"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "CellKind.WideLead",
+          "signature": "WideLead"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "CellKind.WideCont",
+          "signature": "WideCont"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Cell",
+          "signature": "public struct Cell <: Equatable<Cell> {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Cell.symbol",
+          "signature": "public var symbol: String = \" \""
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Cell.style",
+          "signature": "public var style: Style = Style.default()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Cell.kind",
+          "signature": "public var kind: CellKind = CellKind.Normal"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Cell.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Cell.init",
+          "signature": "public init(symbol: String, style!: Style = Style.default(), kind!: CellKind = CellKind.Normal)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Cell.operator_==",
+          "signature": "public operator func ==(other: Cell): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer",
+          "signature": "public class Buffer {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.area",
+          "signature": "public let area: Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.init",
+          "signature": "public init(area: Rect)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.capabilities",
+          "signature": "public func capabilities(): TerminalCapabilities"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.setCapabilities",
+          "signature": "public func setCapabilities(capabilities: TerminalCapabilities): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.theme",
+          "signature": "public func theme(): ?Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.setTheme",
+          "signature": "public func setTheme(theme: ?Theme): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.resolveTheme",
+          "signature": "public func resolveTheme(explicit: ?Theme): ?Theme"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.withParentTheme",
+          "signature": "public func withParentTheme(explicit: ?Theme, draw: () -> Unit): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.textWidthOptions",
+          "signature": "public func textWidthOptions(): TextWidthOptions"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.setTextWidthOptions",
+          "signature": "public func setTextWidthOptions(options: TextWidthOptions): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.clear",
+          "signature": "public func clear(style!: Style = Style.default()): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.indexOf",
+          "signature": "public func indexOf(x: Int64, y: Int64): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.setCell",
+          "signature": "public func setCell(x: Int64, y: Int64, cell: Cell): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.getCell",
+          "signature": "public func getCell(x: Int64, y: Int64): Cell"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.fill",
+          "signature": "public func fill(area: Rect, cell: Cell): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.fill",
+          "signature": "public func fill(area: Rect, style!: Style = Style.default()): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.fillRect",
+          "signature": "public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style!: Style = Style.default()): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.fillLine",
+          "signature": "public func fillLine(y: Int64, x: Int64, width: Int64, cell: Cell): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.fillLine",
+          "signature": "public func fillLine(y: Int64, x: Int64, width: Int64, style!: Style = Style.default()): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.hline",
+          "signature": "public func hline(x: Int64, y: Int64, width: Int64, symbol: String, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.hline",
+          "signature": "public func hline(x: Int64, y: Int64, width: Int64, style!: Style = Style.default()): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.vline",
+          "signature": "public func vline(x: Int64, y: Int64, height: Int64, symbol: String, style: Style): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.vline",
+          "signature": "public func vline(x: Int64, y: Int64, height: Int64, style!: Style = Style.default()): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.writeAsciiSpan",
+          "signature": "public func writeAsciiSpan(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.writeAsciiSpanUnchecked",
+          "signature": "public func writeAsciiSpanUnchecked(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.setString",
+          "signature": "public func setString(x: Int64, y: Int64, text: String, style!: Style = Style.default()): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.resize",
+          "signature": "public func resize(area: Rect): Buffer"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.copy",
+          "signature": "public func copy(): Buffer"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.blitFrom",
+          "signature": "public func blitFrom(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.blitFromUnchecked",
+          "signature": "public func blitFromUnchecked(source: Buffer, sourceArea: Rect, targetX: Int64, targetY: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.diff",
+          "signature": "public func diff(previous: Buffer): Array<DrawOp>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.addMedia",
+          "signature": "public func addMedia(placement: MediaPlacement): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "Buffer.mediaPlacements",
+          "signature": "public func mediaPlacements(): Array<MediaPlacement>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "DrawOp",
+          "signature": "public struct DrawOp {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "DrawOp.x",
+          "signature": "public let x: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "DrawOp.y",
+          "signature": "public let y: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "DrawOp.cell",
+          "signature": "public let cell: Cell"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/buffer.cj",
+          "symbol": "DrawOp.init",
+          "signature": "public init(x: Int64, y: Int64, cell: Cell)"
+        }
+      ]
     }
   ]
 }
