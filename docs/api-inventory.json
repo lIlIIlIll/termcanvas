@@ -10903,7 +10903,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 515,
+      "line": 517,
       "level": "top_level",
       "kind": "class",
       "symbol": "ComposerSubmit",
@@ -10921,7 +10921,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 516,
+      "line": 520,
       "level": "member",
       "kind": "let",
       "symbol": "text",
@@ -10939,7 +10939,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 517,
+      "line": 524,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -10957,7 +10957,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 542,
+      "line": 551,
       "level": "top_level",
       "kind": "class",
       "symbol": "Composer",
@@ -10975,7 +10975,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 543,
+      "line": 554,
       "level": "member",
       "kind": "let",
       "symbol": "area",
@@ -10993,7 +10993,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 544,
+      "line": 557,
       "level": "member",
       "kind": "var",
       "symbol": "lastError",
@@ -11011,7 +11011,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 564,
+      "line": 582,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11029,7 +11029,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 571,
+      "line": 593,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -11047,7 +11047,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 624,
+      "line": 651,
       "level": "member",
       "kind": "func",
       "symbol": "paste",
@@ -11065,7 +11065,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 639,
+      "line": 669,
       "level": "member",
       "kind": "func",
       "symbol": "draftText",
@@ -11083,7 +11083,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 644,
+      "line": 677,
       "level": "member",
       "kind": "func",
       "symbol": "restoreDraft",
@@ -11101,7 +11101,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 655,
+      "line": 691,
       "level": "member",
       "kind": "func",
       "symbol": "currentSlashHints",
@@ -11119,7 +11119,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 664,
+      "line": 703,
       "level": "member",
       "kind": "func",
       "symbol": "completionVisible",
@@ -11137,7 +11137,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 668,
+      "line": 710,
       "level": "member",
       "kind": "func",
       "symbol": "cancelCompletion",
@@ -11155,7 +11155,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 672,
+      "line": 719,
       "level": "member",
       "kind": "func",
       "symbol": "visualHeight",
@@ -11173,7 +11173,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 680,
+      "line": 731,
       "level": "member",
       "kind": "func",
       "symbol": "cursorPosition",
@@ -11191,7 +11191,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 701,
+      "line": 756,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11209,7 +11209,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 933,
+      "line": 988,
       "level": "top_level",
       "kind": "class",
       "symbol": "ActivityStep",
@@ -11227,7 +11227,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 934,
+      "line": 989,
       "level": "member",
       "kind": "let",
       "symbol": "title",
@@ -11245,7 +11245,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 935,
+      "line": 990,
       "level": "member",
       "kind": "let",
       "symbol": "status",
@@ -11263,7 +11263,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 936,
+      "line": 991,
       "level": "member",
       "kind": "let",
       "symbol": "detail",
@@ -11281,7 +11281,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 937,
+      "line": 992,
       "level": "member",
       "kind": "let",
       "symbol": "duration",
@@ -11299,7 +11299,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 939,
+      "line": 994,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11317,7 +11317,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 947,
+      "line": 1002,
       "level": "top_level",
       "kind": "class",
       "symbol": "ActivityTimeline",
@@ -11335,7 +11335,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 951,
+      "line": 1006,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11353,7 +11353,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 956,
+      "line": 1011,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11371,7 +11371,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 972,
+      "line": 1027,
       "level": "top_level",
       "kind": "class",
       "symbol": "RequestDialog",
@@ -11389,7 +11389,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 978,
+      "line": 1033,
       "level": "member",
       "kind": "var",
       "symbol": "selected",
@@ -11407,7 +11407,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 983,
+      "line": 1038,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11425,7 +11425,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 996,
+      "line": 1051,
       "level": "member",
       "kind": "func",
       "symbol": "setTheme",
@@ -11443,7 +11443,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1000,
+      "line": 1055,
       "level": "member",
       "kind": "func",
       "symbol": "handle",
@@ -11461,7 +11461,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1012,
+      "line": 1067,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11479,7 +11479,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1023,
+      "line": 1078,
       "level": "top_level",
       "kind": "type",
       "symbol": "DecisionDialog",
@@ -11497,7 +11497,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1025,
+      "line": 1080,
       "level": "top_level",
       "kind": "func",
       "symbol": "statusMark",
@@ -11515,7 +11515,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1064,
+      "line": 1119,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptStatusStyle",
@@ -11533,7 +11533,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1069,
+      "line": 1124,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptStatusStyle",
@@ -11551,7 +11551,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1102,
+      "line": 1157,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptStatusLabel",
@@ -11569,7 +11569,7 @@
     {
       "package": "core",
       "path": "packages/core/src/content_widgets.cj",
-      "line": 1120,
+      "line": 1175,
       "level": "top_level",
       "kind": "func",
       "symbol": "transcriptCardDocument",

@@ -512,8 +512,15 @@ public class TranscriptView <: Widget {
     }
 }
 
+/** 输入器成功提交的内容。
+ */
 public class ComposerSubmit {
+    /** 展开粘贴内容后的提交文本。
+     */
     public let text: String
+    /** 创建提交结果。
+     * @param text 提交文本
+     */
     public init(text: String) {
         this.text = text
     }
@@ -539,8 +546,14 @@ class ComposerHistoryEntry {
     }
 }
 
+/** 带历史、补全和长文本粘贴处理的消息输入器。
+ */
 public class Composer <: Widget {
+    /** 底层文本输入区域。
+     */
     public let area: TextArea
+    /** 最近一次长粘贴标记校验错误。
+     */
     public var lastError: ?String = None
     private let history = ArrayList<ComposerHistoryEntry>()
     private let retainedPastes = ArrayList<ComposerRetainedPaste>()
@@ -561,6 +574,11 @@ public class Composer <: Widget {
     private var cachedCursorRow: Int64 = 0
     private var cachedCursorColumn: Int64 = 0
 
+    /** 创建输入器。
+     * @param value 初始文本
+     * @param slashHints 斜杠命令候选
+     * @param block 可选外框
+     */
     public init(value!: String = "", slashHints!: Array<String> = [], block!: ?Block = None) {
         this.area = TextArea(value: value, block: block, placeholder: "message")
         this.slashHints = slashHints
@@ -568,6 +586,10 @@ public class Composer <: Widget {
         this.trackedValue = value
     }
 
+    /** 处理编辑、历史和提交按键；补全可见时优先处理补全。
+     * @param key 键盘事件
+     * @return 普通回车成功提交非空内容时返回结果，否则返回 None。
+     */
     public func handle(key: KeyEvent): ?ComposerSubmit {
         synchronizeAreaValue()
         if (area.completionVisible()) {
@@ -621,6 +643,11 @@ public class Composer <: Widget {
         }
     }
 
+    /** 插入文本；超过阈值时在编辑区保留标记，提交时展开原文。
+     * @param text 待粘贴文本
+     * @param collapseThreshold 以字节计的折叠阈值
+     * @return 当前实现返回 true。
+     */
     public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool {
         synchronizeAreaValue()
         let before = area.value
@@ -636,11 +663,17 @@ public class Composer <: Widget {
         true
     }
 
+    /** 获取展开粘贴内容后的草稿。
+     * @return 标记完整时返回草稿，否则返回 None 并设置错误。
+     */
     public func draftText(): ?String {
         synchronizeAreaValue()
         expandedSubmissionText(area.value)
     }
 
+    /** 替换当前草稿并重置补全与历史浏览状态。
+     * @param text 要恢复的草稿文本
+     */
     public func restoreDraft(text: String): Unit {
         clearRetainedPastes()
         lastError = None
@@ -652,6 +685,9 @@ public class Composer <: Widget {
         _ = paste(text)
     }
 
+    /** 按当前完整输入匹配斜杠命令前缀。
+     * @return 匹配的候选数组；输入不以斜杠开头时为空。
+     */
     public func currentSlashHints(): Array<String> {
         if (!area.value.startsWith("/")) { return [] }
         let out = ArrayList<String>()
@@ -661,14 +697,25 @@ public class Composer <: Widget {
         out.toArray()
     }
 
+    /** 查询底层补全面板是否可见。
+     * @return 可见时为 true。
+     */
     public func completionVisible(): Bool {
         area.completionVisible()
     }
 
+    /** 取消底层补全。
+     * @return 取消了可见补全时为 true。
+     */
     public func cancelCompletion(): Bool {
         area.cancelCompletion()
     }
 
+    /** 计算换行和补全占用的可见高度。
+     * @param width 文本宽度
+     * @param maximum 最大行数
+     * @return 计算得到的行数；宽度或上限非正时返回一。
+     */
     public func visualHeight(width: Int64, maximum: Int64): Int64 {
         if (width <= 0 || maximum <= 0) { return 1 }
         let textRows = max(1, layoutLines(width).size)
@@ -677,6 +724,10 @@ public class Composer <: Widget {
         ))
     }
 
+    /** 计算当前区域内的光标位置，并调整垂直滚动。
+     * @param areaRect 输入器绘制区域
+     * @return 光标位置。
+     */
     public func cursorPosition(areaRect: Rect): Position {
         var target = areaRect
         match (block) {
@@ -698,6 +749,10 @@ public class Composer <: Widget {
         )
     }
 
+    /** 绘制文本、占位提示及补全。
+     * @param areaRect 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(areaRect: Rect, buffer: Buffer): Unit {
         let theme = buffer.resolveTheme(Option<Theme>.None)
         let normal = widgetRoleStyle(Option<Style>.None, theme, ThemeRole.Normal, Style.default())

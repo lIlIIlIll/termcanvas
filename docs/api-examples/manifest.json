@@ -13499,6 +13499,122 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "composer",
+      "source": "docs/api-examples/composer.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ComposerSubmit",
+          "signature": "public class ComposerSubmit {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ComposerSubmit.text",
+          "signature": "public let text: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "ComposerSubmit.init",
+          "signature": "public init(text: String)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer",
+          "signature": "public class Composer <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.area",
+          "signature": "public let area: TextArea"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.lastError",
+          "signature": "public var lastError: ?String = None"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.init",
+          "signature": "public init(value!: String = \"\", slashHints!: Array<String> = [], block!: ?Block = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.handle",
+          "signature": "public func handle(key: KeyEvent): ?ComposerSubmit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.paste",
+          "signature": "public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.draftText",
+          "signature": "public func draftText(): ?String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.restoreDraft",
+          "signature": "public func restoreDraft(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.currentSlashHints",
+          "signature": "public func currentSlashHints(): Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.completionVisible",
+          "signature": "public func completionVisible(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.cancelCompletion",
+          "signature": "public func cancelCompletion(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.visualHeight",
+          "signature": "public func visualHeight(width: Int64, maximum: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.cursorPosition",
+          "signature": "public func cursorPosition(areaRect: Rect): Position"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/content_widgets.cj",
+          "symbol": "Composer.render",
+          "signature": "public func render(areaRect: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }

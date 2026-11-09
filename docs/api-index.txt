@@ -596,44 +596,44 @@ packages/core/src/content_widgets.cj:340:public var selected: Int64
 packages/core/src/content_widgets.cj:358:public init( transcript: Transcript, offset!: Int64 = 0, selected!: Int64 = 0, block!: ?Block = None, style!: ?Style = None, selectedStyle!: ?Style = None, cardTheme!: ?TranscriptCardTheme = None )
 packages/core/src/content_widgets.cj:385:public func handle(key: KeyEvent, viewportHeight: Int64): Bool
 packages/core/src/content_widgets.cj:417:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:515:public class ComposerSubmit {
-packages/core/src/content_widgets.cj:516:public let text: String
-packages/core/src/content_widgets.cj:517:public init(text: String)
-packages/core/src/content_widgets.cj:542:public class Composer <: Widget {
-packages/core/src/content_widgets.cj:543:public let area: TextArea
-packages/core/src/content_widgets.cj:544:public var lastError: ?String = None
-packages/core/src/content_widgets.cj:564:public init(value!: String = "", slashHints!: Array<String> = [], block!: ?Block = None)
-packages/core/src/content_widgets.cj:571:public func handle(key: KeyEvent): ?ComposerSubmit
-packages/core/src/content_widgets.cj:624:public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool
-packages/core/src/content_widgets.cj:639:public func draftText(): ?String
-packages/core/src/content_widgets.cj:644:public func restoreDraft(text: String): Unit
-packages/core/src/content_widgets.cj:655:public func currentSlashHints(): Array<String>
-packages/core/src/content_widgets.cj:664:public func completionVisible(): Bool
-packages/core/src/content_widgets.cj:668:public func cancelCompletion(): Bool
-packages/core/src/content_widgets.cj:672:public func visualHeight(width: Int64, maximum: Int64): Int64
-packages/core/src/content_widgets.cj:680:public func cursorPosition(areaRect: Rect): Position
-packages/core/src/content_widgets.cj:701:public func render(areaRect: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:933:public class ActivityStep {
-packages/core/src/content_widgets.cj:934:public let title: String
-packages/core/src/content_widgets.cj:935:public let status: TranscriptItemStatus
-packages/core/src/content_widgets.cj:936:public let detail: String
-packages/core/src/content_widgets.cj:937:public let duration: String
-packages/core/src/content_widgets.cj:939:public init(title: String, status!: TranscriptItemStatus = TranscriptItemStatus.Pending, detail!: String = "", duration!: String = "")
-packages/core/src/content_widgets.cj:947:public class ActivityTimeline <: Widget {
-packages/core/src/content_widgets.cj:951:public init(steps: Array<ActivityStep>, block!: ?Block = None)
-packages/core/src/content_widgets.cj:956:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:972:public class RequestDialog <: Widget {
-packages/core/src/content_widgets.cj:978:public var selected: Int64
-packages/core/src/content_widgets.cj:983:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
-packages/core/src/content_widgets.cj:996:public func setTheme(theme: ?Theme): Unit
-packages/core/src/content_widgets.cj:1000:public func handle(key: KeyEvent): ?String
-packages/core/src/content_widgets.cj:1012:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/content_widgets.cj:1023:public type DecisionDialog = RequestDialog
-packages/core/src/content_widgets.cj:1025:public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
-packages/core/src/content_widgets.cj:1064:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
-packages/core/src/content_widgets.cj:1069:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style
-packages/core/src/content_widgets.cj:1102:public func transcriptStatusLabel(status: TranscriptItemStatus): String
-packages/core/src/content_widgets.cj:1120:public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
+packages/core/src/content_widgets.cj:517:public class ComposerSubmit {
+packages/core/src/content_widgets.cj:520:public let text: String
+packages/core/src/content_widgets.cj:524:public init(text: String)
+packages/core/src/content_widgets.cj:551:public class Composer <: Widget {
+packages/core/src/content_widgets.cj:554:public let area: TextArea
+packages/core/src/content_widgets.cj:557:public var lastError: ?String = None
+packages/core/src/content_widgets.cj:582:public init(value!: String = "", slashHints!: Array<String> = [], block!: ?Block = None)
+packages/core/src/content_widgets.cj:593:public func handle(key: KeyEvent): ?ComposerSubmit
+packages/core/src/content_widgets.cj:651:public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool
+packages/core/src/content_widgets.cj:669:public func draftText(): ?String
+packages/core/src/content_widgets.cj:677:public func restoreDraft(text: String): Unit
+packages/core/src/content_widgets.cj:691:public func currentSlashHints(): Array<String>
+packages/core/src/content_widgets.cj:703:public func completionVisible(): Bool
+packages/core/src/content_widgets.cj:710:public func cancelCompletion(): Bool
+packages/core/src/content_widgets.cj:719:public func visualHeight(width: Int64, maximum: Int64): Int64
+packages/core/src/content_widgets.cj:731:public func cursorPosition(areaRect: Rect): Position
+packages/core/src/content_widgets.cj:756:public func render(areaRect: Rect, buffer: Buffer): Unit
+packages/core/src/content_widgets.cj:988:public class ActivityStep {
+packages/core/src/content_widgets.cj:989:public let title: String
+packages/core/src/content_widgets.cj:990:public let status: TranscriptItemStatus
+packages/core/src/content_widgets.cj:991:public let detail: String
+packages/core/src/content_widgets.cj:992:public let duration: String
+packages/core/src/content_widgets.cj:994:public init(title: String, status!: TranscriptItemStatus = TranscriptItemStatus.Pending, detail!: String = "", duration!: String = "")
+packages/core/src/content_widgets.cj:1002:public class ActivityTimeline <: Widget {
+packages/core/src/content_widgets.cj:1006:public init(steps: Array<ActivityStep>, block!: ?Block = None)
+packages/core/src/content_widgets.cj:1011:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/content_widgets.cj:1027:public class RequestDialog <: Widget {
+packages/core/src/content_widgets.cj:1033:public var selected: Int64
+packages/core/src/content_widgets.cj:1038:public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None)
+packages/core/src/content_widgets.cj:1051:public func setTheme(theme: ?Theme): Unit
+packages/core/src/content_widgets.cj:1055:public func handle(key: KeyEvent): ?String
+packages/core/src/content_widgets.cj:1067:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/content_widgets.cj:1078:public type DecisionDialog = RequestDialog
+packages/core/src/content_widgets.cj:1080:public func statusMark( status: TranscriptItemStatus, activityFrame!: Int64 = 0 ): String
+packages/core/src/content_widgets.cj:1119:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style
+packages/core/src/content_widgets.cj:1124:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style
+packages/core/src/content_widgets.cj:1157:public func transcriptStatusLabel(status: TranscriptItemStatus): String
+packages/core/src/content_widgets.cj:1175:public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
 packages/core/src/dashboard_widgets.cj:6:public class MetricCard <: Widget {
 packages/core/src/dashboard_widgets.cj:22:public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: ?Style = None, valueStyle!: ?Style = None )
 packages/core/src/dashboard_widgets.cj:42:public func render(area: Rect, buffer: Buffer): Unit
