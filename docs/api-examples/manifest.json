@@ -2277,6 +2277,236 @@
           "signature": "public func render(area: Rect, buffer: Buffer): Unit"
         }
       ]
+    },
+    {
+      "id": "core-text-buffer",
+      "source": "docs/api-examples/text-buffer.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextPosition",
+          "signature": "public struct TextPosition <: Equatable<TextPosition> {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextPosition.line",
+          "signature": "public let line: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextPosition.column",
+          "signature": "public let column: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextPosition.init",
+          "signature": "public init(line: Int64, column: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextPosition.operator_==",
+          "signature": "public operator func ==(other: TextPosition): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextRange",
+          "signature": "public struct TextRange {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextRange.start",
+          "signature": "public let start: TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextRange.end",
+          "signature": "public let end: TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextRange.init",
+          "signature": "public init(start: TextPosition, end: TextPosition)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextRange.isEmpty",
+          "signature": "public func isEmpty(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer",
+          "signature": "public class TextBuffer {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.init",
+          "signature": "public init(text!: String = \"\", model!: ?EditableTextModel = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.textModel",
+          "signature": "public prop textModel: EditableTextModel { get() { modelValue } }"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.setText",
+          "signature": "public func setText(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.text",
+          "signature": "public func text(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.lineCount",
+          "signature": "public func lineCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.line",
+          "signature": "public func line(index: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.insert",
+          "signature": "public func insert(position: TextPosition, text: String): TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.replace",
+          "signature": "public func replace(range: TextRange, text: String): TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.deleteRange",
+          "signature": "public func deleteRange(range: TextRange): TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.slice",
+          "signature": "public func slice(range: TextRange): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.clampPosition",
+          "signature": "public func clampPosition(position: TextPosition): TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.positionToOffset",
+          "signature": "public func positionToOffset(position: TextPosition): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.offsetToPosition",
+          "signature": "public func offsetToPosition(offset: Int64): TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.deleteBackward",
+          "signature": "public func deleteBackward(position: TextPosition): TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.deleteForward",
+          "signature": "public func deleteForward(position: TextPosition): TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.beginUndoGroup",
+          "signature": "public func beginUndoGroup(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.endUndoGroup",
+          "signature": "public func endUndoGroup(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.undo",
+          "signature": "public func undo(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.redo",
+          "signature": "public func redo(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.wordLeft",
+          "signature": "public func wordLeft(position: TextPosition): TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.wordRight",
+          "signature": "public func wordRight(position: TextPosition): TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.find",
+          "signature": "public func find(needle: String, start!: TextPosition = TextPosition(0, 0)): ?TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.findPrevious",
+          "signature": "public func findPrevious(needle: String, start!: TextPosition = TextPosition(Int64.Max, Int64.Max)): ?TextPosition"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.findAll",
+          "signature": "public func findAll(needle: String): Array<TextRange>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text_buffer.cj",
+          "symbol": "TextBuffer.replaceAll",
+          "signature": "public func replaceAll(needle: String, replacement: String): Int64"
+        }
+      ]
     }
   ]
 }

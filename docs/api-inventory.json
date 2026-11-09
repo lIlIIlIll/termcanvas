@@ -41421,7 +41421,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "struct",
       "symbol": "TextPosition",
@@ -41439,7 +41439,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 6,
+      "line": 8,
       "level": "member",
       "kind": "let",
       "symbol": "line",
@@ -41457,7 +41457,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 7,
+      "line": 10,
       "level": "member",
       "kind": "let",
       "symbol": "column",
@@ -41475,7 +41475,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 9,
+      "line": 16,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -41493,7 +41493,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 14,
+      "line": 25,
       "level": "member",
       "kind": "operator",
       "symbol": "operator_==",
@@ -41511,7 +41511,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 19,
+      "line": 31,
       "level": "top_level",
       "kind": "struct",
       "symbol": "TextRange",
@@ -41529,7 +41529,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 20,
+      "line": 33,
       "level": "member",
       "kind": "let",
       "symbol": "start",
@@ -41547,7 +41547,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 21,
+      "line": 35,
       "level": "member",
       "kind": "let",
       "symbol": "end",
@@ -41565,7 +41565,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 23,
+      "line": 41,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -41583,7 +41583,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 33,
+      "line": 54,
       "level": "member",
       "kind": "func",
       "symbol": "isEmpty",
@@ -41601,7 +41601,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 39,
+      "line": 61,
       "level": "top_level",
       "kind": "class",
       "symbol": "TextBuffer",
@@ -41619,7 +41619,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 41,
+      "line": 67,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -41637,7 +41637,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 44,
+      "line": 71,
       "level": "member",
       "kind": "prop",
       "symbol": "textModel",
@@ -41655,7 +41655,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 45,
+      "line": 75,
       "level": "member",
       "kind": "func",
       "symbol": "setText",
@@ -41673,7 +41673,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 49,
+      "line": 82,
       "level": "member",
       "kind": "func",
       "symbol": "text",
@@ -41691,7 +41691,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 50,
+      "line": 86,
       "level": "member",
       "kind": "func",
       "symbol": "lineCount",
@@ -41709,7 +41709,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 51,
+      "line": 91,
       "level": "member",
       "kind": "func",
       "symbol": "line",
@@ -41727,7 +41727,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 54,
+      "line": 99,
       "level": "member",
       "kind": "func",
       "symbol": "insert",
@@ -41745,7 +41745,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 59,
+      "line": 109,
       "level": "member",
       "kind": "func",
       "symbol": "replace",
@@ -41763,7 +41763,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 65,
+      "line": 119,
       "level": "member",
       "kind": "func",
       "symbol": "deleteRange",
@@ -41781,7 +41781,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 66,
+      "line": 124,
       "level": "member",
       "kind": "func",
       "symbol": "slice",
@@ -41799,7 +41799,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 69,
+      "line": 131,
       "level": "member",
       "kind": "func",
       "symbol": "clampPosition",
@@ -41817,7 +41817,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 76,
+      "line": 142,
       "level": "member",
       "kind": "func",
       "symbol": "positionToOffset",
@@ -41835,7 +41835,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 80,
+      "line": 150,
       "level": "member",
       "kind": "func",
       "symbol": "offsetToPosition",
@@ -41853,7 +41853,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 85,
+      "line": 159,
       "level": "member",
       "kind": "func",
       "symbol": "deleteBackward",
@@ -41871,7 +41871,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 95,
+      "line": 173,
       "level": "member",
       "kind": "func",
       "symbol": "deleteForward",
@@ -41889,7 +41889,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 106,
+      "line": 185,
       "level": "member",
       "kind": "func",
       "symbol": "beginUndoGroup",
@@ -41907,7 +41907,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 107,
+      "line": 187,
       "level": "member",
       "kind": "func",
       "symbol": "endUndoGroup",
@@ -41925,7 +41925,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 108,
+      "line": 191,
       "level": "member",
       "kind": "func",
       "symbol": "undo",
@@ -41943,7 +41943,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 109,
+      "line": 195,
       "level": "member",
       "kind": "func",
       "symbol": "redo",
@@ -41961,7 +41961,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 110,
+      "line": 200,
       "level": "member",
       "kind": "func",
       "symbol": "wordLeft",
@@ -41979,7 +41979,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 113,
+      "line": 207,
       "level": "member",
       "kind": "func",
       "symbol": "wordRight",
@@ -41997,7 +41997,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 116,
+      "line": 215,
       "level": "member",
       "kind": "func",
       "symbol": "find",
@@ -42015,7 +42015,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 121,
+      "line": 225,
       "level": "member",
       "kind": "func",
       "symbol": "findPrevious",
@@ -42033,7 +42033,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 126,
+      "line": 234,
       "level": "member",
       "kind": "func",
       "symbol": "findAll",
@@ -42051,7 +42051,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text_buffer.cj",
-      "line": 139,
+      "line": 252,
       "level": "member",
       "kind": "func",
       "symbol": "replaceAll",

@@ -2277,42 +2277,42 @@ packages/core/src/text_area.cj:2076:public let behavior: MarkdownEditorBehavior
 packages/core/src/text_area.cj:2078:public init(value!: String = "", block!: ?Block = None, lineNumbers!: Bool = true)
 packages/core/src/text_area.cj:2083:public func handle(key: KeyEvent): Bool
 packages/core/src/text_area.cj:2087:public func render(areaRect: Rect, buffer: Buffer): Unit
-packages/core/src/text_buffer.cj:5:public struct TextPosition <: Equatable<TextPosition> {
-packages/core/src/text_buffer.cj:6:public let line: Int64
-packages/core/src/text_buffer.cj:7:public let column: Int64
-packages/core/src/text_buffer.cj:9:public init(line: Int64, column: Int64)
-packages/core/src/text_buffer.cj:14:public operator func ==(other: TextPosition): Bool
-packages/core/src/text_buffer.cj:19:public struct TextRange {
-packages/core/src/text_buffer.cj:20:public let start: TextPosition
-packages/core/src/text_buffer.cj:21:public let end: TextPosition
-packages/core/src/text_buffer.cj:23:public init(start: TextPosition, end: TextPosition)
-packages/core/src/text_buffer.cj:33:public func isEmpty(): Bool
-packages/core/src/text_buffer.cj:39:public class TextBuffer {
-packages/core/src/text_buffer.cj:41:public init(text!: String = "", model!: ?EditableTextModel = None)
-packages/core/src/text_buffer.cj:44:public prop textModel: EditableTextModel { get() { modelValue } }
-packages/core/src/text_buffer.cj:45:public func setText(text: String): Unit
-packages/core/src/text_buffer.cj:49:public func text(): String
-packages/core/src/text_buffer.cj:50:public func lineCount(): Int64
-packages/core/src/text_buffer.cj:51:public func line(index: Int64): String
-packages/core/src/text_buffer.cj:54:public func insert(position: TextPosition, text: String): TextPosition
-packages/core/src/text_buffer.cj:59:public func replace(range: TextRange, text: String): TextPosition
-packages/core/src/text_buffer.cj:65:public func deleteRange(range: TextRange): TextPosition
-packages/core/src/text_buffer.cj:66:public func slice(range: TextRange): String
-packages/core/src/text_buffer.cj:69:public func clampPosition(position: TextPosition): TextPosition
-packages/core/src/text_buffer.cj:76:public func positionToOffset(position: TextPosition): Int64
-packages/core/src/text_buffer.cj:80:public func offsetToPosition(offset: Int64): TextPosition
-packages/core/src/text_buffer.cj:85:public func deleteBackward(position: TextPosition): TextPosition
-packages/core/src/text_buffer.cj:95:public func deleteForward(position: TextPosition): TextPosition
-packages/core/src/text_buffer.cj:106:public func beginUndoGroup(): Unit
-packages/core/src/text_buffer.cj:107:public func endUndoGroup(): Unit
-packages/core/src/text_buffer.cj:108:public func undo(): Bool
-packages/core/src/text_buffer.cj:109:public func redo(): Bool
-packages/core/src/text_buffer.cj:110:public func wordLeft(position: TextPosition): TextPosition
-packages/core/src/text_buffer.cj:113:public func wordRight(position: TextPosition): TextPosition
-packages/core/src/text_buffer.cj:116:public func find(needle: String, start!: TextPosition = TextPosition(0, 0)): ?TextPosition
-packages/core/src/text_buffer.cj:121:public func findPrevious(needle: String, start!: TextPosition = TextPosition(Int64.Max, Int64.Max)): ?TextPosition
-packages/core/src/text_buffer.cj:126:public func findAll(needle: String): Array<TextRange>
-packages/core/src/text_buffer.cj:139:public func replaceAll(needle: String, replacement: String): Int64
+packages/core/src/text_buffer.cj:6:public struct TextPosition <: Equatable<TextPosition> {
+packages/core/src/text_buffer.cj:8:public let line: Int64
+packages/core/src/text_buffer.cj:10:public let column: Int64
+packages/core/src/text_buffer.cj:16:public init(line: Int64, column: Int64)
+packages/core/src/text_buffer.cj:25:public operator func ==(other: TextPosition): Bool
+packages/core/src/text_buffer.cj:31:public struct TextRange {
+packages/core/src/text_buffer.cj:33:public let start: TextPosition
+packages/core/src/text_buffer.cj:35:public let end: TextPosition
+packages/core/src/text_buffer.cj:41:public init(start: TextPosition, end: TextPosition)
+packages/core/src/text_buffer.cj:54:public func isEmpty(): Bool
+packages/core/src/text_buffer.cj:61:public class TextBuffer {
+packages/core/src/text_buffer.cj:67:public init(text!: String = "", model!: ?EditableTextModel = None)
+packages/core/src/text_buffer.cj:71:public prop textModel: EditableTextModel { get() { modelValue } }
+packages/core/src/text_buffer.cj:75:public func setText(text: String): Unit
+packages/core/src/text_buffer.cj:82:public func text(): String
+packages/core/src/text_buffer.cj:86:public func lineCount(): Int64
+packages/core/src/text_buffer.cj:91:public func line(index: Int64): String
+packages/core/src/text_buffer.cj:99:public func insert(position: TextPosition, text: String): TextPosition
+packages/core/src/text_buffer.cj:109:public func replace(range: TextRange, text: String): TextPosition
+packages/core/src/text_buffer.cj:119:public func deleteRange(range: TextRange): TextPosition
+packages/core/src/text_buffer.cj:124:public func slice(range: TextRange): String
+packages/core/src/text_buffer.cj:131:public func clampPosition(position: TextPosition): TextPosition
+packages/core/src/text_buffer.cj:142:public func positionToOffset(position: TextPosition): Int64
+packages/core/src/text_buffer.cj:150:public func offsetToPosition(offset: Int64): TextPosition
+packages/core/src/text_buffer.cj:159:public func deleteBackward(position: TextPosition): TextPosition
+packages/core/src/text_buffer.cj:173:public func deleteForward(position: TextPosition): TextPosition
+packages/core/src/text_buffer.cj:185:public func beginUndoGroup(): Unit
+packages/core/src/text_buffer.cj:187:public func endUndoGroup(): Unit
+packages/core/src/text_buffer.cj:191:public func undo(): Bool
+packages/core/src/text_buffer.cj:195:public func redo(): Bool
+packages/core/src/text_buffer.cj:200:public func wordLeft(position: TextPosition): TextPosition
+packages/core/src/text_buffer.cj:207:public func wordRight(position: TextPosition): TextPosition
+packages/core/src/text_buffer.cj:215:public func find(needle: String, start!: TextPosition = TextPosition(0, 0)): ?TextPosition
+packages/core/src/text_buffer.cj:225:public func findPrevious(needle: String, start!: TextPosition = TextPosition(Int64.Max, Int64.Max)): ?TextPosition
+packages/core/src/text_buffer.cj:234:public func findAll(needle: String): Array<TextRange>
+packages/core/src/text_buffer.cj:252:public func replaceAll(needle: String, replacement: String): Int64
 packages/core/src/text_decorations.cj:7:public struct TextEditDelta {
 packages/core/src/text_decorations.cj:9:public let start: Int64
 packages/core/src/text_decorations.cj:11:public let end: Int64
