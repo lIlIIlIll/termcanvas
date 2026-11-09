@@ -634,47 +634,47 @@ packages/core/src/content_widgets.cj:885:public func transcriptStatusStyle(statu
 packages/core/src/content_widgets.cj:890:public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style
 packages/core/src/content_widgets.cj:923:public func transcriptStatusLabel(status: TranscriptItemStatus): String
 packages/core/src/content_widgets.cj:941:public func transcriptCardDocument( item: TranscriptItem, theme!: TranscriptCardTheme = TranscriptCardTheme() ): Document
-packages/core/src/dashboard_widgets.cj:5:public class MetricCard <: Widget {
-packages/core/src/dashboard_widgets.cj:13:public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: ?Style = None, valueStyle!: ?Style = None )
-packages/core/src/dashboard_widgets.cj:29:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:47:public class Meter <: Widget {
-packages/core/src/dashboard_widgets.cj:54:public init(label: String, value: Int64, total!: Int64 = 100, style!: ?Style = None, fillStyle!: ?Style = None)
-packages/core/src/dashboard_widgets.cj:62:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:76:public class LegendItem {
-packages/core/src/dashboard_widgets.cj:77:public let label: String
-packages/core/src/dashboard_widgets.cj:78:public let symbol: String
-packages/core/src/dashboard_widgets.cj:79:public let style: Style
-packages/core/src/dashboard_widgets.cj:82:public init(label: String, symbol!: String = "#", style!: ?Style = None)
-packages/core/src/dashboard_widgets.cj:90:public class Legend <: Widget {
-packages/core/src/dashboard_widgets.cj:94:public init(items: Array<LegendItem>, gap!: String = " ")
-packages/core/src/dashboard_widgets.cj:99:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:116:public class TimeSeriesChart <: Widget {
-packages/core/src/dashboard_widgets.cj:121:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None)
-packages/core/src/dashboard_widgets.cj:127:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:167:public class HeaderBar <: Widget {
-packages/core/src/dashboard_widgets.cj:173:public init(title: String, left!: String = "", right!: String = "", style!: ?Style = None)
+packages/core/src/dashboard_widgets.cj:6:public class MetricCard <: Widget {
+packages/core/src/dashboard_widgets.cj:22:public init( title: String, value: String, detail!: String = "", trend!: String = "", style!: ?Style = None, valueStyle!: ?Style = None )
+packages/core/src/dashboard_widgets.cj:42:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:61:public class Meter <: Widget {
+packages/core/src/dashboard_widgets.cj:75:public init(label: String, value: Int64, total!: Int64 = 100, style!: ?Style = None, fillStyle!: ?Style = None)
+packages/core/src/dashboard_widgets.cj:87:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:102:public class LegendItem {
+packages/core/src/dashboard_widgets.cj:104:public let label: String
+packages/core/src/dashboard_widgets.cj:106:public let symbol: String
+packages/core/src/dashboard_widgets.cj:108:public let style: Style
+packages/core/src/dashboard_widgets.cj:116:public init(label: String, symbol!: String = "#", style!: ?Style = None)
+packages/core/src/dashboard_widgets.cj:125:public class Legend <: Widget {
+packages/core/src/dashboard_widgets.cj:133:public init(items: Array<LegendItem>, gap!: String = " ")
+packages/core/src/dashboard_widgets.cj:142:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:160:public class TimeSeriesChart <: Widget {
+packages/core/src/dashboard_widgets.cj:170:public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None)
 packages/core/src/dashboard_widgets.cj:180:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:185:public class FooterBar <: Widget {
-packages/core/src/dashboard_widgets.cj:191:public init(left!: String = "", center!: String = "", right!: String = "", style!: ?Style = None)
-packages/core/src/dashboard_widgets.cj:198:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:203:public class EmptyState <: Widget {
-packages/core/src/dashboard_widgets.cj:208:public init(title!: String = "No data", detail!: String = "", style!: ?Style = None)
-packages/core/src/dashboard_widgets.cj:214:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:219:public class ErrorBox <: Widget {
-packages/core/src/dashboard_widgets.cj:226:public init(message: String, detail!: String = "", style!: ?Style = None, borderKind!: ?BorderKind = None, theme!: ?Theme = None)
-packages/core/src/dashboard_widgets.cj:234:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:247:public class LoadingOverlay <: Widget {
-packages/core/src/dashboard_widgets.cj:251:public init(label!: String = "Loading", frame!: Int64 = 0)
-packages/core/src/dashboard_widgets.cj:256:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:261:public class Skeleton <: Widget {
-packages/core/src/dashboard_widgets.cj:265:public init(rows!: Int64 = 3, style!: ?Style = None)
-packages/core/src/dashboard_widgets.cj:270:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:280:public class InlineAlert <: Widget {
-packages/core/src/dashboard_widgets.cj:284:public init(message: String, state!: StyleState = StyleState.Accent)
-packages/core/src/dashboard_widgets.cj:289:public func render(area: Rect, buffer: Buffer): Unit
-packages/core/src/dashboard_widgets.cj:313:public class Badge <: Widget {
-packages/core/src/dashboard_widgets.cj:319:public init(label: String, style!: ?Style = None, theme!: ?Theme = None)
-packages/core/src/dashboard_widgets.cj:326:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:221:public class HeaderBar <: Widget {
+packages/core/src/dashboard_widgets.cj:233:public init(title: String, left!: String = "", right!: String = "", style!: ?Style = None)
+packages/core/src/dashboard_widgets.cj:244:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:250:public class FooterBar <: Widget {
+packages/core/src/dashboard_widgets.cj:262:public init(left!: String = "", center!: String = "", right!: String = "", style!: ?Style = None)
+packages/core/src/dashboard_widgets.cj:273:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:279:public class EmptyState <: Widget {
+packages/core/src/dashboard_widgets.cj:289:public init(title!: String = "No data", detail!: String = "", style!: ?Style = None)
+packages/core/src/dashboard_widgets.cj:299:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:305:public class ErrorBox <: Widget {
+packages/core/src/dashboard_widgets.cj:319:public init(message: String, detail!: String = "", style!: ?Style = None, borderKind!: ?BorderKind = None, theme!: ?Theme = None)
+packages/core/src/dashboard_widgets.cj:331:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:345:public class LoadingOverlay <: Widget {
+packages/core/src/dashboard_widgets.cj:353:public init(label!: String = "Loading", frame!: Int64 = 0)
+packages/core/src/dashboard_widgets.cj:362:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:368:public class Skeleton <: Widget {
+packages/core/src/dashboard_widgets.cj:376:public init(rows!: Int64 = 3, style!: ?Style = None)
+packages/core/src/dashboard_widgets.cj:385:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:396:public class InlineAlert <: Widget {
+packages/core/src/dashboard_widgets.cj:404:public init(message: String, state!: StyleState = StyleState.Accent)
+packages/core/src/dashboard_widgets.cj:413:public func render(area: Rect, buffer: Buffer): Unit
+packages/core/src/dashboard_widgets.cj:437:public class Badge <: Widget {
+packages/core/src/dashboard_widgets.cj:447:public init(label: String, style!: ?Style = None, theme!: ?Theme = None)
+packages/core/src/dashboard_widgets.cj:457:public func render(area: Rect, buffer: Buffer): Unit
 packages/core/src/data_widgets.cj:7:public class Paginator {
 packages/core/src/data_widgets.cj:8:public var page: Int64
 packages/core/src/data_widgets.cj:9:public var pageSize: Int64

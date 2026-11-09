@@ -11587,7 +11587,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "class",
       "symbol": "MetricCard",
@@ -11605,7 +11605,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 13,
+      "line": 22,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11623,7 +11623,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 29,
+      "line": 42,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11641,7 +11641,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 47,
+      "line": 61,
       "level": "top_level",
       "kind": "class",
       "symbol": "Meter",
@@ -11659,7 +11659,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 54,
+      "line": 75,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11677,7 +11677,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 62,
+      "line": 87,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11695,7 +11695,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 76,
+      "line": 102,
       "level": "top_level",
       "kind": "class",
       "symbol": "LegendItem",
@@ -11713,7 +11713,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 77,
+      "line": 104,
       "level": "member",
       "kind": "let",
       "symbol": "label",
@@ -11731,7 +11731,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 78,
+      "line": 106,
       "level": "member",
       "kind": "let",
       "symbol": "symbol",
@@ -11749,7 +11749,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 79,
+      "line": 108,
       "level": "member",
       "kind": "let",
       "symbol": "style",
@@ -11767,7 +11767,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 82,
+      "line": 116,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11785,7 +11785,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 90,
+      "line": 125,
       "level": "top_level",
       "kind": "class",
       "symbol": "Legend",
@@ -11803,7 +11803,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 94,
+      "line": 133,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11821,7 +11821,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 99,
+      "line": 142,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11839,7 +11839,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 116,
+      "line": 160,
       "level": "top_level",
       "kind": "class",
       "symbol": "TimeSeriesChart",
@@ -11857,7 +11857,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 121,
+      "line": 170,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11875,7 +11875,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 127,
+      "line": 180,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11893,7 +11893,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 167,
+      "line": 221,
       "level": "top_level",
       "kind": "class",
       "symbol": "HeaderBar",
@@ -11911,7 +11911,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 173,
+      "line": 233,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11929,7 +11929,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 180,
+      "line": 244,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -11947,7 +11947,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 185,
+      "line": 250,
       "level": "top_level",
       "kind": "class",
       "symbol": "FooterBar",
@@ -11965,7 +11965,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 191,
+      "line": 262,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -11983,7 +11983,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 198,
+      "line": 273,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -12001,7 +12001,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 203,
+      "line": 279,
       "level": "top_level",
       "kind": "class",
       "symbol": "EmptyState",
@@ -12019,7 +12019,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 208,
+      "line": 289,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -12037,7 +12037,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 214,
+      "line": 299,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -12055,7 +12055,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 219,
+      "line": 305,
       "level": "top_level",
       "kind": "class",
       "symbol": "ErrorBox",
@@ -12073,7 +12073,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 226,
+      "line": 319,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -12091,7 +12091,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 234,
+      "line": 331,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -12109,7 +12109,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 247,
+      "line": 345,
       "level": "top_level",
       "kind": "class",
       "symbol": "LoadingOverlay",
@@ -12127,7 +12127,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 251,
+      "line": 353,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -12145,7 +12145,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 256,
+      "line": 362,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -12163,7 +12163,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 261,
+      "line": 368,
       "level": "top_level",
       "kind": "class",
       "symbol": "Skeleton",
@@ -12181,7 +12181,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 265,
+      "line": 376,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -12199,7 +12199,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 270,
+      "line": 385,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -12217,7 +12217,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 280,
+      "line": 396,
       "level": "top_level",
       "kind": "class",
       "symbol": "InlineAlert",
@@ -12235,7 +12235,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 284,
+      "line": 404,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -12253,7 +12253,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 289,
+      "line": 413,
       "level": "member",
       "kind": "func",
       "symbol": "render",
@@ -12271,7 +12271,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 313,
+      "line": 437,
       "level": "top_level",
       "kind": "class",
       "symbol": "Badge",
@@ -12289,7 +12289,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 319,
+      "line": 447,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -12307,7 +12307,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dashboard_widgets.cj",
-      "line": 326,
+      "line": 457,
       "level": "member",
       "kind": "func",
       "symbol": "render",

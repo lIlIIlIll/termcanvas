@@ -12829,6 +12829,266 @@
           "signature": "public func detectClipboard( runner!: ClipboardCommandRunner = NativeClipboardCommandRunner(), osc52Emitter!: ?(String) -> Unit = None, timeoutMillis!: Int64 = 2000, maxBytes!: Int64 = 1024 * 1024 ): Clipboard"
         }
       ]
+    },
+    {
+      "id": "dashboard",
+      "source": "docs/api-examples/dashboard.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "MetricCard",
+          "signature": "public class MetricCard <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "MetricCard.init",
+          "signature": "public init( title: String, value: String, detail!: String = \"\", trend!: String = \"\", style!: ?Style = None, valueStyle!: ?Style = None )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "MetricCard.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Meter",
+          "signature": "public class Meter <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Meter.init",
+          "signature": "public init(label: String, value: Int64, total!: Int64 = 100, style!: ?Style = None, fillStyle!: ?Style = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Meter.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "LegendItem",
+          "signature": "public class LegendItem {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "LegendItem.label",
+          "signature": "public let label: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "LegendItem.symbol",
+          "signature": "public let symbol: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "LegendItem.style",
+          "signature": "public let style: Style"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "LegendItem.init",
+          "signature": "public init(label: String, symbol!: String = \"#\", style!: ?Style = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Legend",
+          "signature": "public class Legend <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Legend.init",
+          "signature": "public init(items: Array<LegendItem>, gap!: String = \" \")"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Legend.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "TimeSeriesChart",
+          "signature": "public class TimeSeriesChart <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "TimeSeriesChart.init",
+          "signature": "public init(values: Array<Int64>, maxValue!: Int64 = 0, style!: ?Style = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "TimeSeriesChart.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "HeaderBar",
+          "signature": "public class HeaderBar <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "HeaderBar.init",
+          "signature": "public init(title: String, left!: String = \"\", right!: String = \"\", style!: ?Style = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "HeaderBar.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "FooterBar",
+          "signature": "public class FooterBar <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "FooterBar.init",
+          "signature": "public init(left!: String = \"\", center!: String = \"\", right!: String = \"\", style!: ?Style = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "FooterBar.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "EmptyState",
+          "signature": "public class EmptyState <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "EmptyState.init",
+          "signature": "public init(title!: String = \"No data\", detail!: String = \"\", style!: ?Style = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "EmptyState.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "ErrorBox",
+          "signature": "public class ErrorBox <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "ErrorBox.init",
+          "signature": "public init(message: String, detail!: String = \"\", style!: ?Style = None, borderKind!: ?BorderKind = None, theme!: ?Theme = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "ErrorBox.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "LoadingOverlay",
+          "signature": "public class LoadingOverlay <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "LoadingOverlay.init",
+          "signature": "public init(label!: String = \"Loading\", frame!: Int64 = 0)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "LoadingOverlay.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Skeleton",
+          "signature": "public class Skeleton <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Skeleton.init",
+          "signature": "public init(rows!: Int64 = 3, style!: ?Style = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Skeleton.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "InlineAlert",
+          "signature": "public class InlineAlert <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "InlineAlert.init",
+          "signature": "public init(message: String, state!: StyleState = StyleState.Accent)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "InlineAlert.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Badge",
+          "signature": "public class Badge <: Widget {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Badge.init",
+          "signature": "public init(label: String, style!: ?Style = None, theme!: ?Theme = None)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dashboard_widgets.cj",
+          "symbol": "Badge.render",
+          "signature": "public func render(area: Rect, buffer: Buffer): Unit"
+        }
+      ]
     }
   ]
 }
