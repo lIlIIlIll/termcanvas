@@ -4,14 +4,22 @@ import std.collection.*
 
 const ESC: String = "\u{1B}"
 
+/** 东亚宽度分类为模糊宽度时采用的终端单元格宽度。 */
 public enum AmbiguousWidth {
+    /** 将模糊宽度字符按一个单元格计算。 */
     | Narrow
+    /** 将模糊宽度字符按两个单元格计算。 */
     | Wide
 }
 
+/** 文本显示宽度的计算选项。 */
 public struct TextWidthOptions {
+    /** 模糊宽度字符的宽度策略。 */
     public let ambiguousWidth: AmbiguousWidth
 
+    /** 创建宽度选项。
+     * @param ambiguousWidth 模糊宽度字符的策略
+     */
     public init(ambiguousWidth!: AmbiguousWidth = AmbiguousWidth.Narrow) {
         this.ambiguousWidth = ambiguousWidth
     }
@@ -24,12 +32,23 @@ func usesWideAmbiguous(options: TextWidthOptions): Bool {
     }
 }
 
+/** 一个字素簇的文本、UTF-8 字节边界和显示宽度。 */
 public struct GraphemeCluster {
+    /** 字素簇文本。 */
     public let text: String
+    /** 起始 UTF-8 字节偏移，包含该位置。 */
     public let startOffset: Int64
+    /** 结束 UTF-8 字节偏移，不包含该位置。 */
     public let endOffset: Int64
+    /** 显示宽度，单位为终端单元格。 */
     public let width: Int64
 
+    /** 保存字素簇数据；调用方负责提供一致的边界和宽度。
+     * @param text 字素簇文本
+     * @param startOffset 起始字节偏移
+     * @param endOffset 结束字节偏移，不包含该位置
+     * @param width 显示宽度
+     */
     public init(text: String, startOffset: Int64, endOffset: Int64, width: Int64) {
         this.text = text
         this.startOffset = startOffset
@@ -38,10 +57,19 @@ public struct GraphemeCluster {
     }
 }
 
+/** 使用默认策略计算字符串的显示宽度。
+ * @param text 待测文本
+ * @return 终端单元格数
+ */
 public func displayWidth(text: String): Int64 {
     displayWidth(text, options: TextWidthOptions())
 }
 
+/** 按指定策略累计字符串中字素簇的显示宽度。
+ * @param text 待测文本
+ * @param options 字符宽度策略
+ * @return 终端单元格数
+ */
 public func displayWidth(text: String, options!: TextWidthOptions): Int64 {
     let bytes = unsafe { text.rawData() }
     if (isPrintableAscii(bytes)) { return bytes.size }
@@ -61,10 +89,19 @@ func displayWidthFast(text: String, options!: TextWidthOptions = TextWidthOption
     displayWidth(text, options: options)
 }
 
+/** 使用默认策略计算单个 Unicode 标量值的显示宽度。
+ * @param r 待测字符
+ * @return 终端单元格数
+ */
 public func displayWidth(r: Rune): Int64 {
     displayWidth(r, options: TextWidthOptions())
 }
 
+/** 按指定策略计算单个 Unicode 标量值的显示宽度。
+ * @param r 待测字符
+ * @param options 字符宽度策略
+ * @return 终端单元格数
+ */
 public func displayWidth(r: Rune, options!: TextWidthOptions): Int64 {
     let code = UInt32(r)
     if (code == 0 || code < 32 || (code >= 0x7Fu32 && code < 0xA0u32)) {
@@ -106,11 +143,19 @@ public func displayWidth(r: Rune, options!: TextWidthOptions): Int64 {
     1
 }
 
+/** 使用默认宽度策略拆分字素簇。
+ * @param text 待拆分文本
+ * @return 按顺序排列的字素簇
+ */
 public func graphemeClusters(text: String): Array<GraphemeCluster> {
     graphemeClusters(text, options: TextWidthOptions())
 }
 
-/** 使用指定的显示宽度策略拆分字素簇。 */
+/** 使用指定的显示宽度策略拆分字素簇。
+ * @param text 待拆分文本
+ * @param options 字符宽度策略
+ * @return 按顺序排列的字素簇
+ */
 public func graphemeClusters(text: String, options!: TextWidthOptions): Array<GraphemeCluster> {
     let clusters = ArrayList<GraphemeCluster>()
     var offset: Int64 = 0
@@ -123,6 +168,10 @@ public func graphemeClusters(text: String, options!: TextWidthOptions): Array<Gr
     clusters.toArray()
 }
 
+/** 使用默认策略计算字素文本的显示宽度。
+ * @param text 待测字素文本
+ * @return 终端单元格数
+ */
 public func graphemeDisplayWidth(text: String): Int64 {
     graphemeDisplayWidth(text, options: TextWidthOptions())
 }
@@ -130,6 +179,11 @@ public func graphemeDisplayWidth(text: String): Int64 {
 // Truncate to a display width budget with a trailing ellipsis. Grapheme-safe
 // (never splits a cluster). Moved down from product code (was agent_tui's
 // local cut/graphemePrefix): generic UI capability.
+/** 按显示宽度截断文本；需要截断时在末尾添加最多三个点，不拆分字素簇。
+ * @param text 待截断文本
+ * @param width 最大单元格宽度；非正时返回空字符串
+ * @return 截断后的文本
+ */
 public func cut(text: String, width: Int64): String {
     if (width <= 0) {
         ""
@@ -143,11 +197,21 @@ public func cut(text: String, width: Int64): String {
     }
 }
 
+/** 使用默认宽度策略取得不超过宽度的完整字素簇前缀。
+ * @param text 原文本
+ * @param maxWidth 最大单元格宽度
+ * @return 满足宽度限制的前缀
+ */
 public func graphemePrefix(text: String, maxWidth: Int64): String {
     graphemePrefix(text, maxWidth, options: TextWidthOptions())
 }
 
-/** 按指定宽度策略返回完整字素簇前缀。 */
+/** 按指定宽度策略返回完整字素簇前缀。
+ * @param text 原文本
+ * @param maxWidth 最大单元格宽度
+ * @param options 字符宽度策略
+ * @return 满足宽度限制的前缀
+ */
 public func graphemePrefix(text: String, maxWidth: Int64, options!: TextWidthOptions): String {
     if (maxWidth <= 0) {
         return ""
@@ -164,6 +228,11 @@ public func graphemePrefix(text: String, maxWidth: Int64, options!: TextWidthOpt
     result
 }
 
+/** 按指定策略计算字素文本的显示宽度；含零宽连接符时按组合序列计算。
+ * @param text 待测字素文本
+ * @param options 字符宽度策略
+ * @return 终端单元格数
+ */
 public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64 {
     if (text.isEmpty()) { return 0 }
     if (containsRune(text, r'\u{200D}')) {
@@ -188,11 +257,23 @@ public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int6
     width
 }
 
+/** 使用默认宽度策略按换行方式拆分文本。
+ * @param text 待拆分文本
+ * @param width 可用单元格宽度；非正时返回空数组
+ * @param mode 换行方式
+ * @return 按顺序排列的行
+ */
 public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String> {
     wrapText(text, width, mode, options: TextWidthOptions())
 }
 
-/** 使用指定的显示宽度策略换行。 */
+/** 使用指定的显示宽度策略换行。
+ * @param text 待拆分文本
+ * @param width 可用单元格宽度；非正时返回空数组
+ * @param mode 换行方式
+ * @param options 字符宽度策略
+ * @return 按顺序排列的行
+ */
 public func wrapText(text: String, width: Int64, mode: WrapMode, options!: TextWidthOptions): Array<String> {
     let lines = ArrayList<String>()
     if (width <= 0) { return lines.toArray() }
@@ -387,6 +468,11 @@ func truncate(text: String, maxWidth: Int64, options!: TextWidthOptions = TextWi
     out.toString()
 }
 
+/** 将字节偏移限制在字符串范围内，并回退到 Unicode 标量值的起始边界。
+ * @param text 原文本
+ * @param offset UTF-8 字节偏移
+ * @return 有效的字节边界
+ */
 public func clampToRuneBoundary(text: String, offset: Int64): Int64 {
     let target = clamp(offset, 0, text.size)
     if (target <= 0 || target >= text.size) { return target }
@@ -400,6 +486,11 @@ func previousRuneOffset(text: String, offset: Int64): Int64 {
     previousGraphemeOffset(text, offset)
 }
 
+/** 从字符串起点查找目标偏移之前的字素簇起始位置。
+ * @param text 原文本
+ * @param offset UTF-8 字节偏移，先限制在字符串范围内
+ * @return 前一个字素簇的起始字节偏移；到达开头时为零
+ */
 public func previousGraphemeOffset(text: String, offset: Int64): Int64 {
     let target = clampToRuneBoundary(text, offset)
     if (target <= 0) { return 0 }
@@ -416,6 +507,11 @@ func nextRuneOffset(text: String, offset: Int64): Int64 {
     nextGraphemeOffset(text, offset)
 }
 
+/** 从限制到字符边界的偏移处向前查找字素簇结束位置。
+ * @param text 原文本
+ * @param offset UTF-8 字节偏移
+ * @return 字素簇结束字节偏移；到达末尾时为字符串字节长度
+ */
 public func nextGraphemeOffset(text: String, offset: Int64): Int64 {
     let target = clampToRuneBoundary(text, offset)
     if (target >= text.size) { return text.size }

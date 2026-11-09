@@ -38701,7 +38701,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 7,
+      "line": 8,
       "level": "top_level",
       "kind": "enum",
       "symbol": "AmbiguousWidth",
@@ -38719,7 +38719,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 8,
+      "line": 10,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -38738,7 +38738,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 9,
+      "line": 12,
       "column": 5,
       "level": "enum_constructor",
       "kind": "enum_constructor",
@@ -38757,7 +38757,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 12,
+      "line": 16,
       "level": "top_level",
       "kind": "struct",
       "symbol": "TextWidthOptions",
@@ -38775,7 +38775,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 13,
+      "line": 18,
       "level": "member",
       "kind": "let",
       "symbol": "ambiguousWidth",
@@ -38793,7 +38793,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 15,
+      "line": 23,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -38811,7 +38811,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 27,
+      "line": 36,
       "level": "top_level",
       "kind": "struct",
       "symbol": "GraphemeCluster",
@@ -38829,7 +38829,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 28,
+      "line": 38,
       "level": "member",
       "kind": "let",
       "symbol": "text",
@@ -38847,7 +38847,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 29,
+      "line": 40,
       "level": "member",
       "kind": "let",
       "symbol": "startOffset",
@@ -38865,7 +38865,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 30,
+      "line": 42,
       "level": "member",
       "kind": "let",
       "symbol": "endOffset",
@@ -38883,7 +38883,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 31,
+      "line": 44,
       "level": "member",
       "kind": "let",
       "symbol": "width",
@@ -38901,7 +38901,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 33,
+      "line": 52,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -38919,7 +38919,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 41,
+      "line": 64,
       "level": "top_level",
       "kind": "func",
       "symbol": "displayWidth",
@@ -38937,7 +38937,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 45,
+      "line": 73,
       "level": "top_level",
       "kind": "func",
       "symbol": "displayWidth",
@@ -38955,7 +38955,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 64,
+      "line": 96,
       "level": "top_level",
       "kind": "func",
       "symbol": "displayWidth",
@@ -38973,7 +38973,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 68,
+      "line": 105,
       "level": "top_level",
       "kind": "func",
       "symbol": "displayWidth",
@@ -38991,7 +38991,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 109,
+      "line": 150,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemeClusters",
@@ -39009,7 +39009,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 114,
+      "line": 159,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemeClusters",
@@ -39027,7 +39027,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 126,
+      "line": 175,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemeDisplayWidth",
@@ -39045,7 +39045,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 133,
+      "line": 187,
       "level": "top_level",
       "kind": "func",
       "symbol": "cut",
@@ -39063,7 +39063,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 146,
+      "line": 205,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemePrefix",
@@ -39081,7 +39081,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 151,
+      "line": 215,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemePrefix",
@@ -39099,7 +39099,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 167,
+      "line": 236,
       "level": "top_level",
       "kind": "func",
       "symbol": "graphemeDisplayWidth",
@@ -39117,7 +39117,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 191,
+      "line": 266,
       "level": "top_level",
       "kind": "func",
       "symbol": "wrapText",
@@ -39135,7 +39135,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 196,
+      "line": 277,
       "level": "top_level",
       "kind": "func",
       "symbol": "wrapText",
@@ -39153,7 +39153,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 390,
+      "line": 476,
       "level": "top_level",
       "kind": "func",
       "symbol": "clampToRuneBoundary",
@@ -39171,7 +39171,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 403,
+      "line": 494,
       "level": "top_level",
       "kind": "func",
       "symbol": "previousGraphemeOffset",
@@ -39189,7 +39189,7 @@
     {
       "package": "core",
       "path": "packages/core/src/text.cj",
-      "line": 419,
+      "line": 515,
       "level": "top_level",
       "kind": "func",
       "symbol": "nextGraphemeOffset",

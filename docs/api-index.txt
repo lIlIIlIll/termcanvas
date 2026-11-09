@@ -2126,34 +2126,34 @@ packages/core/src/terminal.cj:2094:public static func lastError(): ?String
 packages/core/src/terminal.cj:2098:public static func enterRawMode(): Bool
 packages/core/src/terminal.cj:2138:public static func restore(): Unit
 packages/core/src/terminal.cj:2156:public static func size(): ?Rect
-packages/core/src/text.cj:7:public enum AmbiguousWidth {
-packages/core/src/text.cj:8:Narrow
-packages/core/src/text.cj:9:Wide
-packages/core/src/text.cj:12:public struct TextWidthOptions {
-packages/core/src/text.cj:13:public let ambiguousWidth: AmbiguousWidth
-packages/core/src/text.cj:15:public init(ambiguousWidth!: AmbiguousWidth = AmbiguousWidth.Narrow)
-packages/core/src/text.cj:27:public struct GraphemeCluster {
-packages/core/src/text.cj:28:public let text: String
-packages/core/src/text.cj:29:public let startOffset: Int64
-packages/core/src/text.cj:30:public let endOffset: Int64
-packages/core/src/text.cj:31:public let width: Int64
-packages/core/src/text.cj:33:public init(text: String, startOffset: Int64, endOffset: Int64, width: Int64)
-packages/core/src/text.cj:41:public func displayWidth(text: String): Int64
-packages/core/src/text.cj:45:public func displayWidth(text: String, options!: TextWidthOptions): Int64
-packages/core/src/text.cj:64:public func displayWidth(r: Rune): Int64
-packages/core/src/text.cj:68:public func displayWidth(r: Rune, options!: TextWidthOptions): Int64
-packages/core/src/text.cj:109:public func graphemeClusters(text: String): Array<GraphemeCluster>
-packages/core/src/text.cj:114:public func graphemeClusters(text: String, options!: TextWidthOptions): Array<GraphemeCluster>
-packages/core/src/text.cj:126:public func graphemeDisplayWidth(text: String): Int64
-packages/core/src/text.cj:133:public func cut(text: String, width: Int64): String
-packages/core/src/text.cj:146:public func graphemePrefix(text: String, maxWidth: Int64): String
-packages/core/src/text.cj:151:public func graphemePrefix(text: String, maxWidth: Int64, options!: TextWidthOptions): String
-packages/core/src/text.cj:167:public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64
-packages/core/src/text.cj:191:public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String>
-packages/core/src/text.cj:196:public func wrapText(text: String, width: Int64, mode: WrapMode, options!: TextWidthOptions): Array<String>
-packages/core/src/text.cj:390:public func clampToRuneBoundary(text: String, offset: Int64): Int64
-packages/core/src/text.cj:403:public func previousGraphemeOffset(text: String, offset: Int64): Int64
-packages/core/src/text.cj:419:public func nextGraphemeOffset(text: String, offset: Int64): Int64
+packages/core/src/text.cj:8:public enum AmbiguousWidth {
+packages/core/src/text.cj:10:Narrow
+packages/core/src/text.cj:12:Wide
+packages/core/src/text.cj:16:public struct TextWidthOptions {
+packages/core/src/text.cj:18:public let ambiguousWidth: AmbiguousWidth
+packages/core/src/text.cj:23:public init(ambiguousWidth!: AmbiguousWidth = AmbiguousWidth.Narrow)
+packages/core/src/text.cj:36:public struct GraphemeCluster {
+packages/core/src/text.cj:38:public let text: String
+packages/core/src/text.cj:40:public let startOffset: Int64
+packages/core/src/text.cj:42:public let endOffset: Int64
+packages/core/src/text.cj:44:public let width: Int64
+packages/core/src/text.cj:52:public init(text: String, startOffset: Int64, endOffset: Int64, width: Int64)
+packages/core/src/text.cj:64:public func displayWidth(text: String): Int64
+packages/core/src/text.cj:73:public func displayWidth(text: String, options!: TextWidthOptions): Int64
+packages/core/src/text.cj:96:public func displayWidth(r: Rune): Int64
+packages/core/src/text.cj:105:public func displayWidth(r: Rune, options!: TextWidthOptions): Int64
+packages/core/src/text.cj:150:public func graphemeClusters(text: String): Array<GraphemeCluster>
+packages/core/src/text.cj:159:public func graphemeClusters(text: String, options!: TextWidthOptions): Array<GraphemeCluster>
+packages/core/src/text.cj:175:public func graphemeDisplayWidth(text: String): Int64
+packages/core/src/text.cj:187:public func cut(text: String, width: Int64): String
+packages/core/src/text.cj:205:public func graphemePrefix(text: String, maxWidth: Int64): String
+packages/core/src/text.cj:215:public func graphemePrefix(text: String, maxWidth: Int64, options!: TextWidthOptions): String
+packages/core/src/text.cj:236:public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64
+packages/core/src/text.cj:266:public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String>
+packages/core/src/text.cj:277:public func wrapText(text: String, width: Int64, mode: WrapMode, options!: TextWidthOptions): Array<String>
+packages/core/src/text.cj:476:public func clampToRuneBoundary(text: String, offset: Int64): Int64
+packages/core/src/text.cj:494:public func previousGraphemeOffset(text: String, offset: Int64): Int64
+packages/core/src/text.cj:515:public func nextGraphemeOffset(text: String, offset: Int64): Int64
 packages/core/src/text_area.cj:35:public class TextAreaCaret {
 packages/core/src/text_area.cj:36:public let offset: Int64
 packages/core/src/text_area.cj:37:public let anchor: ?Int64

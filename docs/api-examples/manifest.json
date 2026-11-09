@@ -1549,6 +1549,188 @@
           "signature": "Right"
         }
       ]
+    },
+    {
+      "id": "core-text-width",
+      "source": "docs/api-examples/text-width.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "AmbiguousWidth",
+          "signature": "public enum AmbiguousWidth {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "AmbiguousWidth.Narrow",
+          "signature": "Narrow"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "AmbiguousWidth.Wide",
+          "signature": "Wide"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "TextWidthOptions",
+          "signature": "public struct TextWidthOptions {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "TextWidthOptions.ambiguousWidth",
+          "signature": "public let ambiguousWidth: AmbiguousWidth"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "TextWidthOptions.init",
+          "signature": "public init(ambiguousWidth!: AmbiguousWidth = AmbiguousWidth.Narrow)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "GraphemeCluster",
+          "signature": "public struct GraphemeCluster {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "GraphemeCluster.text",
+          "signature": "public let text: String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "GraphemeCluster.startOffset",
+          "signature": "public let startOffset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "GraphemeCluster.endOffset",
+          "signature": "public let endOffset: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "GraphemeCluster.width",
+          "signature": "public let width: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "GraphemeCluster.init",
+          "signature": "public init(text: String, startOffset: Int64, endOffset: Int64, width: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "displayWidth",
+          "signature": "public func displayWidth(text: String): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "displayWidth",
+          "signature": "public func displayWidth(text: String, options!: TextWidthOptions): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "displayWidth",
+          "signature": "public func displayWidth(r: Rune): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "displayWidth",
+          "signature": "public func displayWidth(r: Rune, options!: TextWidthOptions): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "graphemeClusters",
+          "signature": "public func graphemeClusters(text: String): Array<GraphemeCluster>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "graphemeClusters",
+          "signature": "public func graphemeClusters(text: String, options!: TextWidthOptions): Array<GraphemeCluster>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "graphemeDisplayWidth",
+          "signature": "public func graphemeDisplayWidth(text: String): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "cut",
+          "signature": "public func cut(text: String, width: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "graphemePrefix",
+          "signature": "public func graphemePrefix(text: String, maxWidth: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "graphemePrefix",
+          "signature": "public func graphemePrefix(text: String, maxWidth: Int64, options!: TextWidthOptions): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "graphemeDisplayWidth",
+          "signature": "public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "wrapText",
+          "signature": "public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "wrapText",
+          "signature": "public func wrapText(text: String, width: Int64, mode: WrapMode, options!: TextWidthOptions): Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "clampToRuneBoundary",
+          "signature": "public func clampToRuneBoundary(text: String, offset: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "previousGraphemeOffset",
+          "signature": "public func previousGraphemeOffset(text: String, offset: Int64): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/text.cj",
+          "symbol": "nextGraphemeOffset",
+          "signature": "public func nextGraphemeOffset(text: String, offset: Int64): Int64"
+        }
+      ]
     }
   ]
 }
