@@ -118,7 +118,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 15,
+      "line": 19,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -136,7 +136,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 23,
+      "line": 27,
       "level": "top_level",
       "kind": "struct",
       "symbol": "AnimationSample",
@@ -154,7 +154,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 25,
+      "line": 29,
       "level": "member",
       "kind": "let",
       "symbol": "elapsedMillis",
@@ -172,7 +172,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 27,
+      "line": 31,
       "level": "member",
       "kind": "let",
       "symbol": "cycleMillis",
@@ -190,7 +190,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 29,
+      "line": 33,
       "level": "member",
       "kind": "let",
       "symbol": "durationMillis",
@@ -208,7 +208,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 32,
+      "line": 39,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -226,7 +226,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 62,
+      "line": 69,
       "level": "top_level",
       "kind": "class",
       "symbol": "AnimationScheduler",
@@ -244,7 +244,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 69,
+      "line": 79,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -262,7 +262,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 75,
+      "line": 92,
       "level": "member",
       "kind": "func",
       "symbol": "register",
@@ -280,7 +280,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 95,
+      "line": 117,
       "level": "member",
       "kind": "func",
       "symbol": "setVisible",
@@ -298,7 +298,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 103,
+      "line": 130,
       "level": "member",
       "kind": "func",
       "symbol": "setConfig",
@@ -316,7 +316,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 111,
+      "line": 142,
       "level": "member",
       "kind": "func",
       "symbol": "remove",
@@ -334,7 +334,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 119,
+      "line": 152,
       "level": "member",
       "kind": "func",
       "symbol": "removeScope",
@@ -352,7 +352,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 128,
+      "line": 165,
       "level": "member",
       "kind": "func",
       "symbol": "sample",
@@ -370,7 +370,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 139,
+      "line": 178,
       "level": "member",
       "kind": "func",
       "symbol": "nextTimeoutMillis",
@@ -388,7 +388,7 @@
     {
       "package": "core",
       "path": "packages/core/src/animation.cj",
-      "line": 154,
+      "line": 193,
       "level": "member",
       "kind": "func",
       "symbol": "framePresented",
@@ -14165,7 +14165,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 5,
+      "line": 6,
       "level": "top_level",
       "kind": "class",
       "symbol": "DirtyRects",
@@ -14183,7 +14183,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 8,
+      "line": 10,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -14201,7 +14201,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 10,
+      "line": 15,
       "level": "member",
       "kind": "init",
       "symbol": "init",
@@ -14219,7 +14219,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 14,
+      "line": 23,
       "level": "member",
       "kind": "func",
       "symbol": "full",
@@ -14237,7 +14237,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 20,
+      "line": 32,
       "level": "member",
       "kind": "func",
       "symbol": "add",
@@ -14255,7 +14255,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 39,
+      "line": 54,
       "level": "member",
       "kind": "func",
       "symbol": "addAll",
@@ -14273,7 +14273,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 43,
+      "line": 61,
       "level": "member",
       "kind": "func",
       "symbol": "addAll",
@@ -14291,7 +14291,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 47,
+      "line": 66,
       "level": "member",
       "kind": "func",
       "symbol": "clear",
@@ -14309,7 +14309,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 53,
+      "line": 75,
       "level": "member",
       "kind": "func",
       "symbol": "isEmpty",
@@ -14327,7 +14327,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 57,
+      "line": 82,
       "level": "member",
       "kind": "func",
       "symbol": "rects",
@@ -14345,7 +14345,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 61,
+      "line": 89,
       "level": "member",
       "kind": "func",
       "symbol": "copy",
@@ -14363,7 +14363,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 65,
+      "line": 97,
       "level": "member",
       "kind": "func",
       "symbol": "covers",
@@ -14381,7 +14381,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 75,
+      "line": 111,
       "level": "member",
       "kind": "func",
       "symbol": "intersects",
@@ -14399,7 +14399,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 83,
+      "line": 126,
       "level": "member",
       "kind": "func",
       "symbol": "intersectsRect",
@@ -14417,7 +14417,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 95,
+      "line": 143,
       "level": "member",
       "kind": "func",
       "symbol": "intersectsCell",
@@ -14435,7 +14435,7 @@
     {
       "package": "core",
       "path": "packages/core/src/dirty_rects.cj",
-      "line": 104,
+      "line": 155,
       "level": "member",
       "kind": "func",
       "symbol": "cellCount",

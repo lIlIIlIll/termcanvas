@@ -2,22 +2,22 @@ packages/core/src/animation.cj:6:public struct AnimationConfig {
 packages/core/src/animation.cj:8:public let durationMillis: Int64
 packages/core/src/animation.cj:10:public let framesPerSecond: Int64
 packages/core/src/animation.cj:12:public let enabled: Bool
-packages/core/src/animation.cj:15:public init(durationMillis!: Int64 = 1000, framesPerSecond!: Int64 = 30, enabled!: Bool = true)
-packages/core/src/animation.cj:23:public struct AnimationSample {
-packages/core/src/animation.cj:25:public let elapsedMillis: Int64
-packages/core/src/animation.cj:27:public let cycleMillis: Int64
-packages/core/src/animation.cj:29:public let durationMillis: Int64
-packages/core/src/animation.cj:32:public init(elapsedMillis: Int64, durationMillis: Int64)
-packages/core/src/animation.cj:62:public class AnimationScheduler {
-packages/core/src/animation.cj:69:public init(clock!: RuntimeClock = MonotonicRuntimeClock(), maxFramesPerSecond!: Int64 = 30)
-packages/core/src/animation.cj:75:public func register(scope: String, id: String, config!: AnimationConfig = AnimationConfig(), group!: ?String = None, visible!: Bool = true): Bool
-packages/core/src/animation.cj:95:public func setVisible(scope: String, id: String, visible: Bool): Bool
-packages/core/src/animation.cj:103:public func setConfig(scope: String, id: String, config: AnimationConfig): Bool
-packages/core/src/animation.cj:111:public func remove(scope: String, id: String): Bool
-packages/core/src/animation.cj:119:public func removeScope(scope: String): Unit
-packages/core/src/animation.cj:128:public func sample(scope: String, id: String): ?AnimationSample
-packages/core/src/animation.cj:139:public func nextTimeoutMillis(): ?Int64
-packages/core/src/animation.cj:154:public func framePresented(): Unit
+packages/core/src/animation.cj:19:public init(durationMillis!: Int64 = 1000, framesPerSecond!: Int64 = 30, enabled!: Bool = true)
+packages/core/src/animation.cj:27:public struct AnimationSample {
+packages/core/src/animation.cj:29:public let elapsedMillis: Int64
+packages/core/src/animation.cj:31:public let cycleMillis: Int64
+packages/core/src/animation.cj:33:public let durationMillis: Int64
+packages/core/src/animation.cj:39:public init(elapsedMillis: Int64, durationMillis: Int64)
+packages/core/src/animation.cj:69:public class AnimationScheduler {
+packages/core/src/animation.cj:79:public init(clock!: RuntimeClock = MonotonicRuntimeClock(), maxFramesPerSecond!: Int64 = 30)
+packages/core/src/animation.cj:92:public func register(scope: String, id: String, config!: AnimationConfig = AnimationConfig(), group!: ?String = None, visible!: Bool = true): Bool
+packages/core/src/animation.cj:117:public func setVisible(scope: String, id: String, visible: Bool): Bool
+packages/core/src/animation.cj:130:public func setConfig(scope: String, id: String, config: AnimationConfig): Bool
+packages/core/src/animation.cj:142:public func remove(scope: String, id: String): Bool
+packages/core/src/animation.cj:152:public func removeScope(scope: String): Unit
+packages/core/src/animation.cj:165:public func sample(scope: String, id: String): ?AnimationSample
+packages/core/src/animation.cj:178:public func nextTimeoutMillis(): ?Int64
+packages/core/src/animation.cj:193:public func framePresented(): Unit
 packages/core/src/app.cj:85:public enum ControlFlow {
 packages/core/src/app.cj:86:Continue
 packages/core/src/app.cj:87:Exit
@@ -777,22 +777,22 @@ packages/core/src/data_widgets.cj:1335:public let name: String
 packages/core/src/data_widgets.cj:1336:public let path: String
 packages/core/src/data_widgets.cj:1337:public let isDir: Bool
 packages/core/src/data_widgets.cj:1339:public init(name: String, path: String, isDir: Bool)
-packages/core/src/dirty_rects.cj:5:public class DirtyRects {
-packages/core/src/dirty_rects.cj:8:public init()
-packages/core/src/dirty_rects.cj:10:public init(rects: Array<Rect>)
-packages/core/src/dirty_rects.cj:14:public static func full(area: Rect): DirtyRects
-packages/core/src/dirty_rects.cj:20:public func add(rect: Rect): Unit
-packages/core/src/dirty_rects.cj:39:public func addAll(rects: Array<Rect>): Unit
-packages/core/src/dirty_rects.cj:43:public func addAll(other: DirtyRects): Unit
-packages/core/src/dirty_rects.cj:47:public func clear(): Unit
-packages/core/src/dirty_rects.cj:53:public func isEmpty(): Bool
-packages/core/src/dirty_rects.cj:57:public func rects(): Array<Rect>
-packages/core/src/dirty_rects.cj:61:public func copy(): DirtyRects
-packages/core/src/dirty_rects.cj:65:public func covers(area: Rect): Bool
-packages/core/src/dirty_rects.cj:75:public func intersects(area: Rect): Bool
-packages/core/src/dirty_rects.cj:83:public func intersectsRect(x: Int64, y: Int64, width: Int64, height: Int64): Bool
-packages/core/src/dirty_rects.cj:95:public func intersectsCell(x: Int64, y: Int64): Bool
-packages/core/src/dirty_rects.cj:104:public func cellCount(): Int64
+packages/core/src/dirty_rects.cj:6:public class DirtyRects {
+packages/core/src/dirty_rects.cj:10:public init()
+packages/core/src/dirty_rects.cj:15:public init(rects: Array<Rect>)
+packages/core/src/dirty_rects.cj:23:public static func full(area: Rect): DirtyRects
+packages/core/src/dirty_rects.cj:32:public func add(rect: Rect): Unit
+packages/core/src/dirty_rects.cj:54:public func addAll(rects: Array<Rect>): Unit
+packages/core/src/dirty_rects.cj:61:public func addAll(other: DirtyRects): Unit
+packages/core/src/dirty_rects.cj:66:public func clear(): Unit
+packages/core/src/dirty_rects.cj:75:public func isEmpty(): Bool
+packages/core/src/dirty_rects.cj:82:public func rects(): Array<Rect>
+packages/core/src/dirty_rects.cj:89:public func copy(): DirtyRects
+packages/core/src/dirty_rects.cj:97:public func covers(area: Rect): Bool
+packages/core/src/dirty_rects.cj:111:public func intersects(area: Rect): Bool
+packages/core/src/dirty_rects.cj:126:public func intersectsRect(x: Int64, y: Int64, width: Int64, height: Int64): Bool
+packages/core/src/dirty_rects.cj:143:public func intersectsCell(x: Int64, y: Int64): Bool
+packages/core/src/dirty_rects.cj:155:public func cellCount(): Int64
 packages/core/src/document.cj:5:public class RichSpan {
 packages/core/src/document.cj:6:public let text: String
 packages/core/src/document.cj:7:public let style: Style

@@ -1109,6 +1109,250 @@
           "signature": "public func run( render: (Frame) -> Unit, update: (Event) -> UpdateResult, width!: Int64 = 80, height!: Int64 = 24, tickDeltaMillis!: Int64 = 16 ): TestReport"
         }
       ]
+    },
+    {
+      "id": "core-dirty-regions",
+      "source": "docs/api-examples/dirty-rects.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects",
+          "signature": "public class DirtyRects {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.init",
+          "signature": "public init()"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.init",
+          "signature": "public init(rects: Array<Rect>)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.full",
+          "signature": "public static func full(area: Rect): DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.add",
+          "signature": "public func add(rect: Rect): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.addAll",
+          "signature": "public func addAll(rects: Array<Rect>): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.addAll",
+          "signature": "public func addAll(other: DirtyRects): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.clear",
+          "signature": "public func clear(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.isEmpty",
+          "signature": "public func isEmpty(): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.rects",
+          "signature": "public func rects(): Array<Rect>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.copy",
+          "signature": "public func copy(): DirtyRects"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.covers",
+          "signature": "public func covers(area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.intersects",
+          "signature": "public func intersects(area: Rect): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.intersectsRect",
+          "signature": "public func intersectsRect(x: Int64, y: Int64, width: Int64, height: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.intersectsCell",
+          "signature": "public func intersectsCell(x: Int64, y: Int64): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/dirty_rects.cj",
+          "symbol": "DirtyRects.cellCount",
+          "signature": "public func cellCount(): Int64"
+        }
+      ]
+    },
+    {
+      "id": "core-animation-scheduler",
+      "source": "docs/api-examples/animation.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationConfig",
+          "signature": "public struct AnimationConfig {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationConfig.durationMillis",
+          "signature": "public let durationMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationConfig.framesPerSecond",
+          "signature": "public let framesPerSecond: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationConfig.enabled",
+          "signature": "public let enabled: Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationConfig.init",
+          "signature": "public init(durationMillis!: Int64 = 1000, framesPerSecond!: Int64 = 30, enabled!: Bool = true)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationSample",
+          "signature": "public struct AnimationSample {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationSample.elapsedMillis",
+          "signature": "public let elapsedMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationSample.cycleMillis",
+          "signature": "public let cycleMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationSample.durationMillis",
+          "signature": "public let durationMillis: Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationSample.init",
+          "signature": "public init(elapsedMillis: Int64, durationMillis: Int64)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationScheduler",
+          "signature": "public class AnimationScheduler {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationScheduler.init",
+          "signature": "public init(clock!: RuntimeClock = MonotonicRuntimeClock(), maxFramesPerSecond!: Int64 = 30)"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationScheduler.register",
+          "signature": "public func register(scope: String, id: String, config!: AnimationConfig = AnimationConfig(), group!: ?String = None, visible!: Bool = true): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationScheduler.setVisible",
+          "signature": "public func setVisible(scope: String, id: String, visible: Bool): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationScheduler.setConfig",
+          "signature": "public func setConfig(scope: String, id: String, config: AnimationConfig): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationScheduler.remove",
+          "signature": "public func remove(scope: String, id: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationScheduler.removeScope",
+          "signature": "public func removeScope(scope: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationScheduler.sample",
+          "signature": "public func sample(scope: String, id: String): ?AnimationSample"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationScheduler.nextTimeoutMillis",
+          "signature": "public func nextTimeoutMillis(): ?Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/animation.cj",
+          "symbol": "AnimationScheduler.framePresented",
+          "signature": "public func framePresented(): Unit"
+        }
+      ]
     }
   ]
 }
