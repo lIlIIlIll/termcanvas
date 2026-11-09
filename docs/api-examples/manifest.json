@@ -6273,6 +6273,344 @@
           "signature": "public func getCursor(): ?Position"
         }
       ]
+    },
+    {
+      "id": "core-test-backend",
+      "source": "docs/api-examples/test-backend.cj",
+      "dependencies": [
+        "core"
+      ],
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "declarations": [
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend",
+          "signature": "public interface Backend {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.clear",
+          "signature": "func clear(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.moveTo",
+          "signature": "func moveTo(x: Int64, y: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.enterAlternateScreen",
+          "signature": "func enterAlternateScreen(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.leaveAlternateScreen",
+          "signature": "func leaveAlternateScreen(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.hideCursor",
+          "signature": "func hideCursor(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.showCursor",
+          "signature": "func showCursor(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.setCursorShape",
+          "signature": "func setCursorShape(_: ?CursorShape): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.enableMouse",
+          "signature": "func enableMouse(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.disableMouse",
+          "signature": "func disableMouse(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.enableBracketedPaste",
+          "signature": "func enableBracketedPaste(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.disableBracketedPaste",
+          "signature": "func disableBracketedPaste(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.size",
+          "signature": "func size(): Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.draw",
+          "signature": "func draw(buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.drawDiff",
+          "signature": "func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.drawMedia",
+          "signature": "func drawMedia(ops: Array<MediaOp>): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.write",
+          "signature": "func write(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.flush",
+          "signature": "func flush(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.setInstrumentationEnabled",
+          "signature": "func setInstrumentationEnabled(_: Bool): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "Backend.diagnosticByteCount",
+          "signature": "func diagnosticByteCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend",
+          "signature": "public class TestBackend <: Backend {"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.init",
+          "signature": "public init( area!: Rect = Rect(0, 0, 80, 24), captureSnapshots!: Bool = true )"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.clear",
+          "signature": "public func clear(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.moveTo",
+          "signature": "public func moveTo(x: Int64, y: Int64): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.enterAlternateScreen",
+          "signature": "public func enterAlternateScreen(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.leaveAlternateScreen",
+          "signature": "public func leaveAlternateScreen(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.hideCursor",
+          "signature": "public func hideCursor(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.showCursor",
+          "signature": "public func showCursor(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.setCursorShape",
+          "signature": "public func setCursorShape(shape: ?CursorShape): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.enableMouse",
+          "signature": "public func enableMouse(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.disableMouse",
+          "signature": "public func disableMouse(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.enableBracketedPaste",
+          "signature": "public func enableBracketedPaste(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.disableBracketedPaste",
+          "signature": "public func disableBracketedPaste(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.size",
+          "signature": "public func size(): Rect"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.setSize",
+          "signature": "public func setSize(area: Rect): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.draw",
+          "signature": "public func draw(buffer: Buffer): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.drawDiff",
+          "signature": "public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.drawMedia",
+          "signature": "public func drawMedia(ops: Array<MediaOp>): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.write",
+          "signature": "public func write(text: String): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.flush",
+          "signature": "public func flush(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.output",
+          "signature": "public func output(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.clearOutput",
+          "signature": "public func clearOutput(): Unit"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.lastBuffer",
+          "signature": "public func lastBuffer(): ?Buffer"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.lastDiffOps",
+          "signature": "public func lastDiffOps(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.lastDiffWrites",
+          "signature": "public func lastDiffWrites(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.lastMediaOps",
+          "signature": "public func lastMediaOps(): Array<MediaOp>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.mediaFrameCount",
+          "signature": "public func mediaFrameCount(): Int64"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.snapshot",
+          "signature": "public func snapshot(): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.snapshots",
+          "signature": "public func snapshots(): Array<String>"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.snapshotAt",
+          "signature": "public func snapshotAt(index: Int64): String"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.assertCell",
+          "signature": "public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.assertSnapshot",
+          "signature": "public func assertSnapshot(expected: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.assertSnapshotAt",
+          "signature": "public func assertSnapshotAt(index: Int64, expected: String): Bool"
+        },
+        {
+          "package": "core",
+          "path": "packages/core/src/terminal.cj",
+          "symbol": "TestBackend.assertLastMediaOpCount",
+          "signature": "public func assertLastMediaOpCount(expected: Int64): Bool"
+        }
+      ]
     }
   ]
 }

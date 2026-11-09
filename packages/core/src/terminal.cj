@@ -135,27 +135,67 @@ private func cursorShapeCode(shape: ?CursorShape): Int64 {
     }
 }
 
+/** 终端输出后端接口，负责绘制、模式切换及输出刷新。 */
 public interface Backend {
+    /** 清除终端内容。 */
     func clear(): Unit
+    /** 移动终端光标。
+     * @param x 横坐标
+     * @param y 纵坐标
+     */
     func moveTo(x: Int64, y: Int64): Unit
+    /** 进入备用屏幕。 */
     func enterAlternateScreen(): Unit
+    /** 退出备用屏幕。 */
     func leaveAlternateScreen(): Unit
+    /** 隐藏光标。 */
     func hideCursor(): Unit
+    /** 显示光标。 */
     func showCursor(): Unit
+    /** 设置光标形状；默认实现不操作。
+     * @param _ 可选光标形状
+     */
     func setCursorShape(_: ?CursorShape): Unit {}
+    /** 启用鼠标输入模式。 */
     func enableMouse(): Unit
+    /** 禁用鼠标输入模式。 */
     func disableMouse(): Unit
+    /** 启用括号粘贴模式。 */
     func enableBracketedPaste(): Unit
+    /** 禁用括号粘贴模式。 */
     func disableBracketedPaste(): Unit
+    /** 获取终端区域。
+     * @return 终端区域
+     */
     func size(): Rect
+    /** 绘制完整缓冲区。
+     * @param buffer 待绘制缓冲区
+     */
     func draw(buffer: Buffer): Unit
+    /** 使用差异计划绘制缓冲区。
+     * @param next 目标缓冲区
+     * @param plan 差异绘制计划
+     */
     func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+    /** 处理媒体绘制和清除操作。
+     * @param ops 媒体操作
+     */
     func drawMedia(ops: Array<MediaOp>): Unit
+    /** 写入文本。
+     * @param text 待写入文本
+     */
     func write(text: String): Unit
+    /** 刷新待发送输出。 */
     func flush(): Unit
     // Optional Step-0 transport attribution. Backends that cannot expose a
     // byte count retain -1, which means unavailable rather than zero.
+    /** 启用或关闭可选传输统计；默认实现不操作。
+     * @param _ 是否启用统计
+     */
     func setInstrumentationEnabled(_: Bool): Unit {}
+    /** 获取传输字节统计；默认返回 -1 表示不可用。
+     * @return 字节数或 -1
+     */
     func diagnosticByteCount(): Int64 { -1 }
 }
 
@@ -1520,6 +1560,7 @@ public class AnsiBackend <: Backend {
     }
 }
 
+/** 在内存中记录输出、缓冲区、快照和媒体操作的测试后端。 */
 public class TestBackend <: Backend {
     private var area: Rect
     private let bytes = ArrayList<Byte>()
@@ -1534,6 +1575,10 @@ public class TestBackend <: Backend {
     private var latestDiffWrites: Int64 = 0
     private var selectedCursorShapeCode: Int64 = 0
 
+    /** 创建测试后端。
+     * @param area 初始终端区域
+     * @param captureSnapshots 是否在每次绘制时保存文本快照
+     */
     public init(
         area!: Rect = Rect(0, 0, 80, 24),
         captureSnapshots!: Bool = true
@@ -1542,37 +1587,62 @@ public class TestBackend <: Backend {
         this.captureSnapshots = captureSnapshots
     }
 
+    /** 将对应终端操作记录到输出。 */
     public func clear(): Unit {
         write("${ESC}[2J${ESC}[H")
     }
 
+    /** 记录光标移动序列。
+     * @param x 横坐标
+     * @param y 纵坐标
+     */
     public func moveTo(x: Int64, y: Int64): Unit {
         write("${ESC}[${y + 1};${x + 1}H")
     }
 
+    /** 将对应终端操作记录到输出。 */
     public func enterAlternateScreen(): Unit { write("${ESC}[?1049h") }
+    /** 将对应终端操作记录到输出。 */
     public func leaveAlternateScreen(): Unit { write("${ESC}[?1049l") }
+    /** 将对应终端操作记录到输出。 */
     public func hideCursor(): Unit { write("${ESC}[?25l") }
+    /** 将对应终端操作记录到输出。 */
     public func showCursor(): Unit { write("${ESC}[?25h") }
+    /** 记录光标形状变化；重复设置相同形状不追加输出。
+     * @param shape 可选光标形状
+     */
     public func setCursorShape(shape: ?CursorShape): Unit {
         let code = cursorShapeCode(shape)
         if (code == selectedCursorShapeCode) { return }
         write("${ESC}[${code} q")
         selectedCursorShapeCode = code
     }
+    /** 将对应终端操作记录到输出。 */
     public func enableMouse(): Unit { write("${ESC}[?1000h${ESC}[?1006h") }
+    /** 将对应终端操作记录到输出。 */
     public func disableMouse(): Unit { write("${ESC}[?1006l${ESC}[?1000l") }
+    /** 将对应终端操作记录到输出。 */
     public func enableBracketedPaste(): Unit { write("${ESC}[?2004h") }
+    /** 将对应终端操作记录到输出。 */
     public func disableBracketedPaste(): Unit { write("${ESC}[?2004l") }
 
+    /** 获取模拟终端区域。
+     * @return 终端区域
+     */
     public func size(): Rect {
         area
     }
 
+    /** 设置模拟终端区域。
+     * @param area 新区域
+     */
     public func setSize(area: Rect): Unit {
         this.area = area
     }
 
+    /** 记录完整绘制，并在启用时保存快照。
+     * @param buffer 绘制的缓冲区
+     */
     public func draw(buffer: Buffer): Unit {
         latest = Some(buffer)
         latestDiffOps = buffer.area.width * buffer.area.height
@@ -1583,6 +1653,10 @@ public class TestBackend <: Backend {
         write("<draw>")
     }
 
+    /** 记录差异绘制，并在启用时保存目标缓冲区快照。
+     * @param next 目标缓冲区
+     * @param plan 差异绘制计划
+     */
     public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit {
         latest = Some(next)
         latestDiffOps = plan.dirtyCells
@@ -1593,6 +1667,9 @@ public class TestBackend <: Backend {
         write("<diff:${latestDiffOps}:${latestDiffWrites}>")
     }
 
+    /** 记录一次媒体操作帧。
+     * @param ops 媒体操作
+     */
     public func drawMedia(ops: Array<MediaOp>): Unit {
         mediaFrames.add(ops)
         if (ops.size > 0) {
@@ -1600,45 +1677,71 @@ public class TestBackend <: Backend {
         }
     }
 
+    /** 将文本追加到输出记录。
+     * @param text 待记录文本
+     */
     public func write(text: String): Unit {
         for (b in unsafe { text.rawData() }) {
             bytes.add(b)
         }
     }
 
+    /** 刷新输出；内存后端无需执行操作。 */
     public func flush(): Unit {}
 
+    /** 获取已记录的输出文本。
+     * @return 输出文本
+     */
     public func output(): String {
         unsafe { String.fromUtf8Unchecked(bytes.toArray()) }
     }
 
+    /** 清空输出文本，不清除绘制快照。 */
     public func clearOutput(): Unit {
         while (bytes.size > 0) {
             bytes.remove(at: 0)
         }
     }
 
+    /** 获取最近一次绘制的缓冲区引用。
+     * @return 缓冲区；未绘制时为 None
+     */
     public func lastBuffer(): ?Buffer {
         latest
     }
 
+    /** 获取最近一次绘制记录的脏单元格数。
+     * @return 脏单元格数
+     */
     public func lastDiffOps(): Int64 {
         latestDiffOps
     }
 
+    /** 获取最近一次绘制记录的写入段数。
+     * @return 写入段数
+     */
     public func lastDiffWrites(): Int64 {
         latestDiffWrites
     }
 
+    /** 获取最近一次媒体操作。
+     * @return 操作数组；没有记录时为空数组
+     */
     public func lastMediaOps(): Array<MediaOp> {
         if (mediaFrames.size == 0) { return [] }
         mediaFrames[mediaFrames.size - 1]
     }
 
+    /** 获取已记录的媒体操作帧数，包括空操作帧。
+     * @return 媒体帧数
+     */
     public func mediaFrameCount(): Int64 {
         mediaFrames.size
     }
 
+    /** 获取最近一次绘制缓冲区的当前文本快照。
+     * @return 快照；未绘制时为空字符串
+     */
     public func snapshot(): String {
         match (latest) {
             case Some(buffer) => bufferSnapshot(buffer)
@@ -1646,15 +1749,29 @@ public class TestBackend <: Backend {
         }
     }
 
+    /** 获取保存的绘制快照数组。
+     * @return 按绘制顺序排列的快照
+     */
     public func snapshots(): Array<String> {
         frames.toArray()
     }
 
+    /** 获取指定绘制快照。
+     * @param index 从零开始的快照索引
+     * @return 快照；索引越界时为空字符串
+     */
     public func snapshotAt(index: Int64): String {
         if (index < 0 || index >= frames.size) { return "" }
         frames[index]
     }
 
+    /** 检查最近绘制缓冲区中单元格的符号和样式。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param symbol 期望符号
+     * @param style 期望样式
+     * @return 匹配时为 true
+     */
     public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool {
         match (latest) {
             case Some(buffer) =>
@@ -1664,14 +1781,27 @@ public class TestBackend <: Backend {
         }
     }
 
+    /** 比较最近缓冲区的当前快照。
+     * @param expected 期望文本
+     * @return 匹配时为 true
+     */
     public func assertSnapshot(expected: String): Bool {
         snapshot() == expected
     }
 
+    /** 比较保存的指定快照。
+     * @param index 快照索引
+     * @param expected 期望文本
+     * @return 匹配时为 true
+     */
     public func assertSnapshotAt(index: Int64, expected: String): Bool {
         snapshotAt(index) == expected
     }
 
+    /** 比较最近一次媒体操作数量。
+     * @param expected 期望数量
+     * @return 数量相同时为 true
+     */
     public func assertLastMediaOpCount(expected: Int64): Bool {
         lastMediaOps().size == expected
     }
