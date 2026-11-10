@@ -58,59 +58,134 @@ public struct VirtualTranscriptAppendOnlyText {
 
 // A product supplies already-themed, single-card documents. The core owns
 // viewport selection, measurement and cache invalidation only.
+/** 为虚拟对话视图提供稳定条目标识、修订号和文档内容。 */
 public interface VirtualTranscriptSource {
+    /** 获取条目数量。
+     * @return 条目数量
+     */
     func size(): Int64
     // Hosts that replace a whole snapshot while retaining item ids/revisions
     // must bump this generation so cached rows cannot cross source lifetimes.
+    /** 获取整个来源的代数；替换快照且保留条目标识时应递增。默认返回零。
+     * @return 来源代数
+     */
     func generation(): Int64 { 0 }
+    /** 获取条目的稳定标识。
+     * @param index 条目索引
+     * @return 条目标识
+     */
     func itemId(index: Int64): String
+    /** 获取条目标题；默认返回空字符串。
+     * @param _ 条目索引
+     * @return 标题文本
+     */
     func itemTitle(_: Int64): String { "" }
     // Hosts may keep ordinary conversation rows as plain transcript text
     // while giving structured events the left event rail.  The default keeps
     // the historical card behaviour for existing cjtui clients.
+    /** 判断条目是否使用卡片边饰；默认启用。
+     * @param _ 条目索引
+     * @return 使用卡片边饰时为 true
+     */
     func itemUsesCardChrome(_: Int64): Bool { true }
     // The title is measured/rendered with the live terminal width so a host
     // can preserve the useful tail of a path or command before truncation.
+    /** 为可用宽度生成标题；默认调用 itemTitle。
+     * @param index 条目索引
+     * @param width 可用宽度
+     * @return 标题文本
+     */
     func itemTitleForWidth(index: Int64, width: Int64): String {
         let _ = width
         itemTitle(index)
     }
+    /** 获取条目页脚；默认返回空字符串。
+     * @param _ 条目索引
+     * @return 页脚文本
+     */
     func itemFooter(_: Int64): String { "" }
     // A structured event with no visible body or footer may use only the
     // title rail. This avoids spending a second terminal row on an empty
     // `╰─` while preserving the normal two-ended rail for meaningful
     // summaries and expanded content.
+    /** 判断是否使用紧凑卡片边饰；默认不使用。
+     * @param _ 条目索引
+     * @return 使用紧凑边饰时为 true
+     */
     func itemUsesCompactCardChrome(_: Int64): Bool { false }
+    /** 获取条目内容修订号；内容改变时应更新。
+     * @param index 条目索引
+     * @return 修订号
+     */
     func revision(index: Int64): Int64
     // Plain append-only bodies can bypass Document/DocumentView completely.
     // Existing sources keep the historical document path through this
     // default.  appendEpoch must change whenever text is replaced rather than
     // appended.
+    /** 获取可增量排版的只追加文本；替换内容时来源需更改 appendEpoch。默认不提供。
+     * @param _0 条目索引
+     * @param _1 可用宽度
+     * @param _2 主题标识
+     * @return 追加文本快照；未提供时为 None
+     */
     func itemAppendOnlyText(
         _: Int64,
         _: Int64,
         _: String
     ): ?VirtualTranscriptAppendOnlyText { None }
-    /** 可使用当前应用主题创建追加文本；默认保留原有来源提供的样式。 */
+    /** 可使用当前应用主题创建追加文本；默认保留原有来源提供的样式。
+     * @param index 条目索引
+     * @param width 可用宽度
+     * @param themeKey 主题标识
+     * @param _ 可选应用主题
+     * @return 追加文本快照；未提供时为 None
+     */
     func itemAppendOnlyTextWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): ?VirtualTranscriptAppendOnlyText {
         itemAppendOnlyText(index, width, themeKey)
     }
+    /** 按宽度和主题标识构建条目文档。
+     * @param index 条目索引
+     * @param width 可用宽度
+     * @param themeKey 主题标识
+     * @return 条目文档
+     */
     func document(index: Int64, width: Int64, themeKey: String): Document
-    /** 可使用应用主题创建文档；默认保留原有 document 返回的已着色内容。 */
+    /** 可使用应用主题创建文档；默认保留原有 document 返回的已着色内容。
+     * @param index 条目索引
+     * @param width 可用宽度
+     * @param themeKey 主题标识
+     * @param _ 可选应用主题
+     * @return 条目文档
+     */
     func documentWithTheme(index: Int64, width: Int64, themeKey: String, _: ?Theme): Document {
         document(index, width, themeKey)
     }
     // Per-entry border theme; falls back to the view-wide card theme when
     // None, so hosts can color borders by card kind.
+    /** 获取条目的可选卡片主题；默认使用视图主题。
+     * @param _ 条目索引
+     * @return 条目主题，或 None
+     */
     func itemCardTheme(_: Int64): ?TranscriptCardTheme { None }
 }
 
+/** 保存虚拟对话视图的滚动和锚点状态。 */
 public class VirtualTranscriptState {
+    /** 视口顶部的渲染行偏移。 */
     public var scrollTop: Int64
+    /** 是否跟随内容底部。 */
     public var followBottom: Bool
+    /** 保持位置的条目标识。 */
     public var anchorId: String
+    /** 锚点在条目中的行偏移。 */
     public var anchorRow: Int64
 
+    /** 创建虚拟对话状态。
+     * @param scrollTop 顶部行偏移，负值按零处理
+     * @param followBottom 是否跟随底部
+     * @param anchorId 锚点条目标识
+     * @param anchorRow 锚点行偏移，负值按零处理
+     */
     public init(
         scrollTop!: Int64 = 0,
         followBottom!: Bool = true,
@@ -123,12 +198,18 @@ public class VirtualTranscriptState {
         this.anchorRow = max(0, anchorRow)
     }
 
+    /** 滚动并限制顶部行；到达底部时启用跟随。
+     * @param delta 行偏移增量
+     * @param totalRows 总行数
+     * @param viewportRows 视口行数，计算时至少为一
+     */
     public func scrollBy(delta: Int64, totalRows: Int64, viewportRows: Int64): Unit {
         let maximum = max(0, totalRows - max(1, viewportRows))
         scrollTop = clamp(scrollTop + delta, 0, maximum)
         followBottom = scrollTop >= maximum
     }
 
+    /** 滚动到顶部，关闭跟随并清除锚点。 */
     public func home(): Unit {
         scrollTop = 0
         followBottom = false
@@ -136,6 +217,10 @@ public class VirtualTranscriptState {
         anchorRow = 0
     }
 
+    /** 滚动到底部并启用跟随。
+     * @param totalRows 总行数
+     * @param viewportRows 视口行数，计算时至少为一
+     */
     public func end(totalRows: Int64, viewportRows: Int64): Unit {
         scrollTop = max(0, totalRows - max(1, viewportRows))
         followBottom = true
@@ -314,55 +399,144 @@ public class VisibleRange {
 
 // A narrow, read-only diagnostics contract for profiling hosts. Keeping the
 // counters in one snapshot avoids growing the view API for every new probe.
+/** 虚拟对话视图的缓存、排版和绘制诊断快照。 */
 public class VirtualTranscriptMetrics {
+    /** 自最近一次非空绘制开始后实例化的条目数。 */
     public let materialized: Int64
+    /** 条目缓存数量。 */
     public let cacheEntries: Int64
+    /** 当前测量代数中已测量的条目数。 */
     public let measuredEntries: Int64
+    /** 已测量条目保存的渲染行数。 */
     public let cachedRows: Int64
+    /** 追加文本完整排版次数。 */
     public let appendOnlyFullLayouts: Int64
+    /** 追加文本增量排版次数。 */
     public let appendOnlyIncrementalLayouts: Int64
+    /** 追加文本重新换行处理的字节数。 */
     public let appendOnlyRewrappedBytes: Int64
+    /** 同步条目数量的调用次数。 */
     public let syncCountCalls: Int64
+    /** 处理条目元数据的数量。 */
     public let metadataTouches: Int64
+    /** 重建高度索引时处理的条目数。 */
     public let heightIndexResetEntries: Int64
+    /** 更新高度索引的次数。 */
     public let heightIndexUpdateCalls: Int64
+    /** 高度索引访问的节点数。 */
     public let heightIndexNodesTouched: Int64
+    /** 高度索引扩展次数。 */
     public let heightIndexGrowOperations: Int64
+    /** 高度元数据条目数。 */
     public let heightMetadataEntries: Int64
+    /** 高度索引节点数。 */
     public let heightIndexNodes: Int64
+    /** 缓存查找次数。 */
     public let cacheLookups: Int64
+    /** 缓存命中次数。 */
     public let cacheHits: Int64
+    /** 缓存未命中次数。 */
     public let cacheMisses: Int64
+    /** 排版调用次数。 */
     public let layoutCalls: Int64
+    /** 向来源请求文档的次数。 */
     public let documentRequests: Int64
+    /** 实例化的文档数。 */
     public let documentsMaterialized: Int64
+    /** 换行处理的输入字节数。 */
     public let wrapInputBytes: Int64
+    /** 测量失效次数。 */
     public let measurementInvalidations: Int64
+    /** 测量代数更新次数。 */
     public let measurementGenerationBumps: Int64
+    /** 遇到过期条目的次数。 */
     public let staleEntriesEncountered: Int64
+    /** 重新测量条目的次数。 */
     public let entriesRemeasured: Int64
+    /** 修正高度估计的次数。 */
     public let estimateCorrections: Int64
+    /** 修正滚动锚点的次数。 */
     public let anchorCorrections: Int64
     // Paint attribution is cumulative and instrumentation-only. "Visited"
     // counts work entering the viewport paint loop; "painted" counts work
     // that emitted at least one visible row. Cell-attempt counters are deltas
     // from Buffer's existing Step-0 counter, never an independent cell probe.
+    /** 可见条目数。 */
     public let visibleItems: Int64
+    /** 绘制循环访问的条目数。 */
     public let itemsVisited: Int64
+    /** 实际绘制可见行的条目数。 */
     public let itemsPainted: Int64
+    /** 绘制循环访问的行数。 */
     public let rowsVisited: Int64
+    /** 实际绘制的行数。 */
     public let rowsPainted: Int64
+    /** 变化的条目数。 */
     public let changedItems: Int64
+    /** 条目绘制的单元格写入尝试数。 */
     public let itemPaintCellAttempts: Int64
+    /** 行绘制的单元格写入尝试数。 */
     public let rowPaintCellAttempts: Int64
+    /** 条目背景的单元格写入尝试数。 */
     public let itemBackgroundCellAttempts: Int64
+    /** 内容的单元格写入尝试数。 */
     public let contentCellAttempts: Int64
+    /** 请求排版的行数。 */
     public let layoutRowsRequested: Int64
+    /** 使用的缓存行数。 */
     public let cachedRowsUsed: Int64
+    /** 可见条目选择性失效次数。 */
     public let selectiveItemInvalidations: Int64
+    /** 屏外条目选择性失效次数。 */
     public let selectiveOffscreenInvalidations: Int64
+    /** 因条目高度变化回退到整视口重绘的次数。 */
     public let fallbackFullViewportPaints: Int64
 
+    /** 创建指标快照；字段值按传入值保存。详细工作计数依赖视图的 instrumentationEnabled 配置。
+     * @param materialized 自最近一次非空绘制开始后实例化的条目数
+     * @param cacheEntries 条目缓存数量
+     * @param measuredEntries 当前测量代数中已测量的条目数
+     * @param cachedRows 已测量条目保存的渲染行数
+     * @param appendOnlyFullLayouts 追加文本完整排版次数
+     * @param appendOnlyIncrementalLayouts 追加文本增量排版次数
+     * @param appendOnlyRewrappedBytes 追加文本重新换行处理的字节数
+     * @param syncCountCalls 同步条目数量的调用次数
+     * @param metadataTouches 处理条目元数据的数量
+     * @param heightIndexResetEntries 重建高度索引时处理的条目数
+     * @param heightIndexUpdateCalls 更新高度索引的次数
+     * @param heightIndexNodesTouched 高度索引访问的节点数
+     * @param heightIndexGrowOperations 高度索引扩展次数
+     * @param heightMetadataEntries 高度元数据条目数
+     * @param heightIndexNodes 高度索引节点数
+     * @param cacheLookups 缓存查找次数
+     * @param cacheHits 缓存命中次数
+     * @param cacheMisses 缓存未命中次数
+     * @param layoutCalls 排版调用次数
+     * @param documentRequests 向来源请求文档的次数
+     * @param documentsMaterialized 实例化的文档数
+     * @param wrapInputBytes 换行处理的输入字节数
+     * @param measurementInvalidations 测量失效次数
+     * @param measurementGenerationBumps 测量代数更新次数
+     * @param staleEntriesEncountered 遇到过期条目的次数
+     * @param entriesRemeasured 重新测量条目的次数
+     * @param estimateCorrections 修正高度估计的次数
+     * @param anchorCorrections 修正滚动锚点的次数
+     * @param visibleItems 可见条目数
+     * @param itemsVisited 绘制循环访问的条目数
+     * @param itemsPainted 实际绘制可见行的条目数
+     * @param rowsVisited 绘制循环访问的行数
+     * @param rowsPainted 实际绘制的行数
+     * @param changedItems 变化的条目数
+     * @param itemPaintCellAttempts 条目绘制的单元格写入尝试数
+     * @param rowPaintCellAttempts 行绘制的单元格写入尝试数
+     * @param itemBackgroundCellAttempts 条目背景的单元格写入尝试数
+     * @param contentCellAttempts 内容的单元格写入尝试数
+     * @param layoutRowsRequested 请求排版的行数
+     * @param cachedRowsUsed 使用的缓存行数
+     * @param selectiveItemInvalidations 可见条目选择性失效次数
+     * @param selectiveOffscreenInvalidations 屏外条目选择性失效次数
+     * @param fallbackFullViewportPaints 因条目高度变化回退到整视口重绘的次数
+     */
     public init(
         materialized: Int64,
         cacheEntries: Int64,
@@ -454,8 +628,10 @@ public class VirtualTranscriptMetrics {
     }
 }
 
+/** 按可见区域和缓存按需排版对话条目的视图。 */
 public class VirtualTranscriptView <: Widget {
     private let source: VirtualTranscriptSource
+    /** 共享的滚动和锚点状态。 */
     public let state: VirtualTranscriptState
     private let entries = ArrayList<VirtualTranscriptCacheEntry>()
     private let heights = TranscriptHeightIndex()
@@ -515,9 +691,18 @@ public class VirtualTranscriptView <: Widget {
     // Screen ranges of items rendered by the last render() call, in
     // transcript order: (itemId, topRow, bottomRow). Used by hosts for
     // hit-testing (e.g. clicking a collapsed tool card to expand it).
+    /** 上次绘制的可见条目屏幕范围，可用于命中测试。 */
     public let lastVisibleRanges = ArrayList<VisibleRange>()
     private let lastVisibleIndices = ArrayList<Int64>()
 
+    /** 创建虚拟对话视图。
+     * @param source 提供条目和修订信息的来源
+     * @param state 滚动状态
+     * @param themeKey 传给来源的主题标识
+     * @param overscanViewports 视口外预排版范围，负值按零处理
+     * @param backgroundBatch 每次后台测量批次大小，负值按零处理
+     * @param instrumentationEnabled 是否启用详细计数
+     */
     public init(
         source: VirtualTranscriptSource,
         state!: VirtualTranscriptState = VirtualTranscriptState(),
@@ -535,12 +720,18 @@ public class VirtualTranscriptView <: Widget {
         syncCount()
     }
 
+    /** 更改来源主题标识并使测量缓存失效。
+     * @param value 新主题标识
+     */
     public func setThemeKey(value: String): Unit {
         if (themeKey == value) { return }
         themeKey = value
         invalidateAllMeasurements()
     }
 
+    /** 设置是否使用卡片边饰，并在变化时使测量缓存失效。
+     * @param enabled 是否启用卡片边饰
+     */
     public func setCardChrome(enabled: Bool): Unit {
         if (cardChrome == enabled) { return }
         cardChrome = enabled
@@ -549,12 +740,18 @@ public class VirtualTranscriptView <: Widget {
 
     // Hosts can switch the event rail to the portable ASCII form when the
     // terminal capability probe says Unicode is unavailable.
+    /** 选择 Unicode 或 ASCII 卡片线条，并在变化时使测量缓存失效。
+     * @param enabled 是否使用 Unicode
+     */
     public func setUnicode(enabled: Bool): Unit {
         if (unicode == enabled) { return }
         unicode = enabled
         invalidateAllMeasurements()
     }
 
+    /** 设置视图级显式卡片主题。
+     * @param theme 卡片主题
+     */
     public func setCardTheme(theme: TranscriptCardTheme): Unit {
         explicitCardTheme = true
         applyCardTheme(theme)
@@ -580,6 +777,10 @@ public class VirtualTranscriptView <: Widget {
         if (layoutChanged) { invalidateAllMeasurements() }
     }
 
+    /** 使指定已缓存条目的测量结果失效。
+     * @param id 条目标识
+     * @return 找到条目时为 true
+     */
     public func invalidateItem(id: String): Bool {
         for (index in 0..entries.size) {
             if (entries[index].id == id) {
@@ -595,13 +796,22 @@ public class VirtualTranscriptView <: Widget {
         false
     }
 
+    /** 获取当前总行数估计；尚未测量的条目使用估计高度。
+     * @return 总行数
+     */
     public func totalRows(): Int64 {
         syncCount()
         heights.total()
     }
 
+    /** 获取自最近一次非空绘制开始后实例化的条目数。
+     * @return 实例化次数
+     */
     public func materializedCount(): Int64 { materializedCountValue }
 
+    /** 获取当前缓存和测量指标。
+     * @return 指标快照
+     */
     public func metrics(): VirtualTranscriptMetrics {
         var count: Int64 = 0
         var rows: Int64 = 0
@@ -710,6 +920,10 @@ public class VirtualTranscriptView <: Widget {
     // one existing source item. The caller guarantees item order/count did not
     // change. Offscreen changes need no paint. A height change conservatively
     // falls back to the whole viewport because following items may move.
+    /** 计算可见条目更新后的安全重绘区域；调用方需保证条目顺序和数量未变。
+     * @param id 更新的条目标识
+     * @return 脏区域；不可见或尚未绘制时为 None
+     */
     public func dirtyRectForItemRevision(id: String): ?Rect {
         if (lastRenderArea.width <= 0 || lastRenderArea.height <= 0) { return None }
         var visible: Int64 = 0
@@ -735,6 +949,10 @@ public class VirtualTranscriptView <: Widget {
         None
     }
 
+    /** 处理行滚动、翻页及首尾导航按键。
+     * @param key 按键事件
+     * @return 识别到导航按键时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         let page = max(1, viewportRows)
         match (key.code) {
@@ -748,6 +966,10 @@ public class VirtualTranscriptView <: Widget {
         }
     }
 
+    /** 在区域内按需排版并绘制可见条目。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         let applicationTheme = buffer.resolveTheme(Option<Theme>.None)
         if (!transcriptThemeEqual(contextTheme, applicationTheme)) {

@@ -4,11 +4,24 @@ import std.collection.*
 import std.fs.*
 import std.sort.*
 
+/** 管理零起始的分页索引。
+ */
 public class Paginator {
+    /** 当前页索引。
+     */
     public var page: Int64
+    /** 每页项目数。
+     */
     public var pageSize: Int64
+    /** 项目总数。
+     */
     public var total: Int64
 
+    /** 创建分页状态。
+     * @param page 初始页，限制到可用范围
+     * @param pageSize 每页项目数，至少为一
+     * @param total 项目总数，负值按零处理
+     */
     public init(page!: Int64 = 0, pageSize!: Int64 = 10, total!: Int64 = 0) {
         this.pageSize = max(1, pageSize)
         this.total = max(0, total)
@@ -16,23 +29,37 @@ public class Paginator {
         this.page = clamp(page, 0, max(0, pages - 1))
     }
 
+    /** 计算页数。
+     * @return 总数非正时为零。
+     */
     public func pageCount(): Int64 {
         if (total <= 0) { return 0 }
         (total - 1) / pageSize + 1
     }
 
+    /** 计算当前页起始索引。
+     * @return 页索引乘每页大小。
+     */
     public func offset(): Int64 {
         page * pageSize
     }
 
+    /** 移动到下一页并限制在末页。
+     */
     public func next(): Unit {
         page = min(max(0, pageCount() - 1), page + 1)
     }
 
+    /** 移动到上一页并限制在首页。
+     */
     public func previous(): Unit {
         page = max(0, page - 1)
     }
 
+    /** 处理左右、翻页、首页和末页按键。
+     * @param key 键盘事件
+     * @return 支持的按键返回 true。
+     */
     public func handle(key: KeyEvent): Bool {
         match (key.code) {
             case KeyCode.PageDown | KeyCode.Right =>
@@ -52,11 +79,24 @@ public class Paginator {
     }
 }
 
+/** 表格列标题、宽度和对齐方式。
+ */
 public class TableColumn {
+    /** 列标题。
+     */
     public let title: String
+    /** 列宽。
+     */
     public var width: Int64
+    /** 文本对齐方式。
+     */
     public let align: TextAlign
 
+    /** 创建列配置。
+     * @param title 列标题
+     * @param width 列宽，构造时至少为一
+     * @param align 文本对齐方式
+     */
     public init(title: String, width!: Int64 = 10, align!: TextAlign = TextAlign.Left) {
         this.title = title
         this.width = max(1, width)
@@ -64,28 +104,65 @@ public class TableColumn {
     }
 }
 
+/** 表格数据的显示状态。
+ */
 public enum TableStatus {
+    /** 显示数据。
+     */
     | Ready
+    /** 显示空状态。
+     */
     | Empty
+    /** 显示加载状态。
+     */
     | Loading
+    /** 显示错误信息。
+     * @param _0 错误信息文本
+     */
     | Error(String)
 }
 
+/** 按需读取行并支持导航、过滤和多选的表格。
+ */
 public class VirtualTable <: Widget {
     private let columns: Array<TableColumn>
     private let rowCount: Int64
     private let rowAt: (Int64) -> Array<String>
+    /** 视口起始的可见行索引。
+     */
     public var offset: Int64
+    /** 当前可见行索引。
+     */
     public var selectedRow: ?Int64
+    /** 当前列索引。
+     */
     public var selectedColumn: Int64
+    /** 横向滚动的起始列。
+     */
     public var columnOffset: Int64
+    /** 左侧冻结列数。
+     */
     public var frozenColumns: Int64 = 0
+    /** 当前排序列。
+     */
     public var sortColumn: ?Int64 = None
+    /** 是否降序排序。
+     */
     public var sortDescending: Bool = false
+    /** 当前过滤文本。
+     */
     public var filterText: String = ""
+    /** 是否绘制固定表头。
+     */
     public var stickyHeader: Bool = true
+    /** 表格显示状态。
+     */
     public var status: TableStatus = TableStatus.Ready
+    /** 空表提示文本。
+     */
     public var emptyText: String = "No rows"
+    /** 加载提示文本。
+     */
     public var loadingText: String = "Loading"
     private let selectedRows = ArrayList<Int64>()
     private let rowCache = HashMap<Int64, Array<String>>()
@@ -106,6 +183,26 @@ public class VirtualTable <: Widget {
     private let sortState: ?SortState
     private let filterState: ?FilterState
 
+    /** 创建按索引读取行的表格；分页模型不能与旧式排序、过滤或选择绑定同时使用。
+     * @param columns 表格列
+     * @param rowCount 源行数，负值按零处理
+     * @param rowAt 按源索引读取单行的函数
+     * @param offset 初始可见行偏移
+     * @param selectedRow 初始选中行
+     * @param selectedColumn 初始选中列
+     * @param columnOffset 初始横向起始列
+     * @param block 可选外框
+     * @param style 可选普通行样式
+     * @param selectedStyle 可选选中行样式
+     * @param cellStyle 可选选中单元格样式
+     * @param statusStyle 可选状态提示样式
+     * @param selectionModel 可选旧式选择状态
+     * @param scrollState 可选滚动状态
+     * @param sortState 可选旧式排序状态
+     * @param filterState 可选旧式过滤状态
+     * @param dataModel 可选分页模型
+     * @param cacheCapacity 行缓存容量，至少为一
+     */
     public init(
         columns: Array<TableColumn>,
         rowCount: Int64,
@@ -149,10 +246,20 @@ public class VirtualTable <: Widget {
         this.cacheCapacity = max(1, cacheCapacity)
     }
 
+    /** 创建由分页模型提供数据的表格。
+     * @param columns 表格列
+     * @param model 分页表格模型
+     * @param block 可选外框
+     */
     public init(columns: Array<TableColumn>, model: PagedTableModel, block!: ?Block = None) {
         this(columns, 0, { _ => Array<String>() }, block: block, dataModel: Some(model))
     }
 
+    /** 处理表头排序、滚动和行列选择。
+     * @param mouse 鼠标事件
+     * @param area 表格区域
+     * @return 处理了事件时为 true。
+     */
     public func handle(mouse: MouseEvent, area: Rect): Bool {
         syncExternalState()
         let target = contentArea(area)
@@ -190,6 +297,10 @@ public class VirtualTable <: Widget {
         false
     }
 
+    /** 在区域内裁剪绘制表头和数据。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -263,6 +374,11 @@ public class VirtualTable <: Widget {
         }
     }
 
+    /** 处理行列导航及空格多选。
+     * @param key 键盘事件
+     * @param viewportHeight 可见数据行数
+     * @return 支持的按键返回 true。
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
         syncExternalState()
         let current = match (selectedRow) {
@@ -322,6 +438,11 @@ public class VirtualTable <: Widget {
         handled
     }
 
+    /** 处理按键并计算需要重绘的区域。
+     * @param key 键盘事件
+     * @param area 表格区域
+     * @return 按键被处理且有可用数据区域时返回脏区域，否则返回 None。
+     */
     public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects {
         let content = contentArea(area)
         if (content.width <= 0 || content.height <= 0) { return None }
@@ -344,6 +465,10 @@ public class VirtualTable <: Widget {
         Some(dirtySelectionChange(area, beforeSelected, selectedRow))
     }
 
+    /** 计算表头重绘区域。
+     * @param area 表格区域
+     * @return 表头脏区域；未显示表头时为空。
+     */
     public func dirtyHeader(area: Rect): DirtyRects {
         let dirty = DirtyRects()
         let content = contentArea(area)
@@ -353,6 +478,10 @@ public class VirtualTable <: Widget {
         dirty
     }
 
+    /** 计算数据区重绘区域。
+     * @param area 表格区域
+     * @return 数据区脏区域。
+     */
     public func dirtyBody(area: Rect): DirtyRects {
         let dirty = DirtyRects()
         let content = contentArea(area)
@@ -362,6 +491,11 @@ public class VirtualTable <: Widget {
         dirty
     }
 
+    /** 计算指定可见行的重绘区域；没有命中行时回退到整个内容区域。
+     * @param area 表格区域
+     * @param rows 可见行索引
+     * @return 重绘区域集合。
+     */
     public func dirtyRows(area: Rect, rows: Array<Int64>): DirtyRects {
         let dirty = DirtyRects()
         let content = contentArea(area)
@@ -374,6 +508,12 @@ public class VirtualTable <: Widget {
         dirty
     }
 
+    /** 计算选择变化前后行的重绘区域。
+     * @param area 表格区域
+     * @param before 原可见行索引
+     * @param after 新可见行索引
+     * @return 重绘区域集合。
+     */
     public func dirtySelectionChange(area: Rect, before: ?Int64, after: ?Int64): DirtyRects {
         let rows = ArrayList<Int64>()
         match (before) {
@@ -387,20 +527,33 @@ public class VirtualTable <: Widget {
         dirtyRows(area, rows.toArray())
     }
 
+    /** 计算状态变化的重绘区域。
+     * @param area 表格区域
+     * @return 数据区脏区域。
+     */
     public func dirtyStatus(area: Rect): DirtyRects {
         dirtyBody(area)
     }
 
+    /** 清除行缓存；分页模型也会失效。
+     */
     public func clearCachedRows(): Unit {
         if (let Some(model) <- dataModel) { model.invalidate() }
         clearRowCache()
     }
 
+    /** 获取当前缓存的行数。
+     * @return 缓存行数。
+     */
     public func cachedRowCount(): Int64 {
         if (let Some(model) <- dataModel) { return model.cachedRowCount() }
         rowCache.size
     }
 
+    /** 按列设置排序，重置滚动并清除行缓存。
+     * @param column 排序列索引，会限制到列范围
+     * @param descending 是否降序
+     */
     public func sortBy(column: Int64, descending!: Bool = false): Unit {
         syncExternalState()
         let sortedColumn = clamp(column, 0, max(0, columns.size - 1))
@@ -419,6 +572,8 @@ public class VirtualTable <: Widget {
         clearRowCache()
     }
 
+    /** 清除排序并清除行缓存。
+     */
     public func clearSort(): Unit {
         syncExternalState()
         sortColumn = None
@@ -431,16 +586,27 @@ public class VirtualTable <: Widget {
         clearRowCache()
     }
 
+    /** 调整列宽。
+     * @param column 列索引
+     * @param width 新宽度，至少为一
+     * @return 列索引有效时为 true。
+     */
     public func resizeColumn(column: Int64, width: Int64): Bool {
         if (column < 0 || column >= columns.size) { return false }
         columns[column].width = max(1, width)
         true
     }
 
+    /** 设置左侧冻结列数。
+     * @param count 列数，会限制到有效范围
+     */
     public func setFrozenColumns(count: Int64): Unit {
         frozenColumns = clamp(count, 0, columns.size)
     }
 
+    /** 设置过滤条件，重置选择和滚动并清除缓存。
+     * @param text 过滤文本
+     */
     public func setFilter(text: String): Unit {
         syncExternalState()
         filterText = text
@@ -458,10 +624,15 @@ public class VirtualTable <: Widget {
         clearRowCache()
     }
 
+    /** 设置显示状态。
+     * @param status 新状态
+     */
     public func setStatus(status: TableStatus): Unit {
         this.status = status
     }
 
+    /** 切换当前行的多选状态；分页模型使用其节点标识。
+     */
     public func toggleSelectedRow(): Unit {
         if (let Some(model) <- dataModel) {
             if (let Some(id) <- model.selectedId()) { model.toggle(id) }
@@ -488,6 +659,10 @@ public class VirtualTable <: Widget {
         }
     }
 
+    /** 查询旧式选择模型或本地集合的源行选择状态。
+     * @param row 源行索引
+     * @return 已选中时为 true。
+     */
     public func isSelected(row: Int64): Bool {
         match (selectionModel) {
             case Some(model) => return model.isSelected(row)
@@ -499,6 +674,9 @@ public class VirtualTable <: Widget {
         false
     }
 
+    /** 获取旧式选择模型或本地集合的源行索引。
+     * @return 已选中的源行索引数组。
+     */
     public func selectedRowIndices(): Array<Int64> {
         match (selectionModel) {
             case Some(model) => model.selectedIndices()
@@ -815,12 +993,26 @@ func addVirtualTableRowDirty(dirty: DirtyRects, area: Rect, selected: ?Int64, of
     }
 }
 
+/** 可展开的树节点。
+ */
 public class TreeNode {
+    /** 节点标识。
+     */
     public let id: String
+    /** 显示标签。
+     */
     public let label: String
+    /** 是否展开子节点。
+     */
     public var expanded: Bool
     private let children: ArrayList<TreeNode>
 
+    /** 创建节点。
+     * @param id 节点标识
+     * @param label 显示标签
+     * @param expanded 初始展开状态
+     * @param children 初始子节点
+     */
     public init(id: String, label: String, expanded!: Bool = false, children!: Array<TreeNode> = []) {
         this.id = id
         this.label = label
@@ -831,21 +1023,33 @@ public class TreeNode {
         }
     }
 
+    /** 追加子节点。
+     * @param child 子节点
+     */
     public func add(child: TreeNode): Unit {
         children.add(child)
     }
 
+    /** 获取当前子节点数组。
+     * @return 按插入顺序排列的子节点。
+     */
     public func childNodes(): Array<TreeNode> {
         children.toArray()
     }
 }
 
+/** 显示普通节点或惰性模型的树视图。
+ */
 public class Tree <: Widget {
     private let roots: Array<TreeNode>
     private let dataModel: ?LazyTreeModel
     private var stableId: ?String = None
     private var rememberedIndex: Int64 = -1
+    /** 当前可见行索引。
+     */
     public var selected: Int64
+    /** 视口起始行索引。
+     */
     public var offset: Int64
     private let block: ?Block
     private let style: Style
@@ -855,6 +1059,18 @@ public class Tree <: Widget {
     private var theme: ?Theme
     private var renderedTheme: ?Theme = None
 
+    /** 创建树视图。
+     * @param roots 普通树根节点
+     * @param selected 初始选中行，负值按零处理
+     * @param offset 初始起始行，负值按零处理
+     * @param block 可选外框
+     * @param style 基础样式
+     * @param selectedStyle 可选选中样式
+     * @param dataModel 可选惰性树模型
+     * @param focused 是否聚焦
+     * @param focusedStyle 可选聚焦样式
+     * @param theme 可选语义主题
+     */
     public init(
         roots: Array<TreeNode>,
         selected!: Int64 = 0,
@@ -879,21 +1095,42 @@ public class Tree <: Widget {
         this.theme = theme
     }
 
+    /** 创建惰性模型树。
+     * @param model 惰性树模型
+     * @param block 可选外框
+     * @param focused 是否聚焦
+     * @param theme 可选语义主题
+     */
     public init(model: LazyTreeModel, block!: ?Block = None, focused!: Bool = false, theme!: ?Theme = None) {
         this([], block: block, dataModel: Some(model), focused: focused, theme: theme)
         if (model.selectedId().isNone()) { _ = model.selectIndex(0) }
     }
 
+    /** 设置聚焦状态。
+     * @param value 是否聚焦
+     */
     public func setFocused(value: Bool): Unit { focused = value }
 
+    /** 设置或清除语义主题。
+     * @param value 主题；None 表示清除
+     */
     public func setTheme(value: ?Theme): Unit { theme = value }
 
-    /** 按上次绘制的区块几何处理鼠标；若树自身指定了主题，则绘制前也使用该主题计算几何。 */
+    /** 按上次绘制的区块几何处理鼠标；自身主题优先。
+     * @param mouse 鼠标事件
+     * @param area 树的区域
+     * @return 处理了鼠标事件时为 true。
+     */
     public func handle(mouse: MouseEvent, area: Rect): Bool {
         handleMouseWithTheme(mouse, area, None)
     }
 
-    /** 绘制前可传入应用或父主题以计算鼠标命中区域；树和区块的显式主题优先。 */
+    /** 使用可选父主题计算命中区域；树和区块显式主题优先。
+     * @param mouse 鼠标事件
+     * @param area 树的区域
+     * @param theme 可选应用或父主题
+     * @return 处理了鼠标事件时为 true。
+     */
     public func handle(mouse: MouseEvent, area: Rect, theme!: ?Theme): Bool {
         handleMouseWithTheme(mouse, area, theme)
     }
@@ -924,6 +1161,8 @@ public class Tree <: Widget {
         false
     }
 
+    /** 切换当前节点的展开状态。
+     */
     public func toggleSelected(): Unit {
         if (let Some(model) <- dataModel) { _ = model.toggleSelected(); return }
         let nodes = visibleNodes()
@@ -932,12 +1171,19 @@ public class Tree <: Widget {
         }
     }
 
+    /** 获取当前选择的节点标识。
+     * @return 当前标识或 None。
+     */
     public func selectedId(): ?String {
         if (let Some(model) <- dataModel) { return model.selectedId() }
         _ = visibleRows()
         stableId
     }
 
+    /** 按标识选择可见节点。
+     * @param id 节点标识
+     * @return 找到并选择时为 true。
+     */
     public func selectById(id: String): Bool {
         if (let Some(model) <- dataModel) {
             let found = model.selectById(id)
@@ -955,6 +1201,10 @@ public class Tree <: Widget {
         false
     }
 
+    /** 在普通树的所有节点中查找；惰性树调用会抛出异常。
+     * @param id 节点标识
+     * @return 找到的节点或 None。
+     */
     public func findById(id: String): ?TreeNode {
         if (dataModel.isSome()) { throw IllegalStateException("Use LazyTreeModel.findById for provider nodes") }
         for (root in roots) {
@@ -966,6 +1216,8 @@ public class Tree <: Widget {
         None
     }
 
+    /** 递归展开普通树；惰性树调用会抛出异常。
+     */
     public func expandAll(): Unit {
         if (dataModel.isSome()) { throw IllegalStateException("Lazy trees expand explicit IDs; expandAll would enumerate the source") }
         for (root in roots) {
@@ -973,6 +1225,8 @@ public class Tree <: Widget {
         }
     }
 
+    /** 收起所有节点并重置滚动位置。
+     */
     public func collapseAll(): Unit {
         if (let Some(model) <- dataModel) { model.collapseAll(); offset = 0; return }
         for (root in roots) {
@@ -982,6 +1236,11 @@ public class Tree <: Widget {
         offset = 0
     }
 
+    /** 处理树导航和展开按键。
+     * @param key 键盘事件
+     * @param viewportHeight 可见行数
+     * @return 支持的按键返回 true。
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
         if (let Some(model) <- dataModel) {
             let current = match (model.selectedIndex()) { case Some(index) => index; case None => 0 }
@@ -1013,6 +1272,8 @@ public class Tree <: Widget {
         }
     }
 
+    /** 展开当前节点。
+     */
     public func expandSelected(): Unit {
         if (let Some(model) <- dataModel) {
             if (let Some(id) <- model.selectedId()) { _ = model.setExpanded(id, true) }
@@ -1024,6 +1285,8 @@ public class Tree <: Widget {
         }
     }
 
+    /** 收起当前节点。
+     */
     public func collapseSelected(): Unit {
         if (let Some(model) <- dataModel) {
             if (let Some(id) <- model.selectedId()) { _ = model.setExpanded(id, false) }
@@ -1035,6 +1298,10 @@ public class Tree <: Widget {
         }
     }
 
+    /** 在区域内绘制树。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         renderedTheme = buffer.resolveTheme(None)
         var target = area
@@ -1195,14 +1462,27 @@ func compareStrings(left: String, right: String): Int64 {
     0
 }
 
+/** 浏览目录并选择文件或目录。
+ */
 public class FilePicker <: Widget {
+    /** 当前目录路径；直接修改后需调用 refresh。
+     */
     public var path: String
     private let extension: String
     private let state = ListState(selected: Some(0))
     private var entries: Array<String> = []
+    /** 按名称包含关系过滤的搜索文本。
+     */
     public var searchText: String = ""
+    /** 是否显示以点开头的项目。
+     */
     public var showHidden: Bool = false
 
+    /** 创建选择器并读取目录。
+     * @param path 初始目录
+     * @param extension 文件名后缀过滤条件；空字符串不过滤
+     * @param showHidden 是否显示隐藏项目
+     */
     public init(path!: String = ".", extension!: String = "", showHidden!: Bool = false) {
         this.path = path
         this.extension = extension
@@ -1210,6 +1490,8 @@ public class FilePicker <: Widget {
         refresh()
     }
 
+    /** 重新读取当前目录，目录排在文件前；读取失败时仍保留父目录项。
+     */
     public func refresh(): Unit {
         let dirs = ArrayList<String>()
         let files = ArrayList<String>()
@@ -1233,6 +1515,9 @@ public class FilePicker <: Widget {
         entries = dirs.toArray()
     }
 
+    /** 获取选中项目的名称。
+     * @return 名称或 None。
+     */
     public func selectedEntry(): ?String {
         match (state.selected) {
             case Some(index) =>
@@ -1241,6 +1526,9 @@ public class FilePicker <: Widget {
         }
     }
 
+    /** 获取选中项目路径；父目录项解析为父目录。
+     * @return 路径或 None。
+     */
     public func selectedPath(): ?String {
         match (selectedEntry()) {
             case Some(entry) => Some(if (entry == "..") { parentPath(path) } else { joinPath(path, entry) })
@@ -1248,10 +1536,16 @@ public class FilePicker <: Widget {
         }
     }
 
+    /** 取得当前选择的路径。
+     * @return 路径或 None。
+     */
     public func chooseSelected(): ?String {
         selectedPath()
     }
 
+    /** 设置搜索文本、重置选择并刷新目录。
+     * @param text 名称包含的文本
+     */
     public func setSearch(text: String): Unit {
         searchText = text
         state.select(Some(0))
@@ -1259,11 +1553,16 @@ public class FilePicker <: Widget {
         refresh()
     }
 
+    /** 切换隐藏项目的显示并刷新目录。
+     */
     public func toggleHidden(): Unit {
         showHidden = !showHidden
         refresh()
     }
 
+    /** 取得选中项目的名称、路径及目录标记。
+     * @return 项目信息或 None。
+     */
     public func selectedInfo(): ?FileEntryInfo {
         match (selectedEntry()) {
             case Some(entry) =>
@@ -1273,6 +1572,9 @@ public class FilePicker <: Widget {
         }
     }
 
+    /** 当选中项为目录时进入并刷新。
+     * @return 成功进入目录时为 true。
+     */
     public func enterSelected(): Bool {
         match (selectedPath()) {
             case Some(nextPath) =>
@@ -1288,6 +1590,9 @@ public class FilePicker <: Widget {
         }
     }
 
+    /** 切换到父目录并刷新。
+     * @return 路径变化时为 true。
+     */
     public func parent(): Bool {
         let nextPath = parentPath(path)
         if (nextPath == path) { return false }
@@ -1298,6 +1603,11 @@ public class FilePicker <: Widget {
         true
     }
 
+    /** 处理选择移动、翻页和进入目录按键。
+     * @param key 键盘事件
+     * @param viewportHeight 列表可见行数
+     * @return 支持的导航键返回 true；回车返回进入目录的结果。
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
         match (key.code) {
             case KeyCode.Up =>
@@ -1326,16 +1636,33 @@ public class FilePicker <: Widget {
         }
     }
 
+    /** 在区域内绘制文件列表。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         List(entries, state: Some(state), block: Block(title: path)).render(area, buffer)
     }
 }
 
+/** 文件选择器中项目的基本信息。
+ */
 public class FileEntryInfo {
+    /** 项目名称。
+     */
     public let name: String
+    /** 项目路径。
+     */
     public let path: String
+    /** 项目是否为目录。
+     */
     public let isDir: Bool
 
+    /** 创建项目信息。
+     * @param name 项目名称
+     * @param path 项目路径
+     * @param isDir 是否为目录
+     */
     public init(name: String, path: String, isDir: Bool) {
         this.name = name
         this.path = path

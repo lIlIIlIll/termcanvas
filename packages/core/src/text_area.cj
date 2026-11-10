@@ -32,27 +32,55 @@ class TextAreaEdit {
     }
 }
 
+/** 文本区域中的光标和可选选择锚点。 */
 public class TextAreaCaret {
+    /** 光标的 UTF-8 字节偏移，至少为零。 */
     public let offset: Int64
+    /** 可选的选择锚点字节偏移。 */
     public let anchor: ?Int64
 
+    /** 创建光标；offset 的负值按零处理。
+     * @param offset 光标字节偏移
+     * @param anchor 可选选择锚点
+     */
     public init(offset: Int64, anchor!: ?Int64 = None) {
         this.offset = max(0, offset)
         this.anchor = anchor
     }
 }
 
+/** 向补全提供方传递的文本与光标快照。 */
 public class TextCompletionRequest {
+    /** 补全请求标识。 */
     public let requestId: String
+    /** 请求对应的文本修订号。 */
     public let revision: Int64
+    /** 请求时的完整文本。 */
     public let value: String
+    /** 光标的 UTF-8 字节偏移。 */
     public let cursor: Int64
+    /** 补全前缀起始字节偏移。 */
     public let prefixStart: Int64
+    /** 补全前缀结束字节偏移。 */
     public let prefixEnd: Int64
+    /** 补全前缀文本。 */
     public let prefix: String
+    /** 光标所在行索引。 */
     public let line: Int64
+    /** 光标所在行的显示单元格列。 */
     public let column: Int64
 
+    /** 创建补全请求；各字段按传入值保存。
+     * @param requestId 补全请求标识
+     * @param revision 请求对应的文本修订号
+     * @param value 请求时的完整文本
+     * @param cursor 光标的 UTF-8 字节偏移
+     * @param prefixStart 补全前缀起始字节偏移
+     * @param prefixEnd 补全前缀结束字节偏移
+     * @param prefix 补全前缀文本
+     * @param line 光标所在行索引
+     * @param column 光标所在行的显示单元格列
+     */
     public init(requestId: String, revision: Int64, value: String, cursor: Int64, prefixStart: Int64, prefixEnd: Int64, prefix: String, line: Int64, column: Int64) {
         this.requestId = requestId
         this.revision = revision
@@ -66,11 +94,20 @@ public class TextCompletionRequest {
     }
 }
 
+/** 补全列表中的候选项。 */
 public class TextCompletionItem {
+    /** 显示标签。 */
     public let label: String
+    /** 确认后插入的文本。 */
     public let insertText: String
+    /** 候选项附加说明。 */
     public let detail: String
 
+    /** 创建候选项；插入文本为空时使用标签。
+     * @param label 显示标签
+     * @param insertText 插入文本
+     * @param detail 附加说明
+     */
     public init(label: String, insertText!: String = "", detail!: String = "") {
         this.label = label
         this.insertText = if (insertText.isEmpty()) { label } else { insertText }
@@ -78,13 +115,26 @@ public class TextCompletionItem {
     }
 }
 
+/** 补全提供方返回的候选项及替换范围。 */
 public class TextCompletionResult {
+    /** 对应请求标识。 */
     public let requestId: String
+    /** 对应文本修订号。 */
     public let revision: Int64
+    /** 替换范围起始 UTF-8 字节偏移。 */
     public let replaceStart: Int64
+    /** 替换范围结束 UTF-8 字节偏移。 */
     public let replaceEnd: Int64
+    /** 候选项。 */
     public let items: Array<TextCompletionItem>
 
+    /** 创建补全结果；起点限制为非负，终点限制为不小于起点。
+     * @param requestId 对应请求标识
+     * @param revision 对应文本修订号
+     * @param replaceStart 替换起始字节偏移
+     * @param replaceEnd 替换结束字节偏移
+     * @param items 候选项
+     */
     public init(requestId: String, revision: Int64, replaceStart: Int64, replaceEnd: Int64, items: Array<TextCompletionItem>) {
         this.requestId = requestId
         this.revision = revision
@@ -94,11 +144,20 @@ public class TextCompletionResult {
     }
 }
 
+/** 为 UTF-8 字节范围指定样式的装饰。 */
 public class TextDecoration {
+    /** 起始字节偏移，至少为零。 */
     public let start: Int64
+    /** 结束字节偏移，不小于起点。 */
     public let end: Int64
+    /** 装饰样式。 */
     public let style: Style
 
+    /** 创建文本装饰。
+     * @param start 起始字节偏移，负值按零处理
+     * @param end 结束字节偏移，小于起点时按起点处理
+     * @param style 装饰样式
+     */
     public init(start: Int64, end: Int64, style: Style) {
         this.start = max(0, start)
         this.end = max(this.start, end)
@@ -106,26 +165,40 @@ public class TextDecoration {
     }
 }
 
+/** 文本装饰的兼容别名。 */
 public type HighlightSpan = TextDecoration
 
+/** 某一文本行的装饰集合。 */
 public class LineHighlight {
+    /** 行索引，至少为零。 */
     public let line: Int64
+    /** 相对于该行的装饰范围。 */
     public let spans: Array<TextDecoration>
 
+    /** 创建行高亮。
+     * @param line 行索引，负值按零处理
+     * @param spans 行内装饰
+     */
     public init(line: Int64, spans: Array<TextDecoration>) {
         this.line = max(0, line)
         this.spans = spans
     }
 }
 
+/** 缓存基于文本的轻量 Markdown 高亮结果。 */
 public class MarkdownHighlightCache {
     private var cachedText: String = ""
     private var cachedSpans: Array<TextDecoration> = []
     private var cachedLines: Array<LineHighlight> = []
     private var recomputes: Int64 = 0
 
+    /** 创建空高亮缓存。 */
     public init() {}
 
+    /** 获取全文字节偏移的装饰；文本变化时重新计算。
+     * @param text Markdown 文本
+     * @return 全文装饰
+     */
     public func highlights(text: String): Array<TextDecoration> {
         if (text == cachedText) { return cachedSpans }
         cachedText = text
@@ -135,11 +208,21 @@ public class MarkdownHighlightCache {
         cachedSpans
     }
 
+    /** 获取按行分组的装饰。
+     * @param text Markdown 文本
+     * @return 行高亮数组
+     */
     public func lineHighlights(text: String): Array<LineHighlight> {
         if (text != cachedText) { _ = highlights(text) }
         cachedLines
     }
 
+    /** 获取指定行窗口的装饰，并转换为全文字节偏移。
+     * @param text Markdown 文本
+     * @param firstLine 起始行索引
+     * @param lineCount 最多获取的行数
+     * @return 窗口内的全文装饰
+     */
     public func visibleHighlights(text: String, firstLine!: Int64 = 0, lineCount!: Int64 = 40): Array<TextDecoration> {
         let lines = lineHighlights(text)
         let offsets = lineStartOffsets(text)
@@ -155,10 +238,14 @@ public class MarkdownHighlightCache {
         out.toArray()
     }
 
+    /** 获取缓存重新计算次数。
+     * @return 重新计算次数
+     */
     public func recomputeCount(): Int64 {
         recomputes
     }
 
+    /** 清除缓存文本和高亮结果。 */
     public func invalidate(): Unit {
         cachedText = ""
         cachedSpans = []
@@ -166,10 +253,12 @@ public class MarkdownHighlightCache {
     }
 }
 
+/** 多行文本编辑控件，支持选择、多个光标、补全和装饰。 */
 public class TextArea <: Widget {
     private let textModelValue: EditableTextModel
     // Explicit whole-document access remains convenient for small inputs.
     // Editing, movement and viewport rendering use the indexed model directly.
+    /** 完整文本；赋值替换文档并记录编辑历史。 */
     public mut prop value: String {
         get() { textModelValue.text() }
         set(next) {
@@ -181,7 +270,9 @@ public class TextArea <: Widget {
             clearRedo()
         }
     }
+    /** 底层可编辑文本模型。 */
     public prop textModel: EditableTextModel { get() { textModelValue } }
+    /** 水平显示列滚动偏移。 */
     public var horizontalScroll: Int64 = 0
     private var viewportHeight: Int64 = 1
     private var viewportWidth: Int64 = 0
@@ -189,9 +280,13 @@ public class TextArea <: Widget {
     private var preferredColumn: ?Int64 = None
     private var verticalColumns: Array<Int64> = []
     private var verticalOffsets: Array<Int64> = []
+    /** 主光标的 UTF-8 字节偏移。 */
     public var cursor: Int64
+    /** 垂直可见行滚动偏移。 */
     public var scroll: Int64
+    /** 主选择的可选起始字节偏移。 */
     public var selectionStart: ?Int64 = None
+    /** 主选择的可选结束字节偏移。 */
     public var selectionEnd: ?Int64 = None
     private let block: ?Block
     private let style: Style
@@ -201,7 +296,9 @@ public class TextArea <: Widget {
     private let lineNumbers: Bool
     private let lineNumberStyle: Style
     private let foldState: ?DocumentViewState
+    /** 是否拒绝交互式文本编辑。 */
     public var readOnly: Bool
+    /** 是否启用 Markdown 编辑辅助。 */
     public var markdownEditing: Bool
     private var decorationProviders: Array<TextDecorationProvider> = []
     private let decorationLayerNames = ArrayList<String>()
@@ -226,6 +323,23 @@ public class TextArea <: Widget {
     private var cachedFoldRevision: Int64 = -1
     private var cachedLineRebuilds: Int64 = 0
 
+    /** 创建多行文本区域；传入 model 时使用模型内容。
+     * @param value 未提供模型时的初始文本
+     * @param model 可选文本模型
+     * @param cursor 初始光标字节偏移
+     * @param scroll 初始垂直滚动行数
+     * @param block 可选边框
+     * @param style 文本样式
+     * @param selectedStyle 选中文本样式
+     * @param placeholder 空文本时的占位内容
+     * @param placeholderStyle 占位内容样式
+     * @param lineNumbers 是否显示行号
+     * @param lineNumberStyle 行号样式
+     * @param foldState 可选文档折叠状态
+     * @param readOnly 是否只读
+     * @param markdownEditing 是否启用 Markdown 编辑辅助
+     * @param decorations 初始文本装饰
+     */
     public init(
         value!: String = "",
         model!: ?EditableTextModel = None,
@@ -263,6 +377,10 @@ public class TextArea <: Widget {
         this.decorations = decorations
     }
 
+    /** 处理输入、导航、选择和编辑按键；只读时拒绝修改文本的操作。
+     * @param key 按键事件
+     * @return 识别并处理时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         synchronizeValue()
         if (completionOpen && handleCompletionKey(key)) { return true }
@@ -343,6 +461,11 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 处理按键并估算需要重绘的区域。
+     * @param key 按键事件
+     * @param area 文本区域
+     * @return 处理后的脏区域；未处理时为 None
+     */
     public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects {
         let beforeRevision = editRevision()
         let beforePosition = cursorPosition(area)
@@ -366,6 +489,10 @@ public class TextArea <: Widget {
         Some(dirty)
     }
 
+    /** 处理 h、j、k、l、w、b 等 Vim 导航键。
+     * @param key 按键事件
+     * @return 识别到导航键时为 true
+     */
     public func handleVimNavigation(key: KeyEvent): Bool {
         match (key.code) {
             case Char(r'h') => handle(KeyEvent(KeyCode.Left, modifiers: key.modifiers))
@@ -385,7 +512,9 @@ public class TextArea <: Widget {
         }
     }
 
-    /** 设置后续光标及鼠标定位所使用的文本宽度策略。绘制时会与缓冲区同步。 */
+    /** 设置后续光标及鼠标定位所使用的文本宽度策略。绘制时会与缓冲区同步。
+     * @param options 文本宽度策略
+     */
     public func setTextWidthOptions(options: TextWidthOptions): Unit {
         if (usesWideAmbiguous(options) != usesWideAmbiguous(textWidthOptionsValue)) {
             preferredColumn = None
@@ -395,6 +524,10 @@ public class TextArea <: Widget {
         textWidthOptionsValue = options
     }
 
+    /** 同步文本和宽度策略，绘制可见内容及补全菜单。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         setTextWidthOptions(buffer.textWidthOptions())
         synchronizeValue()
@@ -429,12 +562,20 @@ public class TextArea <: Widget {
         renderCompletion(area, textTarget, buffer)
     }
 
-    /** 使用指定宽度策略计算主光标位置，也将其用于后续定位与编辑。 */
+    /** 使用指定宽度策略计算主光标位置，也将其用于后续定位与编辑。
+     * @param area 文本区域
+     * @param options 文本宽度策略
+     * @return 主光标屏幕坐标
+     */
     public func cursorPosition(area: Rect, options!: TextWidthOptions): Position {
         setTextWidthOptions(options)
         cursorPosition(area)
     }
 
+    /** 计算主光标在区域中的屏幕位置，并调整滚动使其可见。
+     * @param area 文本区域
+     * @return 主光标屏幕坐标
+     */
     public func cursorPosition(area: Rect): Position {
         synchronizeValue()
         let target = textViewport(area)
@@ -448,6 +589,10 @@ public class TextArea <: Widget {
             target.y + clamp(row - scroll, 0, max(0, target.height - 1)))
     }
 
+    /** 获取主光标及可见附加光标的屏幕位置。
+     * @param area 文本区域
+     * @return 光标坐标数组
+     */
     public func cursorPositions(area: Rect): Array<Position> {
         let out = ArrayList<Position>()
         out.add(cursorPosition(area))
@@ -463,16 +608,24 @@ public class TextArea <: Widget {
         out.toArray()
     }
 
+    /** 设置主选择范围；偏移按文本模型边界规范化。
+     * @param start 起始字节偏移
+     * @param end 结束字节偏移
+     */
     public func select(start: Int64, end: Int64): Unit {
         selectionStart = Some(textModelValue.clampOffset(start))
         selectionEnd = Some(textModelValue.clampOffset(end))
     }
 
+    /** 清除主选择范围。 */
     public func clearSelection(): Unit {
         selectionStart = None
         selectionEnd = None
     }
 
+    /** 判断主选择是否为非空范围。
+     * @return 存在非空选择时为 true
+     */
     public func hasSelection(): Bool {
         match ((selectionStart, selectionEnd)) {
             case (Some(a), Some(b)) => a != b
@@ -480,6 +633,9 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 获取主选择的文本。
+     * @return 选中文本；无选择时为空字符串
+     */
     public func selectedText(): String {
         synchronizeValue()
         match (selectionBounds()) {
@@ -488,11 +644,17 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 获取按起止顺序排列的主选择范围。
+     * @return 字节偏移范围；无选择时为 None
+     */
     public func selectedRange(): ?(Int64, Int64) {
         synchronizeValue()
         selectionBounds()
     }
 
+    /** 获取主光标和附加光标的快照。
+     * @return 光标数组，主光标位于首项
+     */
     public func carets(): Array<TextAreaCaret> {
         let out = ArrayList<TextAreaCaret>()
         out.add(primaryCaret())
@@ -500,6 +662,9 @@ public class TextArea <: Widget {
         out.toArray()
     }
 
+    /** 设置主光标及附加光标；空数组保留主光标并清除选择与附加光标。
+     * @param carets 新光标数组
+     */
     public func setCarets(carets: Array<TextAreaCaret>): Unit {
         verticalColumns = []
         preferredColumn = None
@@ -517,6 +682,9 @@ public class TextArea <: Widget {
         extraCarets = extras.toArray()
     }
 
+    /** 添加一个按模型边界规范化的附加光标。
+     * @param caret 附加光标
+     */
     public func addCaret(caret: TextAreaCaret): Unit {
         verticalColumns = []
         preferredColumn = None
@@ -526,10 +694,14 @@ public class TextArea <: Widget {
         extraCarets = extras.toArray()
     }
 
+    /** 清除附加光标。 */
     public func clearExtraCarets(): Unit {
         extraCarets = []
     }
 
+    /** 获取所有具有非空选择的光标对应文本。
+     * @return 选中文本数组
+     */
     public func selectedTexts(): Array<String> {
         synchronizeValue()
         let out = ArrayList<String>()
@@ -542,11 +714,19 @@ public class TextArea <: Widget {
         out.toArray()
     }
 
+    /** 将主选择复制到剪贴板。
+     * @param clipboard 目标剪贴板
+     * @return 存在选择且写入成功时为 true
+     */
     public func copySelectionTo(clipboard: Clipboard): Bool {
         if (!hasSelection()) { return false }
         clipboard.writeText(selectedText()).isSuccess()
     }
 
+    /** 复制主选择，并在写入成功后删除；只读时拒绝。
+     * @param clipboard 目标剪贴板
+     * @return 成功剪切时为 true
+     */
     public func cutSelectionTo(clipboard: Clipboard): Bool {
         if (readOnly) { return false }
         if (!copySelectionTo(clipboard)) { return false }
@@ -554,11 +734,15 @@ public class TextArea <: Widget {
         true
     }
 
+    /** 读取剪贴板并粘贴成功读取的文本；只读时不会修改文本。
+     * @param clipboard 来源剪贴板
+     */
     public func pasteFrom(clipboard: Clipboard): Unit {
         let result = clipboard.readText()
         if (result.isSuccess()) { paste(result.text) }
     }
 
+    /** 删除主选择；只读或没有选择时不操作。 */
     public func deleteSelection(): Unit {
         if (readOnly) { return }
         if (!hasSelection()) { return }
@@ -568,20 +752,34 @@ public class TextArea <: Widget {
         clearRedo()
     }
 
+    /** 在光标处插入或替换选择；只读时不操作。
+     * @param text 要粘贴的文本
+     */
     public func paste(text: String): Unit {
         if (readOnly) { return }
         synchronizeValue()
         replaceSelectionOrInsert(text)
     }
 
+    /** 替换静态文本装饰。
+     * @param decorations 文本装饰
+     */
     public func setDecorations(decorations: Array<TextDecoration>): Unit {
         this.decorations = decorations
     }
 
+    /** 替换动态装饰提供方。
+     * @param providers 装饰提供方
+     */
     public func setDecorationProviders(providers: Array<TextDecorationProvider>): Unit {
         decorationProviders = providers
     }
 
+    /** 应用与当前文本修订和长度匹配的装饰层更新。
+     * @param layer 装饰层标识
+     * @param update 带修订号的装饰更新
+     * @return 更新被接受时为 true
+     */
     public func applyDecorationUpdate(layer: String, update: TextDecorationUpdate): Bool {
         synchronizeValue()
         if (update.revision != revision || update.end > textModelValue.byteLength()) { return false }
@@ -594,6 +792,10 @@ public class TextArea <: Widget {
         store.apply(update)
     }
 
+    /** 移除指定装饰层。
+     * @param layer 装饰层标识
+     * @return 找到并移除时为 true
+     */
     public func clearDecorationLayer(layer: String): Bool {
         for (i in 0..decorationLayerNames.size) {
             if (decorationLayerNames[i] == layer) {
@@ -614,6 +816,10 @@ public class TextArea <: Widget {
         for (store in decorationStores) { store.reset(textModelValue.revision()) }
     }
 
+    /** 替换全文、清除选择和编辑历史；默认将光标移到文本末尾。
+     * @param value 新文本
+     * @param cursor 光标字节偏移；负值表示文本末尾
+     */
     public func setValue(value: String, cursor!: Int64 = -1): Unit {
         textModelValue.replace(0, textModelValue.byteLength(), value)
         this.cursor = if (cursor < 0) { textModelValue.byteLength() } else { textModelValue.clampOffset(cursor) }
@@ -626,11 +832,19 @@ public class TextArea <: Widget {
         clearHistory()
     }
 
+    /** 同步并获取文本修订号。
+     * @return 当前修订号
+     */
     public func editRevision(): Int64 {
         synchronizeValue()
         revision
     }
 
+    /** 处理左键定位、拖动选择及修饰键多光标交互。
+     * @param mouse 鼠标事件
+     * @param area 文本区域
+     * @return 处理事件时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool {
         synchronizeValue()
         match (mouse.button) {
@@ -680,6 +894,10 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 开始补全并记录当前修订与前缀。
+     * @param requestId 请求标识
+     * @return 提供方使用的请求快照
+     */
     public func beginCompletion(requestId: String): TextCompletionRequest {
         synchronizeValue()
         _ = cancelCompletion()
@@ -694,11 +912,20 @@ public class TextArea <: Widget {
         TextCompletionRequest(requestId, revision, source, cursor, start, cursor, textModelValue.slice(start, cursor), line, column)
     }
 
+    /** 创建运行补全提供方的异步命令，并开始对应请求。
+     * @param requestId 请求标识
+     * @param provider 补全提供方
+     * @return 异步补全命令
+     */
     public func completionCommand(requestId: String, provider: (TextCompletionRequest) -> TextCompletionResult): Command {
         let request = beginCompletion(requestId)
         Command.AsyncTask(requestId, { => Event.TextCompletion(requestId, provider(request)) })
     }
 
+    /** 接收匹配当前请求和修订的补全结果。
+     * @param event 补全事件或包含补全的异步结果
+     * @return 结果被接受且有候选项时为 true
+     */
     public func handleCompletionEvent(event: Event): Bool {
         match (event) {
             case Event.TextCompletion(_, result) => applyCompletionResult(result)
@@ -711,11 +938,17 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 判断补全候选列表是否打开。
+     * @return 打开时为 true
+     */
     public func completionVisible(): Bool {
         synchronizeValue()
         completionOpen
     }
 
+    /** 取消当前请求并关闭补全候选列表。
+     * @return 取消前列表打开时为 true
+     */
     public func cancelCompletion(): Bool {
         let wasOpen = completionOpen
         completionOpen = false
@@ -730,12 +963,20 @@ public class TextArea <: Widget {
         _ = cancelCompletion()
     }
 
+    /** 获取可显示的补全候选行数。
+     * @param maximum 最大行数，负值按零处理
+     * @return 候选行数
+     */
     public func completionRows(maximum!: Int64 = 5): Int64 {
         synchronizeValue()
         if (!completionOpen) { return 0 }
         min(max(0, maximum), completionItems.size)
     }
 
+    /** 在文本区域中单独绘制补全覆盖层。
+     * @param area 文本区域
+     * @param buffer 目标缓冲区
+     */
     public func renderCompletionOverlay(area: Rect, buffer: Buffer): Unit {
         synchronizeValue()
         var target = area
@@ -745,6 +986,7 @@ public class TextArea <: Widget {
         renderCompletion(area, textTarget, buffer)
     }
 
+    /** 清除撤销和重做历史。 */
     public func clearHistory(): Unit {
         undoGroupSnapshot = None
         textModelValue.clearHistory()
@@ -773,6 +1015,9 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 撤销一次文本编辑。
+     * @return 存在可撤销编辑并成功时为 true
+     */
     public func undo(): Bool {
         endUndoGroup()
         synchronizeValue()
@@ -784,6 +1029,9 @@ public class TextArea <: Widget {
         true
     }
 
+    /** 重做一次已撤销编辑。
+     * @return 存在可重做编辑并成功时为 true
+     */
     public func redo(): Bool {
         endUndoGroup()
         synchronizeValue()
@@ -805,6 +1053,10 @@ public class TextArea <: Widget {
         }
     }
 
+    /** 从光标向后查找并选中匹配文本。
+     * @param needle 要查找的文本
+     * @return 匹配的字节偏移；未找到时为 None
+     */
     public func findNext(needle: String): ?Int64 {
         synchronizeValue()
         let idx = stringIndexOf(value, needle, cursor)
@@ -816,6 +1068,10 @@ public class TextArea <: Widget {
         None
     }
 
+    /** 从光标向前查找并选中匹配文本。
+     * @param needle 要查找的文本
+     * @return 匹配的字节偏移；未找到时为 None
+     */
     public func findPrevious(needle: String): ?Int64 {
         synchronizeValue()
         let idx = stringLastIndexOf(value, needle, cursor)
@@ -827,11 +1083,13 @@ public class TextArea <: Widget {
         None
     }
 
+    /** 将主光标移动到左侧词边界并清除主选择。 */
     public func moveWordLeft(): Unit {
         cursor = wordOffset(cursor, false)
         clearSelection()
     }
 
+    /** 将主光标移动到右侧词边界并清除主选择。 */
     public func moveWordRight(): Unit {
         cursor = wordOffset(cursor, true)
         clearSelection()
@@ -1807,6 +2065,10 @@ func isMarkdownFenceLine(line: String, start: Int64): Bool {
     matchesAsciiNeedleAt(line, "```", start) || matchesAsciiNeedleAt(line, "~~~", start)
 }
 
+/** 计算轻量 Markdown 全文高亮；范围使用全文字节偏移。
+ * @param text Markdown 文本
+ * @return 文本装饰
+ */
 public func markdownDecorations(text: String): Array<TextDecoration> {
     let out = ArrayList<TextDecoration>()
     let lines = splitLines(text)
@@ -1830,6 +2092,10 @@ public func markdownDecorations(text: String): Array<TextDecoration> {
     out.toArray()
 }
 
+/** 计算轻量 Markdown 按行高亮；每个范围相对于对应行。
+ * @param text Markdown 文本
+ * @return 按行分组的装饰
+ */
 public func markdownLineHighlights(text: String): Array<LineHighlight> {
     let out = ArrayList<LineHighlight>()
     let lines = splitLines(text)
@@ -1941,19 +2207,30 @@ func strongItalicModifier(): Modifier {
     modifier
 }
 
+/** 为文本区域提供轻量 Markdown 编辑和高亮行为。 */
 public class MarkdownEditorBehavior {
     private let highlighter = MarkdownHighlightCache()
 
+    /** 创建 Markdown 编辑行为。 */
     public init() {}
 
+    /** 计算高亮并替换文本区域的静态装饰。
+     * @param area 目标文本区域
+     */
     public func applyHighlights(area: TextArea): Unit {
         area.setDecorations(highlighter.highlights(area.value))
     }
 
+    /** 清除内部高亮缓存。 */
     public func invalidate(): Unit {
         highlighter.invalidate()
     }
 
+    /** 处理 Markdown 配对标记、列表回车和普通文本按键。
+     * @param area 目标文本区域
+     * @param key 按键事件
+     * @return 处理按键时为 true
+     */
     public func handle(area: TextArea, key: KeyEvent): Bool {
         if (area.readOnly) { return area.handle(key) }
         area.markdownEditing = true
@@ -1987,21 +2264,38 @@ public class MarkdownEditorBehavior {
         }
     }
 
+    /** 为选择或当前词切换粗体标记；只读时拒绝。
+     * @param area 目标文本区域
+     * @return 完成编辑时为 true
+     */
     public func toggleBold(area: TextArea): Bool {
         if (area.readOnly) { return false }
         wrapSelectionOrWord(area, "**", "**")
     }
 
+    /** 为选择或当前词切换斜体标记；只读时拒绝。
+     * @param area 目标文本区域
+     * @return 完成编辑时为 true
+     */
     public func toggleItalic(area: TextArea): Bool {
         if (area.readOnly) { return false }
         wrapSelectionOrWord(area, "*", "*")
     }
 
+    /** 为选择或当前词切换行内代码标记；只读时拒绝。
+     * @param area 目标文本区域
+     * @return 完成编辑时为 true
+     */
     public func toggleCode(area: TextArea): Bool {
         if (area.readOnly) { return false }
         wrapSelectionOrWord(area, "`", "`")
     }
 
+    /** 插入链接，或将选择包装为链接；只读时拒绝。
+     * @param area 目标文本区域
+     * @param url 链接地址
+     * @return 完成编辑时为 true
+     */
     public func insertLink(area: TextArea, url!: String = "https://example.com"): Bool {
         if (area.readOnly) { return false }
         if (area.hasSelection()) {
@@ -2012,6 +2306,12 @@ public class MarkdownEditorBehavior {
         }
     }
 
+    /** 插入图片标记；有选择时使用选中文本作为替代文本。
+     * @param area 目标文本区域
+     * @param url 图片地址
+     * @param alt 无选择时使用的替代文本
+     * @return 完成编辑时为 true
+     */
     public func insertImage(area: TextArea, url!: String = "image.png", alt!: String = "alt"): Bool {
         if (area.readOnly) { return false }
         if (area.hasSelection()) {
@@ -2030,6 +2330,11 @@ public class MarkdownEditorBehavior {
         }
     }
 
+    /** 插入引用式链接；有选择时使用选中文本。
+     * @param area 目标文本区域
+     * @param id 引用标识
+     * @return 完成编辑时为 true
+     */
     public func insertReferenceLink(area: TextArea, id!: String = "ref"): Bool {
         if (area.readOnly) { return false }
         if (area.hasSelection()) {
@@ -2040,6 +2345,13 @@ public class MarkdownEditorBehavior {
         }
     }
 
+    /** 在光标处插入引用定义。
+     * @param area 目标文本区域
+     * @param id 引用标识
+     * @param url 链接地址
+     * @param title 可选标题
+     * @return 完成编辑时为 true
+     */
     public func insertReferenceDefinition(area: TextArea, id!: String = "ref", url!: String = "https://example.com", title!: String = ""): Bool {
         if (area.readOnly) { return false }
         let suffix = if (title.isEmpty()) { "" } else { " \"${title}\"" }
@@ -2047,6 +2359,11 @@ public class MarkdownEditorBehavior {
         true
     }
 
+    /** 在文档开头插入 frontmatter。
+     * @param area 目标文本区域
+     * @param title 标题值
+     * @return 完成编辑时为 true
+     */
     public func insertFrontmatter(area: TextArea, title!: String = "Untitled"): Bool {
         if (area.readOnly) { return false }
         let oldCursor = area.cursor
@@ -2058,12 +2375,21 @@ public class MarkdownEditorBehavior {
         true
     }
 
+    /** 插入示例表格；只读时拒绝。
+     * @param area 目标文本区域
+     * @return 完成编辑时为 true
+     */
     public func insertTable(area: TextArea): Bool {
         if (area.readOnly) { return false }
         area.paste("| Name | Value |\n| --- | --- |\n| item | value |\n")
         true
     }
 
+    /** 插入代码围栏；只读时拒绝。
+     * @param area 目标文本区域
+     * @param language 代码语言
+     * @return 完成编辑时为 true
+     */
     public func insertCodeFence(area: TextArea, language!: String = ""): Bool {
         if (area.readOnly) { return false }
         area.paste("```" + language + "\n\n```\n")
@@ -2071,19 +2397,35 @@ public class MarkdownEditorBehavior {
     }
 }
 
+/** 组合文本区域和 Markdown 编辑行为的控件。 */
 public class MarkdownTextEditor <: Widget {
+    /** 内部文本区域。 */
     public let area: TextArea
+    /** Markdown 编辑行为。 */
     public let behavior: MarkdownEditorBehavior
 
+    /** 创建 Markdown 文本编辑器。
+     * @param value 初始文本
+     * @param block 可选边框
+     * @param lineNumbers 是否显示行号
+     */
     public init(value!: String = "", block!: ?Block = None, lineNumbers!: Bool = true) {
         area = TextArea(value: value, block: block, lineNumbers: lineNumbers, markdownEditing: true)
         behavior = MarkdownEditorBehavior()
     }
 
+    /** 使用 Markdown 行为处理按键。
+     * @param key 按键事件
+     * @return 处理按键时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         behavior.handle(area, key)
     }
 
+    /** 刷新高亮并绘制编辑器。
+     * @param areaRect 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(areaRect: Rect, buffer: Buffer): Unit {
         behavior.applyHighlights(area)
         area.render(areaRect, buffer)

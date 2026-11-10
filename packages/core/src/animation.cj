@@ -11,7 +11,11 @@ public struct AnimationConfig {
     /** 是否为该组件安排动画帧。 */
     public let enabled: Bool
 
-    /** 设置循环时长、期望帧率与动画是否启用。 */
+    /** 设置循环时长、期望帧率与动画是否启用。
+     * @param durationMillis 循环时长，单位为毫秒
+     * @param framesPerSecond 期望的最高帧率
+     * @param enabled 是否请求动画帧
+     */
     public init(durationMillis!: Int64 = 1000, framesPerSecond!: Int64 = 30, enabled!: Bool = true) {
         this.durationMillis = max(1, durationMillis)
         this.framesPerSecond = min(1000, max(1, framesPerSecond))
@@ -28,7 +32,10 @@ public struct AnimationSample {
     /** 当前组件的循环时长。 */
     public let durationMillis: Int64
 
-    /** 按经过时间和循环时长计算采样。 */
+    /** 按经过时间和循环时长计算采样。
+     * @param elapsedMillis 已经过的毫秒数，负数置零
+     * @param durationMillis 循环时长，至少为一毫秒
+     */
     public init(elapsedMillis: Int64, durationMillis: Int64) {
         this.elapsedMillis = max(0, elapsedMillis)
         this.durationMillis = max(1, durationMillis)
@@ -65,13 +72,23 @@ public class AnimationScheduler {
     private let entries = ArrayList<AnimationEntry>()
     private var lastFrame: ?Int64 = None
 
-    /** 设置时钟与应用最大动画帧率；帧率限制在 1 至 1000。 */
+    /** 设置时钟与应用最大动画帧率；帧率限制在 1 至 1000。
+     * @param clock 提供单调时间的时钟
+     * @param maxFramesPerSecond 应用的最高动画帧率
+     */
     public init(clock!: RuntimeClock = MonotonicRuntimeClock(), maxFramesPerSecond!: Int64 = 30) {
         this.clock = clock
         this.maxFps = min(1000, max(1, maxFramesPerSecond))
     }
 
-    /** 注册组件；身份为空、重复或组名为空时返回 false，已有状态不变。 */
+    /** 注册组件；身份为空、重复或组名为空时返回 false，已有状态不变。
+     * @param scope 组件所属范围
+     * @param id 范围内的组件身份
+     * @param config 组件动画设置
+     * @param group 可选的共享起始时间组
+     * @param visible 是否可见
+     * @return 注册成功时为 true
+     */
     public func register(scope: String, id: String, config!: AnimationConfig = AnimationConfig(), group!: ?String = None, visible!: Bool = true): Bool {
         if (scope.isEmpty() || id.isEmpty() || indexOf(scope, id) >= 0) { return false }
         let now = clock.nowMillis()
@@ -91,7 +108,12 @@ public class AnimationScheduler {
         true
     }
 
-    /** 设置组件可见性；身份不存在时返回 false。 */
+    /** 设置组件可见性；身份不存在时返回 false。
+     * @param scope 组件所属范围
+     * @param id 组件身份
+     * @param visible 新的可见性
+     * @return 找到组件时为 true
+     */
     public func setVisible(scope: String, id: String, visible: Bool): Bool {
         let index = indexOf(scope, id)
         if (index < 0) { return false }
@@ -99,7 +121,12 @@ public class AnimationScheduler {
         true
     }
 
-    /** 更新组件设置而保留时间轴起点；身份不存在时返回 false。 */
+    /** 更新组件设置而保留时间轴起点；身份不存在时返回 false。
+     * @param scope 组件所属范围
+     * @param id 组件身份
+     * @param config 新的动画设置
+     * @return 找到组件时为 true
+     */
     public func setConfig(scope: String, id: String, config: AnimationConfig): Bool {
         let index = indexOf(scope, id)
         if (index < 0) { return false }
@@ -107,7 +134,11 @@ public class AnimationScheduler {
         true
     }
 
-    /** 移除一个组件；身份不存在时返回 false。 */
+    /** 移除一个组件；身份不存在时返回 false。
+     * @param scope 组件所属范围
+     * @param id 组件身份
+     * @return 移除成功时为 true
+     */
     public func remove(scope: String, id: String): Bool {
         let index = indexOf(scope, id)
         if (index < 0) { return false }
@@ -115,7 +146,9 @@ public class AnimationScheduler {
         true
     }
 
-    /** 移除容器中的所有组件；组的最后一个组件移除后，该组时间轴随之释放。 */
+    /** 移除容器中的所有组件；组的最后一个组件移除后，该组时间轴随之释放。
+     * @param scope 待移除组件所属范围
+     */
     public func removeScope(scope: String): Unit {
         var index = entries.size
         while (index > 0) {
@@ -124,7 +157,11 @@ public class AnimationScheduler {
         }
     }
 
-    /** 按当前时钟读取组件采样；身份不存在时返回 None。采样值按该组件和应用帧率上限中较小者向下量化。 */
+    /** 按当前时钟读取组件采样；身份不存在时返回 None。采样值按该组件和应用帧率上限中较小者向下量化。
+     * @param scope 组件所属范围
+     * @param id 组件身份
+     * @return 存在时返回采样，否则返回 None
+     */
     public func sample(scope: String, id: String): ?AnimationSample {
         let index = indexOf(scope, id)
         if (index < 0) { return None }
@@ -135,7 +172,9 @@ public class AnimationScheduler {
         Some(AnimationSample(elapsed / interval * interval, entry.config.durationMillis))
     }
 
-    /** 距下一动画帧的毫秒数；没有可见且启用的动画时返回 None。 */
+    /** 距下一动画帧的毫秒数；没有可见且启用的动画时返回 None。
+     * @return 距下一帧的毫秒数，或无活动动画时返回 None
+     */
     public func nextTimeoutMillis(): ?Int64 {
         var fps: Int64 = 0
         for (entry in entries) {

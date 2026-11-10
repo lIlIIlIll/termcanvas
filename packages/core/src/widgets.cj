@@ -2,40 +2,71 @@ package core
 
 import std.collection.*
 
+/** 区块边框类型；Auto 使用主题或终端能力选择默认外观。 */
 public enum BorderKind {
+    /** 根据主题及终端能力选择。 */
     | Auto
+    /** 使用 ASCII 边框。 */
     | Ascii
+    /** 使用直角 Unicode 单线边框。 */
     | Unicode
+    /** 使用圆角 Unicode 单线边框。 */
     | Rounded
     /** 双线 Unicode 边框。 */
     | Double
     /** 使用 Unicode 虚线边及直角连接符。 */
     | Dashed
+    /** 不绘制边框。 */
     | NoBorder
 }
 
+/** 区块标题在顶部边框上的对齐方式。 */
 public enum TitleAlign {
+    /** 靠左对齐。 */
     | Left
+    /** 居中对齐。 */
     | Center
+    /** 靠右对齐。 */
     | Right
 }
 
+/** 区块解析语义边框样式时使用的状态。 */
 public enum BoxState {
+    /** 普通状态。 */
     | Normal
+    /** 焦点状态。 */
     | Focused
+    /** 活动状态。 */
     | Active
+    /** 错误状态。 */
     | Error
+    /** 禁用状态。 */
     | Disabled
 }
 
+/** 描述边框水平边、垂直边和四角使用的字符串。 */
 public class BorderSet {
+    /** 水平边符号。 */
     public let horizontal: String
+    /** 垂直边符号。 */
     public let vertical: String
+    /** 左上角符号。 */
     public let topLeft: String
+    /** 右上角符号。 */
     public let topRight: String
+    /** 左下角符号。 */
     public let bottomLeft: String
+    /** 右下角符号。 */
     public let bottomRight: String
 
+    /** 创建边框字符集。
+     * @param horizontal 水平边符号
+     * @param vertical 垂直边符号
+     * @param topLeft 左上角符号
+     * @param topRight 右上角符号
+     * @param bottomLeft 左下角符号
+     * @param bottomRight 右下角符号
+     */
     public init(
         horizontal!: String = "-",
         vertical!: String = "|",
@@ -52,46 +83,90 @@ public class BorderSet {
         this.bottomRight = bottomRight
     }
 
+    /** 创建ASCII 边框字符集。
+     * @return 边框字符集
+     */
     public static func ascii(): BorderSet {
         BorderSet()
     }
 
+    /** 创建直角 Unicode 单线边框字符集。
+     * @return 边框字符集
+     */
     public static func unicode(): BorderSet {
         BorderSet(horizontal: "─", vertical: "│", topLeft: "┌", topRight: "┐", bottomLeft: "└", bottomRight: "┘")
     }
 
+    /** 创建圆角 Unicode 单线边框字符集。
+     * @return 边框字符集
+     */
     public static func rounded(): BorderSet {
         BorderSet(horizontal: "─", vertical: "│", topLeft: "╭", topRight: "╮", bottomLeft: "╰", bottomRight: "╯")
     }
 
+    /** 创建Unicode 双线边框字符集。
+     * @return 边框字符集
+     */
     public static func doubleLine(): BorderSet {
         BorderSet(horizontal: "═", vertical: "║", topLeft: "╔", topRight: "╗", bottomLeft: "╚", bottomRight: "╝")
     }
 
+    /** 创建Unicode 虚线边框字符集。
+     * @return 边框字符集
+     */
     public static func dashed(): BorderSet {
         BorderSet(horizontal: "┄", vertical: "┆", topLeft: "┌", topRight: "┐", bottomLeft: "└", bottomRight: "┘")
     }
 }
 
+/** 区块标题、边框、间距及语义样式选项。显式样式优先于主题样式。 */
 public class BlockOptions {
+    /** 标题文字。 */
     public let title: String
+    /** 边框类型。 */
     public let borderKind: BorderKind
+    /** 显式边框字符集；空字符串集合表示自动选择。 */
     public let border: BorderSet
+    /** 标题对齐方式。 */
     public let titleAlign: TitleAlign
+    /** 内容内边距。 */
     public let padding: Spacing
+    /** 区块外边距。 */
     public let margin: Spacing
+    /** 背景样式；未显式提供时字段为默认样式。 */
     public let backgroundStyle: Style
+    /** 边框样式；未显式提供时字段为默认样式。 */
     public let borderStyle: Style
+    /** 内容样式；未显式提供时字段为默认样式。 */
     public let contentStyle: Style
+    /** 标题样式；未显式提供时字段为默认样式。 */
     public let titleStyle: Style
     let hasBackgroundStyle: Bool
     let hasBorderStyle: Bool
     let hasContentStyle: Bool
     let hasTitleStyle: Bool
+    /** 语义状态。 */
     public let state: BoxState
+    /** 是否强制使用 ASCII 边框。 */
     public let asciiFallback: Bool
+    /** 可选显式主题。 */
     public let theme: ?Theme
 
+    /** 创建区块选项。绘制边框时显式字符集优先于边框类型；ASCII 回退优先于显式字符集。
+     * @param title 标题文字
+     * @param borderKind 边框类型
+     * @param border 显式边框字符集
+     * @param titleAlign 标题对齐方式
+     * @param padding 内容内边距
+     * @param margin 区块外边距
+     * @param backgroundStyle 可选背景样式
+     * @param borderStyle 可选边框样式
+     * @param contentStyle 可选内容样式
+     * @param titleStyle 可选标题样式
+     * @param state 语义状态
+     * @param asciiFallback 是否强制 ASCII 边框
+     * @param theme 可选显式主题
+     */
     public init(
         title!: String = "",
         borderKind!: BorderKind = BorderKind.Auto,
@@ -127,14 +202,22 @@ public class BlockOptions {
     }
 }
 
+/** 绘制背景、边框与标题，并计算内部内容区域。 */
 public class Block <: Widget {
     private let options: BlockOptions
     private var inheritedTheme: ?Theme = None
 
+    /** 使用标题和可选样式创建区块。
+     * @param title 标题文字
+     * @param style 可选的边框和标题样式
+     */
     public init(title!: String = "", style!: ?Style = None) {
         this.options = BlockOptions(title: title, borderStyle: style, titleStyle: style)
     }
 
+    /** 使用完整选项创建区块。
+     * @param options 区块选项
+     */
     public init(options: BlockOptions) {
         this.options = options
     }
@@ -143,16 +226,27 @@ public class Block <: Widget {
     func explicitTheme(): ?Theme { options.theme }
 
     /** 根据最近一次绘制时的主题计算内容区域；尚未绘制时使用区块显式主题和默认值。
+     * @param area 外部区域
+     * @return 扣除外边距、边框和内边距后的内容区域
      */
     public func inner(area: Rect): Rect {
         contentArea(frameArea(area))
     }
 
-    /** 绘制前可显式提供应用主题以计算内容区域；区块自身的显式主题优先。 */
+    /** 绘制前可显式提供应用主题以计算内容区域；区块自身的显式主题优先。
+     * @param area 外部区域
+     * @param theme 可选应用主题
+     * @return 内容区域
+     */
     public func inner(area: Rect, theme!: ?Theme): Rect {
         contentAreaForTheme(frameArea(area), resolveBlockTheme(theme))
     }
 
+    /** 绘制区块并返回内容区域。
+     * @param area 外部区域
+     * @param buffer 目标缓冲区
+     * @return 内容区域
+     */
     public func renderInner(area: Rect, buffer: Buffer): Rect {
         inheritedTheme = buffer.resolveTheme(None)
         let frame = frameArea(area)
@@ -176,6 +270,10 @@ public class Block <: Widget {
         }
     }
 
+    /** 绘制区块。
+     * @param area 外部区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         _ = renderInner(area, buffer)
     }
@@ -316,20 +414,34 @@ public class Block <: Widget {
 
 }
 
+/** 使用区块包装可选子组件的面板。 */
 public class Panel <: Widget {
     private let block: Block
     private let child: ?Widget
 
+    /** 使用区块和可选子组件创建面板。
+     * @param block 外围区块
+     * @param child 可选子组件
+     */
     public init(block!: Block = Block(), child!: ?Widget = None) {
         this.block = block
         this.child = child
     }
 
+    /** 使用区块选项和可选子组件创建面板。
+     * @param options 区块选项
+     * @param child 可选子组件
+     */
     public init(options: BlockOptions, child!: ?Widget = None) {
         this.block = Block(options)
         this.child = child
     }
 
+    /** 绘制区块及子组件，并返回内容区域。
+     * @param area 外部区域
+     * @param buffer 目标缓冲区
+     * @return 内容区域
+     */
     public func renderInner(area: Rect, buffer: Buffer): Rect {
         let inner = block.renderInner(area, buffer)
         match (child) {
@@ -339,11 +451,16 @@ public class Panel <: Widget {
         inner
     }
 
+    /** 绘制面板和子组件。
+     * @param area 外部区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         _ = renderInner(area, buffer)
     }
 }
 
+/** 支持换行、对齐和滚动的文本段落。 */
 public class Paragraph <: Widget {
     private let text: String
     private let block: ?Block
@@ -353,6 +470,12 @@ public class Paragraph <: Widget {
     private let align: TextAlign
 
     /** 保存段落文本与绘制设置；负数滚动行数按零处理。省略样式时使用应用主题的正文样式，显式样式优先。
+     * @param text 段落文本
+     * @param block 可选外围区块
+     * @param style 可选文字样式
+     * @param scroll 起始滚动行数
+     * @param wrap 换行方式
+     * @param align 水平对齐方式
      */
     public init(
         text: String,
@@ -370,6 +493,10 @@ public class Paragraph <: Widget {
         this.align = align
     }
 
+    /** 在区域内绘制段落。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -407,6 +534,7 @@ func controlBlockArea(area: Rect, block: ?Block, componentTheme: ?Theme,
     match (block) { case Some(value) => value.inner(area, theme: effective); case None => area }
 }
 
+/** 显示文本项并可使用外部状态管理选择和滚动的列表。 */
 public class List <: Widget {
     private let items: Array<String>
     private let selected: ?Int64
@@ -420,6 +548,18 @@ public class List <: Widget {
     private var renderedTheme: ?Theme = None
     private let selectionMarker: ?String
 
+    /** 创建列表；提供 state 时绘制和鼠标处理使用该状态。
+     * @param items 按顺序显示的文本项
+     * @param selected 无外部状态时的选中索引
+     * @param offset 无外部状态时的首项偏移
+     * @param state 可选的列表状态
+     * @param block 可选外围区块
+     * @param style 普通项样式
+     * @param selectedStyle 可选选中样式
+     * @param focused 是否显示焦点
+     * @param theme 可选主题
+     * @param selectionMarker 可选选择标记
+     */
     public init(
         items: Array<String>,
         selected!: ?Int64 = None,
@@ -444,9 +584,19 @@ public class List <: Widget {
         this.selectionMarker = selectionMarker
     }
 
-    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    /** 使用已知主题处理鼠标选择。
+     * @param mouse 鼠标事件
+     * @param area 组件区域
+     * @return 更新选择时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
 
+    /** 处理鼠标选择；组件和区块的显式主题优先于布局主题。
+     * @param mouse 鼠标事件
+     * @param area 组件区域
+     * @param layoutTheme 可选的布局主题
+     * @return 更新选择时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
         let target = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         match (state) {
@@ -462,6 +612,10 @@ public class List <: Widget {
         false
     }
 
+    /** 在区域内绘制内容。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -545,19 +699,32 @@ func writeFocusedListText(x: Int64, y: Int64, text: String, width: Int64, style:
     }
 }
 
+/** 保存列表的选中索引和首项偏移。 */
 public class ListState {
+    /** 选中项索引；None 表示未选择。 */
     public var selected: ?Int64
+    /** 首个可见项的索引。 */
     public var offset: Int64
 
+    /** 创建状态；负偏移按零处理。
+     * @param selected 初始选中索引
+     * @param offset 初始首项偏移
+     */
     public init(selected!: ?Int64 = None, offset!: Int64 = 0) {
         this.selected = selected
         this.offset = max(0, offset)
     }
 
+    /** 设置选中索引；此操作不调整偏移。
+     * @param index 选中索引，None 清除选择
+     */
     public func select(index: ?Int64): Unit {
         selected = index
     }
 
+    /** 选择下一项，最多到最后一项；总数非正时清除选择并重置偏移。
+     * @param total 项目总数
+     */
     public func next(total: Int64): Unit {
         if (total <= 0) {
             selected = None
@@ -571,6 +738,11 @@ public class ListState {
         selected = Some(min(total - 1, current + 1))
     }
 
+    /** 按增量移动选择；视口高度为正时调整偏移以显示选择。
+     * @param delta 选择移动量
+     * @param total 项目总数
+     * @param viewportHeight 可见行数
+     */
     public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit {
         if (total <= 0) {
             selected = None
@@ -587,6 +759,13 @@ public class ListState {
         }
     }
 
+    /** 移动选择并返回需要重绘的区域；滚动时标记整个区域，否则标记新旧选择行。
+     * @param delta 选择移动量
+     * @param total 项目总数
+     * @param viewportHeight 可见行数
+     * @param area 列表内容区域
+     * @return 脏区域集合
+     */
     public func moveWithDirty(delta: Int64, total: Int64, viewportHeight: Int64, area: Rect): DirtyRects {
         let beforeSelected = selected
         let beforeOffset = offset
@@ -601,6 +780,9 @@ public class ListState {
         dirty
     }
 
+    /** 选择上一项，最少到第一项；总数非正时清除选择并重置偏移。
+     * @param total 项目总数
+     */
     public func previous(total: Int64): Unit {
         if (total <= 0) {
             selected = None
@@ -614,6 +796,10 @@ public class ListState {
         selected = Some(max(0, current - 1))
     }
 
+    /** 调整偏移以显示选中项；总数或视口高度非正时偏移置零。
+     * @param total 项目总数
+     * @param viewportHeight 可见行数
+     */
     public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit {
         if (total <= 0 || viewportHeight <= 0) {
             offset = 0
@@ -632,6 +818,7 @@ public class ListState {
     }
 }
 
+/** 显示表头和数据行，并可使用外部状态管理选择的表格。 */
 public class Table <: Widget {
     private let headers: Array<String>
     private let rows: Array<Array<String>>
@@ -649,6 +836,17 @@ public class Table <: Widget {
     /** 保存表头、数据行、列宽及绘制设置，用于后续表格绘制。
      * 省略 style 时普通数据行保留已有背景；显式样式沿用主题样式合并规则。
      * 省略 headerStyle 时使用主题标题样式，并保留表头与分隔线下方已有的背景；显式样式原样使用，包括重置背景色。
+     * @param headers 表头文字
+     * @param rows 按顺序排列的数据行
+     * @param widths 可选列宽
+     * @param state 可选表格状态
+     * @param block 可选外围区块
+     * @param style 可选数据行样式
+     * @param headerStyle 可选表头样式
+     * @param selectedStyle 可选选中行样式
+     * @param focused 是否显示焦点
+     * @param theme 可选主题
+     * @param selectionMarker 可选选择标记
      */
     public init(
         headers: Array<String>,
@@ -676,9 +874,19 @@ public class Table <: Widget {
         this.selectionMarker = selectionMarker
     }
 
-    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    /** 使用已知主题处理鼠标选择。
+     * @param mouse 鼠标事件
+     * @param area 组件区域
+     * @return 更新选择时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
 
+    /** 处理鼠标选择；组件和区块的显式主题优先于布局主题。
+     * @param mouse 鼠标事件
+     * @param area 组件区域
+     * @param layoutTheme 可选的布局主题
+     * @return 更新选择时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
         let inner = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         let target = Rect(inner.x, inner.y + 2, inner.width, max(0, inner.height - 2))
@@ -695,6 +903,10 @@ public class Table <: Widget {
         false
     }
 
+    /** 在区域内绘制内容。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -937,19 +1149,32 @@ func listSelectionStyle(style: ?Style, theme: ?Theme): Style {
     }
 }
 
+/** 保存表格的选中行和首行偏移。 */
 public class TableState {
+    /** 选中行索引；None 表示未选择。 */
     public var selectedRow: ?Int64
+    /** 首个可见项的索引。 */
     public var offset: Int64
 
+    /** 创建状态；负偏移按零处理。
+     * @param selectedRow 初始选中索引
+     * @param offset 初始首项偏移
+     */
     public init(selectedRow!: ?Int64 = None, offset!: Int64 = 0) {
         this.selectedRow = selectedRow
         this.offset = max(0, offset)
     }
 
+    /** 设置选中索引；此操作不调整偏移。
+     * @param index 选中索引，None 清除选择
+     */
     public func select(index: ?Int64): Unit {
         selectedRow = index
     }
 
+    /** 选择下一项，最多到最后一项；总数非正时清除选择并重置偏移。
+     * @param total 项目总数
+     */
     public func next(total: Int64): Unit {
         if (total <= 0) {
             selectedRow = None
@@ -963,6 +1188,11 @@ public class TableState {
         selectedRow = Some(min(total - 1, current + 1))
     }
 
+    /** 按增量移动选择；视口高度为正时调整偏移以显示选择。
+     * @param delta 选择移动量
+     * @param total 项目总数
+     * @param viewportHeight 可见行数
+     */
     public func move(delta: Int64, total: Int64, viewportHeight!: Int64 = 0): Unit {
         if (total <= 0) {
             selectedRow = None
@@ -979,6 +1209,9 @@ public class TableState {
         }
     }
 
+    /** 选择上一项，最少到第一项；总数非正时清除选择并重置偏移。
+     * @param total 项目总数
+     */
     public func previous(total: Int64): Unit {
         if (total <= 0) {
             selectedRow = None
@@ -992,6 +1225,10 @@ public class TableState {
         selectedRow = Some(max(0, current - 1))
     }
 
+    /** 调整偏移以显示选中项；总数或视口高度非正时偏移置零。
+     * @param total 项目总数
+     * @param viewportHeight 可见行数
+     */
     public func scrollToVisible(total: Int64, viewportHeight: Int64): Unit {
         if (total <= 0 || viewportHeight <= 0) {
             offset = 0
@@ -1010,6 +1247,7 @@ public class TableState {
     }
 }
 
+/** 绘制滚动位置并支持鼠标滚轮及拖动的垂直滚动条。 */
 public class Scrollbar <: Widget {
     private let total: Int64
     private let offset: Int64
@@ -1017,6 +1255,13 @@ public class Scrollbar <: Widget {
     private let style: Style
     private let thumbStyle: Style
 
+    /** 创建滚动条；总数、偏移和视口的负值按零处理。
+     * @param total 项目总数
+     * @param offset 当前偏移
+     * @param viewport 可见项目数
+     * @param style 轨道样式
+     * @param thumbStyle 滑块样式
+     */
     public init(
         total: Int64,
         offset!: Int64 = 0,
@@ -1031,6 +1276,14 @@ public class Scrollbar <: Widget {
         this.thumbStyle = thumbStyle
     }
 
+    /** 处理滚动条的鼠标事件并更新传入的滚动状态。
+     * @param mouse 鼠标事件
+     * @param area 滚动条所在区域
+     * @param state 要更新的滚动状态
+     * @param capture 指针捕获状态
+     * @param owner 捕获身份
+     * @return 事件被处理时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, state: ScrollState, capture: PointerCapture, owner: String): Bool {
         if (capture.release(owner, mouse)) { return true }
         if (area.width <= 0 || area.height <= 0 || total <= viewport || viewport <= 0) { return false }
@@ -1066,6 +1319,8 @@ public class Scrollbar <: Widget {
     }
 
     /** 在区域最右列绘制轨道和滑块；Unicode 不可用或符号并非单列时回退至 ASCII。单行视口使用方向标记表示还有内容可滚动。区域宽高不大于 0、视口不大于 0 或内容量不超过视口时不写入缓冲区。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
      */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0 || total <= viewport || viewport <= 0) {
@@ -1110,7 +1365,7 @@ public class Input <: Widget {
     /** 输入控件当前保存的文本内容。
      */
     public var value: String
-    /** 当前光标在输入文本中的偏移量；通过构造器设置时会调整到字符边界。
+    /** 当前光标在输入文本中的 UTF-8 字节偏移；通过构造器设置时会调整到字符边界。
      */
     public var cursor: Int64
     private var viewportOffset: Int64 = 0
@@ -1127,6 +1382,13 @@ public class Input <: Widget {
     private var renderedTheme: ?Theme = None
 
     /** 建立输入控件并保存文本、边框及显示样式；初始光标位置会调整到文本的字符边界。
+     * @param value 初始文本
+     * @param cursor 初始 UTF-8 字节光标偏移
+     * @param block 可选外围区块
+     * @param style 文本样式
+     * @param placeholder 空文本时显示的占位文字
+     * @param placeholderStyle 可选占位样式
+     * @param showBoundary 无区块时是否绘制输入边界
      */
     public init(
         value!: String = "",
@@ -1146,6 +1408,10 @@ public class Input <: Widget {
         this.showBoundary = showBoundary
     }
     /** 设置聚焦、禁用或错误状态及其语义主题；状态优先级为禁用、错误、聚焦，全部关闭时为普通状态。
+     * @param focused 是否聚焦
+     * @param disabled 是否禁用
+     * @param error 是否为错误状态
+     * @param theme 可选语义主题
      */
     public func setVisualState(
         focused!: Bool = false,
@@ -1160,6 +1426,7 @@ public class Input <: Widget {
     }
 
     /** 在当前光标处插入文本；非空文本插入前会将光标限制到文本范围及 UTF-8 字符边界；禁用状态或空文本时不改变文本和光标。
+     * @param text 待插入文本
      */
     public func paste(text: String): Unit {
         if (disabled || text.isEmpty()) { return }
@@ -1168,6 +1435,8 @@ public class Input <: Widget {
     }
 
     /** 按键事件处理字符输入、退格、向前删除及光标移动等操作；已展示的这些按键分支返回 true。
+     * @param key 输入按键
+     * @return 按键被处理时为 true；禁用时为 false
      */
     public func handle(key: KeyEvent): Bool {
         if (disabled) { return false }
@@ -1200,8 +1469,19 @@ public class Input <: Widget {
         }
     }
 
+    /** 处理按键并计算脏区域。
+     * @param key 输入按键
+     * @param area 输入组件区域
+     * @return 处理时返回脏区域，否则返回 None
+     */
     public func handleWithDirty(key: KeyEvent, area: Rect): ?DirtyRects { handleWithDirty(key, area, layoutTheme: None) }
 
+    /** 处理按键并按布局主题计算内容行的脏区域。
+     * @param key 输入按键
+     * @param area 输入组件区域
+     * @param layoutTheme 可选布局主题
+     * @return 处理时返回脏区域，否则返回 None
+     */
     public func handleWithDirty(key: KeyEvent, area: Rect, layoutTheme!: ?Theme): ?DirtyRects {
         let beforeViewport = viewportOffset
         let beforeEmpty = value.isEmpty()
@@ -1216,9 +1496,19 @@ public class Input <: Widget {
         Some(dirty)
     }
 
-    /** 绘制前可传入应用布局主题；组件自身的显式主题及区块的显式主题优先。 */
+    /** 使用已知主题处理鼠标定位。
+     * @param mouse 鼠标事件
+     * @param area 输入组件区域
+     * @return 更新光标时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): Bool { handleMouse(mouse, area, layoutTheme: None) }
 
+    /** 按布局主题计算内容区域并处理鼠标定位；显式主题优先。
+     * @param mouse 鼠标事件
+     * @param area 输入组件区域
+     * @param layoutTheme 可选布局主题
+     * @return 更新光标时为 true
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect, layoutTheme!: ?Theme): Bool {
         if (disabled) { return false }
         let outer = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
@@ -1233,6 +1523,10 @@ public class Input <: Widget {
         }
     }
 
+    /** 在区域内绘制输入、占位文字及可选边界。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withCanvasClip(area) { => renderClipped(area, buffer) }
     }
@@ -1305,16 +1599,28 @@ public class Input <: Widget {
         }
     }
 
-    /** 使用指定宽度策略计算光标位置，也将其用于后续的鼠标命中及视口调整。 */
+    /** 使用指定宽度策略计算光标位置，也将其用于后续的鼠标命中及视口调整。
+     * @param area 输入组件区域
+     * @param options 文本宽度策略
+     * @param layoutTheme 可选布局主题
+     * @return 屏幕单元格位置
+     */
     public func cursorPosition(area: Rect, options!: TextWidthOptions, layoutTheme!: ?Theme = None): Position {
         textWidthOptionsValue = options
         cursorPosition(area, layoutTheme: layoutTheme)
     }
 
-    /** 按内容区域宽度调整文本视口，并返回光标在该区域首行的显示位置；有外围区块时使用其内部区域。绘制前可用 layoutTheme 指定应用主题。
+    /** 按内容区域宽度调整文本视口，并返回光标在该区域首行的显示位置。
+     * @param area 输入组件区域
+     * @return 屏幕单元格位置
      */
     public func cursorPosition(area: Rect): Position { cursorPosition(area, layoutTheme: None) }
 
+    /** 按可选布局主题计算内容区并返回光标显示位置。
+     * @param area 输入组件区域
+     * @param layoutTheme 可选布局主题
+     * @return 屏幕单元格位置
+     */
     public func cursorPosition(area: Rect, layoutTheme!: ?Theme): Position {
         var target = controlBlockArea(area, block, theme, layoutTheme, renderedTheme)
         let outer = target
@@ -1332,23 +1638,30 @@ public class Input <: Widget {
         }
     }
 
+    /** 替换文本并重置视口；负光标偏移表示文本末尾。
+     * @param value 新文本
+     * @param cursor UTF-8 字节光标偏移
+     */
     public func setValue(value: String, cursor!: Int64 = -1): Unit {
         this.value = value
         this.cursor = if (cursor < 0) { value.size } else { clampToRuneBoundary(value, cursor) }
         viewportOffset = 0
     }
 
+    /** 清空文本并重置光标和视口。 */
     public func clear(): Unit {
         value = ""
         cursor = 0
         viewportOffset = 0
     }
 
+    /** 将光标和视口移到文本开头。 */
     public func moveToStart(): Unit {
         cursor = 0
         viewportOffset = 0
     }
 
+    /** 将光标移到文本末尾。 */
     public func moveToEnd(): Unit {
         cursor = value.size
     }
@@ -1401,15 +1714,34 @@ func addListRowDirty(dirty: DirtyRects, area: Rect, selected: ?Int64, offset: In
     }
 }
 
+/** 使用文件选择器并绘制外围标题的对话框组件。 */
 public class FileDialog <: Widget {
+    /** 对话框使用的文件选择器。 */
     public let picker: FilePicker
     private let title: String
+    /** 创建文件对话框。
+     * @param path 初始目录路径
+     * @param extension 文件扩展名过滤条件
+     * @param title 区块标题
+     */
     public init(path!: String = ".", extension!: String = "", title!: String = "Files") {
         picker = FilePicker(path: path, extension: extension)
         this.title = title
     }
+    /** 获取文件选择器当前路径。
+     * @return 存在选择时返回路径，否则返回 None
+     */
     public func selectedPath(): ?String { picker.selectedPath() }
+    /** 将按键交给文件选择器。
+     * @param key 输入按键
+     * @param viewportHeight 可见行数
+     * @return 按键被处理时为 true
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool { picker.handle(key, viewportHeight) }
+    /** 绘制文件选择器和外围区块。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         picker.render(area, buffer)
         Block(title: title).render(area, buffer)

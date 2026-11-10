@@ -61,6 +61,7 @@ class SyntaxRule {
     func overlay(kind: CodeTokenKind): ?Style { styles.get(syntaxKindName(kind)) }
 }
 
+/** 代码围栏使用的可配置语法高亮规则。 */
 public class SyntaxHighlightConfig {
     private let names: HashMap<String, SyntaxRule>
     init(names: HashMap<String, SyntaxRule>) { this.names = names }
@@ -195,6 +196,10 @@ func syntaxArity(args: Array<String>, low: Int64, high: Int64, line: Int64): Uni
     if (args.size < low || args.size > high) { syntaxError(line, "wrong argument count") }
 }
 
+/** 解析语法高亮配置；格式或规则无效时抛出 IllegalArgumentException。
+ * @param text 以 syntax 1 开头的配置文本
+ * @return 已解析的高亮配置
+ */
 public func parseSyntaxHighlightConfig(text: String): SyntaxHighlightConfig {
     if (text.size > 256 * 1024) { syntaxError(1, "configuration exceeds 256 KiB") }
     let names = HashMap<String, SyntaxRule>()

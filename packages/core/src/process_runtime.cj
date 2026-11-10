@@ -3,18 +3,61 @@ package core
 import std.collection.*
 import std.time.*
 
-public enum ProcessOutputStream { | Stdout | Stderr }
-public enum ProcessEndReason { | Exited | Cancelled | TimedOut | OutputLimit | DrainTimeout }
+/** 子进程输出流。 */
+public enum ProcessOutputStream {
+    /** 标准输出。 */
+    | Stdout
+    /** 标准错误。 */
+    | Stderr
+}
+/** 子进程结束原因。 */
+public enum ProcessEndReason {
+    /** 进程退出。 */
+    | Exited
+    /** 请求取消。 */
+    | Cancelled
+    /** 运行超时。 */
+    | TimedOut
+    /** 达到输出上限。 */
+    | OutputLimit
+    /** 等待输出排空超时。 */
+    | DrainTimeout
+}
 
 // The child receives EOF on stdin. Interactive terminal applications use PTY.
+/** 非交互管道进程的启动参数；子进程标准输入收到 EOF。
+ */
 public class ProcessSpec {
+    /** 可执行命令。
+     */
     public let command: String
+    /** 参数快照。
+     */
     public let args: Array<String>
+    /** 工作目录；空字符串使用默认目录。
+     */
     public let cwd: String
+    /** 环境项快照。
+     */
     public let env: Array<String>
+    /** 运行超时毫秒数；零表示不设运行超时。
+     */
     public let timeoutMillis: Int64
+    /** 允许接收的输出字节上限。
+     */
     public let maxOutputBytes: Int64
+    /** 退出后等待输出排空的超时毫秒数。
+     */
     public let drainTimeoutMillis: Int64
+    /** 创建配置或结果。
+     * @param command 可执行命令
+     * @param args 参数数组
+     * @param cwd 工作目录
+     * @param env 环境项数组
+     * @param timeoutMillis 运行超时毫秒数；零表示不设运行超时
+     * @param maxOutputBytes 输出字节上限，不能为负
+     * @param drainTimeoutMillis 排空超时毫秒数，必须大于零
+     */
     public init(command: String, args!: Array<String> = [], cwd!: String = "", env!: Array<String> = [],
         timeoutMillis!: Int64 = 0, maxOutputBytes!: Int64 = 16 * 1024 * 1024, drainTimeoutMillis!: Int64 = 1000) {
         if (timeoutMillis < 0 || maxOutputBytes < 0 || drainTimeoutMillis <= 0) { throw IllegalArgumentException("process limits must be non-negative") }
@@ -31,37 +74,97 @@ public class ProcessSpec {
     }
 }
 
+/** 子进程结束结果。
+ */
 public struct ProcessResult {
+    /** 结束原因。
+     */
     public let reason: ProcessEndReason
+    /** 进程退出状态。
+     */
     public let status: PtyExitStatus
+    /** 已接收的输出字节数。
+     */
     public let outputBytes: Int64
+    /** 输出是否完整排空。
+     */
     public let outputComplete: Bool
+    /** 创建配置或结果。
+     * @param reason 结束原因
+     * @param status 退出状态
+     * @param outputBytes 输出字节数
+     * @param outputComplete 输出是否完整
+     */
     public init(reason: ProcessEndReason, status: PtyExitStatus, outputBytes: Int64, outputComplete!: Bool = true) {
         this.reason = reason; this.status = status; this.outputBytes = outputBytes; this.outputComplete = outputComplete
     }
 }
 
+/** 进程运行时的输出及背压统计。
+ */
 public struct ProcessMetrics {
+    /** 当前排队输出字节数。
+     */
     public let queuedBytes: Int64
+    /** 排队输出字节数峰值。
+     */
     public let peakQueuedBytes: Int64
+    /** 累计输出字节数。
+     */
     public let outputBytes: Int64
+    /** 背压次数。
+     */
     public let backpressureCount: Int64
+    /** 创建配置或结果。
+     * @param queuedBytes 当前排队字节数
+     * @param peakQueuedBytes 排队字节数峰值
+     * @param outputBytes 累计输出字节数
+     * @param backpressureCount 背压次数
+     */
     public init(queuedBytes!: Int64 = 0, peakQueuedBytes!: Int64 = 0, outputBytes!: Int64 = 0, backpressureCount!: Int64 = 0) {
         this.queuedBytes = queuedBytes; this.peakQueuedBytes = peakQueuedBytes
         this.outputBytes = outputBytes; this.backpressureCount = backpressureCount
     }
 }
 
+/** 管道子进程的启动、事件排空和资源管理接口。
+ */
 public interface ProcessRuntime {
+    /** 启动进程。
+     * @param id 进程标识
+     * @param spec 进程配置
+     * @return 启动成功或失败事件。
+     */
     func start(id: String, spec: ProcessSpec): Event
     // Cancellation is acknowledged immediately. The one Finished event is
     // emitted later, after the child has been reaped and output accounted for.
+    /** 请求取消进程；完成事件在回收及处理输出后产生。
+     * @param id 进程标识
+     * @return 取消请求或失败事件。
+     */
     func cancel(id: String): Event
+    /** 获取进程相关事件源。
+     * @return 事件源数组。
+     */
     func sources(): Array<EventSource>
+    /** 推进进程并读取可交付事件。
+     * @return 进程事件数组。
+     */
     func drain(): Array<Event>
+    /** 获取活动进程数。
+     * @return 活动进程数。
+     */
     func activeCount(): Int64
+    /** 获取建议的下次等待时长。
+     * @return 等待毫秒数；无需唤醒时为 None。
+     */
     func nextTimeoutMillis(): ?Int64
+    /** 获取输出与背压统计。
+     * @return 统计快照。
+     */
     func metrics(): ProcessMetrics
+    /** 关闭并回收所有进程。
+     */
     func closeAll(): Unit
 }
 
@@ -430,9 +533,17 @@ class PipeOutputSource <: EventSource {
 
 // One decoder per output stream. Invalid bytes are replaced deterministically;
 // incomplete suffixes use at most three bytes and flush once at EOF.
+/** 增量解码 UTF-8 字节；每个输出流应使用独立解码器。
+ */
 public class Utf8StreamDecoder {
     private var pending: Array<Byte> = []
+    /** 创建空解码器。
+     */
     public init() {}
+    /** 解码当前字节并保留不完整的尾部；无效字节替换为 U+FFFD。
+     * @param bytes 输入字节
+     * @return 本次解码得到的文本。
+     */
     public func feed(bytes: Array<Byte>): String {
         let data = Array<Byte>(pending.size + bytes.size, repeat: 0)
         pending.copyTo(data, 0, 0, pending.size); bytes.copyTo(data, 0, pending.size, bytes.size)
@@ -467,6 +578,9 @@ public class Utf8StreamDecoder {
         pending = data[offset..].clone()
         text.toString()
     }
+    /** 结束输入并清除未完成尾部。
+     * @return 存在不完整尾部时返回替换字符，否则返回空字符串。
+     */
     public func finish(): String {
         let value = if (pending.isEmpty()) { "" } else { "\u{FFFD}" }
         pending = []; value

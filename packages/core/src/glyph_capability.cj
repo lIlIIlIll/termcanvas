@@ -2,8 +2,11 @@ package core
 
 /** 可信提供者对 Nerd Font 字形覆盖情况的判断。Unknown 不证明字体缺失。 */
 public enum GlyphCapability {
+    /** 未知；不代表字体不支持。 */
     | Unknown
+    /** 可信提供者已确认所需字形受支持。 */
     | VerifiedSupported
+    /** 可信提供者确认所需字形不受支持。 */
     | Unsupported
 }
 
@@ -12,12 +15,21 @@ public enum GlyphCapability {
  * 才可返回 VerifiedSupported。不得读取终端输入；实现应在 budgetMillis 内返回。
  */
 public interface GlyphCapabilityProvider {
+    /** 在指定预算内判断字形支持情况；不得读取终端输入。
+     * @param budgetMillis 等待预算，单位为毫秒
+     * @return 字形能力判断
+     */
     func probe(budgetMillis: Int64): GlyphCapability
 }
 
 /** 没有通用可靠探测协议时的保守提供者，不读取终端输入。 */
 public class UnknownGlyphCapabilityProvider <: GlyphCapabilityProvider {
+    /** 创建保守的未知能力提供者。 */
     public init() {}
+    /** 不执行探测，始终返回未知。
+     * @param _ 等待预算，单位为毫秒
+     * @return 未知能力
+     */
     public func probe(_: Int64): GlyphCapability { GlyphCapability.Unknown }
 }
 
@@ -46,14 +58,20 @@ public class GlyphCapabilitySession {
     private var reportedIcon: Int64 = 0
     private var reportedCapability: Int64 = 0
 
-    /** 配置可信提供者和最长等待毫秒数；非正时长按一毫秒处理。 */
+    /** 配置可信提供者和最长等待毫秒数；非正时长按一毫秒处理。
+     * @param provider 可信字体能力提供者
+     * @param timeoutMillis 最长等待毫秒数
+     * @param clock 会话使用的时钟
+     */
     public init(provider!: GlyphCapabilityProvider = UnknownGlyphCapabilityProvider(), timeoutMillis!: Int64 = 150, clock!: RuntimeClock = MonotonicRuntimeClock()) {
         this.provider = provider
         this.timeoutMillis = max(1, timeoutMillis)
         this.clock = clock
     }
 
-    /** 当前图标集；未经可靠确认时采用 Unicode。 */
+    /** 当前图标集；未经可靠确认时采用 Unicode。
+     * @return 当前协商或显式覆盖的图标集
+     */
     public func iconSet(): IconSet {
         match (overrideValue) {
             case Some(value) => value
@@ -64,13 +82,20 @@ public class GlyphCapabilitySession {
         }
     }
 
-    /** 最近一次有效探测结果；超时、失败和显式切换后为 Unknown。 */
+    /** 最近一次有效探测结果；超时、失败和显式切换后为 Unknown。
+     * @return 当前能力判断
+     */
     public func detected(): GlyphCapability { capability }
 
-    /** 复制主题并将图标集设为当前协商结果。 */
+    /** 复制主题并将图标集设为当前协商结果。
+     * @param theme 原主题
+     * @return 应用当前图标集的新主题
+     */
     public func applyTo(theme: Theme): Theme { theme.withIconSet(iconSet()) }
 
-    /** 设置或清除显式图标集。清除覆盖后重新开始协商；关闭后无效果。 */
+    /** 设置或清除显式图标集。清除覆盖后重新开始协商；关闭后无效果。
+     * @param value 显式图标集；None 清除覆盖
+     */
     public func setOverride(value: ?IconSet): Unit {
         if (closed) { return }
         overrideValue = value

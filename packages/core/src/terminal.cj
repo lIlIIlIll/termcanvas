@@ -119,8 +119,11 @@ let DISABLE_NEWLINE_AUTO_RETURN: UInt32 = 0x0008u32
 @When[os == "Windows"]
 let CONSOLE_SCREEN_BUFFER_INFO_BYTES: Int64 = 22
 
+/** 终端光标形状。 */
 public enum CursorShape {
+    /** 块状光标。 */
     | Block
+    /** 竖线光标。 */
     | Bar
 }
 
@@ -132,36 +135,87 @@ private func cursorShapeCode(shape: ?CursorShape): Int64 {
     }
 }
 
+/** 终端输出后端接口，负责绘制、模式切换及输出刷新。 */
 public interface Backend {
+    /** 清除终端内容。 */
     func clear(): Unit
+    /** 移动终端光标。
+     * @param x 横坐标
+     * @param y 纵坐标
+     */
     func moveTo(x: Int64, y: Int64): Unit
+    /** 进入备用屏幕。 */
     func enterAlternateScreen(): Unit
+    /** 退出备用屏幕。 */
     func leaveAlternateScreen(): Unit
+    /** 隐藏光标。 */
     func hideCursor(): Unit
+    /** 显示光标。 */
     func showCursor(): Unit
+    /** 设置光标形状；默认实现不操作。
+     * @param _ 可选光标形状
+     */
     func setCursorShape(_: ?CursorShape): Unit {}
+    /** 启用鼠标输入模式。 */
     func enableMouse(): Unit
+    /** 禁用鼠标输入模式。 */
     func disableMouse(): Unit
+    /** 启用括号粘贴模式。 */
     func enableBracketedPaste(): Unit
+    /** 禁用括号粘贴模式。 */
     func disableBracketedPaste(): Unit
+    /** 获取终端区域。
+     * @return 终端区域
+     */
     func size(): Rect
+    /** 绘制完整缓冲区。
+     * @param buffer 待绘制缓冲区
+     */
     func draw(buffer: Buffer): Unit
+    /** 使用差异计划绘制缓冲区。
+     * @param next 目标缓冲区
+     * @param plan 差异绘制计划
+     */
     func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit
+    /** 处理媒体绘制和清除操作。
+     * @param ops 媒体操作
+     */
     func drawMedia(ops: Array<MediaOp>): Unit
+    /** 写入文本。
+     * @param text 待写入文本
+     */
     func write(text: String): Unit
+    /** 刷新待发送输出。 */
     func flush(): Unit
     // Optional Step-0 transport attribution. Backends that cannot expose a
     // byte count retain -1, which means unavailable rather than zero.
+    /** 启用或关闭可选传输统计；默认实现不操作。
+     * @param _ 是否启用统计
+     */
     func setInstrumentationEnabled(_: Bool): Unit {}
+    /** 获取传输字节统计；默认返回 -1 表示不可用。
+     * @return 字节数或 -1
+     */
     func diagnosticByteCount(): Int64 { -1 }
 }
 
+/** 一段从指定坐标开始、使用相同样式的差异文本。 */
 public struct RenderDiffSpan {
+    /** 起始横坐标。 */
     public let x: Int64
+    /** 纵坐标。 */
     public let y: Int64
+    /** 差异文本。 */
     public let text: String
+    /** 文本样式。 */
     public let style: Style
 
+    /** 创建差异文本片段。
+     * @param x 起始横坐标
+     * @param y 纵坐标
+     * @param text 差异文本
+     * @param style 文本样式
+     */
     public init(x: Int64, y: Int64, text: String, style: Style) {
         this.x = x
         this.y = y
@@ -170,54 +224,95 @@ public struct RenderDiffSpan {
     }
 }
 
+/** 一次差异绘制的脏单元格数量和文本片段。 */
 public struct RenderDiffPlan {
+    /** 脏单元格数量。 */
     public let dirtyCells: Int64
+    /** 按绘制顺序排列的差异片段。 */
     public let spans: Array<RenderDiffSpan>
 
+    /** 创建差异计划；负单元格数量按零处理。
+     * @param dirtyCells 脏单元格数量
+     * @param spans 差异文本片段
+     */
     public init(dirtyCells: Int64, spans: Array<RenderDiffSpan>) {
         this.dirtyCells = max(0, dirtyCells)
         this.spans = spans
     }
 }
 
+/** 一次绘制使用的区域、缓冲区及可选脏区域。 */
 public class Frame {
+    /** 帧的绘制区域。 */
     public let area: Rect
     private let buffer: Buffer
     private let dirty: ?DirtyRects
     private var cursor: ?Position = None
     private var cursorShape: ?CursorShape = None
 
+    /** 创建帧；未指定脏区域时视为全部需要绘制。
+     * @param area 帧区域
+     * @param buffer 目标缓冲区
+     * @param dirty 可选脏区域
+     */
     public init(area: Rect, buffer: Buffer, dirty!: ?DirtyRects = None) {
         this.area = area
         this.buffer = buffer
         this.dirty = dirty
     }
 
-    /** 返回应用为该帧设置的主题；None 表示使用组件原有默认样式。 */
+    /** 返回应用为该帧设置的主题；None 表示使用组件原有默认样式。
+     * @return 应用主题或 None
+     */
     public func theme(): ?Theme { buffer.theme() }
 
-    /** 返回该帧采用的文本显示宽度策略。 */
+    /** 返回该帧采用的文本显示宽度策略。
+     * @return 文本宽度选项
+     */
     public func textWidthOptions(): TextWidthOptions { buffer.textWidthOptions() }
 
+    /** 区域与脏区域相交时绘制组件；未指定脏区域时直接绘制。
+     * @param widget 要绘制的组件
+     * @param area 组件区域
+     */
     public func renderWidget(widget: Widget, area: Rect): Unit {
         if (!isDirty(area)) { return }
         widget.render(area, buffer)
     }
 
+    /** 创建使用指定区域裁剪的画布。
+     * @param area 画布裁剪区域
+     * @return 共享帧缓冲区的画布
+     */
     public func canvas(area!: Rect = this.area): Canvas {
         Canvas(buffer, area)
     }
 
+    /** 使用样式填充区域。
+     * @param area 待填充区域
+     * @param style 填充样式
+     */
     public func fill(area: Rect, style: Style): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         buffer.fill(area, style: style)
     }
 
+    /** 按坐标和尺寸填充区域。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param width 宽度
+     * @param height 高度
+     * @param style 填充样式
+     */
     public func fillRect(x: Int64, y: Int64, width: Int64, height: Int64, style: Style): Unit {
         if (width <= 0 || height <= 0) { return }
         buffer.fillRect(x, y, width, height, style: style)
     }
 
+    /** 检查区域是否与脏区域相交；未指定脏区域时返回 true。
+     * @param area 待检查区域
+     * @return 需要绘制时为 true
+     */
     public func isDirty(area: Rect): Bool {
         match (dirty) {
             case Some(rects) => rects.intersects(area)
@@ -225,6 +320,11 @@ public class Frame {
         }
     }
 
+    /** 检查单元格是否位于脏区域；未指定脏区域时返回 true。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @return 需要绘制时为 true
+     */
     public func isDirtyCell(x: Int64, y: Int64): Bool {
         match (dirty) {
             case Some(rects) => rects.intersectsCell(x, y)
@@ -232,6 +332,9 @@ public class Frame {
         }
     }
 
+    /** 获取帧的脏区域；未指定时返回帧区域。
+     * @return 脏矩形数组
+     */
     public func dirtyRects(): Array<Rect> {
         match (dirty) {
             case Some(rects) => rects.rects()
@@ -239,14 +342,23 @@ public class Frame {
         }
     }
 
+    /** 向缓冲区追加媒体放置。
+     * @param placement 媒体放置
+     */
     public func addMedia(placement: MediaPlacement): Unit {
         buffer.addMedia(placement)
     }
 
+    /** 设置帧结束时使用的光标位置。
+     * @param position 光标坐标
+     */
     public func setCursor(position: Position): Unit {
         cursor = Some(position)
     }
 
+    /** 设置帧结束时使用的光标形状。
+     * @param shape 光标形状
+     */
     public func setCursorShape(shape: CursorShape): Unit {
         cursorShape = Some(shape)
     }
@@ -255,16 +367,23 @@ public class Frame {
         cursorShape
     }
 
+    /** 获取已设置的光标位置。
+     * @return 光标位置；未设置时为 None
+     */
     public func getCursor(): ?Position {
         cursor
     }
 }
 
+/** 终端帧输出模式。 */
 public enum RenderMode {
+    /** 比较前后帧并输出差异。 */
     | Diff
+    /** 每次输出完整帧。 */
     | Full
 }
 
+/** 通过后端管理帧缓冲区、主题和完整或差异绘制。 */
 public class Terminal {
     private let backend: Backend
     private let renderMode: RenderMode
@@ -278,6 +397,11 @@ public class Terminal {
     private var themeValue: ?Theme = None
     private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
 
+    /** 创建终端渲染器。
+     * @param backend 输出后端
+     * @param renderMode 完整或差异输出模式
+     * @param instrumentationEnabled 是否启用可选性能统计
+     */
     public init(
         backend: Backend,
         renderMode!: RenderMode = RenderMode.Diff,
@@ -289,32 +413,46 @@ public class Terminal {
         backend.setInstrumentationEnabled(instrumentationEnabled)
     }
 
+    /** 设置后续帧的终端能力并丢弃缓存，使下一帧完整重绘。
+     * @param capabilities 终端能力
+     */
     public func setCapabilities(capabilities: TerminalCapabilities): Unit {
         capabilitiesValue = capabilities
         front = None
         back = None
     }
 
-    /** 设置后续帧的应用主题，并强制下一帧完整重绘；None 恢复组件默认样式。 */
+    /** 设置后续帧的应用主题，并强制下一帧完整重绘；None 恢复组件默认样式。
+     * @param theme 可选应用主题
+     */
     public func setTheme(theme: ?Theme): Unit {
         themeValue = theme
         front = None
         back = None
     }
 
-    /** 设置后续帧的文本宽度策略，并强制完整重绘。 */
+    /** 设置后续帧的文本宽度策略，并强制完整重绘。
+     * @param options 文本宽度策略
+     */
     public func setTextWidthOptions(options: TextWidthOptions): Unit {
         textWidthOptionsValue = options
         front = None
         back = None
     }
 
+    /** 按后端当前尺寸绘制一帧。
+     * @param render 帧绘制回调
+     * @return 渲染指标
+     */
     public func draw(render: (Frame) -> Unit): RenderMetrics {
         draw(render, dirtyRects: None)
     }
 
     /** 按后端当前尺寸绘制一帧；尺寸变化时丢弃旧缓冲区，差异模式下可依据脏区域局部渲染，并返回渲染指标。
      * 渲染回调抛出异常时原样传播，并使后续一帧完整重绘。
+     * @param render 帧绘制回调
+     * @param dirtyRects 可选的脏区域
+     * @return 渲染指标
      */
     public func draw(render: (Frame) -> Unit, dirtyRects!: ?DirtyRects): RenderMetrics {
         let area = backend.size()
@@ -481,6 +619,7 @@ public class Terminal {
         )
     }
 
+    /** 清除后端和已显示的媒体，并使下一帧完整重绘。 */
     public func clear(): Unit {
         backend.drawMedia(diffMediaPlacements(previousMedia, []))
         backend.clear()
@@ -642,26 +781,63 @@ func renderDiffPlanWithPrevious(previousCell: (Int64, Int64) -> Cell, previousAr
     RenderDiffPlan(dirtyCells, spans.toArray())
 }
 
+/** 键盘协议的配置方式。
+ */
 public enum KeyboardProtocolMode {
+    /** 基础协议。
+     */
     | Basic
+    /** ModifyOtherKeys 协议。
+     */
     | ModifyOtherKeys
+    /** Kitty 键盘协议。
+     */
     | Kitty
+    /** 根据终端能力自动选择。
+     */
     | Auto
 }
 
+/** 终端能力的探测方式。
+ */
 public enum TerminalProbeMode {
+    /** 禁用探测。
+     */
     | Disabled
+    /** 仅依据环境信息。
+     */
     | EnvOnly
+    /** 主动查询终端。
+     */
     | Active
 }
 
+/** 键盘协议、探测和按键计时设置。
+ */
 public struct KeyboardOptions {
+    /** 键盘协议模式。
+     */
     public let mode: KeyboardProtocolMode
+    /** 能力探测模式。
+     */
     public let probe: TerminalProbeMode
+    /** 主动探测预算，限制在 0 至 100 毫秒。
+     */
     public let probeBudgetMillis: Int64
+    /** 独立 Escape 的等待毫秒数。
+     */
     public let escDelayMillis: Int64
+    /** 按键保持时间设置。
+     */
     public let repeatHeldMillis: Int64
 
+    /** 创建配置或结果。
+     * @param mode 键盘协议模式
+     * @param probe 探测模式
+     * @param probeBudgetMillis 探测预算，限制在 0 至 100 毫秒
+     * @param escDelayMillis Escape 等待时间，负值按零处理
+     * @param repeatHeldMillis 按键保持时间，至少为一毫秒
+     */
     public init(
         mode!: KeyboardProtocolMode = KeyboardProtocolMode.Basic,
         probe!: TerminalProbeMode = TerminalProbeMode.Disabled,
@@ -677,14 +853,30 @@ public struct KeyboardOptions {
     }
 }
 
+/** 终端探测得到的能力和读取字节。
+ */
 public struct TerminalProbeResult {
+    /** 探测后的终端能力。
+     */
     public let capabilities: TerminalCapabilities
     // All bytes read during the probe, including ordinary input. App replays
     // the non-response bytes through its normal EventParser.
+    /** 探测期间读取的全部字节，可能包含普通输入。
+     */
     public let consumedBytes: Array<Byte>
+    /** 探测预算，限制在 0 至 100 毫秒。
+     */
     public let budgetMillis: Int64
+    /** 已用毫秒数。
+     */
     public let elapsedMillis: Int64
 
+    /** 创建配置或结果。
+     * @param capabilities 探测后的能力
+     * @param consumedBytes 探测期间读取的全部字节
+     * @param budgetMillis 探测预算，限制在 0 至 100 毫秒
+     * @param elapsedMillis 已用时间，负值按零处理
+     */
     public init(capabilities: TerminalCapabilities, consumedBytes!: Array<Byte>, budgetMillis!: Int64, elapsedMillis!: Int64) {
         this.capabilities = capabilities
         this.consumedBytes = consumedBytes
@@ -693,7 +885,16 @@ public struct TerminalProbeResult {
     }
 }
 
+/** 主动查询终端键盘能力。
+ */
 public class TerminalProbe {
+    /** 发送查询并读取响应；输入源应及时返回，预算不能中断阻塞读取。
+     * @param backend 输出查询的后端
+     * @param inputSource 用于读取响应的输入源
+     * @param base 探测前能力
+     * @param budgetMillis 探测预算，限制在 0 至 100 毫秒
+     * @return 探测能力及读取的字节。
+     */
     public static func run(
         backend: Backend,
         inputSource: InputSource,
@@ -743,6 +944,8 @@ class SessionInputSource <: InputSource {
     }
 }
 
+/** 管理终端模式的启用和恢复。
+ */
 public class TerminalSession {
     private let backend: Backend
     private let driver: TerminalDriver
@@ -768,8 +971,23 @@ public class TerminalSession {
     private let pendingProbeInput = ArrayList<Byte>()
     private var probeInputOffset: Int64 = 0
 
+    /** 当前会话是否成功启用原始模式。
+     */
     public prop rawModeEnabled: Bool { get() { rawActive } }
 
+    /** 配置终端会话。
+     * @param backend 终端后端
+     * @param driver 原始模式和尺寸驱动
+     * @param probeInputSource 主动探测输入源
+     * @param rawMode 是否启用原始模式
+     * @param alternateScreen 是否启用备用屏幕
+     * @param mouse 是否启用鼠标
+     * @param mouseMove 是否启用鼠标移动事件
+     * @param focusEvents 是否启用焦点事件
+     * @param bracketedPaste 是否启用括号粘贴
+     * @param hideCursor 是否隐藏光标
+     * @param keyboard 键盘协议选项
+     */
     public init(
         backend: Backend,
         driver!: TerminalDriver = defaultTerminalDriver(),
@@ -796,6 +1014,9 @@ public class TerminalSession {
         this.keyboard = keyboard
     }
 
+    /** 获取最近一次主动探测结果。
+     * @return 结果或 None。
+     */
     public func probeResult(): ?TerminalProbeResult {
         lastProbe
     }
@@ -811,6 +1032,9 @@ public class TerminalSession {
         bytes
     }
 
+    /** 启用配置的模式；原始模式失败时回滚已启用模式。
+     * @return 成功时为 true，原始模式启用失败时为 false。
+     */
     public func start(): Bool {
         if (active) { return true }
         lastProbe = None
@@ -854,6 +1078,8 @@ public class TerminalSession {
         }
     }
 
+    /** 恢复当前会话启用的模式；未启动时不执行操作。
+     */
     public func stop(): Unit {
         if (!active) { return }
         let cleanupFailure = cleanupStartedModes()
@@ -862,6 +1088,9 @@ public class TerminalSession {
         }
     }
 
+    /** 启动会话、执行动作并尝试恢复；动作异常时也会恢复。
+     * @param action 会话中执行的动作
+     */
     public func run(action: () -> Unit): Unit {
         start()
         try {
@@ -1133,37 +1362,93 @@ class TerminalSignalGuard {
     }
 }
 
+/** 终端原始模式、尺寸和能力的驱动接口。
+ */
 public interface TerminalDriver {
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     func name(): String
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true。
+     */
     func enterRawMode(): Bool
+    /** 恢复原始模式之前的终端状态。
+     */
     func restore(): Unit
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     func size(): ?Rect
+    /** 获取终端能力。
+     * @param backend 用于获取能力的后端
+     * @return 能力信息。
+     */
     func capabilities(backend: Backend): TerminalCapabilities
 }
 
+/** Linux 原生终端驱动。
+ */
 @When[os == "Linux"]
 public class LinuxTerminalDriver <: TerminalDriver {
+    /** 创建驱动。
+     */
     public init() {}
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "linux-glibc" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true。
+     */
     public func enterRawMode(): Bool { TerminalMode.enterRawMode() }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit { TerminalMode.restore() }
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { TerminalMode.size() }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities.detect(backend: backend, driverName: name())
     }
 }
 
+/** 不启用原始模式的后备终端驱动。
+ */
 public class FallbackTerminalDriver <: TerminalDriver {
     private let area: Rect
+    /** 创建驱动；后备实现使用给定区域。
+     * @param area 后备终端区域
+     */
     public init(area!: Rect = Rect(0, 0, 80, 24)) {
         this.area = area
     }
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "fallback" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true；后备实现返回 false。
+     */
     public func enterRawMode(): Bool { false }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit {}
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { Some(area) }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities(
             size: backend.size(),
@@ -1177,18 +1462,38 @@ public class FallbackTerminalDriver <: TerminalDriver {
     }
 }
 
+/** macOS 终端驱动；其他平台使用后备实现。
+ */
 @When[os != "macOS"]
 public class MacOSTerminalDriver <: TerminalDriver {
     private let fallback: FallbackTerminalDriver
 
+    /** 创建驱动；后备实现使用给定区域。
+     * @param area 后备终端区域
+     */
     public init(area!: Rect = Rect(0, 0, 80, 24)) {
         fallback = FallbackTerminalDriver(area: area)
     }
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "macos-fallback" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true；后备实现返回 false。
+     */
     public func enterRawMode(): Bool { false }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit {}
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { fallback.size() }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities(
             size: backend.size(),
@@ -1202,33 +1507,73 @@ public class MacOSTerminalDriver <: TerminalDriver {
     }
 }
 
+/** macOS 终端驱动；其他平台使用后备实现。
+ */
 @When[os == "macOS"]
 public class MacOSTerminalDriver <: TerminalDriver {
+    /** 创建驱动；后备实现使用给定区域。
+     * @param area 后备终端区域
+     */
     public init(area!: Rect = Rect(0, 0, 80, 24)) {
         if (area.width < 0) { return }
     }
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "macos-termios" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true；后备实现返回 false。
+     */
     public func enterRawMode(): Bool { MacOSTerminalMode.enterRawMode() }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit { MacOSTerminalMode.restore() }
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { MacOSTerminalMode.size() }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities.detect(backend: backend, driverName: name())
     }
 }
 
+/** Windows 终端驱动；其他平台使用后备实现。
+ */
 @When[os != "Windows"]
 public class WindowsTerminalDriver <: TerminalDriver {
     private let fallback: FallbackTerminalDriver
 
+    /** 创建驱动；后备实现使用给定区域。
+     * @param area 后备终端区域
+     */
     public init(area!: Rect = Rect(0, 0, 80, 24)) {
         fallback = FallbackTerminalDriver(area: area)
     }
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "windows-fallback" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true；后备实现返回 false。
+     */
     public func enterRawMode(): Bool { false }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit {}
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { fallback.size() }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities(
             size: backend.size(),
@@ -1242,31 +1587,60 @@ public class WindowsTerminalDriver <: TerminalDriver {
     }
 }
 
+/** Windows 终端驱动；其他平台使用后备实现。
+ */
 @When[os == "Windows"]
 public class WindowsTerminalDriver <: TerminalDriver {
+    /** 创建驱动；后备实现使用给定区域。
+     * @param area 后备终端区域
+     */
     public init(area!: Rect = Rect(0, 0, 80, 24)) {
         if (area.width < 0) { return }
     }
 
+    /** 获取驱动名称。
+     * @return 驱动名称。
+     */
     public func name(): String { "windows-vt" }
+    /** 尝试启用原始模式。
+     * @return 启用成功时为 true；后备实现返回 false。
+     */
     public func enterRawMode(): Bool { WindowsConsoleMode.enterRawMode() }
+    /** 恢复终端状态。
+     */
     public func restore(): Unit { WindowsConsoleMode.restore() }
+    /** 获取终端区域。
+     * @return 区域或 None。
+     */
     public func size(): ?Rect { WindowsConsoleMode.size() }
+    /** 获取终端能力。
+     * @param backend 终端后端
+     * @return 能力信息。
+     */
     public func capabilities(backend: Backend): TerminalCapabilities {
         TerminalCapabilities.detect(backend: backend, driverName: name())
     }
 }
 
+/** 创建当前平台的默认终端驱动。
+ * @return 平台终端驱动。
+ */
 @When[os == "Linux"]
 public func defaultTerminalDriver(): TerminalDriver {
     LinuxTerminalDriver()
 }
 
+/** 创建当前平台的默认终端驱动。
+ * @return 平台终端驱动。
+ */
 @When[os == "macOS"]
 public func defaultTerminalDriver(): TerminalDriver {
     MacOSTerminalDriver()
 }
 
+/** 创建当前平台的默认终端驱动。
+ * @return 平台终端驱动。
+ */
 @When[os == "Windows"]
 public func defaultTerminalDriver(): TerminalDriver {
     WindowsTerminalDriver()
@@ -1445,6 +1819,7 @@ public class AnsiBackend <: Backend {
     }
 }
 
+/** 在内存中记录输出、缓冲区、快照和媒体操作的测试后端。 */
 public class TestBackend <: Backend {
     private var area: Rect
     private let bytes = ArrayList<Byte>()
@@ -1459,6 +1834,10 @@ public class TestBackend <: Backend {
     private var latestDiffWrites: Int64 = 0
     private var selectedCursorShapeCode: Int64 = 0
 
+    /** 创建测试后端。
+     * @param area 初始终端区域
+     * @param captureSnapshots 是否在每次绘制时保存文本快照
+     */
     public init(
         area!: Rect = Rect(0, 0, 80, 24),
         captureSnapshots!: Bool = true
@@ -1467,37 +1846,62 @@ public class TestBackend <: Backend {
         this.captureSnapshots = captureSnapshots
     }
 
+    /** 将对应终端操作记录到输出。 */
     public func clear(): Unit {
         write("${ESC}[2J${ESC}[H")
     }
 
+    /** 记录光标移动序列。
+     * @param x 横坐标
+     * @param y 纵坐标
+     */
     public func moveTo(x: Int64, y: Int64): Unit {
         write("${ESC}[${y + 1};${x + 1}H")
     }
 
+    /** 将对应终端操作记录到输出。 */
     public func enterAlternateScreen(): Unit { write("${ESC}[?1049h") }
+    /** 将对应终端操作记录到输出。 */
     public func leaveAlternateScreen(): Unit { write("${ESC}[?1049l") }
+    /** 将对应终端操作记录到输出。 */
     public func hideCursor(): Unit { write("${ESC}[?25l") }
+    /** 将对应终端操作记录到输出。 */
     public func showCursor(): Unit { write("${ESC}[?25h") }
+    /** 记录光标形状变化；重复设置相同形状不追加输出。
+     * @param shape 可选光标形状
+     */
     public func setCursorShape(shape: ?CursorShape): Unit {
         let code = cursorShapeCode(shape)
         if (code == selectedCursorShapeCode) { return }
         write("${ESC}[${code} q")
         selectedCursorShapeCode = code
     }
+    /** 将对应终端操作记录到输出。 */
     public func enableMouse(): Unit { write("${ESC}[?1000h${ESC}[?1006h") }
+    /** 将对应终端操作记录到输出。 */
     public func disableMouse(): Unit { write("${ESC}[?1006l${ESC}[?1000l") }
+    /** 将对应终端操作记录到输出。 */
     public func enableBracketedPaste(): Unit { write("${ESC}[?2004h") }
+    /** 将对应终端操作记录到输出。 */
     public func disableBracketedPaste(): Unit { write("${ESC}[?2004l") }
 
+    /** 获取模拟终端区域。
+     * @return 终端区域
+     */
     public func size(): Rect {
         area
     }
 
+    /** 设置模拟终端区域。
+     * @param area 新区域
+     */
     public func setSize(area: Rect): Unit {
         this.area = area
     }
 
+    /** 记录完整绘制，并在启用时保存快照。
+     * @param buffer 绘制的缓冲区
+     */
     public func draw(buffer: Buffer): Unit {
         latest = Some(buffer)
         latestDiffOps = buffer.area.width * buffer.area.height
@@ -1508,6 +1912,10 @@ public class TestBackend <: Backend {
         write("<draw>")
     }
 
+    /** 记录差异绘制，并在启用时保存目标缓冲区快照。
+     * @param next 目标缓冲区
+     * @param plan 差异绘制计划
+     */
     public func drawDiff(next: Buffer, plan: RenderDiffPlan): Unit {
         latest = Some(next)
         latestDiffOps = plan.dirtyCells
@@ -1518,6 +1926,9 @@ public class TestBackend <: Backend {
         write("<diff:${latestDiffOps}:${latestDiffWrites}>")
     }
 
+    /** 记录一次媒体操作帧。
+     * @param ops 媒体操作
+     */
     public func drawMedia(ops: Array<MediaOp>): Unit {
         mediaFrames.add(ops)
         if (ops.size > 0) {
@@ -1525,45 +1936,71 @@ public class TestBackend <: Backend {
         }
     }
 
+    /** 将文本追加到输出记录。
+     * @param text 待记录文本
+     */
     public func write(text: String): Unit {
         for (b in unsafe { text.rawData() }) {
             bytes.add(b)
         }
     }
 
+    /** 刷新输出；内存后端无需执行操作。 */
     public func flush(): Unit {}
 
+    /** 获取已记录的输出文本。
+     * @return 输出文本
+     */
     public func output(): String {
         unsafe { String.fromUtf8Unchecked(bytes.toArray()) }
     }
 
+    /** 清空输出文本，不清除绘制快照。 */
     public func clearOutput(): Unit {
         while (bytes.size > 0) {
             bytes.remove(at: 0)
         }
     }
 
+    /** 获取最近一次绘制的缓冲区引用。
+     * @return 缓冲区；未绘制时为 None
+     */
     public func lastBuffer(): ?Buffer {
         latest
     }
 
+    /** 获取最近一次绘制记录的脏单元格数。
+     * @return 脏单元格数
+     */
     public func lastDiffOps(): Int64 {
         latestDiffOps
     }
 
+    /** 获取最近一次绘制记录的写入段数。
+     * @return 写入段数
+     */
     public func lastDiffWrites(): Int64 {
         latestDiffWrites
     }
 
+    /** 获取最近一次媒体操作。
+     * @return 操作数组；没有记录时为空数组
+     */
     public func lastMediaOps(): Array<MediaOp> {
         if (mediaFrames.size == 0) { return [] }
         mediaFrames[mediaFrames.size - 1]
     }
 
+    /** 获取已记录的媒体操作帧数，包括空操作帧。
+     * @return 媒体帧数
+     */
     public func mediaFrameCount(): Int64 {
         mediaFrames.size
     }
 
+    /** 获取最近一次绘制缓冲区的当前文本快照。
+     * @return 快照；未绘制时为空字符串
+     */
     public func snapshot(): String {
         match (latest) {
             case Some(buffer) => bufferSnapshot(buffer)
@@ -1571,15 +2008,29 @@ public class TestBackend <: Backend {
         }
     }
 
+    /** 获取保存的绘制快照数组。
+     * @return 按绘制顺序排列的快照
+     */
     public func snapshots(): Array<String> {
         frames.toArray()
     }
 
+    /** 获取指定绘制快照。
+     * @param index 从零开始的快照索引
+     * @return 快照；索引越界时为空字符串
+     */
     public func snapshotAt(index: Int64): String {
         if (index < 0 || index >= frames.size) { return "" }
         frames[index]
     }
 
+    /** 检查最近绘制缓冲区中单元格的符号和样式。
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param symbol 期望符号
+     * @param style 期望样式
+     * @return 匹配时为 true
+     */
     public func assertCell(x: Int64, y: Int64, symbol: String, style!: Style = Style.default()): Bool {
         match (latest) {
             case Some(buffer) =>
@@ -1589,14 +2040,27 @@ public class TestBackend <: Backend {
         }
     }
 
+    /** 比较最近缓冲区的当前快照。
+     * @param expected 期望文本
+     * @return 匹配时为 true
+     */
     public func assertSnapshot(expected: String): Bool {
         snapshot() == expected
     }
 
+    /** 比较保存的指定快照。
+     * @param index 快照索引
+     * @param expected 期望文本
+     * @return 匹配时为 true
+     */
     public func assertSnapshotAt(index: Int64, expected: String): Bool {
         snapshotAt(index) == expected
     }
 
+    /** 比较最近一次媒体操作数量。
+     * @param expected 期望数量
+     * @return 数量相同时为 true
+     */
     public func assertLastMediaOpCount(expected: Int64): Bool {
         lastMediaOps().size == expected
     }
@@ -1610,27 +2074,68 @@ func mediaTerminalId(id: String): Int64 {
     max(1, value)
 }
 
+/** 终端尺寸、输入输出和显示能力的快照。 */
 public struct TerminalCapabilities {
+    /** 终端区域。 */
     public let size: Rect
+    /** 是否支持真彩色。 */
     public let trueColor: Bool
+    /** 颜色能力等级。 */
     public let colorLevel: Int64
+    /** 是否支持鼠标事件。 */
     public let mouse: Bool
+    /** 是否支持鼠标移动事件。 */
     public let mouseMove: Bool
+    /** 是否支持焦点事件。 */
     public let focusEvents: Bool
+    /** 是否支持括号粘贴。 */
     public let bracketedPaste: Bool
+    /** 是否支持备用屏幕。 */
     public let alternateScreen: Bool
+    /** 是否支持 Unicode。 */
     public let unicode: Bool
+    /** 是否支持 Kitty 图形协议。 */
     public let kittyGraphics: Bool
+    /** 是否支持 Sixel。 */
     public let sixel: Bool
+    /** 是否支持 OSC 8 超链接。 */
     public let osc8: Bool
+    /** 键盘协议。 */
     public let keyboardProtocol: KeyProtocol
+    /** 是否支持按键释放事件。 */
     public let keyUp: Bool
+    /** 是否支持按键重复事件。 */
     public let keyRepeat: Bool
+    /** 建议的刷新帧率。 */
     public let recommendedFps: Int64
+    /** 单元格像素宽度。 */
     public let cellWidthPixels: Int64
+    /** 单元格像素高度。 */
     public let cellHeightPixels: Int64
+    /** 终端驱动名称。 */
     public let driverName: String
 
+    /** 创建终端能力快照；颜色等级、帧率和单元格像素尺寸限制为正。真彩色时颜色等级至少为 24。
+     * @param size 终端区域
+     * @param trueColor 是否支持真彩色
+     * @param colorLevel 颜色能力等级
+     * @param mouse 是否支持鼠标事件
+     * @param mouseMove 是否支持鼠标移动事件
+     * @param focusEvents 是否支持焦点事件
+     * @param bracketedPaste 是否支持括号粘贴
+     * @param alternateScreen 是否支持备用屏幕
+     * @param unicode 是否支持 Unicode
+     * @param kittyGraphics 是否支持 Kitty 图形协议
+     * @param sixel 是否支持 Sixel
+     * @param osc8 是否支持 OSC 8 超链接
+     * @param keyboardProtocol 键盘协议
+     * @param keyUp 是否支持按键释放事件
+     * @param keyRepeat 是否支持按键重复事件
+     * @param recommendedFps 建议的刷新帧率
+     * @param cellWidthPixels 单元格像素宽度
+     * @param cellHeightPixels 单元格像素高度
+     * @param driverName 终端驱动名称
+     */
     public init(
         size!: Rect = Rect(0, 0, 80, 24),
         trueColor!: Bool = true,
@@ -1783,28 +2288,69 @@ func probedCapabilities(base: TerminalCapabilities, bytes: Array<Byte>): Termina
     )
 }
 
+/** 单帧渲染、差异计算和输出的指标快照；部分计数依赖可选统计或后端支持。 */
 public struct RenderMetrics {
+    /** 帧区域。 */
     public let size: Rect
+    /** 本帧差异单元格数；完整重绘时为区域单元格数。 */
     public let dirtyCells: Int64
+    /** 本帧输出的差异片段数；完整重绘时按行数记录。 */
     public let diffWrites: Int64
+    /** 媒体操作数。 */
     public let mediaOps: Int64
+    /** 是否使用完整重绘。 */
     public let fullRedraw: Bool
+    /** 绘制回调耗时，单位为毫秒。 */
     public let renderMillis: Int64
+    /** 差异计算和后端输出耗时，单位为毫秒。 */
     public let drawMillis: Int64
+    /** 本帧总耗时，单位为毫秒。 */
     public let totalMillis: Int64
+    /** 参与渲染的单元格区域数量。 */
     public let renderedCells: Int64
+    /** 本帧使用的脏矩形数。 */
     public let dirtyRects: Int64
+    /** 缓冲区快照或准备过程涉及的单元格数。 */
     public let copiedCells: Int64
+    /** 缓冲区单元格写入尝试数；依赖可选统计。 */
     public let bufferCellAttempts: Int64
+    /** 缓冲区实际单元格写入数；依赖可选统计。 */
     public let bufferCellWrites: Int64
+    /** 与 dirtyCells 相同的差异单元格数。 */
     public let diffCells: Int64
+    /** 与 diffWrites 相同的差异片段数。 */
     public let diffSpans: Int64
+    /** 绘制回调耗时，单位为纳秒。 */
     public let renderNanos: Int64
+    /** 差异计划计算耗时，单位为纳秒。 */
     public let diffNanos: Int64
+    /** 后端输出阶段扣除差异计算的耗时，单位为纳秒。 */
     public let writeNanos: Int64
+    /** 本帧总耗时，单位为纳秒。 */
     public let totalNanos: Int64
+    /** 后端报告的输出字节数；-1 表示不可用。 */
     public let ansiBytes: Int64
 
+    /** 创建渲染指标；计数和耗时的负值置零，负的输出字节数记为 -1。
+     * @param size 帧区域
+     * @param dirtyCells 本帧差异单元格数；完整重绘时为区域单元格数
+     * @param diffWrites 本帧输出的差异片段数；完整重绘时按行数记录
+     * @param mediaOps 媒体操作数
+     * @param fullRedraw 是否使用完整重绘
+     * @param renderMillis 绘制回调耗时，单位为毫秒
+     * @param drawMillis 差异计算和后端输出耗时，单位为毫秒
+     * @param totalMillis 本帧总耗时，单位为毫秒
+     * @param renderedCells 参与渲染的单元格区域数量
+     * @param dirtyRects 本帧使用的脏矩形数
+     * @param copiedCells 缓冲区快照或准备过程涉及的单元格数
+     * @param bufferCellAttempts 缓冲区单元格写入尝试数；依赖可选统计
+     * @param bufferCellWrites 缓冲区实际单元格写入数；依赖可选统计
+     * @param renderNanos 绘制回调耗时，单位为纳秒
+     * @param diffNanos 差异计划计算耗时，单位为纳秒
+     * @param writeNanos 后端输出阶段扣除差异计算的耗时，单位为纳秒
+     * @param totalNanos 本帧总耗时，单位为纳秒
+     * @param ansiBytes 后端报告的输出字节数；-1 表示不可用
+     */
     public init(
         size!: Rect = Rect(0, 0, 0, 0),
         dirtyCells!: Int64 = 0,
@@ -1848,15 +2394,25 @@ public struct RenderMetrics {
     }
 }
 
+/** 显示最近一帧运行指标的单行覆盖层。
+ */
 public class DebugOverlay <: Widget {
     private let metrics: AppMetrics
     private let style: Style
 
+    /** 创建覆盖层。
+     * @param metrics 应用指标
+     * @param style 显示样式
+     */
     public init(metrics: AppMetrics, style!: Style = Style(fg: Color.Black, bg: Color.Yellow)) {
         this.metrics = metrics
         this.style = style
     }
 
+    /** 绘制最近一帧指标；没有帧数据时显示零值。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         let frame = metrics.lastFrame()
@@ -1881,6 +2437,8 @@ func bufferSnapshot(buffer: Buffer): String {
     join(lines.toArray(), "\n")
 }
 
+/** Linux 标准输入原始模式和尺寸辅助工具。
+ */
 @When[os == "Linux"]
 public class TerminalMode {
     private static var saved: ?Array<UInt8> = None
@@ -1888,10 +2446,16 @@ public class TerminalMode {
     private static var depth: Int64 = 0
     private static var lastErrorValue: ?String = None
 
+    /** 获取最近一次原始模式操作错误。
+     * @return 错误文本或 None。
+     */
     public static func lastError(): ?String {
         lastErrorValue
     }
 
+    /** 尝试启用原始模式；支持嵌套调用。
+     * @return 成功时为 true。
+     */
     public static func enterRawMode(): Bool {
         if (active) {
             depth++
@@ -1932,6 +2496,8 @@ public class TerminalMode {
         true
     }
 
+    /** 恢复一次原始模式嵌套；最后一次恢复终端状态。
+     */
     public static func restore(): Unit {
         if (!active) { return }
         if (depth > 1) {
@@ -1950,6 +2516,9 @@ public class TerminalMode {
         saved = None
     }
 
+    /** 获取终端尺寸。
+     * @return 尺寸区域或 None。
+     */
     public static func size(): ?Rect {
         if (unsafe { isatty(STDOUT_FILENO) } == 0) {
             return None

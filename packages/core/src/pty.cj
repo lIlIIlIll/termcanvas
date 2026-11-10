@@ -95,15 +95,31 @@ const PTY_READ_BYTES: Int64 = 4096
 @When[os != "Windows"]
 const STDERR_FILENO: Int32 = 2
 
+/** 伪终端输出流。
+ */
 public enum PtyOutputStream {
+    /** 标准输出。
+     */
     | Stdout
+    /** 标准错误。
+     */
     | Stderr
 }
 
+/** 伪终端字符单元格尺寸。
+ */
 public struct PtySize {
+    /** 列数，至少为一。
+     */
     public let cols: Int64
+    /** 行数，至少为一。
+     */
     public let rows: Int64
 
+    /** 创建对象。
+     * @param cols 列数，小于一时按一处理
+     * @param rows 行数，小于一时按一处理
+     */
     public init(cols!: Int64 = 80, rows!: Int64 = 24) {
         this.cols = max(1, cols)
         this.rows = max(1, rows)
@@ -118,13 +134,32 @@ func snapshotStrings(values: Array<String>): Array<String> {
     snapshot.toArray()
 }
 
+/** 伪终端进程启动参数。
+ */
 public class PtySpec {
+    /** 可执行命令。
+     */
     public let command: String
+    /** 参数快照。
+     */
     public let args: Array<String>
+    /** 工作目录。
+     */
     public let cwd: String
+    /** 环境项快照。
+     */
     public let env: Array<String>
+    /** 初始终端尺寸。
+     */
     public let size: PtySize
 
+    /** 创建对象。
+     * @param command 可执行命令
+     * @param args 参数数组
+     * @param cwd 工作目录
+     * @param env 环境项数组
+     * @param size 初始尺寸
+     */
     public init(
         command: String,
         args!: Array<String> = [],
@@ -140,61 +175,172 @@ public class PtySpec {
     }
 }
 
+/** 可向伪终端进程发送的信号。
+ */
 public enum PtySignal {
+    /** 中断。
+     */
     | Interrupt
+    /** 终止。
+     */
     | Terminate
+    /** 强制终止。
+     */
     | Kill
 }
 
+/** 伪终端子进程退出状态。
+ */
 public enum PtyExitStatus {
+    /** 正常退出。
+     * @param _0 退出码
+     */
     | Exited(Int64)
+    /** 由信号结束。
+     * @param _0 信号编号
+     */
     | Signaled(Int32)
 }
 
+/** 一个伪终端进程的操作接口。
+ */
 public interface PtyProcess {
+    /** 获取进程标识。
+     * @return 进程标识。
+     */
     func id(): String
     // Success accepts the complete byte request. Native PTYs keep a snapshot
     // while the descriptor is blocked; their EventSources must keep being
     // serviced. Native queues reject requests beyond 4 MiB pending data.
+    /** 提交完整字节请求；原生实现可能排队，需继续处理事件源。
+     * @param bytes 输入字节
+     * @return 完整请求被接受时为 true。
+     */
     func write(bytes: Array<Byte>): Bool
+    /** 向伪终端提交文本。
+     * @param text 输入文本
+     * @return 请求被接受时为 true。
+     */
     func writeText(text: String): Bool
+    /** 调整终端尺寸。
+     * @param size 新尺寸
+     * @return 操作成功时为 true。
+     */
     func resize(size: PtySize): Bool
+    /** 向进程发送信号。
+     * @param signal 信号
+     * @return 操作成功时为 true。
+     */
     func signal(signal: PtySignal): Bool
     // Closing a native PTY terminates its process group, waits for the actual
     // child status, and discards bytes still queued for writing.
+    /** 关闭进程；原生实现会结束进程组并回收子进程。
+     */
     func close(): Unit
 }
 
+/** 管理伪终端进程和事件的接口。
+ */
 public interface PtyRuntime {
     // App closes and drains an existing instance before starting the same id.
+    /** 启动伪终端进程。
+     * @param id 进程标识
+     * @param spec 启动参数
+     * @return 启动或失败事件。
+     */
     func start(id: String, spec: PtySpec): Event
+    /** 查找进程。
+     * @param id 进程标识
+     * @return 进程或 None。
+     */
     func process(id: String): ?PtyProcess
+    /** 提交输入字节。
+     * @param id 进程标识
+     * @param bytes 输入字节
+     * @return 操作结果事件。
+     */
     func write(id: String, bytes: Array<Byte>): Event
+    /** 调整终端尺寸。
+     * @param id 进程标识
+     * @param size 新尺寸
+     * @return 操作结果事件。
+     */
     func resize(id: String, size: PtySize): Event
+    /** 发送信号。
+     * @param id 进程标识
+     * @param signal 信号
+     * @return 操作结果事件。
+     */
     func signal(id: String, signal: PtySignal): Event
     // Output collected while closing remains in drain(). Deliver that output
     // before this returned terminal event; App command dispatch does so.
+    /** 关闭进程；关闭时收集的输出仍可从 drain 获取。
+     * @param id 进程标识
+     * @return 退出或失败事件。
+     */
     func close(id: String): Event
+    /** 获取需要服务的事件源。
+     * @return 事件源数组。
+     */
     func sources(): Array<EventSource>
+    /** 读取已收集的事件。
+     * @return 事件数组。
+     */
     func drain(): Array<Event>
+    /** 获取活动进程数。
+     * @return 活动进程数。
+     */
     func activeCount(): Int64
 }
 
+/** 事件源关注的就绪类型。
+ */
 public enum EventSourceInterest {
+    /** 可读。
+     */
     | Read
+    /** 可写。
+     */
     | Write
+    /** 可读和可写。
+     */
     | ReadWrite
 }
 
+/** 向事件循环提供可等待资源和事件的接口。
+ */
 public interface EventSource {
+    /** 获取事件源标识。
+     * @return 事件源标识。
+     */
     func id(): String
+    /** 获取 Unix 文件描述符。
+     * @return 文件描述符或 None。
+     */
     func fd(): ?Int32
     // Windows wait handles are orthogonal to Unix file descriptors. The
     // default keeps all existing PTY sources source-compatible.
+    /** 获取 Windows 等待句柄；默认实现返回 None。
+     * @return 等待句柄或 None。
+     */
     func waitHandle(): ?CPointer<Unit> { None }
+    /** 获取关注的就绪类型。
+     * @return 关注类型。
+     */
     func interests(): EventSourceInterest
+    /** 通知事件源资源已就绪。
+     * @param readable 是否可读
+     * @param writable 是否可写
+     * @param error 是否出错
+     * @param hangup 是否挂断
+     */
     func onReady(readable: Bool, writable: Bool, error: Bool, hangup: Bool): Unit
+    /** 读取事件源已收集的事件。
+     * @return 事件数组。
+     */
     func drain(): Array<Event>
+    /** 关闭事件源。
+     */
     func close(): Unit
 }
 
@@ -379,10 +525,23 @@ public class UnsupportedPtyRuntime <: PtyRuntime {
     public func activeCount(): Int64 { 0 }
 }
 
+/** 伪终端输出排队和背压统计。
+ */
 public struct PtyFlowMetrics {
+    /** 当前排队字节数。
+     */
     public let queuedBytes: Int64
+    /** 排队字节数峰值。
+     */
     public let peakQueuedBytes: Int64
+    /** 背压次数。
+     */
     public let backpressureCount: Int64
+    /** 创建对象。
+     * @param queuedBytes 当前排队字节数
+     * @param peakQueuedBytes 排队字节数峰值
+     * @param backpressureCount 背压次数
+     */
     public init(queuedBytes: Int64, peakQueuedBytes: Int64, backpressureCount: Int64) {
         this.queuedBytes = queuedBytes; this.peakQueuedBytes = peakQueuedBytes; this.backpressureCount = backpressureCount
     }

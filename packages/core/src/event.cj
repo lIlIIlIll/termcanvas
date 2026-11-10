@@ -5,16 +5,27 @@ import std.collection.*
 @FastNative
 foreign func read(fd: Int32, buf: CPointer<Unit>, count: UIntNative): IntNative
 
+/** 提供可用终端输入字节的来源。 */
 public interface InputSource {
+    /** 读取输入字节；具体输入源可能等待数据。
+    * @param maxBytes 希望读取的最大字节数
+    * @return 读取到的字节
+     */
     func readAvailable(maxBytes: Int64): Array<Byte>
 }
 
+/** 从标准输入读取终端字节。 */
 public class StdinInputSource <: InputSource {
     @When[os == "Windows"]
     private let console = WindowsConsoleInput()
 
+    /** 创建标准输入源。 */
     public init() {}
 
+    /** 读取标准输入；调用可能等待数据。
+     * @param maxBytes 希望读取的最大字节数；应传入正值
+     * @return 读取的字节；未读到数据时为空
+     */
     public func readAvailable(maxBytes: Int64): Array<Byte> { readNative(maxBytes) }
 
     @When[os == "Windows"]
@@ -36,43 +47,89 @@ public class StdinInputSource <: InputSource {
     }
 }
 
+/** 键盘按键代码。 */
 public enum KeyCode {
+    /** 字符按键。
+     * @param _0 输入字符
+     */
     | Char(Rune)
+    /** Ctrl+C 按键。 */
     | CtrlC
+    /** Escape 按键。 */
     | Esc
+    /** Tab 按键。 */
     | Tab
+    /** 反向 Tab 按键。 */
     | BackTab
+    /** 回车按键。 */
     | Enter
+    /** 退格按键。 */
     | Backspace
+    /** 向前删除按键。 */
     | Delete
+    /** 插入按键。 */
     | Insert
+    /** 上方向键。 */
     | Up
+    /** 下方向键。 */
     | Down
+    /** 左方向键。 */
     | Left
+    /** 右方向键。 */
     | Right
+    /** Home 按键。 */
     | Home
+    /** End 按键。 */
     | End
+    /** 向上翻页键。 */
     | PageUp
+    /** 向下翻页键。 */
     | PageDown
+    /** 功能键。
+     * @param _0 功能键编号
+     */
     | F(Int64)
 }
 
+/** 键盘输入使用的终端协议。 */
 public enum KeyProtocol {
+    /** 基础键盘协议。 */
     | Basic
+    /** ModifyOtherKeys 协议。 */
     | ModifyOtherKeys
+    /** Kitty 键盘协议。 */
     | Kitty
 }
 
+/** 键盘或鼠标事件携带的修饰键及锁定状态。 */
 public struct KeyModifier <: Equatable<KeyModifier> {
+    /** Shift 状态。 */
     public let shift: Bool
+    /** Alt 状态。 */
     public let alt: Bool
+    /** Ctrl 状态。 */
     public let ctrl: Bool
+    /** Super 状态。 */
     public let superKey: Bool
+    /** Meta 状态。 */
     public let meta: Bool
+    /** Hyper 状态。 */
     public let hyper: Bool
+    /** 大写锁定状态。 */
     public let capsLock: Bool
+    /** 数字锁定状态。 */
     public let numLock: Bool
 
+    /** 创建修饰键状态。
+     * @param shift Shift 状态
+     * @param alt Alt 状态
+     * @param ctrl Ctrl 状态
+     * @param superKey Super 状态
+     * @param meta Meta 状态
+     * @param hyper Hyper 状态
+     * @param capsLock 大写锁定状态
+     * @param numLock 数字锁定状态
+     */
     public init(
         shift!: Bool = false,
         alt!: Bool = false,
@@ -93,10 +150,17 @@ public struct KeyModifier <: Equatable<KeyModifier> {
         this.numLock = numLock
     }
 
+    /** 创建所有修饰键均关闭的状态。
+     * @return 无修饰状态
+     */
     public static func none(): KeyModifier {
         KeyModifier()
     }
 
+    /** 解码 CSI 修饰参数；值先按至少 1 处理，扩展位可表示更多修饰与锁定状态。
+     * @param value CSI 修饰参数
+     * @return 解码后的状态
+     */
     public static func fromCsiParam(value: Int64): KeyModifier {
         let encoded = max(1, value) - 1
         if (encoded > 7) {
@@ -123,6 +187,10 @@ public struct KeyModifier <: Equatable<KeyModifier> {
         }
     }
 
+    /** 比较所有修饰与锁定状态。
+     * @param other 待比较状态
+     * @return 状态相同时为 true
+     */
     public operator func ==(other: KeyModifier): Bool {
         shift == other.shift &&
             alt == other.alt &&
@@ -134,18 +202,35 @@ public struct KeyModifier <: Equatable<KeyModifier> {
             numLock == other.numLock
     }
 
+    /** 比较所有修饰与锁定状态。
+     * @param other 待比较状态
+     * @return 状态不同时为 true
+     */
     public operator func !=(other: KeyModifier): Bool {
         !(this == other)
     }
 }
 
+/** 键盘事件的按键、修饰键、文本与协议元数据。 */
 public struct KeyEvent {
+    /** 按键代码。 */
     public let code: KeyCode
+    /** 修饰键状态。 */
     public let modifiers: KeyModifier
+    /** 可选的输入文本。 */
     public let text: ?String
+    /** 键盘协议。 */
     public let protocol: KeyProtocol
+    /** 是否由原生输入标记为重复。 */
     public let nativeRepeat: Bool
 
+    /** 创建键盘事件。
+     * @param code 按键代码
+     * @param modifiers 修饰键状态
+     * @param text 可选输入文本
+     * @param protocol 键盘协议
+     * @param nativeRepeat 是否为原生重复事件
+     */
     public init(
         code: KeyCode,
         modifiers!: KeyModifier = KeyModifier.none(),
@@ -161,29 +246,55 @@ public struct KeyEvent {
     }
 }
 
+/** 鼠标事件关联的按键或滚轮方向。 */
 public enum MouseButton {
+    /** 左键。 */
     | Left
+    /** 中键。 */
     | Middle
+    /** 右键。 */
     | Right
+    /** 滚轮向上。 */
     | WheelUp
+    /** 滚轮向下。 */
     | WheelDown
+    /** 没有关联按键。 */
     | None
 }
 
+/** 鼠标事件类型。 */
 public enum MouseKind {
+    /** 按下。 */
     | Down
+    /** 释放。 */
     | Up
+    /** 拖动。 */
     | Drag
+    /** 移动。 */
     | Move
+    /** 滚动。 */
     | Scroll
 }
 
+/** 包含位置、按键和修饰键状态的鼠标事件。 */
 public struct MouseEvent {
+    /** 事件类型。 */
     public let kind: MouseKind
+    /** 关联按键或滚轮方向。 */
     public let button: MouseButton
+    /** 终端单元格横坐标。 */
     public let x: Int64
+    /** 终端单元格纵坐标。 */
     public let y: Int64
+    /** 修饰键状态。 */
     public let modifiers: KeyModifier
+    /** 创建鼠标事件。
+     * @param kind 事件类型
+     * @param button 关联按键或滚轮方向
+     * @param x 横坐标
+     * @param y 纵坐标
+     * @param modifiers 修饰键状态
+     */
     public init(kind: MouseKind, button: MouseButton, x: Int64, y: Int64, modifiers!: KeyModifier = KeyModifier.none()) {
         this.kind = kind
         this.button = button
@@ -193,12 +304,23 @@ public struct MouseEvent {
     }
 }
 
+/** 描述一帧的时间与丢帧信息；数值在构造时限制为非负。 */
 public struct TickEvent {
+    /** 距上一帧的毫秒数。 */
     public let deltaMillis: Int64
+    /** 累计经过的毫秒数。 */
     public let elapsedMillis: Int64
+    /** 帧序号。 */
     public let frameIndex: Int64
+    /** 丢弃的帧数。 */
     public let droppedFrames: Int64
 
+    /** 创建帧时间事件。
+    * @param deltaMillis 帧间隔毫秒数，负值按零处理
+    * @param elapsedMillis 累计毫秒数，负值按零处理
+    * @param frameIndex 帧序号，负值按零处理
+    * @param droppedFrames 丢帧数，负值按零处理
+     */
     public init(deltaMillis!: Int64 = 0, elapsedMillis!: Int64 = 0, frameIndex!: Int64 = 0, droppedFrames!: Int64 = 0) {
         this.deltaMillis = max(0, deltaMillis)
         this.elapsedMillis = max(0, elapsedMillis)
@@ -207,22 +329,41 @@ public struct TickEvent {
     }
 }
 
+/** 定时器的触发方式。 */
 public enum TimerMode {
+    /** 触发一次。 */
     | OneShot
+    /** 重复触发。 */
     | Repeating
 }
 
+/** 处理未及时执行的帧或定时任务的策略。 */
 public enum FrameMissPolicy {
+    /** 丢弃错过的触发。 */
     | Drop
+    /** 补执行错过的触发。
+    * @param _0 补执行次数的上限
+     */
     | CatchUp(Int64)
 }
 
+/** 描述一次定时器触发。 */
 public struct TimerEvent {
+    /** 定时器标识。 */
     public let id: String
+    /** 累计经过的毫秒数。 */
     public let elapsedMillis: Int64
+    /** 触发次数，至少为一。 */
     public let firedCount: Int64
+    /** 丢弃的帧数。 */
     public let droppedFrames: Int64
 
+    /** 创建定时器事件。
+    * @param id 定时器标识
+    * @param elapsedMillis 累计毫秒数，负值按零处理
+    * @param firedCount 触发次数，小于一时按一处理
+    * @param droppedFrames 丢帧数，负值按零处理
+     */
     public init(id: String, elapsedMillis!: Int64 = 0, firedCount!: Int64 = 1, droppedFrames!: Int64 = 0) {
         this.id = id
         this.elapsedMillis = max(0, elapsedMillis)
@@ -231,51 +372,174 @@ public struct TimerEvent {
     }
 }
 
+/** 定时器任务的调度优先级。 */
 public enum TimerPriority {
+    /** 立即执行。 */
     | Immediate
+    /** 普通优先级。 */
     | Normal
+    /** 低优先级。 */
     | Low
 }
 
+/** 应用接收的输入、运行时和定时事件。 */
 public enum Event {
+    /** 按键按下事件。
+     * @param _0 键盘事件
+     */
     | KeyDown(KeyEvent)
+    /** 按键释放事件。
+     * @param _0 键盘事件
+     */
     | KeyUp(KeyEvent)
+    /** 按键重复事件。
+     * @param _0 键盘事件
+     */
     | KeyRepeat(KeyEvent)
+    /** 按键持续按下事件。
+     * @param _0 键盘事件
+     */
     | KeyHeld(KeyEvent)
+    /** 鼠标输入事件。
+     * @param _0 鼠标事件
+     */
     | Mouse(MouseEvent)
+    /** 终端获得焦点。
+     */
     | FocusIn
+    /** 终端失去焦点。
+     */
     | FocusOut
+    /** 终端能力发生更新。
+     * @param _0 终端能力
+     */
     | Capabilities(TerminalCapabilities)
+    /** 粘贴输入。
+     * @param _0 粘贴文本
+     */
     | Paste(String)
+    /** 应用消息。
+     * @param _0 消息文本
+     */
     | Message(String)
+    /** 命令执行结果。
+     * @param _0 命令标识
+     * @param _1 退出码
+     * @param _2 合并的标准输出和标准错误文本或错误信息
+     */
     | ExecResult(String, Int64, String)
+    /** 文本补全结果。
+     * @param _0 请求标识
+     * @param _1 补全结果
+     */
     | TextCompletion(String, TextCompletionResult)
+    /** 管道子进程启动。
+     * @param _0 进程标识
+     */
     | ProcessStarted(String)
+    /** 管道子进程输出。
+     * @param _0 进程标识
+     * @param _1 输出流
+     * @param _2 输出字节
+     */
     | ProcessOutput(String, ProcessOutputStream, Array<Byte>)
+    /** 管道子进程结束。
+     * @param _0 进程标识
+     * @param _1 进程结果
+     */
     | ProcessFinished(String, ProcessResult)
+    /** 管道子进程操作失败。
+     * @param _0 进程标识
+     * @param _1 错误信息
+     */
     | ProcessFailed(String, String)
+    /** 已请求取消管道子进程。
+     * @param _0 进程标识
+     */
     | ProcessCancelRequested(String)
+    /** 伪终端进程启动。
+     * @param _0 进程标识
+     */
     | PtyStarted(String)
+    /** 伪终端进程输出。
+     * @param _0 进程标识
+     * @param _1 输出流
+     * @param _2 输出字节
+     */
     | PtyOutput(String, PtyOutputStream, Array<Byte>)
+    /** 伪终端进程退出。
+     * @param _0 进程标识
+     * @param _1 退出状态
+     */
     | PtyExited(String, PtyExitStatus)
+    /** 伪终端操作失败。
+     * @param _0 进程标识
+     * @param _1 错误信息
+     */
     | PtyFailed(String, String)
+    /** 异步任务启动。
+     * @param _0 任务标识
+     */
     | AsyncStarted(String)
+    /** 异步任务完成。
+     * @param _0 任务标识
+     * @param _1 任务返回的事件
+     */
     | AsyncCompleted(String, Event)
+    /** 异步任务失败。
+     * @param _0 任务标识
+     * @param _1 错误信息
+     */
     | AsyncFailed(String, String)
+    /** 异步任务取消。
+     * @param _0 任务标识
+     */
     | AsyncCancelled(String)
+    /** 异步数据已就绪。
+     * @param _0 数据标识
+     * @param _1 代次
+     */
     | DataReady(String, Int64)
+    /** 异步数据加载失败。
+     * @param _0 数据标识
+     * @param _1 代次
+     * @param _2 错误信息
+     */
     | DataFailed(String, Int64, String)
+    /** 异步数据加载取消。
+     * @param _0 数据标识
+     * @param _1 代次
+     */
     | DataCancelled(String, Int64)
+    /** 帧计时事件。
+     * @param _0 帧时间信息
+     */
     | Tick(TickEvent)
+    /** 定时器触发事件。
+     * @param _0 定时器信息
+     */
     | Timer(TimerEvent)
+    /** 终端尺寸变化。
+     * @param _0 新区域
+     */
     | Resize(Rect)
+    /** 无法识别的输入字节。
+     * @param _0 原始字节
+     */
     | Unknown(Array<Byte>)
 }
 
+/** 保存按下的按键及持续时间。 */
 public struct PressedKey {
+    /** 按键事件。 */
     public let key: KeyEvent
+    /** 持续按下的毫秒数。 */
     public let heldMillis: Int64
 
+    /** 创建按键状态快照。
+    * @param key 按键事件
+    * @param heldMillis 持续毫秒数，负值按零处理
+     */
     public init(key: KeyEvent, heldMillis!: Int64 = 0) {
         this.key = key
         this.heldMillis = max(0, heldMillis)
@@ -292,15 +556,23 @@ class InputKeyState {
     }
 }
 
+/** 跟踪按键、修饰键和按住时间。超时的按键会被移除。 */
 public class InputState {
     private let keys = ArrayList<InputKeyState>()
     private var mods: KeyModifier = KeyModifier.none()
     private let releaseAfterMillis: Int64
 
+    /** 创建输入状态。
+    * @param releaseAfterMillis 没有新按键事件时的释放超时，至少为一毫秒
+     */
     public init(releaseAfterMillis!: Int64 = 180) {
         this.releaseAfterMillis = max(1, releaseAfterMillis)
     }
 
+    /** 更新按键状态；重复按键额外产生按住事件。失焦时清空状态。
+    * @param event 输入事件
+    * @return 额外产生的事件
+     */
     public func handle(event: Event): Array<Event> {
         let generated = ArrayList<Event>()
         match (event) {
@@ -316,6 +588,10 @@ public class InputState {
         generated.toArray()
     }
 
+    /** 推进按住时间并移除超时按键。
+    * @param deltaMillis 增加的毫秒数，负值按零处理
+    * @return 仍按住的按键事件
+     */
     public func advance(deltaMillis: Int64): Array<Event> {
         let generated = ArrayList<Event>()
         var i: Int64 = 0
@@ -333,10 +609,17 @@ public class InputState {
         generated.toArray()
     }
 
+    /** 查询按键是否处于按下状态。
+    * @param key 要查询的按键
+    * @return 按下时为 true
+     */
     public func isPressed(key: KeyEvent): Bool {
         find(key) >= 0
     }
 
+    /** 获取当前按键状态快照。
+    * @return 按下的按键及持续时间
+     */
     public func pressedKeys(): Array<PressedKey> {
         let out = ArrayList<PressedKey>()
         for (state in keys) {
@@ -345,10 +628,14 @@ public class InputState {
         out.toArray()
     }
 
+    /** 获取当前按下按键的修饰键集合。
+    * @return 合并后的修饰键
+     */
     public func modifiers(): KeyModifier {
         mods
     }
 
+    /** 清空按键和修饰键状态。 */
     public func clear(): Unit {
         while (keys.size > 0) { keys.remove(at: 0) }
         mods = KeyModifier.none()
@@ -404,6 +691,7 @@ public class InputState {
     }
 }
 
+/** 增量解析输入字节为终端事件。 */
 public class EventParser {
     private let inputSource: InputSource
     private var pending = ArrayList<Byte>()
@@ -412,10 +700,17 @@ public class EventParser {
     private var pendingEscPolls: Int64 = 0
     private var inputDrainPending = false
 
+    /** 创建解析器；可注入输入源以便测试。
+    * @param inputSource 提供输入字节的来源
+     */
     public init(inputSource!: InputSource = StdinInputSource()) {
         this.inputSource = inputSource
     }
 
+    /** 追加字节并解析完整事件；不完整序列保留到下次输入。
+    * @param bytes 输入字节
+    * @return 当前解析出的事件
+     */
     public func push(bytes: Array<Byte>): Array<Event> {
         for (b in bytes) {
             pending.add(b)
@@ -430,6 +725,9 @@ public class EventParser {
         drainReady()
     }
 
+    /** 从输入源读取并解析当前可用事件；一次最多读取 65536 字节。
+    * @return 当前解析出的事件
+     */
     public func readEvents(): Array<Event> {
         // SGR mouse reports are commonly around ten bytes each.  Reading
         // only 64 bytes leaves a fast wheel gesture queued across many app
@@ -459,6 +757,9 @@ public class EventParser {
         drainReady()
     }
 
+    /** 读取一个事件；其余事件保留供后续读取。
+    * @return 下一个事件，无事件时为 None
+     */
     public func readEvent(): ?Event {
         if (ready.size == 0) {
             let events = readEvents()
@@ -474,10 +775,16 @@ public class EventParser {
         None
     }
 
+    /** 获取上次读取的字节数。
+    * @return 上次读取的字节数
+     */
     public func lastReadBytes(): Int64 {
         lastReadByteCount
     }
 
+    /** 判断上次读取是否达到单次读取上限。
+    * @return 达到上限时为 true
+     */
     public func hasPendingInputDrain(): Bool {
         inputDrainPending
     }
@@ -486,6 +793,9 @@ public class EventParser {
         pending.size == 1 && pending[0] == 0x1B
     }
 
+    /** 将单独等待中的 ESC 字节解析为 Escape 按键。
+    * @return 当前可交付的事件
+     */
     public func flushEsc(): Array<Event> {
         if (pending.size == 1 && pending[0] == 0x1B) {
             pending.remove(at: 0)
@@ -495,6 +805,10 @@ public class EventParser {
         drainReady()
     }
 
+    /** 多次轮询后将等待中的单独 ESC 解析为按键。
+    * @param polls 触发解析所需的轮询次数，至少为一
+    * @return 当前可交付的事件
+     */
     public func flushEscAfterPolls(polls: Int64): Array<Event> {
         if (pending.size == 1 && pending[0] == 0x1B) {
             pendingEscPolls++

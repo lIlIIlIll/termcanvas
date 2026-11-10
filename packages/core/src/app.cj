@@ -82,38 +82,77 @@ let WAIT_FAILED_RESULT: UInt32 = 0xFFFF_FFFFu32
 @When[os == "Windows"]
 let INFINITE_WAIT: UInt32 = 0xFFFF_FFFFu32
 
+/** 更新后应用事件循环应采取的动作。 */
 public enum ControlFlow {
+    /** 继续运行。 */
     | Continue
+    /** 退出应用。 */
     | Exit
 }
 
 // Optional, low-overhead hooks for end-to-end latency tracing.  The default
 // App path keeps this disabled; applications opt in explicitly when running a
 // diagnostic session.
+/** 可选的应用事件循环和帧诊断回调；运行前显式接入。
+ */
 public interface AppTraceSink {
     // ExternalPort accept to runtime import. This excludes the following
     // application update and frame work, which retain their existing stages.
+    /** 外部事件从端口取出时调用。
+     * @param _ 排队等待时间，单位为纳秒
+     */
     func externalDequeued(_: Int64): Unit {}
+    /** 接收输入事件时调用。
+     * @param event 输入事件
+     * @param eventQueueLength 事件队列长度
+     */
     func inputReceived(event: Event, eventQueueLength: Int64): Unit
+    /** 事件分发结束时调用。
+     */
     func eventDispatchCompleted(): Unit
+    /** 状态更新结束时调用。
+     */
     func stateUpdateCompleted(): Unit
+    /** 开始绘制时调用。
+     */
     func renderStarted(): Unit
     // Presentation-only scheduling attribution. Application update ordering
     // is already fixed before this hook runs.
+    /** 记录帧调度信息。
+     * @param _ 帧调度快照
+     */
     func frameScheduling(_: FrameSchedulingSnapshot): Unit {}
     // Called after Terminal.draw returns so one diagnostic record can bind
     // application timing to the Buffer/diff/transport metrics of that same
     // completed frame. The default preserves existing trace sinks.
+    /** 一帧绘制完成时调用。
+     * @param _ 绘制指标
+     */
     func frameCompleted(_: RenderMetrics): Unit {}
+    /** 记录事件循环阻塞。
+     * @param task 任务名称
+     * @param durationNanos 持续时间，单位为纳秒
+     */
     func eventLoopStall(task: String, durationNanos: Int64): Unit
 }
 
+/** 配置应用定时器的周期、模式和错过触发时的策略。 */
 public struct TimerSpec {
+    /** 定时器标识。 */
     public let id: String
+    /** 定时器周期。 */
     public let every: Duration
+    /** 一次性或重复触发模式。 */
     public let mode: TimerMode
+    /** 错过触发时的处理策略。 */
     public let missPolicy: FrameMissPolicy
 
+    /** 创建定时器配置；非正周期按一毫秒处理。
+     * @param id 定时器标识
+     * @param every 触发周期
+     * @param mode 触发模式
+     * @param missPolicy 错过触发时的策略
+     */
     public init(id: String, every: Duration, mode!: TimerMode = TimerMode.Repeating, missPolicy!: FrameMissPolicy = FrameMissPolicy.Drop) {
         this.id = id
         this.every = if (every <= Duration.Zero) { Duration.millisecond } else { every }
@@ -122,31 +161,115 @@ public struct TimerSpec {
     }
 }
 
+/** 事件更新后由应用执行的动作。
+ */
 public enum Command {
+    /** 不执行动作。
+     */
     | Noop
+    /** 请求退出应用。
+     */
     | Quit
+    /** 向事件循环发送事件。
+     * @param _0 事件
+     */
     | Emit(Event)
+    /** 发送消息事件。
+     * @param _0 消息文本
+     */
     | Message(String)
+    /** 启动返回固定消息的异步任务。
+     * @param _0 任务标识
+     */
     | Async(String)
+    /** 执行返回事件的异步任务。
+     * @param _0 任务标识
+     * @param _1 任务函数
+     */
     | AsyncTask(String, () -> Event)
+    /** 异步执行命令行。
+     * @param _0 任务标识
+     * @param _1 命令行
+     */
     | AsyncExec(String, String)
+    /** 异步执行程序及参数。
+     * @param _0 任务标识
+     * @param _1 程序
+     * @param _2 参数数组
+     */
     | AsyncExecArgs(String, String, Array<String>)
+    /** 请求取消异步任务。
+     * @param _0 任务标识
+     */
     | CancelAsync(String)
+    /** 启动管道子进程。
+     * @param _0 进程标识
+     * @param _1 进程配置
+     */
     | ProcessStart(String, ProcessSpec)
+    /** 请求取消管道子进程。
+     * @param _0 进程标识
+     */
     | ProcessCancel(String)
+    /** 启动伪终端进程。
+     * @param _0 进程标识
+     * @param _1 伪终端配置
+     */
     | PtyStart(String, PtySpec)
+    /** 向伪终端写入字节。
+     * @param _0 进程标识
+     * @param _1 输入字节
+     */
     | PtyWrite(String, Array<Byte>)
+    /** 调整伪终端尺寸。
+     * @param _0 进程标识
+     * @param _1 新尺寸
+     */
     | PtyResize(String, PtySize)
+    /** 向伪终端进程发送信号。
+     * @param _0 进程标识
+     * @param _1 信号
+     */
     | PtySendSignal(String, PtySignal)
+    /** 关闭伪终端进程。
+     * @param _0 进程标识
+     */
     | PtyClose(String)
+    /** 启动定时器。
+     * @param _0 定时器配置
+     */
     | StartTimer(TimerSpec)
+    /** 停止定时器。
+     * @param _0 定时器标识
+     */
     | StopTimer(String)
+    /** 停止并重新启动定时器。
+     * @param _0 定时器配置
+     */
     | RestartTimer(TimerSpec)
+    /** 同步执行命令行并发送结果事件。
+     * @param _0 命令行
+     */
     | Exec(String)
+    /** 同步执行程序及参数并发送结果事件。
+     * @param _0 结果标识
+     * @param _1 程序
+     * @param _2 参数数组
+     */
     | ExecArgs(String, String, Array<String>)
+    /** 请求重置终端并重绘。
+     */
     | ResetTerminal
+    /** 设置或清除终端能力覆盖并请求重绘。
+     * @param _0 能力覆盖；None 清除
+     */
     | SetCapabilitiesOverride(?TerminalCapabilities)
+    /** 请求挂起应用。
+     */
     | Suspend
+    /** 按顺序提交一组命令。
+     * @param _0 命令数组
+     */
     | Batch(Array<Command>)
 }
 
@@ -217,26 +340,65 @@ class TerminalLifecycleRequests {
     }
 }
 
+/** 单帧应用渲染、输出和事件队列统计。 */
 public struct FrameMetrics {
+    /** 帧序号。 */
     public let frameIndex: Int64
+    /** 估算帧率。 */
     public let fps: Int64
+    /** 渲染回调耗时，单位毫秒。 */
     public let renderMillis: Int64
+    /** 差异计算和输出耗时，单位毫秒。 */
     public let drawMillis: Int64
+    /** 总耗时，单位毫秒。 */
     public let totalMillis: Int64
+    /** 事件队列长度。 */
     public let eventQueueLength: Int64
+    /** 差异单元格数。 */
     public let dirtyCells: Int64
+    /** 差异片段数。 */
     public let diffWrites: Int64
+    /** 终端区域。 */
     public let terminalSize: Rect
+    /** 丢弃的 tick 数。 */
     public let droppedTicks: Int64
+    /** tick 间隔，单位毫秒。 */
     public let tickDeltaMillis: Int64
+    /** 参与渲染的单元格数。 */
     public let renderedCells: Int64
+    /** 脏矩形数。 */
     public let dirtyRects: Int64
+    /** 缓冲区单元格写入尝试次数。 */
     public let bufferCellAttempts: Int64
+    /** 缓冲区实际单元格写入次数。 */
     public let bufferCellWrites: Int64
+    /** 差异计算耗时，单位纳秒。 */
     public let diffNanos: Int64
+    /** 终端写入耗时，单位纳秒。 */
     public let writeNanos: Int64
+    /** 输出字节数；-1 表示不可用。 */
     public let ansiBytes: Int64
 
+    /** 创建帧统计；除 ansiBytes 为 -1 表示不可用外，负数均限制为零。
+     * @param frameIndex 帧序号
+     * @param fps 估算帧率
+     * @param renderMillis 渲染回调耗时，单位毫秒
+     * @param drawMillis 差异计算和输出耗时，单位毫秒
+     * @param totalMillis 总耗时，单位毫秒
+     * @param eventQueueLength 事件队列长度
+     * @param dirtyCells 差异单元格数
+     * @param diffWrites 差异片段数
+     * @param terminalSize 终端区域
+     * @param droppedTicks 丢弃的 tick 数
+     * @param tickDeltaMillis tick 间隔，单位毫秒
+     * @param renderedCells 参与渲染的单元格数
+     * @param dirtyRects 脏矩形数
+     * @param bufferCellAttempts 缓冲区单元格写入尝试次数
+     * @param bufferCellWrites 缓冲区实际单元格写入次数
+     * @param diffNanos 差异计算耗时，单位纳秒
+     * @param writeNanos 终端写入耗时，单位纳秒
+     * @param ansiBytes 输出字节数；-1 表示不可用
+     */
     public init(
         frameIndex!: Int64 = 0,
         fps!: Int64 = 0,
@@ -278,6 +440,7 @@ public struct FrameMetrics {
     }
 }
 
+/** 记录近期帧和应用运行时统计。 */
 public class AppMetrics {
     private let values = ArrayList<FrameMetrics>()
     private let maxFramesValue: ?Int64
@@ -291,6 +454,9 @@ public class AppMetrics {
     private var queueOverflowValue: Int64 = 0
     private var schedulingValue = FrameSchedulingSnapshot()
 
+    /** 创建帧统计存储。
+     * @param maxFrames 最多保留的帧数，至少为一；None 表示不限制
+     */
     public init(maxFrames!: ?Int64 = Some(600)) {
         this.maxFramesValue = match (maxFrames) {
             case Some(limit) => Some(max(1, limit))
@@ -298,6 +464,9 @@ public class AppMetrics {
         }
     }
 
+    /** 记录一帧；达到容量后覆盖最早的帧。
+     * @param frame 帧统计
+     */
     public func record(frame: FrameMetrics): Unit {
         match (maxFramesValue) {
             case None => values.add(frame)
@@ -311,6 +480,13 @@ public class AppMetrics {
         }
     }
 
+    /** 从终端渲染统计记录一帧。
+     * @param render 终端渲染统计
+     * @param frameIndex 帧序号
+     * @param eventQueueLength 事件队列长度
+     * @param droppedTicks 丢弃的 tick 数
+     * @param tickDeltaMillis tick 间隔，正值用于计算帧率
+     */
     public func record(
         render: RenderMetrics,
         frameIndex!: Int64 = 0,
@@ -341,6 +517,9 @@ public class AppMetrics {
         ))
     }
 
+    /** 获取最近记录的帧。
+     * @return 最近一帧；无记录时为 None
+     */
     public func lastFrame(): ?FrameMetrics {
         if (values.size == 0) { return None }
         let lastIndex = match (maxFramesValue) {
@@ -352,6 +531,9 @@ public class AppMetrics {
         Some(values[lastIndex])
     }
 
+    /** 按记录顺序获取保留的帧。
+     * @return 从旧到新的帧数组
+     */
     public func frames(): Array<FrameMetrics> {
         match (maxFramesValue) {
             case None => values.toArray()
@@ -372,6 +554,9 @@ public class AppMetrics {
         }
     }
 
+    /** 计算保留帧中正帧率的整数平均值。
+     * @return 平均帧率；没有正帧率时为零
+     */
     public func averageFps(): Int64 {
         var total: Int64 = 0
         var count: Int64 = 0
@@ -385,6 +570,9 @@ public class AppMetrics {
         total / count
     }
 
+    /** 获取最近一帧记录的丢弃 tick 数。
+     * @return 丢弃 tick 数；无帧时为零
+     */
     public func droppedTicks(): Int64 {
         match (lastFrame()) {
             case Some(frame) => frame.droppedTicks
@@ -392,6 +580,7 @@ public class AppMetrics {
         }
     }
 
+    /** 清除帧与运行时统计。 */
     public func reset(): Unit {
         values.clear()
         nextFrameIndex = 0
@@ -421,6 +610,9 @@ public class AppMetrics {
         schedulingValue = snapshot
     }
 
+    /** 获取运行时统计快照。
+     * @return 当前队列和调度统计
+     */
     public func runtime(): RuntimeMetricsSnapshot {
         RuntimeMetricsSnapshot(
             queueEnqueued: queueEnqueuedValue,
@@ -434,15 +626,32 @@ public class AppMetrics {
     }
 }
 
+/** 应用事件队列与帧调度的统计快照。 */
 public struct RuntimeMetricsSnapshot {
+    /** 入队事件数。 */
     public let queueEnqueued: Int64
+    /** 已处理事件数。 */
     public let queueProcessed: Int64
+    /** 最大队列深度。 */
     public let maxQueueDepth: Int64
+    /** 最大更新深度。 */
     public let maxUpdateDepth: Int64
+    /** 主动让出执行的次数。 */
     public let yieldedTurns: Int64
+    /** 队列溢出次数。 */
     public let queueOverflows: Int64
+    /** 帧调度快照。 */
     public let scheduling: FrameSchedulingSnapshot
 
+    /** 创建运行时统计快照；计数负值限制为零。
+     * @param queueEnqueued 入队事件数
+     * @param queueProcessed 已处理事件数
+     * @param maxQueueDepth 最大队列深度
+     * @param maxUpdateDepth 最大更新深度
+     * @param yieldedTurns 主动让出执行的次数
+     * @param queueOverflows 队列溢出次数
+     * @param scheduling 帧调度快照
+     */
     public init(
         queueEnqueued!: Int64 = 0,
         queueProcessed!: Int64 = 0,
@@ -809,16 +1018,27 @@ public class WindowsConsoleEventWaiter <: EventWaiter {
     }
 }
 
+/** 向事件循环返回更新后的控制流、命令及重绘请求。 */
 public struct UpdateResult {
+    /** 更新后的控制流。 */
     public let flow: ControlFlow
+    /** 要执行的命令。 */
     public let command: Command
+    /** 需要重绘的区域；None 使用应用的默认重绘行为。 */
     public let dirtyRects: ?DirtyRects
     // Most existing update handlers mutate state and rely on the app loop's
     // compatibility full redraw when no dirty rectangles are supplied.  Keep
     // that default, but let boundary/no-op handlers explicitly suppress a
     // frame so buffered input cannot build an expensive redraw backlog.
+    /** 是否请求绘制下一帧。 */
     public let renderRequested: Bool
 
+    /** 创建更新结果。
+     * @param flow 控制流
+     * @param command 要执行的命令
+     * @param dirtyRects 可选的脏区域
+     * @param renderRequested 是否请求绘制
+     */
     public init(
         flow!: ControlFlow = ControlFlow.Continue,
         command!: Command = Command.Noop,
@@ -831,26 +1051,47 @@ public struct UpdateResult {
         this.renderRequested = renderRequested
     }
 
+    /** 创建继续运行并请求默认重绘的结果。
+     * @return 更新结果
+     */
     public static func next(): UpdateResult {
         UpdateResult()
     }
 
+    /** 创建不请求重绘的继续运行结果。
+     * @return 更新结果
+     */
     public static func unchanged(): UpdateResult {
         UpdateResult(renderRequested: false)
     }
 
+    /** 创建退出结果。
+     * @return 更新结果
+     */
     public static func exit(): UpdateResult {
         UpdateResult(flow: ControlFlow.Exit)
     }
 
+    /** 创建携带命令的继续运行结果。
+     * @param command 要执行的命令
+     * @return 更新结果
+     */
     public static func withCommand(command: Command): UpdateResult {
         UpdateResult(command: command)
     }
 
+    /** 创建包含一个脏区域的更新结果。
+     * @param area 要重绘的区域
+     * @return 更新结果
+     */
     public static func dirty(area: Rect): UpdateResult {
         UpdateResult(dirtyRects: Some(DirtyRects.full(area)))
     }
 
+    /** 复制现有脏区域并添加区域，同时请求重绘。
+     * @param area 要添加的区域
+     * @return 新的更新结果
+     */
     public func withDirty(area: Rect): UpdateResult {
         let rects = match (dirtyRects) {
             case Some(existing) => existing.copy()
@@ -861,33 +1102,59 @@ public struct UpdateResult {
     }
 }
 
+/** 表示事件是否被处理，以及后续控制流和命令。 */
 public struct HandleResult {
+    /** 事件是否已被处理。 */
     public let handled: Bool
+    /** 事件处理后的控制流。 */
     public let flow: ControlFlow
+    /** 要执行的命令。 */
     public let command: Command
 
+    /** 创建事件处理结果。
+     * @param handled 事件是否已处理
+     * @param flow 控制流
+     * @param command 要执行的命令
+     */
     public init(handled!: Bool = false, flow!: ControlFlow = ControlFlow.Continue, command!: Command = Command.Noop) {
         this.handled = handled
         this.flow = flow
         this.command = command
     }
 
+    /** 创建未处理事件的结果。
+     * @return 处理结果
+     */
     public static func ignored(): HandleResult {
         HandleResult()
     }
 
+    /** 创建已处理事件的结果。
+     * @param command 要执行的命令
+     * @return 处理结果
+     */
     public static func consumed(command!: Command = Command.Noop): HandleResult {
         HandleResult(handled: true, command: command)
     }
 
+    /** 创建已处理并请求退出的结果。
+     * @return 处理结果
+     */
     public static func exit(): HandleResult {
         HandleResult(handled: true, flow: ControlFlow.Exit)
     }
 
+    /** 创建已处理且携带命令的结果。
+     * @param command 要执行的命令
+     * @return 处理结果
+     */
     public static func withCommand(command: Command): HandleResult {
         HandleResult(handled: true, command: command)
     }
 
+    /** 将控制流与命令转换为默认重绘的更新结果。
+     * @return 更新结果
+     */
     public func toUpdateResult(): UpdateResult {
         UpdateResult(flow: flow, command: command)
     }
@@ -1549,6 +1816,8 @@ func sameFlow(left: ControlFlow, right: ControlFlow): Bool {
     }
 }
 
+/** 管理终端会话、事件更新、命令和绘制的应用运行时。
+ */
 public class App {
     private let backend: Backend
     private let inputSource: InputSource
@@ -1581,6 +1850,28 @@ public class App {
     private var themeValue: ?Theme = None
     private var themePending: Bool = false
 
+    /** 使用默认终端后端创建应用。
+     * @param inputSource 终端输入源
+     * @param terminalDriver 终端模式和尺寸驱动
+     * @param probeInputSource 主动探测输入源
+     * @param renderMode 渲染模式
+     * @param rawMode 是否启用原始模式
+     * @param alternateScreen 是否启用备用屏幕
+     * @param mouse 是否启用鼠标
+     * @param mouseMove 是否启用鼠标移动事件
+     * @param focusEvents 是否启用焦点事件
+     * @param bracketedPaste 是否启用括号粘贴
+     * @param hideCursor 是否隐藏光标
+     * @param keyboard 键盘选项
+     * @param resize 是否监听尺寸变化
+     * @param tickEvery 可选帧周期，优先于目标帧率
+     * @param targetFps 可选目标帧率
+     * @param missPolicy 错过帧时的策略
+     * @param idleSleep 空闲等待时间
+     * @param resizePollEvery 尺寸轮询周期
+     * @param metrics 可选应用指标
+     * @param instrumentationEnabled 是否启用渲染诊断计数
+     */
     public init(
         inputSource!: InputSource = StdinInputSource(),
         terminalDriver!: TerminalDriver = defaultTerminalDriver(),
@@ -1631,6 +1922,29 @@ public class App {
 
     // Stable Backend injection remains available without exposing the
     // concrete default backend in the public construction contract.
+    /** 使用指定后端创建应用。
+     * @param backend 终端后端
+     * @param inputSource 终端输入源
+     * @param terminalDriver 终端模式和尺寸驱动
+     * @param probeInputSource 主动探测输入源
+     * @param renderMode 渲染模式
+     * @param rawMode 是否启用原始模式
+     * @param alternateScreen 是否启用备用屏幕
+     * @param mouse 是否启用鼠标
+     * @param mouseMove 是否启用鼠标移动事件
+     * @param focusEvents 是否启用焦点事件
+     * @param bracketedPaste 是否启用括号粘贴
+     * @param hideCursor 是否隐藏光标
+     * @param keyboard 键盘选项
+     * @param resize 是否监听尺寸变化
+     * @param tickEvery 可选帧周期，优先于目标帧率
+     * @param targetFps 可选目标帧率
+     * @param missPolicy 错过帧时的策略
+     * @param idleSleep 空闲等待时间
+     * @param resizePollEvery 尺寸轮询周期
+     * @param metrics 可选应用指标
+     * @param instrumentationEnabled 是否启用渲染诊断计数
+     */
     public init(
         backend!: Backend,
         inputSource!: InputSource = StdinInputSource(),
@@ -1736,6 +2050,9 @@ public class App {
     // Experimental observability must be attached before run. The sink stays
     // scoped to this App instance and does not participate in normal App
     // construction or runtime state transitions.
+    /** 接入诊断回调；须在运行前调用。
+     * @param traceSink 跟踪回调
+     */
     public func attachTraceSink(traceSink: AppTraceSink): Unit {
         if (runStarted) {
             throw Exception("trace sink must be attached before App.run")
@@ -1743,25 +2060,33 @@ public class App {
         this.traceSink = Some(traceSink)
     }
 
-    /** 设置应用主题；None 恢复组件默认样式。运行中只能从应用事件循环线程调用；下一帧完整重绘。后台线程应通过事件端口交给 update 设置主题。 */
+    /** 设置应用主题并请求下一帧完整重绘；运行中须从事件循环线程调用。
+     * @param theme 主题；None 恢复默认样式
+     */
     public func setTheme(theme: ?Theme): Unit {
         themeValue = theme
         themePending = true
     }
 
-    /** 在运行前设置应用所有帧的文本宽度策略。 */
+    /** 在运行前设置应用所有帧的文本宽度策略。
+     * @param options 文本宽度选项
+     */
     public func setTextWidthOptions(options: TextWidthOptions): Unit {
         if (runStarted) { throw Exception("text width options must be set before App.run") }
         textWidthOptionsValue = options
     }
 
-    /** 为应用接入动画调度器；须在运行前调用，且只在应用事件循环线程访问调度器。 */
+    /** 在运行前接入动画调度器；只在事件循环线程访问。
+     * @param scheduler 动画调度器
+     */
     public func attachAnimationScheduler(scheduler: AnimationScheduler): Unit {
         if (runStarted) { throw Exception("animation scheduler must be attached before App.run") }
         animationScheduler = Some(scheduler)
     }
 
-    /** 接入后台图标能力协商；须在运行前调用。渲染时使用 session.applyTo(theme)。 */
+    /** 在运行前接入后台图标能力协商；渲染时可用 session.applyTo(theme)。
+     * @param session 能力协商会话
+     */
     public func attachGlyphCapabilitySession(session: GlyphCapabilitySession): Unit {
         if (runStarted) { throw Exception("glyph capability session must be attached before App.run") }
         if (glyphCapabilitySession.isSome()) { throw Exception("glyph capability session already attached") }
@@ -1771,11 +2096,17 @@ public class App {
 
     // Experimental PTY support is an explicit pre-run capability. Normal App
     // construction keeps the unsupported default as an implementation detail.
+    /** 接入管道进程运行时；须在运行前调用。
+     * @param processRuntime 进程运行时
+     */
     public func attachProcessRuntime(processRuntime: ProcessRuntime): Unit {
         if (runStarted) { throw Exception("process runtime must be attached before App.run") }
         this.processRuntime = processRuntime
     }
 
+    /** 接入伪终端运行时；须在运行前调用。
+     * @param ptyRuntime 伪终端运行时
+     */
     public func attachPtyRuntime(ptyRuntime: PtyRuntime): Unit {
         if (runStarted) {
             throw Exception("PTY runtime must be attached before App.run")
@@ -1783,10 +2114,18 @@ public class App {
         this.ptyRuntime = ptyRuntime
     }
 
+    /** 运行事件循环，更新函数只返回继续或退出。
+     * @param render 帧绘制函数
+     * @param update 事件更新函数
+     */
     public func run(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit {
         runWithCommands(render, { event => UpdateResult(flow: update(event)) })
     }
 
+    /** 运行事件循环，更新函数可返回命令和脏区域。
+     * @param render 帧绘制函数
+     * @param update 事件更新函数
+     */
     public func runWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit {
         runWithRuntime(render, update, None)
     }
@@ -1794,6 +2133,11 @@ public class App {
     // External producers enqueue Events through the stable bounded port. The
     // App imports them into the same ordered run-to-completion runtime; this is
     // not a second event bus and Accepted does not imply update completion.
+    /** 运行事件循环并接收外部端口事件；入队成功不代表更新已完成。
+     * @param port 外部事件端口
+     * @param render 帧绘制函数
+     * @param update 事件更新函数
+     */
     public func runWithExternalPort(
         port: ExternalPort<Event>,
         render: (Frame) -> Unit,
@@ -2479,6 +2823,12 @@ public class App {
         }
     }
 
+    /** 将更新结果的命令加入队列并合并脏区域。
+     * @param result 更新结果
+     * @param commandQueue 命令队列
+     * @param dirtySink 可选脏区域集合
+     * @return 继续运行时为 true，退出时为 false。
+     */
     public static func applyUpdateResult(result: UpdateResult, commandQueue: ArrayList<Command>, dirtySink!: ?DirtyRects = None): Bool {
         App.enqueue(result.command, commandQueue)
         match ((dirtySink, result.dirtyRects)) {
@@ -2751,6 +3101,10 @@ public class App {
         None
     }
 
+    /** 同步解析并执行命令行；调用会等待进程结束。
+     * @param commandLine 命令行
+     * @return 包含退出码及输出或错误信息的事件。
+     */
     public static func executeCommand(commandLine: String): Event {
         let parts = splitCommandLine(commandLine)
         if (parts.size == 0) {
@@ -2759,6 +3113,12 @@ public class App {
         App.executeCommandArgs(commandLine, parts[0], parts[1..])
     }
 
+    /** 同步执行程序和参数；调用会等待进程结束。
+     * @param id 结果标识
+     * @param program 可执行程序
+     * @param args 参数数组
+     * @return 包含退出码及合并输出或错误信息的事件。
+     */
     public static func executeCommandArgs(id: String, program: String, args: Array<String>): Event {
         if (program.isEmpty()) {
             return Event.ExecResult(id, 127, "empty command")
@@ -2826,14 +3186,25 @@ func coalescePendingScrollReversal(events: Array<Event>): Array<Event> {
     result.toArray()
 }
 
+/** 使用默认配置创建应用。
+ * @return 应用实例。
+ */
 public func defaultApp(): App {
     App()
 }
 
+/** 使用默认配置运行应用。
+ * @param render 帧绘制函数
+ * @param update 事件更新函数
+ */
 public func runApp(render: (Frame) -> Unit, update: (Event) -> ControlFlow): Unit {
     defaultApp().run(render, update)
 }
 
+/** 使用默认配置运行支持命令的应用。
+ * @param render 帧绘制函数
+ * @param update 事件更新函数
+ */
 public func runAppWithCommands(render: (Frame) -> Unit, update: (Event) -> UpdateResult): Unit {
     defaultApp().runWithCommands(render, update)
 }
@@ -3207,13 +3578,19 @@ func splitCommandLine(commandLine: String): Array<String> {
     parts.toArray()
 }
 
+/** 按注册顺序管理焦点，并在启用的条目之间循环切换。 */
 public class FocusManager {
     private let ids = ArrayList<String>()
     private let enabled = ArrayList<Bool>()
     private var currentIndex: Int64 = -1
 
+    /** 创建空的焦点管理器。 */
     public init() {}
 
+    /** 注册焦点条目；尚无焦点时，首个启用条目获得焦点。允许重复标识。
+     * @param id 条目标识
+     * @param enabled 是否启用
+     */
     public func add(id: String, enabled!: Bool = true): Unit {
         ids.add(id)
         this.enabled.add(enabled)
@@ -3222,6 +3599,9 @@ public class FocusManager {
         }
     }
 
+    /** 移除首个匹配的条目；当前条目被移除时尝试聚焦下一个启用条目。
+     * @param id 条目标识
+     */
     public func remove(id: String): Unit {
         let index = indexOf(id)
         if (index < 0) { return }
@@ -3236,6 +3616,10 @@ public class FocusManager {
         }
     }
 
+    /** 聚焦首个匹配且启用的条目。
+     * @param id 条目标识
+     * @return 成功聚焦时为 true
+     */
     public func focus(id: String): Bool {
         let index = indexOf(id)
         if (index < 0 || !enabled[index]) { return false }
@@ -3243,7 +3627,11 @@ public class FocusManager {
         true
     }
 
-    /** 更新首个匹配条目的启用状态；不存在时返回 false。禁用当前条目时焦点移到下一个启用条目，全部禁用则清除焦点。重新启用且没有焦点时聚焦该条目。 */
+    /** 更新首个匹配条目的启用状态；不存在时返回 false。禁用当前条目时焦点移到下一个启用条目，全部禁用则清除焦点。重新启用且没有焦点时聚焦该条目。
+     * @param id 条目标识
+     * @param value 是否启用
+     * @return 找到条目时为 true
+     */
     public func setEnabled(id: String, value: Bool): Bool {
         let index = indexOf(id)
         if (index < 0) { return false }
@@ -3256,11 +3644,18 @@ public class FocusManager {
         true
     }
 
+    /** 获取当前焦点标识。
+     * @return 焦点标识；没有焦点时为 None
+     */
     public func current(): ?String {
         if (currentIndex < 0 || currentIndex >= ids.size) { return None }
         Some(ids[currentIndex])
     }
 
+    /** 判断指定标识是否为当前焦点。
+     * @param id 条目标识
+     * @return 标识匹配时为 true
+     */
     public func isFocused(id: String): Bool {
         match (current()) {
             case Some(v) => v == id
@@ -3268,14 +3663,24 @@ public class FocusManager {
         }
     }
 
+    /** 向后循环移动到下一个启用条目。
+     * @return 新焦点；没有启用条目时为 None
+     */
     public func next(): ?String {
         move(1)
     }
 
+    /** 向前循环移动到上一个启用条目。
+     * @return 新焦点；没有启用条目时为 None
+     */
     public func previous(): ?String {
         move(-1)
     }
 
+    /** 处理 Tab、Shift+Tab 和 BackTab 焦点切换。
+     * @param key 按键事件
+     * @return 识别到切换按键时为 true
+     */
     public func handle(key: KeyEvent): Bool {
         match (key.code) {
             case KeyCode.Tab =>

@@ -2,11 +2,15 @@ package core
 
 // A limited, opt-in modal policy for one TextArea. The application's edit/preview
 // focus state remains independent of this editor's Normal/Insert state.
+/** Vim 编辑行为支持的模式。 */
 public enum VimMode {
+    /** 普通模式，按键用于导航和有限编辑命令。 */
     | Normal
+    /** 插入模式，输入交给插入处理器。 */
     | Insert
 }
 
+/** 为一个 TextArea 提供可选的有限 Vim 模式编辑行为；应用焦点状态由调用方单独管理。 */
 public class VimEditorBehavior {
     private let area: TextArea
     private let insertHandler: (TextArea, KeyEvent) -> Bool
@@ -14,6 +18,11 @@ public class VimEditorBehavior {
     private var prefix: ?Rune = None
     private var attached: Bool = true
 
+    /** 附加编辑行为并进入普通模式；同一 TextArea 不能同时附加两个活动行为。
+     * @param area 要控制的文本区域
+     * @param insertHandler 插入模式下处理按键的回调
+     * @throws IllegalStateException 文本区域已附加其他活动 Vim 编辑行为
+     */
     public init(area: TextArea, insertHandler!: (TextArea, KeyEvent) -> Bool = { target, key => target.handle(key) }) {
         this.area = area
         this.insertHandler = insertHandler
@@ -24,10 +33,12 @@ public class VimEditorBehavior {
         normalizeCursor()
     }
 
+    /** 当前普通或插入模式。 */
     public prop mode: VimMode {
         get() { currentMode }
     }
 
+    /** 退出插入模式并解除附加；可重复调用。后续 handle 可尝试重新附加。 */
     public func deactivate(): Unit {
         if (!attached) { return }
         if (let VimMode.Insert <- currentMode) {
@@ -42,6 +53,11 @@ public class VimEditorBehavior {
         attached = false
     }
 
+    /** 处理按键、粘贴和补全事件；失焦会解除附加。解除后再次处理事件时尝试重新附加。
+     * @param event 输入或补全事件
+     * @return 事件被处理时为 true
+     * @throws IllegalStateException 重新附加时文本区域已有其他活动 Vim 编辑行为
+     */
     public func handle(event: Event): Bool {
         if (let Event.FocusOut <- event) { deactivate(); return false }
         if (!attached) {

@@ -18,6 +18,8 @@ New focused guides describe [interaction](interaction.md), [indexed editing](tex
 
 ## Reference: authority and scope
 
+See [Generate the Chinese API reference](cjdoc.md) for the current documentation generator and its validation limits.
+
 This page is a human-oriented map, not the API contract. The generated [`api-inventory.json`](api-inventory.json) is authoritative for exhaustive membership, ownership, signatures, and stability. Its `counts.production_public_top_level` and `counts.top_level_by_stability` fields provide current totals; this page intentionally does not duplicate numbers that can drift when declarations change.
 
 The generated [`stable-api-contract.txt`](stable-api-contract.txt) and [`experimental-api-contract.txt`](experimental-api-contract.txt) provide source-level contracts, including enum constructors and exact signatures. [`api-index.txt`](api-index.txt) is an exported-symbol baseline, not a stability contract: an indexed symbol may still be experimental, internal, or test-only. These generated files are maintained by repository scripts; do not edit them by hand. Physical location in `core` or another package, language `public` visibility, and package ownership do not determine stability.

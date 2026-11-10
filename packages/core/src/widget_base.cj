@@ -2,7 +2,12 @@ package core
 
 import std.collection.*
 
+/** 能够向给定区域和缓冲区绘制内容的组件。 */
 public interface Widget {
+    /** 将组件绘制到缓冲区。
+     * @param area 可供绘制的区域
+     * @param buffer 目标缓冲区
+     */
     func render(area: Rect, buffer: Buffer): Unit
 }
 
@@ -27,15 +32,23 @@ func widgetRoleStyle(style: ?Style, theme: ?Theme, role: ThemeRole, fallback: St
     }
 }
 
+/** 文本超出可用宽度时的换行方式。 */
 public enum WrapMode {
+    /** 按原始换行分行，不按宽度自动换行。 */
     | NoWrap
+    /** 优先按单词边界换行。 */
     | Word
+    /** 按字符显示宽度换行。 */
     | Character
 }
 
+/** 文本在区域内的水平对齐方式。 */
 public enum TextAlign {
+    /** 靠左对齐。 */
     | Left
+    /** 居中对齐。 */
     | Center
+    /** 靠右对齐。 */
     | Right
 }
 

@@ -2,12 +2,23 @@ package core
 
 import std.collection.*
 
+/** 带样式、可选链接和源位置的文本片段。 */
 public class RichSpan {
+    /** 片段文本。 */
     public let text: String
+    /** 文本样式。 */
     public let style: Style
+    /** 可选的链接地址。 */
     public let linkUrl: ?String
+    /** 可选的源字节范围字符串，格式为起点:终点。 */
     public let sourceRange: ?String
 
+    /** 创建文本片段。
+     * @param text 片段文本
+     * @param style 文本样式
+     * @param linkUrl 可选链接地址
+     * @param sourceRange 可选的源字节范围
+     */
     public init(text: String, style!: Style = Style.default(), linkUrl!: ?String = None, sourceRange!: ?String = None) {
         this.text = text
         this.style = style
@@ -16,32 +27,71 @@ public class RichSpan {
     }
 }
 
+/** 文档行的语义类型。 */
 public enum DocumentLineKind {
+    /** 段落。 */
     | Paragraph
+    /** 标题
+     * @param _0 标题级别
+     */
     | Heading(Int64)
+    /** 列表项
+     * @param _0 是否为有序列表
+     */
     | ListItem(Bool)
+    /** 引用。 */
     | Quote
+    /** 代码块。 */
     | CodeBlock
+    /** 表格行。 */
     | TableRow
+    /** 表头。 */
     | TableHeader
+    /** 分隔线。 */
     | HorizontalRule
+    /** 任务列表项
+     * @param _0 是否已完成
+     */
     | TaskListItem(Bool)
+    /** 图片。 */
     | Image
+    /** 诊断信息。 */
     | Diagnostic
+    /** HTML 内容。 */
     | Html
+    /** 删除线内容。 */
     | Strikethrough
+    /** 代码围栏信息
+     * @param _0 语言或围栏信息
+     */
     | CodeFenceInfo(String)
+    /** 空行。 */
     | Blank
 }
 
+/** 包含语义类型、文本片段和可选媒体的文档行。 */
 public class DocumentLine {
+    /** 文档行类型。 */
     public let kind: DocumentLineKind
+    /** 文本片段。 */
     public let spans: Array<RichSpan>
+    /** 引用嵌套深度，至少为零。 */
     public let quoteDepth: Int64
+    /** 可选媒体来源。 */
     public let media: ?MediaSource
+    /** 媒体适配方式。 */
     public let mediaFit: MediaFit
+    /** 媒体高度，至少为一行。 */
     public let mediaHeight: Int64
 
+    /** 根据文本片段创建文档行。
+     * @param kind 行类型
+     * @param spans 文本片段
+     * @param quoteDepth 引用深度，负值按零处理
+     * @param media 可选媒体来源
+     * @param mediaFit 媒体适配方式
+     * @param mediaHeight 媒体高度，至少为一
+     */
     public init(
         kind: DocumentLineKind,
         spans: Array<RichSpan>,
@@ -58,6 +108,15 @@ public class DocumentLine {
         this.mediaHeight = max(1, mediaHeight)
     }
 
+    /** 根据纯文本创建文档行。
+     * @param kind 行类型
+     * @param text 文本
+     * @param style 文本样式
+     * @param quoteDepth 引用深度，负值按零处理
+     * @param media 可选媒体来源
+     * @param mediaFit 媒体适配方式
+     * @param mediaHeight 媒体高度，至少为一
+     */
     public init(
         kind: DocumentLineKind,
         text: String,
@@ -75,19 +134,36 @@ public class DocumentLine {
         this.mediaHeight = max(1, mediaHeight)
     }
 
+    /** 创建图片文档行；空替代文本使用媒体回退文本。
+     * @param source 媒体来源
+     * @param alt 替代文本
+     * @param style 文本样式
+     * @param mediaHeight 媒体高度
+     * @return 图片文档行
+     */
     public static func image(source: MediaSource, alt!: String = "", style!: Style = Style(fg: Color.Cyan), mediaHeight!: Int64 = 6): DocumentLine {
         let label = if (alt.isEmpty()) { mediaFallbackText(source) } else { alt }
         DocumentLine(DocumentLineKind.Image, [RichSpan(label, style: style, linkUrl: Some(source.uri))], media: Some(source), mediaHeight: mediaHeight)
     }
 }
 
+/** 由文档行组成的可渲染文档。 */
 public class Document {
+    /** 按顺序排列的文档行。 */
     public let lines: Array<DocumentLine>
 
+    /** 创建文档。
+     * @param lines 文档行
+     */
     public init(lines: Array<DocumentLine>) {
         this.lines = lines
     }
 
+    /** 将纯文本按行转换为段落文档。
+     * @param text 纯文本
+     * @param style 文本样式
+     * @return 段落文档
+     */
     public static func plain(text: String, style!: Style = Style.default()): Document {
         let lines = ArrayList<DocumentLine>()
         for (line in splitLines(text)) {
@@ -97,29 +173,74 @@ public class Document {
     }
 }
 
+/** 文档各语义元素使用的样式集合。 */
 public struct DocumentTheme {
+    /** 段落样式。 */
     public let paragraph: Style
+    /** 通用标题样式。 */
     public let heading: Style
+    /** 一级标题样式。 */
     public let heading1: Style
+    /** 二级标题样式。 */
     public let heading2: Style
+    /** 三级标题样式。 */
     public let heading3: Style
+    /** 四级标题样式。 */
     public let heading4: Style
+    /** 五级标题样式。 */
     public let heading5: Style
+    /** 六级标题样式。 */
     public let heading6: Style
+    /** 列表样式。 */
     public let list: Style
+    /** 引用样式。 */
     public let quoteStyle: Style
+    /** 代码块样式。 */
     public let code: Style
+    /** 表格样式。 */
     public let table: Style
+    /** 链接样式。 */
     public let link: Style
+    /** 强调样式。 */
     public let emphasis: Style
+    /** 加重样式。 */
     public let strong: Style
+    /** 行内代码样式。 */
     public let inlineCode: Style
+    /** 图片文本样式。 */
     public let image: Style
+    /** 诊断信息样式。 */
     public let diagnostic: Style
+    /** HTML 样式。 */
     public let html: Style
+    /** 删除线内容样式。 */
     public let strikethrough: Style
+    /** 表头样式。 */
     public let tableHeader: Style
 
+    /** 创建文档主题。一级标题缺省使用 heading；二至六级各有独立默认样式。
+     * @param paragraph 段落样式
+     * @param heading 通用标题样式
+     * @param heading1 一级标题样式
+     * @param heading2 二级标题样式
+     * @param heading3 三级标题样式
+     * @param heading4 四级标题样式
+     * @param heading5 五级标题样式
+     * @param heading6 六级标题样式
+     * @param list 列表样式
+     * @param quoteStyle 引用样式
+     * @param code 代码块样式
+     * @param table 表格样式
+     * @param link 链接样式
+     * @param emphasis 强调样式
+     * @param strong 加重样式
+     * @param inlineCode 行内代码样式
+     * @param image 图片文本样式
+     * @param diagnostic 诊断信息样式
+     * @param html HTML 样式
+     * @param strikethrough 删除线内容样式
+     * @param tableHeader 表头样式
+     */
     public init(
         paragraph!: Style = Style.default(),
         heading!: Style = Style(fg: Color.Yellow, modifier: Modifier.strong()),
@@ -184,6 +305,10 @@ public struct DocumentTheme {
         this.tableHeader = tableHeader
     }
 
+    /** 获取指定标题级别的样式。
+     * @param level 标题级别
+     * @return 一级至六级对应的样式，其他级别返回通用标题样式
+     */
     public func headingStyle(level: Int64): Style {
         match (level) {
             case 1 => heading1
@@ -197,41 +322,72 @@ public struct DocumentTheme {
     }
 }
 
+/** 文档主题的 Markdown 兼容别名。 */
 public type MarkdownTheme = DocumentTheme
+/** 文档模型的 Markdown 兼容别名。 */
 public type MarkdownDocument = Document
 
+/** 文档中按查询文本应用的高亮。 */
 public class DocumentHighlight {
+    /** 要高亮的文本。 */
     public let query: String
+    /** 高亮样式。 */
     public let style: Style
 
+    /** 创建高亮规则。
+     * @param query 要匹配的文本
+     * @param style 高亮样式
+     */
     public init(query: String, style!: Style = Style(bg: Color.Yellow)) {
         this.query = query
         this.style = style
     }
 }
 
+/** 以源偏移定义的闭区间折叠范围。 */
 public class DocumentFoldRange {
+    /** 起始偏移，至少为零。 */
     public let startOffset: Int64
+    /** 结束偏移，不小于起点。 */
     public let endOffset: Int64
 
+    /** 创建折叠范围。
+     * @param startOffset 起始偏移，负值按零处理
+     * @param endOffset 结束偏移，小于起点时按起点处理
+     */
     public init(startOffset: Int64, endOffset: Int64) {
         this.startOffset = max(0, startOffset)
         this.endOffset = max(this.startOffset, endOffset)
     }
 
+    /** 判断偏移是否位于闭区间内。
+     * @param offset 要查询的偏移
+     * @return 位于范围内时为 true
+     */
     public func contains(offset: Int64): Bool {
         startOffset <= offset && offset <= endOffset
     }
 }
 
+/** 保存文档视图的滚动、光标、链接、搜索和折叠状态。 */
 public class DocumentViewState {
+    /** 渲染行滚动偏移。 */
     public var scroll: Int64
+    /** 可选的源文本光标偏移。 */
     public var cursorSourceOffset: ?Int64
+    /** 当前链接索引。 */
     public var selectedLinkIndex: Int64
+    /** 当前搜索匹配索引。 */
     public var searchMatchIndex: Int64
     private let foldedRanges = ArrayList<DocumentFoldRange>()
     private var foldVersion: Int64 = 0
 
+    /** 创建视图状态；数字索引的负值限制为零。
+     * @param scroll 初始滚动行数
+     * @param cursorSourceOffset 可选源文本光标偏移
+     * @param selectedLinkIndex 初始链接索引
+     * @param searchMatchIndex 初始搜索匹配索引
+     */
     public init(scroll!: Int64 = 0, cursorSourceOffset!: ?Int64 = None, selectedLinkIndex!: Int64 = 0, searchMatchIndex!: Int64 = 0) {
         this.scroll = max(0, scroll)
         this.cursorSourceOffset = cursorSourceOffset
@@ -239,10 +395,14 @@ public class DocumentViewState {
         this.searchMatchIndex = max(0, searchMatchIndex)
     }
 
+    /** 获取折叠范围快照。
+     * @return 已折叠范围
+     */
     public func folds(): Array<DocumentFoldRange> {
         foldedRanges.toArray()
     }
 
+    /** 清除所有折叠范围。 */
     public func clearFolds(): Unit {
         if (foldedRanges.size == 0) { return }
         while (foldedRanges.size > 0) { foldedRanges.remove(at: 0) }
@@ -253,6 +413,11 @@ public class DocumentViewState {
         foldVersion
     }
 
+    /** 以原样提供的起止偏移精确匹配折叠范围。
+     * @param startOffset 起始偏移
+     * @param endOffset 结束偏移
+     * @return 存在精确匹配时为 true
+     */
     public func isFolded(startOffset: Int64, endOffset: Int64): Bool {
         for (range in foldedRanges) {
             if (range.startOffset == startOffset && range.endOffset == endOffset) { return true }
@@ -260,6 +425,11 @@ public class DocumentViewState {
         false
     }
 
+    /** 设置折叠状态；起点限制为非负，终点限制为不小于起点。
+     * @param startOffset 起始偏移
+     * @param endOffset 结束偏移
+     * @param folded 是否折叠
+     */
     public func setFolded(startOffset: Int64, endOffset: Int64, folded: Bool): Unit {
         let start = max(0, startOffset)
         let end = max(start, endOffset)
@@ -279,6 +449,11 @@ public class DocumentViewState {
         }
     }
 
+    /** 切换给定范围的折叠状态；请传入非负且终点不小于起点的偏移。
+     * @param startOffset 起始偏移
+     * @param endOffset 结束偏移
+     * @return 请求设置的新折叠状态
+     */
     public func toggleFold(startOffset: Int64, endOffset: Int64): Bool {
         let folded = !isFolded(startOffset, endOffset)
         setFolded(startOffset, endOffset, folded)
@@ -286,6 +461,7 @@ public class DocumentViewState {
     }
 }
 
+/** 排版、绘制文档并提供源偏移、链接和滚动交互。 */
 public class DocumentView <: Widget {
     private let document: Document
     private let block: ?Block
@@ -307,6 +483,19 @@ public class DocumentView <: Widget {
     private var cachedFoldRevision: Int64 = -1
     private var cachedCursorSource: ?Int64 = None
 
+    /** 创建文档视图。
+     * @param document 要显示的文档
+     * @param block 可选边框
+     * @param style 可选段落基础样式
+     * @param headingStyle 可选标题样式
+     * @param theme 可选文档主题
+     * @param scroll 未传入状态时的滚动行数
+     * @param wrap 换行模式
+     * @param highlights 文本高亮规则
+     * @param state 可选交互状态
+     * @param currentSourceStyle 当前源位置的可选高亮样式
+     * @param cacheLayout 是否缓存排版结果
+     */
     public init(
         document: Document,
         block!: ?Block = None,
@@ -340,16 +529,27 @@ public class DocumentView <: Widget {
         this.cacheLayout = cacheLayout
     }
 
-    /** 指定后续排版采用的宽度策略；变更时使缓存失效。 */
+    /** 指定后续排版采用的宽度策略；变更时使缓存失效。
+     * @param options 文本宽度策略
+     */
     public func setTextWidthOptions(options: TextWidthOptions): Unit {
         if (usesWideAmbiguous(options) != usesWideAmbiguous(textWidthOptionsValue)) { cachedWidth = -1 }
         textWidthOptionsValue = options
     }
 
+    /** 计算给定宽度下的渲染行数。
+     * @param width 排版宽度
+     * @return 渲染行数
+     */
     public func renderedLineCount(width: Int64): Int64 {
         renderRows(document, width).size
     }
 
+    /** 获取渲染行首个带源范围的片段起点。
+     * @param width 排版宽度
+     * @param renderedLine 渲染行索引
+     * @return 源偏移；行无效或无源范围时为 None
+     */
     public func sourceOffsetForRenderedLine(width: Int64, renderedLine: Int64): ?Int64 {
         let rows = renderRows(document, width)
         if (renderedLine < 0 || renderedLine >= rows.size) { return None }
@@ -362,10 +562,19 @@ public class DocumentView <: Widget {
         None
     }
 
+    /** 获取渲染行的源偏移，是 sourceOffsetForRenderedLine 的别名。
+     * @param width 排版宽度
+     * @param renderedLine 渲染行索引
+     * @return 源偏移，或 None
+     */
     public func sourceOffsetAtRenderedLine(width: Int64, renderedLine: Int64): ?Int64 {
         sourceOffsetForRenderedLine(width, renderedLine)
     }
 
+    /** 获取每个渲染行的源偏移；无源范围的行沿用上一个偏移，起始为零。
+     * @param width 排版宽度
+     * @return 各渲染行的源偏移
+     */
     public func sourceOffsetsForRenderedLines(width: Int64): Array<Int64> {
         let rows = renderRows(document, width)
         let offsets = ArrayList<Int64>()
@@ -381,6 +590,11 @@ public class DocumentView <: Widget {
         offsets.toArray()
     }
 
+    /** 查找包含源偏移的渲染行；无包含范围时使用之前最后匹配的行或零。
+     * @param width 排版宽度
+     * @param sourceOffset 源偏移
+     * @return 渲染行索引
+     */
     public func renderedLineForSourceOffset(width: Int64, sourceOffset: Int64): Int64 {
         let rows = renderRows(document, width)
         var fallback: Int64 = 0
@@ -403,6 +617,11 @@ public class DocumentView <: Widget {
         fallback
     }
 
+    /** 获取渲染行中的第一个链接地址。
+     * @param width 排版宽度
+     * @param renderedLine 渲染行索引
+     * @return 链接地址；无链接或行无效时为 None
+     */
     public func linkAtRenderedLine(width: Int64, renderedLine: Int64): ?String {
         let rows = renderRows(document, width)
         if (renderedLine < 0 || renderedLine >= rows.size) { return None }
@@ -415,6 +634,12 @@ public class DocumentView <: Widget {
         None
     }
 
+    /** 使用传入的状态对象处理滚动键及回车定位；没有状态对象时不处理。
+     * @param key 按键事件
+     * @param width 排版宽度
+     * @param viewportHeight 视口高度
+     * @return 识别到按键时为 true
+     */
     public func handleKey(key: KeyEvent, width: Int64, viewportHeight: Int64): Bool {
         match (state) {
             case Some(s) =>
@@ -444,6 +669,11 @@ public class DocumentView <: Widget {
         }
     }
 
+    /** 将视口内鼠标行映射到源偏移；不检查鼠标事件种类。
+     * @param mouse 鼠标事件
+     * @param area 视图区域
+     * @return 源偏移；未命中或无源范围时为 None
+     */
     public func handleMouse(mouse: MouseEvent, area: Rect): ?Int64 {
         let target = match (block) {
             case Some(b) => b.inner(area)
@@ -455,6 +685,10 @@ public class DocumentView <: Widget {
         sourceOffsetForRenderedLine(target.width, row)
     }
 
+    /** 按缓冲区主题和宽度策略绘制文档。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         let applicationTheme = buffer.resolveTheme(Option<Theme>.None)
         let sourceHighlight = match (currentSourceOverride) {
@@ -678,9 +912,19 @@ func documentContextThemeEqual(left: ?Theme, right: ?Theme): Bool {
     }
 }
 
+/** 文档视图的兼容包装；文本构造器将输入按纯文本处理，不解析 Markdown。 */
 public class MarkdownView <: Widget {
     private let view: DocumentView
 
+    /** 创建文档视图包装。
+     * @param text 纯文本，按行转换为段落
+     * @param block 可选边框
+     * @param style 可选段落样式
+     * @param headingStyle 可选标题样式
+     * @param theme 可选文档主题
+     * @param scroll 初始滚动行数
+     * @param wrap 换行模式
+     */
     public init(
         text: String,
         block!: ?Block = None,
@@ -694,6 +938,15 @@ public class MarkdownView <: Widget {
         this.view = DocumentView(Document.plain(text, style: textStyle), block: block, style: style, headingStyle: headingStyle, theme: theme, scroll: scroll, wrap: wrap)
     }
 
+    /** 创建文档视图包装。
+     * @param document 已构造的文档
+     * @param block 可选边框
+     * @param style 可选段落样式
+     * @param headingStyle 可选标题样式
+     * @param theme 可选文档主题
+     * @param scroll 初始滚动行数
+     * @param wrap 换行模式
+     */
     public init(
         document: Document,
         block!: ?Block = None,
@@ -706,6 +959,10 @@ public class MarkdownView <: Widget {
         this.view = DocumentView(document, block: block, style: style, headingStyle: headingStyle, theme: theme, scroll: scroll, wrap: wrap)
     }
 
+    /** 绘制包装的文档视图。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         view.render(area, buffer)
     }

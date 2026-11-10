@@ -1403,10 +1403,10 @@ packages/core/src/paged_table.cj:public func requestViewport(offset: Int64, heig
 packages/core/src/paged_table.cj:public func accept(request: TablePageRequest, page: TablePage): Bool
 packages/core/src/paged_table.cj:public func fail(request: TablePageRequest, message: String): Bool
 packages/core/src/paged_table.cj:public func isPending(request: TablePageRequest): Bool
-packages/core/src/process_runtime.cj:public enum ProcessOutputStream { | Stdout | Stderr }
+packages/core/src/process_runtime.cj:public enum ProcessOutputStream {
 packages/core/src/process_runtime.cj:Stdout
 packages/core/src/process_runtime.cj:Stderr
-packages/core/src/process_runtime.cj:public enum ProcessEndReason { | Exited | Cancelled | TimedOut | OutputLimit | DrainTimeout }
+packages/core/src/process_runtime.cj:public enum ProcessEndReason {
 packages/core/src/process_runtime.cj:Exited
 packages/core/src/process_runtime.cj:Cancelled
 packages/core/src/process_runtime.cj:TimedOut

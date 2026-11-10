@@ -10,12 +10,19 @@ public class StyledWidget <: Widget {
     private let child: Widget
     private let styleOverride: StyleOverride
 
+    /** 包装子组件并设置样式覆盖。
+     * @param child 待绘制的子组件
+     * @param override 要覆盖的样式属性
+     */
     public init(child: Widget, override!: StyleOverride) {
         this.child = child
         this.styleOverride = override
     }
 
-    /** 在区域内绘制子组件；覆盖和裁剪在返回或抛出异常后恢复。 */
+    /** 在区域内绘制子组件；覆盖和裁剪在返回或抛出异常后恢复。
+     * @param area 子组件的绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         if (area.width <= 0 || area.height <= 0) { return }
         buffer.withCanvasClip(area) { =>

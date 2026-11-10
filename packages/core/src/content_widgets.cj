@@ -3,59 +3,152 @@ package core
 import std.collection.*
 import std.env.*
 
+/** 记录项的内容类别。
+ */
 public enum TranscriptItemKind {
+    /** 文本。
+     */
     | Text
+    /** 代码。
+     */
     | Code
+    /** 事件。
+     */
     | Event
+    /** 错误。
+     */
     | Error
+    /** 进度。
+     */
     | Progress
+    /** 详情。
+     */
     | Detail
 }
 
+/** 记录项的执行状态。
+ */
 public enum TranscriptItemStatus {
+    /** 待处理。
+     */
     | Pending
+    /** 已排队。
+     */
     | Queued
+    /** 运行中。
+     */
     | Running
+    /** 流式输出中。
+     */
     | Streaming
+    /** 已完成。
+     */
     | Done
+    /** 等待批准。
+     */
     | Awaiting
+    /** 已批准。
+     */
     | Approved
+    /** 失败。
+     */
     | Failed
+    /** 已取消。
+     */
     | Cancelled
+    /** 已拒绝。
+     */
     | Rejected
+    /** 超时。
+     */
     | TimedOut
+    /** 已过期。
+     */
     | Expired
+    /** 冲突。
+     */
     | Conflict
 }
 
+/** 记录卡片中的可选项。
+ */
 public class TranscriptCardOption {
+    /** 选项文本。
+     */
     public let label: String
+    /** 是否突出显示此选项。
+     */
     public let selected: Bool
 
+    /** 创建并保存配置。
+     * @param label 选项文本
+     * @param selected 是否选中
+     */
     public init(label: String, selected!: Bool = false) {
         this.label = label
         this.selected = selected
     }
 }
 
+/** 控制记录卡片的样式和内容布局。
+ */
 public class TranscriptCardTheme {
+    /** 正文样式。
+     */
     public let style: Style
+    /** 标题样式。
+     */
     public let titleStyle: Style
+    /** 次要信息样式。
+     */
     public let mutedStyle: Style
+    /** 选项选中样式。
+     */
     public let selectedStyle: Style
+    /** 正文缩进列数，不小于零。
+     */
     public let bodyIndent: Int64
+    /** 正文最多显示的原始行数；零表示不限制。
+     */
     public let bodyLimit: Int64
+    /** 边框样式。
+     */
     public let borderStyle: Style
+    /** 边框背景样式。
+     */
     public let borderBackground: Style
+    /** 顶部标题样式。
+     */
     public let topTitleStyle: Style
     // Transcript hosts can opt individual items into a complete terminal
     // frame or a borderless, full-width background block.  Defaults retain
     // the historical left-rail rendering for existing clients.
+    /** 是否使用完整边框。
+     */
     public let fullFrame: Bool
+    /** 是否填充背景。
+     */
     public let fillBackground: Bool
+    /** 内容内边距。
+     */
     public let contentPadding: Spacing
     let semanticTheme: ?Theme
 
+    /** 创建并保存配置。
+     * @param style 正文样式
+     * @param titleStyle 标题样式
+     * @param mutedStyle 次要信息样式
+     * @param selectedStyle 选中项样式
+     * @param bodyIndent 正文缩进列数，负值按零处理
+     * @param bodyLimit 正文最多显示的原始行数，零表示不限制
+     * @param borderStyle 边框样式
+     * @param borderBackground 边框背景样式
+     * @param topTitleStyle 顶部标题样式
+     * @param fullFrame 是否使用完整边框
+     * @param fillBackground 是否填充背景
+     * @param contentPadding 内容内边距
+     * @param semanticTheme 可选语义主题
+     */
     public init(
         style!: Style = Style.default(),
         titleStyle!: Style = Style(modifier: Modifier.strong()),
@@ -96,20 +189,60 @@ func applicationTranscriptCardTheme(theme: Theme, style!: Style = Style.default(
         topTitleStyle: theme.heading, semanticTheme: Some(theme))
 }
 
+/** 一条带状态和可折叠正文的记录。
+ */
 public class TranscriptItem {
+    /** 记录标识。
+     */
     public let id: String
+    /** 内容类别。
+     */
     public let kind: TranscriptItemKind
+    /** 标题；为空时卡片使用标识。
+     */
     public let title: String
+    /** 正文文档。
+     */
     public let body: Document
+    /** 执行状态。
+     */
     public let status: TranscriptItemStatus
+    /** 是否折叠正文。
+     */
     public var collapsed: Bool
+    /** 调用者保存的时间文本。
+     */
     public let timestamp: String
+    /** 显示在标题后的耗时文本。
+     */
     public let duration: String
+    /** 自定义状态文本；为空时使用状态默认标签。
+     */
     public let stateLabel: String
+    /** 活动状态的动画帧，构造时负值按零处理。
+     */
     public let activityFrame: Int64
+    /** 正文后的选项。
+     */
     public let options: Array<TranscriptCardOption>
+    /** 正文后的页脚文本。
+     */
     public let footer: String
 
+    /** 创建并保存配置。
+     * @param id 记录标识
+     * @param kind 内容类别
+     * @param title 标题
+     * @param body 正文文档
+     * @param status 执行状态
+     * @param collapsed 是否折叠正文
+     * @param timestamp 调用者保存的时间文本
+     * @param duration 耗时文本
+     * @param stateLabel 自定义状态文本
+     * @param activityFrame 活动状态动画帧，负值按零处理
+     * @param options 卡片选项
+     * @param footer 页脚文本
+     */
     public init(
         id: String,
         kind!: TranscriptItemKind = TranscriptItemKind.Text,
@@ -139,29 +272,51 @@ public class TranscriptItem {
     }
 }
 
+/** 按顺序保存记录项。
+ */
 public class Transcript {
     private let items = ArrayList<TranscriptItem>()
 
+    /** 创建记录集合。
+     * @param items 初始记录项
+     */
     public init(items!: Array<TranscriptItem> = []) {
         for (item in items) { this.items.add(item) }
     }
 
+    /** 在末尾追加记录。
+     * @param item 待追加的记录
+     */
     public func append(item: TranscriptItem): Unit {
         items.add(item)
     }
 
+    /** 获取记录数。
+     * @return 记录项数量。
+     */
     public func size(): Int64 {
         items.size
     }
 
+    /** 按索引查找记录。
+     * @param index 从零开始的索引
+     * @return 索引有效时返回记录，否则返回 None。
+     */
     public func get(index: Int64): ?TranscriptItem {
         if (index < 0 || index >= items.size) { None } else { Some(items[index]) }
     }
 
+    /** 取得顺序数组。
+     * @return 包含当前记录项的数组。
+     */
     public func toArray(): Array<TranscriptItem> {
         items.toArray()
     }
 
+    /** 切换第一个匹配标识的记录的折叠状态。
+     * @param id 记录标识
+     * @return 找到记录时为 true，否则为 false。
+     */
     public func toggleCollapsed(id: String): Bool {
         for (item in items) {
             if (item.id == id) {
@@ -173,9 +328,15 @@ public class Transcript {
     }
 }
 
+/** 绘制记录集合并支持键盘导航。
+ */
 public class TranscriptView <: Widget {
     private let transcript: Transcript
+    /** 视口起始记录索引。
+     */
     public var offset: Int64
+    /** 当前选中的记录索引。
+     */
     public var selected: Int64
     private let block: ?Block
     private let style: ?Style
@@ -185,6 +346,15 @@ public class TranscriptView <: Widget {
     private var viewportWidth: Int64 = 0
     private var textWidthOptionsValue: TextWidthOptions = TextWidthOptions()
 
+    /** 创建记录视图。
+     * @param transcript 要显示的记录集合
+     * @param offset 初始起始索引，负值按零处理
+     * @param selected 初始选中索引，负值按零处理
+     * @param block 可选外框
+     * @param style 可选正文样式
+     * @param selectedStyle 可选选中样式
+     * @param cardTheme 可选卡片主题
+     */
     public init(
         transcript: Transcript,
         offset!: Int64 = 0,
@@ -207,6 +377,11 @@ public class TranscriptView <: Widget {
         }
     }
 
+    /** 处理上下、翻页及折叠按键。
+     * @param key 键盘事件
+     * @param viewportHeight 可见高度，用于调整滚动
+     * @return 按键被处理时为 true。
+     */
     public func handle(key: KeyEvent, viewportHeight: Int64): Bool {
         let count = transcript.size()
         match (key.code) {
@@ -235,6 +410,10 @@ public class TranscriptView <: Widget {
         }
     }
 
+    /** 在区域内绘制可见记录。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
@@ -333,8 +512,15 @@ public class TranscriptView <: Widget {
     }
 }
 
+/** 输入器成功提交的内容。
+ */
 public class ComposerSubmit {
+    /** 展开粘贴内容后的提交文本。
+     */
     public let text: String
+    /** 创建提交结果。
+     * @param text 提交文本
+     */
     public init(text: String) {
         this.text = text
     }
@@ -360,8 +546,14 @@ class ComposerHistoryEntry {
     }
 }
 
+/** 带历史、补全和长文本粘贴处理的消息输入器。
+ */
 public class Composer <: Widget {
+    /** 底层文本输入区域。
+     */
     public let area: TextArea
+    /** 最近一次长粘贴标记校验错误。
+     */
     public var lastError: ?String = None
     private let history = ArrayList<ComposerHistoryEntry>()
     private let retainedPastes = ArrayList<ComposerRetainedPaste>()
@@ -382,6 +574,11 @@ public class Composer <: Widget {
     private var cachedCursorRow: Int64 = 0
     private var cachedCursorColumn: Int64 = 0
 
+    /** 创建输入器。
+     * @param value 初始文本
+     * @param slashHints 斜杠命令候选
+     * @param block 可选外框
+     */
     public init(value!: String = "", slashHints!: Array<String> = [], block!: ?Block = None) {
         this.area = TextArea(value: value, block: block, placeholder: "message")
         this.slashHints = slashHints
@@ -389,6 +586,10 @@ public class Composer <: Widget {
         this.trackedValue = value
     }
 
+    /** 处理编辑、历史和提交按键；补全可见时优先处理补全。
+     * @param key 键盘事件
+     * @return 普通回车成功提交非空内容时返回结果，否则返回 None。
+     */
     public func handle(key: KeyEvent): ?ComposerSubmit {
         synchronizeAreaValue()
         if (area.completionVisible()) {
@@ -442,6 +643,11 @@ public class Composer <: Widget {
         }
     }
 
+    /** 插入文本；超过阈值时在编辑区保留标记，提交时展开原文。
+     * @param text 待粘贴文本
+     * @param collapseThreshold 以字节计的折叠阈值
+     * @return 当前实现返回 true。
+     */
     public func paste(text: String, collapseThreshold!: Int64 = 2000): Bool {
         synchronizeAreaValue()
         let before = area.value
@@ -457,11 +663,17 @@ public class Composer <: Widget {
         true
     }
 
+    /** 获取展开粘贴内容后的草稿。
+     * @return 标记完整时返回草稿，否则返回 None 并设置错误。
+     */
     public func draftText(): ?String {
         synchronizeAreaValue()
         expandedSubmissionText(area.value)
     }
 
+    /** 替换当前草稿并重置补全与历史浏览状态。
+     * @param text 要恢复的草稿文本
+     */
     public func restoreDraft(text: String): Unit {
         clearRetainedPastes()
         lastError = None
@@ -473,6 +685,9 @@ public class Composer <: Widget {
         _ = paste(text)
     }
 
+    /** 按当前完整输入匹配斜杠命令前缀。
+     * @return 匹配的候选数组；输入不以斜杠开头时为空。
+     */
     public func currentSlashHints(): Array<String> {
         if (!area.value.startsWith("/")) { return [] }
         let out = ArrayList<String>()
@@ -482,14 +697,25 @@ public class Composer <: Widget {
         out.toArray()
     }
 
+    /** 查询底层补全面板是否可见。
+     * @return 可见时为 true。
+     */
     public func completionVisible(): Bool {
         area.completionVisible()
     }
 
+    /** 取消底层补全。
+     * @return 取消了可见补全时为 true。
+     */
     public func cancelCompletion(): Bool {
         area.cancelCompletion()
     }
 
+    /** 计算换行和补全占用的可见高度。
+     * @param width 文本宽度
+     * @param maximum 最大行数
+     * @return 计算得到的行数；宽度或上限非正时返回一。
+     */
     public func visualHeight(width: Int64, maximum: Int64): Int64 {
         if (width <= 0 || maximum <= 0) { return 1 }
         let textRows = max(1, layoutLines(width).size)
@@ -498,6 +724,10 @@ public class Composer <: Widget {
         ))
     }
 
+    /** 计算当前区域内的光标位置，并调整垂直滚动。
+     * @param areaRect 输入器绘制区域
+     * @return 光标位置。
+     */
     public func cursorPosition(areaRect: Rect): Position {
         var target = areaRect
         match (block) {
@@ -519,6 +749,10 @@ public class Composer <: Widget {
         )
     }
 
+    /** 绘制文本、占位提示及补全。
+     * @param areaRect 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(areaRect: Rect, buffer: Buffer): Unit {
         let theme = buffer.resolveTheme(Option<Theme>.None)
         let normal = widgetRoleStyle(Option<Style>.None, theme, ThemeRole.Normal, Style.default())
@@ -751,12 +985,28 @@ func composerChangedRange(before: String, after: String): (Int64, Int64) {
     (prefix, before.size - suffix)
 }
 
+/** 活动时间线中的一步。
+ */
 public class ActivityStep {
+    /** 步骤标题。
+     */
     public let title: String
+    /** 步骤状态。
+     */
     public let status: TranscriptItemStatus
+    /** 步骤详情。
+     */
     public let detail: String
+    /** 耗时文本。
+     */
     public let duration: String
 
+    /** 创建活动步骤。
+     * @param title 步骤标题
+     * @param status 步骤状态
+     * @param detail 详情文本
+     * @param duration 耗时文本
+     */
     public init(title: String, status!: TranscriptItemStatus = TranscriptItemStatus.Pending, detail!: String = "", duration!: String = "") {
         this.title = title
         this.status = status
@@ -765,15 +1015,25 @@ public class ActivityStep {
     }
 }
 
+/** 按行绘制活动步骤及状态。
+ */
 public class ActivityTimeline <: Widget {
     private let steps: Array<ActivityStep>
     private let block: ?Block
 
+    /** 创建时间线。
+     * @param steps 按显示顺序排列的步骤
+     * @param block 可选外框
+     */
     public init(steps: Array<ActivityStep>, block!: ?Block = None) {
         this.steps = steps
         this.block = block
     }
 
+    /** 按可见高度绘制步骤。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         var target = area
         if (let Some(b) <- block) {
@@ -790,17 +1050,32 @@ public class ActivityTimeline <: Widget {
     }
 }
 
+/** 显示请求、风险说明和操作按钮的对话框。
+ */
 public class RequestDialog <: Widget {
     private let title: String
     private let body: String
     private let detail: Document
     private let risk: String
     private let buttons: Array<String>
+    /** 当前选中的按钮索引。
+     */
     public var selected: Int64
     private let style: ?Style
     private let selectedStyle: ?Style
     private var theme: ?Theme = None
 
+    /** 创建请求对话框。
+     * @param title 对话框标题
+     * @param body 请求内容
+     * @param detail 可选详情文档
+     * @param risk 可选风险说明
+     * @param buttons 操作按钮文本
+     * @param selected 初始按钮索引，会限制在有效范围
+     * @param style 可选正文样式
+     * @param selectedStyle 可选按钮选中样式
+     * @param theme 可选语义主题
+     */
     public init(title!: String = "Request", body!: String = "", detail!: Document = Document([]), risk!: String = "", buttons!: Array<String> = ["Cancel", "Confirm"], selected!: Int64 = 0, style!: ?Style = None, selectedStyle!: ?Style = None, theme!: ?Theme = None) {
         this.title = title
         this.body = body
@@ -812,12 +1087,17 @@ public class RequestDialog <: Widget {
         this.selectedStyle = selectedStyle
         this.theme = theme
     }
-    /** 设置请求对话框使用的语义主题；None 清除主题。
+    /** 设置或清除语义主题。
+     * @param theme 新主题；None 表示清除
      */
     public func setTheme(theme: ?Theme): Unit {
         this.theme = theme
     }
 
+    /** 处理左右选择和回车。
+     * @param key 键盘事件
+     * @return 回车且存在按钮时返回选中按钮文本，否则返回 None。
+     */
     public func handle(key: KeyEvent): ?String {
         let dialog = Dialog(title: title, body: body, buttons: buttons, selected: selected, style: style, selectedStyle: selectedStyle, theme: theme)
         match (dialog.handle(key)) {
@@ -830,6 +1110,10 @@ public class RequestDialog <: Widget {
         }
     }
 
+    /** 绘制对话框；区域足够大时绘制详情文档。
+     * @param area 绘制区域
+     * @param buffer 目标缓冲区
+     */
     public func render(area: Rect, buffer: Buffer): Unit {
         buffer.withParentTheme(theme) { =>
             Dialog(title: title, body: if (risk.isEmpty()) { body } else { risk + "\n" + body }, buttons: buttons, selected: selected, style: style, selectedStyle: selectedStyle, theme: theme).render(area, buffer)
@@ -841,8 +1125,15 @@ public class RequestDialog <: Widget {
     }
 }
 
+/** 请求对话框的别名。
+ */
 public type DecisionDialog = RequestDialog
 
+/** 获取状态对应的符号；运行和流式状态按帧变化。
+ * @param status 记录状态
+ * @param activityFrame 活动状态的动画帧
+ * @return 状态符号。
+ */
 public func statusMark(
     status: TranscriptItemStatus,
     activityFrame!: Int64 = 0
@@ -882,11 +1173,21 @@ func streamingStatusMark(frame: Int64): String {
     }
 }
 
+/** 按状态修补基础样式；设置 NO_COLOR 时保留基础样式。
+ * @param status 记录状态
+ * @param base 基础样式
+ * @return 状态样式。
+ */
 public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style): Style {
     transcriptStatusStyle(status, base, theme: None)
 }
 
-/** 根据显式主题解析状态样式；未提供主题时沿用原有无主题行为。 */
+/** 按语义主题或无主题配色修补基础样式。
+ * @param status 记录状态
+ * @param base 基础样式
+ * @param theme 可选语义主题
+ * @return 状态样式；没有主题且设置 NO_COLOR 时为基础样式。
+ */
 public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, theme!: ?Theme): Style {
     match (theme) {
         case Some(value) =>
@@ -920,6 +1221,10 @@ public func transcriptStatusStyle(status: TranscriptItemStatus, base: Style, the
     }
 }
 
+/** 获取状态默认的英文标签。
+ * @param status 记录状态
+ * @return 状态标签。
+ */
 public func transcriptStatusLabel(status: TranscriptItemStatus): String {
     match (status) {
         case TranscriptItemStatus.Pending => "pending"
@@ -938,6 +1243,11 @@ public func transcriptStatusLabel(status: TranscriptItemStatus): String {
     }
 }
 
+/** 将记录转换为可绘制的卡片文档。
+ * @param item 记录项
+ * @param theme 卡片样式和布局
+ * @return 包含标题及可见正文、选项和页脚的文档。
+ */
 public func transcriptCardDocument(
     item: TranscriptItem,
     theme!: TranscriptCardTheme = TranscriptCardTheme()

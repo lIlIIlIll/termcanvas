@@ -4,14 +4,22 @@ import std.collection.*
 
 const ESC: String = "\u{1B}"
 
+/** 东亚宽度分类为模糊宽度时采用的终端单元格宽度。 */
 public enum AmbiguousWidth {
+    /** 将模糊宽度字符按一个单元格计算。 */
     | Narrow
+    /** 将模糊宽度字符按两个单元格计算。 */
     | Wide
 }
 
+/** 文本显示宽度的计算选项。 */
 public struct TextWidthOptions {
+    /** 模糊宽度字符的宽度策略。 */
     public let ambiguousWidth: AmbiguousWidth
 
+    /** 创建宽度选项。
+     * @param ambiguousWidth 模糊宽度字符的策略
+     */
     public init(ambiguousWidth!: AmbiguousWidth = AmbiguousWidth.Narrow) {
         this.ambiguousWidth = ambiguousWidth
     }
@@ -24,12 +32,23 @@ func usesWideAmbiguous(options: TextWidthOptions): Bool {
     }
 }
 
+/** 一个字素簇的文本、UTF-8 字节边界和显示宽度。 */
 public struct GraphemeCluster {
+    /** 字素簇文本。 */
     public let text: String
+    /** 起始 UTF-8 字节偏移，包含该位置。 */
     public let startOffset: Int64
+    /** 结束 UTF-8 字节偏移，不包含该位置。 */
     public let endOffset: Int64
+    /** 显示宽度，单位为终端单元格。 */
     public let width: Int64
 
+    /** 保存字素簇数据；调用方负责提供一致的边界和宽度。
+     * @param text 字素簇文本
+     * @param startOffset 起始字节偏移
+     * @param endOffset 结束字节偏移，不包含该位置
+     * @param width 显示宽度
+     */
     public init(text: String, startOffset: Int64, endOffset: Int64, width: Int64) {
         this.text = text
         this.startOffset = startOffset
@@ -38,10 +57,19 @@ public struct GraphemeCluster {
     }
 }
 
+/** 使用默认策略计算字符串的显示宽度。
+ * @param text 待测文本
+ * @return 终端单元格数
+ */
 public func displayWidth(text: String): Int64 {
     displayWidth(text, options: TextWidthOptions())
 }
 
+/** 按指定策略累计字符串中字素簇的显示宽度。
+ * @param text 待测文本
+ * @param options 字符宽度策略
+ * @return 终端单元格数
+ */
 public func displayWidth(text: String, options!: TextWidthOptions): Int64 {
     let bytes = unsafe { text.rawData() }
     if (isPrintableAscii(bytes)) { return bytes.size }
@@ -61,10 +89,19 @@ func displayWidthFast(text: String, options!: TextWidthOptions = TextWidthOption
     displayWidth(text, options: options)
 }
 
+/** 使用默认策略计算单个 Unicode 标量值的显示宽度。
+ * @param r 待测字符
+ * @return 终端单元格数
+ */
 public func displayWidth(r: Rune): Int64 {
     displayWidth(r, options: TextWidthOptions())
 }
 
+/** 按指定策略计算单个 Unicode 标量值的显示宽度。
+ * @param r 待测字符
+ * @param options 字符宽度策略
+ * @return 终端单元格数
+ */
 public func displayWidth(r: Rune, options!: TextWidthOptions): Int64 {
     let code = UInt32(r)
     if (code == 0 || code < 32 || (code >= 0x7Fu32 && code < 0xA0u32)) {
@@ -106,11 +143,19 @@ public func displayWidth(r: Rune, options!: TextWidthOptions): Int64 {
     1
 }
 
+/** 使用默认宽度策略拆分字素簇。
+ * @param text 待拆分文本
+ * @return 按顺序排列的字素簇
+ */
 public func graphemeClusters(text: String): Array<GraphemeCluster> {
     graphemeClusters(text, options: TextWidthOptions())
 }
 
-/** 使用指定的显示宽度策略拆分字素簇。 */
+/** 使用指定的显示宽度策略拆分字素簇。
+ * @param text 待拆分文本
+ * @param options 字符宽度策略
+ * @return 按顺序排列的字素簇
+ */
 public func graphemeClusters(text: String, options!: TextWidthOptions): Array<GraphemeCluster> {
     let clusters = ArrayList<GraphemeCluster>()
     var offset: Int64 = 0
@@ -123,6 +168,10 @@ public func graphemeClusters(text: String, options!: TextWidthOptions): Array<Gr
     clusters.toArray()
 }
 
+/** 使用默认策略计算字素文本的显示宽度。
+ * @param text 待测字素文本
+ * @return 终端单元格数
+ */
 public func graphemeDisplayWidth(text: String): Int64 {
     graphemeDisplayWidth(text, options: TextWidthOptions())
 }
@@ -130,6 +179,11 @@ public func graphemeDisplayWidth(text: String): Int64 {
 // Truncate to a display width budget with a trailing ellipsis. Grapheme-safe
 // (never splits a cluster). Moved down from product code (was agent_tui's
 // local cut/graphemePrefix): generic UI capability.
+/** 按显示宽度截断文本；需要截断时在末尾添加最多三个点，不拆分字素簇。
+ * @param text 待截断文本
+ * @param width 最大单元格宽度；非正时返回空字符串
+ * @return 截断后的文本
+ */
 public func cut(text: String, width: Int64): String {
     if (width <= 0) {
         ""
@@ -143,11 +197,21 @@ public func cut(text: String, width: Int64): String {
     }
 }
 
+/** 使用默认宽度策略取得不超过宽度的完整字素簇前缀。
+ * @param text 原文本
+ * @param maxWidth 最大单元格宽度
+ * @return 满足宽度限制的前缀
+ */
 public func graphemePrefix(text: String, maxWidth: Int64): String {
     graphemePrefix(text, maxWidth, options: TextWidthOptions())
 }
 
-/** 按指定宽度策略返回完整字素簇前缀。 */
+/** 按指定宽度策略返回完整字素簇前缀。
+ * @param text 原文本
+ * @param maxWidth 最大单元格宽度
+ * @param options 字符宽度策略
+ * @return 满足宽度限制的前缀
+ */
 public func graphemePrefix(text: String, maxWidth: Int64, options!: TextWidthOptions): String {
     if (maxWidth <= 0) {
         return ""
@@ -164,6 +228,11 @@ public func graphemePrefix(text: String, maxWidth: Int64, options!: TextWidthOpt
     result
 }
 
+/** 按指定策略计算字素文本的显示宽度；含零宽连接符时按组合序列计算。
+ * @param text 待测字素文本
+ * @param options 字符宽度策略
+ * @return 终端单元格数
+ */
 public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int64 {
     if (text.isEmpty()) { return 0 }
     if (containsRune(text, r'\u{200D}')) {
@@ -188,11 +257,23 @@ public func graphemeDisplayWidth(text: String, options!: TextWidthOptions): Int6
     width
 }
 
+/** 使用默认宽度策略按换行方式拆分文本。
+ * @param text 待拆分文本
+ * @param width 可用单元格宽度；非正时返回空数组
+ * @param mode 换行方式
+ * @return 按顺序排列的行
+ */
 public func wrapText(text: String, width: Int64, mode: WrapMode): Array<String> {
     wrapText(text, width, mode, options: TextWidthOptions())
 }
 
-/** 使用指定的显示宽度策略换行。 */
+/** 使用指定的显示宽度策略换行。
+ * @param text 待拆分文本
+ * @param width 可用单元格宽度；非正时返回空数组
+ * @param mode 换行方式
+ * @param options 字符宽度策略
+ * @return 按顺序排列的行
+ */
 public func wrapText(text: String, width: Int64, mode: WrapMode, options!: TextWidthOptions): Array<String> {
     let lines = ArrayList<String>()
     if (width <= 0) { return lines.toArray() }
@@ -387,6 +468,11 @@ func truncate(text: String, maxWidth: Int64, options!: TextWidthOptions = TextWi
     out.toString()
 }
 
+/** 将字节偏移限制在字符串范围内，并回退到 Unicode 标量值的起始边界。
+ * @param text 原文本
+ * @param offset UTF-8 字节偏移
+ * @return 有效的字节边界
+ */
 public func clampToRuneBoundary(text: String, offset: Int64): Int64 {
     let target = clamp(offset, 0, text.size)
     if (target <= 0 || target >= text.size) { return target }
@@ -400,6 +486,11 @@ func previousRuneOffset(text: String, offset: Int64): Int64 {
     previousGraphemeOffset(text, offset)
 }
 
+/** 从字符串起点查找目标偏移之前的字素簇起始位置。
+ * @param text 原文本
+ * @param offset UTF-8 字节偏移，先限制在字符串范围内
+ * @return 前一个字素簇的起始字节偏移；到达开头时为零
+ */
 public func previousGraphemeOffset(text: String, offset: Int64): Int64 {
     let target = clampToRuneBoundary(text, offset)
     if (target <= 0) { return 0 }
@@ -416,6 +507,11 @@ func nextRuneOffset(text: String, offset: Int64): Int64 {
     nextGraphemeOffset(text, offset)
 }
 
+/** 从限制到字符边界的偏移处向前查找字素簇结束位置。
+ * @param text 原文本
+ * @param offset UTF-8 字节偏移
+ * @return 字素簇结束字节偏移；到达末尾时为字符串字节长度
+ */
 public func nextGraphemeOffset(text: String, offset: Int64): Int64 {
     let target = clampToRuneBoundary(text, offset)
     if (target >= text.size) { return text.size }
@@ -644,7 +740,7 @@ func containsRune(text: String, needle: Rune): Bool {
 
 func isEastAsianAmbiguous(code: UInt32): Bool {
     if (code < 0x00A1u32) { return false }
-    (code >= 0x00A1u32 && code <= 0x00A1u32) ||
+    if ((code >= 0x00A1u32 && code <= 0x00A1u32) ||
         (code >= 0x00A4u32 && code <= 0x00A4u32) ||
         (code >= 0x00A7u32 && code <= 0x00A8u32) ||
         (code >= 0x00AAu32 && code <= 0x00AAu32) ||
@@ -655,8 +751,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x00C6u32 && code <= 0x00C6u32) ||
         (code >= 0x00D0u32 && code <= 0x00D0u32) ||
         (code >= 0x00D7u32 && code <= 0x00D8u32) ||
-        (code >= 0x00DEu32 && code <= 0x00E1u32) ||
-        (code >= 0x00E6u32 && code <= 0x00E6u32) ||
+        (code >= 0x00DEu32 && code <= 0x00E1u32)) { return true }
+    if ((code >= 0x00E6u32 && code <= 0x00E6u32) ||
         (code >= 0x00E8u32 && code <= 0x00EAu32) ||
         (code >= 0x00ECu32 && code <= 0x00EDu32) ||
         (code >= 0x00F0u32 && code <= 0x00F0u32) ||
@@ -667,8 +763,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x0101u32 && code <= 0x0101u32) ||
         (code >= 0x0111u32 && code <= 0x0111u32) ||
         (code >= 0x0113u32 && code <= 0x0113u32) ||
-        (code >= 0x011Bu32 && code <= 0x011Bu32) ||
-        (code >= 0x0126u32 && code <= 0x0127u32) ||
+        (code >= 0x011Bu32 && code <= 0x011Bu32)) { return true }
+    if ((code >= 0x0126u32 && code <= 0x0127u32) ||
         (code >= 0x012Bu32 && code <= 0x012Bu32) ||
         (code >= 0x0131u32 && code <= 0x0133u32) ||
         (code >= 0x0138u32 && code <= 0x0138u32) ||
@@ -679,8 +775,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x0152u32 && code <= 0x0153u32) ||
         (code >= 0x0166u32 && code <= 0x0167u32) ||
         (code >= 0x016Bu32 && code <= 0x016Bu32) ||
-        (code >= 0x01CEu32 && code <= 0x01CEu32) ||
-        (code >= 0x01D0u32 && code <= 0x01D0u32) ||
+        (code >= 0x01CEu32 && code <= 0x01CEu32)) { return true }
+    if ((code >= 0x01D0u32 && code <= 0x01D0u32) ||
         (code >= 0x01D2u32 && code <= 0x01D2u32) ||
         (code >= 0x01D4u32 && code <= 0x01D4u32) ||
         (code >= 0x01D6u32 && code <= 0x01D6u32) ||
@@ -691,8 +787,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x0261u32 && code <= 0x0261u32) ||
         (code >= 0x02C4u32 && code <= 0x02C4u32) ||
         (code >= 0x02C7u32 && code <= 0x02C7u32) ||
-        (code >= 0x02C9u32 && code <= 0x02CBu32) ||
-        (code >= 0x02CDu32 && code <= 0x02CDu32) ||
+        (code >= 0x02C9u32 && code <= 0x02CBu32)) { return true }
+    if ((code >= 0x02CDu32 && code <= 0x02CDu32) ||
         (code >= 0x02D0u32 && code <= 0x02D0u32) ||
         (code >= 0x02D8u32 && code <= 0x02DBu32) ||
         (code >= 0x02DDu32 && code <= 0x02DDu32) ||
@@ -703,8 +799,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x2013u32 && code <= 0x2016u32) ||
         (code >= 0x2018u32 && code <= 0x2019u32) ||
         (code >= 0x201Cu32 && code <= 0x201Du32) ||
-        (code >= 0x2020u32 && code <= 0x2022u32) ||
-        (code >= 0x2024u32 && code <= 0x2027u32) ||
+        (code >= 0x2020u32 && code <= 0x2022u32)) { return true }
+    if ((code >= 0x2024u32 && code <= 0x2027u32) ||
         (code >= 0x2030u32 && code <= 0x2030u32) ||
         (code >= 0x2032u32 && code <= 0x2033u32) ||
         (code >= 0x2035u32 && code <= 0x2035u32) ||
@@ -715,8 +811,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x2081u32 && code <= 0x2084u32) ||
         (code >= 0x20ACu32 && code <= 0x20ACu32) ||
         (code >= 0x2103u32 && code <= 0x2103u32) ||
-        (code >= 0x2105u32 && code <= 0x2105u32) ||
-        (code >= 0x2109u32 && code <= 0x2109u32) ||
+        (code >= 0x2105u32 && code <= 0x2105u32)) { return true }
+    if ((code >= 0x2109u32 && code <= 0x2109u32) ||
         (code >= 0x2113u32 && code <= 0x2113u32) ||
         (code >= 0x2116u32 && code <= 0x2116u32) ||
         (code >= 0x2121u32 && code <= 0x2122u32) ||
@@ -727,8 +823,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x2160u32 && code <= 0x216Bu32) ||
         (code >= 0x2170u32 && code <= 0x2179u32) ||
         (code >= 0x2189u32 && code <= 0x2189u32) ||
-        (code >= 0x2190u32 && code <= 0x2199u32) ||
-        (code >= 0x21B8u32 && code <= 0x21B9u32) ||
+        (code >= 0x2190u32 && code <= 0x2199u32)) { return true }
+    if ((code >= 0x21B8u32 && code <= 0x21B9u32) ||
         (code >= 0x21D2u32 && code <= 0x21D2u32) ||
         (code >= 0x21D4u32 && code <= 0x21D4u32) ||
         (code >= 0x21E7u32 && code <= 0x21E7u32) ||
@@ -739,8 +835,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x220Fu32 && code <= 0x220Fu32) ||
         (code >= 0x2211u32 && code <= 0x2211u32) ||
         (code >= 0x2215u32 && code <= 0x2215u32) ||
-        (code >= 0x221Au32 && code <= 0x221Au32) ||
-        (code >= 0x221Du32 && code <= 0x2220u32) ||
+        (code >= 0x221Au32 && code <= 0x221Au32)) { return true }
+    if ((code >= 0x221Du32 && code <= 0x2220u32) ||
         (code >= 0x2223u32 && code <= 0x2223u32) ||
         (code >= 0x2225u32 && code <= 0x2225u32) ||
         (code >= 0x2227u32 && code <= 0x222Cu32) ||
@@ -751,8 +847,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x224Cu32 && code <= 0x224Cu32) ||
         (code >= 0x2252u32 && code <= 0x2252u32) ||
         (code >= 0x2260u32 && code <= 0x2261u32) ||
-        (code >= 0x2264u32 && code <= 0x2267u32) ||
-        (code >= 0x226Au32 && code <= 0x226Bu32) ||
+        (code >= 0x2264u32 && code <= 0x2267u32)) { return true }
+    if ((code >= 0x226Au32 && code <= 0x226Bu32) ||
         (code >= 0x226Eu32 && code <= 0x226Fu32) ||
         (code >= 0x2282u32 && code <= 0x2283u32) ||
         (code >= 0x2286u32 && code <= 0x2287u32) ||
@@ -763,8 +859,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x2312u32 && code <= 0x2312u32) ||
         (code >= 0x2460u32 && code <= 0x24E9u32) ||
         (code >= 0x24EBu32 && code <= 0x254Bu32) ||
-        (code >= 0x2550u32 && code <= 0x2573u32) ||
-        (code >= 0x2580u32 && code <= 0x258Fu32) ||
+        (code >= 0x2550u32 && code <= 0x2573u32)) { return true }
+    if ((code >= 0x2580u32 && code <= 0x258Fu32) ||
         (code >= 0x2592u32 && code <= 0x2595u32) ||
         (code >= 0x25A0u32 && code <= 0x25A1u32) ||
         (code >= 0x25A3u32 && code <= 0x25A9u32) ||
@@ -775,8 +871,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x25C6u32 && code <= 0x25C8u32) ||
         (code >= 0x25CBu32 && code <= 0x25CBu32) ||
         (code >= 0x25CEu32 && code <= 0x25D1u32) ||
-        (code >= 0x25E2u32 && code <= 0x25E5u32) ||
-        (code >= 0x25EFu32 && code <= 0x25EFu32) ||
+        (code >= 0x25E2u32 && code <= 0x25E5u32)) { return true }
+    if ((code >= 0x25EFu32 && code <= 0x25EFu32) ||
         (code >= 0x2605u32 && code <= 0x2606u32) ||
         (code >= 0x2609u32 && code <= 0x2609u32) ||
         (code >= 0x260Eu32 && code <= 0x260Fu32) ||
@@ -787,8 +883,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x2660u32 && code <= 0x2661u32) ||
         (code >= 0x2663u32 && code <= 0x2665u32) ||
         (code >= 0x2667u32 && code <= 0x266Au32) ||
-        (code >= 0x266Cu32 && code <= 0x266Du32) ||
-        (code >= 0x266Fu32 && code <= 0x266Fu32) ||
+        (code >= 0x266Cu32 && code <= 0x266Du32)) { return true }
+    if ((code >= 0x266Fu32 && code <= 0x266Fu32) ||
         (code >= 0x269Eu32 && code <= 0x269Fu32) ||
         (code >= 0x26BFu32 && code <= 0x26BFu32) ||
         (code >= 0x26C6u32 && code <= 0x26CDu32) ||
@@ -799,8 +895,8 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x26EBu32 && code <= 0x26F1u32) ||
         (code >= 0x26F4u32 && code <= 0x26F4u32) ||
         (code >= 0x26F6u32 && code <= 0x26F9u32) ||
-        (code >= 0x26FBu32 && code <= 0x26FCu32) ||
-        (code >= 0x26FEu32 && code <= 0x26FFu32) ||
+        (code >= 0x26FBu32 && code <= 0x26FCu32)) { return true }
+    if ((code >= 0x26FEu32 && code <= 0x26FFu32) ||
         (code >= 0x273Du32 && code <= 0x273Du32) ||
         (code >= 0x2776u32 && code <= 0x277Fu32) ||
         (code >= 0x2B56u32 && code <= 0x2B59u32) ||
@@ -811,9 +907,10 @@ func isEastAsianAmbiguous(code: UInt32): Bool {
         (code >= 0x1F100u32 && code <= 0x1F10Au32) ||
         (code >= 0x1F110u32 && code <= 0x1F12Du32) ||
         (code >= 0x1F130u32 && code <= 0x1F169u32) ||
-        (code >= 0x1F170u32 && code <= 0x1F18Du32) ||
-        (code >= 0x1F18Fu32 && code <= 0x1F190u32) ||
-        (code >= 0x1F19Bu32 && code <= 0x1F1ACu32)
+        (code >= 0x1F170u32 && code <= 0x1F18Du32)) { return true }
+    if ((code >= 0x1F18Fu32 && code <= 0x1F190u32) ||
+        (code >= 0x1F19Bu32 && code <= 0x1F1ACu32)) { return true }
+    false
 }
 
 
