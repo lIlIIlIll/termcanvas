@@ -77,6 +77,32 @@ class ExampleLinkTest(unittest.TestCase):
             page = self.output / "packages" / "core" / site["platform"] / "html" / "item.html"
             self.assertIn("termcanvas-example-item-example", page.read_text(encoding="utf-8"))
 
+    def test_missing_binding_only_fails_for_an_applicable_selected_site(self):
+        scenarios, _ = load_examples(self.inventory)
+        cases = (
+            ("windows", [("core", "windows")], False),
+            ("macos", [("core", "macos")], False),
+            ("other-package", [("diff", "linux")], False),
+            ("crossed-pairs", [("core", "windows"), ("diff", "linux")], False),
+            ("linux", [("core", "linux")], True),
+            ("mixed-platforms", [("core", "windows"), ("core", "linux")], True),
+        )
+        for name, selected, should_fail in cases:
+            with self.subTest(name=name):
+                output = self.output / name
+                output.mkdir()
+                sites = []
+                for package, platform in selected:
+                    html_root = output / "packages" / package / platform / "html"
+                    html_root.mkdir(parents=True)
+                    (html_root / "symbol-index.json").write_text('{"entries": []}', encoding="utf-8")
+                    sites.append({"package": package, "platform": platform})
+                if should_fail:
+                    with self.assertRaisesRegex(ValueError, "example binding has no generated page: Item"):
+                        link_examples(output, sites, scenarios)
+                else:
+                    link_examples(output, sites, scenarios)
+
     def test_link_points_to_shared_offline_example(self):
         scenarios, _ = load_examples(self.inventory)
         html_root = self.output / "packages/core/linux/html"

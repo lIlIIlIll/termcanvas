@@ -128,9 +128,11 @@ def link_examples(built: Path, sites: list[dict], scenarios: list[dict]) -> None
                                    f'{html.escape(scenario["id"])}</a></p></section>')
                         page.write_text(text.replace("</main>", section + "</main>", 1), encoding="utf-8")
                     linked[declaration_key(binding)] += 1
-    selected_packages = {site["package"] for site in sites}
+    selected_sites = {(site["package"], site["platform"]) for site in sites}
     for scenario in scenarios:
         for binding in scenario["declarations"]:
             item = binding["_inventory"][0]
-            if Path(item["path"]).parts[1] in selected_packages and not linked[declaration_key(binding)]:
+            package = Path(item["path"]).parts[1]
+            applicable = any((package, target) in selected_sites for target in scenario["platforms"])
+            if applicable and not linked[declaration_key(binding)]:
                 raise ValueError(f'example binding has no generated page: {item["qualified_symbol"]}')
